@@ -13,7 +13,7 @@ namespace DigitalDynamics.Foundation.Localization;
 /// </summary>
 public sealed class LocalizationResourceStore
 {
-    private readonly Dictionary<Type, LocalizationResourceInfo> _resources = new();
+    private readonly Dictionary<Type, LocalizationResourceInfo> _resources = [];
 
     /// <summary>
     /// Enregistre une nouvelle ressource de localisation.

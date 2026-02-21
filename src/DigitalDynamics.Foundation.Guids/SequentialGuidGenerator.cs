@@ -19,6 +19,7 @@
 // Porte de Volo.Abp.Guids.SequentialGuidGenerator (MIT).
 // =============================================================================
 
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 
@@ -40,27 +41,24 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
     }
 
     /// <inheritdoc />
-    public Guid Create()
-    {
-        return Create(_options.GetDefaultSequentialGuidType());
-    }
+    public Guid Create() => Create(_options.GetDefaultSequentialGuidType());
 
     /// <summary>
     /// Cree un nouveau GUID sequentiel du type specifie.
     /// </summary>
-#pragma warning disable CA1822 // Methode publique intentionnellement non-statique pour coherence API
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
+    [SuppressMessage("Minor Code Smell", "S2325:Methods and properties that don't access instance data should be static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
     public Guid Create(SequentialGuidType guidType)
-#pragma warning restore CA1822
     {
         // 10 octets aleatoires cryptographiquement surs
-        var randomBytes = new byte[10];
+        byte[] randomBytes = new byte[10];
         Rng.GetBytes(randomBytes);
 
         // Timestamp en millisecondes depuis DateTime.MinValue
-        var timestamp = DateTime.UtcNow.Ticks / 10000L;
+        long timestamp = DateTime.UtcNow.Ticks / 10000L;
 
         // Convertir le timestamp en tableau d'octets (8 octets)
-        var timestampBytes = BitConverter.GetBytes(timestamp);
+        byte[] timestampBytes = BitConverter.GetBytes(timestamp);
 
         // Big-endian pour un tri correct
         if (BitConverter.IsLittleEndian)
@@ -68,7 +66,7 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
             Array.Reverse(timestampBytes);
         }
 
-        var guidBytes = new byte[16];
+        byte[] guidBytes = new byte[16];
 
         switch (guidType)
         {

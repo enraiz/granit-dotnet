@@ -18,7 +18,7 @@ public sealed class CurrentTimezoneProviderTests
     public void Timezone_DefaultsToNull()
     {
         // Arrange
-        var provider = new CurrentTimezoneProvider();
+        CurrentTimezoneProvider provider = new CurrentTimezoneProvider();
 
         // Assert
         provider.Timezone.Should().BeNull();
@@ -28,7 +28,7 @@ public sealed class CurrentTimezoneProviderTests
     public void Timezone_CanBeSetAndRead()
     {
         // Arrange
-        var provider = new CurrentTimezoneProvider();
+        CurrentTimezoneProvider provider = new CurrentTimezoneProvider();
 
         // Act
         provider.Timezone = "Europe/Brussels";
@@ -41,7 +41,7 @@ public sealed class CurrentTimezoneProviderTests
     public void Timezone_CanBeResetToNull()
     {
         // Arrange
-        var provider = new CurrentTimezoneProvider();
+        CurrentTimezoneProvider provider = new CurrentTimezoneProvider();
         provider.Timezone = "Europe/Brussels";
 
         // Act
@@ -55,7 +55,7 @@ public sealed class CurrentTimezoneProviderTests
     public async Task Timezone_IsIsolatedPerAsyncContext()
     {
         // Arrange
-        var provider = new CurrentTimezoneProvider();
+        CurrentTimezoneProvider provider = new CurrentTimezoneProvider();
         provider.Timezone = "Europe/Brussels";
 
         string? innerTimezone = null;

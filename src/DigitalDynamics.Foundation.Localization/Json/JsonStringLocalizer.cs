@@ -73,19 +73,14 @@ internal sealed class JsonStringLocalizer : IStringLocalizer
     public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
     {
         HashSet<string> seen = [];
-        CultureInfo culture = CultureInfo.CurrentUICulture;
 
         // Parcourir la chaîne de cultures
-        CultureInfo currentCulture = culture;
+        CultureInfo currentCulture = CultureInfo.CurrentUICulture;
         while (true)
         {
-            Dictionary<string, string> dictionary = GetOrLoadDictionary(currentCulture.Name);
-            foreach (KeyValuePair<string, string> kvp in dictionary)
+            foreach (KeyValuePair<string, string> kvp in GetOrLoadDictionary(currentCulture.Name).Where(kvp => seen.Add(kvp.Key)))
             {
-                if (seen.Add(kvp.Key))
-                {
-                    yield return new LocalizedString(kvp.Key, kvp.Value, resourceNotFound: false);
-                }
+                yield return new LocalizedString(kvp.Key, kvp.Value, resourceNotFound: false);
             }
 
             if (!includeParentCultures || currentCulture == CultureInfo.InvariantCulture)
@@ -99,25 +94,18 @@ internal sealed class JsonStringLocalizer : IStringLocalizer
         // Fallback sur la culture par défaut
         if (includeParentCultures)
         {
-            Dictionary<string, string> defaultDict = GetOrLoadDictionary(_defaultCulture);
-            foreach (KeyValuePair<string, string> kvp in defaultDict)
+            foreach (KeyValuePair<string, string> kvp in GetOrLoadDictionary(_defaultCulture).Where(kvp => seen.Add(kvp.Key)))
             {
-                if (seen.Add(kvp.Key))
-                {
-                    yield return new LocalizedString(kvp.Key, kvp.Value, resourceNotFound: false);
-                }
+                yield return new LocalizedString(kvp.Key, kvp.Value, resourceNotFound: false);
             }
         }
 
         // Héritage : inclure les clés des parents
         foreach (IStringLocalizer baseLocalizer in _baseLocalizers)
         {
-            foreach (LocalizedString localizedString in baseLocalizer.GetAllStrings(includeParentCultures))
+            foreach (LocalizedString localizedString in baseLocalizer.GetAllStrings(includeParentCultures).Where(s => seen.Add(s.Name)))
             {
-                if (seen.Add(localizedString.Name))
-                {
-                    yield return localizedString;
-                }
+                yield return localizedString;
             }
         }
     }

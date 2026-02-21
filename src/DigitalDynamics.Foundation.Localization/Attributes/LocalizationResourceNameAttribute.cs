@@ -21,5 +21,5 @@ public sealed class LocalizationResourceNameAttribute(string name) : Attribute
     /// Culture par défaut de la ressource, utilisée comme fallback final.
     /// Utilisée par l'auto-discovery quand aucun enregistrement explicite n'est présent.
     /// </summary>
-    public string DefaultCulture { get; init; } = "fr";
+    public string DefaultCulture { get; init; } = "en";
 }

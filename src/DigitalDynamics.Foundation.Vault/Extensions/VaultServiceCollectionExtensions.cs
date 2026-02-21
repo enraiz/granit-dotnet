@@ -1,9 +1,6 @@
 // =============================================================================
 // VaultServiceCollectionExtensions - Enregistrement des services Vault
 // =============================================================================
-// Usage :
-//   builder.Services.AddFoundationVault(builder.Configuration);
-// =============================================================================
 
 using DigitalDynamics.Foundation.Localization;
 using DigitalDynamics.Foundation.Localization.Extensions;

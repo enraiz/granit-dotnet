@@ -20,7 +20,7 @@ public sealed class SequentialGuidGeneratorTests
     private static SequentialGuidGenerator CreateGenerator(
         SequentialGuidType? guidType = null)
     {
-        var options = Substitute.For<IOptions<GuidGeneratorOptions>>();
+        IOptions<GuidGeneratorOptions> options = Substitute.For<IOptions<GuidGeneratorOptions>>();
         options.Value.Returns(new GuidGeneratorOptions
         {
             DefaultSequentialGuidType = guidType
@@ -32,10 +32,10 @@ public sealed class SequentialGuidGeneratorTests
     public void Create_ReturnsNonEmptyGuid()
     {
         // Arrange
-        var generator = CreateGenerator();
+        SequentialGuidGenerator generator = CreateGenerator();
 
         // Act
-        var guid = generator.Create();
+        Guid guid = generator.Create();
 
         // Assert
         guid.Should().NotBe(Guid.Empty);
@@ -45,11 +45,11 @@ public sealed class SequentialGuidGeneratorTests
     public void Create_GeneratesUniqueGuids()
     {
         // Arrange
-        var generator = CreateGenerator();
-        var guids = new HashSet<Guid>();
+        SequentialGuidGenerator generator = CreateGenerator();
+        HashSet<Guid> guids = new HashSet<Guid>();
 
         // Act
-        for (var i = 0; i < 10_000; i++)
+        for (int i = 0; i < 10_000; i++)
         {
             guids.Add(generator.Create());
         }
@@ -62,11 +62,11 @@ public sealed class SequentialGuidGeneratorTests
     public async Task Create_SequentialAsString_GeneratesOrderedGuids()
     {
         // Arrange
-        var generator = CreateGenerator(SequentialGuidType.SequentialAsString);
-        var guids = new List<string>();
+        SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAsString);
+        List<string> guids = new List<string>();
 
         // Act - delai entre chaque batch pour garantir des timestamps differents
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             guids.Add(generator.Create().ToString());
             await Task.Delay(2, TestContext.Current.CancellationToken);
@@ -81,10 +81,10 @@ public sealed class SequentialGuidGeneratorTests
     public void Create_SequentialAtEnd_GeneratesNonEmptyGuids()
     {
         // Arrange
-        var generator = CreateGenerator(SequentialGuidType.SequentialAtEnd);
+        SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAtEnd);
 
         // Act
-        var guid = generator.Create();
+        Guid guid = generator.Create();
 
         // Assert
         guid.Should().NotBe(Guid.Empty);
@@ -94,10 +94,10 @@ public sealed class SequentialGuidGeneratorTests
     public void Create_SequentialAsBinary_GeneratesNonEmptyGuids()
     {
         // Arrange
-        var generator = CreateGenerator(SequentialGuidType.SequentialAsBinary);
+        SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAsBinary);
 
         // Act
-        var guid = generator.Create();
+        Guid guid = generator.Create();
 
         // Assert
         guid.Should().NotBe(Guid.Empty);
@@ -107,11 +107,11 @@ public sealed class SequentialGuidGeneratorTests
     public async Task Create_DefaultsToSequentialAsString()
     {
         // Arrange - pas de type specifie, le defaut doit etre SequentialAsString
-        var generator = CreateGenerator();
-        var guids = new List<string>();
+        SequentialGuidGenerator generator = CreateGenerator();
+        List<string> guids = new List<string>();
 
         // Act - delai entre chaque batch pour garantir des timestamps differents
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             guids.Add(generator.Create().ToString());
             await Task.Delay(2, TestContext.Current.CancellationToken);
@@ -126,23 +126,23 @@ public sealed class SequentialGuidGeneratorTests
     public void Create_WithExplicitType_UsesSpecifiedType()
     {
         // Arrange
-        var generator = CreateGenerator(SequentialGuidType.SequentialAtEnd);
-        var guids = new List<Guid>();
+        SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAtEnd);
+        List<Guid> guids = new List<Guid>();
 
         // Act
-        for (var i = 0; i < 100; i++)
+        for (int i = 0; i < 100; i++)
         {
             guids.Add(generator.Create());
         }
 
         // Assert - les 6 derniers octets doivent etre croissants (timestamp a la fin)
-        var lastSixBytesList = guids
+        List<byte[]> lastSixBytesList = guids
             .Select(g => g.ToByteArray()[10..16])
             .ToList();
 
-        for (var i = 1; i < lastSixBytesList.Count; i++)
+        for (int i = 1; i < lastSixBytesList.Count; i++)
         {
-            var comparison = CompareBytes(lastSixBytesList[i], lastSixBytesList[i - 1]);
+            int comparison = CompareBytes(lastSixBytesList[i], lastSixBytesList[i - 1]);
             comparison.Should().BeGreaterThanOrEqualTo(0,
                 "les 6 derniers octets (timestamp) doivent etre croissants pour SequentialAtEnd");
         }
@@ -150,7 +150,7 @@ public sealed class SequentialGuidGeneratorTests
 
     private static int CompareBytes(byte[] a, byte[] b)
     {
-        for (var i = 0; i < a.Length; i++)
+        for (int i = 0; i < a.Length; i++)
         {
             if (a[i] != b[i])
             {

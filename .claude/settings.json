@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__sonarqube__sonar_quality_gate"
+    ]
+  }
+}
