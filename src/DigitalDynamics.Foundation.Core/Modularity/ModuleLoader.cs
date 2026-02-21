@@ -29,7 +29,7 @@ internal static class ModuleLoader
     /// </summary>
     public static IReadOnlyList<ModuleDescriptor> LoadModules(Type startupModuleType)
     {
-        Dictionary<Type, ModuleDescriptor> descriptors = new();
+        Dictionary<Type, ModuleDescriptor> descriptors = [];
         DiscoverModules(startupModuleType, descriptors);
         return TopologicalSort(descriptors);
     }
