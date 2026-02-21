@@ -26,6 +26,9 @@ TestResults/
 *.swo
 *~
 
+# --- AI tools ---
+.claude/settings.local.json
+
 # --- OS ---
 .DS_Store
 Thumbs.db
