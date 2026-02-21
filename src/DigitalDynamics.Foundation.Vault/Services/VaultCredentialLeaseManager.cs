@@ -127,27 +127,27 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
         LogLeaseRenewed(_logger, _leaseId, _leaseDurationSeconds);
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Démarrage du gestionnaire de credentials dynamiques Vault")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Starting Vault dynamic credentials manager")]
     private static partial void LogLeaseManagerStarting(ILogger logger);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Arrêt du gestionnaire de credentials dynamiques Vault")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Stopping Vault dynamic credentials manager")]
     private static partial void LogLeaseManagerStopping(ILogger logger);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Prochain renouvellement du lease dans {Delay}")]
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Next lease renewal in {Delay}")]
     private static partial void LogNextRenewal(ILogger logger, TimeSpan delay);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Échec du renouvellement du lease {LeaseId}, obtention de nouveaux credentials")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Lease {LeaseId} renewal failed, obtaining new credentials")]
     private static partial void LogLeaseRenewalFailed(ILogger logger, string leaseId, Exception ex);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Obtention de credentials dynamiques depuis {Path}")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Fetching dynamic credentials from {Path}")]
     private static partial void LogObtainingCredentials(ILogger logger, string path);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Credentials dynamiques obtenus : user={Username}, lease={LeaseId}, TTL={TTL}s")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Dynamic credentials obtained: user={Username}, lease={LeaseId}, TTL={TTL}s")]
     private static partial void LogCredentialsObtained(ILogger logger, string username, string leaseId, int ttl);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Renouvellement du lease {LeaseId}")]
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Renewing lease {LeaseId}")]
     private static partial void LogLeaseRenewing(ILogger logger, string leaseId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Lease {LeaseId} renouvelé, nouveau TTL={TTL}s")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Lease {LeaseId} renewed, new TTL={TTL}s")]
     private static partial void LogLeaseRenewed(ILogger logger, string leaseId, int ttl);
 }

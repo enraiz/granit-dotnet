@@ -74,9 +74,9 @@ public sealed partial class TransitEncryptionService : ITransitEncryptionService
         return Encoding.UTF8.GetString(bytes);
     }
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Données chiffrées avec la clé Transit {KeyName}")]
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Data encrypted with Transit key {KeyName}")]
     private static partial void LogDataEncrypted(ILogger logger, string keyName);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Données déchiffrées avec la clé Transit {KeyName}")]
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Data decrypted with Transit key {KeyName}")]
     private static partial void LogDataDecrypted(ILogger logger, string keyName);
 }

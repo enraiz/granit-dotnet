@@ -73,12 +73,12 @@ public sealed partial class VaultClientFactory
         return new TokenAuthMethodInfo(_options.Token);
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Client Vault créé avec la méthode {AuthMethod} vers {Address}")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Vault client created with auth method {AuthMethod} at {Address}")]
     private static partial void LogClientCreated(ILogger logger, string authMethod, string address);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Authentification Kubernetes avec le rôle {Role}")]
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Kubernetes authentication with role {Role}")]
     private static partial void LogKubernetesAuth(ILogger logger, string role);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Authentification Vault par token statique — utiliser uniquement en développement local")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Static token Vault authentication — use only for local development")]
     private static partial void LogTokenAuth(ILogger logger);
 }
