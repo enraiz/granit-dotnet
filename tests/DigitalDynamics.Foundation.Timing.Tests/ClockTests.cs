@@ -108,13 +108,15 @@ public sealed class ClockTests
         // Arrange
         _timezoneProvider.Timezone.Returns("Europe/Brussels");
         var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        var tzInfo = TimeZoneInfo.FindSystemTimeZoneById("Europe/Brussels");
+        var expectedOffset = tzInfo.GetUtcOffset(utcTime);
 
         // Act
         var userTime = _clock.ConvertToUserTime(utcTime);
 
-        // Assert - Brussels est UTC+2 en ete (CEST)
-        userTime.Offset.Should().Be(TimeSpan.FromHours(2));
-        userTime.LocalDateTime.Hour.Should().Be(14);
+        // Assert - le meme instant UTC, converti dans le fuseau utilisateur
+        userTime.UtcDateTime.Should().Be(utcTime.UtcDateTime, "la conversion ne doit pas changer l'instant UTC");
+        userTime.Offset.Should().Be(expectedOffset);
     }
 
     [Fact]
