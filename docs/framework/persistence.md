@@ -25,15 +25,16 @@ important :
 
 ```csharp
 builder.Services.AddFoundationTiming();      // IClock (requis par les intercepteurs)
-builder.Services.AddFoundationGuids();       // IGuidGenerator (requis par AuditableEntityInterceptor)
+builder.Services.AddFoundationGuids();       // IGuidGenerator (requis par AuditedEntityInterceptor)
 builder.Services.AddFoundationSecurity(builder.Configuration); // ICurrentUserService
 builder.Services.AddFoundationPersistence();
 ```
 
-## AuditableEntityInterceptor
+## AuditedEntityInterceptor
 
 Intercepteur `SaveChanges` qui remplit automatiquement les champs d'audit sur les
-entités `AuditableEntity`.
+entités héritant de la hiérarchie `CreationAuditedEntity` / `AuditedEntity` /
+`FullAuditedEntity`.
 
 ### Comportement
 
@@ -53,8 +54,8 @@ d'un `UPDATE` (via `IsModified = false`).
 ### Exemple
 
 ```csharp
-// L'entité hérite de AuditableEntity
-public sealed class Patient : AuditableEntity
+// L'entité hérite de AuditedEntity
+public sealed class Patient : AuditedEntity
 {
     public string FirstName { get; set; } = string.Empty;
 }
@@ -124,7 +125,7 @@ var allPatients = await db.Patients
 ```text
 DigitalDynamics.Foundation.Persistence
 ├── Interceptors/
-│   ├── AuditableEntityInterceptor.cs     (audit HDS : CreatedAt/By, ModifiedAt/By)
+│   ├── AuditedEntityInterceptor.cs       (audit HDS : CreatedAt/By, ModifiedAt/By)
 │   └── SoftDeleteInterceptor.cs          (soft delete RGPD : IsDeleted, DeletedAt/By)
 └── Extensions/
     ├── ModelBuilderExtensions.cs          (ApplyFoundationConventions : query filters)
@@ -135,7 +136,7 @@ DigitalDynamics.Foundation.Persistence
 
 | Service | Implementation | Lifetime |
 | --- | --- | --- |
-| `AuditableEntityInterceptor` | - | Scoped |
+| `AuditedEntityInterceptor` | - | Scoped |
 | `SoftDeleteInterceptor` | - | Scoped |
 
 ## Tests
@@ -147,7 +148,7 @@ var clock = Substitute.For<IClock>();
 var fixedNow = new DateTimeOffset(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
 clock.Now.Returns(fixedNow);
 
-var interceptor = new AuditableEntityInterceptor(currentUserService, clock);
+var interceptor = new AuditedEntityInterceptor(currentUserService, clock);
 // ... assertions exactes avec Be() au lieu de BeCloseTo()
 ```
 
@@ -155,7 +156,7 @@ var interceptor = new AuditableEntityInterceptor(currentUserService, clock);
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail | `AuditableEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
+| HDS - Audit trail | `AuditedEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
 | HDS - Horodatage UTC | `IClock.Now` (jamais `DateTimeOffset.UtcNow`) |
 | RGPD - Droit à l'oubli | `SoftDeleteInterceptor` (suppression logique) |
 | RGPD - Minimisation | Query filters (entités supprimées exclues par défaut) |

@@ -29,8 +29,8 @@ dotnet add package DigitalDynamics.Foundation.Core
 
 Ce package est automatiquement tiré comme dépendance transitive par tous les packages
 Foundation. Il n'est nécessaire de le référencer explicitement que dans le projet Host
-(composition root) et dans les projets qui utilisent les types domaine (`AuditableEntity`,
-`ISoftDeletable`).
+(composition root) et dans les projets qui utilisent les types domaine (`AuditedEntity`,
+`FullAuditedEntity`, `ISoftDeletable`).
 
 ## Concepts
 
@@ -48,8 +48,9 @@ implémentation :
 | Foundation.Security | `ICurrentUserService` | `KeycloakCurrentUserService` |
 | Foundation.Vault | `ITransitEncryptionService` | `VaultTransitEncryptionService` |
 
-Les types domaine partagés (`AuditableEntity`, `ISoftDeletable`, `AuditLogEntry`) vivent
-dans `Foundation.Core.Domain` car ils n'ont pas d'implémentation associée.
+Les types domaine partagés (`Entity`, `CreationAuditedEntity`, `AuditedEntity`,
+`FullAuditedEntity`, `ISoftDeletable`, `AuditLogEntry`) vivent dans
+`Foundation.Core.Domain` car ils n'ont pas d'implémentation associée.
 
 ### Lifecycle (sync + async)
 
@@ -401,7 +402,10 @@ Le `ModuleLoader` utilise l'algorithme de Kahn pour le tri topologique :
 ```text
 DigitalDynamics.Foundation.Core
 ├── Domain/
-│   ├── AuditableEntity.cs          (types domaine partagés)
+│   ├── Entity.cs                   (classe de base, identifiant)
+│   ├── CreationAuditedEntity.cs    (+ CreatedAt, CreatedBy)
+│   ├── AuditedEntity.cs            (+ ModifiedAt, ModifiedBy)
+│   ├── FullAuditedEntity.cs        (+ ISoftDeletable)
 │   ├── ISoftDeletable.cs
 │   └── AuditLogEntry.cs
 ├── Modularity/

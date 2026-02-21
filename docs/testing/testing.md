@@ -84,7 +84,7 @@ Les classes de tests suivent le pattern `{ClasseTestée}Tests` :
 | --- | --- |
 | `Clock` | `ClockTests` |
 | `SequentialGuidGenerator` | `SequentialGuidGeneratorTests` |
-| `AuditableEntityInterceptor` | `AuditableEntityInterceptorTests` |
+| `AuditedEntityInterceptor` | `AuditedEntityInterceptorTests` |
 | `CurrentUserService` | `CurrentUserServiceTests` |
 
 Les méthodes de test suivent le pattern `Method_Scenario_ExpectedBehavior` :
@@ -150,7 +150,7 @@ l'approche utilisée :
 
 ```csharp
 // =============================================================================
-// Tests - AuditableEntityInterceptor
+// Tests - AuditedEntityInterceptor
 // =============================================================================
 // Vérifie que les champs d'audit HDS sont correctement remplis
 // lors de la création et modification des entités.
@@ -259,7 +259,7 @@ par test pour garantir l'isolation :
 ```csharp
 private TestDbContext CreateContext()
 {
-    var interceptor = new AuditableEntityInterceptor(
+    var interceptor = new AuditedEntityInterceptor(
         _currentUserService, _clock, _guidGenerator);
     var options = new DbContextOptionsBuilder<TestDbContext>()
         .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -276,7 +276,7 @@ internes `private sealed class`. Cela évite les dépendances entre tests et ren
 chaque fichier de test autosuffisant :
 
 ```csharp
-private sealed class TestEntity : AuditableEntity
+private sealed class TestEntity : AuditedEntity
 {
     public string Name { get; set; } = string.Empty;
 }
@@ -296,7 +296,7 @@ private sealed class TestDbContext : DbContext
 }
 ```
 
-> `ValueGeneratedNever()` est nécessaire car l'intercepteur `AuditableEntityInterceptor`
+> `ValueGeneratedNever()` est nécessaire car l'intercepteur `AuditedEntityInterceptor`
 > gère lui-même la génération des GUID via `IGuidGenerator`.
 
 ## Tests de conformité HDS / RGPD
@@ -305,7 +305,7 @@ Certains tests vérifient directement des exigences réglementaires :
 
 ### Audit trail HDS
 
-Les tests de `AuditableEntityInterceptor` vérifient que les champs d'audit sont
+Les tests de `AuditedEntityInterceptor` vérifient que les champs d'audit sont
 correctement remplis, conformément à l'exigence HDS de traçabilité sur 3 ans :
 
 ```csharp

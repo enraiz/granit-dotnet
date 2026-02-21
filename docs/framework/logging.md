@@ -136,7 +136,7 @@ _logger.LogInformation("Connexion Vault établie, méthode={AuthMethod}", authMe
 ### Audit trail
 
 Les opérations métier critiques (création, modification, suppression d'entités)
-sont tracées via `AuditableEntity` et `AuditLogEntry` (package Core), pas via
+sont tracées via la hiérarchie `AuditedEntity` et `AuditLogEntry` (package Core), pas via
 les logs applicatifs. Les logs complètent l'audit trail pour le diagnostic
 opérationnel.
 

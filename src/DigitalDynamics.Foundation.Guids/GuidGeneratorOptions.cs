@@ -7,8 +7,8 @@
 //       options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd;
 //   });
 //
-// Le defaut est SequentialAsString (PostgreSQL), contrairement a ABP qui
-// utilise SequentialAtEnd (SQL Server).
+// Le défaut est SequentialAsString (PostgreSQL) au lieu de SequentialAtEnd
+// (SQL Server).
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Guids;
