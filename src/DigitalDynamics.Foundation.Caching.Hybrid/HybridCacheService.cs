@@ -35,7 +35,7 @@ namespace DigitalDynamics.Foundation.Caching.Hybrid;
 /// </para>
 /// </remarks>
 /// <typeparam name="TCacheItem">Type de l'élément mis en cache. Doit être une classe.</typeparam>
-public class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
+public partial class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
     where TCacheItem : class
 {
     private readonly HybridCache _hybridCache;
@@ -70,7 +70,7 @@ public class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
     public async Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default)
     {
         string compositeKey = BuildKey(key);
-        _logger.LogDebug("HybridCache GET {Key}", compositeKey);
+        LogGet(_logger, compositeKey);
 
         // HybridCache.GetOrCreateAsync ne permet pas de faire un "Get seul" natif.
         // On passe une factory qui retourne null pour simuler un GetOrDefault.
@@ -91,7 +91,7 @@ public class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
         CancellationToken ct = default)
     {
         string compositeKey = BuildKey(key);
-        _logger.LogDebug("HybridCache GET_OR_ADD {Key}", compositeKey);
+        LogGetOrAdd(_logger, compositeKey);
 
         HybridCacheEntryOptions? hybridOptions = options is not null
             ? BuildHybridOptions(options)
@@ -101,7 +101,7 @@ public class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
             compositeKey,
             async (innerCt) =>
             {
-                _logger.LogDebug("HybridCache FACTORY {Key}", compositeKey);
+                LogFactory(_logger, compositeKey);
                 TCacheItem value = await factory(innerCt);
                 return value;
             },
@@ -119,7 +119,7 @@ public class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
         CancellationToken ct = default)
     {
         string compositeKey = BuildKey(key);
-        _logger.LogDebug("HybridCache SET {Key}", compositeKey);
+        LogSet(_logger, compositeKey);
 
         HybridCacheEntryOptions? hybridOptions = options is not null
             ? BuildHybridOptions(options)
@@ -132,7 +132,7 @@ public class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
     public async Task RemoveAsync(string key, CancellationToken ct = default)
     {
         string compositeKey = BuildKey(key);
-        _logger.LogDebug("HybridCache REMOVE {Key}", compositeKey);
+        LogRemove(_logger, compositeKey);
 
         await _hybridCache.RemoveAsync(compositeKey, ct);
     }
@@ -142,12 +142,29 @@ public class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
     {
         // HybridCache ne supporte pas nativement le refresh (sliding expiration sur IDistributedCache).
         // Un SetAsync avec la valeur actuelle est l'équivalent fonctionnel.
-        _logger.LogWarning(
-            "HybridCache REFRESH non supporté nativement pour {Key}. Utilisez GetOrAddAsync.",
-            BuildKey(key));
+        string compositeKey = BuildKey(key);
+        LogRefreshNotSupported(_logger, compositeKey);
 
         return Task.CompletedTask;
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "HybridCache GET {Key}")]
+    private static partial void LogGet(ILogger logger, string key);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "HybridCache GET_OR_ADD {Key}")]
+    private static partial void LogGetOrAdd(ILogger logger, string key);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "HybridCache FACTORY {Key}")]
+    private static partial void LogFactory(ILogger logger, string key);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "HybridCache SET {Key}")]
+    private static partial void LogSet(ILogger logger, string key);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "HybridCache REMOVE {Key}")]
+    private static partial void LogRemove(ILogger logger, string key);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "HybridCache REFRESH not natively supported for {Key}. Use GetOrAddAsync instead.")]
+    private static partial void LogRefreshNotSupported(ILogger logger, string key);
 
     private string BuildKey(string userKey) =>
         $"{_options.Value.KeyPrefix}:{_cacheName}:{userKey}";
