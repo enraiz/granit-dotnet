@@ -23,6 +23,11 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
     public JsonStringLocalizerFactory(IOptions<FoundationLocalizationOptions> options)
     {
         _options = options;
+
+        if (options.Value.EnableAutoDiscovery)
+        {
+            LocalizationAutoDiscovery.Discover(options.Value);
+        }
     }
 
     /// <inheritdoc />
