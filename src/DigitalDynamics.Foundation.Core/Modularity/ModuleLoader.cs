@@ -73,7 +73,7 @@ internal static class ModuleLoader
     {
         // Calculer le degre entrant de chaque noeud
         Dictionary<Type, int> inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
-        Dictionary<Type, List<Type>> adjacency = descriptors.ToDictionary(kv => kv.Key, _ => (List<Type>)[]);
+        Dictionary<Type, List<Type>> adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
 
         foreach ((Type type, ModuleDescriptor descriptor) in descriptors)
         {
