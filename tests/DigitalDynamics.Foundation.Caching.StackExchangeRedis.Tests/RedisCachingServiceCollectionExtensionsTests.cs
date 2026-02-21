@@ -141,4 +141,27 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         opts.Configuration.Should().Be("redis-service:6379");
         opts.InstanceName.Should().Be("guava:");
     }
+
+    [Fact]
+    public void AddFoundationCachingRedis_IsEnabledTrue_AppliesRedisConfigurationToStackExchangeOptions()
+    {
+        // Arrange — vérifie que le lambda AddStackExchangeRedisCache est bien exécuté
+        IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
+        {
+            ["Cache:Redis:IsEnabled"] = "true",
+            ["Cache:Redis:Configuration"] = "redis-service:6379",
+            ["Cache:Redis:InstanceName"] = "myapp:",
+        });
+
+        ServiceCollection services = new();
+        services.AddFoundationCachingRedis(configuration);
+        ServiceProvider sp = services.BuildServiceProvider();
+
+        // Act — résoudre IOptions<RedisCacheOptions> force l'exécution du lambda de configuration
+        RedisCacheOptions redisOpts = sp.GetRequiredService<IOptions<RedisCacheOptions>>().Value;
+
+        // Assert
+        redisOpts.Configuration.Should().Be("redis-service:6379");
+        redisOpts.InstanceName.Should().Be("myapp:");
+    }
 }

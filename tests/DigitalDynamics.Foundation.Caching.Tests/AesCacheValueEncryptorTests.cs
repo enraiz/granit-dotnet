@@ -116,4 +116,19 @@ public sealed class AesCacheValueEncryptorTests
         // Assert
         decrypted.Should().BeEmpty();
     }
+
+    [Fact]
+    public void Decrypt_CiphertextShorterThan16Bytes_ThrowsArgumentException()
+    {
+        // Arrange — ciphertext invalide : moins de 16 octets (taille de l'IV)
+        AesCacheValueEncryptor encryptor = CreateEncryptor();
+        byte[] tooShort = new byte[10];
+
+        // Act
+        Action act = () => encryptor.Decrypt(tooShort);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithMessage("*16*");
+    }
 }
