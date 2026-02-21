@@ -22,7 +22,7 @@ namespace DigitalDynamics.Foundation.Caching;
 /// Le <see cref="IMemoryCache"/> injecté est dédié aux verrous stampede (clé DI : <c>DigitalDynamics.Foundation.Caching.Locks</c>)
 /// et est séparé du cache mémoire applicatif pour éviter les interférences.
 /// </remarks>
-public class DistributedCacheService<TCacheItem> : ICacheService<TCacheItem>
+public partial class DistributedCacheService<TCacheItem> : ICacheService<TCacheItem>
     where TCacheItem : class
 {
     internal const string LockCacheKey = "DigitalDynamics.Foundation.Caching.Locks";
@@ -105,7 +105,7 @@ public class DistributedCacheService<TCacheItem> : ICacheService<TCacheItem>
             TCacheItem value = await factory(ct);
             await SetAsync(key, value, options, ct);
 
-            _logger.LogDebug("Cache miss resolved via factory: {Key}", BuildKey(key));
+            LogCacheMiss(_logger, BuildKey(key));
 
             return value;
         }
@@ -134,7 +134,7 @@ public class DistributedCacheService<TCacheItem> : ICacheService<TCacheItem>
 
         await _cache.SetAsync(compositeKey, bytes, entryOptions, ct);
 
-        _logger.LogDebug("Cache set: {Key}", compositeKey);
+        LogCacheSet(_logger, compositeKey);
     }
 
     /// <inheritdoc/>
@@ -165,6 +165,12 @@ public class DistributedCacheService<TCacheItem> : ICacheService<TCacheItem>
 
         return entry;
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Cache miss resolved via factory: {Key}")]
+    private static partial void LogCacheMiss(ILogger logger, string key);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Cache set: {Key}")]
+    private static partial void LogCacheSet(ILogger logger, string key);
 
     private SemaphoreSlim GetOrCreateLock(string compositeKey) =>
         _lockCache.GetOrCreate(
