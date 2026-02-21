@@ -186,7 +186,7 @@ pack:
       if [ -n "$CI_COMMIT_TAG" ]; then
         VERSION="${CI_COMMIT_TAG#v}"
       else
-        VERSION="0.0.1-ci.${CI_PIPELINE_IID}"
+        VERSION="0.1.0-dev.${CI_PIPELINE_IID}"
       fi
     - dotnet build -c $CONFIGURATION
     - dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=$VERSION -o ./nupkgs

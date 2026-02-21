@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>DigitalDynamics.Foundation.Caching</PackageId>
+    <Description>Abstraction de cache typée (ICacheService) avec fournisseur Memory par défaut.
+    Protection stampede via SemaphoreSlim dans IMemoryCache (sans fuite mémoire).
+    Chiffrement AES-256-CBC opt-in par type via [CacheEncrypted] pour la conformité HDS/RGPD.
+    Conçu pour être remplacé par FoundationCachingRedisModule ou FoundationCachingHybridModule en production.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="DigitalDynamics.Foundation.Caching.Tests" />
+    <InternalsVisibleTo Include="DigitalDynamics.Foundation.Caching.StackExchangeRedis" />
+    <InternalsVisibleTo Include="DigitalDynamics.Foundation.Caching.Hybrid" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalDynamics.Foundation.Core\DigitalDynamics.Foundation.Core.csproj" />
+  </ItemGroup>
+
+</Project>

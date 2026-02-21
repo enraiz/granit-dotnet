@@ -14,6 +14,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 - Projets : Abstractions, Security, Persistence, Vault, Observability
 - Projets de tests associés
 - CLAUDE.md, CONTRIBUTING.md, CI/CD pipeline
+- `DigitalDynamics.Foundation.Caching` — abstraction `ICacheService<T>` + fournisseur Memory, protection stampede (double-check locking + SemaphoreSlim dans IMemoryCache), chiffrement AES-256-CBC opt-in par type via `[CacheEncrypted]`
+- `DigitalDynamics.Foundation.Caching.StackExchangeRedis` — fournisseur Redis (StackExchange.Redis), activation `AesCacheValueEncryptor` automatique si `EncryptValues = true`
+- `DigitalDynamics.Foundation.Caching.Hybrid` — fournisseur HybridCache L1+L2 pour Kubernetes multi-pods, `LocalCacheExpiration ≤ 60 s` pour borner la fenêtre de données obsolètes
 
 ---
 
