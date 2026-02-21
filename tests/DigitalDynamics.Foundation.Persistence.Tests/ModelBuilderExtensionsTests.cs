@@ -104,10 +104,8 @@ internal sealed class TestDbContext : DbContext
     public DbSet<TestProduct> Products => Set<TestProduct>();
     public DbSet<TestCategory> Categories => Set<TestCategory>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyFoundationConventions();
-    }
 }
 
 #endregion

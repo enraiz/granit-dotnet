@@ -62,28 +62,16 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
             NullLogger<VaultCredentialLeaseManager>.Instance);
     }
 
-    public void Dispose()
-    {
-        _sut.Dispose();
-    }
+    public void Dispose() => _sut.Dispose();
 
     [Fact]
-    public void IsReady_Initially_ReturnsFalse()
-    {
-        _sut.IsReady.Should().BeFalse();
-    }
+    public void IsReady_Initially_ReturnsFalse() => _sut.IsReady.Should().BeFalse();
 
     [Fact]
-    public void Username_Initially_ReturnsEmpty()
-    {
-        _sut.Username.Should().BeEmpty();
-    }
+    public void Username_Initially_ReturnsEmpty() => _sut.Username.Should().BeEmpty();
 
     [Fact]
-    public void Password_Initially_ReturnsEmpty()
-    {
-        _sut.Password.Should().BeEmpty();
-    }
+    public void Password_Initially_ReturnsEmpty() => _sut.Password.Should().BeEmpty();
 
     [Fact]
     public async Task ExecuteAsync_ObtainsCredentialsOnStart()
@@ -166,14 +154,14 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
             .ThrowsAsync(new InvalidOperationException("Lease expired"));
 
         // Setup second credential obtainment (fallback)
-        var callCount = 0;
+        int callCount = 0;
         _databaseEngine.GetCredentialsAsync("readwrite", mountPoint: "database")
             .Returns(_ =>
             {
                 callCount++;
-                var username = callCount == 1 ? "v-user-first" : "v-user-second";
-                var password = callCount == 1 ? "pass1" : "pass2";
-                var leaseId = callCount == 1 ? "lease-1" : "lease-2";
+                string username = callCount == 1 ? "v-user-first" : "v-user-second";
+                string password = callCount == 1 ? "pass1" : "pass2";
+                string leaseId = callCount == 1 ? "lease-1" : "lease-2";
                 return new Secret<UsernamePasswordCredentials>
                 {
                     Data = new UsernamePasswordCredentials { Username = username, Password = password },
@@ -206,13 +194,10 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
     }
 
     [Fact]
-    public void IDatabaseCredentialProvider_IsImplemented()
-    {
+    public void IDatabaseCredentialProvider_IsImplemented() =>
         _sut.Should().BeAssignableTo<IDatabaseCredentialProvider>();
-    }
 
-    private void SetupDatabaseCredentials(string username, string password, string leaseId, int ttl)
-    {
+    private void SetupDatabaseCredentials(string username, string password, string leaseId, int ttl) =>
         _databaseEngine.GetCredentialsAsync("readwrite", mountPoint: "database")
             .Returns(new Secret<UsernamePasswordCredentials>
             {
@@ -220,5 +205,4 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
                 LeaseId = leaseId,
                 LeaseDurationSeconds = ttl
             });
-    }
 }
