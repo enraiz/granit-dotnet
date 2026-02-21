@@ -22,6 +22,7 @@ variables:
   DOTNET_VERSION: "10.0"
   CONFIGURATION: Release
   NUGET_SOURCE: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json"
+  NUGET_PACKAGES: '${CI_PROJECT_DIR}/.nuget/packages'
 
 stages:
   - quality
@@ -31,14 +32,28 @@ stages:
   - publish
 
 # ---------------------------------------------------------------------------
+# HIDDEN JOBS
+# ---------------------------------------------------------------------------
+
+.dotnet:
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  tags:
+    - docker
+  cache:
+    key:
+      files:
+        - Directory.Packages.props
+    paths:
+      - .nuget/packages/
+    policy: pull-push
+
+# ---------------------------------------------------------------------------
 # QUALITY
 # ---------------------------------------------------------------------------
 
 format:
+  extends: .dotnet
   stage: quality
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - dotnet format --verify-no-changes
   rules:
@@ -46,10 +61,8 @@ format:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 build:
+  extends: .dotnet
   stage: quality
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - dotnet restore
     - dotnet build -c $CONFIGURATION --no-restore
@@ -59,10 +72,8 @@ build:
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
 
 test:
+  extends: .dotnet
   stage: quality
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - dotnet build -c $CONFIGURATION
     - >
@@ -112,10 +123,8 @@ semgrep-sast:
 # ---------------------------------------------------------------------------
 
 sonarqube:
+  extends: .dotnet
   stage: analysis
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   needs:
     - job: test
       artifacts: true
@@ -147,15 +156,30 @@ sonarqube:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $SONAR_HOST_URL && $SONAR_TOKEN
   allow_failure: true
 
+audit:nuget:
+  extends: .dotnet
+  stage: analysis
+  script:
+    - dotnet restore
+    - dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+    - '! grep -q "has the following vulnerable packages" vulnerability-report.txt'
+  artifacts:
+    when: always
+    paths:
+      - vulnerability-report.txt
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  allow_failure: true
+
 # ---------------------------------------------------------------------------
 # PACK
 # ---------------------------------------------------------------------------
 
 pack:
+  extends: .dotnet
   stage: pack
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - |
       if [ -n "$CI_COMMIT_TAG" ]; then
@@ -178,10 +202,8 @@ pack:
 # ---------------------------------------------------------------------------
 
 publish:
+  extends: .dotnet
   stage: publish
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - dotnet nuget add source "$NUGET_SOURCE" --name gitlab --username gitlab-ci-token --password "$CI_JOB_TOKEN" --store-password-in-clear-text
     - dotnet nuget push "nupkgs/*.nupkg" --source gitlab
