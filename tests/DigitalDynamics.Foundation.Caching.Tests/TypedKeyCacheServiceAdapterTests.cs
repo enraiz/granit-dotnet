@@ -1,151 +1,228 @@
 // =============================================================================
 // Tests - TypedKeyCacheServiceAdapter<TCacheItem, TKey>
 // =============================================================================
-// Vérifie que chaque méthode de l'adaptateur délègue correctement à
-// l'ICacheService<TCacheItem> sous-jacent en convertissant la clé typée
-// via key.ToString().
+// Vérifie que l'adaptateur convertit correctement la clé typée en string via
+// key.ToString() et délègue à ICacheService<TCacheItem> sous-jacent.
+// Utilise un ServiceProvider in-memory (même pattern que DistributedCacheServiceTests)
+// pour éviter d'exposer des types internes aux générateurs de proxy NSubstitute.
 // =============================================================================
 
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Distributed;
-using NSubstitute;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace DigitalDynamics.Foundation.Caching.Tests;
 
 public sealed class TypedKeyCacheServiceAdapterTests
 {
-    public sealed class Item
+    private static ServiceProvider BuildServiceProvider()
     {
-        public string Value { get; init; } = string.Empty;
+        ServiceCollection services = new();
+        services.AddLogging();
+        services.AddDistributedMemoryCache();
+        services.AddKeyedSingleton<IMemoryCache>(
+            DistributedCacheService<DistributedCacheServiceTests.UserCacheItem>.LockCacheKey,
+            (_, _) => new MemoryCache(Options.Create(new MemoryCacheOptions { SizeLimit = 100 })));
+        services.AddSingleton<ICacheValueEncryptor, NullCacheValueEncryptor>();
+        services.Configure<CachingOptions>(_ => { });
+        services.AddSingleton(typeof(ICacheService<>), typeof(DistributedCacheService<>));
+        services.AddSingleton(typeof(ICacheService<,>), typeof(TypedKeyCacheServiceAdapter<,>));
+        return services.BuildServiceProvider();
     }
 
-    private static (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) CreateAdapter()
+    [Fact]
+    public async Task SetAsync_TypedKey_CanBeRetrievedWithStringKey()
     {
-        ICacheService<Item> inner = Substitute.For<ICacheService<Item>>();
-        TypedKeyCacheServiceAdapter<Item, Guid> adapter = new(inner);
-        return (adapter, inner);
+        // Arrange — écriture via clé Guid, lecture via clé string équivalente
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem> stringSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem>>();
+
+        Guid id = Guid.NewGuid();
+        DistributedCacheServiceTests.UserCacheItem item = new() { Id = id, Name = "Alice" };
+
+        // Act
+        await typedSvc.SetAsync(id, item, null, TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem? result =
+            await stringSvc.GetAsync(id.ToString(), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(id);
+    }
+
+    [Fact]
+    public async Task GetAsync_TypedKey_ReturnsValueStoredByStringKey()
+    {
+        // Arrange — écriture via clé string, lecture via clé Guid
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem> stringSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem>>();
+
+        Guid id = Guid.NewGuid();
+        DistributedCacheServiceTests.UserCacheItem item = new() { Id = id, Name = "Bob" };
+
+        // Act
+        await stringSvc.SetAsync(id.ToString(), item, null, TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem? result =
+            await typedSvc.GetAsync(id, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Name.Should().Be("Bob");
+    }
+
+    [Fact]
+    public async Task GetOrAddAsync_TypedKey_CallsFactoryOnMissAndCachesResult()
+    {
+        // Arrange
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
+
+        Guid id = Guid.NewGuid();
+        int callCount = 0;
+
+        // Act
+        DistributedCacheServiceTests.UserCacheItem result = await typedSvc.GetOrAddAsync(
+            id,
+            async ct =>
+            {
+                callCount++;
+                await Task.Delay(1, ct);
+                return new DistributedCacheServiceTests.UserCacheItem { Id = id, Name = "Charlie" };
+            },
+            null,
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Id.Should().Be(id);
+        callCount.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task RemoveAsync_TypedKey_InvalidatesEntry()
+    {
+        // Arrange
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
+
+        Guid id = Guid.NewGuid();
+        await typedSvc.SetAsync(
+            id,
+            new DistributedCacheServiceTests.UserCacheItem { Id = id, Name = "Diana" },
+            null,
+            TestContext.Current.CancellationToken);
+
+        // Act
+        await typedSvc.RemoveAsync(id, TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem? result =
+            await typedSvc.GetAsync(id, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().BeNull();
     }
 
     [Fact]
     public async Task GetAsync_StringKey_DelegatesToInner()
     {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
-        Item expected = new() { Value = "test" };
-        inner.GetAsync("key", Arg.Any<CancellationToken>()).Returns(expected);
+        // Arrange — vérifie la surcharge clé string héritée de ICacheService<T>
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
 
-        Item? result = await adapter.GetAsync("key", TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem item = new() { Id = Guid.NewGuid(), Name = "Eve" };
+        await typedSvc.SetAsync("string-key", item, null, TestContext.Current.CancellationToken);
 
-        result.Should().Be(expected);
-    }
+        // Act
+        DistributedCacheServiceTests.UserCacheItem? result =
+            await typedSvc.GetAsync("string-key", TestContext.Current.CancellationToken);
 
-    [Fact]
-    public async Task GetAsync_TypedKey_ConvertsToStringAndDelegates()
-    {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
-        Guid id = Guid.NewGuid();
-        Item expected = new() { Value = "typed" };
-        inner.GetAsync(id.ToString(), Arg.Any<CancellationToken>()).Returns(expected);
-
-        Item? result = await adapter.GetAsync(id, TestContext.Current.CancellationToken);
-
-        result.Should().Be(expected);
+        // Assert
+        result.Should().NotBeNull();
+        result!.Name.Should().Be("Eve");
     }
 
     [Fact]
     public async Task GetOrAddAsync_StringKey_DelegatesToInner()
     {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
-        Item expected = new() { Value = "added" };
-        inner.GetOrAddAsync(
-                "key",
-                Arg.Any<Func<CancellationToken, Task<Item>>>(),
-                Arg.Any<DistributedCacheEntryOptions?>(),
-                Arg.Any<CancellationToken>())
-            .Returns(expected);
+        // Arrange — vérifie la surcharge clé string héritée de ICacheService<T>
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
 
-        Item result = await adapter.GetOrAddAsync(
-            "key",
+        DistributedCacheServiceTests.UserCacheItem expected = new() { Id = Guid.NewGuid(), Name = "Frank" };
+
+        // Act
+        DistributedCacheServiceTests.UserCacheItem result = await typedSvc.GetOrAddAsync(
+            "string-key-2",
             _ => Task.FromResult(expected),
             null,
             TestContext.Current.CancellationToken);
 
-        result.Should().Be(expected);
-    }
-
-    [Fact]
-    public async Task GetOrAddAsync_TypedKey_ConvertsToStringAndDelegates()
-    {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
-        Guid id = Guid.NewGuid();
-        Item expected = new() { Value = "typed-added" };
-        inner.GetOrAddAsync(
-                id.ToString(),
-                Arg.Any<Func<CancellationToken, Task<Item>>>(),
-                Arg.Any<DistributedCacheEntryOptions?>(),
-                Arg.Any<CancellationToken>())
-            .Returns(expected);
-
-        Item result = await adapter.GetOrAddAsync(
-            id,
-            _ => Task.FromResult(expected),
-            null,
-            TestContext.Current.CancellationToken);
-
-        result.Should().Be(expected);
+        // Assert
+        result.Id.Should().Be(expected.Id);
     }
 
     [Fact]
     public async Task SetAsync_StringKey_DelegatesToInner()
     {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
-        Item item = new() { Value = "set" };
+        // Arrange — vérifie la surcharge clé string héritée de ICacheService<T>
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
 
-        await adapter.SetAsync("key", item, null, TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem item = new() { Id = Guid.NewGuid(), Name = "Grace" };
 
-        await inner.Received(1).SetAsync("key", item, null, Arg.Any<CancellationToken>());
-    }
+        // Act
+        await typedSvc.SetAsync("string-key-3", item, null, TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem? result =
+            await typedSvc.GetAsync("string-key-3", TestContext.Current.CancellationToken);
 
-    [Fact]
-    public async Task SetAsync_TypedKey_ConvertsToStringAndDelegates()
-    {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
-        Guid id = Guid.NewGuid();
-        Item item = new() { Value = "typed-set" };
-
-        await adapter.SetAsync(id, item, null, TestContext.Current.CancellationToken);
-
-        await inner.Received(1).SetAsync(id.ToString(), item, null, Arg.Any<CancellationToken>());
+        // Assert
+        result.Should().NotBeNull();
     }
 
     [Fact]
     public async Task RemoveAsync_StringKey_DelegatesToInner()
     {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
+        // Arrange — vérifie la surcharge clé string héritée de ICacheService<T>
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
 
-        await adapter.RemoveAsync("key", TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem item = new() { Id = Guid.NewGuid(), Name = "Heidi" };
+        await typedSvc.SetAsync("remove-key", item, null, TestContext.Current.CancellationToken);
 
-        await inner.Received(1).RemoveAsync("key", Arg.Any<CancellationToken>());
-    }
+        // Act
+        await typedSvc.RemoveAsync("remove-key", TestContext.Current.CancellationToken);
+        DistributedCacheServiceTests.UserCacheItem? result =
+            await typedSvc.GetAsync("remove-key", TestContext.Current.CancellationToken);
 
-    [Fact]
-    public async Task RemoveAsync_TypedKey_ConvertsToStringAndDelegates()
-    {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
-        Guid id = Guid.NewGuid();
-
-        await adapter.RemoveAsync(id, TestContext.Current.CancellationToken);
-
-        await inner.Received(1).RemoveAsync(id.ToString(), Arg.Any<CancellationToken>());
+        // Assert
+        result.Should().BeNull();
     }
 
     [Fact]
     public async Task RefreshAsync_StringKey_DelegatesToInner()
     {
-        (TypedKeyCacheServiceAdapter<Item, Guid> adapter, ICacheService<Item> inner) = CreateAdapter();
+        // Arrange — vérifie que RefreshAsync ne lève pas d'exception sur l'adaptateur
+        ServiceProvider sp = BuildServiceProvider();
+        ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
+            sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
 
-        await adapter.RefreshAsync("key", TestContext.Current.CancellationToken);
+        // Act — RefreshAsync ne retourne Task.CompletedTask si la clé n'existe pas en Memory
+        Func<Task> act = () => typedSvc.RefreshAsync("refresh-key", TestContext.Current.CancellationToken);
 
-        await inner.Received(1).RefreshAsync("key", Arg.Any<CancellationToken>());
+        // Assert
+        await act.Should().NotThrowAsync();
     }
 }
