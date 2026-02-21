@@ -19,6 +19,7 @@
 // Porte de Volo.Abp.Guids.SequentialGuidGenerator (MIT).
 // =============================================================================
 
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 
@@ -45,9 +46,9 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
     /// <summary>
     /// Cree un nouveau GUID sequentiel du type specifie.
     /// </summary>
-#pragma warning disable CA1822 // Methode publique intentionnellement non-statique pour coherence API
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
+    [SuppressMessage("Minor Code Smell", "S2325:Methods and properties that don't access instance data should be static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
     public Guid Create(SequentialGuidType guidType)
-#pragma warning restore CA1822
     {
         // 10 octets aleatoires cryptographiquement surs
         byte[] randomBytes = new byte[10];
