@@ -5,6 +5,8 @@
 //   builder.Services.AddFoundationVault(builder.Configuration);
 // =============================================================================
 
+using DigitalDynamics.Foundation.Localization;
+using DigitalDynamics.Foundation.Localization.Extensions;
 using DigitalDynamics.Foundation.Vault.Options;
 using DigitalDynamics.Foundation.Vault.Services;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +28,17 @@ public static class VaultServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddFoundationLocalization();
+        services.Configure<FoundationLocalizationOptions>(options =>
+        {
+            options.Resources
+                .Add<VaultLocalizationResource>(defaultCulture: "fr")
+                .AddJson(
+                    typeof(VaultLocalizationResource).Assembly,
+                    "DigitalDynamics.Foundation.Vault.Localization.Vault")
+                .AddBaseTypes(typeof(FoundationLocalizationResource));
+        });
+
         services.Configure<VaultOptions>(configuration.GetSection(VaultOptions.SectionName));
 
         services.AddSingleton<VaultClientFactory>();

@@ -9,6 +9,7 @@
 // =============================================================================
 
 using DigitalDynamics.Foundation.Vault.Options;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
@@ -25,11 +26,16 @@ public sealed partial class VaultClientFactory
 {
     private readonly VaultOptions _options;
     private readonly ILogger<VaultClientFactory> _logger;
+    private readonly IStringLocalizer<VaultLocalizationResource> _localizer;
 
-    public VaultClientFactory(IOptions<VaultOptions> options, ILogger<VaultClientFactory> logger)
+    public VaultClientFactory(
+        IOptions<VaultOptions> options,
+        ILogger<VaultClientFactory> logger,
+        IStringLocalizer<VaultLocalizationResource> localizer)
     {
         _options = options.Value;
         _logger = logger;
+        _localizer = localizer;
     }
 
     /// <summary>Crée un client VaultSharp authentifié.</summary>
@@ -40,8 +46,7 @@ public sealed partial class VaultClientFactory
             "kubernetes" => CreateKubernetesAuth(),
             "token" => CreateTokenAuth(),
             _ => throw new InvalidOperationException(
-                $"Méthode d'authentification Vault inconnue : '{_options.AuthMethod}'. " +
-                "Valeurs autorisées : 'Kubernetes', 'Token'.")
+                _localizer["Vault:UnknownAuthMethod", _options.AuthMethod])
         };
 
         VaultClientSettings settings = new(_options.Address, authMethod);
@@ -61,9 +66,7 @@ public sealed partial class VaultClientFactory
     {
         if (string.IsNullOrEmpty(_options.Token))
         {
-            throw new InvalidOperationException(
-                "Le token Vault est requis pour l'authentification par token. " +
-                "Configurez Vault:Token dans la configuration.");
+            throw new InvalidOperationException(_localizer["Vault:TokenRequired"]);
         }
 
         LogTokenAuth(_logger);
