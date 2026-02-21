@@ -1,0 +1,43 @@
+// =============================================================================
+// VaultServiceCollectionExtensions - Enregistrement des services Vault
+// =============================================================================
+// Usage :
+//   builder.Services.AddFoundationVault(builder.Configuration);
+// =============================================================================
+
+using DigitalDynamics.Foundation.Vault.Options;
+using DigitalDynamics.Foundation.Vault.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using VaultSharp;
+
+namespace DigitalDynamics.Foundation.Vault.Extensions;
+
+/// <summary>
+/// Extensions pour configurer les services Vault dans le conteneur DI.
+/// </summary>
+public static class VaultServiceCollectionExtensions
+{
+    /// <summary>
+    /// Ajoute le client Vault, le gestionnaire de credentials dynamiques
+    /// et le service de chiffrement Transit.
+    /// </summary>
+    public static IServiceCollection AddFoundationVault(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<VaultOptions>(configuration.GetSection(VaultOptions.SectionName));
+
+        services.AddSingleton<VaultClientFactory>();
+        services.AddSingleton<IVaultClient>(sp => sp.GetRequiredService<VaultClientFactory>().Create());
+
+        services.AddSingleton<VaultCredentialLeaseManager>();
+        services.AddSingleton<IDatabaseCredentialProvider>(sp =>
+            sp.GetRequiredService<VaultCredentialLeaseManager>());
+        services.AddHostedService(sp => sp.GetRequiredService<VaultCredentialLeaseManager>());
+
+        services.AddScoped<ITransitEncryptionService, TransitEncryptionService>();
+
+        return services;
+    }
+}

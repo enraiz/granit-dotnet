@@ -1,0 +1,55 @@
+# =============================================================================
+# .gitignore - DigitalDynamics.Foundation
+# =============================================================================
+
+# --- .NET ---
+bin/
+obj/
+out/
+*.user
+*.suo
+*.DotSettings.user
+nupkgs/
+TestResults/
+
+# --- Environnement ---
+.env
+.env.*
+!.env.example
+
+# --- IDE ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# --- AI tools ---
+.claude/settings.local.json
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Sécurité (CRITIQUE) ---
+# Ne JAMAIS commiter ces fichiers
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+credentials.json
+secrets.json
+token.json
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Temporaire ---
+tmp/
+temp/
+*.tmp

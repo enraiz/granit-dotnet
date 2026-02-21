@@ -51,7 +51,15 @@ dotnet add package DigitalDynamics.Foundation.Guids
 
 ## Configuration
 
-### Program.cs
+### Avec le système de modules (recommandé)
+
+Le module `FoundationGuidsModule` est automatiquement chargé via `[DependsOn]` quand
+un module dépendant (ex : Persistence) en a besoin. Il suffit d'utiliser
+`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](modularity.md)).
+
+### Enregistrement direct
+
+Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
 builder.Services.AddFoundationGuids();
@@ -74,9 +82,11 @@ builder.Services.AddFoundationGuids(options =>
 
 ## IGuidGenerator
 
-Interface dans `DigitalDynamics.Foundation.Abstractions` (zéro dépendance) :
+Interface définie dans le package `DigitalDynamics.Foundation.Guids` :
 
 ```csharp
+namespace DigitalDynamics.Foundation.Guids;
+
 public interface IGuidGenerator
 {
     Guid Create();
@@ -294,15 +304,13 @@ if (entry.Entity is AuditableEntity auditable)
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Abstractions
-└── Guids/
-    └── IGuidGenerator.cs
-
 DigitalDynamics.Foundation.Guids
+├── IGuidGenerator.cs                 (interface, contrat public)
 ├── SequentialGuidGenerator.cs
 ├── SimpleGuidGenerator.cs
 ├── SequentialGuidType.cs
 ├── GuidGeneratorOptions.cs
+├── FoundationGuidsModule.cs          (module Foundation)
 └── Extensions/
     └── GuidsServiceCollectionExtensions.cs  (AddFoundationGuids)
 ```

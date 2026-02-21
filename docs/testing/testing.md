@@ -40,7 +40,7 @@ Chaque package Foundation a un projet de tests dédié, nommé `*.Tests` :
 
 ```text
 src/
-├── DigitalDynamics.Foundation.Abstractions/
+├── DigitalDynamics.Foundation.Core/
 ├── DigitalDynamics.Foundation.Guids/
 ├── DigitalDynamics.Foundation.Observability/
 ├── DigitalDynamics.Foundation.Persistence/
@@ -49,6 +49,7 @@ src/
 └── DigitalDynamics.Foundation.Vault/
 
 tests/
+├── DigitalDynamics.Foundation.Core.Tests/
 ├── DigitalDynamics.Foundation.Guids.Tests/
 ├── DigitalDynamics.Foundation.Observability.Tests/
 ├── DigitalDynamics.Foundation.Persistence.Tests/
