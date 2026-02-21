@@ -1,0 +1,62 @@
+# Licence Propriétaire - Digital Dynamics
+
+Copyright (c) 2026 Digital Dynamics. Tous droits réservés.
+
+---
+
+## Restrictions d'utilisation
+
+Ce code et cette documentation sont la propriété exclusive de **Digital Dynamics** et sont fournis sous licence propriétaire. L'utilisation, la copie, la modification, la fusion, la publication, la distribution, la sous-licence et/ou la vente de copies de ce logiciel sont strictement interdites sans autorisation écrite préalable de Digital Dynamics.
+
+### Permissions (employés et contractants autorisés)
+
+- **Lecture** : Accès en lecture au code source pour les besoins opérationnels
+- **Modification** : Modification du code dans le cadre des responsabilités professionnelles
+- **Déploiement** : Déploiement sur l'infrastructure de Digital Dynamics
+
+### Restrictions
+
+- **Redistribution** : Interdiction de redistribuer le code ou la documentation
+- **Usage commercial externe** : Interdiction d'utiliser ce code pour d'autres projets ou entreprises
+- **Publication** : Interdiction de publier ce code sur des plateformes publiques
+- **Divulgation** : Interdiction de divulguer des informations confidentielles
+
+---
+
+## Données de santé
+
+Ce système gère des **données de santé à caractère personnel** soumises à :
+
+- **Hébergement de Données de Santé (HDS)** — Certification française
+- **Règlement Général sur la Protection des Données (RGPD)** — Réglementation européenne
+
+Toute utilisation non autorisée peut entraîner des sanctions administratives et pénales (amendes RGPD jusqu'à 4% du CA annuel mondial ou 20M EUR).
+
+---
+
+## Propriété intellectuelle
+
+Tout le code source contenu dans ce repository est la **propriété intellectuelle exclusive de Digital Dynamics**. Toute contribution devient automatiquement la propriété de Digital Dynamics.
+
+---
+
+## Juridiction
+
+Cette licence est régie par le **droit français**. Tout litige sera soumis à la **compétence exclusive des tribunaux de Paris, France**.
+
+---
+
+## Contact
+
+**Digital Dynamics**
+Adresse : Au Sawou 23, 4607 Berneau, Belgique
+Email : <info@digitaldynamics.be>
+
+**Data Protection Officer (DPO)**
+Email : <dpo@digitaldynamics.be>
+
+---
+
+**Version** : 1.0 | **Date d'effet** : 2026-02-20
+
+(c) 2026 Digital Dynamics. Tous droits réservés. CONFIDENTIEL — NE PAS DISTRIBUER

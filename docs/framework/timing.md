@@ -46,7 +46,15 @@ dotnet add package DigitalDynamics.Foundation.Timing
 
 ## Configuration
 
-Enregistrer les services dans `Program.cs` :
+### Avec le système de modules (recommandé)
+
+Le module `FoundationTimingModule` est automatiquement chargé via `[DependsOn]` quand
+un module dépendant (ex : Persistence) en a besoin. Il suffit d'utiliser
+`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](modularity.md)).
+
+### Enregistrement direct
+
+Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
 builder.Services.AddFoundationTiming();
@@ -63,10 +71,13 @@ builder.Services.AddFoundationTiming(options =>
 
 ## IClock
 
-`IClock` est l'interface principale du module. Elle doit être injectée partout où le
-code a besoin de l'heure courante ou de conversions de fuseau horaire.
+`IClock` est l'interface principale du module, définie dans le package
+`DigitalDynamics.Foundation.Timing`. Elle doit être injectée partout où le code a besoin
+de l'heure courante ou de conversions de fuseau horaire.
 
 ```csharp
+namespace DigitalDynamics.Foundation.Timing;
+
 public interface IClock
 {
     DateTimeOffset Now { get; }
@@ -374,16 +385,14 @@ public static AppointmentResponse ToResponse(
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Abstractions (zéro dépendance)
-└── Timing/
-    ├── IClock.cs
-    └── ICurrentTimezoneProvider.cs
-
 DigitalDynamics.Foundation.Timing
+├── IClock.cs                             (interface, contrat public)
+├── ICurrentTimezoneProvider.cs           (interface, contrat public)
 ├── Clock.cs                              (implémentation, délègue à TimeProvider)
 ├── ClockOptions.cs                       (options configurables)
 ├── CurrentTimezoneProvider.cs            (AsyncLocal, Singleton)
 ├── DisableDateTimeNormalizationAttribute.cs
+├── FoundationTimingModule.cs             (module Foundation)
 └── Extensions/
     └── TimingServiceCollectionExtensions.cs  (AddFoundationTiming)
 ```

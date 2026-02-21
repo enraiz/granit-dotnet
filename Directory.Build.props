@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <NoWarn>CA1848;CA1707;CA1305;CA1861</NoWarn>
+  </PropertyGroup>
+
+  <!-- NuGet Package Metadata -->
+  <PropertyGroup>
+    <Authors>Digital Dynamics</Authors>
+    <Company>Digital Dynamics</Company>
+    <Copyright>Copyright (c) 2026 Digital Dynamics. All rights reserved.</Copyright>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://gitlab.digitaldynamics.be/digital-dynamics/dd-foundation-dotnet</RepositoryUrl>
+    <PackageProjectUrl>https://gitlab.digitaldynamics.be/digital-dynamics/dd-foundation-dotnet</PackageProjectUrl>
+    <Description>DigitalDynamics.Foundation - Packages partagés pour les applications .NET Digital Dynamics</Description>
+  </PropertyGroup>
+</Project>
