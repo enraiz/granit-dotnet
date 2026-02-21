@@ -44,7 +44,7 @@ public sealed partial class VaultClientFactory
                 "Valeurs autorisées : 'Kubernetes', 'Token'.")
         };
 
-        var settings = new VaultClientSettings(_options.Address, authMethod);
+        VaultClientSettings settings = new(_options.Address, authMethod);
         LogClientCreated(_logger, _options.AuthMethod, _options.Address);
 
         return new VaultClient(settings);
@@ -52,7 +52,7 @@ public sealed partial class VaultClientFactory
 
     private KubernetesAuthMethodInfo CreateKubernetesAuth()
     {
-        var jwt = File.ReadAllText(_options.KubernetesTokenPath);
+        string jwt = File.ReadAllText(_options.KubernetesTokenPath);
         LogKubernetesAuth(_logger, _options.KubernetesRole);
         return new KubernetesAuthMethodInfo(_options.KubernetesRole, jwt);
     }

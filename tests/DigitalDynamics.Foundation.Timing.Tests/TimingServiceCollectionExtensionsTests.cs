@@ -17,15 +17,15 @@ public sealed class TimingServiceCollectionExtensionsTests
     public void AddFoundationTiming_RegistersClock()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         services.AddFoundationTiming();
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var clock = sp.GetService<IClock>();
+        IClock? clock = sp.GetService<IClock>();
         clock.Should().NotBeNull();
         clock.Should().BeOfType<Clock>();
     }
@@ -34,15 +34,15 @@ public sealed class TimingServiceCollectionExtensionsTests
     public void AddFoundationTiming_RegistersTimezoneProvider()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         services.AddFoundationTiming();
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var provider = sp.GetService<ICurrentTimezoneProvider>();
+        ICurrentTimezoneProvider? provider = sp.GetService<ICurrentTimezoneProvider>();
         provider.Should().NotBeNull();
         provider.Should().BeOfType<CurrentTimezoneProvider>();
     }
@@ -51,15 +51,15 @@ public sealed class TimingServiceCollectionExtensionsTests
     public void AddFoundationTiming_RegistersTimeProvider()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         services.AddFoundationTiming();
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var timeProvider = sp.GetService<TimeProvider>();
+        TimeProvider? timeProvider = sp.GetService<TimeProvider>();
         timeProvider.Should().NotBeNull();
         timeProvider.Should().BeSameAs(TimeProvider.System);
     }
@@ -68,17 +68,17 @@ public sealed class TimingServiceCollectionExtensionsTests
     public void AddFoundationTiming_TryAddSingleton_DoesNotOverrideExisting()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var customClock = NSubstitute.Substitute.For<IClock>();
+        ServiceCollection services = new();
+        IClock customClock = NSubstitute.Substitute.For<IClock>();
         services.AddSingleton(customClock);
 
         // Act
         services.AddFoundationTiming();
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var resolved = sp.GetRequiredService<IClock>();
+        IClock resolved = sp.GetRequiredService<IClock>();
         resolved.Should().BeSameAs(customClock);
     }
 
@@ -86,7 +86,7 @@ public sealed class TimingServiceCollectionExtensionsTests
     public void AddFoundationTiming_WithConfigure_AppliesOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         services.AddFoundationTiming(opts =>
@@ -94,10 +94,10 @@ public sealed class TimingServiceCollectionExtensionsTests
             opts.DefaultTimezone = "America/New_York";
         });
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ClockOptions>>().Value;
+        ClockOptions options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ClockOptions>>().Value;
         options.DefaultTimezone.Should().Be("America/New_York");
     }
 }

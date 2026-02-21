@@ -270,18 +270,18 @@ public class PatientService
 }
 ```
 
-### Dans l'intercepteur AuditableEntityInterceptor
+### Dans l'intercepteur AuditedEntityInterceptor
 
-L'intercepteur `AuditableEntityInterceptor` du package Persistence peut utiliser
+L'intercepteur `AuditedEntityInterceptor` du package Persistence peut utiliser
 `IGuidGenerator` pour assigner les `Id` des nouvelles entités au lieu de
 `Guid.NewGuid()` :
 
 ```csharp
-if (entry.Entity is AuditableEntity auditable)
+if (entry.Entity is Entity entity)
 {
-    if (entry.State == EntityState.Added && auditable.Id == Guid.Empty)
+    if (entry.State == EntityState.Added && entity.Id == Guid.Empty)
     {
-        auditable.Id = _guidGenerator.Create();
+        entity.Id = _guidGenerator.Create();
     }
 }
 ```

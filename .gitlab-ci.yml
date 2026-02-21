@@ -148,6 +148,7 @@ sonarqube:
       /d:sonar.token="${SONAR_TOKEN}"
       /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
       /d:sonar.coverage.exclusions="**/Tests/**,**/test/**"
+      /d:sonar.exclusions=".nuget/**"
       /d:sonar.qualitygate.wait=true
     - dotnet build -c $CONFIGURATION
     - dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
@@ -208,6 +209,7 @@ publish:
     - dotnet nuget add source "$NUGET_SOURCE" --name gitlab --username gitlab-ci-token --password "$CI_JOB_TOKEN" --store-password-in-clear-text
     - dotnet nuget push "nupkgs/*.nupkg" --source gitlab
   rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
   needs:
     - pack

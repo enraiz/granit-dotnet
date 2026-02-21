@@ -13,6 +13,8 @@ using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
+using VaultSharp.V1.Commons;
+using VaultSharp.V1.SecretsEngines.Transit;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
 
@@ -40,11 +42,11 @@ public sealed partial class TransitEncryptionService : ITransitEncryptionService
         string plaintext,
         CancellationToken cancellationToken = default)
     {
-        var base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
+        string base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
 
-        var result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
+        Secret<EncryptionResponse> result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
             keyName,
-            new VaultSharp.V1.SecretsEngines.Transit.EncryptRequestOptions
+            new EncryptRequestOptions
             {
                 Base64EncodedPlainText = base64Plaintext
             },
@@ -59,15 +61,15 @@ public sealed partial class TransitEncryptionService : ITransitEncryptionService
         string ciphertext,
         CancellationToken cancellationToken = default)
     {
-        var result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
+        Secret<DecryptionResponse> result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
             keyName,
-            new VaultSharp.V1.SecretsEngines.Transit.DecryptRequestOptions
+            new DecryptRequestOptions
             {
                 CipherText = ciphertext
             },
             mountPoint: _options.TransitMountPoint);
 
-        var bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
+        byte[] bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
         LogDataDecrypted(_logger, keyName);
         return Encoding.UTF8.GetString(bytes);
     }

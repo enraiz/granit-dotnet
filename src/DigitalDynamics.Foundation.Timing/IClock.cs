@@ -3,7 +3,7 @@
 // =============================================================================
 // Remplace tout appel direct a DateTimeOffset.UtcNow dans le code applicatif.
 // Utilise System.TimeProvider en interne pour Now.
-// Ajoute les conversions de fuseau horaire par-dessus (style ABP Timing).
+// Ajoute les conversions de fuseau horaire par-dessus.
 //
 // Usage : injecter IClock dans les handlers, intercepteurs, services.
 //   var now = clock.Now;

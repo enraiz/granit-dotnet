@@ -37,10 +37,10 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
     {
         _vaultClient = Substitute.For<IVaultClient>();
 
-        var v1 = Substitute.For<IVaultClientV1>();
+        IVaultClientV1 v1 = Substitute.For<IVaultClientV1>();
         _vaultClient.V1.Returns(v1);
 
-        var secretsEngine = Substitute.For<ISecretsEngine>();
+        ISecretsEngine secretsEngine = Substitute.For<ISecretsEngine>();
         v1.Secrets.Returns(secretsEngine);
 
         _databaseEngine = Substitute.For<IDatabaseSecretsEngine>();
@@ -79,7 +79,7 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
         // Arrange
         SetupDatabaseCredentials("v-user-123", "p@ssw0rd!", "lease-abc", 3600);
 
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(
+        using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
             TestContext.Current.CancellationToken);
 
         // Act - Start and immediately cancel after credentials are obtained
@@ -120,7 +120,7 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
                 LeaseDurationSeconds = 3600
             });
 
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(
+        using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
             TestContext.Current.CancellationToken);
 
         // Act
@@ -170,7 +170,7 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
                 };
             });
 
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(
+        using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
             TestContext.Current.CancellationToken);
 
         // Act

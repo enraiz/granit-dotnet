@@ -17,6 +17,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
+using VaultSharp.V1.Commons;
+using VaultSharp.V1.SecretsEngines;
+using VaultSharp.V1.SystemBackend;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
 
@@ -68,11 +71,11 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
     {
         LogLeaseManagerStarting(_logger);
 
-        await ObtainCredentialsAsync(stoppingToken);
+        await ObtainCredentialsAsync();
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            var renewalDelay = TimeSpan.FromSeconds(
+            TimeSpan renewalDelay = TimeSpan.FromSeconds(
                 _leaseDurationSeconds * _options.LeaseRenewalThreshold);
 
             LogNextRenewal(_logger, renewalDelay);
@@ -81,25 +84,25 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
 
             try
             {
-                await RenewLeaseAsync(stoppingToken);
+                await RenewLeaseAsync();
             }
             catch (Exception ex)
             {
                 LogLeaseRenewalFailed(_logger, _leaseId, ex);
 
-                await ObtainCredentialsAsync(stoppingToken);
+                await ObtainCredentialsAsync();
             }
         }
 
         LogLeaseManagerStopping(_logger);
     }
 
-    private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
+    private async Task ObtainCredentialsAsync()
     {
-        var path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
+        string path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
         LogObtainingCredentials(_logger, path);
 
-        var secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
+        Secret<UsernamePasswordCredentials> secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
             _options.DatabaseRoleName,
             mountPoint: _options.DatabaseMountPoint);
 
@@ -111,11 +114,11 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
         LogCredentialsObtained(_logger, _username, _leaseId, _leaseDurationSeconds);
     }
 
-    private async Task RenewLeaseAsync(CancellationToken cancellationToken)
+    private async Task RenewLeaseAsync()
     {
         LogLeaseRenewing(_logger, _leaseId);
 
-        var renewed = await _vaultClient.V1.System.RenewLeaseAsync(
+        Secret<RenewedLease> renewed = await _vaultClient.V1.System.RenewLeaseAsync(
             _leaseId,
             _leaseDurationSeconds);
 

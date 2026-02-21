@@ -13,8 +13,6 @@ namespace DigitalDynamics.Foundation.Guids;
 /// </summary>
 public sealed class FoundationGuidsModule : FoundationModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
         context.Services.AddFoundationGuids();
-    }
 }

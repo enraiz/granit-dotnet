@@ -34,11 +34,11 @@ public sealed class ClockTests
     public void Now_ReturnsUtcFromTimeProvider()
     {
         // Arrange
-        var expected = new DateTimeOffset(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
+        DateTimeOffset expected = new(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
         _fakeTimeProvider.SetUtcNow(expected);
 
         // Act
-        var now = _clock.Now;
+        DateTimeOffset now = _clock.Now;
 
         // Assert
         now.Should().Be(expected);
@@ -49,7 +49,7 @@ public sealed class ClockTests
     public void Now_IsAlwaysUtc()
     {
         // Act
-        var now = _clock.Now;
+        DateTimeOffset now = _clock.Now;
 
         // Assert
         now.Offset.Should().Be(TimeSpan.Zero, "le Clock doit toujours retourner UTC (conformite HDS)");
@@ -65,10 +65,10 @@ public sealed class ClockTests
     public void Normalize_ConvertsLocalOffsetToUtc()
     {
         // Arrange - DateTimeOffset avec offset +02:00 (Europe/Brussels en ete)
-        var localTime = new DateTimeOffset(2026, 6, 15, 14, 30, 0, TimeSpan.FromHours(2));
+        DateTimeOffset localTime = new(2026, 6, 15, 14, 30, 0, TimeSpan.FromHours(2));
 
         // Act
-        var normalized = _clock.Normalize(localTime);
+        DateTimeOffset normalized = _clock.Normalize(localTime);
 
         // Assert - Doit etre converti en UTC (+00:00), meme instant
         normalized.Offset.Should().Be(TimeSpan.Zero);
@@ -79,10 +79,10 @@ public sealed class ClockTests
     public void Normalize_KeepsUtcUnchanged()
     {
         // Arrange
-        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero);
+        DateTimeOffset utcTime = new(2026, 6, 15, 12, 30, 0, TimeSpan.Zero);
 
         // Act
-        var normalized = _clock.Normalize(utcTime);
+        DateTimeOffset normalized = _clock.Normalize(utcTime);
 
         // Assert
         normalized.Should().Be(utcTime);
@@ -92,10 +92,10 @@ public sealed class ClockTests
     public void Normalize_ConvertsNegativeOffsetToUtc()
     {
         // Arrange - DateTimeOffset avec offset -05:00 (America/New_York)
-        var localTime = new DateTimeOffset(2026, 6, 15, 7, 30, 0, TimeSpan.FromHours(-5));
+        DateTimeOffset localTime = new(2026, 6, 15, 7, 30, 0, TimeSpan.FromHours(-5));
 
         // Act
-        var normalized = _clock.Normalize(localTime);
+        DateTimeOffset normalized = _clock.Normalize(localTime);
 
         // Assert
         normalized.Offset.Should().Be(TimeSpan.Zero);
@@ -107,12 +107,12 @@ public sealed class ClockTests
     {
         // Arrange
         _timezoneProvider.Timezone.Returns("Europe/Brussels");
-        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
-        var tzInfo = TimeZoneInfo.FindSystemTimeZoneById("Europe/Brussels");
-        var expectedOffset = tzInfo.GetUtcOffset(utcTime);
+        DateTimeOffset utcTime = new(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        TimeZoneInfo tzInfo = TimeZoneInfo.FindSystemTimeZoneById("Europe/Brussels");
+        TimeSpan expectedOffset = tzInfo.GetUtcOffset(utcTime);
 
         // Act
-        var userTime = _clock.ConvertToUserTime(utcTime);
+        DateTimeOffset userTime = _clock.ConvertToUserTime(utcTime);
 
         // Assert - le meme instant UTC, converti dans le fuseau utilisateur
         userTime.UtcDateTime.Should().Be(utcTime.UtcDateTime, "la conversion ne doit pas changer l'instant UTC");
@@ -124,10 +124,10 @@ public sealed class ClockTests
     {
         // Arrange
         _timezoneProvider.Timezone.Returns((string?)null);
-        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        DateTimeOffset utcTime = new(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
         // Act
-        var userTime = _clock.ConvertToUserTime(utcTime);
+        DateTimeOffset userTime = _clock.ConvertToUserTime(utcTime);
 
         // Assert
         userTime.Should().Be(utcTime);
@@ -138,10 +138,10 @@ public sealed class ClockTests
     {
         // Arrange
         _timezoneProvider.Timezone.Returns("");
-        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        DateTimeOffset utcTime = new(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
         // Act
-        var userTime = _clock.ConvertToUserTime(utcTime);
+        DateTimeOffset userTime = _clock.ConvertToUserTime(utcTime);
 
         // Assert
         userTime.Should().Be(utcTime);
@@ -151,10 +151,10 @@ public sealed class ClockTests
     public void ConvertToUtc_ConvertsToUtc()
     {
         // Arrange - DateTimeOffset avec offset +02:00
-        var localTime = new DateTimeOffset(2026, 6, 15, 14, 0, 0, TimeSpan.FromHours(2));
+        DateTimeOffset localTime = new(2026, 6, 15, 14, 0, 0, TimeSpan.FromHours(2));
 
         // Act
-        var utcTime = _clock.ConvertToUtc(localTime);
+        DateTimeOffset utcTime = _clock.ConvertToUtc(localTime);
 
         // Assert
         utcTime.Offset.Should().Be(TimeSpan.Zero);
@@ -165,10 +165,10 @@ public sealed class ClockTests
     public void ConvertToUtc_KeepsUtcUnchanged()
     {
         // Arrange
-        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        DateTimeOffset utcTime = new(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
         // Act
-        var result = _clock.ConvertToUtc(utcTime);
+        DateTimeOffset result = _clock.ConvertToUtc(utcTime);
 
         // Assert
         result.Should().Be(utcTime);

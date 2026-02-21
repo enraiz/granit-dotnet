@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>DigitalDynamics.Foundation.Core</PackageId>
-    <Description>Systeme de modules ABP-inspired pour les packages DigitalDynamics.Foundation. Topological loading, DependsOn, lifecycle. Types domaine partages (AuditableEntity, ISoftDeletable).</Description>
+    <Description>Système de modules pour les packages DigitalDynamics.Foundation. Topological loading, DependsOn, lifecycle. Types domaine partagés (Entity, CreationAuditedEntity, AuditedEntity, FullAuditedEntity, ISoftDeletable).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

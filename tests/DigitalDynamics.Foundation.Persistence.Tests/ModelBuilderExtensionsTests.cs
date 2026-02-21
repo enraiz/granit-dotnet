@@ -19,7 +19,7 @@ public sealed class ModelBuilderExtensionsTests
     public async Task ApplyFoundationConventions_FiltersSoftDeletedEntities()
     {
         // Arrange
-        await using var context = CreateContext();
+        await using TestDbContext context = CreateContext();
         await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
         context.Products.Add(new TestProduct { Name = "Active", IsDeleted = false });
@@ -27,7 +27,7 @@ public sealed class ModelBuilderExtensionsTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var results = await context.Products.ToListAsync(TestContext.Current.CancellationToken);
+        List<TestProduct> results = await context.Products.ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(1);
@@ -38,7 +38,7 @@ public sealed class ModelBuilderExtensionsTests
     public async Task ApplyFoundationConventions_IgnoreQueryFilters_ReturnsAll()
     {
         // Arrange
-        await using var context = CreateContext();
+        await using TestDbContext context = CreateContext();
         await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
         context.Products.Add(new TestProduct { Name = "Active", IsDeleted = false });
@@ -46,7 +46,7 @@ public sealed class ModelBuilderExtensionsTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var results = await context.Products.IgnoreQueryFilters().ToListAsync(TestContext.Current.CancellationToken);
+        List<TestProduct> results = await context.Products.IgnoreQueryFilters().ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -56,7 +56,7 @@ public sealed class ModelBuilderExtensionsTests
     public async Task ApplyFoundationConventions_NonSoftDeletableEntity_NotFiltered()
     {
         // Arrange
-        await using var context = CreateContext();
+        await using TestDbContext context = CreateContext();
         await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
         context.Categories.Add(new TestCategory { Name = "Cat1" });
@@ -64,7 +64,7 @@ public sealed class ModelBuilderExtensionsTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var results = await context.Categories.ToListAsync(TestContext.Current.CancellationToken);
+        List<TestCategory> results = await context.Categories.ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -72,7 +72,7 @@ public sealed class ModelBuilderExtensionsTests
 
     private static TestDbContext CreateContext()
     {
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 

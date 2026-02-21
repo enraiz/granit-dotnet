@@ -15,20 +15,20 @@ namespace DigitalDynamics.Foundation.Persistence.Tests;
 public sealed class PersistenceServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddFoundationPersistence_RegistersAuditableEntityInterceptor()
+    public void AddFoundationPersistence_RegistersAuditedEntityInterceptor()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         AddRequiredDependencies(services);
 
         // Act
         services.AddFoundationPersistence();
 
-        using var sp = services.BuildServiceProvider();
-        using var scope = sp.CreateScope();
+        using ServiceProvider sp = services.BuildServiceProvider();
+        using IServiceScope scope = sp.CreateScope();
 
         // Assert
-        var interceptor = scope.ServiceProvider.GetService<AuditableEntityInterceptor>();
+        AuditedEntityInterceptor? interceptor = scope.ServiceProvider.GetService<AuditedEntityInterceptor>();
         interceptor.Should().NotBeNull();
     }
 
@@ -36,17 +36,17 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     public void AddFoundationPersistence_RegistersSoftDeleteInterceptor()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         AddRequiredDependencies(services);
 
         // Act
         services.AddFoundationPersistence();
 
-        using var sp = services.BuildServiceProvider();
-        using var scope = sp.CreateScope();
+        using ServiceProvider sp = services.BuildServiceProvider();
+        using IServiceScope scope = sp.CreateScope();
 
         // Assert
-        var interceptor = scope.ServiceProvider.GetService<SoftDeleteInterceptor>();
+        SoftDeleteInterceptor? interceptor = scope.ServiceProvider.GetService<SoftDeleteInterceptor>();
         interceptor.Should().NotBeNull();
     }
 
@@ -54,22 +54,22 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     public void AddFoundationPersistence_InterceptorsAreScoped()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         services.AddFoundationPersistence();
 
         // Assert
-        var auditDescriptor = services.First(d => d.ServiceType == typeof(AuditableEntityInterceptor));
+        ServiceDescriptor auditDescriptor = services.First(d => d.ServiceType == typeof(AuditedEntityInterceptor));
         auditDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
 
-        var softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
+        ServiceDescriptor softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
         softDeleteDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
     }
 
     private static void AddRequiredDependencies(ServiceCollection services)
     {
-        // AuditableEntityInterceptor requires IClock, IGuidGenerator, ICurrentUserService
+        // AuditedEntityInterceptor requires IClock, IGuidGenerator, ICurrentUserService
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Timing.IClock>());
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Guids.IGuidGenerator>());
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Security.ICurrentUserService>());
