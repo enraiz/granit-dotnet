@@ -90,7 +90,8 @@ public partial class DistributedCacheService<TCacheItem> : ICacheService<TCacheI
         }
 
         // 2. Acquisition du verrou stocké dans IMemoryCache (TTL 30 s — auto-nettoyage par le GC)
-        SemaphoreSlim semaphore = GetOrCreateLock(BuildKey(key));
+        string compositeKey = BuildKey(key);
+        SemaphoreSlim semaphore = GetOrCreateLock(compositeKey);
         await semaphore.WaitAsync(ct);
         try
         {
@@ -105,7 +106,7 @@ public partial class DistributedCacheService<TCacheItem> : ICacheService<TCacheI
             TCacheItem value = await factory(ct);
             await SetAsync(key, value, options, ct);
 
-            LogCacheMiss(_logger, BuildKey(key));
+            LogCacheMiss(_logger, compositeKey);
 
             return value;
         }
