@@ -23,9 +23,20 @@ public sealed class LocalizationResourceStore
     /// <param name="defaultCulture">Culture par défaut (défaut : "fr").</param>
     /// <returns>Info de la ressource pour chaînage fluent.</returns>
     public LocalizationResourceInfo Add<TResource>(string defaultCulture = "fr")
+        => Add(typeof(TResource), defaultCulture);
+
+    /// <summary>
+    /// Enregistre une nouvelle ressource de localisation (surcharge non-générique).
+    /// Utilisée par l'auto-discovery pour enregistrer dynamiquement des types découverts.
+    /// Si le type est déjà enregistré, l'entrée est remplacée.
+    /// </summary>
+    /// <param name="resourceType">Type marker de la ressource.</param>
+    /// <param name="defaultCulture">Culture par défaut (défaut : "fr").</param>
+    /// <returns>Info de la ressource pour chaînage fluent.</returns>
+    public LocalizationResourceInfo Add(Type resourceType, string defaultCulture = "fr")
     {
-        LocalizationResourceInfo info = new(typeof(TResource), defaultCulture);
-        _resources[typeof(TResource)] = info;
+        LocalizationResourceInfo info = new(resourceType, defaultCulture);
+        _resources[resourceType] = info;
         return info;
     }
 

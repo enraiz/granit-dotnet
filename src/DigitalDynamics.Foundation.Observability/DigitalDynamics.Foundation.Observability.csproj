@@ -4,6 +4,8 @@
     <PackageId>DigitalDynamics.Foundation.Observability</PackageId>
     <Description>Serilog et OpenTelemetry (OTLP vers Loki/Tempo/Mimir) pour les applications .NET Digital Dynamics.</Description>
     <IsPackable>true</IsPackable>
+    <!-- NU5104: OpenTelemetry.Instrumentation.EntityFrameworkCore n'a pas encore de version stable -->
+    <NoWarn>$(NoWarn);NU5104</NoWarn>
   </PropertyGroup>
 
   <!-- ASP.NET Core shared framework (pour IHostApplicationBuilder, ASP.NET instrumentation) -->

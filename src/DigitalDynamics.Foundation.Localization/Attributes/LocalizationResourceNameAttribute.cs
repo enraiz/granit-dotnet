@@ -16,4 +16,10 @@ public sealed class LocalizationResourceNameAttribute(string name) : Attribute
     /// Nom court de la ressource (ex: "Foundation", "Vault").
     /// </summary>
     public string Name { get; } = name;
+
+    /// <summary>
+    /// Culture par défaut de la ressource, utilisée comme fallback final.
+    /// Utilisée par l'auto-discovery quand aucun enregistrement explicite n'est présent.
+    /// </summary>
+    public string DefaultCulture { get; init; } = "fr";
 }

@@ -26,4 +26,12 @@ public sealed class FoundationLocalizationOptions
     /// Langues disponibles dans l'application (pour UI de sélection de langue).
     /// </summary>
     public List<LanguageInfo> Languages { get; } = [];
+
+    /// <summary>
+    /// Active l'auto-discovery des ressources JSON par convention de nommage.
+    /// Quand activé, les assemblies chargées sont scannées pour détecter les types
+    /// marqués avec <see cref="Attributes.LocalizationResourceNameAttribute"/> et
+    /// leurs fichiers JSON embarqués, sans enregistrement explicite <c>AddJson()</c>.
+    /// </summary>
+    public bool EnableAutoDiscovery { get; set; }
 }
