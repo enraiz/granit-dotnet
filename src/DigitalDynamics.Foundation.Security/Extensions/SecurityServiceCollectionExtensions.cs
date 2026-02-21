@@ -32,10 +32,10 @@ public static class SecurityServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var keycloakSection = configuration.GetSection(KeycloakOptions.SectionName);
+        IConfigurationSection keycloakSection = configuration.GetSection(KeycloakOptions.SectionName);
         services.Configure<KeycloakOptions>(keycloakSection);
 
-        var options = keycloakSection.Get<KeycloakOptions>()
+        KeycloakOptions options = keycloakSection.Get<KeycloakOptions>()
                       ?? new KeycloakOptions();
 
         services
@@ -58,17 +58,13 @@ public static class SecurityServiceCollectionExtensions
                 };
             });
 
-        services.AddAuthorization(auth =>
-        {
-            auth.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
-
-            auth.AddPolicy("FhirAccess", policy =>
+        services.AddAuthorizationBuilder()
+            .AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser())
+            .AddPolicy("FhirAccess", policy =>
                 policy.RequireAuthenticatedUser()
-                      .RequireClaim("scope", "fhir-access"));
-
-            auth.AddPolicy("Admin", policy =>
+                      .RequireClaim("scope", "fhir-access"))
+            .AddPolicy("Admin", policy =>
                 policy.RequireRole(options.AdminRole));
-        });
 
         services.AddHttpContextAccessor();
         services.AddTransient<IClaimsTransformation, KeycloakClaimsTransformation>();

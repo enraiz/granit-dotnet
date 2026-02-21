@@ -17,6 +17,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
+using VaultSharp.V1.Commons;
+using VaultSharp.V1.SecretsEngines;
+using VaultSharp.V1.SystemBackend;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
 
@@ -72,7 +75,7 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            var renewalDelay = TimeSpan.FromSeconds(
+            TimeSpan renewalDelay = TimeSpan.FromSeconds(
                 _leaseDurationSeconds * _options.LeaseRenewalThreshold);
 
             LogNextRenewal(_logger, renewalDelay);
@@ -96,10 +99,10 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
 
     private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
     {
-        var path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
+        string path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
         LogObtainingCredentials(_logger, path);
 
-        var secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
+        Secret<UsernamePasswordCredentials> secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
             _options.DatabaseRoleName,
             mountPoint: _options.DatabaseMountPoint);
 
@@ -115,7 +118,7 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
     {
         LogLeaseRenewing(_logger, _leaseId);
 
-        var renewed = await _vaultClient.V1.System.RenewLeaseAsync(
+        Secret<RenewedLease> renewed = await _vaultClient.V1.System.RenewLeaseAsync(
             _leaseId,
             _leaseDurationSeconds);
 

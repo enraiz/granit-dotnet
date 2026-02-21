@@ -40,8 +40,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnDelete_ConvertToSoftDelete()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestSoftDeletableEntity
+        await using TestDbContext context = CreateContext();
+        TestSoftDeletableEntity entity = new()
         {
             Id = Guid.NewGuid(),
             Name = "ToDelete",
@@ -63,7 +63,7 @@ public sealed class SoftDeleteInterceptorTests
         entity.DeletedBy.Should().Be("user-test-123");
 
         // Vérifier que l'entité existe encore en base (pas supprimée physiquement)
-        var count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
+        int count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
         count.Should().Be(1);
     }
 
@@ -71,8 +71,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnModify_DoesNotTriggerSoftDelete()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestSoftDeletableEntity
+        await using TestDbContext context = CreateContext();
+        TestSoftDeletableEntity entity = new()
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -95,10 +95,10 @@ public sealed class SoftDeleteInterceptorTests
 
     private TestDbContext CreateContext()
     {
-        var guidGenerator = Substitute.For<IGuidGenerator>();
-        var auditInterceptor = new AuditableEntityInterceptor(_currentUserService, _clock, guidGenerator);
-        var softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
+        AuditableEntityInterceptor auditInterceptor = new(_currentUserService, _clock, guidGenerator);
+        SoftDeleteInterceptor softDeleteInterceptor = new(_currentUserService, _clock);
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(auditInterceptor, softDeleteInterceptor)
             .Options;

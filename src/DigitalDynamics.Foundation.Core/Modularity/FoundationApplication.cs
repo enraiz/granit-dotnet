@@ -32,7 +32,7 @@ public sealed class FoundationApplication
     /// </summary>
     internal void ConfigureServices(ServiceConfigurationContext context)
     {
-        foreach (var module in _modules)
+        foreach (ModuleDescriptor module in _modules)
         {
             module.Instance.ConfigureServices(context);
         }
@@ -44,7 +44,7 @@ public sealed class FoundationApplication
     /// </summary>
     internal async Task ConfigureServicesAsync(ServiceConfigurationContext context)
     {
-        foreach (var module in _modules)
+        foreach (ModuleDescriptor module in _modules)
         {
             await module.Instance.ConfigureServicesAsync(context);
         }
@@ -56,7 +56,7 @@ public sealed class FoundationApplication
     /// </summary>
     internal void InitializeApplication(ApplicationInitializationContext context)
     {
-        foreach (var module in _modules)
+        foreach (ModuleDescriptor module in _modules)
         {
             module.Instance.OnApplicationInitialization(context);
         }
@@ -68,7 +68,7 @@ public sealed class FoundationApplication
     /// </summary>
     internal async Task InitializeApplicationAsync(ApplicationInitializationContext context)
     {
-        foreach (var module in _modules)
+        foreach (ModuleDescriptor module in _modules)
         {
             await module.Instance.OnApplicationInitializationAsync(context);
         }

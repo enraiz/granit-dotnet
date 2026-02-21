@@ -60,10 +60,10 @@ public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
             return;
         }
 
-        var now = _clock.Now;
-        var userId = _currentUserService.UserId ?? "system";
+        DateTimeOffset now = _clock.Now;
+        string userId = _currentUserService.UserId ?? "system";
 
-        foreach (var entry in context.ChangeTracker.Entries<AuditableEntity>())
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<AuditableEntity> entry in context.ChangeTracker.Entries<AuditableEntity>())
         {
             switch (entry.State)
             {

@@ -28,9 +28,8 @@ public sealed class SecurityServiceCollectionExtensionsTests
     private static IConfiguration CreateConfiguration(
         string authority = "https://auth.test.com/realms/test",
         string clientId = "test-client",
-        string adminRole = "admin")
-    {
-        return new ConfigurationBuilder()
+        string adminRole = "admin") =>
+        new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Keycloak:Authority"] = authority,
@@ -39,22 +38,21 @@ public sealed class SecurityServiceCollectionExtensionsTests
                 ["Keycloak:AdminRole"] = adminRole
             })
             .Build();
-    }
 
     [Fact]
     public void AddFoundationSecurity_RegistersKeycloakOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var config = CreateConfiguration();
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
 
         // Act
         services.AddFoundationSecurity(config);
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var options = sp.GetRequiredService<IOptions<KeycloakOptions>>().Value;
+        KeycloakOptions options = sp.GetRequiredService<IOptions<KeycloakOptions>>().Value;
         options.Authority.Should().Be("https://auth.test.com/realms/test");
         options.ClientId.Should().Be("test-client");
         options.RequireHttpsMetadata.Should().BeFalse();
@@ -64,16 +62,16 @@ public sealed class SecurityServiceCollectionExtensionsTests
     public void AddFoundationSecurity_RegistersJwtBearerAuthentication()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var config = CreateConfiguration();
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
 
         // Act
         services.AddFoundationSecurity(config);
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+        JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
             .Get(JwtBearerDefaults.AuthenticationScheme);
 
         jwtOptions.Authority.Should().Be("https://auth.test.com/realms/test");
@@ -89,16 +87,16 @@ public sealed class SecurityServiceCollectionExtensionsTests
     public void AddFoundationSecurity_RegistersAuthorizationPolicies()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var config = CreateConfiguration();
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
 
         // Act
         services.AddFoundationSecurity(config);
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
+        AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
 
         authOptions.GetPolicy("Authenticated").Should().NotBeNull();
         authOptions.GetPolicy("FhirAccess").Should().NotBeNull();
@@ -109,14 +107,14 @@ public sealed class SecurityServiceCollectionExtensionsTests
     public void AddFoundationSecurity_RegistersCurrentUserService()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var config = CreateConfiguration();
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
 
         // Act
         services.AddFoundationSecurity(config);
 
         // Assert
-        var descriptor = services.FirstOrDefault(
+        ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(ICurrentUserService));
 
         descriptor.Should().NotBeNull();
@@ -128,15 +126,15 @@ public sealed class SecurityServiceCollectionExtensionsTests
     public void AddFoundationSecurity_RegistersClaimsTransformation()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var config = CreateConfiguration();
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
 
         // Act
         services.AddFoundationSecurity(config);
 
         // Assert — AddAuthentication registers NoopClaimsTransformation first,
         // our KeycloakClaimsTransformation is added after
-        var descriptors = services
+        List<ServiceDescriptor> descriptors = services
             .Where(d => d.ServiceType == typeof(IClaimsTransformation))
             .ToList();
 
@@ -147,14 +145,14 @@ public sealed class SecurityServiceCollectionExtensionsTests
     public void AddFoundationSecurity_RegistersHttpContextAccessor()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var config = CreateConfiguration();
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
 
         // Act
         services.AddFoundationSecurity(config);
 
         // Assert
-        var descriptor = services.FirstOrDefault(
+        ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(IHttpContextAccessor));
 
         descriptor.Should().NotBeNull();
@@ -164,8 +162,8 @@ public sealed class SecurityServiceCollectionExtensionsTests
     public void AddFoundationSecurity_WithCustomAudience_UsesAudienceOverClientId()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var config = new ConfigurationBuilder()
+        ServiceCollection services = new ServiceCollection();
+        IConfigurationRoot config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Keycloak:Authority"] = "https://auth.test.com/realms/test",
@@ -178,10 +176,10 @@ public sealed class SecurityServiceCollectionExtensionsTests
         // Act
         services.AddFoundationSecurity(config);
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+        JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
             .Get(JwtBearerDefaults.AuthenticationScheme);
 
         jwtOptions.Audience.Should().Be("custom-audience");

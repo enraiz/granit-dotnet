@@ -31,10 +31,10 @@ public static class ObservabilityServiceCollectionExtensions
     public static IHostApplicationBuilder AddFoundationObservability(
         this IHostApplicationBuilder builder)
     {
-        var section = builder.Configuration.GetSection(ObservabilityOptions.SectionName);
+        IConfigurationSection section = builder.Configuration.GetSection(ObservabilityOptions.SectionName);
         builder.Services.Configure<ObservabilityOptions>(section);
 
-        var options = section.Get<ObservabilityOptions>() ?? new ObservabilityOptions();
+        ObservabilityOptions options = section.Get<ObservabilityOptions>() ?? new ObservabilityOptions();
 
         ConfigureSerilog(builder, options);
         ConfigureOpenTelemetry(builder, options);
@@ -70,7 +70,7 @@ public static class ObservabilityServiceCollectionExtensions
 
     private static void ConfigureOpenTelemetry(IHostApplicationBuilder builder, ObservabilityOptions options)
     {
-        var resourceBuilder = ResourceBuilder.CreateDefault()
+        ResourceBuilder resourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(
                 serviceName: options.ServiceName,
                 serviceVersion: options.ServiceVersion,

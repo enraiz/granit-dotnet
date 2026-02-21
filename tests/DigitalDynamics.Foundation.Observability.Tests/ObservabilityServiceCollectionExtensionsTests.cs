@@ -23,17 +23,17 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
     public void AddFoundationObservability_RegistersObservabilityOptions()
     {
         // Arrange
-        var builder = Host.CreateApplicationBuilder([]);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
         builder.Configuration["Observability:ServiceName"] = "test-service";
         builder.Configuration["Observability:ServiceVersion"] = "1.2.3";
 
         // Act
         builder.AddFoundationObservability();
 
-        using var sp = builder.Services.BuildServiceProvider();
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
 
         // Assert
-        var options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
+        ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
         options.ServiceName.Should().Be("test-service");
         options.ServiceVersion.Should().Be("1.2.3");
     }
@@ -42,17 +42,17 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
     public void AddFoundationObservability_RegistersTracerProvider()
     {
         // Arrange
-        var builder = Host.CreateApplicationBuilder([]);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
         builder.Configuration["Observability:EnableTracing"] = "true";
         builder.Configuration["Observability:OtlpEndpoint"] = "http://localhost:4317";
 
         // Act
         builder.AddFoundationObservability();
 
-        using var sp = builder.Services.BuildServiceProvider();
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
 
         // Assert
-        var tracerProvider = sp.GetService<TracerProvider>();
+        TracerProvider? tracerProvider = sp.GetService<TracerProvider>();
         tracerProvider.Should().NotBeNull();
     }
 
@@ -60,17 +60,17 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
     public void AddFoundationObservability_RegistersMeterProvider()
     {
         // Arrange
-        var builder = Host.CreateApplicationBuilder([]);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
         builder.Configuration["Observability:EnableMetrics"] = "true";
         builder.Configuration["Observability:OtlpEndpoint"] = "http://localhost:4317";
 
         // Act
         builder.AddFoundationObservability();
 
-        using var sp = builder.Services.BuildServiceProvider();
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
 
         // Assert
-        var meterProvider = sp.GetService<MeterProvider>();
+        MeterProvider? meterProvider = sp.GetService<MeterProvider>();
         meterProvider.Should().NotBeNull();
     }
 
@@ -78,15 +78,15 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
     public void AddFoundationObservability_WithDefaultConfig_UsesDefaultOptions()
     {
         // Arrange
-        var builder = Host.CreateApplicationBuilder([]);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
 
         // Act
         builder.AddFoundationObservability();
 
-        using var sp = builder.Services.BuildServiceProvider();
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
 
         // Assert
-        var options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
+        ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
         options.ServiceName.Should().Be("unknown-service");
         options.OtlpEndpoint.Should().Be("http://localhost:4317");
         options.EnableTracing.Should().BeTrue();
@@ -97,10 +97,10 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
     public void AddFoundationObservability_ReturnsBuilder_ForChaining()
     {
         // Arrange
-        var builder = Host.CreateApplicationBuilder([]);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
 
         // Act
-        var result = builder.AddFoundationObservability();
+        IHostApplicationBuilder result = builder.AddFoundationObservability();
 
         // Assert
         result.Should().BeSameAs(builder);

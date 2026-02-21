@@ -17,16 +17,16 @@ public sealed class GuidsServiceCollectionExtensionsTests
     public void AddFoundationGuids_RegistersGuidGenerator()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         services.AddOptions();
 
         // Act
         services.AddFoundationGuids();
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var generator = sp.GetService<IGuidGenerator>();
+        IGuidGenerator? generator = sp.GetService<IGuidGenerator>();
         generator.Should().NotBeNull();
         generator.Should().BeOfType<SequentialGuidGenerator>();
     }
@@ -35,17 +35,17 @@ public sealed class GuidsServiceCollectionExtensionsTests
     public void AddFoundationGuids_TryAddSingleton_DoesNotOverrideExisting()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var customGenerator = NSubstitute.Substitute.For<IGuidGenerator>();
+        ServiceCollection services = new();
+        IGuidGenerator customGenerator = NSubstitute.Substitute.For<IGuidGenerator>();
         services.AddSingleton(customGenerator);
 
         // Act
         services.AddFoundationGuids();
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var resolved = sp.GetRequiredService<IGuidGenerator>();
+        IGuidGenerator resolved = sp.GetRequiredService<IGuidGenerator>();
         resolved.Should().BeSameAs(customGenerator);
     }
 
@@ -53,7 +53,7 @@ public sealed class GuidsServiceCollectionExtensionsTests
     public void AddFoundationGuids_WithConfigure_AppliesOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         services.AddFoundationGuids(opts =>
@@ -61,10 +61,10 @@ public sealed class GuidsServiceCollectionExtensionsTests
             opts.DefaultSequentialGuidType = SequentialGuidType.SequentialAsBinary;
         });
 
-        using var sp = services.BuildServiceProvider();
+        using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
-        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GuidGeneratorOptions>>().Value;
+        GuidGeneratorOptions options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GuidGeneratorOptions>>().Value;
         options.DefaultSequentialGuidType.Should().Be(SequentialGuidType.SequentialAsBinary);
     }
 }

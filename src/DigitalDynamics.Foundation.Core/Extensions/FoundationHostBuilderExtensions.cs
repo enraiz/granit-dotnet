@@ -29,10 +29,10 @@ public static class FoundationHostBuilderExtensions
         this IHostApplicationBuilder builder)
         where TModule : FoundationModule
     {
-        var modules = ModuleLoader.LoadModules<TModule>();
-        var application = new FoundationApplication(modules);
+        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TModule>();
+        FoundationApplication application = new(modules);
 
-        var context = new ServiceConfigurationContext(
+        ServiceConfigurationContext context = new(
             builder.Services,
             builder.Configuration,
             builder);
@@ -56,10 +56,10 @@ public static class FoundationHostBuilderExtensions
         this IHostApplicationBuilder builder)
         where TModule : FoundationModule
     {
-        var modules = ModuleLoader.LoadModules<TModule>();
-        var application = new FoundationApplication(modules);
+        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TModule>();
+        FoundationApplication application = new(modules);
 
-        var context = new ServiceConfigurationContext(
+        ServiceConfigurationContext context = new(
             builder.Services,
             builder.Configuration,
             builder);

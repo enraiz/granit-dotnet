@@ -18,17 +18,17 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     public void AddFoundationPersistence_RegistersAuditableEntityInterceptor()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         AddRequiredDependencies(services);
 
         // Act
         services.AddFoundationPersistence();
 
-        using var sp = services.BuildServiceProvider();
-        using var scope = sp.CreateScope();
+        using ServiceProvider sp = services.BuildServiceProvider();
+        using IServiceScope scope = sp.CreateScope();
 
         // Assert
-        var interceptor = scope.ServiceProvider.GetService<AuditableEntityInterceptor>();
+        AuditableEntityInterceptor? interceptor = scope.ServiceProvider.GetService<AuditableEntityInterceptor>();
         interceptor.Should().NotBeNull();
     }
 
@@ -36,17 +36,17 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     public void AddFoundationPersistence_RegistersSoftDeleteInterceptor()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         AddRequiredDependencies(services);
 
         // Act
         services.AddFoundationPersistence();
 
-        using var sp = services.BuildServiceProvider();
-        using var scope = sp.CreateScope();
+        using ServiceProvider sp = services.BuildServiceProvider();
+        using IServiceScope scope = sp.CreateScope();
 
         // Assert
-        var interceptor = scope.ServiceProvider.GetService<SoftDeleteInterceptor>();
+        SoftDeleteInterceptor? interceptor = scope.ServiceProvider.GetService<SoftDeleteInterceptor>();
         interceptor.Should().NotBeNull();
     }
 
@@ -54,16 +54,16 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     public void AddFoundationPersistence_InterceptorsAreScoped()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         services.AddFoundationPersistence();
 
         // Assert
-        var auditDescriptor = services.First(d => d.ServiceType == typeof(AuditableEntityInterceptor));
+        ServiceDescriptor auditDescriptor = services.First(d => d.ServiceType == typeof(AuditableEntityInterceptor));
         auditDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
 
-        var softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
+        ServiceDescriptor softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
         softDeleteDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
     }
 

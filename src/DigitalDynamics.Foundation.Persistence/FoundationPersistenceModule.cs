@@ -21,8 +21,6 @@ namespace DigitalDynamics.Foundation.Persistence;
     typeof(FoundationSecurityModule))]
 public sealed class FoundationPersistenceModule : FoundationModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
         context.Services.AddFoundationPersistence();
-    }
 }

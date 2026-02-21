@@ -58,10 +58,10 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
             return;
         }
 
-        var now = _clock.Now;
-        var userId = _currentUserService.UserId ?? "system";
+        DateTimeOffset now = _clock.Now;
+        string userId = _currentUserService.UserId ?? "system";
 
-        foreach (var entry in context.ChangeTracker.Entries<ISoftDeletable>())
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ISoftDeletable> entry in context.ChangeTracker.Entries<ISoftDeletable>())
         {
             if (entry.State != EntityState.Deleted)
             {

@@ -16,6 +16,7 @@
 using System.Linq.Expressions;
 using DigitalDynamics.Foundation.Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DigitalDynamics.Foundation.Persistence.Extensions;
 
@@ -37,17 +38,17 @@ public static class ModelBuilderExtensions
 
     private static void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
     {
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (!typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
             {
                 continue;
             }
 
-            var parameter = Expression.Parameter(entityType.ClrType, "e");
-            var property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
-            var condition = Expression.Equal(property, Expression.Constant(false));
-            var lambda = Expression.Lambda(condition, parameter);
+            ParameterExpression parameter = Expression.Parameter(entityType.ClrType, "e");
+            MemberExpression property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
+            BinaryExpression condition = Expression.Equal(property, Expression.Constant(false));
+            LambdaExpression lambda = Expression.Lambda(condition, parameter);
 
             modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
         }

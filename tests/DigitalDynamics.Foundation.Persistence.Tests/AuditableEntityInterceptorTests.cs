@@ -46,8 +46,8 @@ public sealed class AuditableEntityInterceptorTests
     public async Task SaveChangesAsync_OnAdd_SetsCreatedFields()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestEntity { Name = "Test" };
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new() { Name = "Test" };
         context.TestEntities.Add(entity);
 
         // Act
@@ -63,8 +63,8 @@ public sealed class AuditableEntityInterceptorTests
     public async Task SaveChangesAsync_OnModify_SetsModifiedFields()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestEntity
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new()
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -90,8 +90,8 @@ public sealed class AuditableEntityInterceptorTests
     public async Task SaveChangesAsync_OnModify_DoesNotOverwriteCreatedFields()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestEntity
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new()
         {
             Id = Guid.NewGuid(),
             Name = "Original"
@@ -100,8 +100,8 @@ public sealed class AuditableEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Capturer les valeurs de création posées par l'intercepteur lors du Add
-        var originalCreatedAt = entity.CreatedAt;
-        var originalCreatedBy = entity.CreatedBy;
+        DateTimeOffset originalCreatedAt = entity.CreatedAt;
+        string? originalCreatedBy = entity.CreatedBy;
 
         // Avancer le temps pour le Modify
         _clock.Now.Returns(FixedNow.AddHours(1));
@@ -125,8 +125,8 @@ public sealed class AuditableEntityInterceptorTests
     {
         // Arrange
         _currentUserService.UserId.Returns((string?)null);
-        await using var context = CreateContext();
-        var entity = new TestEntity { Name = "Test" };
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new() { Name = "Test" };
         context.TestEntities.Add(entity);
 
         // Act
@@ -138,8 +138,8 @@ public sealed class AuditableEntityInterceptorTests
 
     private TestDbContext CreateContext()
     {
-        var interceptor = new AuditableEntityInterceptor(_currentUserService, _clock, _guidGenerator);
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        AuditableEntityInterceptor interceptor = new(_currentUserService, _clock, _guidGenerator);
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(interceptor)
             .Options;
