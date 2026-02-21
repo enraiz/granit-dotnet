@@ -1,4 +1,3 @@
-using System.Text.Json;
 using DigitalDynamics.Foundation.Caching;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -29,9 +28,10 @@ namespace DigitalDynamics.Foundation.Caching.Hybrid;
 /// Protection stampede : native dans <c>HybridCache</c>, aucune <c>SemaphoreSlim</c> nécessaire.
 /// </para>
 /// <para>
-/// Chiffrement HDS : si <see cref="CacheEncryptionResolver.ShouldEncrypt"/> est <c>true</c>,
-/// les valeurs sont chiffrées via <see cref="ICacheValueEncryptor"/> avant stockage sur L2.
-/// Le L1 stocke les données déchiffrées (mémoire locale sécurisée par le pod).
+/// Chiffrement HDS : non supporté par ce fournisseur. <c>HybridCache</c> gère la sérialisation
+/// vers L2 en interne — il n'est pas possible d'y intercaler un chiffrement <c>byte[]</c>.
+/// Pour les données sensibles nécessitant un chiffrement au repos, utiliser
+/// <c>FoundationCachingRedisModule</c> (fournisseur Redis pur avec <see cref="ICacheValueEncryptor"/>).
 /// </para>
 /// </remarks>
 /// <typeparam name="TCacheItem">Type de l'élément mis en cache. Doit être une classe.</typeparam>
@@ -39,31 +39,25 @@ public partial class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
     where TCacheItem : class
 {
     private readonly HybridCache _hybridCache;
-    private readonly ICacheValueEncryptor _encryptor;
     private readonly IOptions<CachingOptions> _options;
     private readonly ILogger<HybridCacheService<TCacheItem>> _logger;
     private readonly string _cacheName;
-    private readonly bool _shouldEncrypt;
 
     /// <summary>
     /// Initialise une nouvelle instance de <see cref="HybridCacheService{TCacheItem}"/>.
     /// </summary>
     /// <param name="hybridCache">Cache hybride L1+L2 fourni par le runtime .NET 9.</param>
-    /// <param name="encryptor">Chiffreur de valeurs (no-op ou AES-256 selon configuration).</param>
     /// <param name="options">Options globales du cache.</param>
     /// <param name="logger">Logger structuré.</param>
     public HybridCacheService(
         HybridCache hybridCache,
-        ICacheValueEncryptor encryptor,
         IOptions<CachingOptions> options,
         ILogger<HybridCacheService<TCacheItem>> logger)
     {
         _hybridCache = hybridCache;
-        _encryptor = encryptor;
         _options = options;
         _logger = logger;
         _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
-        _shouldEncrypt = CacheEncryptionResolver.ShouldEncrypt(typeof(TCacheItem), options.Value);
     }
 
     /// <inheritdoc/>
