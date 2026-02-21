@@ -30,21 +30,21 @@ public sealed class KeycloakClaimsTransformation : IClaimsTransformation
             return Task.FromResult(principal);
         }
 
-        var realmAccessClaim = identity.FindFirst(RealmAccessClaim);
+        Claim? realmAccessClaim = identity.FindFirst(RealmAccessClaim);
         if (realmAccessClaim is null)
         {
             return Task.FromResult(principal);
         }
 
-        using var doc = JsonDocument.Parse(realmAccessClaim.Value);
-        if (!doc.RootElement.TryGetProperty(RolesProperty, out var rolesElement))
+        using JsonDocument doc = JsonDocument.Parse(realmAccessClaim.Value);
+        if (!doc.RootElement.TryGetProperty(RolesProperty, out JsonElement rolesElement))
         {
             return Task.FromResult(principal);
         }
 
-        foreach (var role in rolesElement.EnumerateArray())
+        foreach (JsonElement role in rolesElement.EnumerateArray())
         {
-            var roleValue = role.GetString();
+            string? roleValue = role.GetString();
             if (!string.IsNullOrEmpty(roleValue) && !identity.HasClaim(ClaimTypes.Role, roleValue))
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, roleValue));

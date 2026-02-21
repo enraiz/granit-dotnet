@@ -18,7 +18,7 @@ public sealed class ObservabilityOptionsTests
     public void DefaultValues_AreCorrect()
     {
         // Arrange & Act
-        var options = new ObservabilityOptions();
+        ObservabilityOptions options = new ObservabilityOptions();
 
         // Assert
         options.ServiceName.Should().Be("unknown-service");
@@ -34,7 +34,7 @@ public sealed class ObservabilityOptionsTests
     public void Binding_FromConfiguration_Works()
     {
         // Arrange
-        var config = new ConfigurationBuilder()
+        IConfigurationRoot config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 [$"{ObservabilityOptions.SectionName}:ServiceName"] = "guava-backend",
@@ -47,7 +47,7 @@ public sealed class ObservabilityOptionsTests
             .Build();
 
         // Act
-        var options = config.GetSection(ObservabilityOptions.SectionName)
+        ObservabilityOptions? options = config.GetSection(ObservabilityOptions.SectionName)
             .Get<ObservabilityOptions>();
 
         // Assert
@@ -61,8 +61,5 @@ public sealed class ObservabilityOptionsTests
     }
 
     [Fact]
-    public void SectionName_IsCorrect()
-    {
-        ObservabilityOptions.SectionName.Should().Be("Observability");
-    }
+    public void SectionName_IsCorrect() => ObservabilityOptions.SectionName.Should().Be("Observability");
 }

@@ -37,29 +37,24 @@ public sealed class Clock : IClock
     public bool SupportsMultipleTimezone => true;
 
     /// <inheritdoc />
-    public DateTimeOffset Normalize(DateTimeOffset dateTime)
-    {
+    public DateTimeOffset Normalize(DateTimeOffset dateTime) =>
         // Conformite HDS : tout est converti en UTC avant persistance.
         // Meme un DateTimeOffset avec offset local (+02:00) sera normalise en UTC (+00:00).
-        return dateTime.ToUniversalTime();
-    }
+        dateTime.ToUniversalTime();
 
     /// <inheritdoc />
     public DateTimeOffset ConvertToUserTime(DateTimeOffset utcDateTime)
     {
-        var tz = _timezoneProvider.Timezone;
+        string? tz = _timezoneProvider.Timezone;
         if (string.IsNullOrWhiteSpace(tz))
         {
             return utcDateTime;
         }
 
-        var tzInfo = TimeZoneInfo.FindSystemTimeZoneById(tz);
+        TimeZoneInfo tzInfo = TimeZoneInfo.FindSystemTimeZoneById(tz);
         return TimeZoneInfo.ConvertTime(utcDateTime, tzInfo);
     }
 
     /// <inheritdoc />
-    public DateTimeOffset ConvertToUtc(DateTimeOffset dateTime)
-    {
-        return dateTime.ToUniversalTime();
-    }
+    public DateTimeOffset ConvertToUtc(DateTimeOffset dateTime) => dateTime.ToUniversalTime();
 }

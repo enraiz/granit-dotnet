@@ -115,9 +115,6 @@ public sealed class SoftDeleteInterceptorTests
         public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
         public DbSet<TestSoftDeletableEntity> Entities => Set<TestSoftDeletableEntity>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<TestSoftDeletableEntity>().Property(e => e.Id).ValueGeneratedNever();
-        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.Entity<TestSoftDeletableEntity>().Property(e => e.Id).ValueGeneratedNever();
     }
 }

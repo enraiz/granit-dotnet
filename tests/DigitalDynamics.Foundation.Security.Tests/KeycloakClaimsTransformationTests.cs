@@ -20,18 +20,18 @@ public sealed class KeycloakClaimsTransformationTests
     public async Task TransformAsync_WithRealmAccessRoles_AddsRoleClaims()
     {
         // Arrange
-        var realmAccess = """{"roles":["admin","practitioner"]}""";
-        var identity = new ClaimsIdentity(
+        string realmAccess = """{"roles":["admin","practitioner"]}""";
+        ClaimsIdentity identity = new ClaimsIdentity(
             new[]
             {
                 new Claim("sub", "user-123"),
                 new Claim("realm_access", realmAccess)
             },
             "Bearer");
-        var principal = new ClaimsPrincipal(identity);
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
         // Act
-        var result = await _sut.TransformAsync(principal);
+        ClaimsPrincipal result = await _sut.TransformAsync(principal);
 
         // Assert
         result.IsInRole("admin").Should().BeTrue();
@@ -43,13 +43,13 @@ public sealed class KeycloakClaimsTransformationTests
     public async Task TransformAsync_WithoutRealmAccess_ReturnsUnmodifiedPrincipal()
     {
         // Arrange
-        var identity = new ClaimsIdentity(
+        ClaimsIdentity identity = new ClaimsIdentity(
             new[] { new Claim("sub", "user-123") },
             "Bearer");
-        var principal = new ClaimsPrincipal(identity);
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
         // Act
-        var result = await _sut.TransformAsync(principal);
+        ClaimsPrincipal result = await _sut.TransformAsync(principal);
 
         // Assert
         result.FindAll(ClaimTypes.Role).Should().BeEmpty();
@@ -59,11 +59,11 @@ public sealed class KeycloakClaimsTransformationTests
     public async Task TransformAsync_WithUnauthenticatedPrincipal_ReturnsUnmodifiedPrincipal()
     {
         // Arrange — pas de AuthenticationType → IsAuthenticated = false
-        var identity = new ClaimsIdentity();
-        var principal = new ClaimsPrincipal(identity);
+        ClaimsIdentity identity = new ClaimsIdentity();
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
         // Act
-        var result = await _sut.TransformAsync(principal);
+        ClaimsPrincipal result = await _sut.TransformAsync(principal);
 
         // Assert
         result.Identity!.IsAuthenticated.Should().BeFalse();
@@ -74,18 +74,18 @@ public sealed class KeycloakClaimsTransformationTests
     public async Task TransformAsync_WithEmptyRoles_AddsNoClaims()
     {
         // Arrange
-        var realmAccess = """{"roles":[]}""";
-        var identity = new ClaimsIdentity(
+        string realmAccess = """{"roles":[]}""";
+        ClaimsIdentity identity = new ClaimsIdentity(
             new[]
             {
                 new Claim("sub", "user-123"),
                 new Claim("realm_access", realmAccess)
             },
             "Bearer");
-        var principal = new ClaimsPrincipal(identity);
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
         // Act
-        var result = await _sut.TransformAsync(principal);
+        ClaimsPrincipal result = await _sut.TransformAsync(principal);
 
         // Assert
         result.FindAll(ClaimTypes.Role).Should().BeEmpty();
@@ -95,8 +95,8 @@ public sealed class KeycloakClaimsTransformationTests
     public async Task TransformAsync_DoesNotDuplicateExistingRoles()
     {
         // Arrange
-        var realmAccess = """{"roles":["admin"]}""";
-        var identity = new ClaimsIdentity(
+        string realmAccess = """{"roles":["admin"]}""";
+        ClaimsIdentity identity = new ClaimsIdentity(
             new[]
             {
                 new Claim("sub", "user-123"),
@@ -104,10 +104,10 @@ public sealed class KeycloakClaimsTransformationTests
                 new Claim("realm_access", realmAccess)
             },
             "Bearer");
-        var principal = new ClaimsPrincipal(identity);
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
         // Act
-        var result = await _sut.TransformAsync(principal);
+        ClaimsPrincipal result = await _sut.TransformAsync(principal);
 
         // Assert
         result.FindAll(ClaimTypes.Role).Should().HaveCount(1);

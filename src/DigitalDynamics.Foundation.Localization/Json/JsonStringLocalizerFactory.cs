@@ -81,13 +81,9 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
 
         foreach (Attributes.InheritResourceAttribute attr in inheritAttributes)
         {
-            foreach (Type baseResourceType in attr.BaseResourceTypes)
+            foreach (Type baseResourceType in attr.BaseResourceTypes.Where(t => !info.BaseTypes.Contains(t)))
             {
-                // Éviter les doublons si déjà déclaré via AddBaseTypes()
-                if (!info.BaseTypes.Contains(baseResourceType))
-                {
-                    baseLocalizers.Add(Create(baseResourceType));
-                }
+                baseLocalizers.Add(Create(baseResourceType));
             }
         }
 
