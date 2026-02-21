@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>DigitalDynamics.Foundation.Caching.Hybrid</PackageId>
+    <Description>Fournisseur HybridCache (L1 mémoire locale + L2 Redis) pour DigitalDynamics.Foundation.Caching.
+    Optimisé pour Kubernetes multi-pods : lecture &lt; 1 ms sur L1, ~2 ms sur L2 Redis.
+    Protection stampede native via HybridCache .NET 9. LocalCacheExpiration court (≤ 60 s)
+    pour borner la fenêtre de données obsolètes entre pods.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="DigitalDynamics.Foundation.Caching.Hybrid.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalDynamics.Foundation.Caching\DigitalDynamics.Foundation.Caching.csproj" />
+    <ProjectReference Include="..\DigitalDynamics.Foundation.Caching.StackExchangeRedis\DigitalDynamics.Foundation.Caching.StackExchangeRedis.csproj" />
+  </ItemGroup>
+
+</Project>
