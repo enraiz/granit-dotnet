@@ -1,0 +1,7 @@
+{
+  "culture": "fr",
+  "texts": {
+    "Parent:SharedKey": "Valeur partagée du parent",
+    "Parent:OnlyInParent": "Seulement dans le parent"
+  }
+}

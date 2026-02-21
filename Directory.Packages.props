@@ -9,6 +9,10 @@
   <!-- Toutes les versions sont centralisées ici (Central Package Mgmt)    -->
   <!-- =================================================================== -->
 
+  <ItemGroup Label="Localisation">
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="10.*" />
+  </ItemGroup>
+
   <ItemGroup Label="ASP.NET Core">
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.*" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.*" />

@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "texts": {
+    "Test:Hello": "Hello",
+    "Test:Welcome": "Welcome {0}, you have {1} messages",
+    "Test:Goodbye": "Goodbye"
+  }
+}
