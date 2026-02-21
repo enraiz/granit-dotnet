@@ -9,9 +9,9 @@
 // =============================================================================
 
 using System.Text;
+using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DigitalDynamics.Foundation.Vault.Options;
 using VaultSharp;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
@@ -19,7 +19,7 @@ namespace DigitalDynamics.Foundation.Vault.Services;
 /// <summary>
 /// Implémentation de <see cref="ITransitEncryptionService"/> via Vault Transit Engine.
 /// </summary>
-public sealed class TransitEncryptionService : ITransitEncryptionService
+public sealed partial class TransitEncryptionService : ITransitEncryptionService
 {
     private readonly IVaultClient _vaultClient;
     private readonly VaultOptions _options;
@@ -50,7 +50,7 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
             },
             mountPoint: _options.TransitMountPoint);
 
-        _logger.LogDebug("Données chiffrées avec la clé Transit {KeyName}", keyName);
+        LogDataEncrypted(_logger, keyName);
         return result.Data.CipherText;
     }
 
@@ -68,7 +68,13 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
             mountPoint: _options.TransitMountPoint);
 
         var bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
-        _logger.LogDebug("Données déchiffrées avec la clé Transit {KeyName}", keyName);
+        LogDataDecrypted(_logger, keyName);
         return Encoding.UTF8.GetString(bytes);
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Données chiffrées avec la clé Transit {KeyName}")]
+    private static partial void LogDataEncrypted(ILogger logger, string keyName);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Données déchiffrées avec la clé Transit {KeyName}")]
+    private static partial void LogDataDecrypted(ILogger logger, string keyName);
 }

@@ -8,9 +8,9 @@
 // En production, l'authentification Kubernetes est OBLIGATOIRE.
 // =============================================================================
 
+using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DigitalDynamics.Foundation.Vault.Options;
 using VaultSharp;
 using VaultSharp.V1.AuthMethods;
 using VaultSharp.V1.AuthMethods.Kubernetes;
@@ -21,7 +21,7 @@ namespace DigitalDynamics.Foundation.Vault.Services;
 /// <summary>
 /// Factory pour créer un client VaultSharp avec la méthode d'authentification configurée.
 /// </summary>
-public sealed class VaultClientFactory
+public sealed partial class VaultClientFactory
 {
     private readonly VaultOptions _options;
     private readonly ILogger<VaultClientFactory> _logger;
@@ -45,10 +45,7 @@ public sealed class VaultClientFactory
         };
 
         var settings = new VaultClientSettings(_options.Address, authMethod);
-        _logger.LogInformation(
-            "Client Vault créé avec la méthode {AuthMethod} vers {Address}",
-            _options.AuthMethod,
-            _options.Address);
+        LogClientCreated(_logger, _options.AuthMethod, _options.Address);
 
         return new VaultClient(settings);
     }
@@ -56,7 +53,7 @@ public sealed class VaultClientFactory
     private KubernetesAuthMethodInfo CreateKubernetesAuth()
     {
         var jwt = File.ReadAllText(_options.KubernetesTokenPath);
-        _logger.LogDebug("Authentification Kubernetes avec le rôle {Role}", _options.KubernetesRole);
+        LogKubernetesAuth(_logger, _options.KubernetesRole);
         return new KubernetesAuthMethodInfo(_options.KubernetesRole, jwt);
     }
 
@@ -69,8 +66,16 @@ public sealed class VaultClientFactory
                 "Configurez Vault:Token dans la configuration.");
         }
 
-        _logger.LogWarning(
-            "Authentification Vault par token statique — utiliser uniquement en développement local");
+        LogTokenAuth(_logger);
         return new TokenAuthMethodInfo(_options.Token);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Client Vault créé avec la méthode {AuthMethod} vers {Address}")]
+    private static partial void LogClientCreated(ILogger logger, string authMethod, string address);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Authentification Kubernetes avec le rôle {Role}")]
+    private static partial void LogKubernetesAuth(ILogger logger, string role);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Authentification Vault par token statique — utiliser uniquement en développement local")]
+    private static partial void LogTokenAuth(ILogger logger);
 }
