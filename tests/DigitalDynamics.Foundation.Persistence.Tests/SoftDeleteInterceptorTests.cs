@@ -96,7 +96,7 @@ public sealed class SoftDeleteInterceptorTests
     private TestDbContext CreateContext()
     {
         IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
-        AuditableEntityInterceptor auditInterceptor = new(_currentUserService, _clock, guidGenerator);
+        AuditedEntityInterceptor auditInterceptor = new(_currentUserService, _clock, guidGenerator);
         SoftDeleteInterceptor softDeleteInterceptor = new(_currentUserService, _clock);
         DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -105,12 +105,9 @@ public sealed class SoftDeleteInterceptorTests
         return new TestDbContext(options);
     }
 
-    private sealed class TestSoftDeletableEntity : AuditableEntity, ISoftDeletable
+    private sealed class TestSoftDeletableEntity : FullAuditedEntity
     {
         public string Name { get; set; } = string.Empty;
-        public bool IsDeleted { get; set; }
-        public DateTimeOffset? DeletedAt { get; set; }
-        public string? DeletedBy { get; set; }
     }
 
     private sealed class TestDbContext : DbContext

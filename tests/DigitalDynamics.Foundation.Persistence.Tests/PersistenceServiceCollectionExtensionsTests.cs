@@ -15,7 +15,7 @@ namespace DigitalDynamics.Foundation.Persistence.Tests;
 public sealed class PersistenceServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddFoundationPersistence_RegistersAuditableEntityInterceptor()
+    public void AddFoundationPersistence_RegistersAuditedEntityInterceptor()
     {
         // Arrange
         ServiceCollection services = new();
@@ -28,7 +28,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         using IServiceScope scope = sp.CreateScope();
 
         // Assert
-        AuditableEntityInterceptor? interceptor = scope.ServiceProvider.GetService<AuditableEntityInterceptor>();
+        AuditedEntityInterceptor? interceptor = scope.ServiceProvider.GetService<AuditedEntityInterceptor>();
         interceptor.Should().NotBeNull();
     }
 
@@ -60,7 +60,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         services.AddFoundationPersistence();
 
         // Assert
-        ServiceDescriptor auditDescriptor = services.First(d => d.ServiceType == typeof(AuditableEntityInterceptor));
+        ServiceDescriptor auditDescriptor = services.First(d => d.ServiceType == typeof(AuditedEntityInterceptor));
         auditDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
 
         ServiceDescriptor softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
@@ -69,7 +69,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
     private static void AddRequiredDependencies(ServiceCollection services)
     {
-        // AuditableEntityInterceptor requires IClock, IGuidGenerator, ICurrentUserService
+        // AuditedEntityInterceptor requires IClock, IGuidGenerator, ICurrentUserService
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Timing.IClock>());
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Guids.IGuidGenerator>());
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Security.ICurrentUserService>());

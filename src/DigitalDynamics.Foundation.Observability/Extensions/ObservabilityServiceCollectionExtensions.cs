@@ -70,12 +70,6 @@ public static class ObservabilityServiceCollectionExtensions
 
     private static void ConfigureOpenTelemetry(IHostApplicationBuilder builder, ObservabilityOptions options)
     {
-        ResourceBuilder resourceBuilder = ResourceBuilder.CreateDefault()
-            .AddService(
-                serviceName: options.ServiceName,
-                serviceVersion: options.ServiceVersion,
-                serviceNamespace: options.ServiceNamespace);
-
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(r => r.AddService(
                 serviceName: options.ServiceName,

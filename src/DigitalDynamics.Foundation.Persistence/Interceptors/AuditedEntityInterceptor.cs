@@ -1,10 +1,12 @@
 // =============================================================================
-// AuditableEntityInterceptor - Remplissage automatique des champs d'audit HDS
+// AuditedEntityInterceptor - Remplissage automatique des champs d'audit HDS
 // =============================================================================
-// Intercepte les SaveChanges d'EF Core pour remplir automatiquement
-// CreatedAt/CreatedBy et ModifiedAt/ModifiedBy sur toute AuditableEntity.
+// Intercepte les SaveChanges d'EF Core pour remplir automatiquement :
+//   - CreatedAt/CreatedBy sur toute CreationAuditedEntity (ajout)
+//   - ModifiedAt/ModifiedBy sur toute AuditedEntity (modification)
 //
-// Conformité HDS : chaque modification est tracée avec l'utilisateur et l'horodatage.
+// Conformité HDS : chaque modification est tracée avec l'utilisateur
+// et l'horodatage.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Domain;
@@ -12,21 +14,22 @@ using DigitalDynamics.Foundation.Guids;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 
 /// <summary>
 /// Intercepteur EF Core qui remplit automatiquement les champs d'audit
-/// sur les entités <see cref="AuditableEntity"/>.
+/// sur les entités héritant de <see cref="CreationAuditedEntity"/>.
 /// </summary>
-public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
+public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IClock _clock;
     private readonly IGuidGenerator _guidGenerator;
 
-    public AuditableEntityInterceptor(
+    public AuditedEntityInterceptor(
         ICurrentUserService currentUserService,
         IClock clock,
         IGuidGenerator guidGenerator)
@@ -63,7 +66,7 @@ public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
         DateTimeOffset now = _clock.Now;
         string userId = _currentUserService.UserId ?? "system";
 
-        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<AuditableEntity> entry in context.ChangeTracker.Entries<AuditableEntity>())
+        foreach (EntityEntry<CreationAuditedEntity> entry in context.ChangeTracker.Entries<CreationAuditedEntity>())
         {
             switch (entry.State)
             {
@@ -77,11 +80,16 @@ public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
                     break;
 
                 case EntityState.Modified:
-                    entry.Entity.ModifiedAt = now;
-                    entry.Entity.ModifiedBy = userId;
-                    // Empêcher la modification des champs de création
+                    // Protéger les champs de création
                     entry.Property(e => e.CreatedAt).IsModified = false;
                     entry.Property(e => e.CreatedBy).IsModified = false;
+
+                    // Remplir les champs de modification uniquement sur AuditedEntity
+                    if (entry.Entity is AuditedEntity audited)
+                    {
+                        audited.ModifiedAt = now;
+                        audited.ModifiedBy = userId;
+                    }
                     break;
             }
         }

@@ -36,7 +36,7 @@ public sealed class FoundationPersistenceModuleTests
 
         // Assert
         ServiceDescriptor? auditDescriptor = builder.Services.FirstOrDefault(
-            d => d.ServiceType == typeof(AuditableEntityInterceptor));
+            d => d.ServiceType == typeof(AuditedEntityInterceptor));
         auditDescriptor.Should().NotBeNull();
 
         ServiceDescriptor? softDeleteDescriptor = builder.Services.FirstOrDefault(

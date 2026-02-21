@@ -38,19 +38,16 @@ public static class ModelBuilderExtensions
 
     private static void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
     {
-        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
+        foreach (Type clrType in modelBuilder.Model.GetEntityTypes()
+            .Select(entityType => entityType.ClrType)
+            .Where(clrType => typeof(ISoftDeletable).IsAssignableFrom(clrType)))
         {
-            if (!typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
-            {
-                continue;
-            }
-
-            ParameterExpression parameter = Expression.Parameter(entityType.ClrType, "e");
+            ParameterExpression parameter = Expression.Parameter(clrType, "e");
             MemberExpression property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
             BinaryExpression condition = Expression.Equal(property, Expression.Constant(false));
             LambdaExpression lambda = Expression.Lambda(condition, parameter);
 
-            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+            modelBuilder.Entity(clrType).HasQueryFilter(lambda);
         }
     }
 }

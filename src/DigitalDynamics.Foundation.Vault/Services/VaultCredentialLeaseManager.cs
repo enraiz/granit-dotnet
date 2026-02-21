@@ -97,7 +97,7 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
         LogLeaseManagerStopping(_logger);
     }
 
-    private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
+    private async Task ObtainCredentialsAsync(CancellationToken _)
     {
         string path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
         LogObtainingCredentials(_logger, path);
@@ -114,7 +114,7 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
         LogCredentialsObtained(_logger, _username, _leaseId, _leaseDurationSeconds);
     }
 
-    private async Task RenewLeaseAsync(CancellationToken cancellationToken)
+    private async Task RenewLeaseAsync(CancellationToken _)
     {
         LogLeaseRenewing(_logger, _leaseId);
 
