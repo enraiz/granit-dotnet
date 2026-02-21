@@ -46,7 +46,7 @@ public sealed class SequentialGuidGeneratorTests
     {
         // Arrange
         SequentialGuidGenerator generator = CreateGenerator();
-        HashSet<Guid> guids = new HashSet<Guid>();
+        HashSet<Guid> guids = [];
 
         // Act
         for (int i = 0; i < 10_000; i++)
@@ -63,7 +63,7 @@ public sealed class SequentialGuidGeneratorTests
     {
         // Arrange
         SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAsString);
-        List<string> guids = new List<string>();
+        List<string> guids = [];
 
         // Act - delai entre chaque batch pour garantir des timestamps differents
         for (int i = 0; i < 5; i++)
@@ -108,7 +108,7 @@ public sealed class SequentialGuidGeneratorTests
     {
         // Arrange - pas de type specifie, le defaut doit etre SequentialAsString
         SequentialGuidGenerator generator = CreateGenerator();
-        List<string> guids = new List<string>();
+        List<string> guids = [];
 
         // Act - delai entre chaque batch pour garantir des timestamps differents
         for (int i = 0; i < 5; i++)
@@ -127,7 +127,7 @@ public sealed class SequentialGuidGeneratorTests
     {
         // Arrange
         SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAtEnd);
-        List<Guid> guids = new List<Guid>();
+        List<Guid> guids = [];
 
         // Act
         for (int i = 0; i < 100; i++)
