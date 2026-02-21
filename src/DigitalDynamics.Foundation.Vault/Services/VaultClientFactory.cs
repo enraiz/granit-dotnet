@@ -9,6 +9,7 @@
 // =============================================================================
 
 using DigitalDynamics.Foundation.Vault.Options;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
@@ -25,11 +26,16 @@ public sealed partial class VaultClientFactory
 {
     private readonly VaultOptions _options;
     private readonly ILogger<VaultClientFactory> _logger;
+    private readonly IStringLocalizer<VaultLocalizationResource> _localizer;
 
-    public VaultClientFactory(IOptions<VaultOptions> options, ILogger<VaultClientFactory> logger)
+    public VaultClientFactory(
+        IOptions<VaultOptions> options,
+        ILogger<VaultClientFactory> logger,
+        IStringLocalizer<VaultLocalizationResource> localizer)
     {
         _options = options.Value;
         _logger = logger;
+        _localizer = localizer;
     }
 
     /// <summary>Crée un client VaultSharp authentifié.</summary>
@@ -40,8 +46,7 @@ public sealed partial class VaultClientFactory
             "kubernetes" => CreateKubernetesAuth(),
             "token" => CreateTokenAuth(),
             _ => throw new InvalidOperationException(
-                $"Méthode d'authentification Vault inconnue : '{_options.AuthMethod}'. " +
-                "Valeurs autorisées : 'Kubernetes', 'Token'.")
+                _localizer["Vault:UnknownAuthMethod", _options.AuthMethod])
         };
 
         VaultClientSettings settings = new(_options.Address, authMethod);
@@ -61,21 +66,19 @@ public sealed partial class VaultClientFactory
     {
         if (string.IsNullOrEmpty(_options.Token))
         {
-            throw new InvalidOperationException(
-                "Le token Vault est requis pour l'authentification par token. " +
-                "Configurez Vault:Token dans la configuration.");
+            throw new InvalidOperationException(_localizer["Vault:TokenRequired"]);
         }
 
         LogTokenAuth(_logger);
         return new TokenAuthMethodInfo(_options.Token);
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Client Vault créé avec la méthode {AuthMethod} vers {Address}")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Vault client created with auth method {AuthMethod} at {Address}")]
     private static partial void LogClientCreated(ILogger logger, string authMethod, string address);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Authentification Kubernetes avec le rôle {Role}")]
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Kubernetes authentication with role {Role}")]
     private static partial void LogKubernetesAuth(ILogger logger, string role);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Authentification Vault par token statique — utiliser uniquement en développement local")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Static token Vault authentication — use only for local development")]
     private static partial void LogTokenAuth(ILogger logger);
 }

@@ -6,6 +6,7 @@
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Modularity;
+using DigitalDynamics.Foundation.Localization;
 using DigitalDynamics.Foundation.Vault.Extensions;
 using Microsoft.Extensions.Hosting;
 
@@ -15,6 +16,7 @@ namespace DigitalDynamics.Foundation.Vault;
 /// Module Foundation pour Vault (credentials dynamiques + Transit encryption).
 /// Skip l'enregistrement en Development (pas de Vault en local).
 /// </summary>
+[DependsOn(typeof(FoundationLocalizationModule))]
 public sealed class FoundationVaultModule : FoundationModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)

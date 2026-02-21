@@ -1,0 +1,8 @@
+{
+  "culture": "fr",
+  "texts": {
+    "Test:Hello": "Bonjour",
+    "Test:Welcome": "Bienvenue {0}, vous avez {1} messages",
+    "Test:Goodbye": "Au revoir"
+  }
+}
