@@ -51,6 +51,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalDynamics.Foundation.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalDynamics.Foundation.Caching.Hybrid.Tests", "tests\DigitalDynamics.Foundation.Caching.Hybrid.Tests\DigitalDynamics.Foundation.Caching.Hybrid.Tests.csproj", "{BB358030-6F8D-46F3-966A-930B8E388663}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalDynamics.Foundation.Encryption", "src\DigitalDynamics.Foundation.Encryption\DigitalDynamics.Foundation.Encryption.csproj", "{B1000006-0000-0000-0000-000000000006}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalDynamics.Foundation.Encryption.Tests", "tests\DigitalDynamics.Foundation.Encryption.Tests\DigitalDynamics.Foundation.Encryption.Tests.csproj", "{C1000005-0000-0000-0000-000000000005}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -325,6 +329,30 @@ Global
 		{BB358030-6F8D-46F3-966A-930B8E388663}.Release|x64.Build.0 = Release|Any CPU
 		{BB358030-6F8D-46F3-966A-930B8E388663}.Release|x86.ActiveCfg = Release|Any CPU
 		{BB358030-6F8D-46F3-966A-930B8E388663}.Release|x86.Build.0 = Release|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Debug|x64.Build.0 = Debug|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Debug|x86.Build.0 = Debug|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Release|x64.ActiveCfg = Release|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Release|x64.Build.0 = Release|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Release|x86.ActiveCfg = Release|Any CPU
+		{B1000006-0000-0000-0000-000000000006}.Release|x86.Build.0 = Release|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Debug|x64.Build.0 = Debug|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Debug|x86.Build.0 = Debug|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Release|x64.ActiveCfg = Release|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Release|x64.Build.0 = Release|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Release|x86.ActiveCfg = Release|Any CPU
+		{C1000005-0000-0000-0000-000000000005}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -352,5 +380,7 @@ Global
 		{7A1A8409-E371-40DC-A307-3B7EC3115DB0} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{671314E3-2435-4370-AF4A-E7198865E791} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{BB358030-6F8D-46F3-966A-930B8E388663} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{B1000006-0000-0000-0000-000000000006} = {A1B2C3D4-0001-0001-0001-000000000001}
+		{C1000005-0000-0000-0000-000000000005} = {A1B2C3D4-0002-0002-0002-000000000002}
 	EndGlobalSection
 EndGlobal
