@@ -1,9 +1,11 @@
 // =============================================================================
 // Tests - PersistenceServiceCollectionExtensions
 // =============================================================================
-// Vérifie que AddFoundationPersistence enregistre les intercepteurs EF Core.
+// Verifies that AddFoundationPersistence registers the EF Core interceptors
+// and the IDataFilter service.
 // =============================================================================
 
+using DigitalDynamics.Foundation.Core.DataFiltering;
 using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Persistence.Extensions;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
@@ -66,6 +68,22 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
         ServiceDescriptor softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
         softDeleteDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddFoundationPersistence_RegistersDataFilter_AsSingleton()
+    {
+        // Arrange
+        ServiceCollection services = new();
+
+        // Act
+        services.AddFoundationPersistence();
+
+        // Assert
+        ServiceDescriptor? descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IDataFilter));
+        descriptor.Should().NotBeNull();
+        descriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        descriptor.ImplementationType.Should().Be<DataFilter>();
     }
 
     private static void AddRequiredDependencies(ServiceCollection services)

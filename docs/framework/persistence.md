@@ -124,7 +124,24 @@ await db.SaveChangesAsync();
 ## Query Filters
 
 `ModelBuilderExtensions.ApplyFoundationConventions()` applique automatiquement des
-filtres globaux EF Core sur les entités Foundation.
+filtres globaux EF Core sur toutes les entités Foundation détectées dans le modèle.
+
+```csharp
+public static ModelBuilder ApplyFoundationConventions(
+    this ModelBuilder modelBuilder,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null)
+```
+
+| Interface | Filtre appliqué | Requis |
+| --- | --- | --- |
+| `ISoftDeletable` | `WHERE IsDeleted = false` | toujours |
+| `IActive` | `WHERE IsActive = true` | toujours |
+| `IMultiTenant` | `WHERE TenantId = currentTenant.Id` | si `currentTenant` fourni |
+
+Les entités implémentant plusieurs interfaces reçoivent un **unique** `HasQueryFilter`
+combinant les conditions avec `AND` (le problème de double `HasQueryFilter` — qui faisait
+silencieusement perdre le premier filtre — est résolu depuis cette version).
 
 ### Query Filter Soft Delete
 
@@ -139,12 +156,34 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 }
 ```
 
-Pour inclure les entités supprimées (ex : audit trail), utiliser `IgnoreQueryFilters()` :
+Pour inclure les entités supprimées (ex : audit trail), utiliser `IgnoreQueryFilters()`
+(désactive tous les filtres) ou `IDataFilter.Disable<ISoftDeletable>()` (bypass sélectif) :
 
 ```csharp
-List<DossierPatient> tous = await db.Dossiers
-    .IgnoreQueryFilters()
-    .ToListAsync();
+// Tous les filtres désactivés
+List<DossierPatient> tous = await db.Dossiers.IgnoreQueryFilters().ToListAsync();
+
+// Soft delete seul désactivé (multi-tenant et IActive restent actifs)
+using IDisposable scope = _dataFilter.Disable<ISoftDeletable>();
+List<DossierPatient> tousAvecFiltres = await db.Dossiers.ToListAsync();
+```
+
+### Query Filter IActive
+
+Toutes les entités `IActive` reçoivent un filtre `WHERE IsActive = true` :
+
+```csharp
+public sealed class Etablissement : AuditedEntity, IActive
+{
+    public bool IsActive { get; set; } = true;
+    public string Nom { get; set; } = string.Empty;
+}
+
+// Dans OnModelCreating — filtre IActive appliqué automatiquement
+modelBuilder.ApplyFoundationConventions();
+
+// Seuls les établissements actifs sont retournés
+List<Etablissement> actifs = await db.Etablissements.ToListAsync();
 ```
 
 ### Query Filter Multi-Tenant
@@ -166,7 +205,6 @@ public sealed class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        // Soft delete + filtre multi-tenant
         modelBuilder.ApplyFoundationConventions(_currentTenant);
     }
 }
@@ -182,6 +220,57 @@ Le filtre est évalué dynamiquement à chaque requête (closure sur l'instance
 Si `ApplyFoundationConventions()` est appelé sans `ICurrentTenant`, seul le filtre
 soft delete est appliqué (pas d'isolation multi-tenant).
 
+### Bypass sélectif via IDataFilter
+
+`IDataFilter` permet de désactiver un filtre individuel pour le flux async courant,
+sans toucher aux autres filtres. Injecter `IDataFilter` dans le DbContext et le passer
+à `ApplyFoundationConventions` :
+
+```csharp
+public sealed class AppDbContext : DbContext
+{
+    private readonly ICurrentTenant _currentTenant;
+    private readonly IDataFilter _dataFilter;
+
+    public AppDbContext(
+        DbContextOptions options,
+        ICurrentTenant currentTenant,
+        IDataFilter dataFilter)
+        : base(options)
+    {
+        _currentTenant = currentTenant;
+        _dataFilter = dataFilter;
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyFoundationConventions(_currentTenant, _dataFilter);
+    }
+}
+```
+
+Usage — désactiver un filtre dans un scope applicatif :
+
+```csharp
+// Job de purge HDS : accès aux enregistrements supprimés logiquement
+using IDisposable scope = _dataFilter.Disable<ISoftDeletable>();
+List<DossierPatient> aArchiver = await _context.Dossiers
+    .Where(d => d.IsDeleted)
+    .ToListAsync(ct);
+// Filtre soft delete restauré automatiquement à la fin du using
+
+// Requête système cross-tenant (opération de maintenance)
+using IDisposable scope = _dataFilter.Disable<IMultiTenant>();
+int totalGlobal = await _context.Dossiers.CountAsync(ct);
+```
+
+> **Rétrocompatibilité** : si `dataFilter` n'est pas passé (ou est `null`), tous les
+> filtres sont toujours appliqués — comportement identique aux versions précédentes.
+> Les DbContexts existants n'ont pas besoin d'être modifiés.
+
+Pour la documentation complète de `IDataFilter`, voir [data-filtering.md](data-filtering.md).
+
 ## Architecture
 
 ```text
@@ -190,16 +279,18 @@ DigitalDynamics.Foundation.Persistence
 │   ├── AuditedEntityInterceptor.cs       (audit HDS : CreatedAt/By, ModifiedAt/By)
 │   └── SoftDeleteInterceptor.cs          (soft delete RGPD : IsDeleted, DeletedAt/By)
 └── Extensions/
-    ├── ModelBuilderExtensions.cs          (ApplyFoundationConventions : query filters)
+    ├── ModelBuilderExtensions.cs          (ApplyFoundationConventions : ISoftDeletable,
+    │                                       IActive, IMultiTenant, IDataFilter bypass)
     └── PersistenceServiceCollectionExtensions.cs  (AddFoundationPersistence)
 ```
 
 ## Services enregistrés
 
-| Service | Implementation | Lifetime |
+| Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `AuditedEntityInterceptor` | - | Scoped |
 | `SoftDeleteInterceptor` | - | Scoped |
+| `IDataFilter` | `DataFilter` | Singleton |
 
 ## Tests
 
@@ -230,6 +321,7 @@ AuditedEntityInterceptor interceptor = new(currentUser, clock, guidGenerator, cu
 | HDS - Audit trail | `AuditedEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
 | HDS - Horodatage UTC | `IClock.Now` (jamais `DateTimeOffset.UtcNow`) |
 | RGPD - Droit à l'oubli | `SoftDeleteInterceptor` (suppression logique) |
-| RGPD - Minimisation | Query filters (entités supprimées exclues par défaut) |
+| RGPD - Minimisation | Query filters (entités supprimées et inactives exclues par défaut) |
 | RGPD - Isolation tenant | Query filter multi-tenant (`ApplyFoundationConventions(currentTenant)`) |
 | RGPD - Pseudonymisation | `TenantId` GUID — jamais de données nominatives dans ce champ |
+| Maintenance HDS | `IDataFilter.Disable<ISoftDeletable>()` — accès aux données supprimées en scope contrôlé |
