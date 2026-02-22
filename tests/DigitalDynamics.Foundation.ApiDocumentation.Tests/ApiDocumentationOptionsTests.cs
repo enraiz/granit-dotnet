@@ -13,10 +13,8 @@ namespace DigitalDynamics.Foundation.ApiDocumentation.Tests;
 public sealed class ApiDocumentationOptionsTests
 {
     [Fact]
-    public void SectionName_IsApiDocumentation()
-    {
+    public void SectionName_IsApiDocumentation() =>
         ApiDocumentationOptions.SectionName.Should().Be("ApiDocumentation");
-    }
 
     [Fact]
     public void MajorVersions_DefaultsToListWithOne()

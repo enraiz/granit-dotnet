@@ -26,7 +26,7 @@ public static class ApiDocumentationServiceCollectionExtensions
         // The .NET configuration binder appends to existing IList values instead of replacing them.
         // Clearing MajorVersions before Bind prevents duplicates when config mirrors the default value.
         ApiDocumentationOptions options = new();
-        options.MajorVersions = new List<int>();
+        options.MajorVersions = [];
         section.Bind(options);
         if (options.MajorVersions.Count == 0)
         {

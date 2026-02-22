@@ -13,10 +13,8 @@ namespace DigitalDynamics.Foundation.ApiVersioning.Tests;
 public sealed class FoundationApiVersioningOptionsTests
 {
     [Fact]
-    public void SectionName_IsApiVersioning()
-    {
+    public void SectionName_IsApiVersioning() =>
         FoundationApiVersioningOptions.SectionName.Should().Be("ApiVersioning");
-    }
 
     [Fact]
     public void DefaultMajorVersion_DefaultsToOne()

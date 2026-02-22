@@ -56,9 +56,6 @@ public sealed class InternalApiAttributeTests
     }
 
     [Fact]
-    public void InternalApiAttribute_IsAttribute()
-    {
-        // Assert
+    public void InternalApiAttribute_IsAttribute() =>
         typeof(InternalApiAttribute).Should().BeAssignableTo<Attribute>();
-    }
 }

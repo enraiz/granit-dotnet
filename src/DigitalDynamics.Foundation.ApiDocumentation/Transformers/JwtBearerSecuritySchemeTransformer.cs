@@ -49,10 +49,10 @@ internal sealed class JwtBearerSecuritySchemeTransformer(
 
         foreach (KeyValuePair<string, IOpenApiPathItem> path in document.Paths)
         {
-            foreach (KeyValuePair<HttpMethod, OpenApiOperation> operation in path.Value.Operations ?? [])
+            foreach (OpenApiOperation operation in (path.Value.Operations ?? []).Select(op => op.Value))
             {
-                operation.Value.Security ??= [];
-                operation.Value.Security.Add(securityRequirement);
+                operation.Security ??= [];
+                operation.Security.Add(securityRequirement);
             }
         }
     }
