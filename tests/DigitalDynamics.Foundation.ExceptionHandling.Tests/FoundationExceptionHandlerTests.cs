@@ -48,7 +48,7 @@ public sealed class FoundationExceptionHandlerTests
             ServiceProvider sp,
             Exception exception)
     {
-        FoundationExceptionHandler handler = (FoundationExceptionHandler)sp
+        var handler = (FoundationExceptionHandler)sp
             .GetRequiredService<Microsoft.AspNetCore.Diagnostics.IExceptionHandler>();
 
         DefaultHttpContext httpContext = new();
@@ -78,7 +78,7 @@ public sealed class FoundationExceptionHandlerTests
     public async Task OperationCanceled_ReturnsTrueWithoutWritingResponse()
     {
         using ServiceProvider sp = BuildServiceProvider();
-        FoundationExceptionHandler handler = (FoundationExceptionHandler)sp
+        var handler = (FoundationExceptionHandler)sp
             .GetRequiredService<Microsoft.AspNetCore.Diagnostics.IExceptionHandler>();
 
         DefaultHttpContext httpContext = new();

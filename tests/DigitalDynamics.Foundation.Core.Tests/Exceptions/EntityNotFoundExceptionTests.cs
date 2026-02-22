@@ -33,7 +33,7 @@ public sealed class EntityNotFoundExceptionTests
     [Fact]
     public void Constructor_SetsEntityId()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         EntityNotFoundException exception = new(typeof(Appointment), id);
 
         exception.EntityId.Should().Be(id);
@@ -50,7 +50,7 @@ public sealed class EntityNotFoundExceptionTests
     [Fact]
     public void Constructor_MessageContainsEntityId()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         EntityNotFoundException exception = new(typeof(Appointment), id);
 
         exception.Message.Should().Contain(id.ToString());
