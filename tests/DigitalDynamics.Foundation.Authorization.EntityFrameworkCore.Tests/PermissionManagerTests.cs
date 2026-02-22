@@ -208,6 +208,7 @@ public sealed class PermissionManagerTests
 
         ILogger<PermissionManager<TestDbContext>> logger =
             Substitute.For<ILogger<PermissionManager<TestDbContext>>>();
+        logger.IsEnabled(LogLevel.Information).Returns(true);
 
         PermissionManager<TestDbContext> manager = new(
             context,
