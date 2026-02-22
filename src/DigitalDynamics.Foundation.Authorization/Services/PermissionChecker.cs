@@ -43,12 +43,9 @@ internal sealed class PermissionChecker(
             return false;
         }
 
-        foreach (string adminRole in opts.AdminRoles)
+        if (opts.AdminRoles.Any(currentUserService.IsInRole))
         {
-            if (currentUserService.IsInRole(adminRole))
-            {
-                return true;
-            }
+            return true;
         }
 
         if (!definitionManager.Exists(permissionName))
