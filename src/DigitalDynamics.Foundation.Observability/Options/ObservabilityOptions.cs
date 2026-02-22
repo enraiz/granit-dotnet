@@ -1,16 +1,3 @@
-// =============================================================================
-// ObservabilityOptions - Configuration de l'observabilité (Serilog + OTEL)
-// =============================================================================
-// Bind depuis la section "Observability" de la configuration.
-//
-// Exemple appsettings.json :
-//   "Observability": {
-//     "ServiceName": "guava-backend",
-//     "ServiceVersion": "1.0.0",
-//     "OtlpEndpoint": "http://otel-collector:4317"
-//   }
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Observability.Options;
 
 /// <summary>

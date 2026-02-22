@@ -1,14 +1,3 @@
-// =============================================================================
-// TimingServiceCollectionExtensions - Enregistrement DI du module Timing
-// =============================================================================
-// Usage :
-//   builder.Services.AddFoundationTiming();
-//   builder.Services.AddFoundationTiming(options =>
-//   {
-//       options.DefaultTimezone = "Europe/Brussels";
-//   });
-// =============================================================================
-
 using DigitalDynamics.Foundation.Timing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

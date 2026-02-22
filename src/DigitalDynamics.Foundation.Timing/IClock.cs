@@ -1,15 +1,3 @@
-// =============================================================================
-// IClock - Abstraction pour l'acces au temps systeme
-// =============================================================================
-// Remplace tout appel direct a DateTimeOffset.UtcNow dans le code applicatif.
-// Utilise System.TimeProvider en interne pour Now.
-// Ajoute les conversions de fuseau horaire par-dessus (style ABP Timing).
-//
-// Usage : injecter IClock dans les handlers, intercepteurs, services.
-//   var now = clock.Now;
-//   var userTime = clock.ConvertToUserTime(utcDateTime);
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Timing;
 
 /// <summary>

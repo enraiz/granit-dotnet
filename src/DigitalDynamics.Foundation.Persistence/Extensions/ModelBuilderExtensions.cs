@@ -1,17 +1,3 @@
-// =============================================================================
-// ModelBuilderExtensions - Configuration EF Core pour les entités Foundation
-// =============================================================================
-// Applique les query filters globaux (soft delete) et la configuration
-// des entités d'audit sur le ModelBuilder.
-//
-// Usage dans un DbContext de module :
-//   protected override void OnModelCreating(ModelBuilder modelBuilder)
-//   {
-//       modelBuilder.HasDefaultSchema("auth");
-//       modelBuilder.ApplyFoundationConventions();
-//       modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
-//   }
-// =============================================================================
 
 using System.Linq.Expressions;
 using DigitalDynamics.Foundation.Core.Domain;

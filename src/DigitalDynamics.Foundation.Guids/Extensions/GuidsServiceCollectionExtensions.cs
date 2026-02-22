@@ -1,14 +1,3 @@
-// =============================================================================
-// GuidsServiceCollectionExtensions - Enregistrement DI du module Guids
-// =============================================================================
-// Usage :
-//   builder.Services.AddFoundationGuids();
-//   builder.Services.AddFoundationGuids(options =>
-//   {
-//       options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd;
-//   });
-// =============================================================================
-
 using DigitalDynamics.Foundation.Guids;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

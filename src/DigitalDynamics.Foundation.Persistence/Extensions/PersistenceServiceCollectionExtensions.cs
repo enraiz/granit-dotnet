@@ -1,10 +1,3 @@
-// =============================================================================
-// PersistenceServiceCollectionExtensions - Enregistrement des intercepteurs
-// =============================================================================
-// Usage :
-//   builder.Services.AddFoundationPersistence();
-// =============================================================================
-
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using Microsoft.Extensions.DependencyInjection;
 

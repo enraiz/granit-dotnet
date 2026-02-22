@@ -101,7 +101,7 @@ public sealed class FoundationMultiTenancyModuleTests
 
         FoundationApplication foundationApp = app.Services.GetRequiredService<FoundationApplication>();
 
-        foundationApp.ModuleTypes.Should().ContainInOrder(
+        foundationApp.GetModuleTypes().Should().ContainInOrder(
             typeof(FoundationSecurityModule),
             typeof(FoundationMultiTenancyModule));
     }

@@ -1,13 +1,3 @@
-// =============================================================================
-// ObservabilityServiceCollectionExtensions - Serilog + OpenTelemetry → OTLP
-// =============================================================================
-// Configure Serilog (logs structurés) et OpenTelemetry (traces + métriques)
-// avec export vers un collecteur OTLP (stack LGTM : Loki/Grafana/Tempo/Mimir).
-//
-// Usage :
-//   builder.AddFoundationObservability();
-// =============================================================================
-
 using DigitalDynamics.Foundation.Observability.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,11 +1,3 @@
-// =============================================================================
-// FoundationApplication - Orchestrateur du lifecycle des modules
-// =============================================================================
-// Enregistre comme singleton dans le conteneur DI par AddFoundation<T>()
-// ou AddFoundationAsync<T>(). Stocke la liste ordonnee des modules et
-// pilote les phases lifecycle (sync et async).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Modularity;
 
 /// <summary>
@@ -22,8 +14,8 @@ public sealed class FoundationApplication
         _modules = modules;
     }
 
-    /// <summary>Types des modules charges en ordre topologique (pour diagnostics).</summary>
-    public IReadOnlyList<Type> ModuleTypes =>
+    /// <summary>Retourne les types des modules chargés en ordre topologique (pour diagnostics).</summary>
+    public IReadOnlyList<Type> GetModuleTypes() =>
         _modules.Select(m => m.ModuleType).ToList();
 
     /// <summary>

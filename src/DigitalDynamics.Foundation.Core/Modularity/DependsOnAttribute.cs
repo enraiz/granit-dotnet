@@ -1,15 +1,3 @@
-// =============================================================================
-// DependsOnAttribute - Declaration des dependances entre modules
-// =============================================================================
-// Utilise sur les classes FoundationModule pour declarer les dependances.
-// Le systeme de modules resout l'ordre d'initialisation par tri topologique.
-//
-// Usage :
-//   [DependsOn(typeof(FoundationTimingModule))]
-//   [DependsOn(typeof(FoundationGuidsModule))]
-//   public class FoundationPersistenceModule : FoundationModule { }
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Modularity;
 
 /// <summary>

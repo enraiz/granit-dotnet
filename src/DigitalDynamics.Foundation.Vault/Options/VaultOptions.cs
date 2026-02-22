@@ -1,19 +1,3 @@
-// =============================================================================
-// VaultOptions - Configuration du client Vault
-// =============================================================================
-// Bind depuis la section "Vault" de la configuration (IOptions<T> pattern).
-//
-// Exemple appsettings.json :
-//   "Vault": {
-//     "Address": "https://vault.guava-health.com",
-//     "AuthMethod": "Kubernetes",
-//     "KubernetesRole": "guava-backend",
-//     "DatabaseMountPoint": "database",
-//     "DatabaseRoleName": "readwrite",
-//     "TransitMountPoint": "transit"
-//   }
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Vault.Options;
 
 /// <summary>

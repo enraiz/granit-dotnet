@@ -1,16 +1,3 @@
-// =============================================================================
-// GuidGeneratorOptions - Configuration du module Guids
-// =============================================================================
-// Configurable via IOptions<GuidGeneratorOptions> dans Program.cs :
-//   builder.Services.AddFoundationGuids(options =>
-//   {
-//       options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd;
-//   });
-//
-// Le defaut est SequentialAsString (PostgreSQL), contrairement a ABP qui
-// utilise SequentialAtEnd (SQL Server).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Guids;
 
 /// <summary>

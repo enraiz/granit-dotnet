@@ -149,7 +149,7 @@ public sealed class FoundationApplicationTests
         var modules = ModuleLoader.LoadModules<TrackingModuleB>();
         var app = new FoundationApplication(modules);
 
-        var types = app.ModuleTypes;
+        var types = app.GetModuleTypes();
 
         types.Should().HaveCount(2);
         types[0].Should().Be<TrackingModuleA>();

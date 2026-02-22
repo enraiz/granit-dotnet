@@ -1,13 +1,3 @@
-// =============================================================================
-// ClockOptions - Configuration du module Timing
-// =============================================================================
-// Configurable via IOptions<ClockOptions> dans Program.cs :
-//   builder.Services.AddFoundationTiming(options =>
-//   {
-//       options.DefaultTimezone = "Europe/Brussels";
-//   });
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Timing;
 
 /// <summary>
