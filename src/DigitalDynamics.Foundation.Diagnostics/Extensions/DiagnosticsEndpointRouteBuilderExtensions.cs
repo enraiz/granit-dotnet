@@ -37,15 +37,17 @@ public static class DiagnosticsEndpointRouteBuilderExtensions
         configure?.Invoke(options);
 
         // Liveness: the process is alive — no dependency checks, always returns 200
+        // AllowAnonymous: Kubernetes kubelet cannot authenticate; must bypass any fallback policy.
         endpoints.MapHealthChecks(options.LivenessPath, new HealthCheckOptions
         {
             Predicate = _ => false,
             ResponseWriter = FoundationHealthCheckWriter.WriteAsync
-        });
+        }).AllowAnonymous();
 
         // Readiness: the application can serve traffic
         // Degraded → 200 (pod stays in load balancer; non-critical degradation)
         // Unhealthy → 503 (pod removed from load balancer until dependency recovers)
+        // AllowAnonymous: same rationale as liveness.
         endpoints.MapHealthChecks(options.ReadinessPath, new HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("readiness"),
@@ -56,9 +58,10 @@ public static class DiagnosticsEndpointRouteBuilderExtensions
                 [HealthStatus.Degraded] = 200,
                 [HealthStatus.Unhealthy] = 503
             }
-        });
+        }).AllowAnonymous();
 
         // Startup: slow initialization guard — disables liveness/readiness while pending
+        // AllowAnonymous: same rationale as liveness.
         endpoints.MapHealthChecks(options.StartupPath, new HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("startup"),
@@ -69,7 +72,7 @@ public static class DiagnosticsEndpointRouteBuilderExtensions
                 [HealthStatus.Degraded] = 200,
                 [HealthStatus.Unhealthy] = 503
             }
-        });
+        }).AllowAnonymous();
 
         return endpoints;
     }
