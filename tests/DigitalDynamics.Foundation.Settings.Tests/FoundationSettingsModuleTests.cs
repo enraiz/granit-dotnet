@@ -7,6 +7,7 @@
 
 using DigitalDynamics.Foundation.Core.Extensions;
 using DigitalDynamics.Foundation.Core.Modularity;
+using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Settings.Definitions;
 using DigitalDynamics.Foundation.Settings.Providers;
 using DigitalDynamics.Foundation.Settings.Services;
@@ -25,7 +26,21 @@ public sealed class FoundationSettingsModuleTests
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.AddFoundation<FoundationSettingsModule>();
+        // ICurrentUserService implementation lives in Foundation.Authentication.JwtBearer.
+        // Register a stub so the UserSettingValueProvider can be activated in isolation.
+        builder.Services.AddSingleton<ICurrentUserService, AnonymousCurrentUserService>();
         return builder.Build();
+    }
+
+    /// <summary>Stub that represents an unauthenticated user for unit testing purposes.</summary>
+    private sealed class AnonymousCurrentUserService : ICurrentUserService
+    {
+        public string? UserId => null;
+        public string? UserName => null;
+        public string? Email => null;
+        public bool IsAuthenticated => false;
+        public IReadOnlyList<string> Roles => [];
+        public bool IsInRole(string role) => false;
     }
 
     // --- Câblage DI ---
@@ -122,7 +137,7 @@ public sealed class FoundationSettingsModuleTests
 
         FoundationApplication foundationApp = app.Services.GetRequiredService<FoundationApplication>();
 
-        foundationApp.ModuleTypes.Should().ContainInOrder(
+        foundationApp.GetModuleTypes().Should().ContainInOrder(
             typeof(FoundationSettingsModule));
     }
 

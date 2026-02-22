@@ -1,26 +1,26 @@
 // =============================================================================
-// CreationAuditedEntity - Entité avec traçabilité de création HDS
+// CreationAuditedEntity - Entity with HDS creation traceability
 // =============================================================================
-// Ajoute les champs de création (CreatedAt, CreatedBy) à Entity.
-// Adaptée aux entités immuables (entrées d'audit, transactions, consentements).
+// Adds creation fields (CreatedAt, CreatedBy) to Entity.
+// Suited for immutable entities (audit entries, transactions, consents).
 //
-// Les champs sont remplis automatiquement par AuditedEntityInterceptor
-// dans le package Persistence.
+// Fields are populated automatically by AuditedEntityInterceptor
+// in the Persistence package.
 //
-// Conformité HDS : traçabilité de la création avec utilisateur et horodatage.
+// HDS compliance: creation traceability with user and timestamp.
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>
-/// Entité avec audit trail de création uniquement.
-/// Hérite de <see cref="Entity"/> et ajoute CreatedAt/CreatedBy.
+/// Entity with creation-only audit trail.
+/// Inherits from <see cref="Entity"/> and adds CreatedAt/CreatedBy.
 /// </summary>
 public abstract class CreationAuditedEntity : Entity
 {
-    /// <summary>Date de création (UTC).</summary>
+    /// <summary>Creation timestamp (UTC).</summary>
     public DateTimeOffset CreatedAt { get; set; }
 
-    /// <summary>Identifiant de l'utilisateur ayant créé l'entité.</summary>
+    /// <summary>Identifier of the user who created the entity.</summary>
     public string CreatedBy { get; set; } = string.Empty;
 }

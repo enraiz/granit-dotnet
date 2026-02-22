@@ -4,17 +4,12 @@
 // Verifies the complete service wiring via AddFoundation<T>(),
 // in the style of AbpIntegratedTest<T> in ABP Framework.
 //
-<<<<<<< HEAD
-// Each test bootstraps the full module (Security + MultiTenancy)
+// Each test bootstraps the MultiTenancy module (standalone, no Security dependency)
 // and resolves services from the real DI container.
-=======
-// Le module MultiTenancy est indépendant de Foundation.Security :
-// JwtClaimTenantResolver lit HttpContext.User (ClaimsPrincipal standard)
-// et fonctionne avec n'importe quel fournisseur d'identité.
->>>>>>> feature/settings-module
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Extensions;
+using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.MultiTenancy.Middleware;
 using DigitalDynamics.Foundation.MultiTenancy.Pipeline;
 using DigitalDynamics.Foundation.MultiTenancy.Resolvers;
@@ -96,25 +91,21 @@ public sealed class FoundationMultiTenancyModuleTests
         middleware.Should().NotBeNull();
     }
 
-<<<<<<< HEAD
     // --- Topological order ---
 
     [Fact]
-    public void Module_Topological_Order_Has_Security_Before_MultiTenancy()
+    public void Module_Topological_Order_Contains_MultiTenancy()
     {
         using WebApplication app = BuildApp();
 
         FoundationApplication foundationApp = app.Services.GetRequiredService<FoundationApplication>();
 
-        foundationApp.GetModuleTypes().Should().ContainInOrder(
-            typeof(FoundationSecurityModule),
-            typeof(FoundationMultiTenancyModule));
+        foundationApp.GetModuleTypes().Should().Contain(
+            typeof(FoundationMultiTenancyModule),
+            because: "MultiTenancy module is standalone with no Security dependency");
     }
 
     // --- Functional test (AbpIntegratedTest style) ---
-=======
-    // --- Tests fonctionnels (style AbpIntegratedTest) ---
->>>>>>> feature/settings-module
 
     [Fact]
     public void ICurrentTenant_Resolved_From_DI_Change_Works()

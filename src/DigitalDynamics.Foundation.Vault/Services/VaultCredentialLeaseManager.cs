@@ -12,14 +12,11 @@
 // HDS compliance: no static password in production.
 // =============================================================================
 
-using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using DigitalDynamics.Foundation.Vault.Options;
 using VaultSharp;
-using VaultSharp.V1.Commons;
-using VaultSharp.V1.SecretsEngines;
-using VaultSharp.V1.SystemBackend;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
 
@@ -42,7 +39,7 @@ public interface IDatabaseCredentialProvider
 /// Background service that manages the lifecycle of dynamic
 /// PostgreSQL credentials via Vault Database Engine.
 /// </summary>
-public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDatabaseCredentialProvider
+public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCredentialProvider
 {
     private readonly IVaultClient _vaultClient;
     private readonly VaultOptions _options;
@@ -69,66 +66,45 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-<<<<<<< HEAD
         _logger.LogInformation("Starting Vault dynamic credential manager");
-=======
-        LogLeaseManagerStarting(_logger);
->>>>>>> feature/settings-module
 
-        await ObtainCredentialsAsync();
+        await ObtainCredentialsAsync(stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            TimeSpan renewalDelay = TimeSpan.FromSeconds(
+            var renewalDelay = TimeSpan.FromSeconds(
                 _leaseDurationSeconds * _options.LeaseRenewalThreshold);
 
-<<<<<<< HEAD
             _logger.LogDebug(
                 "Next lease renewal in {Delay}",
                 renewalDelay);
-=======
-            LogNextRenewal(_logger, renewalDelay);
->>>>>>> feature/settings-module
 
             await Task.Delay(renewalDelay, stoppingToken);
 
             try
             {
-                await RenewLeaseAsync();
+                await RenewLeaseAsync(stoppingToken);
             }
             catch (Exception ex)
             {
-<<<<<<< HEAD
                 _logger.LogWarning(
                     ex,
                     "Lease renewal failed for {LeaseId}, obtaining new credentials",
                     _leaseId);
-=======
-                LogLeaseRenewalFailed(_logger, _leaseId, ex);
->>>>>>> feature/settings-module
 
-                await ObtainCredentialsAsync();
+                await ObtainCredentialsAsync(stoppingToken);
             }
         }
 
-<<<<<<< HEAD
         _logger.LogInformation("Stopping Vault dynamic credential manager");
-=======
-        LogLeaseManagerStopping(_logger);
->>>>>>> feature/settings-module
     }
 
-    private async Task ObtainCredentialsAsync()
+    private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
     {
-<<<<<<< HEAD
         var path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
         _logger.LogInformation("Obtaining dynamic credentials from {Path}", path);
-=======
-        string path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
-        LogObtainingCredentials(_logger, path);
->>>>>>> feature/settings-module
 
-        Secret<UsernamePasswordCredentials> secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
+        var secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
             _options.DatabaseRoleName,
             mountPoint: _options.DatabaseMountPoint);
 
@@ -137,62 +113,26 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
         _leaseId = secret.LeaseId;
         _leaseDurationSeconds = secret.LeaseDurationSeconds;
 
-<<<<<<< HEAD
         _logger.LogInformation(
             "Dynamic credentials obtained: user={Username}, lease={LeaseId}, TTL={TTL}s",
             _username,
             _leaseId,
             _leaseDurationSeconds);
-=======
-        LogCredentialsObtained(_logger, _username, _leaseId, _leaseDurationSeconds);
->>>>>>> feature/settings-module
     }
 
-    private async Task RenewLeaseAsync()
+    private async Task RenewLeaseAsync(CancellationToken cancellationToken)
     {
-<<<<<<< HEAD
         _logger.LogDebug("Renewing lease {LeaseId}", _leaseId);
-=======
-        LogLeaseRenewing(_logger, _leaseId);
->>>>>>> feature/settings-module
 
-        Secret<RenewedLease> renewed = await _vaultClient.V1.System.RenewLeaseAsync(
+        var renewed = await _vaultClient.V1.System.RenewLeaseAsync(
             _leaseId,
             _leaseDurationSeconds);
 
         _leaseDurationSeconds = renewed.LeaseDurationSeconds;
 
-<<<<<<< HEAD
         _logger.LogInformation(
             "Lease {LeaseId} renewed, new TTL={TTL}s",
             _leaseId,
             _leaseDurationSeconds);
-=======
-        LogLeaseRenewed(_logger, _leaseId, _leaseDurationSeconds);
->>>>>>> feature/settings-module
     }
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "Starting Vault dynamic credentials manager")]
-    private static partial void LogLeaseManagerStarting(ILogger logger);
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "Stopping Vault dynamic credentials manager")]
-    private static partial void LogLeaseManagerStopping(ILogger logger);
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Next lease renewal in {Delay}")]
-    private static partial void LogNextRenewal(ILogger logger, TimeSpan delay);
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Lease {LeaseId} renewal failed, obtaining new credentials")]
-    private static partial void LogLeaseRenewalFailed(ILogger logger, string leaseId, Exception ex);
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "Fetching dynamic credentials from {Path}")]
-    private static partial void LogObtainingCredentials(ILogger logger, string path);
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "Dynamic credentials obtained: user={Username}, lease={LeaseId}, TTL={TTL}s")]
-    private static partial void LogCredentialsObtained(ILogger logger, string username, string leaseId, int ttl);
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Renewing lease {LeaseId}")]
-    private static partial void LogLeaseRenewing(ILogger logger, string leaseId);
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "Lease {LeaseId} renewed, new TTL={TTL}s")]
-    private static partial void LogLeaseRenewed(ILogger logger, string leaseId, int ttl);
 }

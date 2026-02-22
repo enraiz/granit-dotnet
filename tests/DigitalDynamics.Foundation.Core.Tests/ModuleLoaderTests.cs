@@ -65,7 +65,7 @@ public sealed class ModuleLoaderTests
     [Fact]
     public void LoadModules_SingleModule_ReturnsOnlyThatModule()
     {
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<StandaloneModule>();
+        var modules = ModuleLoader.LoadModules<StandaloneModule>();
 
         modules.Should().HaveCount(1);
         modules[0].ModuleType.Should().Be<StandaloneModule>();
@@ -75,16 +75,11 @@ public sealed class ModuleLoaderTests
     [Fact]
     public void LoadModules_LinearChain_ReturnsDependenciesFirst()
     {
-<<<<<<< HEAD
         // C → B → A : expected order A, B, C
         var modules = ModuleLoader.LoadModules<ModuleC>();
-=======
-        // C → B → A : ordre attendu A, B, C
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<ModuleC>();
->>>>>>> feature/settings-module
 
         modules.Should().HaveCount(3);
-        List<Type> types = modules.Select(m => m.ModuleType).ToList();
+        var types = modules.Select(m => m.ModuleType).ToList();
         types.IndexOf(typeof(ModuleA)).Should().BeLessThan(types.IndexOf(typeof(ModuleB)));
         types.IndexOf(typeof(ModuleB)).Should().BeLessThan(types.IndexOf(typeof(ModuleC)));
     }
@@ -93,25 +88,16 @@ public sealed class ModuleLoaderTests
     public void LoadModules_Diamond_SharedLoadedOnce()
     {
         // DiamondRoot → Left + Right → Shared
-<<<<<<< HEAD
 
         var modules = ModuleLoader.LoadModules<DiamondRootModule>();
-=======
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<DiamondRootModule>();
->>>>>>> feature/settings-module
 
         modules.Should().HaveCount(4);
 
         // Shared must appear exactly once
         modules.Where(m => m.ModuleType == typeof(SharedModule)).Should().HaveCount(1);
 
-<<<<<<< HEAD
         // Shared must come before Left and Right
         var types = modules.Select(m => m.ModuleType).ToList();
-=======
-        // Shared doit etre avant Left et Right
-        List<Type> types = modules.Select(m => m.ModuleType).ToList();
->>>>>>> feature/settings-module
         types.IndexOf(typeof(SharedModule)).Should().BeLessThan(types.IndexOf(typeof(LeftModule)));
         types.IndexOf(typeof(SharedModule)).Should().BeLessThan(types.IndexOf(typeof(RightModule)));
 
@@ -123,7 +109,7 @@ public sealed class ModuleLoaderTests
     [Fact]
     public void LoadModules_CircularDependency_ThrowsInvalidOperationException()
     {
-        Action act = () => ModuleLoader.LoadModules<CircularA>();
+        var act = () => ModuleLoader.LoadModules<CircularA>();
 
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("*Circular dependency*");
@@ -132,7 +118,7 @@ public sealed class ModuleLoaderTests
     [Fact]
     public void LoadModules_NonModuleType_ThrowsInvalidOperationException()
     {
-        Action act = () => ModuleLoader.LoadModules(typeof(NotAModule));
+        var act = () => ModuleLoader.LoadModules(typeof(NotAModule));
 
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("*FoundationModule*");
@@ -141,7 +127,7 @@ public sealed class ModuleLoaderTests
     [Fact]
     public void LoadModules_DuplicateDependency_DeduplicatesCorrectly()
     {
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<DuplicateDepsModule>();
+        var modules = ModuleLoader.LoadModules<DuplicateDepsModule>();
 
         modules.Should().HaveCount(2);
         modules.Where(m => m.ModuleType == typeof(StandaloneModule)).Should().HaveCount(1);
@@ -150,9 +136,9 @@ public sealed class ModuleLoaderTests
     [Fact]
     public void LoadModules_WithDependsOn_SetsCorrectDependencies()
     {
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<DependentModule>();
+        var modules = ModuleLoader.LoadModules<DependentModule>();
 
-        ModuleDescriptor dependent = modules.Single(m => m.ModuleType == typeof(DependentModule));
+        var dependent = modules.Single(m => m.ModuleType == typeof(DependentModule));
         dependent.Dependencies.Should().Contain(typeof(StandaloneModule));
     }
 }

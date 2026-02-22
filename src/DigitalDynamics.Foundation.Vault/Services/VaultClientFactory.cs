@@ -46,36 +46,19 @@ public sealed partial class VaultClientFactory
             "kubernetes" => CreateKubernetesAuth(),
             "token" => CreateTokenAuth(),
             _ => throw new InvalidOperationException(
-<<<<<<< HEAD
-                $"Unknown Vault authentication method: '{_options.AuthMethod}'. " +
-                "Allowed values: 'Kubernetes', 'Token'.")
-        };
-
-        var settings = new VaultClientSettings(_options.Address, authMethod);
-        _logger.LogInformation(
-            "Vault client created with method {AuthMethod} targeting {Address}",
-            _options.AuthMethod,
-            _options.Address);
-=======
                 _localizer["Vault:UnknownAuthMethod", _options.AuthMethod])
         };
 
         VaultClientSettings settings = new(_options.Address, authMethod);
         LogClientCreated(_logger, _options.AuthMethod, _options.Address);
->>>>>>> feature/settings-module
 
         return new VaultClient(settings);
     }
 
     private KubernetesAuthMethodInfo CreateKubernetesAuth()
     {
-<<<<<<< HEAD
-        var jwt = File.ReadAllText(_options.KubernetesTokenPath);
-        _logger.LogDebug("Kubernetes authentication with role {Role}", _options.KubernetesRole);
-=======
         string jwt = File.ReadAllText(_options.KubernetesTokenPath);
         LogKubernetesAuth(_logger, _options.KubernetesRole);
->>>>>>> feature/settings-module
         return new KubernetesAuthMethodInfo(_options.KubernetesRole, jwt);
     }
 
@@ -83,20 +66,10 @@ public sealed partial class VaultClientFactory
     {
         if (string.IsNullOrEmpty(_options.Token))
         {
-<<<<<<< HEAD
-            throw new InvalidOperationException(
-                "Vault token is required for token authentication. " +
-                "Set Vault:Token in the configuration.");
-        }
-
-        _logger.LogWarning(
-            "Vault static token authentication — use only for local development");
-=======
             throw new InvalidOperationException(_localizer["Vault:TokenRequired"]);
         }
 
         LogTokenAuth(_logger);
->>>>>>> feature/settings-module
         return new TokenAuthMethodInfo(_options.Token);
     }
 

@@ -1,18 +1,18 @@
 // =============================================================================
-// Entity - Classe de base minimale pour toutes les entités persistées
+// Entity - Minimal base class for all persisted entities
 // =============================================================================
-// Fournit uniquement l'identifiant. Les entités nécessitant un audit trail
-// héritent de CreationAuditedEntity ou de ses sous-classes.
+// Provides only the identifier. Entities requiring an audit trail
+// inherit from CreationAuditedEntity or its subclasses.
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>
-/// Classe de base abstraite pour toutes les entités persistées.
-/// Fournit uniquement l'identifiant unique (Guid).
+/// Abstract base class for all persisted entities.
+/// Provides only the unique identifier (Guid).
 /// </summary>
 public abstract class Entity
 {
-    /// <summary>Identifiant unique de l'entité.</summary>
+    /// <summary>Unique identifier of the entity.</summary>
     public Guid Id { get; set; }
 }

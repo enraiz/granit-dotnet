@@ -24,21 +24,29 @@ public sealed class FoundationApplicationTests
 
     public sealed class TrackingModuleA : FoundationModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context) =>
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
             CallOrder.Add("ConfigureServices:A");
+        }
 
-        public override void OnApplicationInitialization(ApplicationInitializationContext context) =>
+        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        {
             CallOrder.Add("Initialize:A");
+        }
     }
 
     [DependsOn(typeof(TrackingModuleA))]
     public sealed class TrackingModuleB : FoundationModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context) =>
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
             CallOrder.Add("ConfigureServices:B");
+        }
 
-        public override void OnApplicationInitialization(ApplicationInitializationContext context) =>
+        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        {
             CallOrder.Add("Initialize:B");
+        }
     }
 
     // --- Async module that overrides only ConfigureServicesAsync ---
@@ -76,18 +84,21 @@ public sealed class FoundationApplicationTests
 
     public sealed class NoOpModule : FoundationModule;
 
-    public FoundationApplicationTests() => CallOrder.Clear();
+    public FoundationApplicationTests()
+    {
+        CallOrder.Clear();
+    }
 
     [Fact]
     public void ConfigureServices_CallsModulesInTopologicalOrder()
     {
         // Arrange
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        FoundationApplication app = new(modules);
-        ServiceCollection services = new();
-        IConfigurationRoot config = new ConfigurationBuilder().Build();
-        HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new(services, config, builder);
+        var modules = ModuleLoader.LoadModules<TrackingModuleB>();
+        var app = new FoundationApplication(modules);
+        var services = new ServiceCollection();
+        var config = new ConfigurationBuilder().Build();
+        var builder = Host.CreateEmptyApplicationBuilder(null);
+        var context = new ServiceConfigurationContext(services, config, builder);
 
         // Act
         app.ConfigureServices(context);
@@ -100,11 +111,11 @@ public sealed class FoundationApplicationTests
     public void InitializeApplication_CallsModulesInTopologicalOrder()
     {
         // Arrange
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        FoundationApplication app = new(modules);
-        ServiceCollection services = new();
-        ServiceProvider provider = services.BuildServiceProvider();
-        ApplicationInitializationContext context = new(provider);
+        var modules = ModuleLoader.LoadModules<TrackingModuleB>();
+        var app = new FoundationApplication(modules);
+        var services = new ServiceCollection();
+        var provider = services.BuildServiceProvider();
+        var context = new ApplicationInitializationContext(provider);
 
         // Act
         app.InitializeApplication(context);
@@ -117,16 +128,16 @@ public sealed class FoundationApplicationTests
     public void ConfigureServices_NoOpModules_DoesNotThrow()
     {
         // Arrange
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<NoOpModule>();
-        FoundationApplication app = new(modules);
-        HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new(
+        var modules = ModuleLoader.LoadModules<NoOpModule>();
+        var app = new FoundationApplication(modules);
+        var builder = Host.CreateEmptyApplicationBuilder(null);
+        var context = new ServiceConfigurationContext(
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
 
         // Act
-        Action act = () => app.ConfigureServices(context);
+        var act = () => app.ConfigureServices(context);
 
         // Assert
         act.Should().NotThrow();
@@ -135,14 +146,10 @@ public sealed class FoundationApplicationTests
     [Fact]
     public void ModuleTypes_ReturnsOrderedModuleTypes()
     {
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        FoundationApplication app = new(modules);
+        var modules = ModuleLoader.LoadModules<TrackingModuleB>();
+        var app = new FoundationApplication(modules);
 
-<<<<<<< HEAD
         var types = app.GetModuleTypes();
-=======
-        IReadOnlyList<Type> types = app.ModuleTypes;
->>>>>>> feature/settings-module
 
         types.Should().HaveCount(2);
         types[0].Should().Be<TrackingModuleA>();
@@ -155,10 +162,10 @@ public sealed class FoundationApplicationTests
     public async Task ConfigureServicesAsync_CallsModulesInTopologicalOrder()
     {
         // Arrange
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<AsyncTrackingModuleB>();
-        FoundationApplication app = new(modules);
-        HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new(
+        var modules = ModuleLoader.LoadModules<AsyncTrackingModuleB>();
+        var app = new FoundationApplication(modules);
+        var builder = Host.CreateEmptyApplicationBuilder(null);
+        var context = new ServiceConfigurationContext(
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
@@ -174,10 +181,10 @@ public sealed class FoundationApplicationTests
     public async Task InitializeApplicationAsync_CallsModulesInTopologicalOrder()
     {
         // Arrange
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<AsyncTrackingModuleB>();
-        FoundationApplication app = new(modules);
-        ServiceProvider provider = new ServiceCollection().BuildServiceProvider();
-        ApplicationInitializationContext context = new(provider);
+        var modules = ModuleLoader.LoadModules<AsyncTrackingModuleB>();
+        var app = new FoundationApplication(modules);
+        var provider = new ServiceCollection().BuildServiceProvider();
+        var context = new ApplicationInitializationContext(provider);
 
         // Act
         await app.InitializeApplicationAsync(context);
@@ -189,21 +196,12 @@ public sealed class FoundationApplicationTests
     [Fact]
     public async Task ConfigureServicesAsync_SyncOverride_CalledViaAsyncPath()
     {
-<<<<<<< HEAD
         // Arrange - TrackingModuleA overrides ConfigureServices (sync)
         // ConfigureServicesAsync by default calls the sync version
         var modules = ModuleLoader.LoadModules<TrackingModuleB>();
         var app = new FoundationApplication(modules);
         var builder = Host.CreateEmptyApplicationBuilder(null);
         var context = new ServiceConfigurationContext(
-=======
-        // Arrange - TrackingModuleA surcharge ConfigureServices (sync)
-        // ConfigureServicesAsync par defaut appelle la version sync
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        FoundationApplication app = new(modules);
-        HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new(
->>>>>>> feature/settings-module
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
@@ -219,16 +217,16 @@ public sealed class FoundationApplicationTests
     public async Task ConfigureServicesAsync_NoOpModules_DoesNotThrow()
     {
         // Arrange
-        IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<NoOpModule>();
-        FoundationApplication app = new(modules);
-        HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new(
+        var modules = ModuleLoader.LoadModules<NoOpModule>();
+        var app = new FoundationApplication(modules);
+        var builder = Host.CreateEmptyApplicationBuilder(null);
+        var context = new ServiceConfigurationContext(
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
 
         // Act
-        Func<Task> act = () => app.ConfigureServicesAsync(context);
+        var act = () => app.ConfigureServicesAsync(context);
 
         // Assert
         await act.Should().NotThrowAsync();

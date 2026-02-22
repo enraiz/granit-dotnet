@@ -9,19 +9,22 @@
 //   app.UseAuthentication();
 //   app.UseFoundationMultiTenancy();
 //   app.UseAuthorization();
+//
+// The module has no dependency on Foundation.Security: JwtClaimTenantResolver
+// reads HttpContext.User.FindFirstValue() (standard ASP.NET Core ClaimsPrincipal)
+// and works with any identity provider (Keycloak, Auth0, etc.).
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.MultiTenancy.Extensions;
-using DigitalDynamics.Foundation.Security;
 
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>
 /// Foundation module for multi-tenant management.
-/// Resolves the tenant from the HTTP header or the Keycloak JWT claim.
+/// Resolves the tenant from the HTTP header or the JWT claim (standard ClaimsPrincipal).
+/// Compatible with any identity provider (Keycloak, Auth0, Azure AD, etc.).
 /// </summary>
-[DependsOn(typeof(FoundationSecurityModule))]
 public sealed class FoundationMultiTenancyModule : FoundationModule
 {
     /// <inheritdoc/>

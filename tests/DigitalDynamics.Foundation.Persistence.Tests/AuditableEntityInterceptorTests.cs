@@ -1,5 +1,5 @@
 // =============================================================================
-// Tests - AuditableEntityInterceptor
+// Tests - AuditedEntityInterceptor
 // =============================================================================
 // Verifies that HDS audit fields are correctly populated
 // when entities are created and modified.
@@ -11,6 +11,7 @@
 
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
@@ -29,6 +30,7 @@ public sealed class AuditableEntityInterceptorTests
     private readonly ICurrentUserService _currentUserService;
     private readonly IClock _clock;
     private readonly IGuidGenerator _guidGenerator;
+    private readonly ICurrentTenant _currentTenant;
 
     public AuditableEntityInterceptorTests()
     {
@@ -40,6 +42,9 @@ public sealed class AuditableEntityInterceptorTests
 
         _guidGenerator = Substitute.For<IGuidGenerator>();
         _guidGenerator.Create().Returns(FixedGuid);
+
+        _currentTenant = Substitute.For<ICurrentTenant>();
+        _currentTenant.IsAvailable.Returns(false);
     }
 
     [Fact]
@@ -138,7 +143,7 @@ public sealed class AuditableEntityInterceptorTests
 
     private TestDbContext CreateContext()
     {
-        var interceptor = new AuditableEntityInterceptor(_currentUserService, _clock, _guidGenerator);
+        var interceptor = new AuditedEntityInterceptor(_currentUserService, _clock, _guidGenerator, _currentTenant);
         var options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(interceptor)
@@ -146,7 +151,7 @@ public sealed class AuditableEntityInterceptorTests
         return new TestDbContext(options);
     }
 
-    private sealed class TestEntity : AuditableEntity
+    private sealed class TestEntity : AuditedEntity
     {
         public string Name { get; set; } = string.Empty;
     }

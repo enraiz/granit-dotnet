@@ -31,14 +31,9 @@ public sealed class CurrentUserServiceTests
     [Fact]
     public void UserName_ReturnsIdentityName_ReflectsConfiguredNameClaimType()
     {
-<<<<<<< HEAD:tests/DigitalDynamics.Foundation.Authentication.JwtBearer.Tests/CurrentUserServiceTests.cs
         // Arrange — nameType = "preferred_username" simulates the Keycloak config
         CurrentUserService sut = CreateService(
             nameType: "preferred_username",
-=======
-        // Arrange
-        CurrentUserService sut = CreateService(
->>>>>>> feature/settings-module:tests/DigitalDynamics.Foundation.Security.Tests/CurrentUserServiceTests.cs
             new Claim("sub", "user-123"),
             new Claim("preferred_username", "jean.dupont"));
 
@@ -112,7 +107,6 @@ public sealed class CurrentUserServiceTests
         sut.Roles.Should().BeEmpty();
     }
 
-<<<<<<< HEAD:tests/DigitalDynamics.Foundation.Authentication.JwtBearer.Tests/CurrentUserServiceTests.cs
     // --- Helpers ---
 
     private static CurrentUserService CreateService(params Claim[] claims) =>
@@ -123,13 +117,6 @@ public sealed class CurrentUserServiceTests
         ClaimsIdentity identity = new ClaimsIdentity(claims, "Bearer", nameType, ClaimTypes.Role);
         ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
-=======
-    private static CurrentUserService CreateService(params Claim[] claims)
-    {
-        ClaimsIdentity identity = new ClaimsIdentity(claims, "Bearer");
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
->>>>>>> feature/settings-module:tests/DigitalDynamics.Foundation.Security.Tests/CurrentUserServiceTests.cs
         DefaultHttpContext httpContext = new DefaultHttpContext { User = principal };
         IHttpContextAccessor accessor = Substitute.For<IHttpContextAccessor>();
         accessor.HttpContext.Returns(httpContext);

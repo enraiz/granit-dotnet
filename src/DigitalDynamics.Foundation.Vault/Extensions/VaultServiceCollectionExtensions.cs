@@ -1,12 +1,9 @@
 // =============================================================================
 // VaultServiceCollectionExtensions - Vault service registration
 // =============================================================================
-<<<<<<< HEAD
 // Usage:
 //   builder.Services.AddFoundationVault(builder.Configuration);
 // =============================================================================
-=======
->>>>>>> feature/settings-module
 
 using DigitalDynamics.Foundation.Localization;
 using DigitalDynamics.Foundation.Localization.Extensions;
