@@ -4,6 +4,37 @@
 résolution depuis le header HTTP ou le claim JWT, contexte `AsyncLocal` et middleware
 ASP.NET Core pour les applications multi-tenant.
 
+## Concepts
+
+### Définition
+
+Une architecture multi-tenant est un modèle où une seule instance logicielle sert
+plusieurs clients (**tenants**). Chaque tenant voit uniquement ses propres données,
+même si elles cohabitent dans la même base de données.
+
+### Host vs Tenant
+
+```mermaid
+graph TD
+    H[Host / Hébergeur]
+    H --> T1[Tenant A — Hôpital Nord]
+    H --> T2[Tenant B — Clinique Sud]
+    H --> T3[Tenant C — Cabinet Privé]
+    style H fill:#4a90d9,color:#fff
+    style T1 fill:#7ed321,color:#fff
+    style T2 fill:#7ed321,color:#fff
+    style T3 fill:#7ed321,color:#fff
+```
+
+| Contexte | `ICurrentTenant.Id` | Données accessibles |
+| --- | --- | --- |
+| Tenant A actif | `Guid` du tenant A | Données du tenant A + données globales (`TenantId = null`) |
+| Host (contexte système) | `null` | Toutes les données (background jobs, admin) |
+
+> **Donnée globale** : `TenantId = null` signifie une ressource partagée entre tous
+> les tenants (configuration système, données de référence). Le filtre multi-tenant
+> n'est pas appliqué sur ces enregistrements — ils sont toujours visibles.
+
 ## Installation
 
 ```bash
@@ -108,6 +139,111 @@ using (currentTenant.Change(tenantA))
     }
     // tenantA restauré
 }
+```
+
+### Opérations cross-tenant (mode host)
+
+Pour accéder aux données de tous les tenants (batch nocturne, admin, migration),
+basculer en contexte host en passant `null` :
+
+```csharp
+// Background job : traiter tous les tenants
+using (currentTenant.Change(null))
+{
+    // currentTenant.Id == null → contexte host
+    // Les query filters EF Core retournent toutes les données
+    List<DossierPatient> tous = await db.Dossiers
+        .IgnoreQueryFilters()   // désactive aussi ISoftDeletable si besoin
+        .ToListAsync(ct);
+}
+```
+
+Ou, pour itérer sur chaque tenant séparément :
+
+```csharp
+foreach (Guid tenantId in await tenantRepository.GetAllIdsAsync(ct))
+{
+    using (currentTenant.Change(tenantId))
+    {
+        await ProcessTenantAsync(tenantId, ct);
+    }
+}
+```
+
+> **Sécurité** : les opérations cross-tenant doivent être réservées aux services
+> d'infrastructure (jobs, admin). Les endpoints API doivent toujours avoir un tenant
+> actif — vérifier `currentTenant.IsAvailable` en entrée des contrôleurs sensibles.
+
+## Isolation des entités — IMultiTenant
+
+Pour isoler les données par tenant au niveau de la base de données, les entités doivent
+implémenter `IMultiTenant` (défini dans `Foundation.Core.Domain`).
+
+```csharp
+using DigitalDynamics.Foundation.Core.Domain;
+
+public sealed class DossierPatient : FullAuditedEntity, IMultiTenant
+{
+    public Guid? TenantId { get; set; }
+    public string NumeroAdmission { get; set; } = string.Empty;
+}
+```
+
+### Injection automatique du TenantId
+
+`AuditedEntityInterceptor` (package `Foundation.Persistence`) injecte le `TenantId`
+automatiquement à la création depuis `ICurrentTenant` :
+
+```mermaid
+sequenceDiagram
+    participant App
+    participant DbContext
+    participant AuditedEntityInterceptor
+    participant ICurrentTenant
+
+    App->>DbContext: SaveChangesAsync()
+    DbContext->>AuditedEntityInterceptor: SavingChangesAsync(entries)
+    AuditedEntityInterceptor->>ICurrentTenant: .Id
+    ICurrentTenant-->>AuditedEntityInterceptor: tenantId (AsyncLocal)
+    AuditedEntityInterceptor->>DbContext: entity.TenantId = tenantId
+    DbContext-->>App: résultat
+```
+
+### Query filter automatique
+
+Activer l'isolation par tenant dans `OnModelCreating` en passant l'`ICurrentTenant`
+injecté dans le DbContext (voir [persistence.md](persistence.md#query-filter-multi-tenant)).
+
+```mermaid
+flowchart LR
+    A[Requête EF Core] --> B{Filtre actif ?}
+    B -- Oui --> C["WHERE TenantId = currentTenant.Id"]
+    B -- Non --> D["Toutes les données"]
+    C --> E[Résultat isolé]
+    D --> F[Résultat global]
+```
+
+> `TenantId = null` représente une donnée globale (partagée entre tous les tenants).
+> Ces données sont **exclues** du filtre multi-tenant — elles ne remontent que si le
+> filtre est ignoré ou si la requête est explicitement ciblée.
+
+### Flux complet d'une requête multi-tenant
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Middleware as TenantResolutionMiddleware
+    participant CurrentTenant as ICurrentTenant (AsyncLocal)
+    participant Service
+    participant DbContext
+
+    Client->>Middleware: GET /api/dossiers (X-Tenant-Id: abc)
+    Middleware->>CurrentTenant: Change(tenantId = abc)
+    Middleware->>Service: Appel du service métier
+    Service->>DbContext: GetDossiersAsync()
+    DbContext->>DbContext: WHERE TenantId = abc (query filter)
+    DbContext-->>Service: Dossiers du tenant abc
+    Service-->>Client: 200 OK [résultat isolé]
 ```
 
 ## Options
