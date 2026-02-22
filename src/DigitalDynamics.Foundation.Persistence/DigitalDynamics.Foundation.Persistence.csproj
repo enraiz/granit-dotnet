@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="DigitalDynamics.Foundation.Persistence.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
@@ -18,6 +22,7 @@
     <ProjectReference Include="..\DigitalDynamics.Foundation.Guids\DigitalDynamics.Foundation.Guids.csproj" />
     <ProjectReference Include="..\DigitalDynamics.Foundation.Security\DigitalDynamics.Foundation.Security.csproj" />
     <ProjectReference Include="..\DigitalDynamics.Foundation.MultiTenancy\DigitalDynamics.Foundation.MultiTenancy.csproj" />
+    <ProjectReference Include="..\DigitalDynamics.Foundation.ExceptionHandling\DigitalDynamics.Foundation.ExceptionHandling.csproj" />
   </ItemGroup>
 
 </Project>
