@@ -1,31 +1,31 @@
 // =============================================================================
-// IStringEncryptionService - Chiffrement/déchiffrement de chaînes
+// IStringEncryptionService - String encryption/decryption
 // =============================================================================
-// Abstraction principale pour le chiffrement de chaînes.
-// Délègue au provider sélectionné via StringEncryptionOptions.ProviderName.
+// Primary abstraction for string encryption.
+// Delegates to the provider selected via StringEncryptionOptions.ProviderName.
 //
-// Implémentation : DefaultStringEncryptionService (dans ce package).
-// Providers disponibles : AES-256-CBC (local) ou Vault Transit (distant).
+// Implementation: DefaultStringEncryptionService (in this package).
+// Available providers: AES-256-CBC (local) or Vault Transit (remote).
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Encryption;
 
 /// <summary>
-/// Service de chiffrement/déchiffrement de chaînes.
+/// String encryption/decryption service.
 /// </summary>
 public interface IStringEncryptionService
 {
     /// <summary>
-    /// Chiffre une chaîne en clair.
+    /// Encrypts a plain-text string.
     /// </summary>
-    /// <param name="plainText">Texte en clair à chiffrer.</param>
-    /// <returns>Texte chiffré encodé en Base64.</returns>
+    /// <param name="plainText">Plain-text string to encrypt.</param>
+    /// <returns>Encrypted text encoded as Base64.</returns>
     string Encrypt(string plainText);
 
     /// <summary>
-    /// Déchiffre une chaîne chiffrée.
+    /// Decrypts an encrypted string.
     /// </summary>
-    /// <param name="cipherText">Texte chiffré encodé en Base64.</param>
-    /// <returns>Texte en clair, ou <c>null</c> si le déchiffrement échoue.</returns>
+    /// <param name="cipherText">Encrypted text encoded as Base64.</param>
+    /// <returns>Plain-text string, or <c>null</c> if decryption fails.</returns>
     string? Decrypt(string cipherText);
 }

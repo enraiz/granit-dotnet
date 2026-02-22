@@ -1,13 +1,13 @@
 // ---------------------------------------------------------------------------
 // LocalizationAutoDiscovery.cs
-// Scanne les assemblies chargées pour détecter automatiquement les ressources
-// de localisation JSON par convention de nommage.
+// Scans loaded assemblies to automatically detect JSON localization resources
+// by naming convention.
 //
 // Convention : {anything}.Localization.{ResourceName}.{culture}.json
-// Exemple    : DigitalDynamics.Foundation.Vault.Localization.Vault.fr.json
+// Example    : DigitalDynamics.Foundation.Vault.Localization.Vault.fr.json
 //
-// Déclenché quand FoundationLocalizationOptions.EnableAutoDiscovery = true.
-// Les ressources déjà enregistrées explicitement ne sont pas écrasées.
+// Triggered when FoundationLocalizationOptions.EnableAutoDiscovery = true.
+// Resources already registered explicitly are not overwritten.
 // ---------------------------------------------------------------------------
 
 using System.Reflection;
@@ -16,17 +16,17 @@ using DigitalDynamics.Foundation.Localization.Attributes;
 namespace DigitalDynamics.Foundation.Localization.Json;
 
 /// <summary>
-/// Découverte automatique des ressources de localisation JSON par convention.
+/// Automatic discovery of JSON localization resources by convention.
 /// </summary>
 internal static class LocalizationAutoDiscovery
 {
     private const string LocalizationSegment = ".Localization.";
 
     /// <summary>
-    /// Scanne toutes les assemblies chargées dans l'AppDomain et enregistre
-    /// les ressources de localisation découvertes par convention.
+    /// Scans all assemblies loaded in the AppDomain and registers
+    /// localization resources discovered by convention.
     /// </summary>
-    /// <param name="options">Options de localisation à enrichir.</param>
+    /// <param name="options">Localization options to enrich.</param>
     public static void Discover(FoundationLocalizationOptions options)
     {
         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -74,13 +74,13 @@ internal static class LocalizationAutoDiscovery
                 continue;
             }
 
-            // Ne pas écraser un enregistrement explicite
+            // Do not overwrite an explicit registration
             if (options.Resources.TryGetValue(type, out _))
             {
                 continue;
             }
 
-            // Rechercher le préfixe JSON : *.Localization.{Name}.{culture}.json
+            // Look for the JSON prefix: *.Localization.{Name}.{culture}.json
             string pattern = $"{LocalizationSegment}{attr.Name}.";
             string? prefix = FindPrefix(resourceNames, pattern);
 
@@ -89,7 +89,7 @@ internal static class LocalizationAutoDiscovery
                 continue;
             }
 
-            // Détecter les types parents via [InheritResource]
+            // Detect parent types via [InheritResource]
             InheritResourceAttribute[] inheritAttrs =
                 (InheritResourceAttribute[])type.GetCustomAttributes(
                     typeof(InheritResourceAttribute), inherit: true);
@@ -110,8 +110,8 @@ internal static class LocalizationAutoDiscovery
     }
 
     /// <summary>
-    /// Retourne le préfixe de ressource embarquée correspondant au pattern donné,
-    /// ou null si aucun fichier JSON ne correspond.
+    /// Returns the embedded resource prefix matching the given pattern,
+    /// or null if no JSON file matches.
     /// </summary>
     private static string? FindPrefix(string[] resourceNames, string pattern)
     {
@@ -128,7 +128,7 @@ internal static class LocalizationAutoDiscovery
                 continue;
             }
 
-            // prefix = tout jusqu'à la fin de "{Name}" (sans le "." final du pattern)
+            // prefix = everything up to the end of "{Name}" (without the trailing "." of the pattern)
             return resourceName[..(idx + pattern.Length - 1)];
         }
 

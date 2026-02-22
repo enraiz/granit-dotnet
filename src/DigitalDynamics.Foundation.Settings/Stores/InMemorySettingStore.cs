@@ -1,9 +1,9 @@
 // =============================================================================
-// InMemorySettingStore - Implémentation en mémoire de ISettingStore
+// InMemorySettingStore - In-memory implementation of ISettingStore
 // =============================================================================
-// Utilise un ConcurrentDictionary pour stocker les valeurs de paramètres.
-// Destiné au développement, aux tests et aux environnements sans persistance.
-// Thread-safe. Zéro dépendance externe.
+// Uses a ConcurrentDictionary to store setting values.
+// Intended for development, testing, and environments without persistence.
+// Thread-safe. Zero external dependencies.
 // =============================================================================
 
 using System.Collections.Concurrent;
@@ -12,8 +12,8 @@ using DigitalDynamics.Foundation.Settings.Values;
 namespace DigitalDynamics.Foundation.Settings.Stores;
 
 /// <summary>
-/// Implémentation en mémoire de <see cref="ISettingStore"/>.
-/// Utilise un <see cref="ConcurrentDictionary{TKey,TValue}"/> pour la thread-safety.
+/// In-memory implementation of <see cref="ISettingStore"/>.
+/// Uses a <see cref="ConcurrentDictionary{TKey,TValue}"/> for thread safety.
 /// </summary>
 public sealed class InMemorySettingStore : ISettingStore
 {

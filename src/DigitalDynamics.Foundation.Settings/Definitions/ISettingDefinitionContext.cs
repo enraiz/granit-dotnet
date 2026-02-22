@@ -1,21 +1,21 @@
 // =============================================================================
-// ISettingDefinitionContext - Contexte de déclaration des paramètres
+// ISettingDefinitionContext - Setting declaration context
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>
-/// Contexte passé à <see cref="ISettingDefinitionProvider.Define"/>
-/// pour enregistrer ou consulter des définitions de paramètres.
+/// Context passed to <see cref="ISettingDefinitionProvider.Define"/>
+/// to register or query setting definitions.
 /// </summary>
 public interface ISettingDefinitionContext
 {
-    /// <summary>Ajoute une définition de paramètre.</summary>
-    /// <param name="definition">La définition à enregistrer.</param>
+    /// <summary>Adds a setting definition.</summary>
+    /// <param name="definition">The definition to register.</param>
     void Add(SettingDefinition definition);
 
     /// <summary>
-    /// Retourne la définition associée au nom, ou <c>null</c> si inconnue.
+    /// Returns the definition associated with the name, or <c>null</c> if unknown.
     /// </summary>
     SettingDefinition? GetOrNull(string name);
 }

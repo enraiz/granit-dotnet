@@ -1,12 +1,12 @@
 // =============================================================================
-// GlobalSettingValueProvider - Provider de paramètre global (niveau G)
+// GlobalSettingValueProvider - Global setting provider (level G)
 // =============================================================================
-// Lit/écrit ISettingStore pour la portée globale (providerKey = null).
-// Cache les valeurs via ICacheService<SettingValue> pour éviter les allers-retours BDD.
-// Précédence : User > Tenant > Global > Configuration > Default
+// Reads/writes ISettingStore for the global scope (providerKey = null).
+// Caches values via ICacheService<SettingValue> to avoid round-trips to the database.
+// Precedence: User > Tenant > Global > Configuration > Default
 //
 // Inputs  : ISettingStore, ICacheService<SettingValue>, SettingsOptions
-// Outputs : SettingValue(Name, "G", null, value) ou null si absent
+// Outputs : SettingValue(Name, "G", null, value) or null if absent
 // =============================================================================
 
 using DigitalDynamics.Foundation.Caching;
@@ -19,12 +19,12 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.Settings.Providers;
 
 /// <summary>
-/// Provider de paramètres globaux (portée application, sans isolation tenant/user).
-/// Cache les valeurs lues depuis <see cref="ISettingStore"/> (order = 300).
+/// Global settings provider (application scope, no tenant/user isolation).
+/// Caches values read from <see cref="ISettingStore"/> (order = 300).
 /// </summary>
 public sealed class GlobalSettingValueProvider : ISettingValueProvider
 {
-    /// <summary>Identifiant du provider Global.</summary>
+    /// <summary>Global provider identifier.</summary>
     public const string ProviderName = "G";
 
     private readonly ISettingStore _store;
@@ -62,7 +62,7 @@ public sealed class GlobalSettingValueProvider : ISettingValueProvider
             {
                 SettingValue? stored = await _store.GetOrNullAsync(
                     definition.Name, ProviderName, null, innerCt);
-                // Sentinelle pour distinguer "null stocké" vs "absent du cache"
+                // Sentinel to distinguish "stored null" from "absent from cache"
                 return stored ?? new SettingValue(definition.Name, ProviderName, null, null);
             },
             cacheOptions,

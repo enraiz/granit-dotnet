@@ -1,46 +1,46 @@
 // =============================================================================
-// StringEncryptionOptions - Configuration du service de chiffrement
+// StringEncryptionOptions - Configuration for the encryption service
 // =============================================================================
-// Chargées depuis la section "Encryption" de appsettings.json.
-// La PassPhrase DOIT être fournie via Vault (jamais hardcodée).
+// Loaded from the "Encryption" section of appsettings.json.
+// The PassPhrase MUST be supplied via Vault (never hardcoded).
 //
-// Note HDS (CWE-329) : aucun Salt ni InitVector statique.
-// L'IV est généré aléatoirement à chaque chiffrement par le provider AES.
+// HDS note (CWE-329): no static Salt or InitVector.
+// The IV is generated randomly for each encryption by the AES provider.
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Encryption;
 
 /// <summary>
-/// Options de configuration du service de chiffrement de chaînes.
+/// Configuration options for the string encryption service.
 /// </summary>
 public sealed class StringEncryptionOptions
 {
-    /// <summary>Nom de la section de configuration.</summary>
+    /// <summary>Configuration section name.</summary>
     public const string SectionName = "Encryption";
 
-    /// <summary>Nom du provider AES local.</summary>
+    /// <summary>Name of the local AES provider.</summary>
     public const string AesProviderName = "Aes";
 
-    /// <summary>Nom du provider Vault Transit.</summary>
+    /// <summary>Name of the Vault Transit provider.</summary>
     public const string VaultProviderName = "Vault";
 
     /// <summary>
-    /// Phrase secrète utilisée par le provider AES pour dériver la clé de chiffrement.
-    /// DOIT être fournie via Vault config provider — jamais hardcodée ni committée.
+    /// Passphrase used by the AES provider to derive the encryption key.
+    /// MUST be supplied via Vault config provider — never hardcoded or committed.
     /// </summary>
     public string PassPhrase { get; set; } = string.Empty;
 
-    /// <summary>Taille de la clé AES en bits (256 par défaut = AES-256).</summary>
+    /// <summary>AES key size in bits (256 by default = AES-256).</summary>
     public int KeySize { get; set; } = 256;
 
     /// <summary>
-    /// Nom du provider actif. Valeurs : "Aes" (défaut) ou "Vault".
+    /// Active provider name. Values: "Aes" (default) or "Vault".
     /// </summary>
     public string ProviderName { get; set; } = AesProviderName;
 
     /// <summary>
-    /// Nom de la clé Transit Vault utilisée par VaultStringEncryptionProvider.
-    /// Ignoré si ProviderName != "Vault".
+    /// Vault Transit key name used by VaultStringEncryptionProvider.
+    /// Ignored when ProviderName != "Vault".
     /// </summary>
     public string VaultKeyName { get; set; } = "string-encryption";
 }

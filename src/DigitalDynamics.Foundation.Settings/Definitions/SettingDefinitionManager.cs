@@ -1,17 +1,17 @@
 // =============================================================================
-// SettingDefinitionManager - Registre centralisé des définitions de paramètres
+// SettingDefinitionManager - Centralized registry of setting definitions
 // =============================================================================
-// Singleton. Au démarrage, appelle Define() sur tous les ISettingDefinitionProvider
-// enregistrés et consolide les définitions dans un dictionnaire immuable.
+// Singleton. At startup, calls Define() on all registered ISettingDefinitionProvider
+// instances and consolidates the definitions into an immutable dictionary.
 //
 // Inputs  : IEnumerable<ISettingDefinitionProvider>
-// Outputs : SettingDefinition par nom (Get / GetOrNull)
+// Outputs : SettingDefinition by name (Get / GetOrNull)
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>
-/// Registre centralisé de toutes les définitions de paramètres déclarées par les modules.
+/// Centralized registry of all setting definitions declared by modules.
 /// </summary>
 public sealed class SettingDefinitionManager
 {
@@ -28,19 +28,19 @@ public sealed class SettingDefinitionManager
     }
 
     /// <summary>
-    /// Retourne la définition pour le nom donné.
+    /// Returns the definition for the given name.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Si le paramètre n'est pas déclaré.</exception>
+    /// <exception cref="InvalidOperationException">If the setting is not declared.</exception>
     public SettingDefinition Get(string name) =>
         _definitions.TryGetValue(name, out SettingDefinition? def)
             ? def
-            : throw new InvalidOperationException($"Le paramètre '{name}' n'est pas déclaré. Vérifiez qu'un ISettingDefinitionProvider l'enregistre.");
+            : throw new InvalidOperationException($"Setting '{name}' is not declared. Ensure an ISettingDefinitionProvider registers it.");
 
-    /// <summary>Retourne la définition ou <c>null</c> si inconnue.</summary>
+    /// <summary>Returns the definition or <c>null</c> if unknown.</summary>
     public SettingDefinition? GetOrNull(string name) =>
         _definitions.GetValueOrDefault(name);
 
-    /// <summary>Retourne toutes les définitions déclarées.</summary>
+    /// <summary>Returns all declared definitions.</summary>
     public IReadOnlyCollection<SettingDefinition> GetAll() =>
         (IReadOnlyCollection<SettingDefinition>)_definitions.Values;
 

@@ -1,12 +1,12 @@
 // =============================================================================
-// ISettingValueProvider - Abstraction d'un provider de valeur de paramètre
+// ISettingValueProvider - Abstraction for a setting value provider
 // =============================================================================
-// Chaque provider représente un niveau dans la cascade de résolution :
+// Each provider represents a level in the resolution cascade:
 //   User (U, order=100) → Tenant (T, 200) → Global (G, 300)
 //   → Configuration (C, 400) → Default (D, 500)
 //
-// Les providers de store (G, T, U) utilisent ISettingStore + ICacheService<SettingValue>.
-// Les providers statiques (C, D) lisent IConfiguration ou SettingDefinition.DefaultValue.
+// Store providers (G, T, U) use ISettingStore + ICacheService<SettingValue>.
+// Static providers (C, D) read IConfiguration or SettingDefinition.DefaultValue.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Settings.Definitions;
@@ -15,28 +15,28 @@ using DigitalDynamics.Foundation.Settings.Values;
 namespace DigitalDynamics.Foundation.Settings.Providers;
 
 /// <summary>
-/// Fournit la valeur d'un paramètre pour un niveau donné dans la cascade de résolution.
+/// Provides the value of a setting for a given level in the resolution cascade.
 /// </summary>
 public interface ISettingValueProvider
 {
-    /// <summary>Identifiant court du provider (ex : "G", "T", "U", "C", "D").</summary>
+    /// <summary>Short provider identifier (e.g. "G", "T", "U", "C", "D").</summary>
     string Name { get; }
 
-    /// <summary>Ordre de résolution (priorité croissante : 100 = plus prioritaire).</summary>
+    /// <summary>Resolution order (ascending priority: 100 = highest priority).</summary>
     int Order { get; }
 
     /// <summary>
-    /// Retourne la valeur du paramètre pour le contexte courant, ou <c>null</c> si absente.
+    /// Returns the setting value for the current context, or <c>null</c> if absent.
     /// </summary>
     Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken ct = default);
 
     /// <summary>
-    /// Crée ou met à jour la valeur du paramètre pour le contexte courant.
+    /// Creates or updates the setting value for the current context.
     /// </summary>
     Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default);
 
     /// <summary>
-    /// Supprime la valeur du paramètre pour le contexte courant.
+    /// Deletes the setting value for the current context.
     /// </summary>
     Task ClearAsync(SettingDefinition definition, CancellationToken ct = default);
 }

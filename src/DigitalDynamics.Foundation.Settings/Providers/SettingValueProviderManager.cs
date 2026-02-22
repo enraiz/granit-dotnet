@@ -1,26 +1,26 @@
 // =============================================================================
-// SettingValueProviderManager - Gestionnaire ordonné des providers de valeur
+// SettingValueProviderManager - Ordered manager of value providers
 // =============================================================================
-// Agrège tous les ISettingValueProvider enregistrés dans le DI et les trie
-// par ordre croissant (100 = plus prioritaire, 500 = dernier recours).
+// Aggregates all ISettingValueProvider instances registered in DI and sorts them
+// in ascending order (100 = highest priority, 500 = last resort).
 //
-// Ordre par défaut :
+// Default order:
 //   User (U, 100) → Tenant (T, 200) → Global (G, 300)
 //   → Configuration (C, 400) → Default (D, 500)
 //
 // Inputs  : IEnumerable<ISettingValueProvider> (DI)
-// Outputs : Providers triés (accès par liste ou par nom)
+// Outputs : Sorted providers (access by list or by name)
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Settings.Providers;
 
 /// <summary>
-/// Gestionnaire des providers de valeur de paramètre, triés par ordre de priorité.
+/// Manager of setting value providers, sorted by priority order.
 /// </summary>
 public sealed class SettingValueProviderManager
 {
     /// <summary>
-    /// Liste ordonnée des providers, du plus prioritaire (U=100) au moins prioritaire (D=500).
+    /// Ordered list of providers, from highest priority (U=100) to lowest priority (D=500).
     /// </summary>
     public IReadOnlyList<ISettingValueProvider> Providers { get; }
 
@@ -28,7 +28,7 @@ public sealed class SettingValueProviderManager
         Providers = [.. providers.OrderBy(p => p.Order)];
 
     /// <summary>
-    /// Retourne le provider par son nom court, ou <c>null</c> s'il n'est pas enregistré.
+    /// Returns the provider by its short name, or <c>null</c> if not registered.
     /// </summary>
     public ISettingValueProvider? GetOrNull(string name) =>
         Providers.FirstOrDefault(p => p.Name == name);

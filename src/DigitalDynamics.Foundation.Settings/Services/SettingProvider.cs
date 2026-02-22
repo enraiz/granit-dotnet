@@ -1,16 +1,16 @@
 // =============================================================================
-// SettingProvider - Résolution en cascade des paramètres
+// SettingProvider - Cascading setting resolution
 // =============================================================================
-// Parcourt les providers dans l'ordre U(100) → T(200) → G(300) → C(400) → D(500).
-// Retourne la première valeur non nulle trouvée.
+// Walks the providers in order U(100) → T(200) → G(300) → C(400) → D(500).
+// Returns the first non-null value found.
 //
-// Règles de cascade :
-//   - Si SettingDefinition.Providers est non vide, seuls les providers listés sont consultés.
-//   - Si SettingDefinition.IsInherited = false, la cascade s'arrête au premier provider
-//     applicable qui retourne null (pas de fallback vers les niveaux inférieurs).
+// Cascade rules:
+//   - If SettingDefinition.Providers is non-empty, only the listed providers are consulted.
+//   - If SettingDefinition.IsInherited = false, the cascade stops at the first applicable
+//     provider that returns null (no fallback to lower-priority levels).
 //
 // Inputs  : SettingValueProviderManager, SettingDefinitionManager
-// Outputs : string? (valeur résolue) ou IReadOnlyList<SettingValue>
+// Outputs : string? (resolved value) or IReadOnlyList<SettingValue>
 // =============================================================================
 
 using DigitalDynamics.Foundation.Settings.Definitions;
@@ -20,7 +20,7 @@ using DigitalDynamics.Foundation.Settings.Values;
 namespace DigitalDynamics.Foundation.Settings.Services;
 
 /// <summary>
-/// Implémentation de <see cref="ISettingProvider"/> avec résolution en cascade.
+/// Implementation of <see cref="ISettingProvider"/> with cascading resolution.
 /// </summary>
 public sealed class SettingProvider : ISettingProvider
 {
@@ -77,7 +77,7 @@ public sealed class SettingProvider : ISettingProvider
                 return value;
             }
 
-            // Sans héritage, on ne descend pas vers les niveaux de moindre priorité
+            // Without inheritance, do not fall back to lower-priority levels
             if (!definition.IsInherited)
             {
                 return null;

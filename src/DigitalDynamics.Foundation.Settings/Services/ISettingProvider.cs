@@ -1,11 +1,11 @@
 // =============================================================================
-// ISettingProvider - Service de lecture des paramètres avec cascade automatique
+// ISettingProvider - Setting read service with automatic cascade
 // =============================================================================
-// Parcourt la chaîne de providers U → T → G → C → D et retourne la première
-// valeur non nulle. Gère l'héritage (IsInherited) et la liste blanche (Providers).
+// Walks the provider chain U → T → G → C → D and returns the first
+// non-null value. Handles inheritance (IsInherited) and the allow-list (Providers).
 //
-// Usage : injecter ISettingProvider en lecture seule.
-//         Pour écrire, utiliser ISettingManager.
+// Usage: inject ISettingProvider for read-only access.
+//        For writing, use ISettingManager.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Settings.Values;
@@ -13,21 +13,21 @@ using DigitalDynamics.Foundation.Settings.Values;
 namespace DigitalDynamics.Foundation.Settings.Services;
 
 /// <summary>
-/// Service de lecture des paramètres avec résolution en cascade automatique.
+/// Setting read service with automatic cascading resolution.
 /// </summary>
 public interface ISettingProvider
 {
     /// <summary>
-    /// Retourne la valeur résolue du paramètre, ou <c>null</c> si aucun provider ne fournit de valeur.
+    /// Returns the resolved setting value, or <c>null</c> if no provider supplies a value.
     /// </summary>
-    /// <param name="name">Nom du paramètre.</param>
-    /// <param name="ct">Token d'annulation.</param>
+    /// <param name="name">Setting name.</param>
+    /// <param name="ct">Cancellation token.</param>
     Task<string?> GetOrNullAsync(string name, CancellationToken ct = default);
 
     /// <summary>
-    /// Retourne les valeurs résolues pour une liste de paramètres.
+    /// Returns the resolved values for a list of settings.
     /// </summary>
-    /// <param name="names">Noms des paramètres à résoudre.</param>
-    /// <param name="ct">Token d'annulation.</param>
+    /// <param name="names">Names of the settings to resolve.</param>
+    /// <param name="ct">Cancellation token.</param>
     Task<IReadOnlyList<SettingValue>> GetAllAsync(string[] names, CancellationToken ct = default);
 }

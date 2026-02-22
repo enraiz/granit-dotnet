@@ -1,13 +1,13 @@
 // =============================================================================
-// UserSettingValueProvider - Provider de paramètre utilisateur (niveau U)
+// UserSettingValueProvider - User setting provider (level U)
 // =============================================================================
-// Lit/écrit ISettingStore pour la portée utilisateur (providerKey = UserId).
-// Retourne null si aucun utilisateur n'est authentifié dans le contexte courant.
-// Cache les valeurs via ICacheService<SettingValue>.
-// Précédence : User > Tenant > Global > Configuration > Default
+// Reads/writes ISettingStore for the user scope (providerKey = UserId).
+// Returns null when no user is authenticated in the current context.
+// Caches values via ICacheService<SettingValue>.
+// Precedence: User > Tenant > Global > Configuration > Default
 //
 // Inputs  : ICurrentUserService, ISettingStore, ICacheService<SettingValue>, SettingsOptions
-// Outputs : SettingValue(Name, "U", userId, value) ou null si absent/non authentifié
+// Outputs : SettingValue(Name, "U", userId, value) or null if absent/unauthenticated
 // =============================================================================
 
 using DigitalDynamics.Foundation.Caching;
@@ -21,12 +21,12 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.Settings.Providers;
 
 /// <summary>
-/// Provider de paramètres utilisateur (isolation par utilisateur courant via <see cref="ICurrentUserService"/>).
-/// Cache les valeurs lues depuis <see cref="ISettingStore"/> (order = 100).
+/// User settings provider (isolated per current user via <see cref="ICurrentUserService"/>).
+/// Caches values read from <see cref="ISettingStore"/> (order = 100).
 /// </summary>
 public sealed class UserSettingValueProvider : ISettingValueProvider
 {
-    /// <summary>Identifiant du provider User.</summary>
+    /// <summary>User provider identifier.</summary>
     public const string ProviderName = "U";
 
     private readonly ICurrentUserService _currentUser;

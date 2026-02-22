@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // JsonStringLocalizerFactory.cs
-// Implémente IStringLocalizerFactory pour créer des JsonStringLocalizer.
-// Cache thread-safe via ConcurrentDictionary<Type, Lazy<IStringLocalizer>>.
-// Résout l'héritage de ressources et les sources JSON enregistrées.
+// Implements IStringLocalizerFactory to create JsonStringLocalizer instances.
+// Thread-safe cache via ConcurrentDictionary<Type, Lazy<IStringLocalizer>>.
+// Resolves resource inheritance and registered JSON sources.
 // ---------------------------------------------------------------------------
 
 using System.Collections.Concurrent;
@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.Localization.Json;
 
 /// <summary>
-/// Factory de localizers JSON basée sur les ressources enregistrées dans
+/// JSON localizer factory based on resources registered in
 /// <see cref="FoundationLocalizationOptions"/>.
 /// </summary>
 internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
@@ -43,19 +43,19 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
     /// <inheritdoc />
     public IStringLocalizer Create(string baseName, string location)
     {
-        // Tenter de résoudre le type depuis le nom complet
+        // Try to resolve the type from the fully-qualified name
         Type? resourceType = Type.GetType($"{baseName}, {location}");
         if (resourceType is not null)
         {
             return Create(resourceType);
         }
 
-        // Fallback : créer un localizer vide (clé = valeur retournée)
+        // Fallback: create an empty localizer (key = returned value)
         return new JsonStringLocalizer([], "fr", []);
     }
 
     /// <summary>
-    /// Crée un localizer pour le type de ressource donné, avec héritage.
+    /// Creates a localizer for the given resource type, with inheritance.
     /// </summary>
     private JsonStringLocalizer CreateLocalizer(Type resourceType)
     {
@@ -63,18 +63,18 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
 
         if (!options.Resources.TryGetValue(resourceType, out LocalizationResourceInfo? info))
         {
-            // Type non enregistré : retourner un localizer vide
+            // Unregistered type: return an empty localizer
             return new JsonStringLocalizer([], "fr", []);
         }
 
-        // Construire les localizers des ressources parentes (récursif)
+        // Build localizers for parent resources (recursive)
         List<IStringLocalizer> baseLocalizers = [];
         foreach (Type baseType in info.BaseTypes)
         {
             baseLocalizers.Add(Create(baseType));
         }
 
-        // Vérifier les [InheritResource] sur la classe marker
+        // Check [InheritResource] attributes on the marker class
         Attributes.InheritResourceAttribute[] inheritAttributes =
             (Attributes.InheritResourceAttribute[])resourceType
                 .GetCustomAttributes(typeof(Attributes.InheritResourceAttribute), true);

@@ -1,11 +1,11 @@
 // =============================================================================
-// DefaultValueSettingValueProvider - Provider de valeur par défaut (niveau D)
+// DefaultValueSettingValueProvider - Default value provider (level D)
 // =============================================================================
-// Retourne SettingDefinition.DefaultValue. Dernier maillon de la cascade.
-// Pas de store, pas de cache — la valeur est statique (déclarée à la compilation).
+// Returns SettingDefinition.DefaultValue. Last link in the cascade.
+// No store, no cache — the value is static (declared at compile time).
 //
 // Input  : SettingDefinition.DefaultValue
-// Output : SettingValue(Name, "D", null, DefaultValue) ou null si DefaultValue null
+// Output : SettingValue(Name, "D", null, DefaultValue) or null if DefaultValue is null
 // =============================================================================
 
 using DigitalDynamics.Foundation.Settings.Definitions;
@@ -14,12 +14,12 @@ using DigitalDynamics.Foundation.Settings.Values;
 namespace DigitalDynamics.Foundation.Settings.Providers;
 
 /// <summary>
-/// Provider de valeur par défaut : retourne <see cref="SettingDefinition.DefaultValue"/>.
-/// Dernier niveau de la cascade (order = 500).
+/// Default value provider: returns <see cref="SettingDefinition.DefaultValue"/>.
+/// Last level in the cascade (order = 500).
 /// </summary>
 public sealed class DefaultValueSettingValueProvider : ISettingValueProvider
 {
-    /// <summary>Identifiant du provider Default.</summary>
+    /// <summary>Default provider identifier.</summary>
     public const string ProviderName = "D";
 
     /// <inheritdoc/>

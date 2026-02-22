@@ -9,8 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace DigitalDynamics.Foundation.Localization;
 
 /// <summary>
-/// Module Foundation pour la localisation JSON modulaire.
-/// Enregistre IStringLocalizerFactory et la ressource Foundation par défaut (fr/en).
+/// Foundation module for modular JSON localization.
+/// Registers IStringLocalizerFactory and the default Foundation resource (fr/en).
 /// </summary>
 public sealed class FoundationLocalizationModule : FoundationModule
 {

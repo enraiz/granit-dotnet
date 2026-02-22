@@ -1,9 +1,9 @@
 // =============================================================================
-// DefaultStringEncryptionService - Implémentation de IStringEncryptionService
+// DefaultStringEncryptionService - Implementation of IStringEncryptionService
 // =============================================================================
-// Délègue au provider configuré via StringEncryptionOptions.ProviderName.
-// Les providers disponibles sont enregistrés comme IStringEncryptionProvider
-// et résolus par nom au démarrage.
+// Delegates to the provider configured via StringEncryptionOptions.ProviderName.
+// Available providers are registered as IStringEncryptionProvider
+// and resolved by name at startup.
 //
 // Inputs  : providers (IEnumerable<IStringEncryptionProvider>),
 //           options (IOptions<StringEncryptionOptions>)
@@ -16,8 +16,8 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.Encryption.Services;
 
 /// <summary>
-/// Implémentation de <see cref="IStringEncryptionService"/> qui délègue
-/// au <see cref="IStringEncryptionProvider"/> sélectionné par configuration.
+/// Implementation of <see cref="IStringEncryptionService"/> that delegates
+/// to the <see cref="IStringEncryptionProvider"/> selected by configuration.
 /// </summary>
 public sealed class DefaultStringEncryptionService : IStringEncryptionService
 {
@@ -31,8 +31,8 @@ public sealed class DefaultStringEncryptionService : IStringEncryptionService
 
         _provider = providers.FirstOrDefault(p => p.ProviderName == providerName)
             ?? throw new InvalidOperationException(
-                $"Aucun provider de chiffrement nommé '{providerName}' n'est enregistré. " +
-                $"Providers disponibles : {string.Join(", ", providers.Select(p => p.ProviderName))}.");
+                $"No encryption provider named '{providerName}' is registered. " +
+                $"Available providers: {string.Join(", ", providers.Select(p => p.ProviderName))}.");
     }
 
     /// <inheritdoc/>

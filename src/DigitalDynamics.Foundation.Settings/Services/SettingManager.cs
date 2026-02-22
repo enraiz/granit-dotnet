@@ -1,11 +1,11 @@
 // =============================================================================
-// SettingManager - Implémentation de ISettingManager
+// SettingManager - Implementation of ISettingManager
 // =============================================================================
-// Écrit directement dans ISettingStore (bypass des providers) avec les clés
-// explicites, puis invalide l'entrée de cache correspondante.
+// Writes directly to ISettingStore (bypassing providers) with explicit keys,
+// then invalidates the corresponding cache entry.
 //
 // Inputs  : ISettingStore, ICacheService<SettingValue>, SettingDefinitionManager
-// Outputs : void (effets de bord : store + cache)
+// Outputs : void (side effects: store + cache)
 // =============================================================================
 
 using DigitalDynamics.Foundation.Caching;
@@ -16,8 +16,8 @@ using DigitalDynamics.Foundation.Settings.Values;
 namespace DigitalDynamics.Foundation.Settings.Services;
 
 /// <summary>
-/// Implémentation de <see cref="ISettingManager"/> : écrit dans <see cref="ISettingStore"/>
-/// et invalide le cache pour les portées Global, Tenant et User.
+/// Implementation of <see cref="ISettingManager"/>: writes to <see cref="ISettingStore"/>
+/// and invalidates the cache for the Global, Tenant, and User scopes.
 /// </summary>
 public sealed class SettingManager : ISettingManager
 {
@@ -38,7 +38,7 @@ public sealed class SettingManager : ISettingManager
     /// <inheritdoc/>
     public async Task SetGlobalAsync(string name, string? value, CancellationToken ct = default)
     {
-        _definitions.Get(name); // Valide que le paramètre est déclaré
+        _definitions.Get(name); // Validates that the setting is declared
         await _store.SetAsync(name, GlobalSettingValueProvider.ProviderName, null, value, ct);
         await _cache.RemoveAsync(
             SettingCacheKey.Build(GlobalSettingValueProvider.ProviderName, null, name), ct);

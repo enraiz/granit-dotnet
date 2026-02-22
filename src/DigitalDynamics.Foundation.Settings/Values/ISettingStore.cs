@@ -1,20 +1,20 @@
 // =============================================================================
-// ISettingStore - Abstraction de persistance des valeurs de paramètres
+// ISettingStore - Persistence abstraction for setting values
 // =============================================================================
-// Interface basse couche : pas de cache, pas de chiffrement applicatif.
-// Le chiffrement des valeurs IsEncrypted est géré à cette couche (store EF).
+// Low-level interface: no cache, no application-level encryption.
+// Encryption of IsEncrypted values is handled at this layer (EF store).
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Settings.Values;
 
 /// <summary>
-/// Abstraction de persistance des valeurs de paramètres.
-/// Le chiffrement des paramètres sensibles est géré par l'implémentation.
+/// Persistence abstraction for setting values.
+/// Encryption of sensitive settings is handled by the implementation.
 /// </summary>
 public interface ISettingStore
 {
     /// <summary>
-    /// Retourne la valeur stockée, ou <c>null</c> si absente.
+    /// Returns the stored value, or <c>null</c> if absent.
     /// </summary>
     Task<SettingValue?> GetOrNullAsync(
         string name,
@@ -23,7 +23,7 @@ public interface ISettingStore
         CancellationToken ct = default);
 
     /// <summary>
-    /// Retourne toutes les valeurs stockées pour un provider et une clé donnés.
+    /// Returns all stored values for a given provider and key.
     /// </summary>
     Task<IReadOnlyList<SettingValue>> GetListAsync(
         string providerName,
@@ -31,7 +31,7 @@ public interface ISettingStore
         CancellationToken ct = default);
 
     /// <summary>
-    /// Crée ou met à jour la valeur d'un paramètre.
+    /// Creates or updates the value of a setting.
     /// </summary>
     Task SetAsync(
         string name,
@@ -41,7 +41,7 @@ public interface ISettingStore
         CancellationToken ct = default);
 
     /// <summary>
-    /// Supprime la valeur d'un paramètre pour un provider et une clé donnés.
+    /// Deletes the value of a setting for a given provider and key.
     /// </summary>
     Task DeleteAsync(
         string name,

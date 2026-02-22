@@ -1,7 +1,7 @@
 // =============================================================================
-// EncryptionServiceCollectionExtensions - Enregistrement des services
+// EncryptionServiceCollectionExtensions - Service registration
 // =============================================================================
-// Usage :
+// Usage:
 //   builder.Services.AddFoundationEncryption(
 //       builder.Configuration.GetSection(StringEncryptionOptions.SectionName));
 // =============================================================================
@@ -15,15 +15,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace DigitalDynamics.Foundation.Encryption.Extensions;
 
 /// <summary>
-/// Extensions pour configurer les services de chiffrement dans le conteneur DI.
+/// Extensions for registering encryption services in the DI container.
 /// </summary>
 public static class EncryptionServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute le service de chiffrement de chaînes avec le provider AES-256-CBC par défaut.
+    /// Adds the string encryption service with the default AES-256-CBC provider.
     /// </summary>
-    /// <param name="services">Conteneur DI.</param>
-    /// <param name="configuration">Section de configuration "Encryption".</param>
+    /// <param name="services">DI container.</param>
+    /// <param name="configuration">Configuration section "Encryption".</param>
     public static IServiceCollection AddFoundationEncryption(
         this IServiceCollection services,
         IConfigurationSection configuration)

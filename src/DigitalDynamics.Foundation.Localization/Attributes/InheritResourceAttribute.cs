@@ -1,20 +1,20 @@
 // ---------------------------------------------------------------------------
 // InheritResourceAttribute.cs
-// Déclare qu'une ressource de localisation hérite des traductions
-// d'une ou plusieurs ressources parentes (héritage ABP-style).
+// Declares that a localization resource inherits translations
+// from one or more parent resources (ABP-style inheritance).
 // ---------------------------------------------------------------------------
 
 namespace DigitalDynamics.Foundation.Localization.Attributes;
 
 /// <summary>
-/// Déclare que cette ressource hérite des traductions des ressources parentes spécifiées.
-/// Les clés non trouvées dans cette ressource seront recherchées dans les parents.
+/// Declares that this resource inherits translations from the specified parent resources.
+/// Keys not found in this resource will be looked up in the parents.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
 public sealed class InheritResourceAttribute(params Type[] baseResourceTypes) : Attribute
 {
     /// <summary>
-    /// Types des ressources parentes dont hériter les traductions.
+    /// Types of the parent resources whose translations to inherit.
     /// </summary>
     public Type[] BaseResourceTypes { get; } = baseResourceTypes;
 }

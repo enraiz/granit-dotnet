@@ -1,9 +1,9 @@
 // =============================================================================
-// FoundationEncryptionModule - Module Foundation pour le chiffrement de chaînes
+// FoundationEncryptionModule - Foundation module for string encryption
 // =============================================================================
-// Configure IStringEncryptionService avec AesStringEncryptionProvider par défaut.
-// Pour activer le provider Vault Transit, enregistrer VaultStringEncryptionProvider
-// depuis Foundation.Vault et définir Encryption:ProviderName = "Vault".
+// Configures IStringEncryptionService with AesStringEncryptionProvider by default.
+// To enable the Vault Transit provider, register VaultStringEncryptionProvider
+// from Foundation.Vault and set Encryption:ProviderName = "Vault".
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Modularity;
@@ -12,8 +12,8 @@ using DigitalDynamics.Foundation.Encryption.Extensions;
 namespace DigitalDynamics.Foundation.Encryption;
 
 /// <summary>
-/// Module Foundation pour le chiffrement de chaînes.
-/// Provider par défaut : AES-256-CBC (clé dérivée via PBKDF2 depuis Vault config).
+/// Foundation module for string encryption.
+/// Default provider: AES-256-CBC (key derived via PBKDF2 from Vault config).
 /// </summary>
 public sealed class FoundationEncryptionModule : FoundationModule
 {

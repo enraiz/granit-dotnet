@@ -1,51 +1,51 @@
 // =============================================================================
-// SettingDefinition - Déclaration statique d'un paramètre
+// SettingDefinition - Static declaration of a setting
 // =============================================================================
-// Décrit un paramètre : nom, valeur par défaut, chiffrement, visibilité,
-// héritage et liste blanche des providers autorisés.
+// Describes a setting: name, default value, encryption, visibility,
+// inheritance, and the allow-list of authorized providers.
 //
-// Créé par ISettingDefinitionProvider.Define() au démarrage.
-// Géré par SettingDefinitionManager (Singleton).
+// Created by ISettingDefinitionProvider.Define() at startup.
+// Managed by SettingDefinitionManager (Singleton).
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>
-/// Décrit un paramètre du système (métadonnées statiques).
+/// Describes a system setting (static metadata).
 /// </summary>
 public sealed class SettingDefinition
 {
-    /// <summary>Nom unique du paramètre (clé de lookup).</summary>
+    /// <summary>Unique setting name (lookup key).</summary>
     public string Name { get; }
 
-    /// <summary>Valeur par défaut retournée si aucun provider ne fournit de valeur.</summary>
+    /// <summary>Default value returned when no provider supplies a value.</summary>
     public string? DefaultValue { get; init; }
 
     /// <summary>
-    /// Indique si la valeur doit être chiffrée au repos (via IStringEncryptionService).
-    /// Le cache stocke le plaintext — le chiffrement s'applique uniquement à la couche store.
+    /// Indicates whether the value must be encrypted at rest (via IStringEncryptionService).
+    /// The cache stores plain text — encryption applies only at the store layer.
     /// </summary>
     public bool IsEncrypted { get; init; }
 
-    /// <summary>Si vrai, la valeur est exposable aux clients (API publique).</summary>
+    /// <summary>When true, the value can be exposed to clients (public API).</summary>
     public bool IsVisibleToClients { get; init; }
 
     /// <summary>
-    /// Si vrai (défaut), le provider de rang inférieur hérite la valeur du rang supérieur
-    /// quand la sienne est nulle. Ex : Tenant hérite Global si IsInherited = true.
+    /// When true (default), a lower-priority provider inherits the value from a higher-priority one
+    /// when its own value is null. E.g. Tenant inherits Global when IsInherited = true.
     /// </summary>
     public bool IsInherited { get; init; } = true;
 
     /// <summary>
-    /// Liste blanche des noms de providers autorisés à stocker ce paramètre.
-    /// Liste vide = tous les providers sont autorisés.
+    /// Allow-list of provider names authorized to store this setting.
+    /// Empty list = all providers are authorized.
     /// </summary>
     public IList<string> Providers { get; } = [];
 
-    /// <summary>Libellé d'affichage (UI).</summary>
+    /// <summary>Display label (UI).</summary>
     public string? DisplayName { get; init; }
 
-    /// <summary>Description longue du paramètre (UI, documentation).</summary>
+    /// <summary>Long description of the setting (UI, documentation).</summary>
     public string? Description { get; init; }
 
     public SettingDefinition(string name)

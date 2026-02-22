@@ -1,13 +1,13 @@
 // =============================================================================
-// TenantSettingValueProvider - Provider de paramètre tenant (niveau T)
+// TenantSettingValueProvider - Tenant setting provider (level T)
 // =============================================================================
-// Lit/écrit ISettingStore pour la portée tenant (providerKey = tenantId.ToString()).
-// Retourne null si aucun tenant n'est actif dans le contexte courant.
-// Cache les valeurs via ICacheService<SettingValue>.
-// Précédence : User > Tenant > Global > Configuration > Default
+// Reads/writes ISettingStore for the tenant scope (providerKey = tenantId.ToString()).
+// Returns null when no tenant is active in the current context.
+// Caches values via ICacheService<SettingValue>.
+// Precedence: User > Tenant > Global > Configuration > Default
 //
 // Inputs  : ICurrentTenant, ISettingStore, ICacheService<SettingValue>, SettingsOptions
-// Outputs : SettingValue(Name, "T", tenantId, value) ou null si absent/hors tenant
+// Outputs : SettingValue(Name, "T", tenantId, value) or null if absent/outside tenant
 // =============================================================================
 
 using DigitalDynamics.Foundation.Caching;
@@ -21,12 +21,12 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.Settings.Providers;
 
 /// <summary>
-/// Provider de paramètres tenant (isolation par tenant courant via <see cref="ICurrentTenant"/>).
-/// Cache les valeurs lues depuis <see cref="ISettingStore"/> (order = 200).
+/// Tenant settings provider (isolated per current tenant via <see cref="ICurrentTenant"/>).
+/// Caches values read from <see cref="ISettingStore"/> (order = 200).
 /// </summary>
 public sealed class TenantSettingValueProvider : ISettingValueProvider
 {
-    /// <summary>Identifiant du provider Tenant.</summary>
+    /// <summary>Tenant provider identifier.</summary>
     public const string ProviderName = "T";
 
     private readonly ICurrentTenant _currentTenant;

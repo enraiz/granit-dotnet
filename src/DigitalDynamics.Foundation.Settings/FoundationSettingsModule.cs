@@ -1,16 +1,16 @@
 // =============================================================================
-// FoundationSettingsModule - Module Foundation pour les paramètres dynamiques
+// FoundationSettingsModule - Foundation module for dynamic settings
 // =============================================================================
-// Configure le système de paramètres avec résolution en cascade :
+// Configures the settings system with cascading resolution:
 //   User (U) → Tenant (T) → Global (G) → Configuration (C) → Default (D)
 //
-// Dépendances :
-//   - FoundationCachingModule      : ICacheService<SettingValue> pour le cache des providers
-//   - FoundationMultiTenancyModule : ICurrentTenant pour le provider Tenant
-//   - FoundationEncryptionModule   : IStringEncryptionService pour IsEncrypted (couche store)
-//   - FoundationSecurityModule     : ICurrentUserService pour le provider User
+// Dependencies:
+//   - FoundationCachingModule      : ICacheService<SettingValue> for provider cache
+//   - FoundationMultiTenancyModule : ICurrentTenant for the Tenant provider
+//   - FoundationEncryptionModule   : IStringEncryptionService for IsEncrypted (store layer)
+//   - FoundationSecurityModule     : ICurrentUserService for the User provider
 //
-// Store par défaut : InMemorySettingStore (remplacé par EfCoreSettingStore en production
+// Default store: InMemorySettingStore (replaced by EfCoreSettingStore in production
 //   via FoundationSettingsEntityFrameworkCoreModule).
 // =============================================================================
 
@@ -25,7 +25,7 @@ using DigitalDynamics.Foundation.Settings.Options;
 namespace DigitalDynamics.Foundation.Settings;
 
 /// <summary>
-/// Module Foundation pour la gestion des paramètres dynamiques avec résolution en cascade.
+/// Foundation module for dynamic settings management with cascading resolution.
 /// </summary>
 [DependsOn(typeof(FoundationCachingModule))]
 [DependsOn(typeof(FoundationMultiTenancyModule))]

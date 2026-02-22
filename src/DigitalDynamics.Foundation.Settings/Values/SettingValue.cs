@@ -1,5 +1,5 @@
 // =============================================================================
-// SettingValue - Valeur d'un paramètre pour un provider et une clé donnés
+// SettingValue - Value of a setting for a given provider and key
 // =============================================================================
 
 using DigitalDynamics.Foundation.Caching;
@@ -7,12 +7,12 @@ using DigitalDynamics.Foundation.Caching;
 namespace DigitalDynamics.Foundation.Settings.Values;
 
 /// <summary>
-/// Représente la valeur d'un paramètre pour un provider et une clé donnés.
+/// Represents the value of a setting for a given provider and key.
 /// </summary>
-/// <param name="Name">Nom du paramètre.</param>
-/// <param name="ProviderName">Nom du provider (ex : "G", "T", "U", "C", "D").</param>
-/// <param name="ProviderKey">Clé du provider (null = Global, tenantId = Tenant, userId = User).</param>
-/// <param name="Value">Valeur du paramètre (plaintext — le chiffrement est géré par ISettingStore).</param>
+/// <param name="Name">Setting name.</param>
+/// <param name="ProviderName">Provider name (e.g. "G", "T", "U", "C", "D").</param>
+/// <param name="ProviderKey">Provider key (null = Global, tenantId = Tenant, userId = User).</param>
+/// <param name="Value">Setting value (plain text — encryption is handled by ISettingStore).</param>
 [CacheName("Setting")]
 [CacheEncrypted]
 public sealed record SettingValue(

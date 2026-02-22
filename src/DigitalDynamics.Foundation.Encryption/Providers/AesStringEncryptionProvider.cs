@@ -1,16 +1,16 @@
 // =============================================================================
-// AesStringEncryptionProvider - Chiffrement AES-256-CBC avec PBKDF2
+// AesStringEncryptionProvider - AES-256-CBC encryption with PBKDF2
 // =============================================================================
-// Implémente IStringEncryptionProvider via AES-256-CBC + PBKDF2 (SHA-256).
+// Implements IStringEncryptionProvider via AES-256-CBC + PBKDF2 (SHA-256).
 //
-// Sécurité HDS (CWE-329) :
-//   - IV de 16 octets généré aléatoirement à chaque chiffrement
-//   - Clé dérivée UNE SEULE FOIS au démarrage (PBKDF2 + sel fixe interne)
-//   - Format de sortie : Base64(IV[16] || CipherText)
-//   - La PassPhrase DOIT provenir de Vault — jamais hardcodée
+// HDS security (CWE-329):
+//   - 16-byte IV generated randomly for each encryption
+//   - Key derived ONCE at startup (PBKDF2 + fixed internal salt)
+//   - Output format: Base64(IV[16] || CipherText)
+//   - PassPhrase MUST come from Vault — never hardcoded
 //
 // Inputs  : plainText (string), configuration via IOptions<StringEncryptionOptions>
-// Outputs : Base64 string (encrypt) | plainText | null si erreur (decrypt)
+// Outputs : Base64 string (encrypt) | plainText | null on error (decrypt)
 // =============================================================================
 
 using System.Security.Cryptography;
@@ -21,14 +21,14 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.Encryption.Providers;
 
 /// <summary>
-/// Provider AES-256-CBC avec dérivation de clé PBKDF2 (Rfc2898DeriveBytes/SHA-256).
-/// Conçu pour les opérations fréquentes (&lt; 1 ms après démarrage).
+/// AES-256-CBC provider with PBKDF2 key derivation (Rfc2898DeriveBytes/SHA-256).
+/// Designed for frequent operations (&lt; 1 ms after startup).
 /// </summary>
 public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
 {
-    // Sel interne fixe pour la dérivation de clé PBKDF2.
-    // Acceptable ici : la PassPhrase provient de Vault (haute entropie).
-    // Le sel protège contre les attaques sur des PassPhrases faibles.
+    // Fixed internal salt for PBKDF2 key derivation.
+    // Acceptable here: the PassPhrase comes from Vault (high entropy).
+    // The salt protects against attacks on weak PassPhrases.
     private static readonly byte[] KeyDerivationSalt =
     [
         0x44, 0x44, 0x46, 0x6F, 0x75, 0x6E, 0x64, 0x61,
@@ -50,8 +50,8 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         if (string.IsNullOrEmpty(opts.PassPhrase))
         {
             throw new InvalidOperationException(
-                "Encryption:PassPhrase est requis pour AesStringEncryptionProvider. " +
-                "Configurer via Vault config provider (jamais en clair dans appsettings).");
+                "Encryption:PassPhrase is required for AesStringEncryptionProvider. " +
+                "Configure via Vault config provider (never in plain text in appsettings).");
         }
 
         _key = Rfc2898DeriveBytes.Pbkdf2(

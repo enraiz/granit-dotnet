@@ -1,36 +1,36 @@
 // =============================================================================
-// IStringEncryptionProvider - Provider de chiffrement de chaînes
+// IStringEncryptionProvider - String encryption provider
 // =============================================================================
-// Contrat pour les implémentations concrètes de chiffrement.
-// Les providers sont des singletons auto-configurés via DI.
+// Contract for concrete encryption implementations.
+// Providers are self-configured singletons registered via DI.
 //
-// Providers disponibles :
-//   - AesStringEncryptionProvider : AES-256-CBC local (< 1 ms)
+// Available providers:
+//   - AesStringEncryptionProvider : local AES-256-CBC (< 1 ms)
 //   - VaultStringEncryptionProvider : Vault Transit Engine (10-20 ms)
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Encryption;
 
 /// <summary>
-/// Provider de chiffrement/déchiffrement de chaînes.
-/// Chaque implémentation gère sa propre configuration via DI.
+/// String encryption/decryption provider.
+/// Each implementation manages its own configuration via DI.
 /// </summary>
 public interface IStringEncryptionProvider
 {
-    /// <summary>Nom du provider (ex: "Aes", "Vault").</summary>
+    /// <summary>Provider name (e.g. "Aes", "Vault").</summary>
     string ProviderName { get; }
 
     /// <summary>
-    /// Chiffre une chaîne en clair.
+    /// Encrypts a plain-text string.
     /// </summary>
-    /// <param name="plainText">Texte en clair à chiffrer.</param>
-    /// <returns>Texte chiffré encodé en Base64.</returns>
+    /// <param name="plainText">Plain-text string to encrypt.</param>
+    /// <returns>Encrypted text encoded as Base64.</returns>
     string Encrypt(string plainText);
 
     /// <summary>
-    /// Déchiffre une chaîne chiffrée.
+    /// Decrypts an encrypted string.
     /// </summary>
-    /// <param name="cipherText">Texte chiffré encodé en Base64.</param>
-    /// <returns>Texte en clair, ou <c>null</c> si le déchiffrement échoue.</returns>
+    /// <param name="cipherText">Encrypted text encoded as Base64.</param>
+    /// <returns>Plain-text string, or <c>null</c> if decryption fails.</returns>
     string? Decrypt(string cipherText);
 }

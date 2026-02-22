@@ -1,19 +1,19 @@
 // =============================================================================
-// ISettingDefinitionProvider - Point d'extension pour déclarer des paramètres
+// ISettingDefinitionProvider - Extension point for declaring settings
 // =============================================================================
-// Implémenter cette interface dans chaque module pour déclarer ses paramètres.
-// Enregistrer avec services.AddSettingDefinitionProvider<T>().
+// Implement this interface in each module to declare its settings.
+// Register with services.AddSettingDefinitionProvider<T>().
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>
-/// Point d'extension permettant à un module de déclarer ses paramètres.
+/// Extension point allowing a module to declare its settings.
 /// </summary>
 public interface ISettingDefinitionProvider
 {
     /// <summary>
-    /// Déclare les paramètres du module via <paramref name="context"/>.
+    /// Declares the module's settings via <paramref name="context"/>.
     /// </summary>
     void Define(ISettingDefinitionContext context);
 }

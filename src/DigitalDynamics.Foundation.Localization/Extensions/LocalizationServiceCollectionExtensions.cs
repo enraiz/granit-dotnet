@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // LocalizationServiceCollectionExtensions.cs
-// Extension d'enregistrement DI pour le système de localisation Foundation.
-// Enregistre IStringLocalizerFactory (JsonStringLocalizerFactory) et
-// IStringLocalizer<> (StringLocalizer<> de Microsoft).
+// DI registration extension for the Foundation localization system.
+// Registers IStringLocalizerFactory (JsonStringLocalizerFactory) and
+// IStringLocalizer<> (Microsoft's StringLocalizer<>).
 // ---------------------------------------------------------------------------
 
 using DigitalDynamics.Foundation.Localization.Json;
@@ -13,16 +13,16 @@ using Microsoft.Extensions.Localization;
 namespace DigitalDynamics.Foundation.Localization.Extensions;
 
 /// <summary>
-/// Extensions d'enregistrement DI pour la localisation Foundation.
+/// DI registration extensions for Foundation localization.
 /// </summary>
 public static class LocalizationServiceCollectionExtensions
 {
     /// <summary>
-    /// Enregistre les services de localisation Foundation (JSON embarqué).
+    /// Registers Foundation localization services (embedded JSON).
     /// </summary>
-    /// <param name="services">Collection de services.</param>
-    /// <param name="configure">Configuration optionnelle des options.</param>
-    /// <returns>La collection de services pour chaînage.</returns>
+    /// <param name="services">Service collection.</param>
+    /// <param name="configure">Optional options configuration delegate.</param>
+    /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddFoundationLocalization(
         this IServiceCollection services,
         Action<FoundationLocalizationOptions>? configure = null)
