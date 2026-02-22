@@ -8,6 +8,9 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <NoWarn>CA1848;CA1707;CA1305;CA1861</NoWarn>
+    <!-- NuGet lock files: résolution locale, mode verrouillé en CI -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 
   <!-- NuGet Package Metadata -->

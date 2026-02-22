@@ -10,12 +10,16 @@ DOTNET_VERSION=10.0
 CSHARP_VERSION=14
 
 # --- Packages principaux ---
-EFCORE_VERSION=10.0
-VAULTSHARP_VERSION=1.17
+EFCORE_VERSION=10.0.3
+VAULTSHARP_VERSION=1.17.5.1
 SERILOG_VERSION=10
 OPENTELEMETRY_VERSION=1.15
+ASP_VERSIONING_VERSION=10.0.0-preview.1
+MICROSOFT_OPENAPI_VERSION=3.3.1
+SCALAR_VERSION=2.12.46
 
 # --- Tests ---
+MICROSOFT_NET_TEST_SDK_VERSION=18
 XUNIT_VERSION=3
 FLUENTASSERTIONS_VERSION=8
 NSUBSTITUTE_VERSION=5
@@ -31,4 +35,7 @@ TRIVY_VERSION=latest
 # VaultSharp    : https://github.com/rajanadar/VaultSharp/releases
 # Serilog       : https://github.com/serilog/serilog-aspnetcore/releases
 # OpenTelemetry : https://github.com/open-telemetry/opentelemetry-dotnet/releases
+# Asp.Versioning: https://github.com/dotnet/aspnet-api-versioning/releases
+# Microsoft.OpenApi: https://github.com/microsoft/OpenAPI.NET/releases
+# Scalar        : https://github.com/scalar/scalar/releases
 # =============================================================================
