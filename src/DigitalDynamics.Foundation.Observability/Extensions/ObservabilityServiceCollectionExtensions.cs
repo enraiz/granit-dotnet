@@ -77,7 +77,12 @@ public static class ObservabilityServiceCollectionExtensions
                     {
                         aspnet.RecordException = true;
                         aspnet.Filter = httpContext =>
-                            !httpContext.Request.Path.StartsWithSegments("/healthz");
+                        {
+                            Microsoft.AspNetCore.Http.PathString path = httpContext.Request.Path;
+                            // Exclude /health/* (liveness, readiness, startup) and /healthz (legacy).
+                            // StartsWithSegments is segment-safe: /healthcare/... is NOT excluded.
+                            return !path.StartsWithSegments("/health") && path != "/healthz";
+                        };
                     })
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
