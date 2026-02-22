@@ -21,7 +21,7 @@ namespace DigitalDynamics.Foundation.Idempotency.Internal;
 /// Uses <see cref="IMiddleware"/> so scoped services (<see cref="ICurrentUserService"/>,
 /// <see cref="ICurrentTenant"/>) are resolved per-request from the DI request scope.
 /// </remarks>
-internal sealed class IdempotencyMiddleware(
+internal sealed partial class IdempotencyMiddleware(
     IOptions<IdempotencyOptions> options,
     IIdempotencyStore store,
     RecyclableMemoryStreamManager streamManager,
@@ -110,9 +110,7 @@ internal sealed class IdempotencyMiddleware(
 
             // Key vanished between acquire failure and re-read (extreme TTL race) — proceed without lock.
             // SetCompletedAsync (When.Exists) will silently no-op; response is returned but not stored.
-            _logger.LogWarning(
-                "Idempotency race: key {Key} disappeared between TryAcquire failure and re-read. Proceeding without lock.",
-                redisKey);
+            LogRaceCondition(_logger, redisKey);
         }
 
         // 8. Execute downstream handler and capture the response
@@ -151,9 +149,7 @@ internal sealed class IdempotencyMiddleware(
 
         // Replay the completed response
         await ReplayResponseAsync(context, entry);
-        _logger.LogInformation(
-            "Idempotency replay for key {Key} (status {Status}, completed {CompletedAt}).",
-            redisKey, entry.StatusCode, entry.CompletedAt);
+        LogReplay(_logger, redisKey, entry.StatusCode, entry.CompletedAt);
 
         // meta may carry per-endpoint TTL overrides — kept as parameter for symmetry
         _ = meta;
@@ -193,9 +189,7 @@ internal sealed class IdempotencyMiddleware(
         {
             // ExecutionTimeout fired: release InProgress lock and write 503 so clients can retry
             await _store.DeleteAsync(redisKey, CancellationToken.None);
-            _logger.LogWarning(
-                "Idempotency execution timeout for key {Key} after {Timeout}s. InProgress lock released.",
-                redisKey, _opts.ExecutionTimeout.TotalSeconds);
+            LogExecutionTimeout(_logger, redisKey, (int)_opts.ExecutionTimeout.TotalSeconds);
 
             // Restore before WriteProblemAsync so 503 goes to the client socket, not the capture stream
             context.Response.Body = originalBody;
@@ -209,9 +203,7 @@ internal sealed class IdempotencyMiddleware(
         catch (OperationCanceledException) when (originalAborted.IsCancellationRequested)
         {
             // HTTP 499: client disconnected — never cache a potentially truncated response
-            _logger.LogWarning(
-                "HTTP 499: client disconnected for key {Key}. InProgress lock expires naturally in {Ttl}s.",
-                redisKey, _opts.InProgressTtl.TotalSeconds);
+            LogClientDisconnected(_logger, redisKey, (int)_opts.InProgressTtl.TotalSeconds);
             throw;
         }
         catch
@@ -400,6 +392,30 @@ internal sealed class IdempotencyMiddleware(
             ArrayPool<byte>.Shared.Return(rented);
         }
     }
+
+    // =========================================================================
+    // Problem response helper (Utf8JsonWriter directly to response body — no MVC dependency)
+    // =========================================================================
+
+    // =========================================================================
+    // Source-generated logger messages (CA1873 / CA1848 compliance)
+    // =========================================================================
+
+    [LoggerMessage(Level = LogLevel.Warning,
+        Message = "Idempotency race: key {Key} disappeared between TryAcquire failure and re-read. Proceeding without lock.")]
+    private static partial void LogRaceCondition(ILogger logger, string key);
+
+    [LoggerMessage(Level = LogLevel.Information,
+        Message = "Idempotency replay for key {Key} (status {Status}, completed {CompletedAt}).")]
+    private static partial void LogReplay(ILogger logger, string key, int? status, DateTimeOffset? completedAt);
+
+    [LoggerMessage(Level = LogLevel.Warning,
+        Message = "Idempotency execution timeout for key {Key} after {TimeoutSeconds}s. InProgress lock released.")]
+    private static partial void LogExecutionTimeout(ILogger logger, string key, int timeoutSeconds);
+
+    [LoggerMessage(Level = LogLevel.Warning,
+        Message = "HTTP 499: client disconnected for key {Key}. InProgress lock expires naturally in {TtlSeconds}s.")]
+    private static partial void LogClientDisconnected(ILogger logger, string key, int ttlSeconds);
 
     // =========================================================================
     // Problem response helper (Utf8JsonWriter directly to response body — no MVC dependency)
