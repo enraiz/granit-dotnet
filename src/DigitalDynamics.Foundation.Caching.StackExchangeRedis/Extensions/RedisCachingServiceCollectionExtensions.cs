@@ -1,7 +1,10 @@
 using DigitalDynamics.Foundation.Caching;
+using DigitalDynamics.Foundation.Caching.StackExchangeRedis.HealthChecks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 namespace DigitalDynamics.Foundation.Caching.StackExchangeRedis.Extensions;
 
@@ -60,5 +63,50 @@ public static class RedisCachingServiceCollectionExtensions
         }
 
         return services;
+    }
+
+    /// <summary>
+    /// Adds a Redis connectivity health check tagged <c>"readiness"</c>.
+    /// Issues a PING command and measures round-trip latency. Returns <c>Degraded</c>
+    /// when latency exceeds <paramref name="degradedThreshold"/> and <c>Unhealthy</c>
+    /// when Redis is unreachable.
+    /// </summary>
+    /// <remarks>
+    /// Registers <see cref="IConnectionMultiplexer"/> as a singleton if not already registered.
+    /// Call <see cref="AddFoundationCachingRedis"/> before this method so that
+    /// <see cref="RedisCachingOptions"/> is configured.
+    /// </remarks>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Check name. Defaults to <c>"redis"</c>.</param>
+    /// <param name="degradedThreshold">Latency above which the check returns Degraded. Defaults to 100 ms.</param>
+    /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
+    /// <param name="timeout">Check timeout. Defaults to 5 seconds.</param>
+    public static IHealthChecksBuilder AddFoundationRedisCheck(
+        this IHealthChecksBuilder builder,
+        string name = "redis",
+        TimeSpan? degradedThreshold = null,
+        HealthStatus? failureStatus = null,
+        TimeSpan? timeout = null)
+    {
+        TimeSpan threshold = degradedThreshold ?? TimeSpan.FromMilliseconds(100);
+
+        if (builder.Services.All(d => d.ServiceType != typeof(IConnectionMultiplexer)))
+        {
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                RedisCachingOptions opts = sp.GetRequiredService<IOptions<RedisCachingOptions>>().Value;
+                return ConnectionMultiplexer.Connect(opts.Configuration);
+            });
+        }
+
+        builder.Services.AddSingleton(sp =>
+            new RedisHealthCheck(sp.GetRequiredService<IConnectionMultiplexer>(), threshold));
+
+        return builder.Add(new HealthCheckRegistration(
+            name,
+            sp => sp.GetRequiredService<RedisHealthCheck>(),
+            failureStatus,
+            ["readiness"],
+            timeout ?? TimeSpan.FromSeconds(5)));
     }
 }
