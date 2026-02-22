@@ -1,113 +1,154 @@
 # CLAUDE.md - DigitalDynamics.Foundation
 
-## Projet
+## Project
 
-- **Type** : Packages NuGet partagés pour les applications .NET Digital Dynamics
-- **Repo** : `dd-foundation-dotnet` (niveau société, pas spécifique à un produit)
-- **Cloud** : OVHcloud (Roubaix, FR) — souveraineté européenne
-- **Compliance** : HDS + RGPD | Criticité ÉLEVÉE
-- **Publication** : GitLab Package Registry (NuGet)
+- **Type**: Shared NuGet packages for Digital Dynamics .NET applications
+- **Repo**: `dd-foundation-dotnet` (company-level, not product-specific)
+- **Cloud**: OVHcloud (Roubaix, FR) — European sovereignty
+- **Compliance**: HDS + RGPD | Criticality: HIGH
+- **Publication**: GitLab Package Registry (NuGet)
 
-## Stack et versions
+## Stack & versions
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
 ## Packages
 
-| Package | Rôle |
-| --- | --- |
-| `DigitalDynamics.Foundation.Core` | Système de modules (ABP-inspired), types domaine partagés |
+| Package | Role |
+| ------- | ---- |
+| `DigitalDynamics.Foundation.Core` | Module system (ABP-inspired), shared domain types |
 | `DigitalDynamics.Foundation.Timing` | IClock, ICurrentTimezoneProvider, TimeProvider |
-| `DigitalDynamics.Foundation.Guids` | IGuidGenerator, GUID séquentiels pour index clustered |
-| `DigitalDynamics.Foundation.Security` | JWT Keycloak, ICurrentUserService, policies d'autorisation |
-| `DigitalDynamics.Foundation.Persistence` | Intercepteurs EF Core (audit HDS, soft delete RGPD) |
-| `DigitalDynamics.Foundation.Vault` | VaultSharp client, ITransitEncryptionService, credentials dynamiques |
+| `DigitalDynamics.Foundation.Guids` | IGuidGenerator, sequential GUIDs for clustered indexes |
+| `DigitalDynamics.Foundation.Security` | JWT Keycloak, ICurrentUserService, authorization policies |
+| `DigitalDynamics.Foundation.Persistence` | EF Core interceptors (HDS audit, RGPD soft delete) |
+| `DigitalDynamics.Foundation.Vault` | VaultSharp client, ITransitEncryptionService, dynamic credentials |
 | `DigitalDynamics.Foundation.Observability` | Serilog + OpenTelemetry → OTLP → Loki/Tempo/Mimir |
 
-## Commandes
+## Commands
 
 ```bash
-# Build
 dotnet build
-
-# Tests
 dotnet test
-
-# Pack NuGet (local)
-dotnet pack -c Release -o ./nupkgs
-
-# Format
+dotnet pack -c Release -o ./nupkgs   # local NuGet pack
 dotnet format --verify-no-changes
 ```
 
-## Contraintes réglementaires CRITIQUES
+## Regulatory constraints — CRITICAL
 
-1. **Souveraineté** : Infrastructure DOIT rester en Europe (OVHcloud FR)
-2. **US Cloud Act** : JAMAIS utiliser AWS/Azure/GCP pour données de santé
-3. **HDS** : Audit trail 3 ans, chiffrement au repos et en transit
-4. **RGPD** : Minimisation, droit à l'oubli, pseudonymisation
-5. **Secrets** : Aucun secret en clair, rotation obligatoire
+1. **Sovereignty**: Infrastructure MUST stay in Europe (OVHcloud FR)
+2. **US Cloud Act**: NEVER use AWS/Azure/GCP for health data
+3. **HDS**: 3-year audit trail, encryption at rest and in transit
+4. **RGPD**: Minimization, right to erasure, pseudonymization
+5. **Secrets**: No plaintext secrets, mandatory rotation
 
-## Langues
+## Language
 
-| Contenu | Langue |
-| --- | --- |
-| Code C# — identifiants, XML docs (`/// <summary>`), commentaires inline (`//`) | **Anglais** |
-| Fichiers `docs/**/*.md` | **Français** |
-| Issues GitLab (titre, description, commentaires) | **Français** |
-| Commits (message Conventional Commits) | **Français** |
-| `CLAUDE.md` | **Français** |
+| Content | Language |
+| ------- | -------- |
+| C# code — identifiers, XML docs (`/// <summary>`), inline comments (`//`) | **English** |
+| `docs/**/*.md` | **French** |
+| GitLab issues (title, description, comments) | **French** |
+| Commits (Conventional Commits messages) | **French** |
+| `CLAUDE.md`, skills | **English** |
 
-**Diacritiques** : TOUJOURS utiliser les accents français corrects (é, è, ê, à, â, ù, û, ô, î, ï, ç, œ) dans tous les contenus **en français** (docs, issues, commits). Jamais dans le code.
+**Diacritics**: ALWAYS use correct French accents (é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
+in all French content (docs, issues, commits). Never in code.
 
-## Conventions de code
+## Code conventions
 
-**C#** : PascalCase pour types et méthodes, camelCase pour paramètres et variables locales, `I` prefix pour interfaces, `Async` suffix pour méthodes async. Règles Roslyn strictes :
+**C#**: PascalCase for types and methods, camelCase for parameters and local variables,
+`I` prefix for interfaces, `Async` suffix for async methods. Strict Roslyn rules:
 
-- **IDE0008** : TOUJOURS utiliser le type explicite au lieu de `var` (ex: `ServiceCollection services = new();` et non `var services = new ServiceCollection();`)
-- **IDE0022** : Utiliser les expression body (`=>`) pour les méthodes à instruction unique
-- **ASP0025** : Utiliser `AddAuthorizationBuilder()` au lieu de `AddAuthorization(Action<AuthorizationOptions>)` pour enregistrer les services d'autorisation
+- **IDE0008**: ALWAYS use explicit type instead of `var`
+  (e.g., `ServiceCollection services = new();` not `var services = new ServiceCollection();`)
+- **IDE0022**: Use expression body (`=>`) for single-statement methods
+- **ASP0025**: Use `AddAuthorizationBuilder()` instead of `AddAuthorization(Action<AuthorizationOptions>)`
 
-**Projets** : un projet = un package NuGet, namespace = nom du projet, zéro référence circulaire
+**Projects**: one project = one NuGet package, namespace = project name, zero circular references
 
-**Core** : `DigitalDynamics.Foundation.Core` fournit le système de modules et les types domaine. Chaque module est auto-contenu (interface + implémentation dans le même package). Tous les packages Foundation référencent Core
+**Core**: `DigitalDynamics.Foundation.Core` provides the module system and domain types.
+Each module is self-contained (interface + implementation in the same package).
+All Foundation packages reference Core.
 
-**Tests** : chaque package a son projet de tests (`*.Tests`). xUnit + FluentAssertions + NSubstitute + Bogus. Les tests font partie de la DoD de chaque story
+**Tests**: each package has a test project (`*.Tests`). xUnit + FluentAssertions +
+NSubstitute + Bogus. Tests are part of the DoD for every story.
 
-**Markdown** : Tous les fichiers `.md` doivent être conformes à markdownlint (config dans `.markdownlint.json`). Vérifier avec `npx markdownlint-cli2 "fichier.md"` avant de committer
+**Markdown**: all `.md` files must comply with markdownlint (config in `.markdownlint.json`).
+Verify with `npx markdownlint-cli2 "file.md"` before committing.
 
-## Personas (rôles dans les user stories)
+## Personas (user stories)
 
-Le référentiel des personas est dans `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`.
+Persona registry: `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`.
+15 canonical personas defined.
 
-**Personas disponibles** : SRE, Ingénieur DevOps, Développeur, Architecte, DBA, RSSI, DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe, Utilisateur, Professionnel de santé, Product Owner
+**STRICT RULES:**
 
-**RÈGLES** : TOUJOURS utiliser un persona canonique. JAMAIS de rôles hybrides.
+- **ALWAYS** use a canonical persona in user stories (`As a [persona]`)
+- **NEVER** introduce a new persona without user validation and registry update
+- **NEVER** use hybrid roles (`SRE / DevOps`) — choose the primary persona
+- Context (on-call, audit, incident) belongs in the story body, not in the persona
+
+**Available personas:** SRE, Ingénieur DevOps, Développeur, Architecte, DBA, RSSI,
+DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
+Utilisateur, Professionnel de santé, Product Owner
 
 ## GitLab issues
 
-Avant toute opération GitLab, **invoquer le skill `/gitlab`** pour charger les commandes et conventions.
+Before any GitLab operation, **invoke skill `/gitlab`** to load commands and conventions.
 
-- **Types** : Epic (`[EPIC]`), Feature (`[FEATURE]`), Story (`[STORY]`) — pas d'emoji dans les titres
-- **Hiérarchie** : GitLab Free, liens `relates_to` via API + références dans la description
+- **Types**: Epic (`[EPIC]`), Feature (`[FEATURE]`), Story (`[STORY]`) — no emoji in titles
+- **Hierarchy**: GitLab Free — `relates_to` links via API + references in parent description
+- **Templates**: `.gitlab/issue_templates/` (Story, Feature, Epic, Bug, Spike, Tech_Debt)
 
 ## Git workflow
 
-- **Branching** : Trunk-based (main + `feature/*` + `hotfix/*`)
-- **Push direct sur `main` INTERDIT**
-- **Releases** : Tags sémantiques sur main (vMAJOR.MINOR.PATCH)
-- **Commits** : Conventional Commits (feat:, fix:, docs:, chore:)
-- **MR** : 1 approbation minimum pour main
+- **Branching**: GitFlow (main + develop + `feature/*` + `release/*` + `hotfix/*`)
+- **Direct push to `main` FORBIDDEN**
+- **Releases**: Semantic tags on main (vMAJOR.MINOR.PATCH), `release/*` branches for stabilization
+- **Commits**: Conventional Commits (feat:, fix:, docs:, chore:)
+- **MR**: 1 approval minimum for main
 
-## Sécurité — Règles strictes
+## Security — strict rules
 
-**TOUJOURS** : aucun secret hardcodé, `sensitive = true` pour les secrets, logs sans PII
+**ALWAYS:**
 
-**JAMAIS** : proposer solutions cloud US pour données de santé, stocker secrets en clair, désactiver l'audit logging
+- No hardcoded secrets (not even in comments or examples)
+- `sensitive = true` on all secret variables
+- Logs must not expose secrets or PII
 
-## Comportement attendu
+**NEVER:**
 
-- Comprendre le contexte HDS, RGPD, ISO 27001 et ISO 9001 avant de répondre
-- Challenger les mauvaises pratiques de sécurité
-- Fournir du code production-ready (pas de TODOs)
-- Fournir du code production-ready (pas de TODOs, pas de commentaires évidents)
+- Propose US cloud solutions (AWS/Azure/GCP) for health data
+- Store secrets in plain text
+- Disable audit logging
+- Propose quick fixes that create technical debt
+
+## Refactoring — mandatory rules
+
+Code that looks "weird" almost always exists for a reason: production fix, regulatory
+edge case, HDS/RGPD constraint, third-party limitation workaround. Never remove or
+rewrite code without understanding the original intent.
+
+**Before any refactoring:**
+
+1. Read the entire file for context, not just the targeted function
+2. Check git history (`git log -p -- <file>`) to understand how the code evolved
+3. If intent remains unclear, search for the linked GitLab issue (number in commit,
+   file label, or keyword search) before modifying
+4. When in doubt, ask rather than assuming the code is useless
+
+**NEVER:**
+
+- Delete "dead" code without verifying it is not referenced dynamically
+  (reflection, DI, runtime configuration)
+- Simplify a complex condition without having tested the edge cases it covers
+- Replace a custom implementation with a standard library without verifying why
+  the library was not used initially
+
+## Expected behavior
+
+- Understand HDS, RGPD, ISO 27001 and ISO 9001 context before responding
+- Challenge security bad practices
+- Propose alternatives when a request compromises security
+- Explain the "why" behind best practices
+- Provide production-ready code (no TODOs, no obvious comments)

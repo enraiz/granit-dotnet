@@ -1,112 +1,118 @@
-# Reference des commandes glab
+# glab command reference
 
-Toutes les commandes utilisent `$PROJECT` (chemin du projet) et
-`$PROJECT_ENCODED` (URL-encoded) injectes par le skill.
+All commands use `$PROJECT` (project path) and `$PROJECT_ENCODED` (URL-encoded),
+injected by the skill.
 
-## Issues - Lecture
+## Issues — Read
 
 ```bash
-# Lister les issues ouvertes
+# List open issues
 glab -R "$PROJECT" issue list
 
-# Filtrer par label
+# Filter by label
 glab -R "$PROJECT" issue list --label "Type::Story"
 
-# Filtrer par plusieurs labels
+# Filter by multiple labels
 glab -R "$PROJECT" issue list --label "Type::Story" --label "Area::Vault"
 
-# Exclure un label
+# Exclude a label
 glab -R "$PROJECT" issue list --label "Type::Story" --not-label "Area::GitOps"
 
-# Voir une issue (texte)
+# Search by keyword
+glab -R "$PROJECT" issue list --search "keyword"
+
+# View an issue (text)
 glab -R "$PROJECT" issue view {iid}
 
-# Voir une issue (JSON pour parsing)
+# View an issue (JSON for parsing)
 glab -R "$PROJECT" issue view {iid} --output json
 
-# Extraire la description
+# Extract description
 glab -R "$PROJECT" issue view {iid} --output json | jq -r '.description'
+
+# List comments
+glab -R "$PROJECT" issue view {iid} --comments
 ```
 
-## Issues - Ecriture
+## Issues — Write
 
 ```bash
-# Creer une issue
+# Create an issue
 glab -R "$PROJECT" issue create \
   --title "[TYPE] Titre" \
   --label "Type::XYZ" \
   --description "$(cat <<'EOF'
-contenu
+content
 EOF
 )"
 
-# Modifier la description
+# Update description
 glab -R "$PROJECT" issue update {iid} --description "$(cat <<'EOF'
-nouvelle description
+new description
 EOF
 )"
 
-# Modifier le titre
-glab -R "$PROJECT" issue update {iid} --title "[TYPE] Nouveau titre"
+# Update title
+glab -R "$PROJECT" issue update {iid} --title "[TYPE] New title"
 
-# Ajouter un label
+# Add a label
 glab -R "$PROJECT" issue update {iid} --label "Priority::High"
 
-# Fermer une issue
+# Close an issue
 glab -R "$PROJECT" issue close {iid}
 
-# Rouvrir une issue
+# Reopen an issue
 glab -R "$PROJECT" issue reopen {iid}
 
-# Ajouter un commentaire
-glab -R "$PROJECT" issue note {iid} -m "commentaire"
+# Add a comment
+glab -R "$PROJECT" issue note {iid} -m "comment"
 
-# Commentaire multi-lignes
+# Multi-line comment
 glab -R "$PROJECT" issue note {iid} -m "$(cat <<'EOF'
-commentaire
-multi-lignes
+multi-line
+comment
 EOF
 )"
 ```
 
-## Liens entre issues (API)
+## Issue links (API)
 
 ```bash
-# Creer un lien relates_to
+# Create a relates_to link
 glab api --method POST "projects/$PROJECT_ENCODED/issues/{source_iid}/links" \
   -f target_project_id="$PROJECT_ENCODED" -f target_issue_iid={target_iid} \
   -f link_type=relates_to
 
-# Lister les liens d'une issue
+# List links for an issue
 glab api "projects/$PROJECT_ENCODED/issues/{iid}/links"
 
-# Supprimer un lien
+# Delete a link
 glab api --method DELETE "projects/$PROJECT_ENCODED/issues/{iid}/links/{link_id}"
 ```
 
 ## Merge Requests
 
 ```bash
-# Lister les MR ouvertes
+# List open MRs
 glab -R "$PROJECT" mr list
 
-# Voir une MR
+# View an MR
 glab -R "$PROJECT" mr view {iid}
 
-# Creer une MR
+# Create an MR
 glab -R "$PROJECT" mr create \
   --title "feat: description" \
   --description "Closes #{issue_iid}" \
-  --source-branch "feature/nom" \
+  --source-branch "feature/name" \
   --target-branch "main"
 ```
 
 ## Labels
 
 ```bash
-# Lister les labels
+# List labels
 glab -R "$PROJECT" label list
 
-# Creer un label
-glab -R "$PROJECT" label create "Nom::Label" --color "#color" --description "description"
+# Create a label
+glab -R "$PROJECT" label create "Name::Label" --color "#color" --description "description"
 ```

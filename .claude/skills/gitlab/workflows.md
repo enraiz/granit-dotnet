@@ -1,12 +1,18 @@
-# Workflows GitLab
+# GitLab Workflows
 
-Workflows detailles pour la gestion des issues.
-Dans tous les exemples, `$PROJECT` et `$PROJECT_ENCODED` sont les valeurs
-injectees dynamiquement par le SKILL.md.
+Detailed workflows for issue management.
+In all examples, `$PROJECT` and `$PROJECT_ENCODED` are injected dynamically by SKILL.md.
 
-## Creer une Story
+## Create a Story
 
-1. Creer l'issue avec label et prefixe :
+1. Read any existing related issues or the parent Feature before creating, to avoid
+   duplicates and align with decisions already made:
+
+   ```bash
+   glab -R "$PROJECT" issue list --label "Type::Story" --search "keyword"
+   ```
+
+2. Create the issue:
 
    ```bash
    glab -R "$PROJECT" issue create \
@@ -15,39 +21,39 @@ injectees dynamiquement par le SKILL.md.
      --description "$(cat <<'EOF'
    ## User Story
 
-   - **En tant que** [SRE / DevOps / Developpeur],
-   - **je souhaite** [action/fonctionnalite],
-   - **afin de** [benefice/valeur].
+   - **En tant que** [SRE / DevOps / Développeur],
+   - **je souhaite** [action/fonctionnalité],
+   - **afin de** [bénéfice/valeur].
 
    ## Contexte
 
-   [Pourquoi cette story ? Quel probleme technique resout-elle ?]
+   [Pourquoi cette story ? Quel problème technique résout-elle ?]
 
-   ## Implementation
+   ## Implémentation
 
-   - Fichiers concernes :
-   - Dependances :
-   - Sequence de deploiement :
+   - Fichiers concernés :
+   - Dépendances :
+   - Séquence de déploiement :
 
-   ## Criteres d'acceptation
+   ## Critères d'acceptation
 
-   ### Scenario : [description]
+   ### Scénario : [description]
 
    - Given [contexte initial]
    - When [action]
-   - Then [resultat attendu]
+   - Then [résultat attendu]
 
    ## Definition of Done
 
-   - [ ] Code review approuvee (1 SRE minimum)
-   - [ ] `terraform validate` passe sans erreur
-   - [ ] Documentation mise a jour
+   - [ ] Code review approuvée (1 SRE minimum)
+   - [ ] Tests unitaires ≥ 80 % de couverture
+   - [ ] Documentation mise à jour
    - [ ] Aucun secret en clair
    EOF
    )"
    ```
 
-2. Lier a la Feature parente :
+3. Link to the parent Feature:
 
    ```bash
    glab api --method POST "projects/$PROJECT_ENCODED/issues/{story_iid}/links" \
@@ -55,20 +61,20 @@ injectees dynamiquement par le SKILL.md.
      -f link_type=relates_to
    ```
 
-3. Mettre a jour la description de la Feature (section `## User Stories`) :
+4. Update the Feature description (section `## User Stories`):
 
    ```bash
-   # Lire la description actuelle
    CURRENT=$(glab -R "$PROJECT" issue view {feature_iid} --output json | jq -r '.description')
-   # Ajouter la reference et mettre a jour
    glab -R "$PROJECT" issue update {feature_iid} --description "..."
    ```
 
-   Ajouter la ligne : `- #{story_iid} - description courte`
+   Add the line: `- #{story_iid} - short description`
 
-## Creer une Feature avec ses Stories
+## Create a Feature with its Stories
 
-1. Creer la Feature :
+1. Read the parent Epic first to understand scope and constraints already defined.
+
+2. Create the Feature:
 
    ```bash
    glab -R "$PROJECT" issue create \
@@ -77,49 +83,48 @@ injectees dynamiquement par le SKILL.md.
      --description "$(cat <<'EOF'
    ## Description
 
-   ### Probleme / Besoin
+   ### Problème / Besoin
 
-   [Quel probleme cette feature resout-elle ?]
+   [Quel problème cette feature résout-elle ?]
 
-   ### Solution proposee
+   ### Solution proposée
 
    [Approche technique retenue]
 
-   ### Alternatives considerees
+   ### Alternatives considérées
 
-   - **[Alternative]** : rejete car [raison]
+   - **[Alternative]** : rejetée car [raison]
 
    ## User Stories
 
-   <!-- Stories liees ci-dessous -->
+   <!-- Stories liées ci-dessous -->
 
    ## Configuration technique
 
-   | Parametre | Staging | Production |
+   | Paramètre | Staging | Production |
    | --------- | ------- | ---------- |
    |           |         |            |
 
    ## Livrables attendus
 
-   - [ ] Code Terraform dans `modules/`
-   - [ ] Variables typees avec description et validation
-   - [ ] Outputs documentes
-   - [ ] Documentation dans `docs/`
-   - [ ] Aucun secret hardcode
+   - [ ] Code dans le bon package
+   - [ ] Tests unitaires + intégration
+   - [ ] Documentation mise à jour
+   - [ ] Aucun secret hardcodé
 
    ## Compliance
 
-   - [ ] Donnees restent en Europe (OVHcloud FR)
+   - [ ] Données restent en Europe (OVHcloud FR)
    - [ ] Chiffrement au repos
-   - [ ] Audit trail preserve
+   - [ ] Audit trail préservé
    EOF
    )"
    ```
 
-2. Creer chaque Story (voir workflow ci-dessus)
-3. Lier la Feature a son Epic parent + mettre a jour la description de l'Epic (section `## Features`)
+3. Create each Story (see workflow above).
+4. Link the Feature to its parent Epic + update the Epic description (section `## Features`).
 
-## Creer un Epic
+## Create an Epic
 
 ```bash
 glab -R "$PROJECT" issue create \
@@ -128,30 +133,30 @@ glab -R "$PROJECT" issue create \
   --description "$(cat <<'EOF'
 ## Objectif
 
-[Objectif global et valeur metier]
+[Objectif global et valeur métier]
 
 ## Features
 
-<!-- Features liees ci-dessous -->
+<!-- Features liées ci-dessous -->
 
 ## Architecture
 
-[Description de l'architecture cible et des composants concernes]
+[Description de l'architecture cible et des composants concernés]
 
 ## Contraintes
 
-- [ ] HDS / RGPD / ISO 27001 / ISO 9001 : [contraintes specifiques]
-- [ ] Souverainete : OVHcloud FR uniquement
+- [ ] HDS / RGPD / ISO 27001 / ISO 9001 : [contraintes spécifiques]
+- [ ] Souveraineté : OVHcloud FR uniquement
 
-## Criteres de succes
+## Critères de succès
 
-- [ ] [critere 1]
-- [ ] [critere 2]
+- [ ] [critère 1]
+- [ ] [critère 2]
 EOF
 )"
 ```
 
-## Lier deux issues
+## Link two issues
 
 ```bash
 glab api --method POST "projects/$PROJECT_ENCODED/issues/{source_iid}/links" \
@@ -159,7 +164,7 @@ glab api --method POST "projects/$PROJECT_ENCODED/issues/{source_iid}/links" \
   -f link_type=relates_to
 ```
 
-## Lier plusieurs Stories a une Feature (batch)
+## Link multiple Stories to a Feature (batch)
 
 ```bash
 FEATURE_IID=123
@@ -170,27 +175,33 @@ for STORY_IID in 124 125 126; do
 done
 ```
 
-## Fermer une issue
+## Close an issue
 
-1. Ajouter un commentaire de cloture :
+Before closing, read the full issue history to ensure nothing was missed:
+
+```bash
+glab -R "$PROJECT" issue view {iid} --output json | jq -r '.description'
+```
+
+1. Add a closing comment:
 
    ```bash
    glab -R "$PROJECT" issue note {iid} -m "$(cat <<'EOF'
-   ## Cloture
+   ## Clôture
 
-   **Livre** :
-   - [fichiers crees / decisions prises / MR associee]
+   **Livré** :
+   - [fichiers créés / décisions prises / MR associée]
 
-   **Verification** :
-   - [tests effectues / validation]
+   **Vérification** :
+   - [tests effectués / validation]
    EOF
    )"
    ```
 
-2. Fermer l'issue :
+2. Close the issue:
 
    ```bash
    glab -R "$PROJECT" issue close {iid}
    ```
 
-3. Si derniere Story d'une Feature : verifier si la Feature peut etre fermee
+3. If last Story of a Feature: check whether the Feature can be closed.

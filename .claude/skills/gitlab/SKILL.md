@@ -1,30 +1,26 @@
 ---
 name: gitlab
-description: >
-  Operations GitLab (issues, liens, workflows). Utiliser pour creer, modifier,
-  lier, lister des issues, commenter, et gerer la hierarchie Epic > Feature > Story.
-  Invoquer avant toute operation GitLab.
+description: "GitLab operations: create, edit, link, list issues and manage Epic > Feature > Story hierarchy. Invoke before any GitLab operation."
 argument-hint: "[operation] [args]"
-allowed-tools: Bash(glab *)
 ---
 
 # GitLab Operations
 
-## Initialisation
+## Initialization
 
-Avant toute commande, detecter le projet courant :
+Before any command, detect the current project:
 
 ```bash
 PROJECT=$(git remote get-url origin | sed -E 's|ssh://git@[^/]+:[0-9]+/||;s|https?://[^/]+/||;s|git@[^:]+:||;s|\.git$||')
 PROJECT_ENCODED=$(echo "$PROJECT" | sed 's|/|%2F|g')
 ```
 
-Utiliser `$PROJECT` dans `glab -R "$PROJECT"` et `$PROJECT_ENCODED` dans `glab api`.
+Use `$PROJECT` in `glab -R "$PROJECT"` and `$PROJECT_ENCODED` in `glab api`.
 
-## Types d'issues
+## Issue types
 
-| Type | Label | Prefixe titre | Parent | Section dans parent |
-| ---- | ----- | ------------- | ------ | ------------------- |
+| Type | Label | Title prefix | Parent | Parent section |
+| ---- | ----- | ------------ | ------ | -------------- |
 | Epic | `Type::Epic` | `[EPIC]` | - | - |
 | Feature | `Type::Feature` | `[FEATURE]` | Epic | `## Features` |
 | Story | `Type::Story` | `[STORY]` | Feature | `## User Stories` |
@@ -35,69 +31,88 @@ Utiliser `$PROJECT` dans `glab -R "$PROJECT"` et `$PROJECT_ENCODED` dans `glab a
 | Incident | `Priority::High` | - | - | - |
 | Vault Secret | `vault`, `secret`, `security` | - | - | - |
 
-Regles titres : **pas d'emoji**, prefixe entre crochets, concis.
+Title rules: **no emoji**, prefix in brackets, concise.
 
-## Hierarchie (GitLab Free)
+## Hierarchy (GitLab Free)
 
-Pas de sous-taches natives. La hierarchie est geree par :
+No native sub-tasks. Hierarchy is managed by:
 
-1. **Liens `relates_to`** entre issues via l'API
-2. **References dans la description** du parent (section dediee)
+1. **`relates_to` links** between issues via API
+2. **References in the parent description** (dedicated section)
 
 ```text
 Epic
- └── Feature (lien relates_to + reference dans ## Features)
-      └── Story (lien relates_to + reference dans ## User Stories)
+ └── Feature (relates_to link + reference in ## Features)
+      └── Story (relates_to link + reference in ## User Stories)
 ```
 
-## Regles comportementales
+## Understand before acting
 
-### Apres creation d'une issue
+Before creating, modifying, or closing an issue, always read the existing context:
 
-1. **TOUJOURS lier** l'issue a son parent (Story -> Feature, Feature -> Epic) via l'API
-2. **TOUJOURS mettre a jour** la description du parent pour ajouter la reference
-3. Format dans la description du parent : `- #N - description courte`
+- Read the full issue (description + all comments) before editing or closing
+- For bugs or tech debt: check linked issues and related MRs to understand prior
+  decisions and constraints that led to the current implementation
+- If a fix seems obvious but the code looks intentionally written that way, search
+  for the original issue or MR that introduced it before overriding
+- Never close an issue as "duplicate" or "won't fix" without reading its full history
 
-### Apres fermeture d'une issue
+When investigating a bug or refactoring request, search for related issues:
 
-1. Ajouter un **commentaire** expliquant ce qui a ete livre (fichiers, decisions)
-2. Si c'est la derniere Story d'une Feature : verifier si la Feature peut etre fermee
+```bash
+glab -R "$PROJECT" issue list --search "keyword"
+glab -R "$PROJECT" issue view {iid} --output json | jq -r '.description'
+```
+
+## Behavioral rules
+
+### After creating an issue
+
+1. **Always link** it to its parent (Story → Feature, Feature → Epic) via API
+2. **Always update** the parent description to add the reference
+3. Format in the parent description: `- #N - short description`
+
+### After closing an issue
+
+1. Add a **closing comment** explaining what was delivered (files, decisions)
+2. If it's the last Story of a Feature: check whether the Feature can be closed
 
 ### Descriptions
 
-- Toujours utiliser un HEREDOC pour les descriptions multi-lignes :
+Always use a HEREDOC for multi-line descriptions:
 
 ```bash
 --description "$(cat <<'EOF'
-contenu ici
+content here
 EOF
 )"
 ```
 
-- Les templates de description sont dans `.gitlab/issue_templates/`
-  Utiliser leur structure comme base pour les descriptions passees a `glab`
+Templates are in `.gitlab/issue_templates/`.
+See [templates.md](templates.md) for structure per issue type.
 
-### Securite
+### Security
 
-- JAMAIS de token en clair (glab utilise sa config locale)
-- JAMAIS de secrets dans les descriptions d'issues
-- JAMAIS de PII dans les titres ou descriptions
+- NEVER put tokens in plain text (glab uses its local config)
+- NEVER put secrets in issue descriptions
+- NEVER put PII in titles or descriptions
 
 ## Personas (user stories)
 
-Lors de la création d'une Story, utiliser **exclusivement** un persona du référentiel
-`governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`. Ne JAMAIS inventer un nouveau persona.
+Use **exclusively** a canonical persona from
+`governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`.
+NEVER invent a new persona.
 
-Personas autorisés : SRE, Ingénieur DevOps, Développeur, Architecte, DBA, RSSI,
+Allowed personas: SRE, Ingénieur DevOps, Développeur, Architecte, DBA, RSSI,
 DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
 Utilisateur, Professionnel de santé, Product Owner.
 
-Ne JAMAIS utiliser de rôles hybrides ("slash roles" comme `SRE / DevOps`).
-Le contexte (astreinte, on-call, audit) se précise dans la story, pas dans le persona.
+NEVER use hybrid roles ("slash roles" like `SRE / DevOps`).
+Context (on-call, audit) goes in the story body, not in the persona.
 
-## Ressources
+## Resources
 
-- Pour les workflows detailles (creation, liaison, fermeture), voir [workflows.md](workflows.md)
-- Pour les templates de description par type, voir [templates.md](templates.md)
-- Pour la reference des commandes glab, voir [reference.md](reference.md)
-- Pour le référentiel des personas, voir `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`
+- Detailed workflows (create, link, close): [workflows.md](workflows.md)
+- Description templates per type: [templates.md](templates.md)
+- glab command reference: [reference.md](reference.md)
+- Persona registry: `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`
