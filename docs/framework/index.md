@@ -1,6 +1,6 @@
 # DigitalDynamics.Foundation — Documentation framework
 
-Cette documentation est organisée en cinq sections thématiques.
+Cette documentation est organisée en six sections thématiques.
 
 ## Core
 
@@ -47,8 +47,15 @@ Surveillance, débogage et exposition du comportement de l'application.
 | [observability.md](diagnostics/observability.md) | OpenTelemetry, OTLP, Loki/Tempo/Mimir |
 | [diagnostics.md](diagnostics/diagnostics.md) | Health checks, métriques, ActivitySource |
 | [exception-handling.md](diagnostics/exception-handling.md) | Gestion des erreurs, ProblemDetails |
-| [api-versioning.md](diagnostics/api-versioning.md) | Versioning HTTP par URL et query string |
-| [api-documentation.md](diagnostics/api-documentation.md) | OpenAPI natif .NET 10, UI Scalar multi-version |
+
+## API
+
+Contrat HTTP : versioning des routes et documentation OpenAPI.
+
+| Document | Description |
+| --- | --- |
+| [api-versioning.md](api/api-versioning.md) | Versioning HTTP par URL et query string |
+| [api-documentation.md](api/api-documentation.md) | OpenAPI natif .NET 10, UI Scalar multi-version |
 
 ## Utilities
 
