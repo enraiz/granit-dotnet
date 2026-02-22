@@ -6,6 +6,7 @@
 // =============================================================================
 
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using DigitalDynamics.Foundation.ApiVersioning.Extensions;
 using DigitalDynamics.Foundation.ApiVersioning.Options;
 using FluentAssertions;
@@ -86,5 +87,63 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
 
         // Assert
         returned.Should().BeSameAs(services);
+    }
+
+    [Fact]
+    public void AddFoundationApiVersioning_ConfiguresApiVersioningOptions_WithDefaults()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        IConfiguration configuration = new ConfigurationBuilder().Build();
+        services.AddFoundationApiVersioning(configuration);
+
+        // Act — resolving IOptions triggers the AddApiVersioning lambda
+        using ServiceProvider sp = services.BuildServiceProvider();
+        ApiVersioningOptions options = sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
+
+        // Assert
+        options.DefaultApiVersion.Should().Be(new ApiVersion(1));
+        options.AssumeDefaultVersionWhenUnspecified.Should().BeTrue();
+        options.ReportApiVersions.Should().BeTrue();
+    }
+
+    [Fact]
+    public void AddFoundationApiVersioning_ConfiguresApiVersioningOptions_WithCustomConfig()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["ApiVersioning:DefaultMajorVersion"] = "3",
+                ["ApiVersioning:ReportApiVersions"] = "false",
+            })
+            .Build();
+        services.AddFoundationApiVersioning(configuration);
+
+        // Act
+        using ServiceProvider sp = services.BuildServiceProvider();
+        ApiVersioningOptions options = sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
+
+        // Assert
+        options.DefaultApiVersion.Should().Be(new ApiVersion(3));
+        options.ReportApiVersions.Should().BeFalse();
+    }
+
+    [Fact]
+    public void AddFoundationApiVersioning_ConfiguresApiExplorerOptions()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        IConfiguration configuration = new ConfigurationBuilder().Build();
+        services.AddFoundationApiVersioning(configuration);
+
+        // Act — resolving IOptions triggers the AddApiExplorer lambda
+        using ServiceProvider sp = services.BuildServiceProvider();
+        ApiExplorerOptions options = sp.GetRequiredService<IOptions<ApiExplorerOptions>>().Value;
+
+        // Assert
+        options.GroupNameFormat.Should().Be("'v'VVV");
+        options.SubstituteApiVersionInUrl.Should().BeTrue();
     }
 }
