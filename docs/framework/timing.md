@@ -329,11 +329,11 @@ public class AppointmentService
 Les intercepteurs reçoivent `IClock` par injection constructeur :
 
 ```csharp
-public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
+public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
 {
     private readonly IClock _clock;
 
-    public AuditableEntityInterceptor(
+    public AuditedEntityInterceptor(
         ICurrentUserService currentUserService,
         IClock clock)
     {

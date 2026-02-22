@@ -8,9 +8,10 @@
 // In production, Kubernetes authentication is REQUIRED.
 // =============================================================================
 
+using DigitalDynamics.Foundation.Vault.Options;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DigitalDynamics.Foundation.Vault.Options;
 using VaultSharp;
 using VaultSharp.V1.AuthMethods;
 using VaultSharp.V1.AuthMethods.Kubernetes;
@@ -21,15 +22,20 @@ namespace DigitalDynamics.Foundation.Vault.Services;
 /// <summary>
 /// Factory for creating a VaultSharp client with the configured authentication method.
 /// </summary>
-public sealed class VaultClientFactory
+public sealed partial class VaultClientFactory
 {
     private readonly VaultOptions _options;
     private readonly ILogger<VaultClientFactory> _logger;
+    private readonly IStringLocalizer<VaultLocalizationResource> _localizer;
 
-    public VaultClientFactory(IOptions<VaultOptions> options, ILogger<VaultClientFactory> logger)
+    public VaultClientFactory(
+        IOptions<VaultOptions> options,
+        ILogger<VaultClientFactory> logger,
+        IStringLocalizer<VaultLocalizationResource> localizer)
     {
         _options = options.Value;
         _logger = logger;
+        _localizer = localizer;
     }
 
     /// <summary>Creates an authenticated VaultSharp client.</summary>
@@ -40,6 +46,7 @@ public sealed class VaultClientFactory
             "kubernetes" => CreateKubernetesAuth(),
             "token" => CreateTokenAuth(),
             _ => throw new InvalidOperationException(
+<<<<<<< HEAD
                 $"Unknown Vault authentication method: '{_options.AuthMethod}'. " +
                 "Allowed values: 'Kubernetes', 'Token'.")
         };
@@ -49,14 +56,26 @@ public sealed class VaultClientFactory
             "Vault client created with method {AuthMethod} targeting {Address}",
             _options.AuthMethod,
             _options.Address);
+=======
+                _localizer["Vault:UnknownAuthMethod", _options.AuthMethod])
+        };
+
+        VaultClientSettings settings = new(_options.Address, authMethod);
+        LogClientCreated(_logger, _options.AuthMethod, _options.Address);
+>>>>>>> feature/settings-module
 
         return new VaultClient(settings);
     }
 
     private KubernetesAuthMethodInfo CreateKubernetesAuth()
     {
+<<<<<<< HEAD
         var jwt = File.ReadAllText(_options.KubernetesTokenPath);
         _logger.LogDebug("Kubernetes authentication with role {Role}", _options.KubernetesRole);
+=======
+        string jwt = File.ReadAllText(_options.KubernetesTokenPath);
+        LogKubernetesAuth(_logger, _options.KubernetesRole);
+>>>>>>> feature/settings-module
         return new KubernetesAuthMethodInfo(_options.KubernetesRole, jwt);
     }
 
@@ -64,6 +83,7 @@ public sealed class VaultClientFactory
     {
         if (string.IsNullOrEmpty(_options.Token))
         {
+<<<<<<< HEAD
             throw new InvalidOperationException(
                 "Vault token is required for token authentication. " +
                 "Set Vault:Token in the configuration.");
@@ -71,6 +91,21 @@ public sealed class VaultClientFactory
 
         _logger.LogWarning(
             "Vault static token authentication — use only for local development");
+=======
+            throw new InvalidOperationException(_localizer["Vault:TokenRequired"]);
+        }
+
+        LogTokenAuth(_logger);
+>>>>>>> feature/settings-module
         return new TokenAuthMethodInfo(_options.Token);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Vault client created with auth method {AuthMethod} at {Address}")]
+    private static partial void LogClientCreated(ILogger logger, string authMethod, string address);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Kubernetes authentication with role {Role}")]
+    private static partial void LogKubernetesAuth(ILogger logger, string role);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Static token Vault authentication — use only for local development")]
+    private static partial void LogTokenAuth(ILogger logger);
 }

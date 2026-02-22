@@ -13,8 +13,6 @@ namespace DigitalDynamics.Foundation.Observability;
 /// </summary>
 public sealed class FoundationObservabilityModule : FoundationModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
         context.Builder.AddFoundationObservability();
-    }
 }

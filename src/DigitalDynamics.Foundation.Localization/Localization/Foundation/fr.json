@@ -1,0 +1,10 @@
+{
+  "culture": "fr",
+  "texts": {
+    "Foundation:EntityNotFound": "L'entité de type {0} avec l'identifiant {1} n'a pas été trouvée.",
+    "Foundation:ValidationError": "Erreur de validation.",
+    "Foundation:Unauthorized": "Accès non autorisé.",
+    "Foundation:Forbidden": "Accès interdit.",
+    "Foundation:InternalError": "Une erreur interne est survenue."
+  }
+}

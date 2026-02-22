@@ -4,16 +4,20 @@
 // Verifies the complete service wiring via AddFoundation<T>(),
 // in the style of AbpIntegratedTest<T> in ABP Framework.
 //
+<<<<<<< HEAD
 // Each test bootstraps the full module (Security + MultiTenancy)
 // and resolves services from the real DI container.
+=======
+// Le module MultiTenancy est indépendant de Foundation.Security :
+// JwtClaimTenantResolver lit HttpContext.User (ClaimsPrincipal standard)
+// et fonctionne avec n'importe quel fournisseur d'identité.
+>>>>>>> feature/settings-module
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Extensions;
-using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.MultiTenancy.Middleware;
 using DigitalDynamics.Foundation.MultiTenancy.Pipeline;
 using DigitalDynamics.Foundation.MultiTenancy.Resolvers;
-using DigitalDynamics.Foundation.Security;
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,6 +96,7 @@ public sealed class FoundationMultiTenancyModuleTests
         middleware.Should().NotBeNull();
     }
 
+<<<<<<< HEAD
     // --- Topological order ---
 
     [Fact]
@@ -107,6 +112,9 @@ public sealed class FoundationMultiTenancyModuleTests
     }
 
     // --- Functional test (AbpIntegratedTest style) ---
+=======
+    // --- Tests fonctionnels (style AbpIntegratedTest) ---
+>>>>>>> feature/settings-module
 
     [Fact]
     public void ICurrentTenant_Resolved_From_DI_Change_Works()

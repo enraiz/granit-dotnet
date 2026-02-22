@@ -1,7 +1,7 @@
 # =============================================================================
 # GitLab CI/CD - DigitalDynamics.Foundation
 # =============================================================================
-# Pipeline : quality -> test -> pack -> publish
+# Pipeline : quality -> security -> analysis -> pack -> publish
 #
 # Les packages NuGet sont publiés sur GitLab Package Registry.
 # Publication automatique sur tag vX.Y.Z sur main.
@@ -22,23 +22,38 @@ variables:
   DOTNET_VERSION: "10.0"
   CONFIGURATION: Release
   NUGET_SOURCE: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json"
+  NUGET_PACKAGES: '${CI_PROJECT_DIR}/.nuget/packages'
 
 stages:
   - quality
   - gitlab-security
-  - test
+  - analysis
   - pack
   - publish
+
+# ---------------------------------------------------------------------------
+# HIDDEN JOBS
+# ---------------------------------------------------------------------------
+
+.dotnet:
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  tags:
+    - docker
+  cache:
+    key:
+      files:
+        - Directory.Packages.props
+    paths:
+      - .nuget/packages/
+    policy: pull-push
 
 # ---------------------------------------------------------------------------
 # QUALITY
 # ---------------------------------------------------------------------------
 
 format:
+  extends: .dotnet
   stage: quality
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - dotnet format --verify-no-changes
   rules:
@@ -46,10 +61,8 @@ format:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 build:
+  extends: .dotnet
   stage: quality
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - dotnet restore
     - dotnet build -c $CONFIGURATION --no-restore
@@ -58,39 +71,28 @@ build:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
 
-sonarqube:
+test:
+  extends: .dotnet
   stage: quality
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
-  variables:
-    SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar'
-    GIT_DEPTH: '0'
-  cache:
-    key: sonar-${CI_PROJECT_ID}
-    paths:
-      - .sonar/cache
   script:
-    - apt-get update -qq && apt-get install -y -qq openjdk-17-jre-headless > /dev/null 2>&1
-    - dotnet tool install --global dotnet-sonarscanner
-    - export PATH="$PATH:$HOME/.dotnet/tools"
-    - >
-      dotnet sonarscanner begin
-      /k:"DD-Foundation"
-      /n:"DD Foundation"
-      /v:"${CI_COMMIT_REF_NAME}"
-      /d:sonar.host.url="${SONAR_HOST_URL}"
-      /d:sonar.token="${SONAR_TOKEN}"
-      /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
-      /d:sonar.coverage.exclusions="**/Tests/**,**/test/**"
-      /d:sonar.qualitygate.wait=true
     - dotnet build -c $CONFIGURATION
-    - dotnet test -c $CONFIGURATION --no-build --collect:"XPlat Code Coverage;Format=opencover"
-    - dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
+    - >
+      dotnet test -c $CONFIGURATION --no-build
+      --logger "junit;LogFilePath=TestResults/results.xml"
+      --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+  artifacts:
+    when: always
+    paths:
+      - "**/coverage.opencover.xml"
+    reports:
+      junit: "**/TestResults/results.xml"
+      coverage_report:
+        coverage_format: cobertura
+        path: "**/coverage.cobertura.xml"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $SONAR_HOST_URL && $SONAR_TOKEN
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $SONAR_HOST_URL && $SONAR_TOKEN
-  allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
 
 # ---------------------------------------------------------------------------
 # SECURITY
@@ -117,38 +119,68 @@ semgrep-sast:
   allow_failure: false
 
 # ---------------------------------------------------------------------------
-# TEST
+# ANALYSIS (SonarQube - après les tests)
 # ---------------------------------------------------------------------------
 
-test:
-  stage: test
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
+sonarqube:
+  extends: .dotnet
+  stage: analysis
+  needs:
+    - job: test
+      artifacts: true
+  variables:
+    SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar'
+    GIT_DEPTH: '0'
+  cache:
+    key: sonar-${CI_PROJECT_ID}
+    paths:
+      - .sonar/cache
   script:
+    - apt-get update -qq && apt-get install -y -qq openjdk-17-jre-headless > /dev/null 2>&1
+    - dotnet tool install --global dotnet-sonarscanner
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - >
+      dotnet sonarscanner begin
+      /k:"DD-Foundation"
+      /n:"DD Foundation"
+      /v:"${CI_COMMIT_REF_NAME}"
+      /d:sonar.host.url="${SONAR_HOST_URL}"
+      /d:sonar.token="${SONAR_TOKEN}"
+      /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+      /d:sonar.coverage.exclusions="**/Tests/**,**/test/**"
+      /d:sonar.exclusions=".nuget/**"
+      /d:sonar.qualitygate.wait=true
     - dotnet build -c $CONFIGURATION
-    - dotnet test -c $CONFIGURATION --no-build --logger "junit;LogFilePath=TestResults/results.xml" --collect:"XPlat Code Coverage"
+    - dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $SONAR_HOST_URL && $SONAR_TOKEN
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $SONAR_HOST_URL && $SONAR_TOKEN
+  allow_failure: true
+
+audit:nuget:
+  extends: .dotnet
+  stage: analysis
+  script:
+    - dotnet restore
+    - dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+    - '! grep -q "has the following vulnerable packages" vulnerability-report.txt'
   artifacts:
     when: always
-    reports:
-      junit: "**/TestResults/results.xml"
-      coverage_report:
-        coverage_format: cobertura
-        path: "**/coverage.cobertura.xml"
+    paths:
+      - vulnerability-report.txt
+    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+  allow_failure: true
 
 # ---------------------------------------------------------------------------
 # PACK
 # ---------------------------------------------------------------------------
 
 pack:
+  extends: .dotnet
   stage: pack
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - |
       if [ -n "$CI_COMMIT_TAG" ]; then
@@ -171,14 +203,13 @@ pack:
 # ---------------------------------------------------------------------------
 
 publish:
+  extends: .dotnet
   stage: publish
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  tags:
-    - docker
   script:
     - dotnet nuget add source "$NUGET_SOURCE" --name gitlab --username gitlab-ci-token --password "$CI_JOB_TOKEN" --store-password-in-clear-text
     - dotnet nuget push "nupkgs/*.nupkg" --source gitlab
   rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
   needs:
     - pack

@@ -62,7 +62,11 @@ dotnet format --verify-no-changes
 
 ## Conventions de code
 
-**C#** : PascalCase pour types et méthodes, camelCase pour paramètres et variables locales, `I` prefix pour interfaces, `Async` suffix pour méthodes async
+**C#** : PascalCase pour types et méthodes, camelCase pour paramètres et variables locales, `I` prefix pour interfaces, `Async` suffix pour méthodes async. Règles Roslyn strictes :
+
+- **IDE0008** : TOUJOURS utiliser le type explicite au lieu de `var` (ex: `ServiceCollection services = new();` et non `var services = new ServiceCollection();`)
+- **IDE0022** : Utiliser les expression body (`=>`) pour les méthodes à instruction unique
+- **ASP0025** : Utiliser `AddAuthorizationBuilder()` au lieu de `AddAuthorization(Action<AuthorizationOptions>)` pour enregistrer les services d'autorisation
 
 **Projets** : un projet = un package NuGet, namespace = nom du projet, zéro référence circulaire
 

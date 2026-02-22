@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>DigitalDynamics.Foundation.Encryption</PackageId>
+    <Description>Chiffrement/déchiffrement de chaînes avec providers AES-256-CBC et Vault Transit pour les applications .NET Digital Dynamics.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalDynamics.Foundation.Core\DigitalDynamics.Foundation.Core.csproj" />
+  </ItemGroup>
+
+</Project>

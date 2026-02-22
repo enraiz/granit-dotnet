@@ -19,6 +19,7 @@
 // Ported from Volo.Abp.Guids.SequentialGuidGenerator (MIT).
 // =============================================================================
 
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 
@@ -40,18 +41,20 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
     }
 
     /// <inheritdoc />
-    public Guid Create()
-    {
-        return Create(_options.GetDefaultSequentialGuidType());
-    }
+    public Guid Create() => Create(_options.GetDefaultSequentialGuidType());
 
     /// <summary>
     /// Creates a new sequential GUID of the specified type.
     /// </summary>
+<<<<<<< HEAD
 #pragma warning disable CA1822 // Intentionally non-static public method for API consistency
+=======
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
+    [SuppressMessage("Minor Code Smell", "S2325:Methods and properties that don't access instance data should be static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
+>>>>>>> feature/settings-module
     public Guid Create(SequentialGuidType guidType)
-#pragma warning restore CA1822
     {
+<<<<<<< HEAD
         // 10 cryptographically secure random bytes
         var randomBytes = new byte[10];
         Rng.GetBytes(randomBytes);
@@ -61,6 +64,17 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
 
         // Convert the timestamp to a byte array (8 bytes)
         var timestampBytes = BitConverter.GetBytes(timestamp);
+=======
+        // 10 octets aleatoires cryptographiquement surs
+        byte[] randomBytes = new byte[10];
+        Rng.GetBytes(randomBytes);
+
+        // Timestamp en millisecondes depuis DateTime.MinValue
+        long timestamp = DateTime.UtcNow.Ticks / 10000L;
+
+        // Convertir le timestamp en tableau d'octets (8 octets)
+        byte[] timestampBytes = BitConverter.GetBytes(timestamp);
+>>>>>>> feature/settings-module
 
         // Big-endian for correct sorting
         if (BitConverter.IsLittleEndian)
@@ -68,7 +82,7 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
             Array.Reverse(timestampBytes);
         }
 
-        var guidBytes = new byte[16];
+        byte[] guidBytes = new byte[16];
 
         switch (guidType)
         {

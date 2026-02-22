@@ -1,3 +1,19 @@
+<<<<<<< HEAD
+=======
+// =============================================================================
+// GuidGeneratorOptions - Configuration du module Guids
+// =============================================================================
+// Configurable via IOptions<GuidGeneratorOptions> dans Program.cs :
+//   builder.Services.AddFoundationGuids(options =>
+//   {
+//       options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd;
+//   });
+//
+// Le défaut est SequentialAsString (PostgreSQL) au lieu de SequentialAtEnd
+// (SQL Server).
+// =============================================================================
+
+>>>>>>> feature/settings-module
 namespace DigitalDynamics.Foundation.Guids;
 
 /// <summary>
@@ -15,8 +31,5 @@ public sealed class GuidGeneratorOptions
     /// Returns the configured sequential type or <see cref="SequentialGuidType.SequentialAsString"/>
     /// by default (optimized for PostgreSQL).
     /// </summary>
-    public SequentialGuidType GetDefaultSequentialGuidType()
-    {
-        return DefaultSequentialGuidType ?? SequentialGuidType.SequentialAsString;
-    }
+    public SequentialGuidType GetDefaultSequentialGuidType() => DefaultSequentialGuidType ?? SequentialGuidType.SequentialAsString;
 }

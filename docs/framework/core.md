@@ -5,7 +5,8 @@ Foundation. Il fournit :
 
 - Le **système de modules** (voir [modularity.md](modularity.md)) : `FoundationModule`,
   `[DependsOn]`, `AddFoundationAsync<T>()`, tri topologique
-- Les **types domaine partagés** : `AuditableEntity`, `ISoftDeletable`, `AuditLogEntry`
+- Les **types domaine partagés** : hiérarchie d'entités (`Entity`, `CreationAuditedEntity`,
+  `AuditedEntity`, `FullAuditedEntity`), `ISoftDeletable`, `AuditLogEntry`
 
 Ce package remplace l'ancien `Foundation.Abstractions`. Les interfaces de service
 (`IClock`, `IGuidGenerator`, `ICurrentUserService`, `ITransitEncryptionService`) vivent
@@ -28,31 +29,105 @@ Le système de modules est documenté dans [modularity.md](modularity.md).
 
 ## Types domaine
 
-### AuditableEntity
+### Hiérarchie d'entités
 
-Classe de base abstraite pour toutes les entités persistées nécessitant un audit trail
-HDS. Les champs sont remplis automatiquement par `AuditableEntityInterceptor` du package
-[Persistence](persistence.md).
+Les entités persistées héritent d'une hiérarchie de classes abstraites qui ajoute
+progressivement les champs d'audit HDS. Les champs sont remplis automatiquement par
+`AuditedEntityInterceptor` du package [Persistence](persistence.md).
+
+```text
+Entity (abstract)
+└── CreationAuditedEntity (abstract)
+    └── AuditedEntity (abstract)
+        └── FullAuditedEntity (abstract, implémente ISoftDeletable)
+```
+
+Choisir le niveau approprié selon les besoins de traçabilité de l'entité :
+
+| Classe | Champs ajoutés | Usage |
+| --- | --- | --- |
+| `Entity` | `Id` | Entité de base sans audit |
+| `CreationAuditedEntity` | `CreatedAt`, `CreatedBy` | Traçabilité de création uniquement |
+| `AuditedEntity` | `ModifiedAt`, `ModifiedBy` | Traçabilité de création et modification |
+| `FullAuditedEntity` | `IsDeleted`, `DeletedAt`, `DeletedBy` (via `ISoftDeletable`) | Audit complet + suppression logique RGPD |
+
+### Entity
+
+Classe de base abstraite minimale pour toutes les entités persistées. Fournit
+uniquement l'identifiant.
 
 ```csharp
 using DigitalDynamics.Foundation.Core.Domain;
 
-public abstract class AuditableEntity
+public abstract class Entity
 {
     public Guid Id { get; set; }
+}
+```
+
+### CreationAuditedEntity
+
+Ajoute les champs de traçabilité de création. Pour les entités qui n'ont pas besoin
+de tracer les modifications.
+
+```csharp
+using DigitalDynamics.Foundation.Core.Domain;
+
+public abstract class CreationAuditedEntity : Entity
+{
     public DateTimeOffset CreatedAt { get; set; }
     public string CreatedBy { get; set; }
+}
+```
+
+### AuditedEntity
+
+Ajoute les champs de traçabilité de modification. C'est le choix par défaut pour la
+plupart des entités nécessitant un audit trail HDS.
+
+```csharp
+using DigitalDynamics.Foundation.Core.Domain;
+
+public abstract class AuditedEntity : CreationAuditedEntity
+{
     public DateTimeOffset? ModifiedAt { get; set; }
     public string? ModifiedBy { get; set; }
 }
 ```
 
-Toute entité persistée **doit** hériter de cette classe pour garantir la traçabilité HDS.
+Toute entité persistée nécessitant un audit trail complet **doit** hériter de cette
+classe (ou de `FullAuditedEntity`) pour garantir la traçabilité HDS.
 
 ```csharp
 using DigitalDynamics.Foundation.Core.Domain;
 
-public sealed class Patient : AuditableEntity
+public sealed class Patient : AuditedEntity
+{
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+}
+```
+
+### FullAuditedEntity
+
+Ajoute la suppression logique conforme au RGPD en implémentant `ISoftDeletable`. Pour
+les entités contenant des données personnelles qui doivent supporter le droit à l'oubli.
+
+```csharp
+using DigitalDynamics.Foundation.Core.Domain;
+
+public abstract class FullAuditedEntity : AuditedEntity, ISoftDeletable
+{
+    public bool IsDeleted { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+    public string? DeletedBy { get; set; }
+}
+```
+
+```csharp
+using DigitalDynamics.Foundation.Core.Domain;
+
+public sealed class Patient : FullAuditedEntity
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
@@ -61,9 +136,9 @@ public sealed class Patient : AuditableEntity
 
 ### ISoftDeletable
 
-Interface pour la suppression logique conforme au RGPD. Les entités contenant des
-données personnelles implémentent cette interface pour supporter le droit à l'oubli
-via suppression logique.
+Interface pour la suppression logique conforme au RGPD. `FullAuditedEntity` implémente
+cette interface. Les entités qui ne s'inscrivent pas dans la hiérarchie standard peuvent
+implémenter `ISoftDeletable` directement.
 
 ```csharp
 public interface ISoftDeletable
@@ -78,17 +153,44 @@ Le `SoftDeleteInterceptor` (package [Persistence](persistence.md)) transforme le
 opérations `DELETE` en `UPDATE SET IsDeleted = true`, conservant les données pour
 l'audit trail tout en les excluant des requêtes standard.
 
+### IMultiTenant
+
+Interface pour les entités dont les données sont isolées par tenant. Le `TenantId` est
+automatiquement rempli par `AuditedEntityInterceptor` (package [Persistence](persistence.md))
+lors de la création, depuis `ICurrentTenant` du tenant courant.
+
+```csharp
+public interface IMultiTenant
+{
+    Guid? TenantId { get; set; }
+}
+```
+
+Utilisation typique — combiner avec la hiérarchie d'entités :
+
 ```csharp
 using DigitalDynamics.Foundation.Core.Domain;
 
-public sealed class Patient : AuditableEntity, ISoftDeletable
+// Entité dont chaque enregistrement appartient à un tenant
+public sealed class DossierPatient : FullAuditedEntity, IMultiTenant
 {
-    public string FirstName { get; set; } = string.Empty;
-    public bool IsDeleted { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
-    public string? DeletedBy { get; set; }
+    public Guid? TenantId { get; set; }
+    public string NumeroAdmission { get; set; } = string.Empty;
 }
 ```
+
+Comportement automatique à la création (`SaveChangesAsync`) :
+
+- Si `TenantId == null` et qu'un tenant est actif → `TenantId = ICurrentTenant.Id`
+- Si `TenantId` est déjà défini (migration, import) → valeur conservée
+- Si aucun tenant actif → `TenantId` reste `null` (donnée globale)
+
+Le query filter multi-tenant (`WHERE TenantId = currentTenant.Id`) est activé en
+passant l'`ICurrentTenant` à `ApplyFoundationConventions` dans `OnModelCreating`
+(voir [persistence.md](persistence.md#query-filters-multi-tenant)).
+
+**Conformité RGPD** : `TenantId` est un GUID pseudonymisé. Ne jamais stocker de
+données nominatives (nom, email) dans ce champ.
 
 ### AuditLogEntry
 
@@ -117,8 +219,12 @@ Conformité HDS : les entrées d'audit sont conservées 3 ans.
 ```text
 DigitalDynamics.Foundation.Core
 ├── Domain/
-│   ├── AuditableEntity.cs          (classe de base, audit trail HDS)
+│   ├── Entity.cs                   (classe de base, identifiant)
+│   ├── CreationAuditedEntity.cs    (+ CreatedAt, CreatedBy)
+│   ├── AuditedEntity.cs            (+ ModifiedAt, ModifiedBy)
+│   ├── FullAuditedEntity.cs        (+ ISoftDeletable)
 │   ├── ISoftDeletable.cs           (suppression logique RGPD)
+│   ├── IMultiTenant.cs             (isolation par tenant, TenantId auto-injecté)
 │   └── AuditLogEntry.cs            (entrée d'audit trail)
 ├── Modularity/
 │   ├── FoundationModule.cs         (classe de base des modules)
@@ -179,7 +285,7 @@ DigitalDynamics.Foundation.Core
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail 3 ans | `AuditableEntity` + `AuditLogEntry` |
+| HDS - Audit trail 3 ans | Hiérarchie `AuditedEntity` / `FullAuditedEntity` + `AuditLogEntry` |
 | RGPD - Droit à l'oubli | `ISoftDeletable` (suppression logique) |
 | HDS - Chiffrement au repos | `ITransitEncryptionService` (dans package Vault) |
 | HDS - Traçabilité utilisateur | `ICurrentUserService` (dans package Security) |

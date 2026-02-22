@@ -16,4 +16,12 @@ namespace DigitalDynamics.Foundation.Security;
 /// No services are registered here — use <c>FoundationJwtBearerModule</c> or
 /// <c>FoundationAuthenticationKeycloakModule</c> for the full implementation.
 /// </summary>
+<<<<<<< HEAD
 public sealed class FoundationSecurityModule : FoundationModule;
+=======
+public sealed class FoundationSecurityModule : FoundationModule
+{
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Services.AddFoundationSecurity(context.Configuration);
+}
+>>>>>>> feature/settings-module

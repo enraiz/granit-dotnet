@@ -10,9 +10,10 @@
 
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
+using DigitalDynamics.Foundation.Persistence.Interceptors;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
-using DigitalDynamics.Foundation.Persistence.Interceptors;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -40,8 +41,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnDelete_ConvertToSoftDelete()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestSoftDeletableEntity
+        await using TestDbContext context = CreateContext();
+        TestSoftDeletableEntity entity = new()
         {
             Id = Guid.NewGuid(),
             Name = "ToDelete",
@@ -62,8 +63,13 @@ public sealed class SoftDeleteInterceptorTests
         entity.DeletedAt.Should().Be(FixedNow);
         entity.DeletedBy.Should().Be("user-test-123");
 
+<<<<<<< HEAD
         // Verify the entity still exists in the database (not physically deleted)
         var count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
+=======
+        // Vérifier que l'entité existe encore en base (pas supprimée physiquement)
+        int count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
+>>>>>>> feature/settings-module
         count.Should().Be(1);
     }
 
@@ -71,8 +77,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnModify_DoesNotTriggerSoftDelete()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestSoftDeletableEntity
+        await using TestDbContext context = CreateContext();
+        TestSoftDeletableEntity entity = new()
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -95,22 +101,20 @@ public sealed class SoftDeleteInterceptorTests
 
     private TestDbContext CreateContext()
     {
-        var guidGenerator = Substitute.For<IGuidGenerator>();
-        var auditInterceptor = new AuditableEntityInterceptor(_currentUserService, _clock, guidGenerator);
-        var softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
+        ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
+        AuditedEntityInterceptor auditInterceptor = new(_currentUserService, _clock, guidGenerator, currentTenant);
+        SoftDeleteInterceptor softDeleteInterceptor = new(_currentUserService, _clock);
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(auditInterceptor, softDeleteInterceptor)
             .Options;
         return new TestDbContext(options);
     }
 
-    private sealed class TestSoftDeletableEntity : AuditableEntity, ISoftDeletable
+    private sealed class TestSoftDeletableEntity : FullAuditedEntity
     {
         public string Name { get; set; } = string.Empty;
-        public bool IsDeleted { get; set; }
-        public DateTimeOffset? DeletedAt { get; set; }
-        public string? DeletedBy { get; set; }
     }
 
     private sealed class TestDbContext : DbContext
@@ -118,9 +122,6 @@ public sealed class SoftDeleteInterceptorTests
         public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
         public DbSet<TestSoftDeletableEntity> Entities => Set<TestSoftDeletableEntity>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<TestSoftDeletableEntity>().Property(e => e.Id).ValueGeneratedNever();
-        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.Entity<TestSoftDeletableEntity>().Property(e => e.Id).ValueGeneratedNever();
     }
 }

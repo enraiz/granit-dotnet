@@ -9,17 +9,19 @@
 // =============================================================================
 
 using System.Text;
+using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DigitalDynamics.Foundation.Vault.Options;
 using VaultSharp;
+using VaultSharp.V1.Commons;
+using VaultSharp.V1.SecretsEngines.Transit;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
 
 /// <summary>
 /// Implementation of <see cref="ITransitEncryptionService"/> via Vault Transit Engine.
 /// </summary>
-public sealed class TransitEncryptionService : ITransitEncryptionService
+public sealed partial class TransitEncryptionService : ITransitEncryptionService
 {
     private readonly IVaultClient _vaultClient;
     private readonly VaultOptions _options;
@@ -40,17 +42,21 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
         string plaintext,
         CancellationToken cancellationToken = default)
     {
-        var base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
+        string base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
 
-        var result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
+        Secret<EncryptionResponse> result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
             keyName,
-            new VaultSharp.V1.SecretsEngines.Transit.EncryptRequestOptions
+            new EncryptRequestOptions
             {
                 Base64EncodedPlainText = base64Plaintext
             },
             mountPoint: _options.TransitMountPoint);
 
+<<<<<<< HEAD
         _logger.LogDebug("Data encrypted with Transit key {KeyName}", keyName);
+=======
+        LogDataEncrypted(_logger, keyName);
+>>>>>>> feature/settings-module
         return result.Data.CipherText;
     }
 
@@ -59,16 +65,27 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
         string ciphertext,
         CancellationToken cancellationToken = default)
     {
-        var result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
+        Secret<DecryptionResponse> result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
             keyName,
-            new VaultSharp.V1.SecretsEngines.Transit.DecryptRequestOptions
+            new DecryptRequestOptions
             {
                 CipherText = ciphertext
             },
             mountPoint: _options.TransitMountPoint);
 
+<<<<<<< HEAD
         var bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
         _logger.LogDebug("Data decrypted with Transit key {KeyName}", keyName);
+=======
+        byte[] bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
+        LogDataDecrypted(_logger, keyName);
+>>>>>>> feature/settings-module
         return Encoding.UTF8.GetString(bytes);
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Data encrypted with Transit key {KeyName}")]
+    private static partial void LogDataEncrypted(ILogger logger, string keyName);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Data decrypted with Transit key {KeyName}")]
+    private static partial void LogDataDecrypted(ILogger logger, string keyName);
 }

@@ -20,10 +20,8 @@ internal static class ModuleLoader
     /// </summary>
     /// <exception cref="InvalidOperationException">Circular dependency detected.</exception>
     public static IReadOnlyList<ModuleDescriptor> LoadModules<TModule>()
-        where TModule : FoundationModule
-    {
-        return LoadModules(typeof(TModule));
-    }
+        where TModule : FoundationModule =>
+        LoadModules(typeof(TModule));
 
     /// <summary>
     /// Loads all modules reachable from <paramref name="startupModuleType"/>
@@ -31,7 +29,7 @@ internal static class ModuleLoader
     /// </summary>
     public static IReadOnlyList<ModuleDescriptor> LoadModules(Type startupModuleType)
     {
-        var descriptors = new Dictionary<Type, ModuleDescriptor>();
+        Dictionary<Type, ModuleDescriptor> descriptors = [];
         DiscoverModules(startupModuleType, descriptors);
         return TopologicalSort(descriptors);
     }
@@ -49,9 +47,9 @@ internal static class ModuleLoader
                 $"Type '{moduleType.FullName}' does not inherit from FoundationModule.");
         }
 
-        var instance = (FoundationModule)Activator.CreateInstance(moduleType)!;
+        FoundationModule instance = (FoundationModule)Activator.CreateInstance(moduleType)!;
 
-        var dependencies = moduleType
+        Type[] dependencies = moduleType
             .GetCustomAttributes(typeof(DependsOnAttribute), true)
             .Cast<DependsOnAttribute>()
             .SelectMany(a => a.DependedTypes)
@@ -60,7 +58,7 @@ internal static class ModuleLoader
 
         descriptors[moduleType] = new ModuleDescriptor(moduleType, instance, dependencies);
 
-        foreach (var dep in dependencies)
+        foreach (Type dep in dependencies)
         {
             DiscoverModules(dep, descriptors);
         }
@@ -74,12 +72,12 @@ internal static class ModuleLoader
         Dictionary<Type, ModuleDescriptor> descriptors)
     {
         // Compute the in-degree of each node
-        var inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
-        var adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
+        Dictionary<Type, int> inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
+        Dictionary<Type, List<Type>> adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
 
-        foreach (var (type, descriptor) in descriptors)
+        foreach ((Type type, ModuleDescriptor descriptor) in descriptors)
         {
-            foreach (var dep in descriptor.Dependencies)
+            foreach (Type dep in descriptor.Dependencies)
             {
                 // dep -> type: dep must be loaded before type
                 adjacency[dep].Add(type);
@@ -88,16 +86,16 @@ internal static class ModuleLoader
         }
 
         // Queue of nodes with no incoming edges
-        var queue = new Queue<Type>(
+        Queue<Type> queue = new(
             inDegree.Where(kv => kv.Value == 0).Select(kv => kv.Key));
-        var sorted = new List<ModuleDescriptor>();
+        List<ModuleDescriptor> sorted = [];
 
         while (queue.Count > 0)
         {
-            var current = queue.Dequeue();
+            Type current = queue.Dequeue();
             sorted.Add(descriptors[current]);
 
-            foreach (var neighbor in adjacency[current])
+            foreach (Type neighbor in adjacency[current])
             {
                 inDegree[neighbor]--;
                 if (inDegree[neighbor] == 0)
@@ -109,7 +107,7 @@ internal static class ModuleLoader
 
         if (sorted.Count != descriptors.Count)
         {
-            var cycleTypes = descriptors.Keys
+            IEnumerable<string> cycleTypes = descriptors.Keys
                 .Except(sorted.Select(d => d.ModuleType))
                 .Select(t => t.Name);
             throw new InvalidOperationException(

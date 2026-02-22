@@ -26,9 +26,9 @@ public static class FoundationApplicationExtensions
     /// </summary>
     public static IApplicationBuilder UseFoundation(this IApplicationBuilder app)
     {
-        var foundationApp = app.ApplicationServices
+        FoundationApplication foundationApp = app.ApplicationServices
             .GetRequiredService<FoundationApplication>();
-        var context = new ApplicationInitializationContext(app.ApplicationServices);
+        ApplicationInitializationContext context = new(app.ApplicationServices);
         foundationApp.InitializeApplication(context);
         return app;
     }
@@ -47,9 +47,9 @@ public static class FoundationApplicationExtensions
     /// </summary>
     public static IHost UseFoundation(this IHost host)
     {
-        var foundationApp = host.Services
+        FoundationApplication foundationApp = host.Services
             .GetRequiredService<FoundationApplication>();
-        var context = new ApplicationInitializationContext(host.Services);
+        ApplicationInitializationContext context = new(host.Services);
         foundationApp.InitializeApplication(context);
         return host;
     }
@@ -62,9 +62,9 @@ public static class FoundationApplicationExtensions
     /// </summary>
     public static async Task<IApplicationBuilder> UseFoundationAsync(this IApplicationBuilder app)
     {
-        var foundationApp = app.ApplicationServices
+        FoundationApplication foundationApp = app.ApplicationServices
             .GetRequiredService<FoundationApplication>();
-        var context = new ApplicationInitializationContext(app.ApplicationServices);
+        ApplicationInitializationContext context = new(app.ApplicationServices);
         await foundationApp.InitializeApplicationAsync(context);
         return app;
     }
@@ -83,9 +83,9 @@ public static class FoundationApplicationExtensions
     /// </summary>
     public static async Task<IHost> UseFoundationAsync(this IHost host)
     {
-        var foundationApp = host.Services
+        FoundationApplication foundationApp = host.Services
             .GetRequiredService<FoundationApplication>();
-        var context = new ApplicationInitializationContext(host.Services);
+        ApplicationInitializationContext context = new(host.Services);
         await foundationApp.InitializeApplicationAsync(context);
         return host;
     }

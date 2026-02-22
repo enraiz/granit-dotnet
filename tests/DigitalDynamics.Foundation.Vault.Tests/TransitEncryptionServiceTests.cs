@@ -28,13 +28,13 @@ public sealed class TransitEncryptionServiceTests
     public TransitEncryptionServiceTests()
     {
         _vaultClient = Substitute.For<IVaultClient>();
-        var options = Microsoft.Extensions.Options.Options.Create(new VaultOptions
+        IOptions<VaultOptions> vaultOptions = Microsoft.Extensions.Options.Options.Create(new VaultOptions
         {
             TransitMountPoint = "transit"
         });
         _sut = new TransitEncryptionService(
             _vaultClient,
-            options,
+            vaultOptions,
             NullLogger<TransitEncryptionService>.Instance);
     }
 
@@ -42,12 +42,12 @@ public sealed class TransitEncryptionServiceTests
     public async Task EncryptAsync_CallsVaultTransitWithBase64Plaintext()
     {
         // Arrange
-        var plaintext = "donnée de santé sensible";
-        var expectedBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
-        var ciphertext = "vault:v1:abc123encrypted";
+        string plaintext = "donnée de santé sensible";
+        string expectedBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
+        string ciphertext = "vault:v1:abc123encrypted";
 
-        var transitEngine = Substitute.For<ITransitSecretsEngine>();
-        var secretsEngine = Substitute.For<ISecretsEngine>();
+        ITransitSecretsEngine transitEngine = Substitute.For<ITransitSecretsEngine>();
+        ISecretsEngine secretsEngine = Substitute.For<ISecretsEngine>();
         secretsEngine.Transit.Returns(transitEngine);
         _vaultClient.V1.Returns(Substitute.For<IVaultClientV1>());
         _vaultClient.V1.Secrets.Returns(secretsEngine);
@@ -62,7 +62,7 @@ public sealed class TransitEncryptionServiceTests
             });
 
         // Act
-        var result = await _sut.EncryptAsync("fhir-data", plaintext, TestContext.Current.CancellationToken);
+        string result = await _sut.EncryptAsync("fhir-data", plaintext, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be(ciphertext);
@@ -72,12 +72,12 @@ public sealed class TransitEncryptionServiceTests
     public async Task DecryptAsync_ReturnsDecodedPlaintext()
     {
         // Arrange
-        var originalText = "donnée de santé sensible";
-        var base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(originalText));
-        var ciphertext = "vault:v1:abc123encrypted";
+        string originalText = "donnée de santé sensible";
+        string base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(originalText));
+        string ciphertext = "vault:v1:abc123encrypted";
 
-        var transitEngine = Substitute.For<ITransitSecretsEngine>();
-        var secretsEngine = Substitute.For<ISecretsEngine>();
+        ITransitSecretsEngine transitEngine = Substitute.For<ITransitSecretsEngine>();
+        ISecretsEngine secretsEngine = Substitute.For<ISecretsEngine>();
         secretsEngine.Transit.Returns(transitEngine);
         _vaultClient.V1.Returns(Substitute.For<IVaultClientV1>());
         _vaultClient.V1.Secrets.Returns(secretsEngine);
@@ -92,7 +92,7 @@ public sealed class TransitEncryptionServiceTests
             });
 
         // Act
-        var result = await _sut.DecryptAsync("fhir-data", ciphertext, TestContext.Current.CancellationToken);
+        string result = await _sut.DecryptAsync("fhir-data", ciphertext, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be(originalText);

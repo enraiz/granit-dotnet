@@ -14,8 +14,8 @@ dotnet add package DigitalDynamics.Foundation.Persistence
 ### Avec le système de modules (recommandé)
 
 `FoundationPersistenceModule` déclare ses dépendances via `[DependsOn]` sur Timing,
-Guids et Security. Il suffit d'utiliser `AddFoundation<T>()` dans `Program.cs` et les
-dépendances sont chargées automatiquement dans le bon ordre
+Guids, Security et MultiTenancy. Il suffit d'utiliser `AddFoundation<T>()` dans `Program.cs`
+et les dépendances sont chargées automatiquement dans le bon ordre
 (voir [modularity.md](modularity.md)).
 
 ### Enregistrement direct
@@ -25,36 +25,61 @@ important :
 
 ```csharp
 builder.Services.AddFoundationTiming();      // IClock (requis par les intercepteurs)
-builder.Services.AddFoundationGuids();       // IGuidGenerator (requis par AuditableEntityInterceptor)
+builder.Services.AddFoundationGuids();       // IGuidGenerator (requis par AuditedEntityInterceptor)
 builder.Services.AddFoundationSecurity(builder.Configuration); // ICurrentUserService
+builder.Services.AddFoundationMultiTenancy(builder.Configuration); // ICurrentTenant (requis par AuditedEntityInterceptor)
 builder.Services.AddFoundationPersistence();
 ```
 
-## AuditableEntityInterceptor
+## AuditedEntityInterceptor
 
 Intercepteur `SaveChanges` qui remplit automatiquement les champs d'audit sur les
-entités `AuditableEntity`.
+entités héritant de la hiérarchie `CreationAuditedEntity` / `AuditedEntity` /
+`FullAuditedEntity`.
 
 ### Comportement
 
 | État | Champs remplis |
 | --- | --- |
-| `EntityState.Added` | `CreatedAt`, `CreatedBy`, `Id` (si `Guid.Empty`) |
+| `EntityState.Added` | `CreatedAt`, `CreatedBy`, `Id` (si `Guid.Empty`), `TenantId` (si `IMultiTenant`) |
 | `EntityState.Modified` | `ModifiedAt`, `ModifiedBy` |
 
 Les champs `CreatedAt` et `CreatedBy` sont protégés contre la modification lors
 d'un `UPDATE` (via `IsModified = false`).
 
+### Injection automatique du TenantId
+
+Pour les entités implémentant `IMultiTenant` (voir [core.md](core.md#imultitenant)),
+l'intercepteur injecte automatiquement le `TenantId` lors de la création :
+
+- Si `TenantId == null` et qu'un tenant est actif → `TenantId = ICurrentTenant.Id`
+- Si `TenantId` est déjà défini (migration, import) → valeur conservée
+- Si aucun tenant actif (contexte système) → `TenantId` reste `null`
+
+```csharp
+public sealed class DossierPatient : FullAuditedEntity, IMultiTenant
+{
+    public Guid? TenantId { get; set; }
+    public string NumeroAdmission { get; set; } = string.Empty;
+}
+
+// À l'ajout, TenantId est rempli depuis le contexte courant
+db.Dossiers.Add(new DossierPatient { NumeroAdmission = "ADM-001" });
+await db.SaveChangesAsync();
+// dossier.TenantId == currentTenant.Id (si tenant actif)
+```
+
 ### Sources des valeurs
 
 - **Horodatage** : `IClock.Now` (UTC garanti)
 - **Utilisateur** : `ICurrentUserService.UserId` (fallback : `"system"`)
+- **Tenant** : `ICurrentTenant.Id` (null si pas de tenant actif)
 
 ### Exemple
 
 ```csharp
-// L'entité hérite de AuditableEntity
-public sealed class Patient : AuditableEntity
+// L'entité hérite de AuditedEntity
+public sealed class Patient : AuditedEntity
 {
     public string FirstName { get; set; } = string.Empty;
 }
@@ -96,13 +121,17 @@ await db.SaveChangesAsync();
 // patient.DeletedBy == "user-123"
 ```
 
-## Query Filters (Soft Delete)
+## Query Filters
 
-Le `ModelBuilderExtensions.ApplyFoundationConventions()` applique un filtre global
-sur toutes les entités `ISoftDeletable` :
+`ModelBuilderExtensions.ApplyFoundationConventions()` applique automatiquement des
+filtres globaux EF Core sur les entités Foundation.
+
+### Query Filter Soft Delete
+
+Toutes les entités `ISoftDeletable` reçoivent un filtre `WHERE IsDeleted = false` :
 
 ```csharp
-// Dans le DbContext
+// Dans le DbContext — filtre soft delete uniquement
 protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     base.OnModelCreating(modelBuilder);
@@ -110,21 +139,55 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 }
 ```
 
-Ce filtre ajoute automatiquement `WHERE IsDeleted = false` à toutes les requêtes.
-Pour inclure les entités supprimées (ex : audit), utiliser `IgnoreQueryFilters()` :
+Pour inclure les entités supprimées (ex : audit trail), utiliser `IgnoreQueryFilters()` :
 
 ```csharp
-var allPatients = await db.Patients
+List<DossierPatient> tous = await db.Dossiers
     .IgnoreQueryFilters()
     .ToListAsync();
 ```
+
+### Query Filter Multi-Tenant
+
+Pour activer l'isolation automatique par tenant (`WHERE TenantId = currentTenant.Id`),
+passer l'`ICurrentTenant` injecté dans le constructeur du DbContext :
+
+```csharp
+public sealed class AppDbContext : DbContext
+{
+    private readonly ICurrentTenant _currentTenant;
+
+    public AppDbContext(DbContextOptions options, ICurrentTenant currentTenant)
+        : base(options)
+    {
+        _currentTenant = currentTenant;
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        // Soft delete + filtre multi-tenant
+        modelBuilder.ApplyFoundationConventions(_currentTenant);
+    }
+}
+```
+
+Le filtre est évalué dynamiquement à chaque requête (closure sur l'instance
+`ICurrentTenant`, dont `.Id` est un `AsyncLocal` réévalué par flux).
+
+> **Important** : passer l'**instance** `ICurrentTenant` (pas sa valeur `.Id`).
+> EF Core met en cache le modèle par type de DbContext — la closure doit référencer
+> l'objet pour observer les changements de tenant entre requêtes.
+
+Si `ApplyFoundationConventions()` est appelé sans `ICurrentTenant`, seul le filtre
+soft delete est appliqué (pas d'isolation multi-tenant).
 
 ## Architecture
 
 ```text
 DigitalDynamics.Foundation.Persistence
 ├── Interceptors/
-│   ├── AuditableEntityInterceptor.cs     (audit HDS : CreatedAt/By, ModifiedAt/By)
+│   ├── AuditedEntityInterceptor.cs       (audit HDS : CreatedAt/By, ModifiedAt/By)
 │   └── SoftDeleteInterceptor.cs          (soft delete RGPD : IsDeleted, DeletedAt/By)
 └── Extensions/
     ├── ModelBuilderExtensions.cs          (ApplyFoundationConventions : query filters)
@@ -135,19 +198,28 @@ DigitalDynamics.Foundation.Persistence
 
 | Service | Implementation | Lifetime |
 | --- | --- | --- |
-| `AuditableEntityInterceptor` | - | Scoped |
+| `AuditedEntityInterceptor` | - | Scoped |
 | `SoftDeleteInterceptor` | - | Scoped |
 
 ## Tests
 
-Les intercepteurs sont testables grâce à l'injection d'`IClock` :
+Les intercepteurs sont testables grâce à l'injection de leurs dépendances :
 
 ```csharp
-var clock = Substitute.For<IClock>();
-var fixedNow = new DateTimeOffset(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
+IClock clock = Substitute.For<IClock>();
+DateTimeOffset fixedNow = new(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
 clock.Now.Returns(fixedNow);
 
-var interceptor = new AuditableEntityInterceptor(currentUserService, clock);
+ICurrentUserService currentUser = Substitute.For<ICurrentUserService>();
+currentUser.UserId.Returns("user-test-123");
+
+IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
+guidGenerator.Create().Returns(Guid.NewGuid());
+
+ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
+currentTenant.Id.Returns((Guid?)null);
+
+AuditedEntityInterceptor interceptor = new(currentUser, clock, guidGenerator, currentTenant);
 // ... assertions exactes avec Be() au lieu de BeCloseTo()
 ```
 
@@ -155,7 +227,9 @@ var interceptor = new AuditableEntityInterceptor(currentUserService, clock);
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail | `AuditableEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
+| HDS - Audit trail | `AuditedEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
 | HDS - Horodatage UTC | `IClock.Now` (jamais `DateTimeOffset.UtcNow`) |
 | RGPD - Droit à l'oubli | `SoftDeleteInterceptor` (suppression logique) |
 | RGPD - Minimisation | Query filters (entités supprimées exclues par défaut) |
+| RGPD - Isolation tenant | Query filter multi-tenant (`ApplyFoundationConventions(currentTenant)`) |
+| RGPD - Pseudonymisation | `TenantId` GUID — jamais de données nominatives dans ce champ |

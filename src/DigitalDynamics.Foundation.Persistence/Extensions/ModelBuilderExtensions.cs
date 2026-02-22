@@ -1,41 +1,87 @@
+// =============================================================================
+// ModelBuilderExtensions - EF Core configuration for Foundation entities
+// =============================================================================
+// Applies global query filters (soft delete, multi-tenant) on the ModelBuilder.
+// Call in OnModelCreating of the application's DbContext.
+//
+// Usage in a module DbContext:
+//   protected override void OnModelCreating(ModelBuilder modelBuilder)
+//   {
+//       modelBuilder.HasDefaultSchema("auth");
+//       modelBuilder.ApplyFoundationConventions(_currentTenant);
+//       modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
+//   }
+// =============================================================================
 
 using System.Linq.Expressions;
+using System.Reflection;
 using DigitalDynamics.Foundation.Core.Domain;
+using DigitalDynamics.Foundation.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DigitalDynamics.Foundation.Persistence.Extensions;
 
 /// <summary>
-/// Extensions pour configurer les conventions Foundation sur le ModelBuilder EF Core.
+/// Extensions for configuring Foundation conventions on the EF Core ModelBuilder.
 /// </summary>
 public static class ModelBuilderExtensions
 {
     /// <summary>
-    /// Applique les conventions Foundation :
-    /// - Query filter global ISoftDeletable (WHERE IsDeleted = false)
-    /// - Configuration de la table AuditLogEntry
+    /// Applies Foundation conventions:
+    /// - Global query filter for <see cref="ISoftDeletable"/> (WHERE IsDeleted = false)
+    /// - Global query filter for <see cref="IMultiTenant"/> (WHERE TenantId = currentTenant.Id),
+    ///   only if <paramref name="currentTenant"/> is provided.
     /// </summary>
-    public static ModelBuilder ApplyFoundationConventions(this ModelBuilder modelBuilder)
+    /// <param name="modelBuilder">The EF Core ModelBuilder.</param>
+    /// <param name="currentTenant">
+    /// Current tenant service. If <c>null</c>, the multi-tenant filter is not applied.
+    /// Pass the instance injected in the DbContext constructor for correct lazy evaluation
+    /// (re-evaluated on each query via AsyncLocal).
+    /// </param>
+    public static ModelBuilder ApplyFoundationConventions(
+        this ModelBuilder modelBuilder,
+        ICurrentTenant? currentTenant = null)
     {
         ApplySoftDeleteQueryFilters(modelBuilder);
+
+        if (currentTenant is not null)
+        {
+            ApplyMultiTenantQueryFilters(modelBuilder, currentTenant);
+        }
+
         return modelBuilder;
     }
 
     private static void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
     {
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()
+            .Where(entityType => typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType)))
         {
-            if (!typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
-            {
-                continue;
-            }
-
-            var parameter = Expression.Parameter(entityType.ClrType, "e");
-            var property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
-            var condition = Expression.Equal(property, Expression.Constant(false));
-            var lambda = Expression.Lambda(condition, parameter);
+            ParameterExpression parameter = Expression.Parameter(entityType.ClrType, "e");
+            MemberExpression property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
+            BinaryExpression condition = Expression.Equal(property, Expression.Constant(false));
+            LambdaExpression lambda = Expression.Lambda(condition, parameter);
 
             modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
         }
     }
+
+    private static void ApplyMultiTenantQueryFilters(ModelBuilder modelBuilder, ICurrentTenant currentTenant)
+    {
+        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()
+            .Where(entityType => typeof(IMultiTenant).IsAssignableFrom(entityType.ClrType)))
+        {
+            typeof(ModelBuilderExtensions)
+                .GetMethod(nameof(SetMultiTenantFilter), BindingFlags.Static | BindingFlags.NonPublic)!
+                .MakeGenericMethod(entityType.ClrType)
+                .Invoke(null, [modelBuilder, currentTenant]);
+        }
+    }
+
+    // Generic typed method: EF Core evaluates `currentTenant.Id` as a closure
+    // re-evaluated on each query (not a snapshot captured at filter registration).
+    private static void SetMultiTenantFilter<TEntity>(ModelBuilder modelBuilder, ICurrentTenant currentTenant)
+        where TEntity : class, IMultiTenant =>
+        modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.TenantId == currentTenant.Id);
 }

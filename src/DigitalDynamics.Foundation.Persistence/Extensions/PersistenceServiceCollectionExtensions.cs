@@ -13,7 +13,7 @@ public static class PersistenceServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddFoundationPersistence(this IServiceCollection services)
     {
-        services.AddScoped<AuditableEntityInterceptor>();
+        services.AddScoped<AuditedEntityInterceptor>();
         services.AddScoped<SoftDeleteInterceptor>();
 
         return services;
