@@ -56,6 +56,7 @@ Contrat HTTP : versioning des routes et documentation OpenAPI.
 | --- | --- |
 | [api-versioning.md](api/api-versioning.md) | Versioning HTTP par URL et query string |
 | [api-documentation.md](api/api-documentation.md) | OpenAPI natif .NET 10, UI Scalar multi-version |
+| [idempotency.md](api/idempotency.md) | Idempotence HTTP style Stripe, Redis SET NX PX, conformité HDS |
 
 ## Utilities
 

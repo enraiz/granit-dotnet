@@ -68,6 +68,7 @@ public sealed class IdempotencyMiddlewareTests
                     });
 
                     // Core idempotency services (without Redis store — mocked below)
+                    services.AddSingleton<TimeProvider>(TimeProvider.System);
                     services.AddSingleton<RecyclableMemoryStreamManager>();
                     services.AddTransient<Internal.IdempotencyMiddleware>();
 
