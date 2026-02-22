@@ -5,8 +5,11 @@ Foundation. Il fournit :
 
 - Le **système de modules** (voir [modularity.md](modularity.md)) : `FoundationModule`,
   `[DependsOn]`, `AddFoundationAsync<T>()`, tri topologique
-- Les **types domaine partagés** : hiérarchie d'entités (`Entity`, `CreationAuditedEntity`,
-  `AuditedEntity`, `FullAuditedEntity`), `ISoftDeletable`, `AuditLogEntry`
+- Les **types domaine partagés** (voir [domain.md](domain.md)) : hiérarchie d'entités
+  (`Entity`, `CreationAuditedEntity`, `AuditedEntity`, `FullAuditedEntity`),
+  `ISoftDeletable`, `IMultiTenant`, `IActive`, `AuditLogEntry`
+- Le **service de data filtering** (voir [data-filtering.md](data-filtering.md)) :
+  `IDataFilter` — bypass sélectif des query filters globaux EF Core
 
 Ce package remplace l'ancien `Foundation.Abstractions`. Les interfaces de service
 (`IClock`, `IGuidGenerator`, `ICurrentUserService`, `ITransitEncryptionService`) vivent
@@ -29,190 +32,13 @@ Le système de modules est documenté dans [modularity.md](modularity.md).
 
 ## Types domaine
 
-### Hiérarchie d'entités
+La hiérarchie d'entités et les interfaces domaine (`ISoftDeletable`, `IMultiTenant`,
+`IActive`, `AuditLogEntry`) sont documentées dans [domain.md](domain.md).
 
-Les entités persistées héritent d'une hiérarchie de classes abstraites qui ajoute
-progressivement les champs d'audit HDS. Les champs sont remplis automatiquement par
-`AuditedEntityInterceptor` du package [Persistence](persistence.md).
+## Data Filtering
 
-```text
-Entity (abstract)
-└── CreationAuditedEntity (abstract)
-    └── AuditedEntity (abstract)
-        └── FullAuditedEntity (abstract, implémente ISoftDeletable)
-```
-
-Choisir le niveau approprié selon les besoins de traçabilité de l'entité :
-
-| Classe | Champs ajoutés | Usage |
-| --- | --- | --- |
-| `Entity` | `Id` | Entité de base sans audit |
-| `CreationAuditedEntity` | `CreatedAt`, `CreatedBy` | Traçabilité de création uniquement |
-| `AuditedEntity` | `ModifiedAt`, `ModifiedBy` | Traçabilité de création et modification |
-| `FullAuditedEntity` | `IsDeleted`, `DeletedAt`, `DeletedBy` (via `ISoftDeletable`) | Audit complet + suppression logique RGPD |
-
-### Entity
-
-Classe de base abstraite minimale pour toutes les entités persistées. Fournit
-uniquement l'identifiant.
-
-```csharp
-using DigitalDynamics.Foundation.Core.Domain;
-
-public abstract class Entity
-{
-    public Guid Id { get; set; }
-}
-```
-
-### CreationAuditedEntity
-
-Ajoute les champs de traçabilité de création. Pour les entités qui n'ont pas besoin
-de tracer les modifications.
-
-```csharp
-using DigitalDynamics.Foundation.Core.Domain;
-
-public abstract class CreationAuditedEntity : Entity
-{
-    public DateTimeOffset CreatedAt { get; set; }
-    public string CreatedBy { get; set; }
-}
-```
-
-### AuditedEntity
-
-Ajoute les champs de traçabilité de modification. C'est le choix par défaut pour la
-plupart des entités nécessitant un audit trail HDS.
-
-```csharp
-using DigitalDynamics.Foundation.Core.Domain;
-
-public abstract class AuditedEntity : CreationAuditedEntity
-{
-    public DateTimeOffset? ModifiedAt { get; set; }
-    public string? ModifiedBy { get; set; }
-}
-```
-
-Toute entité persistée nécessitant un audit trail complet **doit** hériter de cette
-classe (ou de `FullAuditedEntity`) pour garantir la traçabilité HDS.
-
-```csharp
-using DigitalDynamics.Foundation.Core.Domain;
-
-public sealed class Patient : AuditedEntity
-{
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-}
-```
-
-### FullAuditedEntity
-
-Ajoute la suppression logique conforme au RGPD en implémentant `ISoftDeletable`. Pour
-les entités contenant des données personnelles qui doivent supporter le droit à l'oubli.
-
-```csharp
-using DigitalDynamics.Foundation.Core.Domain;
-
-public abstract class FullAuditedEntity : AuditedEntity, ISoftDeletable
-{
-    public bool IsDeleted { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
-    public string? DeletedBy { get; set; }
-}
-```
-
-```csharp
-using DigitalDynamics.Foundation.Core.Domain;
-
-public sealed class Patient : FullAuditedEntity
-{
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-}
-```
-
-### ISoftDeletable
-
-Interface pour la suppression logique conforme au RGPD. `FullAuditedEntity` implémente
-cette interface. Les entités qui ne s'inscrivent pas dans la hiérarchie standard peuvent
-implémenter `ISoftDeletable` directement.
-
-```csharp
-public interface ISoftDeletable
-{
-    bool IsDeleted { get; set; }
-    DateTimeOffset? DeletedAt { get; set; }
-    string? DeletedBy { get; set; }
-}
-```
-
-Le `SoftDeleteInterceptor` (package [Persistence](persistence.md)) transforme les
-opérations `DELETE` en `UPDATE SET IsDeleted = true`, conservant les données pour
-l'audit trail tout en les excluant des requêtes standard.
-
-### IMultiTenant
-
-Interface pour les entités dont les données sont isolées par tenant. Le `TenantId` est
-automatiquement rempli par `AuditedEntityInterceptor` (package [Persistence](persistence.md))
-lors de la création, depuis `ICurrentTenant` du tenant courant.
-
-```csharp
-public interface IMultiTenant
-{
-    Guid? TenantId { get; set; }
-}
-```
-
-Utilisation typique — combiner avec la hiérarchie d'entités :
-
-```csharp
-using DigitalDynamics.Foundation.Core.Domain;
-
-// Entité dont chaque enregistrement appartient à un tenant
-public sealed class DossierPatient : FullAuditedEntity, IMultiTenant
-{
-    public Guid? TenantId { get; set; }
-    public string NumeroAdmission { get; set; } = string.Empty;
-}
-```
-
-Comportement automatique à la création (`SaveChangesAsync`) :
-
-- Si `TenantId == null` et qu'un tenant est actif → `TenantId = ICurrentTenant.Id`
-- Si `TenantId` est déjà défini (migration, import) → valeur conservée
-- Si aucun tenant actif → `TenantId` reste `null` (donnée globale)
-
-Le query filter multi-tenant (`WHERE TenantId = currentTenant.Id`) est activé en
-passant l'`ICurrentTenant` à `ApplyFoundationConventions` dans `OnModelCreating`
-(voir [persistence.md](persistence.md#query-filters-multi-tenant)).
-
-**Conformité RGPD** : `TenantId` est un GUID pseudonymisé. Ne jamais stocker de
-données nominatives (nom, email) dans ce champ.
-
-### AuditLogEntry
-
-Classe scellée représentant une entrée de l'audit trail HDS. Enregistre qui a fait
-quoi, quand et sur quelle entité.
-
-```csharp
-public sealed class AuditLogEntry
-{
-    public Guid Id { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
-    public string UserId { get; set; }
-    public string Operation { get; set; }       // Create, Update, Delete, SoftDelete
-    public string EntityType { get; set; }       // Type CLR de l'entité
-    public string EntityId { get; set; }
-    public string? Changes { get; set; }         // JSON des propriétés modifiées
-    public string? IpAddress { get; set; }
-    public string? UserAgent { get; set; }
-}
-```
-
-Conformité HDS : les entrées d'audit sont conservées 3 ans.
+`IDataFilter` et son implémentation `AsyncLocal` sont documentés dans
+[data-filtering.md](data-filtering.md).
 
 ## Architecture
 
@@ -225,7 +51,11 @@ DigitalDynamics.Foundation.Core
 │   ├── FullAuditedEntity.cs        (+ ISoftDeletable)
 │   ├── ISoftDeletable.cs           (suppression logique RGPD)
 │   ├── IMultiTenant.cs             (isolation par tenant, TenantId auto-injecté)
+│   ├── IActive.cs                  (filtre actif/inactif, WHERE IsActive = true)
 │   └── AuditLogEntry.cs            (entrée d'audit trail)
+├── DataFiltering/
+│   ├── IDataFilter.cs              (interface de contrôle runtime des query filters)
+│   └── DataFilter.cs               (implémentation AsyncLocal, Singleton)
 ├── Modularity/
 │   ├── FoundationModule.cs         (classe de base des modules)
 │   ├── DependsOnAttribute.cs       (déclaration de dépendances)

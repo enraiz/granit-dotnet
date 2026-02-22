@@ -20,7 +20,7 @@ public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> optio
     /// Creates a new sequential GUID of the specified type.
     /// </summary>
 #pragma warning disable CA1822 // Intentionally non-static public method for API consistency
-    public Guid Create(SequentialGuidType guidType)
+    public Guid Create(SequentialGuidType guidType) // NOSONAR S2325
 #pragma warning restore CA1822
     {
         // 10 cryptographically secure random bytes

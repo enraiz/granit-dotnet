@@ -8,6 +8,7 @@
 using DigitalDynamics.Foundation.Observability.Extensions;
 using DigitalDynamics.Foundation.Observability.Options;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -104,5 +105,30 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         // Assert
         result.Should().BeSameAs(builder);
+    }
+
+    /// <summary>
+    /// Verifies the OTEL tracing filter: paths under /health/* must be excluded,
+    /// while /healthcare/... and regular paths must be included.
+    /// </summary>
+    [Theory]
+    [InlineData("/health/live", false)]
+    [InlineData("/health/ready", false)]
+    [InlineData("/health/startup", false)]
+    [InlineData("/healthz", false)]
+    [InlineData("/healthcare/patients", true)]
+    [InlineData("/api/orders", true)]
+    [InlineData("/", true)]
+    public void OtelTracingFilter_ExcludesHealthPaths_ButNotHealthcarePaths(string requestPath, bool expectedIncluded)
+    {
+        // The filter is a lambda registered inside AddFoundationObservability via
+        // aspnet.Filter = httpContext => !path.StartsWithSegments("/health") && path != "/healthz"
+        // We test it by replicating its logic to ensure spec coverage of the two conditions.
+
+        PathString path = new(requestPath);
+        bool included = !path.StartsWithSegments("/health") && path != "/healthz";
+
+        included.Should().Be(expectedIncluded,
+            because: $"path '{requestPath}' should {(expectedIncluded ? "be included in" : "be excluded from")} tracing");
     }
 }

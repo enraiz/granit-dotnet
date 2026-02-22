@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using DigitalDynamics.Foundation.Core.DataFiltering;
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,18 @@ namespace DigitalDynamics.Foundation.Persistence.Extensions;
 public static class ModelBuilderExtensions
 {
     /// <summary>
-    /// Applies Foundation conventions:
-    /// - Global query filter for <see cref="ISoftDeletable"/> (WHERE IsDeleted = false)
-    /// - Global query filter for <see cref="IMultiTenant"/> (WHERE TenantId = currentTenant.Id),
-    ///   only if <paramref name="currentTenant"/> is provided.
+    /// Applies Foundation global query filters to all entity types in the model:
+    /// <list type="bullet">
+    ///   <item><see cref="ISoftDeletable"/> → WHERE IsDeleted = false</item>
+    ///   <item><see cref="IActive"/> → WHERE IsActive = true</item>
+    ///   <item>
+    ///     <see cref="IMultiTenant"/> → WHERE TenantId = currentTenant.Id
+    ///     (only when <paramref name="currentTenant"/> is provided)
+    ///   </item>
+    /// </list>
+    /// Entities implementing multiple filter interfaces receive a single combined
+    /// <c>HasQueryFilter</c> (conditions joined with <c>AndAlso</c>), which fixes
+    /// the silent filter-overwrite bug in EF Core when multiple calls are made.
     /// </summary>
     /// <param name="modelBuilder">The EF Core ModelBuilder.</param>
     /// <param name="currentTenant">
@@ -24,49 +33,109 @@ public static class ModelBuilderExtensions
     /// Pass the instance injected in the DbContext constructor for correct lazy evaluation
     /// (re-evaluated on each query via AsyncLocal).
     /// </param>
+    /// <param name="dataFilter">
+    /// Data filter service. If <c>null</c>, all filters are always applied
+    /// (backward-compatible behavior identical to before this parameter was added).
+    /// When provided, each filter can be individually bypassed at runtime via
+    /// <c>IDataFilter.Disable&lt;TFilter&gt;()</c>.
+    /// </param>
     public static ModelBuilder ApplyFoundationConventions(
         this ModelBuilder modelBuilder,
-        ICurrentTenant? currentTenant = null)
+        ICurrentTenant? currentTenant = null,
+        IDataFilter? dataFilter = null)
     {
-        ApplySoftDeleteQueryFilters(modelBuilder);
+        // FilterProxy wraps IDataFilter? and exposes simple boolean properties.
+        // EF Core extracts property access on a ConstantExpression as a query parameter
+        // re-evaluated on each query — the same mechanism used by currentTenant.Id in
+        // the multi-tenant filter. This avoids the risk of EF Core attempting SQL
+        // translation of a generic method call (IsEnabled<T>()).
+        FilterProxy proxy = new(dataFilter);
 
-        if (currentTenant is not null)
+        foreach (Type clrType in modelBuilder.Model.GetEntityTypes().Select(entityType => entityType.ClrType))
         {
-            ApplyMultiTenantQueryFilters(modelBuilder, currentTenant);
+            bool hasSoftDelete = typeof(ISoftDeletable).IsAssignableFrom(clrType);
+            bool hasActive = typeof(IActive).IsAssignableFrom(clrType);
+            bool hasMultiTenant = typeof(IMultiTenant).IsAssignableFrom(clrType)
+                && currentTenant is not null;
+
+            if (!hasSoftDelete && !hasActive && !hasMultiTenant)
+            {
+                continue;
+            }
+
+            typeof(ModelBuilderExtensions)
+                .GetMethod(nameof(SetEntityFilter), BindingFlags.Static | BindingFlags.NonPublic)! // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection
+                .MakeGenericMethod(clrType)
+                .Invoke(null, [modelBuilder, currentTenant, proxy]);
         }
 
         return modelBuilder;
     }
 
-    private static void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
+    // Builds and registers a single combined HasQueryFilter for TEntity.
+    // Each applicable filter interface contributes one condition: bypass || realCondition.
+    // All conditions are combined with AndAlso — one HasQueryFilter call per entity type.
+    private static void SetEntityFilter<TEntity>(
+        ModelBuilder modelBuilder,
+        ICurrentTenant? currentTenant,
+        FilterProxy proxy)
+        where TEntity : class
     {
-        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()
-            .Where(entityType => typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType)))
-        {
-            ParameterExpression parameter = Expression.Parameter(entityType.ClrType, "e");
-            MemberExpression property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
-            BinaryExpression condition = Expression.Equal(property, Expression.Constant(false));
-            LambdaExpression lambda = Expression.Lambda(condition, parameter);
+        ParameterExpression param = Expression.Parameter(typeof(TEntity), "e");
+        List<Expression> conditions = [];
 
-            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+        if (typeof(ISoftDeletable).IsAssignableFrom(typeof(TEntity)))
+        {
+            // bypass = !proxy.SoftDeleteEnabled (re-evaluated by EF Core as a query parameter)
+            // real   = !e.IsDeleted
+            Expression bypass = Expression.Not(
+                Expression.Property(Expression.Constant(proxy), nameof(FilterProxy.SoftDeleteEnabled)));
+            Expression notDeleted = Expression.Not(
+                Expression.Property(param, nameof(ISoftDeletable.IsDeleted)));
+            conditions.Add(Expression.OrElse(bypass, notDeleted));
         }
+
+        if (typeof(IActive).IsAssignableFrom(typeof(TEntity)))
+        {
+            // bypass = !proxy.ActiveEnabled
+            // real   = e.IsActive
+            Expression bypass = Expression.Not(
+                Expression.Property(Expression.Constant(proxy), nameof(FilterProxy.ActiveEnabled)));
+            Expression isActive = Expression.Property(param, nameof(IActive.IsActive));
+            conditions.Add(Expression.OrElse(bypass, isActive));
+        }
+
+        if (typeof(IMultiTenant).IsAssignableFrom(typeof(TEntity)) && currentTenant is not null)
+        {
+            // bypass = !proxy.MultiTenantEnabled
+            // real   = e.TenantId == currentTenant.Id (closure re-evaluated via AsyncLocal)
+            Expression bypass = Expression.Not(
+                Expression.Property(Expression.Constant(proxy), nameof(FilterProxy.MultiTenantEnabled)));
+            Expression tenantMatch = Expression.Equal(
+                Expression.Property(param, nameof(IMultiTenant.TenantId)),
+                Expression.Property(Expression.Constant(currentTenant), nameof(ICurrentTenant.Id)));
+            conditions.Add(Expression.OrElse(bypass, tenantMatch));
+        }
+
+        if (conditions.Count == 0)
+        {
+            return;
+        }
+
+        Expression combined = conditions.Aggregate(Expression.AndAlso);
+        modelBuilder.Entity<TEntity>().HasQueryFilter(Expression.Lambda<Func<TEntity, bool>>(combined, param));
     }
 
-    private static void ApplyMultiTenantQueryFilters(ModelBuilder modelBuilder, ICurrentTenant currentTenant)
+    // Internal wrapper: EF Core evaluates simple property access on a ConstantExpression
+    // as a query parameter re-evaluated on each query execution.
+    // Registered as Singleton + static AsyncLocal in DataFilter → the captured instance
+    // reads the correct per-flow state on every query, regardless of model caching.
+    private sealed class FilterProxy(IDataFilter? dataFilter)
     {
-        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()
-            .Where(entityType => typeof(IMultiTenant).IsAssignableFrom(entityType.ClrType)))
-        {
-            typeof(ModelBuilderExtensions)
-                .GetMethod(nameof(SetMultiTenantFilter), BindingFlags.Static | BindingFlags.NonPublic)! // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection
-                .MakeGenericMethod(entityType.ClrType)
-                .Invoke(null, [modelBuilder, currentTenant]);
-        }
-    }
+        private readonly IDataFilter? _dataFilter = dataFilter;
 
-    // Generic typed method: EF Core evaluates `currentTenant.Id` as a closure
-    // re-evaluated on each query (not a snapshot captured at filter registration).
-    private static void SetMultiTenantFilter<TEntity>(ModelBuilder modelBuilder, ICurrentTenant currentTenant)
-        where TEntity : class, IMultiTenant =>
-        modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.TenantId == currentTenant.Id);
+        public bool SoftDeleteEnabled => _dataFilter?.IsEnabled<ISoftDeletable>() ?? true;
+        public bool ActiveEnabled => _dataFilter?.IsEnabled<IActive>() ?? true;
+        public bool MultiTenantEnabled => _dataFilter?.IsEnabled<IMultiTenant>() ?? true;
+    }
 }
