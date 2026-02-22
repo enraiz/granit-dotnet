@@ -47,7 +47,8 @@ Surveillance, débogage et exposition du comportement de l'application.
 | [observability.md](diagnostics/observability.md) | OpenTelemetry, OTLP, Loki/Tempo/Mimir |
 | [diagnostics.md](diagnostics/diagnostics.md) | Health checks, métriques, ActivitySource |
 | [exception-handling.md](diagnostics/exception-handling.md) | Gestion des erreurs, ProblemDetails |
-| [api-documentation.md](diagnostics/api-documentation.md) | Versioning API, Swagger/OpenAPI |
+| [api-versioning.md](diagnostics/api-versioning.md) | Versioning HTTP par URL et query string |
+| [api-documentation.md](diagnostics/api-documentation.md) | OpenAPI natif .NET 10, UI Scalar multi-version |
 
 ## Utilities
 
