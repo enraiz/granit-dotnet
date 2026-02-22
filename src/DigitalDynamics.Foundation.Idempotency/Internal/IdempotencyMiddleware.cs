@@ -131,7 +131,7 @@ internal sealed partial class IdempotencyMiddleware(
         if (entry.State == IdempotencyState.InProgress)
         {
             int retryAfter = (int)_opts.InProgressTtl.TotalSeconds;
-            context.Response.Headers["Retry-After"] = retryAfter.ToString();
+            context.Response.Headers.RetryAfter = retryAfter.ToString();
             await WriteProblemAsync(context, StatusCodes.Status409Conflict,
                 "Request In Progress",
                 $"A request with this idempotency key is already being processed. Retry after {retryAfter}s.");

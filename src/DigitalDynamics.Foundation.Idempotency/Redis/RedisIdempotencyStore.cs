@@ -57,10 +57,8 @@ internal sealed class RedisIdempotencyStore(
     }
 
     /// <inheritdoc/>
-    public async Task DeleteAsync(string key, CancellationToken ct)
-    {
-        await _db.KeyDeleteAsync(key).WaitAsync(ct);
-    }
+    public Task DeleteAsync(string key, CancellationToken ct) =>
+        _db.KeyDeleteAsync(key).WaitAsync(ct);
 
     // -------------------------------------------------------------------------
     // Serialization helpers
