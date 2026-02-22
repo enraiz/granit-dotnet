@@ -19,7 +19,7 @@ namespace DigitalDynamics.Foundation.Vault.Services;
 /// <summary>
 /// Implementation of <see cref="ITransitEncryptionService"/> via Vault Transit Engine.
 /// </summary>
-public sealed class TransitEncryptionService : ITransitEncryptionService
+public sealed partial class TransitEncryptionService : ITransitEncryptionService
 {
     private readonly IVaultClient _vaultClient;
     private readonly VaultOptions _options;
@@ -50,7 +50,7 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
             },
             mountPoint: _options.TransitMountPoint);
 
-        _logger.LogDebug("Data encrypted with Transit key {KeyName}", keyName);
+        LogEncrypted(_logger, keyName);
         return result.Data.CipherText;
     }
 
@@ -68,7 +68,13 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
             mountPoint: _options.TransitMountPoint);
 
         var bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
-        _logger.LogDebug("Data decrypted with Transit key {KeyName}", keyName);
+        LogDecrypted(_logger, keyName);
         return Encoding.UTF8.GetString(bytes);
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Data encrypted with Transit key {KeyName}")]
+    private static partial void LogEncrypted(ILogger logger, string keyName);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Data decrypted with Transit key {KeyName}")]
+    private static partial void LogDecrypted(ILogger logger, string keyName);
 }
