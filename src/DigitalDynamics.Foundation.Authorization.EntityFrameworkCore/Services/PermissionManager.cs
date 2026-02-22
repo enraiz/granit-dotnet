@@ -69,12 +69,15 @@ internal sealed class PermissionManager<TContext>(
 
         // HDS audit trail: emitted as structured log → Serilog → OTLP → Loki (3-year retention)
         // RGPD: no personal data — only role name, permission name, tenant scope
-        logger.LogInformation(
-            "[AUDIT] Permission {Change}: permission={PermissionName} role={RoleName} tenantId={TenantId}",
-            isGranted ? "Granted" : "Revoked",
-            permissionName,
-            roleName,
-            tenantId);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation(
+                "[AUDIT] Permission {Change}: permission={PermissionName} role={RoleName} tenantId={TenantId}",
+                isGranted ? "Granted" : "Revoked",
+                permissionName,
+                roleName,
+                tenantId);
+        }
     }
 
     /// <inheritdoc />
