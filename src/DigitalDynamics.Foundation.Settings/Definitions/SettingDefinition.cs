@@ -1,13 +1,3 @@
-// =============================================================================
-// SettingDefinition - Static declaration of a setting
-// =============================================================================
-// Describes a setting: name, default value, encryption, visibility,
-// inheritance, and the allow-list of authorized providers.
-//
-// Created by ISettingDefinitionProvider.Define() at startup.
-// Managed by SettingDefinitionManager (Singleton).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>

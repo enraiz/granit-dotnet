@@ -1,7 +1,3 @@
-// =============================================================================
-// FoundationObservabilityModule - Module Foundation pour Serilog + OpenTelemetry
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Observability.Extensions;
 

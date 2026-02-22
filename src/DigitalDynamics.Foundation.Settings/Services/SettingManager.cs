@@ -1,13 +1,3 @@
-// =============================================================================
-// SettingManager - Implementation of ISettingManager
-// =============================================================================
-// Writes directly to ISettingStore (bypassing providers) with explicit keys,
-// then invalidates the corresponding cache entry.
-//
-// Inputs  : ISettingStore, ICacheService<SettingValue>, SettingDefinitionManager
-// Outputs : void (side effects: store + cache)
-// =============================================================================
-
 using DigitalDynamics.Foundation.Caching;
 using DigitalDynamics.Foundation.Settings.Definitions;
 using DigitalDynamics.Foundation.Settings.Providers;
@@ -19,21 +9,14 @@ namespace DigitalDynamics.Foundation.Settings.Services;
 /// Implementation of <see cref="ISettingManager"/>: writes to <see cref="ISettingStore"/>
 /// and invalidates the cache for the Global, Tenant, and User scopes.
 /// </summary>
-public sealed class SettingManager : ISettingManager
+public sealed class SettingManager(
+    ISettingStore store,
+    ICacheService<SettingValue> cache,
+    SettingDefinitionManager definitions) : ISettingManager
 {
-    private readonly ISettingStore _store;
-    private readonly ICacheService<SettingValue> _cache;
-    private readonly SettingDefinitionManager _definitions;
-
-    public SettingManager(
-        ISettingStore store,
-        ICacheService<SettingValue> cache,
-        SettingDefinitionManager definitions)
-    {
-        _store = store;
-        _cache = cache;
-        _definitions = definitions;
-    }
+    private readonly ISettingStore _store = store;
+    private readonly ICacheService<SettingValue> _cache = cache;
+    private readonly SettingDefinitionManager _definitions = definitions;
 
     /// <inheritdoc/>
     public async Task SetGlobalAsync(string name, string? value, CancellationToken ct = default)

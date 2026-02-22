@@ -106,7 +106,7 @@ public sealed class AuditableEntityInterceptorTests
 
         // Capture the creation values set by the interceptor during Add
         var originalCreatedAt = entity.CreatedAt;
-        var originalCreatedBy = entity.CreatedBy;
+        string originalCreatedBy = entity.CreatedBy;
 
         // Advance time for the Modify
         _clock.Now.Returns(FixedNow.AddHours(1));
@@ -156,15 +156,12 @@ public sealed class AuditableEntityInterceptorTests
         public string Name { get; set; } = string.Empty;
     }
 
-    private sealed class TestDbContext : DbContext
+    private sealed class TestDbContext(DbContextOptions<AuditableEntityInterceptorTests.TestDbContext> options) : DbContext(options)
     {
-        public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
         public DbSet<TestEntity> TestEntities => Set<TestEntity>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        protected override void OnModelCreating(ModelBuilder modelBuilder) =>
             // ValueGeneratedNever: the interceptor handles GUID generation
             modelBuilder.Entity<TestEntity>().Property(e => e.Id).ValueGeneratedNever();
-        }
     }
 }

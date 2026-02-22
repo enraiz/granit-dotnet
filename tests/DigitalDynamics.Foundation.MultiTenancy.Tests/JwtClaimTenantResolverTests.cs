@@ -42,7 +42,7 @@ public sealed class JwtClaimTenantResolverTests
     public async Task ValidClaim_Returns_TenantInfo()
     {
         JwtClaimTenantResolver resolver = CreateResolver();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DefaultHttpContext context = ContextWithClaim("tenant_id", tenantId.ToString());
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
@@ -88,7 +88,7 @@ public sealed class JwtClaimTenantResolverTests
     public async Task CustomClaimType_Is_Respected()
     {
         JwtClaimTenantResolver resolver = CreateResolver("custom_tenant");
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DefaultHttpContext context = ContextWithClaim("custom_tenant", tenantId.ToString());
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
@@ -112,8 +112,10 @@ public sealed class JwtClaimTenantResolverTests
     public async Task UnauthenticatedUser_Returns_Null()
     {
         JwtClaimTenantResolver resolver = CreateResolver();
-        DefaultHttpContext context = new();
-        context.User = new ClaimsPrincipal();
+        DefaultHttpContext context = new()
+        {
+            User = new ClaimsPrincipal()
+        };
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 

@@ -1,7 +1,3 @@
-// =============================================================================
-// FoundationGuidsModule - Module Foundation pour IGuidGenerator
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Guids.Extensions;
 

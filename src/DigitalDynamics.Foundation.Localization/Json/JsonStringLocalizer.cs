@@ -14,28 +14,21 @@ namespace DigitalDynamics.Foundation.Localization.Json;
 /// <summary>
 /// Localizer based on embedded JSON dictionaries with culture fallback and inheritance.
 /// </summary>
-internal sealed class JsonStringLocalizer : IStringLocalizer
+/// <remarks>
+/// Creates a new JSON localizer.
+/// </remarks>
+/// <param name="sources">Embedded JSON sources for this resource.</param>
+/// <param name="defaultCulture">Default culture of the resource.</param>
+/// <param name="baseLocalizers">Localizers of parent resources (inheritance).</param>
+internal sealed class JsonStringLocalizer(
+    List<EmbeddedJsonSource> sources,
+    string defaultCulture,
+    List<IStringLocalizer> baseLocalizers) : IStringLocalizer
 {
     private readonly ConcurrentDictionary<string, Lazy<Dictionary<string, string>>> _cultureCache = new(StringComparer.OrdinalIgnoreCase);
-    private readonly List<EmbeddedJsonSource> _sources;
-    private readonly string _defaultCulture;
-    private readonly List<IStringLocalizer> _baseLocalizers;
-
-    /// <summary>
-    /// Creates a new JSON localizer.
-    /// </summary>
-    /// <param name="sources">Embedded JSON sources for this resource.</param>
-    /// <param name="defaultCulture">Default culture of the resource.</param>
-    /// <param name="baseLocalizers">Localizers of parent resources (inheritance).</param>
-    public JsonStringLocalizer(
-        List<EmbeddedJsonSource> sources,
-        string defaultCulture,
-        List<IStringLocalizer> baseLocalizers)
-    {
-        _sources = sources;
-        _defaultCulture = defaultCulture;
-        _baseLocalizers = baseLocalizers;
-    }
+    private readonly List<EmbeddedJsonSource> _sources = sources;
+    private readonly string _defaultCulture = defaultCulture;
+    private readonly List<IStringLocalizer> _baseLocalizers = baseLocalizers;
 
     /// <inheritdoc />
     public LocalizedString this[string name]

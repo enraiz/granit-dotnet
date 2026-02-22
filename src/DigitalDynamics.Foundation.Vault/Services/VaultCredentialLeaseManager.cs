@@ -1,17 +1,3 @@
-// =============================================================================
-// VaultCredentialLeaseManager - PostgreSQL dynamic credentials management
-// =============================================================================
-// BackgroundService that:
-//   1. Obtains a dynamic PostgreSQL credential via Vault Database Engine
-//   2. Renews the lease before expiration (configurable threshold, default 75% of TTL)
-//   3. Requests a new credential if renewal fails
-//
-// Credentials are exposed via IDatabaseCredentialProvider so that
-// the DbContext can dynamically build its connection string.
-//
-// HDS compliance: no static password in production.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -39,26 +25,19 @@ public interface IDatabaseCredentialProvider
 /// Background service that manages the lifecycle of dynamic
 /// PostgreSQL credentials via Vault Database Engine.
 /// </summary>
-public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDatabaseCredentialProvider
+public sealed partial class VaultCredentialLeaseManager(
+    IVaultClient vaultClient,
+    IOptions<VaultOptions> options,
+    ILogger<VaultCredentialLeaseManager> logger) : BackgroundService, IDatabaseCredentialProvider
 {
-    private readonly IVaultClient _vaultClient;
-    private readonly VaultOptions _options;
-    private readonly ILogger<VaultCredentialLeaseManager> _logger;
+    private readonly IVaultClient _vaultClient = vaultClient;
+    private readonly VaultOptions _options = options.Value;
+    private readonly ILogger<VaultCredentialLeaseManager> _logger = logger;
 
     private string _username = string.Empty;
     private string _password = string.Empty;
     private string _leaseId = string.Empty;
     private int _leaseDurationSeconds;
-
-    public VaultCredentialLeaseManager(
-        IVaultClient vaultClient,
-        IOptions<VaultOptions> options,
-        ILogger<VaultCredentialLeaseManager> logger)
-    {
-        _vaultClient = vaultClient;
-        _options = options.Value;
-        _logger = logger;
-    }
 
     public string Username => _username;
     public string Password => _password;
@@ -72,7 +51,7 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            TimeSpan renewalDelay = TimeSpan.FromSeconds(
+            var renewalDelay = TimeSpan.FromSeconds(
                 _leaseDurationSeconds * _options.LeaseRenewalThreshold);
 
             LogNextRenewalIn(_logger, renewalDelay);
@@ -97,7 +76,7 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
         _logger.LogInformation("Stopping Vault dynamic credential manager");
     }
 
-    private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
+    private async Task ObtainCredentialsAsync(CancellationToken cancellationToken) // NOSONAR S1172 - VaultSharp API does not expose cancellation
     {
         string path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
         LogObtainingCredentials(_logger, path);
@@ -114,7 +93,7 @@ public sealed partial class VaultCredentialLeaseManager : BackgroundService, IDa
         LogCredentialsObtained(_logger, _username, _leaseId, _leaseDurationSeconds);
     }
 
-    private async Task RenewLeaseAsync(CancellationToken cancellationToken)
+    private async Task RenewLeaseAsync(CancellationToken cancellationToken) // NOSONAR S1172 - VaultSharp API does not expose cancellation
     {
         LogRenewingLease(_logger, _leaseId);
 

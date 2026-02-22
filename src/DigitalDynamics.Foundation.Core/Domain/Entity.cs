@@ -1,10 +1,3 @@
-// =============================================================================
-// Entity - Minimal base class for all persisted entities
-// =============================================================================
-// Provides only the identifier. Entities requiring an audit trail
-// inherit from CreationAuditedEntity or its subclasses.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>

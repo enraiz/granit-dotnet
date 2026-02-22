@@ -1,16 +1,3 @@
-// =============================================================================
-// KeycloakServiceCollectionExtensions - Extension Keycloak pour JWT Bearer
-// =============================================================================
-// Surcharge la configuration JWT Bearer de Foundation.Authentication.JwtBearer
-// avec les valeurs Keycloak (Authority, Audience, preferred_username) via PostConfigure.
-// Enregistre KeycloakClaimsTransformation et la policy "Admin".
-//
-// Usage :
-//   builder.Services.AddFoundationKeycloak(builder.Configuration);
-//
-// Lit la section "Keycloak" de la configuration.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Authentication.Keycloak.Authentication;
 using DigitalDynamics.Foundation.Authentication.Keycloak.Options;
 using Microsoft.AspNetCore.Authentication;

@@ -49,10 +49,9 @@ public sealed class FoundationPersistenceModuleTests
     public void DependsOn_DeclaresCorrectDependencies()
     {
         // Arrange
-        DependsOnAttribute[] attributes = typeof(FoundationPersistenceModule)
+        DependsOnAttribute[] attributes = [.. typeof(FoundationPersistenceModule)
             .GetCustomAttributes(typeof(DependsOnAttribute), true)
-            .Cast<DependsOnAttribute>()
-            .ToArray();
+            .Cast<DependsOnAttribute>()];
 
         // Assert
         attributes.Should().HaveCount(1);

@@ -1,12 +1,3 @@
-// =============================================================================
-// AuditLogEntry - HDS audit log entry
-// =============================================================================
-// Each entity modification generates an audit entry to satisfy
-// the HDS traceability requirement over 3 years.
-//
-// Stored in a dedicated "audit" schema with configured retention.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>

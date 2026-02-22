@@ -153,8 +153,8 @@ public sealed class TenantSettingValueProviderTests
     [Fact]
     public async Task GetOrNullAsync_Isolates_Entries_By_TenantId()
     {
-        Guid tenantA = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        Guid tenantB = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+        var tenantA = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        var tenantB = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
 
         (TenantSettingValueProvider providerA, InMemorySettingStore store, _) = Create(tenantId: tenantA);
         await store.SetAsync("App.Theme", "T", tenantA.ToString(), "blue", TestContext.Current.CancellationToken);

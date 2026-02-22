@@ -1,14 +1,3 @@
-// =============================================================================
-// FullAuditedEntity - Entité avec audit complet et suppression logique
-// =============================================================================
-// Intègre ISoftDeletable à AuditedEntity pour les entités nécessitant
-// la traçabilité création/modification/suppression.
-//
-// Conformité HDS + RGPD : audit trail complet avec suppression logique
-// (droit à l'oubli). Les propriétés ISoftDeletable sont virtuelles pour
-// permettre une personnalisation dans les sous-classes.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>

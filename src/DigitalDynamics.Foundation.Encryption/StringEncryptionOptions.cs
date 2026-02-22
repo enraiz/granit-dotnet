@@ -1,13 +1,3 @@
-// =============================================================================
-// StringEncryptionOptions - Configuration for the encryption service
-// =============================================================================
-// Loaded from the "Encryption" section of appsettings.json.
-// The PassPhrase MUST be supplied via Vault (never hardcoded).
-//
-// HDS note (CWE-329): no static Salt or InitVector.
-// The IV is generated randomly for each encryption by the AES provider.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Encryption;
 
 /// <summary>

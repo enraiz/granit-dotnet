@@ -1,16 +1,3 @@
-// =============================================================================
-// SoftDeleteInterceptor - GDPR soft deletion
-// =============================================================================
-// Intercepts DELETE operations on ISoftDeletable entities and converts them
-// to UPDATE SET IsDeleted = true.
-//
-// Soft-deleted entities are filtered by the global query filter
-// configured in ConfigureModelExtensions.
-//
-// GDPR compliance: data is marked as deleted but retained
-// for the HDS audit trail (3 years). Physical purge is handled separately.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
@@ -23,16 +10,10 @@ namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 /// EF Core interceptor that converts physical deletions
 /// to soft deletions for <see cref="ISoftDeletable"/> entities.
 /// </summary>
-public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
+public sealed class SoftDeleteInterceptor(ICurrentUserService currentUserService, IClock clock) : SaveChangesInterceptor
 {
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IClock _clock;
-
-    public SoftDeleteInterceptor(ICurrentUserService currentUserService, IClock clock)
-    {
-        _currentUserService = currentUserService;
-        _clock = clock;
-    }
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly IClock _clock = clock;
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,

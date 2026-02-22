@@ -1,13 +1,3 @@
-// =============================================================================
-// ISettingProvider - Setting read service with automatic cascade
-// =============================================================================
-// Walks the provider chain U → T → G → C → D and returns the first
-// non-null value. Handles inheritance (IsInherited) and the allow-list (Providers).
-//
-// Usage: inject ISettingProvider for read-only access.
-//        For writing, use ISettingManager.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Settings.Values;
 
 namespace DigitalDynamics.Foundation.Settings.Services;

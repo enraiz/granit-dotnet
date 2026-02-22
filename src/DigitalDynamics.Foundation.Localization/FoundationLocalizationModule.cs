@@ -1,7 +1,3 @@
-// =============================================================================
-// FoundationLocalizationModule - Module Foundation pour la localisation JSON
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Localization.Extensions;
 using Microsoft.Extensions.DependencyInjection;

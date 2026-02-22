@@ -1,20 +1,3 @@
-// =============================================================================
-// FoundationMultiTenancyModule - Foundation module for multi-tenancy
-// =============================================================================
-// Configures ICurrentTenant, JWT/Header resolvers, and the middleware.
-//
-// IMPORTANT: call app.UseFoundationMultiTenancy() in Program.cs
-// after UseAuthentication() and before UseAuthorization():
-//
-//   app.UseAuthentication();
-//   app.UseFoundationMultiTenancy();
-//   app.UseAuthorization();
-//
-// The module has no dependency on Foundation.Security: JwtClaimTenantResolver
-// reads HttpContext.User.FindFirstValue() (standard ASP.NET Core ClaimsPrincipal)
-// and works with any identity provider (Keycloak, Auth0, etc.).
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.MultiTenancy.Extensions;
 

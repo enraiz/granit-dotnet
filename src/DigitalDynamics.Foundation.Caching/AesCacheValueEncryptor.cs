@@ -59,7 +59,7 @@ public sealed class AesCacheValueEncryptor : ICacheValueEncryptor
         byte[] iv = new byte[IvSizeBytes];
         RandomNumberGenerator.Fill(iv);
 
-        using Aes aes = Aes.Create();
+        using var aes = Aes.Create();
         aes.Key = _key;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;
@@ -97,7 +97,7 @@ public sealed class AesCacheValueEncryptor : ICacheValueEncryptor
         byte[] cipher = new byte[cipherLength];
         Buffer.BlockCopy(ciphertext, IvSizeBytes, cipher, 0, cipherLength);
 
-        using Aes aes = Aes.Create();
+        using var aes = Aes.Create();
         aes.Key = _key;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;

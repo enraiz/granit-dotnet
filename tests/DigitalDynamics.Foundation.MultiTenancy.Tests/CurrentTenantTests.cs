@@ -26,7 +26,7 @@ public sealed class CurrentTenantTests
     public void Change_Sets_Tenant_Context()
     {
         CurrentTenant tenant = Create();
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         using IDisposable _ = tenant.Change(id, "Acme");
 
@@ -50,7 +50,7 @@ public sealed class CurrentTenantTests
     public void Dispose_Restores_Previous_Context()
     {
         CurrentTenant tenant = Create();
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         IDisposable scope = tenant.Change(id, "Acme");
         scope.Dispose();
@@ -63,8 +63,8 @@ public sealed class CurrentTenantTests
     public void Nested_Change_Restores_Outer_Context_On_Dispose()
     {
         CurrentTenant tenant = Create();
-        Guid outerTenant = Guid.NewGuid();
-        Guid innerTenant = Guid.NewGuid();
+        var outerTenant = Guid.NewGuid();
+        var innerTenant = Guid.NewGuid();
 
         using IDisposable outer = tenant.Change(outerTenant, "Outer");
 
@@ -83,7 +83,7 @@ public sealed class CurrentTenantTests
     public void Dispose_IsIdempotent()
     {
         CurrentTenant tenant = Create();
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         IDisposable scope = tenant.Change(id);
         scope.Dispose();
@@ -98,17 +98,17 @@ public sealed class CurrentTenantTests
         // Two parallel tasks with different tenants
         // must not interfere with each other (AsyncLocal)
         CurrentTenant tenant = Create();
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
-        Task taskA = Task.Run(async () =>
+        var taskA = Task.Run(async () =>
         {
             using IDisposable _ = tenant.Change(tenantA, "A");
             await Task.Delay(10, TestContext.Current.CancellationToken);
             tenant.Id.Should().Be(tenantA, "task A must see its own tenant");
         }, TestContext.Current.CancellationToken);
 
-        Task taskB = Task.Run(async () =>
+        var taskB = Task.Run(async () =>
         {
             using IDisposable _ = tenant.Change(tenantB, "B");
             await Task.Delay(10, TestContext.Current.CancellationToken);
@@ -125,7 +125,7 @@ public sealed class CurrentTenantTests
     public void Change_WithoutName_Sets_Id_Only()
     {
         CurrentTenant tenant = Create();
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         using IDisposable _ = tenant.Change(id);
 

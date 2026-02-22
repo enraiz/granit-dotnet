@@ -1,11 +1,3 @@
-// =============================================================================
-// FoundationVaultModule - Module Foundation pour Vault
-// =============================================================================
-// Skip automatiquement l'enregistrement en environnement Development
-// (credentials statiques via connection string).
-// Enregistre VaultStringEncryptionProvider si Vault est actif.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Encryption;
 using DigitalDynamics.Foundation.Localization;

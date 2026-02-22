@@ -1,11 +1,3 @@
-// =============================================================================
-// FoundationApplicationExtensions - Initialisation post-Build()
-// =============================================================================
-// Extensions app.UseFoundation() (sync) et app.UseFoundationAsync() (async)
-// qui appellent OnApplicationInitialization / OnApplicationInitializationAsync
-// sur tous les modules dans l'ordre topologique.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;

@@ -56,10 +56,7 @@ public sealed class ClockTests
     }
 
     [Fact]
-    public void SupportsMultipleTimezone_ReturnsTrue()
-    {
-        _clock.SupportsMultipleTimezone.Should().BeTrue();
-    }
+    public void SupportsMultipleTimezone_ReturnsTrue() => _clock.SupportsMultipleTimezone.Should().BeTrue();
 
     [Fact]
     public void Normalize_ConvertsLocalOffsetToUtc()

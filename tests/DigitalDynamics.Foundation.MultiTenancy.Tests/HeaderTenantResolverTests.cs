@@ -40,7 +40,7 @@ public sealed class HeaderTenantResolverTests
     public async Task ValidHeader_Returns_TenantInfo()
     {
         HeaderTenantResolver resolver = CreateResolver();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DefaultHttpContext context = ContextWithHeader("X-Tenant-Id", tenantId.ToString());
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
@@ -86,7 +86,7 @@ public sealed class HeaderTenantResolverTests
     public async Task CustomHeaderName_Is_Respected()
     {
         HeaderTenantResolver resolver = CreateResolver("X-Custom-Tenant");
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DefaultHttpContext context = ContextWithHeader("X-Custom-Tenant", tenantId.ToString());
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);

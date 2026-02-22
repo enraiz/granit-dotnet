@@ -12,12 +12,10 @@ namespace DigitalDynamics.Foundation.Caching;
 /// // Clé générée : dd:Patient:{userKey}
 /// </code>
 /// </example>
+/// <param name="name">Nom à utiliser comme segment central de la clé composite.</param>
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class CacheNameAttribute : Attribute
+public sealed class CacheNameAttribute(string name) : Attribute
 {
     /// <summary>Nom de cache personnalisé.</summary>
-    public string Name { get; }
-
-    /// <param name="name">Nom à utiliser comme segment central de la clé composite.</param>
-    public CacheNameAttribute(string name) => Name = name;
+    public string Name { get; } = name;
 }

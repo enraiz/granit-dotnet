@@ -1,7 +1,3 @@
-// =============================================================================
-// FoundationPersistenceModule - Module Foundation pour EF Core interceptors
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Guids;
 using DigitalDynamics.Foundation.MultiTenancy;

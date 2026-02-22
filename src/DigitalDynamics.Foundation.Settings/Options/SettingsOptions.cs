@@ -1,7 +1,3 @@
-// =============================================================================
-// SettingsOptions - Configuration options for the Settings module
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Settings.Options;
 
 /// <summary>

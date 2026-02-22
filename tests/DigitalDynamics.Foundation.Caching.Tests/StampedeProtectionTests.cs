@@ -42,7 +42,7 @@ public sealed class StampedeProtectionTests
         CancellationToken ct = TestContext.Current.CancellationToken;
 
         // Act — 10 requêtes concurrentes sur la même clé absente du cache
-        Task<ProductCacheItem>[] tasks = Enumerable.Range(0, 10)
+        Task<ProductCacheItem>[] tasks = [.. Enumerable.Range(0, 10)
             .Select(_ => sut.GetOrAddAsync(
                 "product-42",
                 async innerCt =>
@@ -52,8 +52,7 @@ public sealed class StampedeProtectionTests
                     return product;
                 },
                 null,
-                ct))
-            .ToArray();
+                ct))];
 
         ProductCacheItem[] results = await Task.WhenAll(tasks);
 

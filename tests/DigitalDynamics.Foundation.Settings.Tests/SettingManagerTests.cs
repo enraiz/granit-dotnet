@@ -94,7 +94,7 @@ public sealed class SettingManagerTests
     {
         SettingDefinition def = new("App.Theme");
         (SettingManager manager, InMemorySettingStore store, _) = CreateManager(def);
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await manager.SetForTenantAsync(tenantId, "App.Theme", "blue", TestContext.Current.CancellationToken);
 
@@ -109,7 +109,7 @@ public sealed class SettingManagerTests
     {
         SettingDefinition def = new("App.Theme");
         (SettingManager manager, _, ICacheService<SettingValue> cache) = CreateManager(def);
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await manager.SetForTenantAsync(tenantId, "App.Theme", "blue", TestContext.Current.CancellationToken);
 

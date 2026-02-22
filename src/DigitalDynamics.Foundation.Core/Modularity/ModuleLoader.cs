@@ -1,11 +1,3 @@
-// =============================================================================
-// ModuleLoader - Module discovery and topological sort
-// =============================================================================
-// Starting from a root TModule, recursively discovers all dependent
-// modules via [DependsOn] and sorts them in topological order
-// (Kahn's algorithm). Detects circular dependencies.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Modularity;
 
 /// <summary>
@@ -47,14 +39,13 @@ internal static class ModuleLoader
                 $"Type '{moduleType.FullName}' does not inherit from FoundationModule.");
         }
 
-        FoundationModule instance = (FoundationModule)Activator.CreateInstance(moduleType)!;
+        var instance = (FoundationModule)Activator.CreateInstance(moduleType)!;
 
-        Type[] dependencies = moduleType
+        Type[] dependencies = [.. moduleType
             .GetCustomAttributes(typeof(DependsOnAttribute), true)
             .Cast<DependsOnAttribute>()
             .SelectMany(a => a.DependedTypes)
-            .Distinct()
-            .ToArray();
+            .Distinct()];
 
         descriptors[moduleType] = new ModuleDescriptor(moduleType, instance, dependencies);
 
@@ -72,8 +63,8 @@ internal static class ModuleLoader
         Dictionary<Type, ModuleDescriptor> descriptors)
     {
         // Compute the in-degree of each node
-        Dictionary<Type, int> inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
-        Dictionary<Type, List<Type>> adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
+        var inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
+        var adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
 
         foreach ((Type type, ModuleDescriptor descriptor) in descriptors)
         {

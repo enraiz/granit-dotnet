@@ -148,7 +148,7 @@ public sealed class JsonStringLocalizerTests : IDisposable
         CultureInfo.CurrentUICulture = new CultureInfo("fr");
 
         // Act
-        List<LocalizedString> all = localizer.GetAllStrings(includeParentCultures: false).ToList();
+        var all = localizer.GetAllStrings(includeParentCultures: false).ToList();
 
         // Assert
         all.Should().HaveCount(3);

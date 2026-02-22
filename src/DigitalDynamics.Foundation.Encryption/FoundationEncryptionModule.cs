@@ -1,11 +1,3 @@
-// =============================================================================
-// FoundationEncryptionModule - Foundation module for string encryption
-// =============================================================================
-// Configures IStringEncryptionService with AesStringEncryptionProvider by default.
-// To enable the Vault Transit provider, register VaultStringEncryptionProvider
-// from Foundation.Vault and set Encryption:ProviderName = "Vault".
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Encryption.Extensions;
 

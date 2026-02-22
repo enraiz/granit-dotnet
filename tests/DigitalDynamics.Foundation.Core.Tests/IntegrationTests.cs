@@ -25,10 +25,7 @@ public sealed class IntegrationTests
 
     public sealed class TestLeafModule : FoundationModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
-        {
-            context.Services.AddSingleton<ITestService, TestServiceImpl>();
-        }
+        public override void ConfigureServices(ServiceConfigurationContext context) => context.Services.AddSingleton<ITestService, TestServiceImpl>();
     }
 
     private static bool _initializationCalled;
@@ -37,10 +34,7 @@ public sealed class IntegrationTests
     [DependsOn(typeof(TestLeafModule))]
     public sealed class TestRootModule : FoundationModule
     {
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
-        {
-            _initializationCalled = true;
-        }
+        public override void OnApplicationInitialization(ApplicationInitializationContext context) => _initializationCalled = true;
     }
 
     // --- Modules async ---

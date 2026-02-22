@@ -83,7 +83,7 @@ public sealed class FoundationSettingsModuleTests
     {
         using WebApplication app = BuildApp();
 
-        List<string> names = app.Services
+        var names = app.Services
             .GetRequiredService<IEnumerable<ISettingValueProvider>>()
             .OrderBy(p => p.Order)
             .Select(p => p.Name)

@@ -1,11 +1,3 @@
-// =============================================================================
-// InMemorySettingStore - In-memory implementation of ISettingStore
-// =============================================================================
-// Uses a ConcurrentDictionary to store setting values.
-// Intended for development, testing, and environments without persistence.
-// Thread-safe. Zero external dependencies.
-// =============================================================================
-
 using System.Collections.Concurrent;
 using DigitalDynamics.Foundation.Settings.Values;
 
@@ -36,9 +28,7 @@ public sealed class InMemorySettingStore : ISettingStore
         string? providerKey,
         CancellationToken ct = default)
     {
-        IReadOnlyList<SettingValue> result = _store.Values
-            .Where(v => v.ProviderName == providerName && v.ProviderKey == providerKey)
-            .ToList();
+        IReadOnlyList<SettingValue> result = [.. _store.Values.Where(v => v.ProviderName == providerName && v.ProviderKey == providerKey)];
         return Task.FromResult(result);
     }
 

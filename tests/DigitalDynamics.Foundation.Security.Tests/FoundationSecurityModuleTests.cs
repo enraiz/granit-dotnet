@@ -15,8 +15,5 @@ namespace DigitalDynamics.Foundation.Security.Tests;
 public sealed class FoundationSecurityModuleTests
 {
     [Fact]
-    public void FoundationSecurityModule_IsFoundationModule()
-    {
-        typeof(FoundationSecurityModule).Should().BeAssignableTo<FoundationModule>();
-    }
+    public void FoundationSecurityModule_IsFoundationModule() => typeof(FoundationSecurityModule).Should().BeAssignableTo<FoundationModule>();
 }

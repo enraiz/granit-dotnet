@@ -79,7 +79,7 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
         // Arrange
         SetupDatabaseCredentials("v-user-123", "p@ssw0rd!", "lease-abc", 3600);
 
-        using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(
             TestContext.Current.CancellationToken);
 
         // Act - Start and immediately cancel after credentials are obtained
@@ -120,7 +120,7 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
                 LeaseDurationSeconds = 3600
             });
 
-        using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(
             TestContext.Current.CancellationToken);
 
         // Act
@@ -170,7 +170,7 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
                 };
             });
 
-        using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(
             TestContext.Current.CancellationToken);
 
         // Act

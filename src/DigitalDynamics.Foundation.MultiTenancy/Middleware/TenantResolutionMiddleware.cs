@@ -1,14 +1,3 @@
-// =============================================================================
-// TenantResolutionMiddleware - Per-request tenant resolution and activation
-// =============================================================================
-// ASP.NET Core middleware (IMiddleware): resolves the tenant via the resolver
-// pipeline, then activates its context in ICurrentTenant for the entire
-// duration of the request. If disabled or no tenant resolved, passes through
-// without modifying the context.
-//
-// Registration: app.UseFoundationMultiTenancy() (before UseAuthorization).
-// =============================================================================
-
 using DigitalDynamics.Foundation.MultiTenancy.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -19,21 +8,14 @@ namespace DigitalDynamics.Foundation.MultiTenancy.Middleware;
 /// Middleware for per-request HTTP tenant resolution.
 /// Uses <see cref="TenantResolverPipeline"/> and activates <see cref="ICurrentTenant"/>.
 /// </summary>
-public sealed class TenantResolutionMiddleware : IMiddleware
+public sealed class TenantResolutionMiddleware(
+    ICurrentTenant currentTenant,
+    TenantResolverPipeline pipeline,
+    IOptions<MultiTenancyOptions> options) : IMiddleware
 {
-    private readonly ICurrentTenant _currentTenant;
-    private readonly TenantResolverPipeline _pipeline;
-    private readonly MultiTenancyOptions _options;
-
-    public TenantResolutionMiddleware(
-        ICurrentTenant currentTenant,
-        TenantResolverPipeline pipeline,
-        IOptions<MultiTenancyOptions> options)
-    {
-        _currentTenant = currentTenant;
-        _pipeline = pipeline;
-        _options = options.Value;
-    }
+    private readonly ICurrentTenant _currentTenant = currentTenant;
+    private readonly TenantResolverPipeline _pipeline = pipeline;
+    private readonly MultiTenancyOptions _options = options.Value;
 
     /// <inheritdoc/>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)

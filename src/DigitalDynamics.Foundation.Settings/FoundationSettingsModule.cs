@@ -1,19 +1,3 @@
-// =============================================================================
-// FoundationSettingsModule - Foundation module for dynamic settings
-// =============================================================================
-// Configures the settings system with cascading resolution:
-//   User (U) → Tenant (T) → Global (G) → Configuration (C) → Default (D)
-//
-// Dependencies:
-//   - FoundationCachingModule      : ICacheService<SettingValue> for provider cache
-//   - FoundationMultiTenancyModule : ICurrentTenant for the Tenant provider
-//   - FoundationEncryptionModule   : IStringEncryptionService for IsEncrypted (store layer)
-//   - FoundationSecurityModule     : ICurrentUserService for the User provider
-//
-// Default store: InMemorySettingStore (replaced by EfCoreSettingStore in production
-//   via FoundationSettingsEntityFrameworkCoreModule).
-// =============================================================================
-
 using DigitalDynamics.Foundation.Caching;
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Encryption;

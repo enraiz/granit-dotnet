@@ -18,7 +18,7 @@ public sealed class ObservabilityOptionsTests
     public void DefaultValues_AreCorrect()
     {
         // Arrange & Act
-        ObservabilityOptions options = new ObservabilityOptions();
+        var options = new ObservabilityOptions();
 
         // Assert
         options.ServiceName.Should().Be("unknown-service");

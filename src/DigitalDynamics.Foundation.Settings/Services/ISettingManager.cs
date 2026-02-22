@@ -1,12 +1,3 @@
-// =============================================================================
-// ISettingManager - Setting write service
-// =============================================================================
-// Allows writing setting values at a specific cascade level
-// (Global, Tenant, User) without depending on the current context.
-//
-// For reading with automatic cascade, use ISettingProvider.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Settings.Services;
 
 /// <summary>

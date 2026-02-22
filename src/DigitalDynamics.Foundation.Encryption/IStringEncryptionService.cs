@@ -1,13 +1,3 @@
-// =============================================================================
-// IStringEncryptionService - String encryption/decryption
-// =============================================================================
-// Primary abstraction for string encryption.
-// Delegates to the provider selected via StringEncryptionOptions.ProviderName.
-//
-// Implementation: DefaultStringEncryptionService (in this package).
-// Available providers: AES-256-CBC (local) or Vault Transit (remote).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Encryption;
 
 /// <summary>

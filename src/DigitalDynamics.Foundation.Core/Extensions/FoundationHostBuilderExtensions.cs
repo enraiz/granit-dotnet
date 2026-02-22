@@ -1,11 +1,3 @@
-// =============================================================================
-// FoundationHostBuilderExtensions - Point d'entree du systeme de modules
-// =============================================================================
-// Extensions builder.AddFoundation<TModule>() (sync) et
-// builder.AddFoundationAsync<TModule>() (async) qui decouvrent, trient et
-// configurent tous les modules Foundation en un seul appel.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

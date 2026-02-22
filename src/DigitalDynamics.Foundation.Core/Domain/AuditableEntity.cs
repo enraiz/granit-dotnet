@@ -1,13 +1,3 @@
-// =============================================================================
-// AuditableEntity - Base class for HDS audit (3-year retention)
-// =============================================================================
-// Every persisted entity MUST inherit from AuditableEntity to guarantee
-// the traceability required by HDS certification.
-//
-// Fields are populated automatically by AuditableEntityInterceptor
-// in the Persistence package.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>

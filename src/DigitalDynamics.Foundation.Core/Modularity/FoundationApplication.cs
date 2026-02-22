@@ -16,7 +16,7 @@ public sealed class FoundationApplication
 
     /// <summary>Returns the types of loaded modules in topological order (for diagnostics).</summary>
     public IReadOnlyList<Type> GetModuleTypes() =>
-        _modules.Select(m => m.ModuleType).ToList();
+        [.. _modules.Select(m => m.ModuleType)];
 
     /// <summary>
     /// Calls <see cref="FoundationModule.ConfigureServices"/> on each module

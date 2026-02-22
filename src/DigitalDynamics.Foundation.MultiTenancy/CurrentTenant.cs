@@ -1,13 +1,3 @@
-// =============================================================================
-// CurrentTenant - ICurrentTenant implementation via AsyncLocal
-// =============================================================================
-// Stores the current tenant in AsyncLocal<T> (automatic propagation
-// across Task and async/await). Each async flow has its own context.
-//
-// Change() stacks overrides and restores them via IDisposable.
-// Register as Singleton: state is in AsyncLocal (static), not the instance.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>
@@ -35,12 +25,10 @@ public sealed class CurrentTenant : ICurrentTenant
         return new TenantScope(previous);
     }
 
-    private sealed class TenantScope : IDisposable
+    private sealed class TenantScope(TenantInfo? previous) : IDisposable
     {
-        private readonly TenantInfo? _previous;
+        private readonly TenantInfo? _previous = previous;
         private bool _disposed;
-
-        public TenantScope(TenantInfo? previous) => _previous = previous;
 
         public void Dispose()
         {

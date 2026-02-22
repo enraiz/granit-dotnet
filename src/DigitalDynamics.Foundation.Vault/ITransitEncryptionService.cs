@@ -1,12 +1,3 @@
-// =============================================================================
-// ITransitEncryptionService - Chiffrement/dechiffrement via Vault Transit
-// =============================================================================
-// Abstraction pour le chiffrement des donnees FHIR sensibles.
-// Implemente dans ce meme package via l'engine Transit (cle fhir-data).
-//
-// Conformite HDS : les donnees de sante DOIVENT etre chiffrees au repos.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Vault;
 
 /// <summary>

@@ -1,18 +1,3 @@
-// =============================================================================
-// SettingProvider - Cascading setting resolution
-// =============================================================================
-// Walks the providers in order U(100) → T(200) → G(300) → C(400) → D(500).
-// Returns the first non-null value found.
-//
-// Cascade rules:
-//   - If SettingDefinition.Providers is non-empty, only the listed providers are consulted.
-//   - If SettingDefinition.IsInherited = false, the cascade stops at the first applicable
-//     provider that returns null (no fallback to lower-priority levels).
-//
-// Inputs  : SettingValueProviderManager, SettingDefinitionManager
-// Outputs : string? (resolved value) or IReadOnlyList<SettingValue>
-// =============================================================================
-
 using DigitalDynamics.Foundation.Settings.Definitions;
 using DigitalDynamics.Foundation.Settings.Providers;
 using DigitalDynamics.Foundation.Settings.Values;
@@ -22,18 +7,12 @@ namespace DigitalDynamics.Foundation.Settings.Services;
 /// <summary>
 /// Implementation of <see cref="ISettingProvider"/> with cascading resolution.
 /// </summary>
-public sealed class SettingProvider : ISettingProvider
+public sealed class SettingProvider(
+    SettingValueProviderManager providerManager,
+    SettingDefinitionManager definitionManager) : ISettingProvider
 {
-    private readonly SettingValueProviderManager _providerManager;
-    private readonly SettingDefinitionManager _definitionManager;
-
-    public SettingProvider(
-        SettingValueProviderManager providerManager,
-        SettingDefinitionManager definitionManager)
-    {
-        _providerManager = providerManager;
-        _definitionManager = definitionManager;
-    }
+    private readonly SettingValueProviderManager _providerManager = providerManager;
+    private readonly SettingDefinitionManager _definitionManager = definitionManager;
 
     /// <inheritdoc/>
     public async Task<string?> GetOrNullAsync(string name, CancellationToken ct = default)

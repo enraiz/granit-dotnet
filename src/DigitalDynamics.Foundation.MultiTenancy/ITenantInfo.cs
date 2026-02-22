@@ -1,7 +1,3 @@
-// =============================================================================
-// ITenantInfo - Informations sur un tenant
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>

@@ -24,29 +24,17 @@ public sealed class FoundationApplicationTests
 
     public sealed class TrackingModuleA : FoundationModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
-        {
-            CallOrder.Add("ConfigureServices:A");
-        }
+        public override void ConfigureServices(ServiceConfigurationContext context) => CallOrder.Add("ConfigureServices:A");
 
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
-        {
-            CallOrder.Add("Initialize:A");
-        }
+        public override void OnApplicationInitialization(ApplicationInitializationContext context) => CallOrder.Add("Initialize:A");
     }
 
     [DependsOn(typeof(TrackingModuleA))]
     public sealed class TrackingModuleB : FoundationModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
-        {
-            CallOrder.Add("ConfigureServices:B");
-        }
+        public override void ConfigureServices(ServiceConfigurationContext context) => CallOrder.Add("ConfigureServices:B");
 
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
-        {
-            CallOrder.Add("Initialize:B");
-        }
+        public override void OnApplicationInitialization(ApplicationInitializationContext context) => CallOrder.Add("Initialize:B");
     }
 
     // --- Async module that overrides only ConfigureServicesAsync ---

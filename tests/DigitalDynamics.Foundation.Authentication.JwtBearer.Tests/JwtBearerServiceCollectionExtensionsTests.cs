@@ -40,7 +40,7 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddFoundationJwtBearer_RegistersJwtBearerAuthOptions()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
 
         // Act
@@ -60,7 +60,7 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddFoundationJwtBearer_RegistersJwtBearerAuthentication()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
 
         // Act
@@ -85,7 +85,7 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddFoundationJwtBearer_RegistersOnlyAuthenticatedPolicy()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
 
         // Act
@@ -105,7 +105,7 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddFoundationJwtBearer_RegistersCurrentUserService()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
 
         // Act
@@ -124,7 +124,7 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddFoundationJwtBearer_RegistersHttpContextAccessor()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
 
         // Act
@@ -141,7 +141,7 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddFoundationJwtBearer_WithCustomNameClaimType_UsesConfiguredNameClaimType()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfigurationRoot config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {

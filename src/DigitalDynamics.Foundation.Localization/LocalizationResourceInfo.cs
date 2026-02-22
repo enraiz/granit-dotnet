@@ -12,17 +12,22 @@ namespace DigitalDynamics.Foundation.Localization;
 /// <summary>
 /// Registration information for a localization resource.
 /// </summary>
-public sealed class LocalizationResourceInfo
+/// <remarks>
+/// Creates a new localization resource info.
+/// </remarks>
+/// <param name="resourceType">Marker type of the resource.</param>
+/// <param name="defaultCulture">Default culture.</param>
+public sealed class LocalizationResourceInfo(Type resourceType, string defaultCulture)
 {
     /// <summary>
     /// Marker type of the resource (empty class with attributes).
     /// </summary>
-    public Type ResourceType { get; }
+    public Type ResourceType { get; } = resourceType;
 
     /// <summary>
     /// Default culture for this resource (e.g. "fr").
     /// </summary>
-    public string DefaultCulture { get; }
+    public string DefaultCulture { get; } = defaultCulture;
 
     /// <summary>
     /// Types of parent resources (translation inheritance).
@@ -33,17 +38,6 @@ public sealed class LocalizationResourceInfo
     /// Embedded JSON sources associated with this resource.
     /// </summary>
     internal List<EmbeddedJsonSource> JsonSources { get; } = [];
-
-    /// <summary>
-    /// Creates a new localization resource info.
-    /// </summary>
-    /// <param name="resourceType">Marker type of the resource.</param>
-    /// <param name="defaultCulture">Default culture.</param>
-    public LocalizationResourceInfo(Type resourceType, string defaultCulture)
-    {
-        ResourceType = resourceType;
-        DefaultCulture = defaultCulture;
-    }
 
     /// <summary>
     /// Adds a source of embedded JSON files.

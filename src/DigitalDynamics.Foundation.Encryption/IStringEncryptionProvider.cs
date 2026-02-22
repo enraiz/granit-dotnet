@@ -1,14 +1,3 @@
-// =============================================================================
-// IStringEncryptionProvider - String encryption provider
-// =============================================================================
-// Contract for concrete encryption implementations.
-// Providers are self-configured singletons registered via DI.
-//
-// Available providers:
-//   - AesStringEncryptionProvider : local AES-256-CBC (< 1 ms)
-//   - VaultStringEncryptionProvider : Vault Transit Engine (10-20 ms)
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Encryption;
 
 /// <summary>

@@ -1,7 +1,3 @@
-// =============================================================================
-// ISettingDefinitionContext - Setting declaration context
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>

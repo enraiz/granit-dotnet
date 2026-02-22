@@ -1,15 +1,3 @@
-// =============================================================================
-// AuditedEntityInterceptor - Automatic population of HDS audit fields
-// =============================================================================
-// Intercepts EF Core SaveChanges to automatically populate:
-//   - CreatedAt/CreatedBy on every CreationAuditedEntity (add)
-//   - ModifiedAt/ModifiedBy on every AuditedEntity (modify)
-//   - TenantId on every IMultiTenant entity without a defined tenant (add)
-//
-// HDS compliance: every modification is tracked with the user and timestamp.
-// Multi-tenant isolation is guaranteed at the persistence layer.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
 using DigitalDynamics.Foundation.MultiTenancy;
@@ -26,24 +14,16 @@ namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 /// on entities inheriting from <see cref="CreationAuditedEntity"/>,
 /// and the <see cref="IMultiTenant.TenantId"/> on multi-tenant entities.
 /// </summary>
-public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
+public sealed class AuditedEntityInterceptor(
+    ICurrentUserService currentUserService,
+    IClock clock,
+    IGuidGenerator guidGenerator,
+    ICurrentTenant currentTenant) : SaveChangesInterceptor
 {
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IClock _clock;
-    private readonly IGuidGenerator _guidGenerator;
-    private readonly ICurrentTenant _currentTenant;
-
-    public AuditedEntityInterceptor(
-        ICurrentUserService currentUserService,
-        IClock clock,
-        IGuidGenerator guidGenerator,
-        ICurrentTenant currentTenant)
-    {
-        _currentUserService = currentUserService;
-        _clock = clock;
-        _guidGenerator = guidGenerator;
-        _currentTenant = currentTenant;
-    }
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly IClock _clock = clock;
+    private readonly IGuidGenerator _guidGenerator = guidGenerator;
+    private readonly ICurrentTenant _currentTenant = currentTenant;
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,

@@ -1,11 +1,3 @@
-// =============================================================================
-// EncryptionServiceCollectionExtensions - Service registration
-// =============================================================================
-// Usage:
-//   builder.Services.AddFoundationEncryption(
-//       builder.Configuration.GetSection(StringEncryptionOptions.SectionName));
-// =============================================================================
-
 using DigitalDynamics.Foundation.Encryption.Providers;
 using DigitalDynamics.Foundation.Encryption.Services;
 using Microsoft.Extensions.Configuration;

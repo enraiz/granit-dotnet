@@ -1,13 +1,3 @@
-// =============================================================================
-// VaultClientFactory - VaultSharp client creation with authentication
-// =============================================================================
-// Supports two authentication methods:
-//   - Kubernetes (production): uses the ServiceAccount token
-//   - Token (development): uses a static token
-//
-// In production, Kubernetes authentication is REQUIRED.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -22,21 +12,14 @@ namespace DigitalDynamics.Foundation.Vault.Services;
 /// <summary>
 /// Factory for creating a VaultSharp client with the configured authentication method.
 /// </summary>
-public sealed partial class VaultClientFactory
+public sealed partial class VaultClientFactory(
+    IOptions<VaultOptions> options,
+    ILogger<VaultClientFactory> logger,
+    IStringLocalizer<VaultLocalizationResource> localizer)
 {
-    private readonly VaultOptions _options;
-    private readonly ILogger<VaultClientFactory> _logger;
-    private readonly IStringLocalizer<VaultLocalizationResource> _localizer;
-
-    public VaultClientFactory(
-        IOptions<VaultOptions> options,
-        ILogger<VaultClientFactory> logger,
-        IStringLocalizer<VaultLocalizationResource> localizer)
-    {
-        _options = options.Value;
-        _logger = logger;
-        _localizer = localizer;
-    }
+    private readonly VaultOptions _options = options.Value;
+    private readonly ILogger<VaultClientFactory> _logger = logger;
+    private readonly IStringLocalizer<VaultLocalizationResource> _localizer = localizer;
 
     /// <summary>Creates an authenticated VaultSharp client.</summary>
     public IVaultClient Create()

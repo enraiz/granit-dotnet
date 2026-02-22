@@ -1,10 +1,3 @@
-// =============================================================================
-// ITenantResolver - Contract for resolving the current tenant
-// =============================================================================
-// Implemented by HeaderTenantResolver and JwtClaimTenantResolver.
-// Resolution order is determined by the Order property (ascending).
-// =============================================================================
-
 using Microsoft.AspNetCore.Http;
 
 namespace DigitalDynamics.Foundation.MultiTenancy.Resolvers;

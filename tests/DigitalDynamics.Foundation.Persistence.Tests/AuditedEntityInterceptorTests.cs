@@ -288,7 +288,7 @@ public sealed class AuditedEntityInterceptorTests
     public async Task SaveChangesAsync_MultiTenant_OnAdd_DoesNotOverwriteExistingTenantId()
     {
         // Arrange — TenantId déjà défini explicitement (migration, import)
-        Guid explicitTenant = Guid.NewGuid();
+        var explicitTenant = Guid.NewGuid();
         _currentTenant.Id.Returns((Guid?)TenantId);
         await using TestDbContext context = CreateContext();
         TestMultiTenantEntity entity = new() { Name = "Import", TenantId = explicitTenant };
@@ -336,9 +336,8 @@ public sealed class AuditedEntityInterceptorTests
         public Guid? TenantId { get; set; }
     }
 
-    private sealed class TestDbContext : DbContext
+    private sealed class TestDbContext(DbContextOptions<AuditedEntityInterceptorTests.TestDbContext> options) : DbContext(options)
     {
-        public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
         public DbSet<TestCreationAuditedEntity> CreationAuditedEntities => Set<TestCreationAuditedEntity>();
         public DbSet<TestAuditedEntity> AuditedEntities => Set<TestAuditedEntity>();
         public DbSet<TestFullAuditedEntity> FullAuditedEntities => Set<TestFullAuditedEntity>();

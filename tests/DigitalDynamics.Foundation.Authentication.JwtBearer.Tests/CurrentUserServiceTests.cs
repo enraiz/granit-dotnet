@@ -75,7 +75,7 @@ public sealed class CurrentUserServiceTests
             new Claim(ClaimTypes.Role, "practitioner"));
 
         // Act & Assert
-        sut.Roles.Should().BeEquivalentTo(new[] { "admin", "practitioner" });
+        sut.Roles.Should().BeEquivalentTo(["admin", "practitioner"]);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class CurrentUserServiceTests
         // Arrange
         IHttpContextAccessor accessor = Substitute.For<IHttpContextAccessor>();
         accessor.HttpContext.Returns((HttpContext?)null);
-        CurrentUserService sut = new CurrentUserService(accessor);
+        var sut = new CurrentUserService(accessor);
 
         // Act & Assert
         sut.UserId.Should().BeNull();
@@ -114,10 +114,10 @@ public sealed class CurrentUserServiceTests
 
     private static CurrentUserService CreateService(string nameType, params Claim[] claims)
     {
-        ClaimsIdentity identity = new ClaimsIdentity(claims, "Bearer", nameType, ClaimTypes.Role);
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var identity = new ClaimsIdentity(claims, "Bearer", nameType, ClaimTypes.Role);
+        var principal = new ClaimsPrincipal(identity);
 
-        DefaultHttpContext httpContext = new DefaultHttpContext { User = principal };
+        var httpContext = new DefaultHttpContext { User = principal };
         IHttpContextAccessor accessor = Substitute.For<IHttpContextAccessor>();
         accessor.HttpContext.Returns(httpContext);
 

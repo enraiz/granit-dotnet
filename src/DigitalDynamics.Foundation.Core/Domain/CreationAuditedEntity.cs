@@ -1,15 +1,3 @@
-// =============================================================================
-// CreationAuditedEntity - Entity with HDS creation traceability
-// =============================================================================
-// Adds creation fields (CreatedAt, CreatedBy) to Entity.
-// Suited for immutable entities (audit entries, transactions, consents).
-//
-// Fields are populated automatically by AuditedEntityInterceptor
-// in the Persistence package.
-//
-// HDS compliance: creation traceability with user and timestamp.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>

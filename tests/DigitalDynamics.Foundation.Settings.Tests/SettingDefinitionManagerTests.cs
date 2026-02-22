@@ -94,7 +94,7 @@ public sealed class SettingDefinitionManagerTests
         SettingDefinition added = new("App.Theme");
         SettingDefinition? capturedFromContext = null;
 
-        FakeProvider provider = new FakeProvider(added);
+        var provider = new FakeProvider(added);
 
         // On utilise un provider qui consulte le contexte pendant Define()
         SettingDefinitionManager manager = new([

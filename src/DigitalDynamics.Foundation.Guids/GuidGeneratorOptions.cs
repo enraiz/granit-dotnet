@@ -15,8 +15,5 @@ public sealed class GuidGeneratorOptions
     /// Returns the configured sequential type or <see cref="SequentialGuidType.SequentialAsString"/>
     /// by default (optimized for PostgreSQL).
     /// </summary>
-    public SequentialGuidType GetDefaultSequentialGuidType()
-    {
-        return DefaultSequentialGuidType ?? SequentialGuidType.SequentialAsString;
-    }
+    public SequentialGuidType GetDefaultSequentialGuidType() => DefaultSequentialGuidType ?? SequentialGuidType.SequentialAsString;
 }

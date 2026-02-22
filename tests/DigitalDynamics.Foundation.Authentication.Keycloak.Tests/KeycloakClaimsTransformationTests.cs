@@ -30,13 +30,13 @@ public sealed class KeycloakClaimsTransformationTests
     {
         // Arrange
         string realmAccess = """{"roles":["admin","practitioner"]}""";
-        ClaimsIdentity identity = new ClaimsIdentity(
+        var identity = new ClaimsIdentity(
             [
                 new Claim("sub", "user-123"),
                 new Claim("realm_access", realmAccess)
             ],
             "Bearer");
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var principal = new ClaimsPrincipal(identity);
 
         // Act
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
@@ -52,13 +52,13 @@ public sealed class KeycloakClaimsTransformationTests
     {
         // Arrange
         string resourceAccess = """{"test-client":{"roles":["admin"]}}""";
-        ClaimsIdentity identity = new ClaimsIdentity(
+        var identity = new ClaimsIdentity(
             [
                 new Claim("sub", "user-123"),
                 new Claim("resource_access", resourceAccess)
             ],
             "Bearer");
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var principal = new ClaimsPrincipal(identity);
 
         // Act
         ClaimsPrincipal result = await CreateSut(roleClaimsSource: "resource_access").TransformAsync(principal);
@@ -72,10 +72,10 @@ public sealed class KeycloakClaimsTransformationTests
     public async Task TransformAsync_WithoutRealmAccess_ReturnsUnmodifiedPrincipal()
     {
         // Arrange
-        ClaimsIdentity identity = new ClaimsIdentity(
+        var identity = new ClaimsIdentity(
             [new Claim("sub", "user-123")],
             "Bearer");
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var principal = new ClaimsPrincipal(identity);
 
         // Act
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
@@ -88,8 +88,8 @@ public sealed class KeycloakClaimsTransformationTests
     public async Task TransformAsync_WithUnauthenticatedPrincipal_ReturnsUnmodifiedPrincipal()
     {
         // Arrange — no AuthenticationType → IsAuthenticated = false
-        ClaimsIdentity identity = new ClaimsIdentity();
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var identity = new ClaimsIdentity();
+        var principal = new ClaimsPrincipal(identity);
 
         // Act
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
@@ -104,13 +104,13 @@ public sealed class KeycloakClaimsTransformationTests
     {
         // Arrange
         string realmAccess = """{"roles":[]}""";
-        ClaimsIdentity identity = new ClaimsIdentity(
+        var identity = new ClaimsIdentity(
             [
                 new Claim("sub", "user-123"),
                 new Claim("realm_access", realmAccess)
             ],
             "Bearer");
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var principal = new ClaimsPrincipal(identity);
 
         // Act
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
@@ -124,14 +124,14 @@ public sealed class KeycloakClaimsTransformationTests
     {
         // Arrange
         string realmAccess = """{"roles":["admin"]}""";
-        ClaimsIdentity identity = new ClaimsIdentity(
+        var identity = new ClaimsIdentity(
             [
                 new Claim("sub", "user-123"),
                 new Claim(ClaimTypes.Role, "admin"),
                 new Claim("realm_access", realmAccess)
             ],
             "Bearer");
-        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        var principal = new ClaimsPrincipal(identity);
 
         // Act
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);

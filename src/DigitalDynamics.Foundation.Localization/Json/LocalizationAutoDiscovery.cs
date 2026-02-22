@@ -61,7 +61,7 @@ internal static class LocalizationAutoDiscovery
         }
         catch (ReflectionTypeLoadException ex)
         {
-            types = ex.Types.OfType<Type>().ToArray();
+            types = [.. ex.Types.OfType<Type>()];
         }
 
         foreach (Type type in types)
@@ -90,13 +90,11 @@ internal static class LocalizationAutoDiscovery
             }
 
             // Detect parent types via [InheritResource]
-            InheritResourceAttribute[] inheritAttrs =
+            var inheritAttrs =
                 (InheritResourceAttribute[])type.GetCustomAttributes(
                     typeof(InheritResourceAttribute), inherit: true);
 
-            Type[] baseTypes = inheritAttrs
-                .SelectMany(a => a.BaseResourceTypes)
-                .ToArray();
+            Type[] baseTypes = [.. inheritAttrs.SelectMany(a => a.BaseResourceTypes)];
 
             LocalizationResourceInfo info = options.Resources
                 .Add(type, attr.DefaultCulture)

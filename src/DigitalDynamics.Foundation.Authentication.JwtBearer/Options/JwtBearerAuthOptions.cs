@@ -1,20 +1,3 @@
-// =============================================================================
-// JwtBearerAuthOptions - Generic JWT Bearer (OIDC) configuration
-// =============================================================================
-// Bound from the "Authentication" section of configuration (IOptions<T> pattern).
-//
-// Example appsettings.json:
-//   "Authentication": {
-//     "Authority": "https://idp.example.com/realms/myrealm",
-//     "Audience": "my-client",
-//     "RequireHttpsMetadata": true,
-//     "NameClaimType": "sub"
-//   }
-//
-// For Keycloak: use FoundationAuthenticationKeycloakModule
-// (reads the "Keycloak" section, reconfigures JWT Bearer via PostConfigure).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Options;
 
 /// <summary>

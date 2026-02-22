@@ -43,7 +43,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddFoundationKeycloak_RegistersKeycloakOptions()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
         services.AddFoundationJwtBearer(config);
 
@@ -63,7 +63,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddFoundationKeycloak_PostConfiguresJwtBearer_WithKeycloakValues()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
         services.AddFoundationJwtBearer(config);
 
@@ -85,7 +85,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddFoundationKeycloak_WithCustomAudience_UsesAudienceOverClientId()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
@@ -113,7 +113,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddFoundationKeycloak_RegistersClaimsTransformation()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
         services.AddFoundationJwtBearer(config);
 
@@ -121,7 +121,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
         services.AddFoundationKeycloak(config);
 
         // Assert
-        List<ServiceDescriptor> descriptors = services
+        var descriptors = services
             .Where(d => d.ServiceType == typeof(IClaimsTransformation))
             .ToList();
 
@@ -132,7 +132,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddFoundationKeycloak_RegistersAdminPolicy()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateConfiguration(adminRole: "superadmin");
         services.AddFoundationJwtBearer(config);
 

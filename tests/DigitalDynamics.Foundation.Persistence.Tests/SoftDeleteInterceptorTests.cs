@@ -64,7 +64,7 @@ public sealed class SoftDeleteInterceptorTests
         entity.DeletedBy.Should().Be("user-test-123");
 
         // Verify the entity still exists in the database (not physically deleted)
-        var count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
+        int count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
         count.Should().Be(1);
     }
 
@@ -116,14 +116,10 @@ public sealed class SoftDeleteInterceptorTests
         public string? DeletedBy { get; set; }
     }
 
-    private sealed class TestDbContext : DbContext
+    private sealed class TestDbContext(DbContextOptions<SoftDeleteInterceptorTests.TestDbContext> options) : DbContext(options)
     {
-        public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
         public DbSet<TestSoftDeletableEntity> Entities => Set<TestSoftDeletableEntity>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<TestSoftDeletableEntity>().Property(e => e.Id).ValueGeneratedNever();
-        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.Entity<TestSoftDeletableEntity>().Property(e => e.Id).ValueGeneratedNever();
     }
 }

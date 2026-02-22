@@ -1,15 +1,3 @@
-// =============================================================================
-// UserSettingValueProvider - User setting provider (level U)
-// =============================================================================
-// Reads/writes ISettingStore for the user scope (providerKey = UserId).
-// Returns null when no user is authenticated in the current context.
-// Caches values via ICacheService<SettingValue>.
-// Precedence: User > Tenant > Global > Configuration > Default
-//
-// Inputs  : ICurrentUserService, ISettingStore, ICacheService<SettingValue>, SettingsOptions
-// Outputs : SettingValue(Name, "U", userId, value) or null if absent/unauthenticated
-// =============================================================================
-
 using DigitalDynamics.Foundation.Caching;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Settings.Definitions;
@@ -24,27 +12,19 @@ namespace DigitalDynamics.Foundation.Settings.Providers;
 /// User settings provider (isolated per current user via <see cref="ICurrentUserService"/>).
 /// Caches values read from <see cref="ISettingStore"/> (order = 100).
 /// </summary>
-public sealed class UserSettingValueProvider : ISettingValueProvider
+public sealed class UserSettingValueProvider(
+    ICurrentUserService currentUser,
+    ISettingStore store,
+    ICacheService<SettingValue> cache,
+    IOptions<SettingsOptions> options) : ISettingValueProvider
 {
     /// <summary>User provider identifier.</summary>
     public const string ProviderName = "U";
 
-    private readonly ICurrentUserService _currentUser;
-    private readonly ISettingStore _store;
-    private readonly ICacheService<SettingValue> _cache;
-    private readonly IOptions<SettingsOptions> _options;
-
-    public UserSettingValueProvider(
-        ICurrentUserService currentUser,
-        ISettingStore store,
-        ICacheService<SettingValue> cache,
-        IOptions<SettingsOptions> options)
-    {
-        _currentUser = currentUser;
-        _store = store;
-        _cache = cache;
-        _options = options;
-    }
+    private readonly ICurrentUserService _currentUser = currentUser;
+    private readonly ISettingStore _store = store;
+    private readonly ICacheService<SettingValue> _cache = cache;
+    private readonly IOptions<SettingsOptions> _options = options;
 
     /// <inheritdoc/>
     public string Name => ProviderName;

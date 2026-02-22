@@ -71,7 +71,7 @@ public sealed class FoundationMultiTenancyModuleTests
     {
         using WebApplication app = BuildApp();
 
-        List<ITenantResolver> ordered = app.Services
+        var ordered = app.Services
             .GetRequiredService<IEnumerable<ITenantResolver>>()
             .OrderBy(r => r.Order)
             .ToList();
@@ -112,7 +112,7 @@ public sealed class FoundationMultiTenancyModuleTests
     {
         using WebApplication app = BuildApp();
         ICurrentTenant currentTenant = app.Services.GetRequiredService<ICurrentTenant>();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         currentTenant.IsAvailable.Should().BeFalse("no active tenant at startup");
 
@@ -131,8 +131,8 @@ public sealed class FoundationMultiTenancyModuleTests
     {
         using WebApplication app = BuildApp();
         ICurrentTenant currentTenant = app.Services.GetRequiredService<ICurrentTenant>();
-        Guid outer = Guid.NewGuid();
-        Guid inner = Guid.NewGuid();
+        var outer = Guid.NewGuid();
+        var inner = Guid.NewGuid();
 
         using (currentTenant.Change(outer, "Outer"))
         {

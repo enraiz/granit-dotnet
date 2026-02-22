@@ -36,7 +36,7 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddFoundationVault_RegistersVaultOptions()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateVaultConfiguration();
 
         // Act
@@ -55,7 +55,7 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddFoundationVault_RegistersVaultClient()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         services.AddLogging();
         IConfiguration config = CreateVaultConfiguration();
 
@@ -73,7 +73,7 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddFoundationVault_RegistersDatabaseCredentialProvider()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateVaultConfiguration();
 
         // Act
@@ -91,7 +91,7 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddFoundationVault_RegistersHostedService()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateVaultConfiguration();
 
         // Act
@@ -108,7 +108,7 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddFoundationVault_RegistersTransitEncryptionService()
     {
         // Arrange
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
         IConfiguration config = CreateVaultConfiguration();
 
         // Act

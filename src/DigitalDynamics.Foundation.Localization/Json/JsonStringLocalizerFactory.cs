@@ -44,7 +44,7 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
     public IStringLocalizer Create(string baseName, string location)
     {
         // Try to resolve the type from the fully-qualified name
-        Type? resourceType = Type.GetType($"{baseName}, {location}");
+        var resourceType = Type.GetType($"{baseName}, {location}");
         if (resourceType is not null)
         {
             return Create(resourceType);
@@ -75,7 +75,7 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
         }
 
         // Check [InheritResource] attributes on the marker class
-        Attributes.InheritResourceAttribute[] inheritAttributes =
+        var inheritAttributes =
             (Attributes.InheritResourceAttribute[])resourceType
                 .GetCustomAttributes(typeof(Attributes.InheritResourceAttribute), true);
 

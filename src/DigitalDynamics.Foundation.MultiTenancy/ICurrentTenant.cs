@@ -1,15 +1,3 @@
-// =============================================================================
-// ICurrentTenant - Access to the current tenant
-// =============================================================================
-// Abstraction for reading and overriding the tenant context in the async flow.
-//
-// Implementation: CurrentTenant (AsyncLocal, in this package).
-// Typical usage: injected into services that require tenant isolation.
-//
-// IDisposable.Change() allows temporarily overriding the current tenant
-// (tests, background jobs, multi-tenant workers).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>

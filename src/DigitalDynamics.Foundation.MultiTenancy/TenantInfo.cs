@@ -1,7 +1,3 @@
-// =============================================================================
-// TenantInfo - Resolved tenant data
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>

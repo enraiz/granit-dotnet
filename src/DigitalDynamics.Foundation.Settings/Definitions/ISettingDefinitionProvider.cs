@@ -1,10 +1,3 @@
-// =============================================================================
-// ISettingDefinitionProvider - Extension point for declaring settings
-// =============================================================================
-// Implement this interface in each module to declare its settings.
-// Register with services.AddSettingDefinitionProvider<T>().
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>

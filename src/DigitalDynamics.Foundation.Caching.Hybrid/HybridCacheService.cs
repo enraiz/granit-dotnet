@@ -35,30 +35,22 @@ namespace DigitalDynamics.Foundation.Caching.Hybrid;
 /// </para>
 /// </remarks>
 /// <typeparam name="TCacheItem">Type de l'élément mis en cache. Doit être une classe.</typeparam>
-public partial class HybridCacheService<TCacheItem> : ICacheService<TCacheItem>
+/// <remarks>
+/// Initialise une nouvelle instance de <see cref="HybridCacheService{TCacheItem}"/>.
+/// </remarks>
+/// <param name="hybridCache">Cache hybride L1+L2 fourni par le runtime .NET 9.</param>
+/// <param name="options">Options globales du cache.</param>
+/// <param name="logger">Logger structuré.</param>
+public partial class HybridCacheService<TCacheItem>(
+    HybridCache hybridCache,
+    IOptions<CachingOptions> options,
+    ILogger<HybridCacheService<TCacheItem>> logger) : ICacheService<TCacheItem>
     where TCacheItem : class
 {
-    private readonly HybridCache _hybridCache;
-    private readonly IOptions<CachingOptions> _options;
-    private readonly ILogger<HybridCacheService<TCacheItem>> _logger;
-    private readonly string _cacheName;
-
-    /// <summary>
-    /// Initialise une nouvelle instance de <see cref="HybridCacheService{TCacheItem}"/>.
-    /// </summary>
-    /// <param name="hybridCache">Cache hybride L1+L2 fourni par le runtime .NET 9.</param>
-    /// <param name="options">Options globales du cache.</param>
-    /// <param name="logger">Logger structuré.</param>
-    public HybridCacheService(
-        HybridCache hybridCache,
-        IOptions<CachingOptions> options,
-        ILogger<HybridCacheService<TCacheItem>> logger)
-    {
-        _hybridCache = hybridCache;
-        _options = options;
-        _logger = logger;
-        _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
-    }
+    private readonly HybridCache _hybridCache = hybridCache;
+    private readonly IOptions<CachingOptions> _options = options;
+    private readonly ILogger<HybridCacheService<TCacheItem>> _logger = logger;
+    private readonly string _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
 
     /// <inheritdoc/>
     public async Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default)

@@ -1,13 +1,3 @@
-// =============================================================================
-// DefaultValueSettingValueProvider - Default value provider (level D)
-// =============================================================================
-// Returns SettingDefinition.DefaultValue. Last link in the cascade.
-// No store, no cache — the value is static (declared at compile time).
-//
-// Input  : SettingDefinition.DefaultValue
-// Output : SettingValue(Name, "D", null, DefaultValue) or null if DefaultValue is null
-// =============================================================================
-
 using DigitalDynamics.Foundation.Settings.Definitions;
 using DigitalDynamics.Foundation.Settings.Values;
 

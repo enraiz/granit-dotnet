@@ -1,18 +1,3 @@
-// =============================================================================
-// AesStringEncryptionProvider - AES-256-CBC encryption with PBKDF2
-// =============================================================================
-// Implements IStringEncryptionProvider via AES-256-CBC + PBKDF2 (SHA-256).
-//
-// HDS security (CWE-329):
-//   - 16-byte IV generated randomly for each encryption
-//   - Key derived ONCE at startup (PBKDF2 + fixed internal salt)
-//   - Output format: Base64(IV[16] || CipherText)
-//   - PassPhrase MUST come from Vault — never hardcoded
-//
-// Inputs  : plainText (string), configuration via IOptions<StringEncryptionOptions>
-// Outputs : Base64 string (encrypt) | plainText | null on error (decrypt)
-// =============================================================================
-
 using System.Security.Cryptography;
 using System.Text;
 using DigitalDynamics.Foundation.Encryption;
@@ -68,7 +53,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         byte[] iv = RandomNumberGenerator.GetBytes(IvSize);
         byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
 
-        using Aes aes = Aes.Create();
+        using var aes = Aes.Create();
         aes.Key = _key;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;
@@ -111,7 +96,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         byte[] iv = input[..IvSize];
         byte[] cipherBytes = input[IvSize..];
 
-        using Aes aes = Aes.Create();
+        using var aes = Aes.Create();
         aes.Key = _key;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;

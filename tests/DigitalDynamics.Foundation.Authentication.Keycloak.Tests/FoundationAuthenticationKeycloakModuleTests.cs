@@ -60,7 +60,7 @@ public sealed class FoundationAuthenticationKeycloakModuleTests
         module.ConfigureServices(context);
 
         // Assert
-        List<ServiceDescriptor> descriptors = builder.Services
+        var descriptors = builder.Services
             .Where(d => d.ServiceType == typeof(IClaimsTransformation))
             .ToList();
 

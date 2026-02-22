@@ -1,15 +1,3 @@
-// =============================================================================
-// TenantSettingValueProvider - Tenant setting provider (level T)
-// =============================================================================
-// Reads/writes ISettingStore for the tenant scope (providerKey = tenantId.ToString()).
-// Returns null when no tenant is active in the current context.
-// Caches values via ICacheService<SettingValue>.
-// Precedence: User > Tenant > Global > Configuration > Default
-//
-// Inputs  : ICurrentTenant, ISettingStore, ICacheService<SettingValue>, SettingsOptions
-// Outputs : SettingValue(Name, "T", tenantId, value) or null if absent/outside tenant
-// =============================================================================
-
 using DigitalDynamics.Foundation.Caching;
 using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Settings.Definitions;
@@ -24,27 +12,19 @@ namespace DigitalDynamics.Foundation.Settings.Providers;
 /// Tenant settings provider (isolated per current tenant via <see cref="ICurrentTenant"/>).
 /// Caches values read from <see cref="ISettingStore"/> (order = 200).
 /// </summary>
-public sealed class TenantSettingValueProvider : ISettingValueProvider
+public sealed class TenantSettingValueProvider(
+    ICurrentTenant currentTenant,
+    ISettingStore store,
+    ICacheService<SettingValue> cache,
+    IOptions<SettingsOptions> options) : ISettingValueProvider
 {
     /// <summary>Tenant provider identifier.</summary>
     public const string ProviderName = "T";
 
-    private readonly ICurrentTenant _currentTenant;
-    private readonly ISettingStore _store;
-    private readonly ICacheService<SettingValue> _cache;
-    private readonly IOptions<SettingsOptions> _options;
-
-    public TenantSettingValueProvider(
-        ICurrentTenant currentTenant,
-        ISettingStore store,
-        ICacheService<SettingValue> cache,
-        IOptions<SettingsOptions> options)
-    {
-        _currentTenant = currentTenant;
-        _store = store;
-        _cache = cache;
-        _options = options;
-    }
+    private readonly ICurrentTenant _currentTenant = currentTenant;
+    private readonly ISettingStore _store = store;
+    private readonly ICacheService<SettingValue> _cache = cache;
+    private readonly IOptions<SettingsOptions> _options = options;
 
     /// <inheritdoc/>
     public string Name => ProviderName;

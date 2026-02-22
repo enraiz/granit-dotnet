@@ -1,13 +1,3 @@
-// =============================================================================
-// MultiTenancyApplicationBuilderExtensions - Middleware registration
-// =============================================================================
-// Call in Program.cs, after UseAuthentication and before UseAuthorization:
-//
-//   app.UseAuthentication();
-//   app.UseFoundationMultiTenancy();   // resolves the tenant from JWT or header
-//   app.UseAuthorization();
-// =============================================================================
-
 using DigitalDynamics.Foundation.MultiTenancy.Middleware;
 using Microsoft.AspNetCore.Builder;
 

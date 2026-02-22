@@ -127,14 +127,14 @@ public sealed class ModelBuilderExtensionsTests
         // Arrange — filtre compilé et invoqué directement, sans pipeline EF Core InMemory
         // (le partial evaluator d'EF Core peut capturer la valeur au moment de la compilation
         // de requête ; la compilation directe via Compile() garantit la dynamicité de la closure)
-        Guid tenantA = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
         SharedTenant.Id = tenantA;
 
         using TestMultiTenantDbContext context = CreateMultiTenantContext();
         LambdaExpression? filter = context.Model.FindEntityType(typeof(TestTenantEntity))?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
         filter.Should().NotBeNull();
 
-        Func<TestTenantEntity, bool> compiled = (Func<TestTenantEntity, bool>)filter!.Compile();
+        var compiled = (Func<TestTenantEntity, bool>)filter!.Compile();
 
         // Assert — entité du tenant actuel : passe le filtre
         compiled(new TestTenantEntity { TenantId = tenantA }).Should().BeTrue("entité du tenant courant");
@@ -147,18 +147,18 @@ public sealed class ModelBuilderExtensionsTests
     {
         // Arrange — vérifie que la closure réévalue dynamiquement currentTenant.Id
         // (comportement identique à la production avec ICurrentTenant AsyncLocal)
-        Guid tenantA = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
         SharedTenant.Id = tenantA;
 
         using TestMultiTenantDbContext context = CreateMultiTenantContext();
         LambdaExpression? filter = context.Model.FindEntityType(typeof(TestTenantEntity))?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
-        Func<TestTenantEntity, bool> compiled = (Func<TestTenantEntity, bool>)filter!.Compile();
+        var compiled = (Func<TestTenantEntity, bool>)filter!.Compile();
 
         // Premier tenant actif
         compiled(new TestTenantEntity { TenantId = tenantA }).Should().BeTrue();
 
         // Changer le tenant (simule un changement de contexte AsyncLocal)
-        Guid tenantB = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         SharedTenant.Id = tenantB;
 
         // Assert — le filtre s'adapte dynamiquement
@@ -235,10 +235,8 @@ internal sealed class TestTenantEntity : IMultiTenant
     public Guid? TenantId { get; set; }
 }
 
-internal sealed class TestDbContext : DbContext
+internal sealed class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
 {
-    public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
-
     public DbSet<TestProduct> Products => Set<TestProduct>();
     public DbSet<TestCategory> Categories => Set<TestCategory>();
 
@@ -246,15 +244,9 @@ internal sealed class TestDbContext : DbContext
         modelBuilder.ApplyFoundationConventions();
 }
 
-internal sealed class TestMultiTenantDbContext : DbContext
+internal sealed class TestMultiTenantDbContext(DbContextOptions<TestMultiTenantDbContext> options, ICurrentTenant currentTenant) : DbContext(options)
 {
-    private readonly ICurrentTenant _currentTenant;
-
-    public TestMultiTenantDbContext(DbContextOptions<TestMultiTenantDbContext> options, ICurrentTenant currentTenant)
-        : base(options)
-    {
-        _currentTenant = currentTenant;
-    }
+    private readonly ICurrentTenant _currentTenant = currentTenant;
 
     public DbSet<TestTenantEntity> TenantEntities => Set<TestTenantEntity>();
 
@@ -263,11 +255,8 @@ internal sealed class TestMultiTenantDbContext : DbContext
 }
 
 // DbContext sans filtre multi-tenant (currentTenant non fourni)
-internal sealed class TestMultiTenantDbContextWithoutFilter : DbContext
+internal sealed class TestMultiTenantDbContextWithoutFilter(DbContextOptions<TestMultiTenantDbContextWithoutFilter> options) : DbContext(options)
 {
-    public TestMultiTenantDbContextWithoutFilter(DbContextOptions<TestMultiTenantDbContextWithoutFilter> options)
-        : base(options) { }
-
     public DbSet<TestTenantEntity> TenantEntities => Set<TestTenantEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>

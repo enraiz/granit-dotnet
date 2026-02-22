@@ -1,19 +1,3 @@
-// =============================================================================
-// SettingsServiceCollectionExtensions - DI registration for the Settings module
-// =============================================================================
-// Usage:
-//   builder.Services.AddFoundationSettings(
-//       builder.Configuration.GetSection(SettingsOptions.SectionName));
-//
-// Registered services:
-//   - SettingDefinitionManager       (Singleton)
-//   - ISettingStore                  → InMemorySettingStore (Singleton, replaceable)
-//   - ISettingValueProvider[D,C,G,T,U] (Singleton)
-//   - SettingValueProviderManager    (Singleton)
-//   - ISettingProvider               → SettingProvider (Scoped)
-//   - ISettingManager                → SettingManager  (Scoped)
-// =============================================================================
-
 using DigitalDynamics.Foundation.Settings.Definitions;
 using DigitalDynamics.Foundation.Settings.Options;
 using DigitalDynamics.Foundation.Settings.Providers;

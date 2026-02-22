@@ -1,16 +1,3 @@
-// =============================================================================
-// ICurrentTimezoneProvider - Current user's timezone
-// =============================================================================
-// Carries the timezone of the current request via AsyncLocal.
-// Allows IClock.ConvertToUserTime() to know the target timezone.
-//
-// The timezone is an IANA identifier (e.g. "Europe/Brussels", "America/New_York")
-// or a Windows identifier (e.g. "Romance Standard Time"). TimeZoneInfo.FindSystemTimeZoneById()
-// accepts both formats on .NET 6+.
-//
-// Inspired by Volo.Abp.Timing.ICurrentTimezoneProvider.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Timing;
 
 /// <summary>

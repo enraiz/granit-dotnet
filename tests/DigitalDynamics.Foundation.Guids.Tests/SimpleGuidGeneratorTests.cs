@@ -18,7 +18,7 @@ public sealed class SimpleGuidGeneratorTests
     public void Create_ReturnsNonEmptyGuid()
     {
         // Arrange
-        SimpleGuidGenerator generator = new SimpleGuidGenerator();
+        var generator = new SimpleGuidGenerator();
 
         // Act
         Guid guid = generator.Create();
@@ -31,7 +31,7 @@ public sealed class SimpleGuidGeneratorTests
     public void Create_GeneratesUniqueGuids()
     {
         // Arrange
-        SimpleGuidGenerator generator = new SimpleGuidGenerator();
+        var generator = new SimpleGuidGenerator();
 
         // Act
         Guid guid1 = generator.Create();

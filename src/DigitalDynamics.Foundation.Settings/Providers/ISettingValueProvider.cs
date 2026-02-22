@@ -1,14 +1,3 @@
-// =============================================================================
-// ISettingValueProvider - Abstraction for a setting value provider
-// =============================================================================
-// Each provider represents a level in the resolution cascade:
-//   User (U, order=100) → Tenant (T, 200) → Global (G, 300)
-//   → Configuration (C, 400) → Default (D, 500)
-//
-// Store providers (G, T, U) use ISettingStore + ICacheService<SettingValue>.
-// Static providers (C, D) read IConfiguration or SettingDefinition.DefaultValue.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Settings.Definitions;
 using DigitalDynamics.Foundation.Settings.Values;
 

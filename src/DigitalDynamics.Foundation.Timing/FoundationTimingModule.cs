@@ -1,7 +1,3 @@
-// =============================================================================
-// FoundationTimingModule - Module Foundation pour IClock et TimeProvider
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Timing.Extensions;
 

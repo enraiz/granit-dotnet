@@ -1,14 +1,3 @@
-// =============================================================================
-// MultiTenancyServiceCollectionExtensions - Service registration
-// =============================================================================
-// Usage:
-//   builder.Services.AddFoundationMultiTenancy(
-//       builder.Configuration.GetSection(MultiTenancyOptions.SectionName));
-//
-// Then in the pipeline:
-//   app.UseFoundationMultiTenancy();  // before UseAuthorization
-// =============================================================================
-
 using DigitalDynamics.Foundation.MultiTenancy.Middleware;
 using DigitalDynamics.Foundation.MultiTenancy.Pipeline;
 using DigitalDynamics.Foundation.MultiTenancy.Resolvers;

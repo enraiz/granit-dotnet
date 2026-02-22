@@ -1,19 +1,3 @@
-// =============================================================================
-// KeycloakOptions - Keycloak OIDC authentication configuration
-// =============================================================================
-// Bound from the "Keycloak" section of configuration (IOptions<T> pattern).
-//
-// Example appsettings.json:
-//   "Keycloak": {
-//     "Authority": "https://keycloak.example.com/realms/my-realm",
-//     "ClientId": "my-client",
-//     "ClientSecret": "***",
-//     "RequireHttpsMetadata": true,
-//     "AdminRole": "admin",
-//     "RoleClaimsSource": "realm_access"
-//   }
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Authentication.Keycloak.Options;
 
 /// <summary>

@@ -1,16 +1,3 @@
-// =============================================================================
-// VaultStringEncryptionProvider - Chiffrement via Vault Transit Engine
-// =============================================================================
-// Implémente IStringEncryptionProvider en déléguant à ITransitEncryptionService.
-// Utilise l'engine Transit de Vault pour les opérations rares à haute sécurité.
-//
-// Latence : 10-20 ms (appel réseau Vault). À réserver pour les cas critiques.
-// Pour les opérations fréquentes, préférer AesStringEncryptionProvider (< 1 ms).
-//
-// Inputs  : plainText/cipherText (string), configuration via IOptions<StringEncryptionOptions>
-// Outputs : string vault:v1:... (encrypt) | plaintext | null si erreur (decrypt)
-// =============================================================================
-
 using DigitalDynamics.Foundation.Encryption;
 using Microsoft.Extensions.Options;
 
@@ -20,21 +7,15 @@ namespace DigitalDynamics.Foundation.Vault.Providers;
 /// Provider de chiffrement via Vault Transit Engine.
 /// Réservé aux opérations rares à haute sécurité.
 /// </summary>
-public sealed class VaultStringEncryptionProvider : IStringEncryptionProvider
+public sealed class VaultStringEncryptionProvider(
+    ITransitEncryptionService transitEncryption,
+    IOptions<StringEncryptionOptions> options) : IStringEncryptionProvider
 {
-    private readonly ITransitEncryptionService _transitEncryption;
-    private readonly string _keyName;
+    private readonly ITransitEncryptionService _transitEncryption = transitEncryption;
+    private readonly string _keyName = options.Value.VaultKeyName;
 
     /// <inheritdoc/>
     public string ProviderName => StringEncryptionOptions.VaultProviderName;
-
-    public VaultStringEncryptionProvider(
-        ITransitEncryptionService transitEncryption,
-        IOptions<StringEncryptionOptions> options)
-    {
-        _transitEncryption = transitEncryption;
-        _keyName = options.Value.VaultKeyName;
-    }
 
     /// <inheritdoc/>
     public string Encrypt(string plainText) =>

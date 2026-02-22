@@ -1,18 +1,3 @@
-// =============================================================================
-// ModelBuilderExtensions - EF Core configuration for Foundation entities
-// =============================================================================
-// Applies global query filters (soft delete, multi-tenant) on the ModelBuilder.
-// Call in OnModelCreating of the application's DbContext.
-//
-// Usage in a module DbContext:
-//   protected override void OnModelCreating(ModelBuilder modelBuilder)
-//   {
-//       modelBuilder.HasDefaultSchema("auth");
-//       modelBuilder.ApplyFoundationConventions(_currentTenant);
-//       modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
-//   }
-// =============================================================================
-
 using System.Linq.Expressions;
 using System.Reflection;
 using DigitalDynamics.Foundation.Core.Domain;
@@ -73,7 +58,7 @@ public static class ModelBuilderExtensions
             .Where(entityType => typeof(IMultiTenant).IsAssignableFrom(entityType.ClrType)))
         {
             typeof(ModelBuilderExtensions)
-                .GetMethod(nameof(SetMultiTenantFilter), BindingFlags.Static | BindingFlags.NonPublic)!
+                .GetMethod(nameof(SetMultiTenantFilter), BindingFlags.Static | BindingFlags.NonPublic)! // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection
                 .MakeGenericMethod(entityType.ClrType)
                 .Invoke(null, [modelBuilder, currentTenant]);
         }

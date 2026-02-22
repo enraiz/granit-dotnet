@@ -1,14 +1,3 @@
-// =============================================================================
-// GlobalSettingValueProvider - Global setting provider (level G)
-// =============================================================================
-// Reads/writes ISettingStore for the global scope (providerKey = null).
-// Caches values via ICacheService<SettingValue> to avoid round-trips to the database.
-// Precedence: User > Tenant > Global > Configuration > Default
-//
-// Inputs  : ISettingStore, ICacheService<SettingValue>, SettingsOptions
-// Outputs : SettingValue(Name, "G", null, value) or null if absent
-// =============================================================================
-
 using DigitalDynamics.Foundation.Caching;
 using DigitalDynamics.Foundation.Settings.Definitions;
 using DigitalDynamics.Foundation.Settings.Options;
@@ -22,24 +11,17 @@ namespace DigitalDynamics.Foundation.Settings.Providers;
 /// Global settings provider (application scope, no tenant/user isolation).
 /// Caches values read from <see cref="ISettingStore"/> (order = 300).
 /// </summary>
-public sealed class GlobalSettingValueProvider : ISettingValueProvider
+public sealed class GlobalSettingValueProvider(
+    ISettingStore store,
+    ICacheService<SettingValue> cache,
+    IOptions<SettingsOptions> options) : ISettingValueProvider
 {
     /// <summary>Global provider identifier.</summary>
     public const string ProviderName = "G";
 
-    private readonly ISettingStore _store;
-    private readonly ICacheService<SettingValue> _cache;
-    private readonly IOptions<SettingsOptions> _options;
-
-    public GlobalSettingValueProvider(
-        ISettingStore store,
-        ICacheService<SettingValue> cache,
-        IOptions<SettingsOptions> options)
-    {
-        _store = store;
-        _cache = cache;
-        _options = options;
-    }
+    private readonly ISettingStore _store = store;
+    private readonly ICacheService<SettingValue> _cache = cache;
+    private readonly IOptions<SettingsOptions> _options = options;
 
     /// <inheritdoc/>
     public string Name => ProviderName;

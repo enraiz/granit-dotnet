@@ -1,13 +1,3 @@
-// =============================================================================
-// SettingDefinitionManager - Centralized registry of setting definitions
-// =============================================================================
-// Singleton. At startup, calls Define() on all registered ISettingDefinitionProvider
-// instances and consolidates the definitions into an immutable dictionary.
-//
-// Inputs  : IEnumerable<ISettingDefinitionProvider>
-// Outputs : SettingDefinition by name (Get / GetOrNull)
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Settings.Definitions;
 
 /// <summary>

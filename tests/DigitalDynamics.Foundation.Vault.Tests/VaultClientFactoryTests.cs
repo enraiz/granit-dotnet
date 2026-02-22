@@ -46,7 +46,7 @@ public sealed class VaultClientFactoryTests
             AuthMethod = "Token",
             Token = "dev-token-123"
         });
-        VaultClientFactory factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
+        var factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
 
         // Act
         IVaultClient client = factory.Create();
@@ -65,7 +65,7 @@ public sealed class VaultClientFactoryTests
             AuthMethod = "Token",
             Token = null
         });
-        VaultClientFactory factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
+        var factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
 
         // Act & Assert
         Action act = () => factory.Create();
@@ -82,7 +82,7 @@ public sealed class VaultClientFactoryTests
             Address = "http://localhost:8200",
             AuthMethod = "Unknown"
         });
-        VaultClientFactory factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
+        var factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
 
         // Act & Assert
         Action act = () => factory.Create();

@@ -6,13 +6,8 @@ namespace DigitalDynamics.Foundation.Core.Modularity;
 /// Multiple <see cref="DependsOnAttribute"/> attributes may be stacked.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-public sealed class DependsOnAttribute : Attribute
+public sealed class DependsOnAttribute(params Type[] dependedTypes) : Attribute
 {
     /// <summary>Types of the modules this module depends on.</summary>
-    public Type[] DependedTypes { get; }
-
-    public DependsOnAttribute(params Type[] dependedTypes)
-    {
-        DependedTypes = dependedTypes;
-    }
+    public Type[] DependedTypes { get; } = dependedTypes;
 }

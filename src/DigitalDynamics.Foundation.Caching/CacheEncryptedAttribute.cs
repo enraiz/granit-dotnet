@@ -28,12 +28,10 @@ namespace DigitalDynamics.Foundation.Caching;
 /// public sealed class UserPreferencesCacheItem { ... }
 /// </code>
 /// </example>
+/// <param name="encrypt"><c>true</c> (défaut) pour forcer le chiffrement, <c>false</c> pour l'interdire.</param>
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class CacheEncryptedAttribute : Attribute
+public sealed class CacheEncryptedAttribute(bool encrypt = true) : Attribute
 {
     /// <summary><c>true</c> pour forcer le chiffrement, <c>false</c> pour le désactiver.</summary>
-    public bool Encrypt { get; }
-
-    /// <param name="encrypt"><c>true</c> (défaut) pour forcer le chiffrement, <c>false</c> pour l'interdire.</param>
-    public CacheEncryptedAttribute(bool encrypt = true) => Encrypt = encrypt;
+    public bool Encrypt { get; } = encrypt;
 }

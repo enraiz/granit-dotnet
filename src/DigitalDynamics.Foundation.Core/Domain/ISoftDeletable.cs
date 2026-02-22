@@ -1,13 +1,3 @@
-// =============================================================================
-// ISoftDeletable - Soft delete interface (GDPR)
-// =============================================================================
-// Entities containing personal data implement this interface
-// to support the GDPR right to erasure via soft deletion.
-//
-// The SoftDeleteInterceptor (Persistence package) intercepts DELETE
-// and converts them to UPDATE SET IsDeleted = true.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>

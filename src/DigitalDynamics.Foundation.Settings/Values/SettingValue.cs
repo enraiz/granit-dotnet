@@ -1,7 +1,3 @@
-// =============================================================================
-// SettingValue - Value of a setting for a given provider and key
-// =============================================================================
-
 using DigitalDynamics.Foundation.Caching;
 
 namespace DigitalDynamics.Foundation.Settings.Values;

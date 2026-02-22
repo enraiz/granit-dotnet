@@ -1,12 +1,3 @@
-// =============================================================================
-// AuditedEntity - Entity with full HDS creation/modification traceability
-// =============================================================================
-// Adds modification fields (ModifiedAt, ModifiedBy) to CreationAuditedEntity.
-// Replaces the older AuditableEntity.
-//
-// HDS compliance: every modification is tracked with the user and timestamp.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>

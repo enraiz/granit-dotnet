@@ -1,16 +1,3 @@
-// =============================================================================
-// JwtBearerServiceCollectionExtensions - Generic JWT Bearer + CurrentUser registration
-// =============================================================================
-// Entry point for configuring generic OIDC JWT Bearer authentication
-// in a Digital Dynamics .NET application.
-//
-// Usage:
-//   builder.Services.AddFoundationJwtBearer(builder.Configuration);
-//
-// Reads the "Authentication" section from configuration.
-// For Keycloak: use AddFoundationKeycloak() (Foundation.Authentication.Keycloak).
-// =============================================================================
-
 using DigitalDynamics.Foundation.Authentication.JwtBearer.Authentication;
 using DigitalDynamics.Foundation.Authentication.JwtBearer.Options;
 using DigitalDynamics.Foundation.Security;

@@ -1,10 +1,3 @@
-// =============================================================================
-// ICurrentUserService - Access to the current user
-// =============================================================================
-// Abstraction for retrieving the identity of the authenticated user.
-// Implemented in Foundation.Authentication.JwtBearer (CurrentUserService via HttpContext).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Security;
 
 /// <summary>

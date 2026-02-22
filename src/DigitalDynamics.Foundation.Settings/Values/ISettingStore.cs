@@ -1,10 +1,3 @@
-// =============================================================================
-// ISettingStore - Persistence abstraction for setting values
-// =============================================================================
-// Low-level interface: no cache, no application-level encryption.
-// Encryption of IsEncrypted values is handled at this layer (EF store).
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Settings.Values;
 
 /// <summary>

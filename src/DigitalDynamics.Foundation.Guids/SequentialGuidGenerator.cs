@@ -1,24 +1,3 @@
-// =============================================================================
-// SequentialGuidGenerator - Sequential GUID generation
-// =============================================================================
-// Generates sequential GUIDs by combining a millisecond timestamp (6 bytes)
-// and cryptographically secure random bytes (10 bytes).
-//
-// Advantages over Guid.NewGuid():
-//   - Clustered index: ordered inserts, no page splits
-//   - Uniqueness: 80 bits of entropy (RandomNumberGenerator)
-//   - Temporal ordering: successive GUIDs are monotonically increasing
-//
-// The algorithm handles endianness to guarantee correct sorting on all
-// platforms. Three variants exist depending on the database
-// (see SequentialGuidType).
-//
-// Thread-safe: RandomNumberGenerator is static and thread-safe.
-// Registered as Singleton.
-//
-// Ported from Volo.Abp.Guids.SequentialGuidGenerator (MIT).
-// =============================================================================
-
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 
@@ -28,22 +7,14 @@ namespace DigitalDynamics.Foundation.Guids;
 /// Implementation of <see cref="IGuidGenerator"/> that generates sequential GUIDs
 /// optimized for clustered indexes.
 /// </summary>
-public sealed class SequentialGuidGenerator : IGuidGenerator
+public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> options) : IGuidGenerator
 {
     private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
-    private readonly GuidGeneratorOptions _options;
-
-    public SequentialGuidGenerator(IOptions<GuidGeneratorOptions> options)
-    {
-        _options = options.Value;
-    }
+    private readonly GuidGeneratorOptions _options = options.Value;
 
     /// <inheritdoc />
-    public Guid Create()
-    {
-        return Create(_options.GetDefaultSequentialGuidType());
-    }
+    public Guid Create() => Create(_options.GetDefaultSequentialGuidType());
 
     /// <summary>
     /// Creates a new sequential GUID of the specified type.
@@ -53,14 +24,14 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
 #pragma warning restore CA1822
     {
         // 10 cryptographically secure random bytes
-        var randomBytes = new byte[10];
+        byte[] randomBytes = new byte[10];
         Rng.GetBytes(randomBytes);
 
         // Timestamp in milliseconds since DateTime.MinValue
-        var timestamp = DateTime.UtcNow.Ticks / 10000L;
+        long timestamp = DateTime.UtcNow.Ticks / 10000L;
 
         // Convert the timestamp to a byte array (8 bytes)
-        var timestampBytes = BitConverter.GetBytes(timestamp);
+        byte[] timestampBytes = BitConverter.GetBytes(timestamp);
 
         // Big-endian for correct sorting
         if (BitConverter.IsLittleEndian)
@@ -68,7 +39,7 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
             Array.Reverse(timestampBytes);
         }
 
-        var guidBytes = new byte[16];
+        byte[] guidBytes = new byte[16];
 
         switch (guidType)
         {

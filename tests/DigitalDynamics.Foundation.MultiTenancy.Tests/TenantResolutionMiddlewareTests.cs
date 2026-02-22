@@ -57,7 +57,7 @@ public sealed class TenantResolutionMiddlewareTests
     {
         ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
         IDisposable scope = Substitute.For<IDisposable>();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         currentTenant.Change(Arg.Any<Guid?>(), Arg.Any<string?>()).Returns(scope);
 
         TenantResolverPipeline pipeline = PipelineReturning(new TenantInfo(tenantId, "Acme"));

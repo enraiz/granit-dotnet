@@ -1,24 +1,3 @@
-// =============================================================================
-// FoundationModule - Base class for Foundation modules
-// =============================================================================
-// Each Foundation package declares a module that registers itself in the
-// DI system via ConfigureServices and initializes via
-// OnApplicationInitialization.
-//
-// Lifecycle (sync + async):
-//   1. ConfigureServices / ConfigureServicesAsync
-//   2. OnApplicationInitialization / OnApplicationInitializationAsync
-//
-// Async variants call the sync version by default.
-// A module may override one OR the other (not both).
-// AddFoundationAsync calls the async variants (which also go through sync).
-//
-// Future extensibility (additions without breaking changes):
-//   - PreConfigureServices / PostConfigureServices
-//   - OnPreApplicationInitialization / OnPostApplicationInitialization
-//   - OnApplicationShutdown / OnApplicationShutdownAsync
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Core.Modularity;
 
 /// <summary>

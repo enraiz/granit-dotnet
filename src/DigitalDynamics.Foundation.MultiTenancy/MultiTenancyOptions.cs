@@ -1,7 +1,3 @@
-// =============================================================================
-// MultiTenancyOptions - MultiTenancy module configuration
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>

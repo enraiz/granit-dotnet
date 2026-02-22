@@ -12,14 +12,12 @@ namespace DigitalDynamics.Foundation.Caching;
 /// (Memory, Redis, Hybrid) sans modification.
 /// Il est enregistré en DI pour tous les <c>ICacheService&lt;T, TKey&gt;</c>.
 /// </remarks>
-public sealed class TypedKeyCacheServiceAdapter<TCacheItem, TKey> : ICacheService<TCacheItem, TKey>
+/// <param name="inner">Service de cache sous-jacent (clé string).</param>
+public sealed class TypedKeyCacheServiceAdapter<TCacheItem, TKey>(ICacheService<TCacheItem> inner) : ICacheService<TCacheItem, TKey>
     where TCacheItem : class
     where TKey : notnull
 {
-    private readonly ICacheService<TCacheItem> _inner;
-
-    /// <param name="inner">Service de cache sous-jacent (clé string).</param>
-    public TypedKeyCacheServiceAdapter(ICacheService<TCacheItem> inner) => _inner = inner;
+    private readonly ICacheService<TCacheItem> _inner = inner;
 
     /// <inheritdoc/>
     public Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default) =>

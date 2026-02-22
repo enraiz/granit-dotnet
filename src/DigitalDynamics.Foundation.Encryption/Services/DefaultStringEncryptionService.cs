@@ -1,15 +1,3 @@
-// =============================================================================
-// DefaultStringEncryptionService - Implementation of IStringEncryptionService
-// =============================================================================
-// Delegates to the provider configured via StringEncryptionOptions.ProviderName.
-// Available providers are registered as IStringEncryptionProvider
-// and resolved by name at startup.
-//
-// Inputs  : providers (IEnumerable<IStringEncryptionProvider>),
-//           options (IOptions<StringEncryptionOptions>)
-// Outputs : string (Encrypt) | string? (Decrypt)
-// =============================================================================
-
 using DigitalDynamics.Foundation.Encryption;
 using Microsoft.Extensions.Options;
 
