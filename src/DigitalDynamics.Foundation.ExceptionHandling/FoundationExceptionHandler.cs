@@ -27,7 +27,7 @@ namespace DigitalDynamics.Foundation.ExceptionHandling;
 /// are NEVER forwarded to the client in production. The original exception is always logged.
 /// </para>
 /// </remarks>
-internal sealed class FoundationExceptionHandler(
+internal sealed partial class FoundationExceptionHandler(
     IEnumerable<IExceptionStatusCodeMapper> statusCodeMappers,
     IProblemDetailsService problemDetailsService,
     IOptions<ExceptionHandlingOptions> options,
@@ -82,19 +82,29 @@ internal sealed class FoundationExceptionHandler(
 
     private void LogException(Exception exception, int statusCode)
     {
+        string exceptionType = exception.GetType().Name;
         if (statusCode >= 500)
         {
-            _logger.LogError(exception, "Unhandled exception: {ExceptionType}", exception.GetType().Name);
+            LogUnhandledException(exception, exceptionType);
         }
         else if (statusCode == 499)
         {
-            _logger.LogInformation("Request cancelled: {ExceptionType}", exception.GetType().Name);
+            LogRequestCancelled(exceptionType);
         }
         else
         {
-            _logger.LogWarning(exception, "Handled exception: {ExceptionType} → {StatusCode}", exception.GetType().Name, statusCode);
+            LogHandledException(exception, exceptionType, statusCode);
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Unhandled exception: {ExceptionType}")]
+    private partial void LogUnhandledException(Exception exception, string exceptionType);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Request cancelled: {ExceptionType}")]
+    private partial void LogRequestCancelled(string exceptionType);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Handled exception: {ExceptionType} \u2192 {StatusCode}")]
+    private partial void LogHandledException(Exception exception, string exceptionType, int statusCode);
 
     private ProblemDetails BuildProblemDetails(HttpContext httpContext, Exception exception, int statusCode)
     {
