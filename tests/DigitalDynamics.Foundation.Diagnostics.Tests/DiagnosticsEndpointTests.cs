@@ -1,6 +1,7 @@
 using System.Net;
 using DigitalDynamics.Foundation.Diagnostics.Extensions;
 using FluentAssertions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -83,6 +84,36 @@ public sealed class DiagnosticsEndpointTests
         HttpResponseMessage response = await client.GetAsync("/health/startup", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task HealthEndpoints_Return200_WhenFallbackPolicyRequiresAuthentication()
+    {
+        // Regression guard: if a host adds SetFallbackPolicy(requireAuth), Kubernetes probes
+        // must not receive 401 — AllowAnonymous on each endpoint bypasses the fallback policy.
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+        builder.Services.AddAuthentication();
+        builder.Services.AddAuthorizationBuilder()
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+        builder.Services.AddHealthChecks();
+        builder.Services.AddFoundationDiagnostics();
+
+        WebApplication app = builder.Build();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapFoundationHealthChecks();
+        await app.StartAsync(TestContext.Current.CancellationToken);
+
+        using HttpClient client = app.GetTestClient();
+
+        HttpResponseMessage live = await client.GetAsync("/health/live", TestContext.Current.CancellationToken);
+        HttpResponseMessage ready = await client.GetAsync("/health/ready", TestContext.Current.CancellationToken);
+        HttpResponseMessage startup = await client.GetAsync("/health/startup", TestContext.Current.CancellationToken);
+
+        live.StatusCode.Should().Be(HttpStatusCode.OK);
+        ready.StatusCode.Should().Be(HttpStatusCode.OK);
+        startup.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
