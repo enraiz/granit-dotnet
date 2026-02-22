@@ -62,7 +62,8 @@ format:
   extends: .dotnet
   stage: quality
   script:
-    - dotnet format --verify-no-changes
+    - dotnet restore
+    - dotnet format --verify-no-changes --no-restore
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
