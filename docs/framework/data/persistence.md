@@ -16,7 +16,7 @@ dotnet add package DigitalDynamics.Foundation.Persistence
 `FoundationPersistenceModule` déclare ses dépendances via `[DependsOn]` sur Timing,
 Guids, Security et MultiTenancy. Il suffit d'utiliser `AddFoundation<T>()` dans `Program.cs`
 et les dépendances sont chargées automatiquement dans le bon ordre
-(voir [modularity.md](modularity.md)).
+(voir [modularity.md](../core/modularity.md)).
 
 ### Enregistrement direct
 
@@ -49,7 +49,7 @@ d'un `UPDATE` (via `IsModified = false`).
 
 ### Injection automatique du TenantId
 
-Pour les entités implémentant `IMultiTenant` (voir [core.md](core.md#imultitenant)),
+Pour les entités implémentant `IMultiTenant` (voir [core.md](../core/core.md#imultitenant)),
 l'intercepteur injecte automatiquement le `TenantId` lors de la création :
 
 - Si `TenantId == null` et qu'un tenant est actif → `TenantId = ICurrentTenant.Id`

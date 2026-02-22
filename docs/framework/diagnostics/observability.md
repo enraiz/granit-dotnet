@@ -31,7 +31,7 @@ dotnet add package DigitalDynamics.Foundation.Observability
 ### Program.cs
 
 Avec le système de modules (recommandé), `FoundationObservabilityModule` est chargé
-automatiquement via `AddFoundation<T>()` (voir [modularity.md](modularity.md)).
+automatiquement via `AddFoundation<T>()` (voir [modularity.md](../core/modularity.md)).
 
 Pour un enregistrement direct :
 

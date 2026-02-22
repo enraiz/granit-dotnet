@@ -184,7 +184,7 @@ using (LogContext.PushProperty("RequestId", requestId))
 ```
 
 Le middleware `TenantResolutionMiddleware` enrichit automatiquement le contexte
-avec `TenantId` quand un tenant est résolu (voir [multi-tenancy.md](multi-tenancy.md)).
+avec `TenantId` quand un tenant est résolu (voir [multi-tenancy.md](../data/multi-tenancy.md)).
 
 ## Configuration des niveaux
 
@@ -262,7 +262,7 @@ techniques) mais jamais des données directement identifiantes (nom, prénom, em
 de sécurité sociale, diagnostic, etc.).
 
 > **HDS EXI-04** : les traces d'audit contenant des données de santé transitent par
-> les intercepteurs EF Core (voir [persistence.md](persistence.md)), pas par les logs
+> les intercepteurs EF Core (voir [persistence.md](../data/persistence.md)), pas par les logs
 > applicatifs. Les logs Serilog sont des logs **techniques**, pas des logs d'audit.
 
 ## Corrélation avec les traces OpenTelemetry

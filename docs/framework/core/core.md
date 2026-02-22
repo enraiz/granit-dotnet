@@ -5,10 +5,10 @@ Foundation. Il fournit :
 
 - Le **système de modules** (voir [modularity.md](modularity.md)) : `FoundationModule`,
   `[DependsOn]`, `AddFoundationAsync<T>()`, tri topologique
-- Les **types domaine partagés** (voir [domain.md](domain.md)) : hiérarchie d'entités
+- Les **types domaine partagés** (voir [domain.md](../data/domain.md)) : hiérarchie d'entités
   (`Entity`, `CreationAuditedEntity`, `AuditedEntity`, `FullAuditedEntity`),
   `ISoftDeletable`, `IMultiTenant`, `IActive`, `AuditLogEntry`
-- Le **service de data filtering** (voir [data-filtering.md](data-filtering.md)) :
+- Le **service de data filtering** (voir [data-filtering.md](../data/data-filtering.md)) :
   `IDataFilter` — bypass sélectif des query filters globaux EF Core
 
 Ce package remplace l'ancien `Foundation.Abstractions`. Les interfaces de service
@@ -33,12 +33,12 @@ Le système de modules est documenté dans [modularity.md](modularity.md).
 ## Types domaine
 
 La hiérarchie d'entités et les interfaces domaine (`ISoftDeletable`, `IMultiTenant`,
-`IActive`, `AuditLogEntry`) sont documentées dans [domain.md](domain.md).
+`IActive`, `AuditLogEntry`) sont documentées dans [domain.md](../data/domain.md).
 
 ## Data Filtering
 
 `IDataFilter` et son implémentation `AsyncLocal` sont documentés dans
-[data-filtering.md](data-filtering.md).
+[data-filtering.md](../data/data-filtering.md).
 
 ## Architecture
 

@@ -31,7 +31,7 @@ dotnet add package DigitalDynamics.Foundation.Vault
 
 Avec le système de modules (recommandé), `FoundationVaultModule` est chargé
 automatiquement via `AddFoundation<T>()`. Le module skip l'enregistrement en
-environnement Development (voir [modularity.md](modularity.md)).
+environnement Development (voir [modularity.md](../core/modularity.md)).
 
 Pour un enregistrement direct :
 

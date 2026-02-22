@@ -50,7 +50,7 @@ dotnet add package DigitalDynamics.Foundation.Timing
 
 Le module `FoundationTimingModule` est automatiquement chargé via `[DependsOn]` quand
 un module dépendant (ex : Persistence) en a besoin. Il suffit d'utiliser
-`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](modularity.md)).
+`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
 
 ### Enregistrement direct
 
