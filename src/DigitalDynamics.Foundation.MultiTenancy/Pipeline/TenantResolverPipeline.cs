@@ -8,8 +8,8 @@
 // Outputs : TenantInfo if a resolver succeeds | null if no resolver resolves
 // =============================================================================
 
-using Microsoft.AspNetCore.Http;
 using DigitalDynamics.Foundation.MultiTenancy.Resolvers;
+using Microsoft.AspNetCore.Http;
 
 namespace DigitalDynamics.Foundation.MultiTenancy.Pipeline;
 

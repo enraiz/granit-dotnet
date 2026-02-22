@@ -11,9 +11,9 @@
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
 using DigitalDynamics.Foundation.MultiTenancy;
+using DigitalDynamics.Foundation.Persistence.Interceptors;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
-using DigitalDynamics.Foundation.Persistence.Interceptors;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;

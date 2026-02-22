@@ -9,9 +9,9 @@
 // =============================================================================
 
 using System.Text;
+using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DigitalDynamics.Foundation.Vault.Options;
 using VaultSharp;
 
 namespace DigitalDynamics.Foundation.Vault.Services;

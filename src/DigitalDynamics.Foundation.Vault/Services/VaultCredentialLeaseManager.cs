@@ -12,10 +12,10 @@
 // HDS compliance: no static password in production.
 // =============================================================================
 
+using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DigitalDynamics.Foundation.Vault.Options;
 using VaultSharp;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
