@@ -2,6 +2,8 @@
 // SettingValue - Valeur d'un paramètre pour un provider et une clé donnés
 // =============================================================================
 
+using DigitalDynamics.Foundation.Caching;
+
 namespace DigitalDynamics.Foundation.Settings.Values;
 
 /// <summary>
@@ -11,6 +13,8 @@ namespace DigitalDynamics.Foundation.Settings.Values;
 /// <param name="ProviderName">Nom du provider (ex : "G", "T", "U", "C", "D").</param>
 /// <param name="ProviderKey">Clé du provider (null = Global, tenantId = Tenant, userId = User).</param>
 /// <param name="Value">Valeur du paramètre (plaintext — le chiffrement est géré par ISettingStore).</param>
+[CacheName("Setting")]
+[CacheEncrypted]
 public sealed record SettingValue(
     string Name,
     string ProviderName,

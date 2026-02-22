@@ -4,13 +4,15 @@
 // Intercepte les SaveChanges d'EF Core pour remplir automatiquement :
 //   - CreatedAt/CreatedBy sur toute CreationAuditedEntity (ajout)
 //   - ModifiedAt/ModifiedBy sur toute AuditedEntity (modification)
+//   - TenantId sur toute entité IMultiTenant sans tenant défini (ajout)
 //
 // Conformité HDS : chaque modification est tracée avec l'utilisateur
-// et l'horodatage.
+// et l'horodatage. L'isolation multi-tenant est garantie à la couche persistance.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
 using Microsoft.EntityFrameworkCore;
@@ -21,22 +23,26 @@ namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 
 /// <summary>
 /// Intercepteur EF Core qui remplit automatiquement les champs d'audit
-/// sur les entités héritant de <see cref="CreationAuditedEntity"/>.
+/// sur les entités héritant de <see cref="CreationAuditedEntity"/>,
+/// et le <see cref="IMultiTenant.TenantId"/> sur les entités multi-tenant.
 /// </summary>
 public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IClock _clock;
     private readonly IGuidGenerator _guidGenerator;
+    private readonly ICurrentTenant _currentTenant;
 
     public AuditedEntityInterceptor(
         ICurrentUserService currentUserService,
         IClock clock,
-        IGuidGenerator guidGenerator)
+        IGuidGenerator guidGenerator,
+        ICurrentTenant currentTenant)
     {
         _currentUserService = currentUserService;
         _clock = clock;
         _guidGenerator = guidGenerator;
+        _currentTenant = currentTenant;
     }
 
     public override InterceptionResult<int> SavingChanges(
@@ -77,6 +83,13 @@ public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
                     {
                         entry.Entity.Id = _guidGenerator.Create();
                     }
+
+                    // Isolation multi-tenant : injecter le TenantId courant si l'entité le supporte
+                    if (entry.Entity is IMultiTenant multiTenant && multiTenant.TenantId is null)
+                    {
+                        multiTenant.TenantId = _currentTenant.Id;
+                    }
+
                     break;
 
                 case EntityState.Modified:
@@ -90,6 +103,7 @@ public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
                         audited.ModifiedAt = now;
                         audited.ModifiedBy = userId;
                     }
+
                     break;
             }
         }

@@ -10,6 +10,7 @@
 
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
@@ -96,7 +97,8 @@ public sealed class SoftDeleteInterceptorTests
     private TestDbContext CreateContext()
     {
         IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
-        AuditedEntityInterceptor auditInterceptor = new(_currentUserService, _clock, guidGenerator);
+        ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
+        AuditedEntityInterceptor auditInterceptor = new(_currentUserService, _clock, guidGenerator, currentTenant);
         SoftDeleteInterceptor softDeleteInterceptor = new(_currentUserService, _clock);
         DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
