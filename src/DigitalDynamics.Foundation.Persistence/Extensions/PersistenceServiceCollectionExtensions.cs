@@ -1,6 +1,8 @@
 using DigitalDynamics.Foundation.Core.DataFiltering;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace DigitalDynamics.Foundation.Persistence.Extensions;
 
@@ -29,4 +31,22 @@ public static class PersistenceServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Adds an EF Core connectivity health check for <typeparamref name="TContext"/>,
+    /// tagged <c>"readiness"</c>. Uses <c>CanConnectAsync()</c> to verify the database connection.
+    /// </summary>
+    /// <typeparam name="TContext">The <see cref="DbContext"/> to probe.</typeparam>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Check name. Defaults to the DbContext type name.</param>
+    /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
+    public static IHealthChecksBuilder AddFoundationDbContextCheck<TContext>(
+        this IHealthChecksBuilder builder,
+        string? name = null,
+        HealthStatus? failureStatus = null)
+        where TContext : DbContext
+        => builder.AddDbContextCheck<TContext>(
+            name: name ?? typeof(TContext).Name,
+            failureStatus: failureStatus,
+            tags: ["readiness"]);
 }
