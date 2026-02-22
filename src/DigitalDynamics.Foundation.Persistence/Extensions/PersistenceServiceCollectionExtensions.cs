@@ -1,4 +1,6 @@
 using DigitalDynamics.Foundation.Core.DataFiltering;
+using DigitalDynamics.Foundation.ExceptionHandling;
+using DigitalDynamics.Foundation.Persistence.ExceptionHandling;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +23,11 @@ public static class PersistenceServiceCollectionExtensions
     ///     Registered as Singleton: state lives in a <c>static AsyncLocal</c> field,
     ///     not in instance fields.
     ///   </item>
+    ///   <item>
+    ///     <see cref="EfCoreExceptionStatusCodeMapper"/> if
+    ///     <c>Foundation.ExceptionHandling</c> is present in the container
+    ///     (<see cref="IExceptionStatusCodeMapper"/> already registered).
+    ///   </item>
     /// </list>
     /// </summary>
     public static IServiceCollection AddFoundationPersistence(this IServiceCollection services)
@@ -28,6 +35,14 @@ public static class PersistenceServiceCollectionExtensions
         services.AddScoped<AuditedEntityInterceptor>();
         services.AddScoped<SoftDeleteInterceptor>();
         services.AddSingleton<IDataFilter, DataFilter>();
+
+        // Register the EF Core exception mapper only when Foundation.ExceptionHandling
+        // has been configured (IExceptionStatusCodeMapper already in the container).
+        // This avoids a hard dependency on ExceptionHandling for consumers that don't use it.
+        if (services.Any(d => d.ServiceType == typeof(IExceptionStatusCodeMapper)))
+        {
+            services.AddSingleton<IExceptionStatusCodeMapper, EfCoreExceptionStatusCodeMapper>();
+        }
 
         return services;
     }
