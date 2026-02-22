@@ -10,7 +10,7 @@ using System.Security.Claims;
 using DigitalDynamics.Foundation.Security;
 using Microsoft.AspNetCore.Http;
 
-namespace DigitalDynamics.Foundation.Security.Authentication;
+namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Authentication;
 
 /// <summary>
 /// Implémentation de <see cref="ICurrentUserService"/> basée sur HttpContext.

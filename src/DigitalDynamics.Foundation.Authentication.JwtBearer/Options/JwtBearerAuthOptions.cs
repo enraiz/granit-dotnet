@@ -11,11 +11,11 @@
 //     "NameClaimType": "sub"
 //   }
 //
-// Pour Keycloak : utiliser FoundationSecurityKeycloakModule
-// (lit la section "Keycloak", pas de section "Authentication" nécessaire).
+// Pour Keycloak : utiliser FoundationAuthenticationKeycloakModule
+// (lit la section "Keycloak", reconfigure JWT Bearer via PostConfigure).
 // =============================================================================
 
-namespace DigitalDynamics.Foundation.Security.Options;
+namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Options;
 
 /// <summary>
 /// Options de configuration pour l'authentification JWT Bearer générique (OIDC-compatible).

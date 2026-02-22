@@ -1,35 +1,36 @@
 // =============================================================================
-// SecurityServiceCollectionExtensions - Enregistrement JWT Bearer générique + CurrentUser
+// JwtBearerServiceCollectionExtensions - Enregistrement JWT Bearer générique + CurrentUser
 // =============================================================================
-// Point d'entrée unique pour configurer l'authentification JWT Bearer OIDC générique
+// Point d'entrée pour configurer l'authentification JWT Bearer OIDC générique
 // dans une application .NET Digital Dynamics.
 //
 // Usage :
-//   builder.Services.AddFoundationSecurity(builder.Configuration);
+//   builder.Services.AddFoundationJwtBearer(builder.Configuration);
 //
 // Lit la section "Authentication" de la configuration.
-// Pour Keycloak : utiliser AddFoundationSecurityKeycloak() (Foundation.Security.Keycloak).
+// Pour Keycloak : utiliser AddFoundationKeycloak() (Foundation.Authentication.Keycloak).
 // =============================================================================
 
-using DigitalDynamics.Foundation.Security.Authentication;
-using DigitalDynamics.Foundation.Security.Options;
+using DigitalDynamics.Foundation.Authentication.JwtBearer.Authentication;
+using DigitalDynamics.Foundation.Authentication.JwtBearer.Options;
+using DigitalDynamics.Foundation.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DigitalDynamics.Foundation.Security.Extensions;
+namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Extensions;
 
 /// <summary>
 /// Extensions pour configurer l'authentification JWT Bearer générique et <see cref="ICurrentUserService"/>.
 /// </summary>
-public static class SecurityServiceCollectionExtensions
+public static class JwtBearerServiceCollectionExtensions
 {
     /// <summary>
     /// Ajoute l'authentification JWT Bearer OIDC générique et le service CurrentUser.
     /// Lit la section <c>"Authentication"</c> de la configuration.
     /// </summary>
-    public static IServiceCollection AddFoundationSecurity(
+    public static IServiceCollection AddFoundationJwtBearer(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -39,7 +40,7 @@ public static class SecurityServiceCollectionExtensions
         JwtBearerAuthOptions options = section.Get<JwtBearerAuthOptions>() ?? new JwtBearerAuthOptions();
 
         services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(jwt =>
             {
                 jwt.Authority = options.Authority;

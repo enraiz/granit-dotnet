@@ -5,8 +5,8 @@
 //
 // Exemple appsettings.json :
 //   "Keycloak": {
-//     "Authority": "https://keycloak.meyers.cloud/realms/guava-health",
-//     "ClientId": "guava-backend",
+//     "Authority": "https://keycloak.example.com/realms/my-realm",
+//     "ClientId": "my-client",
 //     "ClientSecret": "***",
 //     "RequireHttpsMetadata": true,
 //     "AdminRole": "admin",
@@ -14,7 +14,7 @@
 //   }
 // =============================================================================
 
-namespace DigitalDynamics.Foundation.Security.Keycloak.Options;
+namespace DigitalDynamics.Foundation.Authentication.Keycloak.Options;
 
 /// <summary>
 /// Options de configuration pour l'authentification Keycloak OIDC.
@@ -24,7 +24,7 @@ public sealed class KeycloakOptions
     /// <summary>Clé de section dans la configuration.</summary>
     public const string SectionName = "Keycloak";
 
-    /// <summary>URL de l'authority OIDC (ex: https://keycloak.meyers.cloud/realms/guava-health).</summary>
+    /// <summary>URL de l'authority OIDC (ex: https://keycloak.example.com/realms/my-realm).</summary>
     public string Authority { get; set; } = string.Empty;
 
     /// <summary>Client ID Keycloak (ex: guava-backend).</summary>

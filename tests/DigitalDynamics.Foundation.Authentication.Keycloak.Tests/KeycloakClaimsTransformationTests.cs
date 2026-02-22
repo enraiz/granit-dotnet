@@ -6,13 +6,13 @@
 // =============================================================================
 
 using System.Security.Claims;
-using DigitalDynamics.Foundation.Security.Keycloak.Authentication;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Authentication;
 using FluentAssertions;
 using Xunit;
-using KeycloakOptions = DigitalDynamics.Foundation.Security.Keycloak.Options.KeycloakOptions;
+using KeycloakOptions = DigitalDynamics.Foundation.Authentication.Keycloak.Options.KeycloakOptions;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 
-namespace DigitalDynamics.Foundation.Security.Keycloak.Tests;
+namespace DigitalDynamics.Foundation.Authentication.Keycloak.Tests;
 
 public sealed class KeycloakClaimsTransformationTests
 {

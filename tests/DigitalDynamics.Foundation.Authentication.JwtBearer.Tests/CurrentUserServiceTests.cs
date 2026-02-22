@@ -7,13 +7,13 @@
 // =============================================================================
 
 using System.Security.Claims;
-using DigitalDynamics.Foundation.Security.Authentication;
+using DigitalDynamics.Foundation.Authentication.JwtBearer.Authentication;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using Xunit;
 
-namespace DigitalDynamics.Foundation.Security.Tests;
+namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Tests;
 
 public sealed class CurrentUserServiceTests
 {

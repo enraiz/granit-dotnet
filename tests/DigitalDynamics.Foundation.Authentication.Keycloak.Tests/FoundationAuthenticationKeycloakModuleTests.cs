@@ -1,14 +1,16 @@
 // =============================================================================
-// Tests - FoundationSecurityKeycloakModule
+// Tests - FoundationAuthenticationKeycloakModule
 // =============================================================================
 // Vérifie le câblage DI complet via ConfigureServices :
-//   - ICurrentUserService résolvable (via dépendance sur FoundationSecurityModule)
+//   - ICurrentUserService résolvable (via dépendance sur FoundationJwtBearerModule)
 //   - KeycloakClaimsTransformation enregistrée
 //   - Policy "Admin" enregistrée
 // =============================================================================
 
+using DigitalDynamics.Foundation.Authentication.JwtBearer;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Authentication;
 using DigitalDynamics.Foundation.Core.Modularity;
-using DigitalDynamics.Foundation.Security.Keycloak.Authentication;
+using DigitalDynamics.Foundation.Security;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -17,21 +19,21 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace DigitalDynamics.Foundation.Security.Keycloak.Tests;
+namespace DigitalDynamics.Foundation.Authentication.Keycloak.Tests;
 
-public sealed class FoundationSecurityKeycloakModuleTests
+public sealed class FoundationAuthenticationKeycloakModuleTests
 {
     [Fact]
     public void ConfigureServices_RegistersICurrentUserService()
     {
         // Arrange
-        FoundationSecurityKeycloakModule module = new();
+        FoundationAuthenticationKeycloakModule module = new();
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
         builder.Configuration["Keycloak:Authority"] = "https://keycloak.test/realms/test";
         builder.Configuration["Keycloak:ClientId"] = "test-client";
-        // Appeler d'abord FoundationSecurityModule (dépendance)
+        // Appeler d'abord FoundationJwtBearerModule (dépendance)
         ServiceConfigurationContext context = new(builder.Services, builder.Configuration, builder);
-        new FoundationSecurityModule().ConfigureServices(context);
+        new FoundationJwtBearerModule().ConfigureServices(context);
 
         // Act
         module.ConfigureServices(context);
@@ -40,19 +42,19 @@ public sealed class FoundationSecurityKeycloakModuleTests
 
         // Assert
         ICurrentUserService? userService = sp.GetService<ICurrentUserService>();
-        userService.Should().NotBeNull("hérité de FoundationSecurityModule");
+        userService.Should().NotBeNull("hérité de FoundationJwtBearerModule");
     }
 
     [Fact]
     public void ConfigureServices_RegistersKeycloakClaimsTransformation()
     {
         // Arrange
-        FoundationSecurityKeycloakModule module = new();
+        FoundationAuthenticationKeycloakModule module = new();
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
         builder.Configuration["Keycloak:Authority"] = "https://keycloak.test/realms/test";
         builder.Configuration["Keycloak:ClientId"] = "test-client";
         ServiceConfigurationContext context = new(builder.Services, builder.Configuration, builder);
-        new FoundationSecurityModule().ConfigureServices(context);
+        new FoundationJwtBearerModule().ConfigureServices(context);
 
         // Act
         module.ConfigureServices(context);
@@ -69,13 +71,13 @@ public sealed class FoundationSecurityKeycloakModuleTests
     public void ConfigureServices_RegistersAdminPolicy()
     {
         // Arrange
-        FoundationSecurityKeycloakModule module = new();
+        FoundationAuthenticationKeycloakModule module = new();
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
         builder.Configuration["Keycloak:Authority"] = "https://keycloak.test/realms/test";
         builder.Configuration["Keycloak:ClientId"] = "test-client";
         builder.Configuration["Keycloak:AdminRole"] = "admin";
         ServiceConfigurationContext context = new(builder.Services, builder.Configuration, builder);
-        new FoundationSecurityModule().ConfigureServices(context);
+        new FoundationJwtBearerModule().ConfigureServices(context);
 
         // Act
         module.ConfigureServices(context);

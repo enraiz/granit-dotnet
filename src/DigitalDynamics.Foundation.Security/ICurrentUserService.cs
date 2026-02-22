@@ -1,32 +1,32 @@
 // =============================================================================
-// ICurrentUserService - Acces a l'utilisateur courant
+// ICurrentUserService - Accès à l'utilisateur courant
 // =============================================================================
-// Abstraction pour recuperer l'identite de l'utilisateur authentifie.
-// Implemente via HttpContext dans ce meme package.
+// Abstraction pour récupérer l'identité de l'utilisateur authentifié.
+// Implémenté dans Foundation.Authentication.JwtBearer (CurrentUserService via HttpContext).
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Security;
 
 /// <summary>
-/// Service pour acceder aux informations de l'utilisateur courant.
+/// Service pour accéder aux informations de l'utilisateur courant.
 /// </summary>
 public interface ICurrentUserService
 {
-    /// <summary>Identifiant unique de l'utilisateur (sub claim Keycloak).</summary>
+    /// <summary>Identifiant unique de l'utilisateur (claim "sub").</summary>
     string? UserId { get; }
 
-    /// <summary>Nom d'utilisateur (preferred_username claim).</summary>
+    /// <summary>Nom d'utilisateur (selon <c>NameClaimType</c> configuré dans JWT Bearer).</summary>
     string? UserName { get; }
 
     /// <summary>Email de l'utilisateur.</summary>
     string? Email { get; }
 
-    /// <summary>Indique si l'utilisateur est authentifie.</summary>
+    /// <summary>Indique si l'utilisateur est authentifié.</summary>
     bool IsAuthenticated { get; }
 
-    /// <summary>Roles de l'utilisateur (realm_access.roles de Keycloak).</summary>
+    /// <summary>Rôles de l'utilisateur.</summary>
     IReadOnlyList<string> Roles { get; }
 
-    /// <summary>Verifie si l'utilisateur possede un role donne.</summary>
+    /// <summary>Vérifie si l'utilisateur possède un rôle donné.</summary>
     bool IsInRole(string role);
 }

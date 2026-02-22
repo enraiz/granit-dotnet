@@ -5,7 +5,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <!-- ASP.NET Core shared framework (pour JwtBearerOptions, AuthorizationOptions) -->
+  <!-- ASP.NET Core shared framework (JwtBearerOptions, AuthorizationOptions) -->
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -20,9 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DigitalDynamics.Foundation.Security.Keycloak\DigitalDynamics.Foundation.Security.Keycloak.csproj" />
-    <!-- Référence directe pour appeler AddFoundationSecurity dans les tests d'intégration -->
-    <ProjectReference Include="..\..\src\DigitalDynamics.Foundation.Security\DigitalDynamics.Foundation.Security.csproj" />
+    <ProjectReference Include="..\..\src\DigitalDynamics.Foundation.Authentication.JwtBearer\DigitalDynamics.Foundation.Authentication.JwtBearer.csproj" />
   </ItemGroup>
 
 </Project>

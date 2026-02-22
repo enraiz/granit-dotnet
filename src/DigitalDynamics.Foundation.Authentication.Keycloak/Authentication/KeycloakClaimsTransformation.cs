@@ -7,7 +7,7 @@
 //     { "realm_access": { "roles": ["admin", "practitioner"] } }
 //
 //   RoleClaimsSource = "resource_access" :
-//     { "resource_access": { "guava-backend": { "roles": ["admin"] } } }
+//     { "resource_access": { "my-client": { "roles": ["admin"] } } }
 //
 // Cette transformation extrait les rôles et les ajoute comme ClaimTypes.Role
 // standard .NET, permettant [Authorize(Roles = "admin")].
@@ -18,11 +18,11 @@
 
 using System.Security.Claims;
 using System.Text.Json;
-using DigitalDynamics.Foundation.Security.Keycloak.Options;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace DigitalDynamics.Foundation.Security.Keycloak.Authentication;
+namespace DigitalDynamics.Foundation.Authentication.Keycloak.Authentication;
 
 /// <summary>
 /// Transforme les claims Keycloak pour mapper les rôles

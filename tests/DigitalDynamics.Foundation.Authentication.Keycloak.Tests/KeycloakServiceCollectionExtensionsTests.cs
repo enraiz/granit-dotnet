@@ -1,17 +1,17 @@
 // =============================================================================
-// Tests - SecurityKeycloakServiceCollectionExtensions
+// Tests - KeycloakServiceCollectionExtensions
 // =============================================================================
-// Vérifie que AddFoundationSecurityKeycloak enregistre correctement :
+// Vérifie que AddFoundationKeycloak enregistre correctement :
 //   - KeycloakOptions depuis la section "Keycloak"
 //   - PostConfigure JWT Bearer (Authority, Audience, NameClaimType)
 //   - KeycloakClaimsTransformation
 //   - Policy "Admin"
 // =============================================================================
 
-using DigitalDynamics.Foundation.Security.Extensions;
-using DigitalDynamics.Foundation.Security.Keycloak.Authentication;
-using DigitalDynamics.Foundation.Security.Keycloak.Extensions;
-using DigitalDynamics.Foundation.Security.Keycloak.Options;
+using DigitalDynamics.Foundation.Authentication.JwtBearer.Extensions;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Authentication;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Extensions;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Options;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,9 +21,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace DigitalDynamics.Foundation.Security.Keycloak.Tests;
+namespace DigitalDynamics.Foundation.Authentication.Keycloak.Tests;
 
-public sealed class SecurityKeycloakServiceCollectionExtensionsTests
+public sealed class KeycloakServiceCollectionExtensionsTests
 {
     private static IConfiguration CreateConfiguration(
         string authority = "https://keycloak.test/realms/test",
@@ -40,15 +40,15 @@ public sealed class SecurityKeycloakServiceCollectionExtensionsTests
             .Build();
 
     [Fact]
-    public void AddFoundationSecurityKeycloak_RegistersKeycloakOptions()
+    public void AddFoundationKeycloak_RegistersKeycloakOptions()
     {
         // Arrange
         ServiceCollection services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
-        services.AddFoundationSecurity(config);
+        services.AddFoundationJwtBearer(config);
 
         // Act
-        services.AddFoundationSecurityKeycloak(config);
+        services.AddFoundationKeycloak(config);
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -60,15 +60,15 @@ public sealed class SecurityKeycloakServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddFoundationSecurityKeycloak_PostConfiguresJwtBearer_WithKeycloakValues()
+    public void AddFoundationKeycloak_PostConfiguresJwtBearer_WithKeycloakValues()
     {
         // Arrange
         ServiceCollection services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
-        services.AddFoundationSecurity(config);
+        services.AddFoundationJwtBearer(config);
 
         // Act
-        services.AddFoundationSecurityKeycloak(config);
+        services.AddFoundationKeycloak(config);
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -82,7 +82,7 @@ public sealed class SecurityKeycloakServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddFoundationSecurityKeycloak_WithCustomAudience_UsesAudienceOverClientId()
+    public void AddFoundationKeycloak_WithCustomAudience_UsesAudienceOverClientId()
     {
         // Arrange
         ServiceCollection services = new ServiceCollection();
@@ -95,10 +95,10 @@ public sealed class SecurityKeycloakServiceCollectionExtensionsTests
                 ["Keycloak:RequireHttpsMetadata"] = "false"
             })
             .Build();
-        services.AddFoundationSecurity(config);
+        services.AddFoundationJwtBearer(config);
 
         // Act
-        services.AddFoundationSecurityKeycloak(config);
+        services.AddFoundationKeycloak(config);
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -110,15 +110,15 @@ public sealed class SecurityKeycloakServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddFoundationSecurityKeycloak_RegistersClaimsTransformation()
+    public void AddFoundationKeycloak_RegistersClaimsTransformation()
     {
         // Arrange
         ServiceCollection services = new ServiceCollection();
         IConfiguration config = CreateConfiguration();
-        services.AddFoundationSecurity(config);
+        services.AddFoundationJwtBearer(config);
 
         // Act
-        services.AddFoundationSecurityKeycloak(config);
+        services.AddFoundationKeycloak(config);
 
         // Assert
         List<ServiceDescriptor> descriptors = services
@@ -129,23 +129,23 @@ public sealed class SecurityKeycloakServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddFoundationSecurityKeycloak_RegistersAdminPolicy()
+    public void AddFoundationKeycloak_RegistersAdminPolicy()
     {
         // Arrange
         ServiceCollection services = new ServiceCollection();
         IConfiguration config = CreateConfiguration(adminRole: "superadmin");
-        services.AddFoundationSecurity(config);
+        services.AddFoundationJwtBearer(config);
 
         // Act
-        services.AddFoundationSecurityKeycloak(config);
+        services.AddFoundationKeycloak(config);
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
         // Assert
         AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
         authOptions.GetPolicy("Admin").Should().NotBeNull();
-        authOptions.GetPolicy("Authenticated").Should().NotBeNull("hérité de Foundation.Security");
+        authOptions.GetPolicy("Authenticated").Should().NotBeNull("hérité de Foundation.Authentication.JwtBearer");
         authOptions.GetPolicy("FhirAccess").Should().BeNull(
-            "FhirAccess est application-specific, pas dans Foundation.Security.Keycloak");
+            "FhirAccess est application-specific, pas dans Foundation.Authentication.Keycloak");
     }
 }

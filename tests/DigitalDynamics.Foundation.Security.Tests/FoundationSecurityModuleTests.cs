@@ -1,13 +1,13 @@
 // =============================================================================
 // Tests - FoundationSecurityModule
 // =============================================================================
-// Vérifie que le module enregistre les services Security via ConfigureServices.
+// FoundationSecurityModule est un module marqueur d'abstractions.
+// Aucun service enregistré — l'implémentation JWT est dans
+// Foundation.Authentication.JwtBearer (FoundationJwtBearerModule).
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Modularity;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Xunit;
 
 namespace DigitalDynamics.Foundation.Security.Tests;
@@ -15,25 +15,8 @@ namespace DigitalDynamics.Foundation.Security.Tests;
 public sealed class FoundationSecurityModuleTests
 {
     [Fact]
-    public void ConfigureServices_RegistersSecurityServices()
+    public void FoundationSecurityModule_IsFoundationModule()
     {
-        // Arrange
-        FoundationSecurityModule module = new();
-        HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        builder.Configuration["Authentication:Authority"] = "https://auth.test/realms/test";
-        builder.Configuration["Authentication:Audience"] = "test-client";
-        ServiceConfigurationContext context = new(
-            builder.Services,
-            builder.Configuration,
-            builder);
-
-        // Act
-        module.ConfigureServices(context);
-
-        using ServiceProvider sp = builder.Services.BuildServiceProvider();
-
-        // Assert
-        ICurrentUserService? userService = sp.GetService<ICurrentUserService>();
-        userService.Should().NotBeNull();
+        typeof(FoundationSecurityModule).Should().BeAssignableTo<FoundationModule>();
     }
 }

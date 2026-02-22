@@ -1,35 +1,35 @@
 // =============================================================================
-// SecurityKeycloakServiceCollectionExtensions - Extras Keycloak pour JWT Bearer
+// KeycloakServiceCollectionExtensions - Extension Keycloak pour JWT Bearer
 // =============================================================================
-// Surcharge la configuration JWT Bearer de Foundation.Security avec les valeurs
-// Keycloak (Authority, Audience, preferred_username) via PostConfigure.
+// Surcharge la configuration JWT Bearer de Foundation.Authentication.JwtBearer
+// avec les valeurs Keycloak (Authority, Audience, preferred_username) via PostConfigure.
 // Enregistre KeycloakClaimsTransformation et la policy "Admin".
 //
 // Usage :
-//   builder.Services.AddFoundationSecurityKeycloak(builder.Configuration);
+//   builder.Services.AddFoundationKeycloak(builder.Configuration);
 //
 // Lit la section "Keycloak" de la configuration.
 // =============================================================================
 
-using DigitalDynamics.Foundation.Security.Keycloak.Authentication;
-using DigitalDynamics.Foundation.Security.Keycloak.Options;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Authentication;
+using DigitalDynamics.Foundation.Authentication.Keycloak.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitalDynamics.Foundation.Security.Keycloak.Extensions;
+namespace DigitalDynamics.Foundation.Authentication.Keycloak.Extensions;
 
 /// <summary>
-/// Extensions pour configurer les extras Keycloak sur <c>Foundation.Security</c>.
+/// Extensions pour configurer les extras Keycloak sur <c>Foundation.Authentication.JwtBearer</c>.
 /// </summary>
-public static class SecurityKeycloakServiceCollectionExtensions
+public static class KeycloakServiceCollectionExtensions
 {
     /// <summary>
     /// Surcharge la configuration JWT Bearer avec les valeurs Keycloak,
     /// enregistre <see cref="KeycloakClaimsTransformation"/> et la policy <c>"Admin"</c>.
     /// </summary>
-    public static IServiceCollection AddFoundationSecurityKeycloak(
+    public static IServiceCollection AddFoundationKeycloak(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -38,7 +38,7 @@ public static class SecurityKeycloakServiceCollectionExtensions
 
         KeycloakOptions options = section.Get<KeycloakOptions>() ?? new KeycloakOptions();
 
-        // PostConfigure s'exécute après AddFoundationSecurity (FoundationSecurityModule),
+        // PostConfigure s'exécute après AddFoundationJwtBearer (FoundationJwtBearerModule),
         // permettant de surcharger Authority, Audience et NameClaimType pour Keycloak.
         services.PostConfigureAll<JwtBearerOptions>(jwt =>
         {

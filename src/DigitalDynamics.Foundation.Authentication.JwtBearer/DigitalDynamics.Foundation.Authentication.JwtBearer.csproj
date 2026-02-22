@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>DigitalDynamics.Foundation.Security.Keycloak</PackageId>
-    <Description>Extras Keycloak pour Foundation.Security : transformation des claims realm_access, policy Admin et configuration JWT Bearer depuis la section "Keycloak".</Description>
+    <PackageId>DigitalDynamics.Foundation.Authentication.JwtBearer</PackageId>
+    <Description>Authentification JWT Bearer générique (OIDC) pour les applications .NET Digital Dynamics. ICurrentUserService, JwtBearerAuthOptions, policy Authenticated.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
-  <!-- ASP.NET Core shared framework (pour IClaimsTransformation, JwtBearerOptions, etc.) -->
+  <!-- ASP.NET Core shared framework (IHttpContextAccessor, Authentication, Authorization) -->
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

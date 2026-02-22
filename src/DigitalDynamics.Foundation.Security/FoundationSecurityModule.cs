@@ -1,22 +1,19 @@
 // =============================================================================
-// FoundationSecurityModule - Module Foundation pour l'authentification JWT Bearer générique
+// FoundationSecurityModule - Module d'abstractions de sécurité
+// =============================================================================
+// Module de base fournissant ICurrentUserService (interface uniquement).
+// L'implémentation et la configuration JWT Bearer sont dans :
+//   Foundation.Authentication.JwtBearer  (FoundationJwtBearerModule)
+//   Foundation.Authentication.Keycloak   (FoundationAuthenticationKeycloakModule)
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Modularity;
-using DigitalDynamics.Foundation.Security.Extensions;
 
 namespace DigitalDynamics.Foundation.Security;
 
 /// <summary>
-/// Module Foundation pour l'authentification JWT Bearer générique (OIDC) et ICurrentUserService.
-/// Lit la section <c>"Authentication"</c> de la configuration.
-/// Pour Keycloak : utiliser <see cref="FoundationSecurityKeycloakModule"/> (Foundation.Security.Keycloak).
-/// Aucune dépendance sur d'autres modules Foundation.
+/// Module Foundation fournissant les abstractions de sécurité (<see cref="ICurrentUserService"/>).
+/// Aucun service enregistré ici — utiliser <c>FoundationJwtBearerModule</c> ou
+/// <c>FoundationAuthenticationKeycloakModule</c> pour l'implémentation complète.
 /// </summary>
-public sealed class FoundationSecurityModule : FoundationModule
-{
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.AddFoundationSecurity(context.Configuration);
-    }
-}
+public sealed class FoundationSecurityModule : FoundationModule;
