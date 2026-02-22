@@ -8,11 +8,13 @@
 //     "Authority": "https://keycloak.meyers.cloud/realms/guava-health",
 //     "ClientId": "guava-backend",
 //     "ClientSecret": "***",
-//     "RequireHttpsMetadata": true
+//     "RequireHttpsMetadata": true,
+//     "AdminRole": "admin",
+//     "RoleClaimsSource": "realm_access"
 //   }
 // =============================================================================
 
-namespace DigitalDynamics.Foundation.Security.Options;
+namespace DigitalDynamics.Foundation.Security.Keycloak.Options;
 
 /// <summary>
 /// Options de configuration pour l'authentification Keycloak OIDC.
@@ -25,10 +27,10 @@ public sealed class KeycloakOptions
     /// <summary>URL de l'authority OIDC (ex: https://keycloak.meyers.cloud/realms/guava-health).</summary>
     public string Authority { get; set; } = string.Empty;
 
-    /// <summary>Client ID (ex: guava-backend).</summary>
+    /// <summary>Client ID Keycloak (ex: guava-backend).</summary>
     public string ClientId { get; set; } = string.Empty;
 
-    /// <summary>Client secret (confidentiel).</summary>
+    /// <summary>Client secret (confidentiel — charger depuis Vault, jamais en clair).</summary>
     public string ClientSecret { get; set; } = string.Empty;
 
     /// <summary>Exiger HTTPS pour les métadonnées OIDC. Défaut : true en production.</summary>
@@ -37,6 +39,15 @@ public sealed class KeycloakOptions
     /// <summary>Audience attendue dans le token. Défaut : ClientId.</summary>
     public string? Audience { get; set; }
 
-    /// <summary>Rôle admin (realm role). Défaut : "admin".</summary>
+    /// <summary>Rôle admin (realm role Keycloak). Défaut : "admin".</summary>
     public string AdminRole { get; set; } = "admin";
+
+    /// <summary>
+    /// Source des rôles dans le token Keycloak.
+    /// <list type="bullet">
+    /// <item><c>"realm_access"</c> (défaut) : rôles realm (<c>realm_access.roles</c>)</item>
+    /// <item><c>"resource_access"</c> : rôles client (<c>resource_access.{ClientId}.roles</c>)</item>
+    /// </list>
+    /// </summary>
+    public string RoleClaimsSource { get; set; } = "realm_access";
 }

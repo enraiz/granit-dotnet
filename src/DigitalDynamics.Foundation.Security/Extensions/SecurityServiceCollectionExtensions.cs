@@ -1,17 +1,18 @@
 // =============================================================================
-// SecurityServiceCollectionExtensions - Enregistrement Keycloak + CurrentUser
+// SecurityServiceCollectionExtensions - Enregistrement JWT Bearer générique + CurrentUser
 // =============================================================================
-// Point d'entrée unique pour configurer l'authentification Keycloak
+// Point d'entrée unique pour configurer l'authentification JWT Bearer OIDC générique
 // dans une application .NET Digital Dynamics.
 //
 // Usage :
 //   builder.Services.AddFoundationSecurity(builder.Configuration);
+//
+// Lit la section "Authentication" de la configuration.
+// Pour Keycloak : utiliser AddFoundationSecurityKeycloak() (Foundation.Security.Keycloak).
 // =============================================================================
 
-using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Security.Authentication;
 using DigitalDynamics.Foundation.Security.Options;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,30 +21,29 @@ using Microsoft.IdentityModel.Tokens;
 namespace DigitalDynamics.Foundation.Security.Extensions;
 
 /// <summary>
-/// Extensions pour configurer l'authentification Keycloak et les services de sécurité.
+/// Extensions pour configurer l'authentification JWT Bearer générique et <see cref="ICurrentUserService"/>.
 /// </summary>
 public static class SecurityServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute l'authentification Keycloak OIDC, la transformation des claims
-    /// et le service CurrentUser.
+    /// Ajoute l'authentification JWT Bearer OIDC générique et le service CurrentUser.
+    /// Lit la section <c>"Authentication"</c> de la configuration.
     /// </summary>
     public static IServiceCollection AddFoundationSecurity(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var keycloakSection = configuration.GetSection(KeycloakOptions.SectionName);
-        services.Configure<KeycloakOptions>(keycloakSection);
+        IConfigurationSection section = configuration.GetSection(JwtBearerAuthOptions.SectionName);
+        services.Configure<JwtBearerAuthOptions>(section);
 
-        var options = keycloakSection.Get<KeycloakOptions>()
-                      ?? new KeycloakOptions();
+        JwtBearerAuthOptions options = section.Get<JwtBearerAuthOptions>() ?? new JwtBearerAuthOptions();
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(jwt =>
             {
                 jwt.Authority = options.Authority;
-                jwt.Audience = options.Audience ?? options.ClientId;
+                jwt.Audience = options.Audience;
                 jwt.RequireHttpsMetadata = options.RequireHttpsMetadata;
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -52,26 +52,16 @@ public static class SecurityServiceCollectionExtensions
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = options.Authority,
-                    ValidAudience = options.Audience ?? options.ClientId,
-                    NameClaimType = "preferred_username",
+                    ValidAudience = options.Audience,
+                    NameClaimType = options.NameClaimType,
                     RoleClaimType = System.Security.Claims.ClaimTypes.Role
                 };
             });
 
-        services.AddAuthorization(auth =>
-        {
-            auth.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
-
-            auth.AddPolicy("FhirAccess", policy =>
-                policy.RequireAuthenticatedUser()
-                      .RequireClaim("scope", "fhir-access"));
-
-            auth.AddPolicy("Admin", policy =>
-                policy.RequireRole(options.AdminRole));
-        });
+        services.AddAuthorizationBuilder()
+            .AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
 
         services.AddHttpContextAccessor();
-        services.AddTransient<IClaimsTransformation, KeycloakClaimsTransformation>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         return services;

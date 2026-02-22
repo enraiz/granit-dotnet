@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- ASP.NET Core shared framework (pour JwtBearerOptions, AuthorizationOptions) -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DigitalDynamics.Foundation.Security.Keycloak\DigitalDynamics.Foundation.Security.Keycloak.csproj" />
+    <!-- Référence directe pour appeler AddFoundationSecurity dans les tests d'intégration -->
+    <ProjectReference Include="..\..\src\DigitalDynamics.Foundation.Security\DigitalDynamics.Foundation.Security.csproj" />
+  </ItemGroup>
+
+</Project>

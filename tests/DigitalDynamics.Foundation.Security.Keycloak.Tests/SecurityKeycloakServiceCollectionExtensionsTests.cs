@@ -1,0 +1,151 @@
+// =============================================================================
+// Tests - SecurityKeycloakServiceCollectionExtensions
+// =============================================================================
+// Vérifie que AddFoundationSecurityKeycloak enregistre correctement :
+//   - KeycloakOptions depuis la section "Keycloak"
+//   - PostConfigure JWT Bearer (Authority, Audience, NameClaimType)
+//   - KeycloakClaimsTransformation
+//   - Policy "Admin"
+// =============================================================================
+
+using DigitalDynamics.Foundation.Security.Extensions;
+using DigitalDynamics.Foundation.Security.Keycloak.Authentication;
+using DigitalDynamics.Foundation.Security.Keycloak.Extensions;
+using DigitalDynamics.Foundation.Security.Keycloak.Options;
+using FluentAssertions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Xunit;
+
+namespace DigitalDynamics.Foundation.Security.Keycloak.Tests;
+
+public sealed class SecurityKeycloakServiceCollectionExtensionsTests
+{
+    private static IConfiguration CreateConfiguration(
+        string authority = "https://keycloak.test/realms/test",
+        string clientId = "test-client",
+        string adminRole = "admin") =>
+        new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Keycloak:Authority"] = authority,
+                ["Keycloak:ClientId"] = clientId,
+                ["Keycloak:RequireHttpsMetadata"] = "false",
+                ["Keycloak:AdminRole"] = adminRole
+            })
+            .Build();
+
+    [Fact]
+    public void AddFoundationSecurityKeycloak_RegistersKeycloakOptions()
+    {
+        // Arrange
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
+        services.AddFoundationSecurity(config);
+
+        // Act
+        services.AddFoundationSecurityKeycloak(config);
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Assert
+        KeycloakOptions options = sp.GetRequiredService<IOptions<KeycloakOptions>>().Value;
+        options.Authority.Should().Be("https://keycloak.test/realms/test");
+        options.ClientId.Should().Be("test-client");
+        options.RequireHttpsMetadata.Should().BeFalse();
+    }
+
+    [Fact]
+    public void AddFoundationSecurityKeycloak_PostConfiguresJwtBearer_WithKeycloakValues()
+    {
+        // Arrange
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
+        services.AddFoundationSecurity(config);
+
+        // Act
+        services.AddFoundationSecurityKeycloak(config);
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Assert — PostConfigure surcharge les valeurs JWT Bearer
+        JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+
+        jwtOptions.Authority.Should().Be("https://keycloak.test/realms/test");
+        jwtOptions.Audience.Should().Be("test-client", "ClientId est utilisé comme Audience par défaut");
+        jwtOptions.TokenValidationParameters.NameClaimType.Should().Be("preferred_username");
+    }
+
+    [Fact]
+    public void AddFoundationSecurityKeycloak_WithCustomAudience_UsesAudienceOverClientId()
+    {
+        // Arrange
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Keycloak:Authority"] = "https://keycloak.test/realms/test",
+                ["Keycloak:ClientId"] = "test-client",
+                ["Keycloak:Audience"] = "custom-audience",
+                ["Keycloak:RequireHttpsMetadata"] = "false"
+            })
+            .Build();
+        services.AddFoundationSecurity(config);
+
+        // Act
+        services.AddFoundationSecurityKeycloak(config);
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Assert
+        JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+
+        jwtOptions.Audience.Should().Be("custom-audience");
+    }
+
+    [Fact]
+    public void AddFoundationSecurityKeycloak_RegistersClaimsTransformation()
+    {
+        // Arrange
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration();
+        services.AddFoundationSecurity(config);
+
+        // Act
+        services.AddFoundationSecurityKeycloak(config);
+
+        // Assert
+        List<ServiceDescriptor> descriptors = services
+            .Where(d => d.ServiceType == typeof(IClaimsTransformation))
+            .ToList();
+
+        descriptors.Should().Contain(d => d.ImplementationType == typeof(KeycloakClaimsTransformation));
+    }
+
+    [Fact]
+    public void AddFoundationSecurityKeycloak_RegistersAdminPolicy()
+    {
+        // Arrange
+        ServiceCollection services = new ServiceCollection();
+        IConfiguration config = CreateConfiguration(adminRole: "superadmin");
+        services.AddFoundationSecurity(config);
+
+        // Act
+        services.AddFoundationSecurityKeycloak(config);
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Assert
+        AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
+        authOptions.GetPolicy("Admin").Should().NotBeNull();
+        authOptions.GetPolicy("Authenticated").Should().NotBeNull("hérité de Foundation.Security");
+        authOptions.GetPolicy("FhirAccess").Should().BeNull(
+            "FhirAccess est application-specific, pas dans Foundation.Security.Keycloak");
+    }
+}

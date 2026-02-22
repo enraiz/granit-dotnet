@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>DigitalDynamics.Foundation.Security.Keycloak</PackageId>
+    <Description>Extras Keycloak pour Foundation.Security : transformation des claims realm_access, policy Admin et configuration JWT Bearer depuis la section "Keycloak".</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <!-- ASP.NET Core shared framework (pour IClaimsTransformation, JwtBearerOptions, etc.) -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalDynamics.Foundation.Security\DigitalDynamics.Foundation.Security.csproj" />
+  </ItemGroup>
+
+</Project>

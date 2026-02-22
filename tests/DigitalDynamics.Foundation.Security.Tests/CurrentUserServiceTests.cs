@@ -2,6 +2,8 @@
 // Tests - CurrentUserService
 // =============================================================================
 // Vérifie l'extraction des informations utilisateur depuis les claims JWT.
+// UserName utilise User.Identity.Name, qui respecte le NameClaimType
+// configuré dans JWT Bearer (dépend du provider IDP utilisé).
 // =============================================================================
 
 using System.Security.Claims;
@@ -19,7 +21,7 @@ public sealed class CurrentUserServiceTests
     public void UserId_WithAuthenticatedUser_ReturnsSubClaim()
     {
         // Arrange
-        var sut = CreateService(new Claim("sub", "user-abc-123"));
+        CurrentUserService sut = CreateService(new Claim("sub", "user-abc-123"));
 
         // Act & Assert
         sut.UserId.Should().Be("user-abc-123");
@@ -27,22 +29,35 @@ public sealed class CurrentUserServiceTests
     }
 
     [Fact]
-    public void UserName_WithPreferredUsername_ReturnsPreferredUsername()
+    public void UserName_ReturnsIdentityName_ReflectsConfiguredNameClaimType()
     {
-        // Arrange
-        var sut = CreateService(
+        // Arrange — nameType = "preferred_username" simule la config Keycloak
+        CurrentUserService sut = CreateService(
+            nameType: "preferred_username",
             new Claim("sub", "user-123"),
             new Claim("preferred_username", "jean.dupont"));
 
-        // Act & Assert
+        // Act & Assert — User.Identity.Name résout la claim "preferred_username"
         sut.UserName.Should().Be("jean.dupont");
+    }
+
+    [Fact]
+    public void UserName_WithGenericSubClaim_ReturnsSubValue()
+    {
+        // Arrange — nameType = "sub" (défaut JwtBearerAuthOptions.NameClaimType)
+        CurrentUserService sut = CreateService(
+            nameType: "sub",
+            new Claim("sub", "user-abc-123"));
+
+        // Act & Assert — User.Identity.Name résout la claim "sub"
+        sut.UserName.Should().Be("user-abc-123");
     }
 
     [Fact]
     public void Email_WithEmailClaim_ReturnsEmail()
     {
         // Arrange
-        var sut = CreateService(
+        CurrentUserService sut = CreateService(
             new Claim("sub", "user-123"),
             new Claim(ClaimTypes.Email, "jean@guava-health.com"));
 
@@ -54,7 +69,7 @@ public sealed class CurrentUserServiceTests
     public void Roles_WithMultipleRoleClaims_ReturnsAllRoles()
     {
         // Arrange
-        var sut = CreateService(
+        CurrentUserService sut = CreateService(
             new Claim("sub", "user-123"),
             new Claim(ClaimTypes.Role, "admin"),
             new Claim(ClaimTypes.Role, "practitioner"));
@@ -67,7 +82,7 @@ public sealed class CurrentUserServiceTests
     public void IsInRole_WithMatchingRole_ReturnsTrue()
     {
         // Arrange
-        var sut = CreateService(
+        CurrentUserService sut = CreateService(
             new Claim("sub", "user-123"),
             new Claim(ClaimTypes.Role, "admin"));
 
@@ -80,9 +95,9 @@ public sealed class CurrentUserServiceTests
     public void Properties_WithoutHttpContext_ReturnDefaults()
     {
         // Arrange
-        var accessor = Substitute.For<IHttpContextAccessor>();
+        IHttpContextAccessor accessor = Substitute.For<IHttpContextAccessor>();
         accessor.HttpContext.Returns((HttpContext?)null);
-        var sut = new CurrentUserService(accessor);
+        CurrentUserService sut = new CurrentUserService(accessor);
 
         // Act & Assert
         sut.UserId.Should().BeNull();
@@ -92,13 +107,18 @@ public sealed class CurrentUserServiceTests
         sut.Roles.Should().BeEmpty();
     }
 
-    private static CurrentUserService CreateService(params Claim[] claims)
-    {
-        var identity = new ClaimsIdentity(claims, "Bearer");
-        var principal = new ClaimsPrincipal(identity);
+    // --- Helpers ---
 
-        var httpContext = new DefaultHttpContext { User = principal };
-        var accessor = Substitute.For<IHttpContextAccessor>();
+    private static CurrentUserService CreateService(params Claim[] claims) =>
+        CreateService(nameType: ClaimTypes.Name, claims);
+
+    private static CurrentUserService CreateService(string nameType, params Claim[] claims)
+    {
+        ClaimsIdentity identity = new ClaimsIdentity(claims, "Bearer", nameType, ClaimTypes.Role);
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+        DefaultHttpContext httpContext = new DefaultHttpContext { User = principal };
+        IHttpContextAccessor accessor = Substitute.For<IHttpContextAccessor>();
         accessor.HttpContext.Returns(httpContext);
 
         return new CurrentUserService(accessor);

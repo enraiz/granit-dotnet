@@ -2,6 +2,8 @@
 // CurrentUserService - Implémentation de ICurrentUserService via HttpContext
 // =============================================================================
 // Extrait les informations de l'utilisateur courant depuis les claims JWT.
+// UserName lit User.Identity.Name, qui respecte le NameClaimType configuré
+// dans JWT Bearer (défaut : "sub" — RFC 7519, toujours présent dans un JWT valide).
 // =============================================================================
 
 using System.Security.Claims;
@@ -27,8 +29,7 @@ public sealed class CurrentUserService : ICurrentUserService
     public string? UserId => User?.FindFirstValue(ClaimTypes.NameIdentifier)
                              ?? User?.FindFirstValue("sub");
 
-    public string? UserName => User?.FindFirstValue("preferred_username")
-                               ?? User?.FindFirstValue(ClaimTypes.Name);
+    public string? UserName => User?.Identity?.Name;
 
     public string? Email => User?.FindFirstValue(ClaimTypes.Email)
                             ?? User?.FindFirstValue("email");
