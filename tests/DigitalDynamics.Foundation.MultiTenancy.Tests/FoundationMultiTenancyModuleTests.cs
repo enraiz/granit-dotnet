@@ -4,16 +4,15 @@
 // Vérifie le câblage complet des services via AddFoundation<T>(),
 // à la manière d'AbpIntegratedTest<T> dans ABP Framework.
 //
-// Chaque test bootstrappe le module complet (Security + MultiTenancy)
-// et résout les services depuis le vrai conteneur DI.
+// Le module MultiTenancy est indépendant de Foundation.Security :
+// JwtClaimTenantResolver lit HttpContext.User (ClaimsPrincipal standard)
+// et fonctionne avec n'importe quel fournisseur d'identité.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Extensions;
-using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.MultiTenancy.Middleware;
 using DigitalDynamics.Foundation.MultiTenancy.Pipeline;
 using DigitalDynamics.Foundation.MultiTenancy.Resolvers;
-using DigitalDynamics.Foundation.Security;
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,21 +91,7 @@ public sealed class FoundationMultiTenancyModuleTests
         middleware.Should().NotBeNull();
     }
 
-    // --- Ordre topologique ---
-
-    [Fact]
-    public void Module_Topological_Order_Has_Security_Before_MultiTenancy()
-    {
-        using WebApplication app = BuildApp();
-
-        FoundationApplication foundationApp = app.Services.GetRequiredService<FoundationApplication>();
-
-        foundationApp.ModuleTypes.Should().ContainInOrder(
-            typeof(FoundationSecurityModule),
-            typeof(FoundationMultiTenancyModule));
-    }
-
-    // --- Test fonctionnel (style AbpIntegratedTest) ---
+    // --- Tests fonctionnels (style AbpIntegratedTest) ---
 
     [Fact]
     public void ICurrentTenant_Resolved_From_DI_Change_Works()

@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalDynamics.Foundation.Core\DigitalDynamics.Foundation.Core.csproj" />
-    <ProjectReference Include="..\DigitalDynamics.Foundation.Security\DigitalDynamics.Foundation.Security.csproj" />
   </ItemGroup>
 
 </Project>

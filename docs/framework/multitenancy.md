@@ -74,7 +74,15 @@ La résolution suit une **chaîne ordonnée** : le premier résolveur non-null g
 | Résolveur | Order | Source | Configurable |
 | --- | --- | --- | --- |
 | `HeaderTenantResolver` | 100 | Header HTTP `X-Tenant-Id` | `TenantIdHeaderName` |
-| `JwtClaimTenantResolver` | 200 | Claim JWT `tenant_id` | `TenantIdClaimType` |
+| `JwtClaimTenantResolver` | 200 | Claim `tenant_id` dans `ClaimsPrincipal` | `TenantIdClaimType` |
+
+`JwtClaimTenantResolver` lit `HttpContext.User.FindFirstValue(claimType)` — standard
+ASP.NET Core. Compatible avec **tout fournisseur d'identité** qui popule le
+`ClaimsPrincipal` : Keycloak, Auth0, Azure AD B2C, IdentityServer, etc. Il n'y a
+aucune dépendance sur `Foundation.Security`.
+
+> Pour que `JwtClaimTenantResolver` fonctionne, le middleware d'authentification doit
+> être enregistré **avant** `UseFoundationMultiTenancy()` dans le pipeline.
 
 Pour ajouter un résolveur personnalisé :
 

@@ -244,5 +244,6 @@ src/DigitalDynamics.Foundation.Settings/
 FoundationSettingsModule
   ├── FoundationCachingModule      (ICacheService<SettingValue>)
   ├── FoundationMultiTenancyModule (ICurrentTenant pour provider T)
-  └── FoundationEncryptionModule   (IStringEncryptionService pour IsEncrypted)
+  ├── FoundationEncryptionModule   (IStringEncryptionService pour IsEncrypted)
+  └── FoundationSecurityModule     (ICurrentUserService pour provider U)
 ```

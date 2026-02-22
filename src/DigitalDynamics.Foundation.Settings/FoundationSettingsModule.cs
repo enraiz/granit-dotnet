@@ -5,9 +5,10 @@
 //   User (U) → Tenant (T) → Global (G) → Configuration (C) → Default (D)
 //
 // Dépendances :
-//   - FoundationCachingModule   : ICacheService<SettingValue> pour le cache des providers
+//   - FoundationCachingModule      : ICacheService<SettingValue> pour le cache des providers
 //   - FoundationMultiTenancyModule : ICurrentTenant pour le provider Tenant
 //   - FoundationEncryptionModule   : IStringEncryptionService pour IsEncrypted (couche store)
+//   - FoundationSecurityModule     : ICurrentUserService pour le provider User
 //
 // Store par défaut : InMemorySettingStore (remplacé par EfCoreSettingStore en production
 //   via FoundationSettingsEntityFrameworkCoreModule).
@@ -17,6 +18,7 @@ using DigitalDynamics.Foundation.Caching;
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Encryption;
 using DigitalDynamics.Foundation.MultiTenancy;
+using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Settings.Extensions;
 using DigitalDynamics.Foundation.Settings.Options;
 
@@ -28,6 +30,7 @@ namespace DigitalDynamics.Foundation.Settings;
 [DependsOn(typeof(FoundationCachingModule))]
 [DependsOn(typeof(FoundationMultiTenancyModule))]
 [DependsOn(typeof(FoundationEncryptionModule))]
+[DependsOn(typeof(FoundationSecurityModule))]
 public sealed class FoundationSettingsModule : FoundationModule
 {
     /// <inheritdoc/>
