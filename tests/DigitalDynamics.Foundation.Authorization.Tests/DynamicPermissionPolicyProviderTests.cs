@@ -1,0 +1,97 @@
+// =============================================================================
+// Tests - DynamicPermissionPolicyProvider
+// =============================================================================
+// Vérifie que le provider :
+//   - Retourne une Policy avec PermissionRequirement pour une permission connue
+//   - Délègue au fallback pour une policy standard ("Authenticated")
+//   - Retourne null pour une policy totalement inconnue
+// =============================================================================
+
+using DigitalDynamics.Foundation.Authorization.Abstractions;
+using DigitalDynamics.Foundation.Authorization.Authorization;
+using FluentAssertions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using NSubstitute;
+using Xunit;
+
+namespace DigitalDynamics.Foundation.Authorization.Tests;
+
+public sealed class DynamicPermissionPolicyProviderTests
+{
+    [Fact]
+    public async Task GetPolicyAsync_KnownPermission_ReturnsPolicyWithPermissionRequirement()
+    {
+        // Arrange
+        IPermissionDefinitionManager manager = Substitute.For<IPermissionDefinitionManager>();
+        manager.Exists("Invoices.Delete").Returns(true);
+
+        DynamicPermissionPolicyProvider provider = new(
+            Microsoft.Extensions.Options.Options.Create(new AuthorizationOptions()),
+            manager);
+
+        // Act
+        AuthorizationPolicy? policy = await provider.GetPolicyAsync("Invoices.Delete");
+
+        // Assert
+        policy.Should().NotBeNull();
+        policy!.Requirements.Should().ContainSingle()
+            .Which.Should().BeOfType<PermissionRequirement>()
+            .Which.PermissionName.Should().Be("Invoices.Delete");
+    }
+
+    [Fact]
+    public async Task GetPolicyAsync_UnknownPolicyName_ReturnsNull()
+    {
+        // Arrange
+        IPermissionDefinitionManager manager = Substitute.For<IPermissionDefinitionManager>();
+        manager.Exists("Unknown.Policy").Returns(false);
+
+        DynamicPermissionPolicyProvider provider = new(
+            Microsoft.Extensions.Options.Options.Create(new AuthorizationOptions()),
+            manager);
+
+        // Act
+        AuthorizationPolicy? policy = await provider.GetPolicyAsync("Unknown.Policy");
+
+        // Assert
+        policy.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetPolicyAsync_StandardAuthenticatedPolicy_DelegatesToFallback()
+    {
+        // Arrange
+        IPermissionDefinitionManager manager = Substitute.For<IPermissionDefinitionManager>();
+        manager.Exists("Authenticated").Returns(false); // not a permission name
+
+        AuthorizationOptions authOptions = new();
+        authOptions.AddPolicy("Authenticated", p => p.RequireAuthenticatedUser());
+
+        DynamicPermissionPolicyProvider provider = new(
+            Microsoft.Extensions.Options.Options.Create(authOptions),
+            manager);
+
+        // Act
+        AuthorizationPolicy? policy = await provider.GetPolicyAsync("Authenticated");
+
+        // Assert
+        policy.Should().NotBeNull("the fallback provider should resolve the registered policy");
+    }
+
+    [Fact]
+    public async Task GetDefaultPolicyAsync_DelegatesToFallback()
+    {
+        // Arrange
+        IPermissionDefinitionManager manager = Substitute.For<IPermissionDefinitionManager>();
+        DynamicPermissionPolicyProvider provider = new(
+            Microsoft.Extensions.Options.Options.Create(new AuthorizationOptions()),
+            manager);
+
+        // Act
+        AuthorizationPolicy defaultPolicy = await provider.GetDefaultPolicyAsync();
+
+        // Assert
+        defaultPolicy.Should().NotBeNull();
+    }
+}
