@@ -9,13 +9,17 @@
 // =============================================================================
 
 using DigitalDynamics.Foundation.Caching.StackExchangeRedis.Extensions;
+using DigitalDynamics.Foundation.Caching.StackExchangeRedis.HealthChecks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using NSubstitute;
+using StackExchange.Redis;
 using Xunit;
 
 namespace DigitalDynamics.Foundation.Caching.StackExchangeRedis.Tests;
@@ -163,5 +167,62 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Assert
         redisOpts.Configuration.Should().Be("redis-service:6379");
         redisOpts.InstanceName.Should().Be("myapp:");
+    }
+
+    [Fact]
+    public void AddFoundationRedisCheck_WhenIConnectionMultiplexerNotRegistered_RegistersIt()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        // Configure RedisCachingOptions so the factory lambda can read it
+        services.Configure<RedisCachingOptions>(opts => opts.Configuration = "localhost:6379");
+        IHealthChecksBuilder builder = services.AddHealthChecks();
+
+        // Act
+        builder.AddFoundationRedisCheck();
+
+        // Assert — IConnectionMultiplexer must have been registered
+        ServiceDescriptor? multiplexerDescriptor = services.FirstOrDefault(
+            d => d.ServiceType == typeof(IConnectionMultiplexer));
+        multiplexerDescriptor.Should().NotBeNull();
+        multiplexerDescriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void AddFoundationRedisCheck_WhenIConnectionMultiplexerAlreadyRegistered_DoesNotRegisterAgain()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        IConnectionMultiplexer existingMultiplexer = Substitute.For<IConnectionMultiplexer>();
+        services.AddSingleton(existingMultiplexer);
+        IHealthChecksBuilder builder = services.AddHealthChecks();
+
+        // Act
+        builder.AddFoundationRedisCheck();
+
+        // Assert — only one IConnectionMultiplexer registration
+        IEnumerable<ServiceDescriptor> multiplexerDescriptors = services.Where(
+            d => d.ServiceType == typeof(IConnectionMultiplexer));
+        multiplexerDescriptors.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void AddFoundationRedisCheck_RegistersCheckTaggedReadiness()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        IConnectionMultiplexer existingMultiplexer = Substitute.For<IConnectionMultiplexer>();
+        services.AddSingleton(existingMultiplexer);
+        IHealthChecksBuilder builder = services.AddHealthChecks();
+
+        // Act
+        builder.AddFoundationRedisCheck(name: "redis");
+
+        // Assert — HealthCheckRegistration tagged "readiness"
+        using ServiceProvider sp = services.BuildServiceProvider();
+        HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
+        HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "redis");
+        registration.Should().NotBeNull();
+        registration!.Tags.Should().Contain("readiness");
     }
 }

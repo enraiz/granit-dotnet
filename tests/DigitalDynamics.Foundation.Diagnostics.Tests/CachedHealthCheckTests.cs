@@ -102,6 +102,65 @@ public sealed class CachedHealthCheckTests
         await inner.Received(1).CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>());
     }
 
+    [Fact]
+    public void Dispose_ReleasesLock_WithoutThrowing()
+    {
+        // Arrange
+        IHealthCheck inner = Substitute.For<IHealthCheck>();
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(10));
+
+        // Act & Assert — Dispose must not throw; SemaphoreSlim is released
+        Action act = sut.Dispose;
+        act.Should().NotThrow();
+    }
+
+    [Fact]
+    public async Task CheckHealthAsync_SecondConcurrentCaller_UsesDoubleCheckLockAndReturnsCachedResult()
+    {
+        // This test explicitly covers the double-check path (line 50):
+        // Two callers enter before the cache is warm. The first acquires the lock,
+        // populates the cache, then releases it. The second acquires the lock, hits
+        // the double-check (cache is now warm), and returns the cached result without
+        // calling inner again.
+        SemaphoreSlim firstCallerStarted = new(0, 1);
+        SemaphoreSlim firstCallerCanContinue = new(0, 1);
+        int callCount = 0;
+
+        IHealthCheck inner = Substitute.For<IHealthCheck>();
+        inner.CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>())
+            .Returns(async _ =>
+            {
+                Interlocked.Increment(ref callCount);
+                firstCallerStarted.Release();
+                await firstCallerCanContinue.WaitAsync();
+                return HealthCheckResult.Healthy("populated");
+            });
+
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30));
+        HealthCheckContext context = BuildContext();
+
+        // First caller takes the lock and waits
+        Task<HealthCheckResult> firstCall = sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
+
+        // Wait until inner is executing (lock is held by first caller)
+        await firstCallerStarted.WaitAsync(TestContext.Current.CancellationToken);
+
+        // Second caller tries to enter — it will block on WaitAsync
+        Task<HealthCheckResult> secondCall = sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
+
+        // Let first caller finish, which populates the cache and releases the lock
+        firstCallerCanContinue.Release();
+        HealthCheckResult firstResult = await firstCall;
+
+        // Second caller gets the lock, hits the double-check, and returns cached result
+        HealthCheckResult secondResult = await secondCall;
+
+        // Only one call to inner
+        callCount.Should().Be(1);
+        firstResult.Status.Should().Be(HealthStatus.Healthy);
+        secondResult.Status.Should().Be(HealthStatus.Healthy);
+    }
+
     private static HealthCheckContext BuildContext() =>
         new() { Registration = new HealthCheckRegistration("test", _ => Substitute.For<IHealthCheck>(), null, []) };
 }

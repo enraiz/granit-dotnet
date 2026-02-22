@@ -5,14 +5,17 @@
 // =============================================================================
 
 using DigitalDynamics.Foundation.Vault.Extensions;
+using DigitalDynamics.Foundation.Vault.HealthChecks;
 using DigitalDynamics.Foundation.Vault.Options;
 using DigitalDynamics.Foundation.Vault.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NSubstitute;
 using VaultSharp;
 using Xunit;
 
@@ -121,5 +124,49 @@ public sealed class VaultServiceCollectionExtensionsTests
         descriptor.Should().NotBeNull();
         descriptor!.ImplementationType.Should().Be<TransitEncryptionService>();
         descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddFoundationVaultCheck_RegistersVaultHealthCheck_AsReadinessCheck()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        // IVaultClient must be registered so VaultHealthCheck can be resolved
+        services.AddSingleton(Substitute.For<IVaultClient>());
+        IHealthChecksBuilder builder = services.AddHealthChecks();
+
+        // Act
+        builder.AddFoundationVaultCheck();
+
+        // Assert — VaultHealthCheck singleton registered
+        ServiceDescriptor? healthCheckDescriptor = services.FirstOrDefault(
+            d => d.ServiceType == typeof(VaultHealthCheck));
+        healthCheckDescriptor.Should().NotBeNull();
+        healthCheckDescriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
+
+        // Assert — HealthCheckRegistration tagged "readiness"
+        using ServiceProvider sp = services.BuildServiceProvider();
+        HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
+        HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "vault");
+        registration.Should().NotBeNull();
+        registration!.Tags.Should().Contain("readiness");
+    }
+
+    [Fact]
+    public void AddFoundationVaultCheck_WithCustomName_RegistersCheckWithThatName()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        services.AddSingleton(Substitute.For<IVaultClient>());
+        IHealthChecksBuilder builder = services.AddHealthChecks();
+
+        // Act
+        builder.AddFoundationVaultCheck(name: "vault-primary");
+
+        // Assert
+        using ServiceProvider sp = services.BuildServiceProvider();
+        HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
+        HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "vault-primary");
+        registration.Should().NotBeNull();
     }
 }
