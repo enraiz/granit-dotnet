@@ -113,8 +113,9 @@ public sealed class ClockTests
         var userTime = _clock.ConvertToUserTime(utcTime);
 
         // Assert - Brussels is UTC+2 in summer (CEST)
+        // Use .DateTime.Hour (respects the stored offset) not .LocalDateTime.Hour (machine-timezone-dependent)
         userTime.Offset.Should().Be(TimeSpan.FromHours(2));
-        userTime.LocalDateTime.Hour.Should().Be(14);
+        userTime.DateTime.Hour.Should().Be(14);
     }
 
     [Fact]
