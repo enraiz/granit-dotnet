@@ -1,25 +1,34 @@
-# Security
+# Authentication & Security
 
-`DigitalDynamics.Foundation.Security` fournit l'authentification JWT Bearer générique,
-`ICurrentUserService` et les policies d'autorisation de base pour les applications .NET
-Digital Dynamics.
+Trois packages constituent la couche d'authentification de Foundation,
+suivant le pattern ABP Framework : abstractions / implémentation générique / extension IDP.
 
-`DigitalDynamics.Foundation.Security.Keycloak` étend ce module avec les spécificités
-Keycloak : transformation des claims, configuration automatique de l'Authority et
-policy `Admin`.
-
-Ce découpage suit le pattern ABP Framework : module générique + extensions par IDP.
+```text
+Foundation.Core
+      ↑
+Foundation.Security                   ← ICurrentUserService (interface seule)
+      ↑
+Foundation.Authentication.JwtBearer   ← JWT Bearer générique, CurrentUserService,
+      ↑                                  policy "Authenticated"
+Foundation.Authentication.Keycloak    ← Claims Keycloak, PostConfigure JWT Bearer,
+                                         policy "Admin"
+      (futur)
+Foundation.Authentication.Auth0       ← [DependsOn(JwtBearer)]
+```
 
 ## Packages
 
-| Package | Rôle |
-| --- | --- |
-| `Foundation.Security` | JWT Bearer générique, `ICurrentUserService`, policy `Authenticated` |
-| `Foundation.Security.Keycloak` | Claims Keycloak, `PostConfigure` JWT Bearer, policy `Admin` |
+| Package | Rôle | Module |
+| --- | --- | --- |
+| `Foundation.Security` | `ICurrentUserService` (abstraction) | `FoundationSecurityModule` |
+| `Foundation.Authentication.JwtBearer` | JWT Bearer générique, `CurrentUserService` | `FoundationJwtBearerModule` |
+| `Foundation.Authentication.Keycloak` | Claims Keycloak, policy `Admin` | `FoundationAuthenticationKeycloakModule` |
 
 ---
 
 ## Foundation.Security
+
+Package d'abstractions pures. Ne contient aucune dépendance sur ASP.NET Core.
 
 ### Installation
 
@@ -27,14 +36,53 @@ Ce découpage suit le pattern ABP Framework : module générique + extensions pa
 dotnet add package DigitalDynamics.Foundation.Security
 ```
 
-### Configuration
+### ICurrentUserService
 
-#### appsettings.json
+```csharp
+public interface ICurrentUserService
+{
+    string? UserId { get; }        // claim "sub"
+    string? UserName { get; }      // selon NameClaimType configuré
+    string? Email { get; }         // claim "email"
+    bool IsAuthenticated { get; }
+    IReadOnlyList<string> Roles { get; }
+    bool IsInRole(string role);
+}
+```
+
+Utilisable dans n'importe quel module applicatif via injection de dépendances.
+L'implémentation (`CurrentUserService`) est fournie par `Foundation.Authentication.JwtBearer`.
+
+```csharp
+// Dans un handler Wolverine (method injection)
+public static async Task Handle(
+    MyCommand command,
+    ICurrentUserService currentUser,
+    CancellationToken cancellationToken)
+{
+    var userId = currentUser.UserId;
+    var isAdmin = currentUser.IsInRole("admin");
+}
+```
+
+---
+
+## Foundation.Authentication.JwtBearer
+
+Implémentation JWT Bearer générique (OIDC-compatible). Ne connaît aucun IDP spécifique.
+
+### Installation
+
+```bash
+dotnet add package DigitalDynamics.Foundation.Authentication.JwtBearer
+```
+
+### Configuration
 
 ```json
 {
   "Authentication": {
-    "Authority": "https://sso.example.com/realms/my-realm",
+    "Authority": "https://idp.example.com/realms/my-realm",
     "Audience": "my-client",
     "RequireHttpsMetadata": true,
     "NameClaimType": "sub"
@@ -42,23 +90,24 @@ dotnet add package DigitalDynamics.Foundation.Security
 }
 ```
 
-> `NameClaimType` définit quel claim JWT alimente `User.Identity.Name` et donc
-> `ICurrentUserService.UserName`. La valeur par défaut `"sub"` est conforme RFC 7519
-> (toujours présente dans un token valide).
+> `NameClaimType` définit quel claim alimente `User.Identity.Name` (et donc
+> `ICurrentUserService.UserName`). La valeur par défaut `"sub"` est conforme RFC 7519
+> (toujours présente dans un JWT valide). Keycloak la surcharge à `"preferred_username"`
+> via `PostConfigure` dans `Foundation.Authentication.Keycloak`.
 
-#### Program.cs
+### Program.cs
 
 Via le système de modules (recommandé) :
 
 ```csharp
-// FoundationSecurityModule est chargé automatiquement via AddFoundation<T>()
-// Voir docs/framework/modularity.md
+[DependsOn(typeof(FoundationJwtBearerModule))]
+public sealed class MyAppModule : FoundationModule { ... }
 ```
 
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddFoundationSecurity(builder.Configuration);
+builder.Services.AddFoundationJwtBearer(builder.Configuration);
 ```
 
 ### JwtBearerAuthOptions
@@ -88,47 +137,30 @@ public sealed class JwtBearerAuthOptions
 | --- | --- |
 | `Authenticated` | Utilisateur authentifié |
 
-### ICurrentUserService
-
-Implémentation de `ICurrentUserService` basée sur `HttpContext`. Extrait les
-informations de l'utilisateur depuis les claims JWT.
-
-```csharp
-// Dans un handler Wolverine (method injection)
-public static async Task Handle(
-    MyCommand command,
-    ICurrentUserService currentUser,
-    CancellationToken cancellationToken)
-{
-    var userId = currentUser.UserId;       // claim "sub"
-    var userName = currentUser.UserName;   // User.Identity.Name (selon NameClaimType)
-    var email = currentUser.Email;         // claim "email"
-    var isAdmin = currentUser.IsInRole("admin");
-}
-```
-
 ---
 
-## Foundation.Security.Keycloak
+## Foundation.Authentication.Keycloak
+
+Extension Keycloak pour `Foundation.Authentication.JwtBearer`.
+Dépend transitivement de `Foundation.Security` et `Foundation.Authentication.JwtBearer`.
 
 ### Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Security.Keycloak
+dotnet add package DigitalDynamics.Foundation.Authentication.Keycloak
 ```
 
-Ce package dépend de `Foundation.Security` : les deux modules sont enregistrés.
+Un seul package suffit — `Foundation.Security` et `Foundation.Authentication.JwtBearer`
+sont amenés transitivement.
 
 ### Configuration
 
-#### appsettings.json
+Seule la section `"Keycloak"` est nécessaire. La section `"Authentication"` n'est
+**pas** requise quand ce module est utilisé : `PostConfigureAll<JwtBearerOptions>`
+applique les valeurs Keycloak après l'initialisation du JWT Bearer.
 
 ```json
 {
-  "Authentication": {
-    "Authority": "https://keycloak.example.com/realms/my-realm",
-    "Audience": "my-client"
-  },
   "Keycloak": {
     "Authority": "https://keycloak.example.com/realms/my-realm",
     "ClientId": "my-client",
@@ -140,24 +172,22 @@ Ce package dépend de `Foundation.Security` : les deux modules sont enregistrés
 }
 ```
 
-> La section `"Authentication"` est lue par `Foundation.Security` (module de base).
-> La section `"Keycloak"` est lue par `Foundation.Security.Keycloak` qui reconfigure
-> ensuite le JWT Bearer via `PostConfigureAll<JwtBearerOptions>`.
-
-#### Program.cs
+### Program.cs
 
 Via le système de modules (recommandé) :
 
 ```csharp
-// FoundationSecurityKeycloakModule ([DependsOn(FoundationSecurityModule)])
-// est chargé automatiquement via AddFoundation<T>()
+[DependsOn(typeof(FoundationAuthenticationKeycloakModule))]
+public sealed class MyAppModule : FoundationModule { ... }
+// FoundationAuthenticationKeycloakModule amène automatiquement :
+// → FoundationJwtBearerModule → FoundationSecurityModule
 ```
 
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddFoundationSecurity(builder.Configuration);
-builder.Services.AddFoundationSecurityKeycloak(builder.Configuration);
+builder.Services.AddFoundationJwtBearer(builder.Configuration);
+builder.Services.AddFoundationKeycloak(builder.Configuration);
 ```
 
 ### KeycloakOptions
@@ -177,16 +207,16 @@ public sealed class KeycloakOptions
 }
 ```
 
-#### RoleClaimsSource
+### RoleClaimsSource
 
-| Valeur | Structure JWT Keycloak |
-| --- | --- |
-| `"realm_access"` (défaut) | `realm_access.roles[]` — rôles du realm |
-| `"resource_access"` | `resource_access.{ClientId}.roles[]` — rôles du client |
+| Valeur | Structure JWT | Usage |
+| --- | --- | --- |
+| `"realm_access"` (défaut) | `realm_access.roles[]` | Rôles realm globaux |
+| `"resource_access"` | `resource_access.{ClientId}.roles[]` | Rôles par client |
 
-### Transformation des claims Keycloak
+### Transformation des claims
 
-Keycloak stocke les rôles dans le claim `realm_access` (ou `resource_access`) :
+Keycloak encode les rôles dans un claim JSON non standard :
 
 ```json
 {
@@ -198,8 +228,7 @@ Keycloak stocke les rôles dans le claim `realm_access` (ou `resource_access`) :
 ```
 
 `KeycloakClaimsTransformation` extrait ces rôles et les ajoute comme `ClaimTypes.Role`
-standard .NET. Cela permet l'utilisation de `[Authorize(Roles = "admin")]` et
-`User.IsInRole("admin")`.
+standard .NET, permettant `[Authorize(Roles = "admin")]` et `User.IsInRole("admin")`.
 
 ### Services supplémentaires enregistrés
 
@@ -213,23 +242,28 @@ standard .NET. Cela permet l'utilisation de `[Authorize(Roles = "admin")]` et
 | --- | --- |
 | `Admin` | Rôle configuré dans `KeycloakOptions.AdminRole` (défaut : `admin`) |
 
-> Les policies métier (ex. `FhirAccess`, `PractitionerOnly`) sont à définir dans
-> l'application elle-même, pas dans Foundation.
+> Les policies métier (`FhirAccess`, `PractitionerOnly`…) sont à définir dans
+> l'application, pas dans Foundation.
 
 ---
 
-## Architecture
+## Architecture des fichiers
 
 ```text
-Foundation.Security                          Foundation.Security.Keycloak
-├── ICurrentUserService.cs                   ├── FoundationSecurityKeycloakModule.cs
-├── Options/                                 │   [DependsOn(FoundationSecurityModule)]
-│   └── JwtBearerAuthOptions.cs             ├── Options/
-├── Authentication/                          │   └── KeycloakOptions.cs
-│   └── CurrentUserService.cs               ├── Authentication/
-├── FoundationSecurityModule.cs             │   └── KeycloakClaimsTransformation.cs
-└── Extensions/                             └── Extensions/
-    └── SecurityServiceCollectionExtensions.cs  └── SecurityKeycloakServiceCollectionExtensions.cs
+Foundation.Security
+└── ICurrentUserService.cs
+
+Foundation.Authentication.JwtBearer
+├── Options/JwtBearerAuthOptions.cs
+├── Authentication/CurrentUserService.cs
+├── Extensions/JwtBearerServiceCollectionExtensions.cs   (AddFoundationJwtBearer)
+└── FoundationJwtBearerModule.cs                         [DependsOn(Security)]
+
+Foundation.Authentication.Keycloak
+├── Options/KeycloakOptions.cs
+├── Authentication/KeycloakClaimsTransformation.cs
+├── Extensions/KeycloakServiceCollectionExtensions.cs    (AddFoundationKeycloak)
+└── FoundationAuthenticationKeycloakModule.cs            [DependsOn(JwtBearer)]
 ```
 
 ## Validation du token
@@ -239,4 +273,24 @@ La configuration JWT Bearer valide :
 - **Issuer** : doit correspondre à `Authority`
 - **Audience** : doit correspondre à `Audience` (ou `ClientId` pour Keycloak)
 - **Lifetime** : le token ne doit pas être expiré
-- **Signing key** : la signature est vérifiée via les clés JWKS de l'IDP
+- **Signing key** : signature vérifiée via les clés JWKS de l'IDP
+
+## Ajouter un nouveau provider (ex. Auth0)
+
+Créer `Foundation.Authentication.Auth0` en dépendant uniquement de
+`Foundation.Authentication.JwtBearer` :
+
+```xml
+<ProjectReference Include="..\DigitalDynamics.Foundation.Authentication.JwtBearer\..." />
+```
+
+```csharp
+[DependsOn(typeof(FoundationJwtBearerModule))]
+public sealed class FoundationAuthenticationAuth0Module : FoundationModule
+{
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Services.AddFoundationAuth0(context.Configuration);
+}
+```
+
+`Foundation.Security` et `Foundation.Authentication.Keycloak` ne sont pas impactés.
