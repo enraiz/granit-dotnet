@@ -30,7 +30,7 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         provider.GetAllSchemesAsync().Returns([]);
 
         JwtBearerSecuritySchemeTransformer transformer = new(provider);
-        OpenApiDocument document = new() { Paths = new OpenApiPaths() };
+        OpenApiDocument document = new() { Paths = [] };
         OpenApiDocumentTransformerContext context = BuildContext();
 
         // Act
@@ -48,7 +48,7 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         // Arrange
         IAuthenticationSchemeProvider provider = BuildProviderWithBearer();
         JwtBearerSecuritySchemeTransformer transformer = new(provider);
-        OpenApiDocument document = new() { Paths = new OpenApiPaths() };
+        OpenApiDocument document = new() { Paths = [] };
         OpenApiDocumentTransformerContext context = BuildContext();
 
         // Act
