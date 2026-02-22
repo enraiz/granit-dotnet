@@ -1,15 +1,15 @@
 // =============================================================================
-// VaultCredentialLeaseManager - Gestion des credentials dynamiques PostgreSQL
+// VaultCredentialLeaseManager - PostgreSQL dynamic credentials management
 // =============================================================================
-// BackgroundService qui :
-//   1. Obtient un credential dynamique PostgreSQL via Vault Database Engine
-//   2. Renouvelle le lease avant expiration (seuil configurable, défaut 75% du TTL)
-//   3. Demande un nouveau credential si le renouvellement échoue
+// BackgroundService that:
+//   1. Obtains a dynamic PostgreSQL credential via Vault Database Engine
+//   2. Renews the lease before expiration (configurable threshold, default 75% of TTL)
+//   3. Requests a new credential if renewal fails
 //
-// Les credentials sont exposés via IDatabaseCredentialProvider pour que
-// le DbContext puisse construire sa connection string dynamiquement.
+// Credentials are exposed via IDatabaseCredentialProvider so that
+// the DbContext can dynamically build its connection string.
 //
-// Conformité HDS : aucun mot de passe statique en production.
+// HDS compliance: no static password in production.
 // =============================================================================
 
 using Microsoft.Extensions.Hosting;
@@ -21,23 +21,23 @@ using VaultSharp;
 namespace DigitalDynamics.Foundation.Vault.Services;
 
 /// <summary>
-/// Interface pour obtenir les credentials dynamiques PostgreSQL.
+/// Interface for obtaining dynamic PostgreSQL credentials.
 /// </summary>
 public interface IDatabaseCredentialProvider
 {
-    /// <summary>Nom d'utilisateur dynamique courant.</summary>
+    /// <summary>Current dynamic username.</summary>
     string Username { get; }
 
-    /// <summary>Mot de passe dynamique courant.</summary>
+    /// <summary>Current dynamic password.</summary>
     string Password { get; }
 
-    /// <summary>Indique si des credentials sont disponibles.</summary>
+    /// <summary>Indicates whether credentials are available.</summary>
     bool IsReady { get; }
 }
 
 /// <summary>
-/// Service d'arrière-plan qui gère le cycle de vie des credentials
-/// dynamiques PostgreSQL via Vault Database Engine.
+/// Background service that manages the lifecycle of dynamic
+/// PostgreSQL credentials via Vault Database Engine.
 /// </summary>
 public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCredentialProvider
 {
@@ -66,7 +66,7 @@ public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCr
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Démarrage du gestionnaire de credentials dynamiques Vault");
+        _logger.LogInformation("Starting Vault dynamic credential manager");
 
         await ObtainCredentialsAsync(stoppingToken);
 
@@ -76,7 +76,7 @@ public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCr
                 _leaseDurationSeconds * _options.LeaseRenewalThreshold);
 
             _logger.LogDebug(
-                "Prochain renouvellement du lease dans {Delay}",
+                "Next lease renewal in {Delay}",
                 renewalDelay);
 
             await Task.Delay(renewalDelay, stoppingToken);
@@ -89,20 +89,20 @@ public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCr
             {
                 _logger.LogWarning(
                     ex,
-                    "Échec du renouvellement du lease {LeaseId}, obtention de nouveaux credentials",
+                    "Lease renewal failed for {LeaseId}, obtaining new credentials",
                     _leaseId);
 
                 await ObtainCredentialsAsync(stoppingToken);
             }
         }
 
-        _logger.LogInformation("Arrêt du gestionnaire de credentials dynamiques Vault");
+        _logger.LogInformation("Stopping Vault dynamic credential manager");
     }
 
     private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
     {
         var path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
-        _logger.LogInformation("Obtention de credentials dynamiques depuis {Path}", path);
+        _logger.LogInformation("Obtaining dynamic credentials from {Path}", path);
 
         var secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
             _options.DatabaseRoleName,
@@ -114,7 +114,7 @@ public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCr
         _leaseDurationSeconds = secret.LeaseDurationSeconds;
 
         _logger.LogInformation(
-            "Credentials dynamiques obtenus : user={Username}, lease={LeaseId}, TTL={TTL}s",
+            "Dynamic credentials obtained: user={Username}, lease={LeaseId}, TTL={TTL}s",
             _username,
             _leaseId,
             _leaseDurationSeconds);
@@ -122,7 +122,7 @@ public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCr
 
     private async Task RenewLeaseAsync(CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Renouvellement du lease {LeaseId}", _leaseId);
+        _logger.LogDebug("Renewing lease {LeaseId}", _leaseId);
 
         var renewed = await _vaultClient.V1.System.RenewLeaseAsync(
             _leaseId,
@@ -131,7 +131,7 @@ public sealed class VaultCredentialLeaseManager : BackgroundService, IDatabaseCr
         _leaseDurationSeconds = renewed.LeaseDurationSeconds;
 
         _logger.LogInformation(
-            "Lease {LeaseId} renouvelé, nouveau TTL={TTL}s",
+            "Lease {LeaseId} renewed, new TTL={TTL}s",
             _leaseId,
             _leaseDurationSeconds);
     }

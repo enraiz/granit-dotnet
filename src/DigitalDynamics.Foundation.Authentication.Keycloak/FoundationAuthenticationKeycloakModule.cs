@@ -1,16 +1,16 @@
 // =============================================================================
-// FoundationAuthenticationKeycloakModule - Module Keycloak pour Foundation.Authentication
+// FoundationAuthenticationKeycloakModule - Keycloak module for Foundation.Authentication
 // =============================================================================
-// Dépend de FoundationJwtBearerModule (JWT Bearer générique).
-// Surcharge la config JWT Bearer avec les valeurs de la section "Keycloak" :
-//   Authority, Audience (ou ClientId), NameClaimType = "preferred_username"
-// Enregistre KeycloakClaimsTransformation (realm_access.roles → ClaimTypes.Role)
-// et la policy "Admin" (rôle configuré dans KeycloakOptions.AdminRole).
+// Depends on FoundationJwtBearerModule (generic JWT Bearer).
+// Overrides the JWT Bearer config with values from the "Keycloak" section:
+//   Authority, Audience (or ClientId), NameClaimType = "preferred_username"
+// Registers KeycloakClaimsTransformation (realm_access.roles -> ClaimTypes.Role)
+// and the "Admin" policy (role configured in KeycloakOptions.AdminRole).
 //
-// Migration depuis FoundationJwtBearerModule :
-//   Remplacer [DependsOn(typeof(FoundationJwtBearerModule))]
-//         par [DependsOn(typeof(FoundationAuthenticationKeycloakModule))]
-//   La section "Keycloak" dans appsettings.json reste inchangée.
+// Migrating from FoundationJwtBearerModule:
+//   Replace [DependsOn(typeof(FoundationJwtBearerModule))]
+//      with [DependsOn(typeof(FoundationAuthenticationKeycloakModule))]
+//   The "Keycloak" section in appsettings.json remains unchanged.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Authentication.JwtBearer;
@@ -20,8 +20,8 @@ using DigitalDynamics.Foundation.Core.Modularity;
 namespace DigitalDynamics.Foundation.Authentication.Keycloak;
 
 /// <summary>
-/// Module Foundation pour les extras Keycloak (claims transformation, policy Admin).
-/// Dépend de <see cref="FoundationJwtBearerModule"/> pour le JWT Bearer générique.
+/// Foundation module for Keycloak extras (claims transformation, Admin policy).
+/// Depends on <see cref="FoundationJwtBearerModule"/> for generic JWT Bearer.
 /// </summary>
 [DependsOn(typeof(FoundationJwtBearerModule))]
 public sealed class FoundationAuthenticationKeycloakModule : FoundationModule

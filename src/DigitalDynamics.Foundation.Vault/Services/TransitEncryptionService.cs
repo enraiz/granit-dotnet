@@ -1,11 +1,11 @@
 // =============================================================================
-// TransitEncryptionService - Chiffrement/déchiffrement via Vault Transit
+// TransitEncryptionService - Encryption/decryption via Vault Transit
 // =============================================================================
-// Implémente ITransitEncryptionService pour le chiffrement des données FHIR
-// via l'engine Transit de Vault (clé AES-256-GCM96).
+// Implements ITransitEncryptionService for encrypting FHIR data
+// via the Vault Transit engine (AES-256-GCM96 key).
 //
-// Conformité HDS : les données de santé sont chiffrées au repos via Vault.
-// Vault gère les clés et leur rotation — aucune clé n'est stockée dans l'app.
+// HDS compliance: health data is encrypted at rest via Vault.
+// Vault manages the keys and their rotation — no key is stored in the app.
 // =============================================================================
 
 using System.Text;
@@ -17,7 +17,7 @@ using VaultSharp;
 namespace DigitalDynamics.Foundation.Vault.Services;
 
 /// <summary>
-/// Implémentation de <see cref="ITransitEncryptionService"/> via Vault Transit Engine.
+/// Implementation of <see cref="ITransitEncryptionService"/> via Vault Transit Engine.
 /// </summary>
 public sealed class TransitEncryptionService : ITransitEncryptionService
 {
@@ -50,7 +50,7 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
             },
             mountPoint: _options.TransitMountPoint);
 
-        _logger.LogDebug("Données chiffrées avec la clé Transit {KeyName}", keyName);
+        _logger.LogDebug("Data encrypted with Transit key {KeyName}", keyName);
         return result.Data.CipherText;
     }
 
@@ -68,7 +68,7 @@ public sealed class TransitEncryptionService : ITransitEncryptionService
             mountPoint: _options.TransitMountPoint);
 
         var bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
-        _logger.LogDebug("Données déchiffrées avec la clé Transit {KeyName}", keyName);
+        _logger.LogDebug("Data decrypted with Transit key {KeyName}", keyName);
         return Encoding.UTF8.GetString(bytes);
     }
 }

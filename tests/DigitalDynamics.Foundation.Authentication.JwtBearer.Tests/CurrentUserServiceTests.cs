@@ -1,9 +1,9 @@
 // =============================================================================
 // Tests - CurrentUserService
 // =============================================================================
-// Vérifie l'extraction des informations utilisateur depuis les claims JWT.
-// UserName utilise User.Identity.Name, qui respecte le NameClaimType
-// configuré dans JWT Bearer (dépend du provider IDP utilisé).
+// Verifies the extraction of user information from JWT claims.
+// UserName uses User.Identity.Name, which respects the NameClaimType
+// configured in JWT Bearer (depends on the IDP provider used).
 // =============================================================================
 
 using System.Security.Claims;
@@ -31,25 +31,25 @@ public sealed class CurrentUserServiceTests
     [Fact]
     public void UserName_ReturnsIdentityName_ReflectsConfiguredNameClaimType()
     {
-        // Arrange — nameType = "preferred_username" simule la config Keycloak
+        // Arrange — nameType = "preferred_username" simulates the Keycloak config
         CurrentUserService sut = CreateService(
             nameType: "preferred_username",
             new Claim("sub", "user-123"),
             new Claim("preferred_username", "jean.dupont"));
 
-        // Act & Assert — User.Identity.Name résout la claim "preferred_username"
+        // Act & Assert — User.Identity.Name resolves the "preferred_username" claim
         sut.UserName.Should().Be("jean.dupont");
     }
 
     [Fact]
     public void UserName_WithGenericSubClaim_ReturnsSubValue()
     {
-        // Arrange — nameType = "sub" (défaut JwtBearerAuthOptions.NameClaimType)
+        // Arrange — nameType = "sub" (default JwtBearerAuthOptions.NameClaimType)
         CurrentUserService sut = CreateService(
             nameType: "sub",
             new Claim("sub", "user-abc-123"));
 
-        // Act & Assert — User.Identity.Name résout la claim "sub"
+        // Act & Assert — User.Identity.Name resolves the "sub" claim
         sut.UserName.Should().Be("user-abc-123");
     }
 

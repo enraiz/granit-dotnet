@@ -1,11 +1,11 @@
 // =============================================================================
-// HeaderTenantResolver - Résolution du tenant depuis le header HTTP
+// HeaderTenantResolver - Tenant resolution from the HTTP header
 // =============================================================================
-// Lit le header MultiTenancyOptions.TenantIdHeaderName ("X-Tenant-Id" par défaut).
-// Utilisé pour les appels service-à-service où le tenant est transmis explicitement.
+// Reads the header MultiTenancyOptions.TenantIdHeaderName ("X-Tenant-Id" by default).
+// Used for service-to-service calls where the tenant is passed explicitly.
 //
 // Inputs  : HttpContext.Request.Headers[TenantIdHeaderName]
-// Outputs : TenantInfo(id) si header valide | null si absent ou GUID invalide
+// Outputs : TenantInfo(id) if header is valid | null if absent or invalid GUID
 // =============================================================================
 
 using Microsoft.AspNetCore.Http;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Primitives;
 namespace DigitalDynamics.Foundation.MultiTenancy.Resolvers;
 
 /// <summary>
-/// Résout le tenant depuis le header HTTP (ordre = 100, résolu en premier).
+/// Resolves the tenant from the HTTP header (order = 100, resolved first).
 /// </summary>
 public sealed class HeaderTenantResolver : ITenantResolver
 {

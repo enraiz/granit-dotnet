@@ -1,11 +1,11 @@
 // =============================================================================
-// JwtClaimTenantResolver - Résolution du tenant depuis le claim JWT
+// JwtClaimTenantResolver - Tenant resolution from the JWT claim
 // =============================================================================
-// Lit le claim MultiTenancyOptions.TenantIdClaimType ("tenant_id" par défaut).
-// Adapté aux flux utilisateur authentifiés via Keycloak (token JWT validé).
+// Reads the claim MultiTenancyOptions.TenantIdClaimType ("tenant_id" by default).
+// Suited for authenticated user flows via Keycloak (validated JWT token).
 //
 // Inputs  : HttpContext.User.FindFirstValue(TenantIdClaimType)
-// Outputs : TenantInfo(id) si claim valide | null si absent ou GUID invalide
+// Outputs : TenantInfo(id) if claim is valid | null if absent or invalid GUID
 // =============================================================================
 
 using System.Security.Claims;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.MultiTenancy.Resolvers;
 
 /// <summary>
-/// Résout le tenant depuis le claim JWT (ordre = 200, résolu après le header).
+/// Resolves the tenant from the JWT claim (order = 200, resolved after the header).
 /// </summary>
 public sealed class JwtClaimTenantResolver : ITenantResolver
 {

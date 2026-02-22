@@ -1,11 +1,11 @@
 // =============================================================================
-// FoundationMultiTenancyModuleTests - Tests d'intégration DI du module
+// FoundationMultiTenancyModuleTests - DI integration tests for the module
 // =============================================================================
-// Vérifie le câblage complet des services via AddFoundation<T>(),
-// à la manière d'AbpIntegratedTest<T> dans ABP Framework.
+// Verifies the complete service wiring via AddFoundation<T>(),
+// in the style of AbpIntegratedTest<T> in ABP Framework.
 //
-// Chaque test bootstrappe le module complet (Security + MultiTenancy)
-// et résout les services depuis le vrai conteneur DI.
+// Each test bootstraps the full module (Security + MultiTenancy)
+// and resolves services from the real DI container.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Extensions;
@@ -30,7 +30,7 @@ public sealed class FoundationMultiTenancyModuleTests
         return builder.Build();
     }
 
-    // --- Câblage DI ---
+    // --- DI wiring ---
 
     [Fact]
     public void ICurrentTenant_Is_Resolvable_And_Singleton()
@@ -42,7 +42,7 @@ public sealed class FoundationMultiTenancyModuleTests
 
         first.Should().NotBeNull();
         first.Should().BeOfType<CurrentTenant>();
-        first.Should().BeSameAs(second, "ICurrentTenant doit être un singleton");
+        first.Should().BeSameAs(second, "ICurrentTenant must be a singleton");
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class FoundationMultiTenancyModuleTests
         TenantResolverPipeline second = app.Services.GetRequiredService<TenantResolverPipeline>();
 
         first.Should().NotBeNull();
-        first.Should().BeSameAs(second, "TenantResolverPipeline doit être un singleton");
+        first.Should().BeSameAs(second, "TenantResolverPipeline must be a singleton");
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class FoundationMultiTenancyModuleTests
             .OrderBy(r => r.Order)
             .ToList();
 
-        ordered[0].Should().BeOfType<HeaderTenantResolver>("Header (order=100) doit précéder JWT (order=200)");
+        ordered[0].Should().BeOfType<HeaderTenantResolver>("Header (order=100) must precede JWT (order=200)");
         ordered[1].Should().BeOfType<JwtClaimTenantResolver>();
     }
 
@@ -92,7 +92,7 @@ public sealed class FoundationMultiTenancyModuleTests
         middleware.Should().NotBeNull();
     }
 
-    // --- Ordre topologique ---
+    // --- Topological order ---
 
     [Fact]
     public void Module_Topological_Order_Has_Security_Before_MultiTenancy()
@@ -106,7 +106,7 @@ public sealed class FoundationMultiTenancyModuleTests
             typeof(FoundationMultiTenancyModule));
     }
 
-    // --- Test fonctionnel (style AbpIntegratedTest) ---
+    // --- Functional test (AbpIntegratedTest style) ---
 
     [Fact]
     public void ICurrentTenant_Resolved_From_DI_Change_Works()
@@ -115,7 +115,7 @@ public sealed class FoundationMultiTenancyModuleTests
         ICurrentTenant currentTenant = app.Services.GetRequiredService<ICurrentTenant>();
         Guid tenantId = Guid.NewGuid();
 
-        currentTenant.IsAvailable.Should().BeFalse("aucun tenant actif au démarrage");
+        currentTenant.IsAvailable.Should().BeFalse("no active tenant at startup");
 
         using (currentTenant.Change(tenantId, "Acme"))
         {
@@ -124,7 +124,7 @@ public sealed class FoundationMultiTenancyModuleTests
             currentTenant.Name.Should().Be("Acme");
         }
 
-        currentTenant.IsAvailable.Should().BeFalse("le scope doit être restauré après Dispose");
+        currentTenant.IsAvailable.Should().BeFalse("the scope must be restored after Dispose");
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public sealed class FoundationMultiTenancyModuleTests
                 currentTenant.Id.Should().Be(inner);
             }
 
-            currentTenant.Id.Should().Be(outer, "le scope outer doit être restauré après dispose du scope inner");
+            currentTenant.Id.Should().Be(outer, "the outer scope must be restored after the inner scope is disposed");
         }
 
         currentTenant.IsAvailable.Should().BeFalse();

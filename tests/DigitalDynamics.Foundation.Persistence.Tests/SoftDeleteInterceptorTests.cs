@@ -1,11 +1,11 @@
 // =============================================================================
 // Tests - SoftDeleteInterceptor
 // =============================================================================
-// Vérifie que la suppression physique est convertie en suppression logique
-// pour les entités ISoftDeletable (conformité RGPD).
+// Verifies that physical deletion is converted to logical deletion
+// for ISoftDeletable entities (GDPR compliance).
 //
-// Approche : on enregistre l'intercepteur dans le DbContext et on appelle
-// SaveChangesAsync directement. IClock est mocké pour des assertions exactes.
+// Approach: the interceptor is registered in the DbContext and
+// SaveChangesAsync is called directly. IClock is mocked for exact assertions.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Domain;
@@ -51,18 +51,18 @@ public sealed class SoftDeleteInterceptorTests
         context.Entities.Add(entity);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Supprimer l'entité
+        // Delete the entity
         context.Entities.Remove(entity);
 
         // Act
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Assert — l'entité est soft-deleted (pas physiquement supprimée)
+        // Assert — the entity is soft-deleted (not physically removed)
         entity.IsDeleted.Should().BeTrue();
         entity.DeletedAt.Should().Be(FixedNow);
         entity.DeletedBy.Should().Be("user-test-123");
 
-        // Vérifier que l'entité existe encore en base (pas supprimée physiquement)
+        // Verify the entity still exists in the database (not physically deleted)
         var count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
         count.Should().Be(1);
     }
@@ -82,13 +82,13 @@ public sealed class SoftDeleteInterceptorTests
         context.Entities.Add(entity);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Modifier l'entité (pas supprimer)
+        // Modify the entity (not delete)
         entity.Name = "Modified";
 
         // Act
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Assert — pas de soft delete
+        // Assert — no soft delete
         entity.IsDeleted.Should().BeFalse();
         entity.DeletedAt.Should().BeNull();
     }

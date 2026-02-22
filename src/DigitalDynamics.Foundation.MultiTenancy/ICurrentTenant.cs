@@ -1,40 +1,40 @@
 // =============================================================================
-// ICurrentTenant - Accès au tenant courant
+// ICurrentTenant - Access to the current tenant
 // =============================================================================
-// Abstraction pour lire et surcharger le contexte tenant dans le flux async.
+// Abstraction for reading and overriding the tenant context in the async flow.
 //
-// Implémentation : CurrentTenant (AsyncLocal, dans ce package).
-// Usage typique : injecté dans les services qui nécessitent l'isolation tenant.
+// Implementation: CurrentTenant (AsyncLocal, in this package).
+// Typical usage: injected into services that require tenant isolation.
 //
-// IDisposable.Change() permet de surcharger temporairement le tenant courant
-// (tests, background jobs, workers multi-tenant).
+// IDisposable.Change() allows temporarily overriding the current tenant
+// (tests, background jobs, multi-tenant workers).
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>
-/// Service pour accéder au tenant courant et surcharger son contexte.
+/// Service for accessing the current tenant and overriding its context.
 /// </summary>
 public interface ICurrentTenant
 {
     /// <summary>
-    /// Indique si un tenant est actif dans le contexte courant.
-    /// Vrai uniquement si <see cref="Id"/> est non null.
+    /// Indicates whether a tenant is active in the current context.
+    /// True only if <see cref="Id"/> is non-null.
     /// </summary>
     bool IsAvailable { get; }
 
-    /// <summary>Identifiant du tenant courant, ou <c>null</c> si hors contexte tenant.</summary>
+    /// <summary>Identifier of the current tenant, or <c>null</c> if outside a tenant context.</summary>
     Guid? Id { get; }
 
-    /// <summary>Nom du tenant courant, ou <c>null</c>.</summary>
+    /// <summary>Name of the current tenant, or <c>null</c>.</summary>
     string? Name { get; }
 
     /// <summary>
-    /// Surcharge temporairement le tenant courant dans le flux async.
-    /// Le tenant précédent est restauré à la libération du scope.
+    /// Temporarily overrides the current tenant in the async flow.
+    /// The previous tenant is restored when the scope is disposed.
     /// </summary>
-    /// <param name="id">Identifiant du tenant à activer, ou <c>null</c> pour désactiver.</param>
-    /// <param name="name">Nom optionnel du tenant.</param>
-    /// <returns>Scope à libérer pour restaurer le tenant précédent.</returns>
+    /// <param name="id">Identifier of the tenant to activate, or <c>null</c> to deactivate.</param>
+    /// <param name="name">Optional tenant name.</param>
+    /// <returns>Scope to dispose to restore the previous tenant.</returns>
     IDisposable Change(Guid? id, string? name = null);
 }

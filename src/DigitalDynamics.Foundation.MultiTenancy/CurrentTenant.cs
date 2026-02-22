@@ -1,18 +1,18 @@
 // =============================================================================
-// CurrentTenant - Implémentation de ICurrentTenant via AsyncLocal
+// CurrentTenant - ICurrentTenant implementation via AsyncLocal
 // =============================================================================
-// Stocke le tenant courant dans AsyncLocal<T> (propagation automatique
-// dans les Task et async/await). Chaque flux async dispose de son propre contexte.
+// Stores the current tenant in AsyncLocal<T> (automatic propagation
+// across Task and async/await). Each async flow has its own context.
 //
-// Change() empile les surcharges et les restaure via IDisposable.
-// Enregistrer comme Singleton : l'état est dans AsyncLocal (static), pas l'instance.
+// Change() stacks overrides and restores them via IDisposable.
+// Register as Singleton: state is in AsyncLocal (static), not the instance.
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>
-/// Implémentation de <see cref="ICurrentTenant"/> basée sur <see cref="AsyncLocal{T}"/>.
-/// Thread-safe : chaque flux async/await possède son propre contexte tenant.
+/// Implementation of <see cref="ICurrentTenant"/> based on <see cref="AsyncLocal{T}"/>.
+/// Thread-safe: each async/await flow has its own tenant context.
 /// </summary>
 public sealed class CurrentTenant : ICurrentTenant
 {

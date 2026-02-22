@@ -1,9 +1,9 @@
 // =============================================================================
-// CurrentUserService - Implémentation de ICurrentUserService via HttpContext
+// CurrentUserService - ICurrentUserService implementation via HttpContext
 // =============================================================================
-// Extrait les informations de l'utilisateur courant depuis les claims JWT.
-// UserName lit User.Identity.Name, qui respecte le NameClaimType configuré
-// dans JWT Bearer (défaut : "sub" — RFC 7519, toujours présent dans un JWT valide).
+// Extracts current user information from JWT claims.
+// UserName reads User.Identity.Name, which respects the NameClaimType configured
+// in JWT Bearer (default: "sub" — RFC 7519, always present in a valid JWT).
 // =============================================================================
 
 using System.Security.Claims;
@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Authentication;
 
 /// <summary>
-/// Implémentation de <see cref="ICurrentUserService"/> basée sur HttpContext.
+/// Implementation of <see cref="ICurrentUserService"/> based on HttpContext.
 /// </summary>
 public sealed class CurrentUserService : ICurrentUserService
 {

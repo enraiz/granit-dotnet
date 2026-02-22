@@ -1,14 +1,14 @@
 // =============================================================================
-// JwtBearerServiceCollectionExtensions - Enregistrement JWT Bearer générique + CurrentUser
+// JwtBearerServiceCollectionExtensions - Generic JWT Bearer + CurrentUser registration
 // =============================================================================
-// Point d'entrée pour configurer l'authentification JWT Bearer OIDC générique
-// dans une application .NET Digital Dynamics.
+// Entry point for configuring generic OIDC JWT Bearer authentication
+// in a Digital Dynamics .NET application.
 //
-// Usage :
+// Usage:
 //   builder.Services.AddFoundationJwtBearer(builder.Configuration);
 //
-// Lit la section "Authentication" de la configuration.
-// Pour Keycloak : utiliser AddFoundationKeycloak() (Foundation.Authentication.Keycloak).
+// Reads the "Authentication" section from configuration.
+// For Keycloak: use AddFoundationKeycloak() (Foundation.Authentication.Keycloak).
 // =============================================================================
 
 using DigitalDynamics.Foundation.Authentication.JwtBearer.Authentication;
@@ -22,13 +22,13 @@ using Microsoft.IdentityModel.Tokens;
 namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Extensions;
 
 /// <summary>
-/// Extensions pour configurer l'authentification JWT Bearer générique et <see cref="ICurrentUserService"/>.
+/// Extensions for configuring generic JWT Bearer authentication and <see cref="ICurrentUserService"/>.
 /// </summary>
 public static class JwtBearerServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute l'authentification JWT Bearer OIDC générique et le service CurrentUser.
-    /// Lit la section <c>"Authentication"</c> de la configuration.
+    /// Adds generic OIDC JWT Bearer authentication and the CurrentUser service.
+    /// Reads the <c>"Authentication"</c> section from configuration.
     /// </summary>
     public static IServiceCollection AddFoundationJwtBearer(
         this IServiceCollection services,

@@ -1,10 +1,10 @@
 // =============================================================================
 // Tests - JwtBearerServiceCollectionExtensions
 // =============================================================================
-// Vérifie que AddFoundationJwtBearer enregistre correctement :
-//   - Authentification JwtBearer générique (section "Authentication")
-//   - Policy d'autorisation "Authenticated" uniquement
-//   - Services CurrentUser et HttpContextAccessor
+// Verifies that AddFoundationJwtBearer correctly registers:
+//   - Generic JwtBearer authentication (section "Authentication")
+//   - "Authenticated" authorization policy only
+//   - CurrentUser and HttpContextAccessor services
 // =============================================================================
 
 using DigitalDynamics.Foundation.Authentication.JwtBearer.Authentication;
@@ -93,12 +93,12 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
-        // Assert — seule "Authenticated" est enregistrée dans Foundation.Authentication.JwtBearer (base)
+        // Assert — only "Authenticated" is registered in Foundation.Authentication.JwtBearer (base)
         AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
 
         authOptions.GetPolicy("Authenticated").Should().NotBeNull();
         authOptions.GetPolicy("Admin").Should().BeNull(
-            "Admin est spécifique à Keycloak, enregistré par Foundation.Authentication.Keycloak");
+            "Admin is specific to Keycloak, registered by Foundation.Authentication.Keycloak");
     }
 
     [Fact]

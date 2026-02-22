@@ -1,9 +1,9 @@
 // =============================================================================
-// KeycloakOptions - Configuration de l'authentification Keycloak OIDC
+// KeycloakOptions - Keycloak OIDC authentication configuration
 // =============================================================================
-// Bind depuis la section "Keycloak" de la configuration (IOptions<T> pattern).
+// Bound from the "Keycloak" section of configuration (IOptions<T> pattern).
 //
-// Exemple appsettings.json :
+// Example appsettings.json:
 //   "Keycloak": {
 //     "Authority": "https://keycloak.example.com/realms/my-realm",
 //     "ClientId": "my-client",
@@ -17,36 +17,36 @@
 namespace DigitalDynamics.Foundation.Authentication.Keycloak.Options;
 
 /// <summary>
-/// Options de configuration pour l'authentification Keycloak OIDC.
+/// Configuration options for Keycloak OIDC authentication.
 /// </summary>
 public sealed class KeycloakOptions
 {
-    /// <summary>Clé de section dans la configuration.</summary>
+    /// <summary>Section key in the configuration.</summary>
     public const string SectionName = "Keycloak";
 
-    /// <summary>URL de l'authority OIDC (ex: https://keycloak.example.com/realms/my-realm).</summary>
+    /// <summary>OIDC authority URL (e.g. https://keycloak.example.com/realms/my-realm).</summary>
     public string Authority { get; set; } = string.Empty;
 
-    /// <summary>Client ID Keycloak (ex: guava-backend).</summary>
+    /// <summary>Keycloak client ID (e.g. guava-backend).</summary>
     public string ClientId { get; set; } = string.Empty;
 
-    /// <summary>Client secret (confidentiel — charger depuis Vault, jamais en clair).</summary>
+    /// <summary>Client secret (confidential — load from Vault, never in plain text).</summary>
     public string ClientSecret { get; set; } = string.Empty;
 
-    /// <summary>Exiger HTTPS pour les métadonnées OIDC. Défaut : true en production.</summary>
+    /// <summary>Require HTTPS for OIDC metadata. Default: true in production.</summary>
     public bool RequireHttpsMetadata { get; set; } = true;
 
-    /// <summary>Audience attendue dans le token. Défaut : ClientId.</summary>
+    /// <summary>Expected audience in the token. Default: ClientId.</summary>
     public string? Audience { get; set; }
 
-    /// <summary>Rôle admin (realm role Keycloak). Défaut : "admin".</summary>
+    /// <summary>Admin role (Keycloak realm role). Default: "admin".</summary>
     public string AdminRole { get; set; } = "admin";
 
     /// <summary>
-    /// Source des rôles dans le token Keycloak.
+    /// Source of roles in the Keycloak token.
     /// <list type="bullet">
-    /// <item><c>"realm_access"</c> (défaut) : rôles realm (<c>realm_access.roles</c>)</item>
-    /// <item><c>"resource_access"</c> : rôles client (<c>resource_access.{ClientId}.roles</c>)</item>
+    /// <item><c>"realm_access"</c> (default): realm roles (<c>realm_access.roles</c>)</item>
+    /// <item><c>"resource_access"</c>: client roles (<c>resource_access.{ClientId}.roles</c>)</item>
     /// </list>
     /// </summary>
     public string RoleClaimsSource { get; set; } = "realm_access";

@@ -1,7 +1,7 @@
 // =============================================================================
 // Tests - VaultClientFactory
 // =============================================================================
-// Vérifie la création du client Vault avec les différentes méthodes d'auth.
+// Verifies the creation of the Vault client with different auth methods.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Vault.Options;

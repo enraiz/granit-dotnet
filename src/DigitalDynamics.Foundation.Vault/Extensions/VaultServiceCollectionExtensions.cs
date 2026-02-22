@@ -1,7 +1,7 @@
 // =============================================================================
-// VaultServiceCollectionExtensions - Enregistrement des services Vault
+// VaultServiceCollectionExtensions - Vault service registration
 // =============================================================================
-// Usage :
+// Usage:
 //   builder.Services.AddFoundationVault(builder.Configuration);
 // =============================================================================
 
@@ -14,13 +14,13 @@ using VaultSharp;
 namespace DigitalDynamics.Foundation.Vault.Extensions;
 
 /// <summary>
-/// Extensions pour configurer les services Vault dans le conteneur DI.
+/// Extensions for configuring Vault services in the DI container.
 /// </summary>
 public static class VaultServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute le client Vault, le gestionnaire de credentials dynamiques
-    /// et le service de chiffrement Transit.
+    /// Adds the Vault client, the dynamic credentials lease manager,
+    /// and the Transit encryption service.
     /// </summary>
     public static IServiceCollection AddFoundationVault(
         this IServiceCollection services,

@@ -1,10 +1,10 @@
 // =============================================================================
-// MultiTenancyApplicationBuilderExtensions - Enregistrement du middleware
+// MultiTenancyApplicationBuilderExtensions - Middleware registration
 // =============================================================================
-// À appeler dans Program.cs, après UseAuthentication et avant UseAuthorization :
+// Call in Program.cs, after UseAuthentication and before UseAuthorization:
 //
 //   app.UseAuthentication();
-//   app.UseFoundationMultiTenancy();   // résout le tenant depuis JWT ou header
+//   app.UseFoundationMultiTenancy();   // resolves the tenant from JWT or header
 //   app.UseAuthorization();
 // =============================================================================
 
@@ -14,13 +14,13 @@ using Microsoft.AspNetCore.Builder;
 namespace DigitalDynamics.Foundation.MultiTenancy.Extensions;
 
 /// <summary>
-/// Extensions pour enregistrer le middleware MultiTenancy dans le pipeline ASP.NET Core.
+/// Extensions for registering the MultiTenancy middleware in the ASP.NET Core pipeline.
 /// </summary>
 public static class MultiTenancyApplicationBuilderExtensions
 {
     /// <summary>
-    /// Ajoute <see cref="TenantResolutionMiddleware"/> dans le pipeline de requêtes.
-    /// À positionner après <c>UseAuthentication()</c> et avant <c>UseAuthorization()</c>.
+    /// Adds <see cref="TenantResolutionMiddleware"/> to the request pipeline.
+    /// Must be positioned after <c>UseAuthentication()</c> and before <c>UseAuthorization()</c>.
     /// </summary>
     public static IApplicationBuilder UseFoundationMultiTenancy(
         this IApplicationBuilder app) =>

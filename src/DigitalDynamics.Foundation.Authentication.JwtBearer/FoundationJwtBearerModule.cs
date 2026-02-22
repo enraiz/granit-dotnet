@@ -1,12 +1,12 @@
 // =============================================================================
-// FoundationJwtBearerModule - Module JWT Bearer générique
+// FoundationJwtBearerModule - Generic JWT Bearer module
 // =============================================================================
-// Configure l'authentification JWT Bearer générique (OIDC-compatible) et
-// enregistre ICurrentUserService via HttpContext.
-// Lit la section "Authentication" de appsettings.json.
+// Configures generic OIDC-compatible JWT Bearer authentication and
+// registers ICurrentUserService via HttpContext.
+// Reads the "Authentication" section of appsettings.json.
 //
-// Pour Keycloak : utiliser FoundationAuthenticationKeycloakModule
-// (Foundation.Authentication.Keycloak) qui dépend de ce module.
+// For Keycloak: use FoundationAuthenticationKeycloakModule
+// (Foundation.Authentication.Keycloak) which depends on this module.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Authentication.JwtBearer.Extensions;
@@ -16,8 +16,8 @@ using DigitalDynamics.Foundation.Security;
 namespace DigitalDynamics.Foundation.Authentication.JwtBearer;
 
 /// <summary>
-/// Module Foundation pour l'authentification JWT Bearer générique (OIDC).
-/// Dépend de <see cref="FoundationSecurityModule"/> pour les abstractions.
+/// Foundation module for generic OIDC JWT Bearer authentication.
+/// Depends on <see cref="FoundationSecurityModule"/> for the abstractions.
 /// </summary>
 [DependsOn(typeof(FoundationSecurityModule))]
 public sealed class FoundationJwtBearerModule : FoundationModule

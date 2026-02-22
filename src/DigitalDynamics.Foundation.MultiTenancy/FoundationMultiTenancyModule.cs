@@ -1,10 +1,10 @@
 // =============================================================================
-// FoundationMultiTenancyModule - Module Foundation pour le multi-tenant
+// FoundationMultiTenancyModule - Foundation module for multi-tenancy
 // =============================================================================
-// Configure ICurrentTenant, les résolveurs JWT/Header et le middleware.
+// Configures ICurrentTenant, JWT/Header resolvers, and the middleware.
 //
-// IMPORTANT : appeler app.UseFoundationMultiTenancy() dans Program.cs
-// après UseAuthentication() et avant UseAuthorization() :
+// IMPORTANT: call app.UseFoundationMultiTenancy() in Program.cs
+// after UseAuthentication() and before UseAuthorization():
 //
 //   app.UseAuthentication();
 //   app.UseFoundationMultiTenancy();
@@ -18,8 +18,8 @@ using DigitalDynamics.Foundation.Security;
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>
-/// Module Foundation pour la gestion multi-tenant.
-/// Résolution du tenant depuis le header HTTP ou le claim JWT Keycloak.
+/// Foundation module for multi-tenant management.
+/// Resolves the tenant from the HTTP header or the Keycloak JWT claim.
 /// </summary>
 [DependsOn(typeof(FoundationSecurityModule))]
 public sealed class FoundationMultiTenancyModule : FoundationModule

@@ -1,24 +1,24 @@
 // =============================================================================
-// ModuleLoader - Decouverte et tri topologique des modules
+// ModuleLoader - Module discovery and topological sort
 // =============================================================================
-// A partir d'un module racine TModule, decouvre recursivement tous les
-// modules dependants via [DependsOn] et les trie par ordre topologique
-// (algorithme de Kahn). Detecte les dependances circulaires.
+// Starting from a root TModule, recursively discovers all dependent
+// modules via [DependsOn] and sorts them in topological order
+// (Kahn's algorithm). Detects circular dependencies.
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Core.Modularity;
 
 /// <summary>
-/// Decouvre, instancie et trie topologiquement les modules Foundation
-/// a partir d'un module racine.
+/// Discovers, instantiates, and topologically sorts Foundation modules
+/// starting from a root module.
 /// </summary>
 internal static class ModuleLoader
 {
     /// <summary>
-    /// Charge tous les modules accessibles depuis <typeparamref name="TModule"/>
-    /// et les retourne en ordre topologique (dependances d'abord).
+    /// Loads all modules reachable from <typeparamref name="TModule"/>
+    /// and returns them in topological order (dependencies first).
     /// </summary>
-    /// <exception cref="InvalidOperationException">Dependance circulaire detectee.</exception>
+    /// <exception cref="InvalidOperationException">Circular dependency detected.</exception>
     public static IReadOnlyList<ModuleDescriptor> LoadModules<TModule>()
         where TModule : FoundationModule
     {
@@ -26,8 +26,8 @@ internal static class ModuleLoader
     }
 
     /// <summary>
-    /// Charge tous les modules accessibles depuis <paramref name="startupModuleType"/>
-    /// et les retourne en ordre topologique (dependances d'abord).
+    /// Loads all modules reachable from <paramref name="startupModuleType"/>
+    /// and returns them in topological order (dependencies first).
     /// </summary>
     public static IReadOnlyList<ModuleDescriptor> LoadModules(Type startupModuleType)
     {
@@ -46,7 +46,7 @@ internal static class ModuleLoader
         if (!typeof(FoundationModule).IsAssignableFrom(moduleType))
         {
             throw new InvalidOperationException(
-                $"Le type '{moduleType.FullName}' n'herite pas de FoundationModule.");
+                $"Type '{moduleType.FullName}' does not inherit from FoundationModule.");
         }
 
         var instance = (FoundationModule)Activator.CreateInstance(moduleType)!;
@@ -67,13 +67,13 @@ internal static class ModuleLoader
     }
 
     /// <summary>
-    /// Tri topologique par algorithme de Kahn.
-    /// Retourne les modules en ordre : dependances d'abord, module racine en dernier.
+    /// Topological sort using Kahn's algorithm.
+    /// Returns modules in order: dependencies first, root module last.
     /// </summary>
     private static List<ModuleDescriptor> TopologicalSort(
         Dictionary<Type, ModuleDescriptor> descriptors)
     {
-        // Calculer le degre entrant de chaque noeud
+        // Compute the in-degree of each node
         var inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
         var adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
 
@@ -81,13 +81,13 @@ internal static class ModuleLoader
         {
             foreach (var dep in descriptor.Dependencies)
             {
-                // dep → type : dep doit etre charge avant type
+                // dep -> type: dep must be loaded before type
                 adjacency[dep].Add(type);
                 inDegree[type]++;
             }
         }
 
-        // File des noeuds sans dependance entrante
+        // Queue of nodes with no incoming edges
         var queue = new Queue<Type>(
             inDegree.Where(kv => kv.Value == 0).Select(kv => kv.Key));
         var sorted = new List<ModuleDescriptor>();
@@ -113,7 +113,7 @@ internal static class ModuleLoader
                 .Except(sorted.Select(d => d.ModuleType))
                 .Select(t => t.Name);
             throw new InvalidOperationException(
-                $"Dependance circulaire detectee entre les modules : {string.Join(", ", cycleTypes)}.");
+                $"Circular dependency detected among modules: {string.Join(", ", cycleTypes)}.");
         }
 
         return sorted;

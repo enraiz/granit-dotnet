@@ -1,11 +1,11 @@
 // =============================================================================
 // Tests - KeycloakServiceCollectionExtensions
 // =============================================================================
-// Vérifie que AddFoundationKeycloak enregistre correctement :
-//   - KeycloakOptions depuis la section "Keycloak"
+// Verifies that AddFoundationKeycloak correctly registers:
+//   - KeycloakOptions from the "Keycloak" section
 //   - PostConfigure JWT Bearer (Authority, Audience, NameClaimType)
 //   - KeycloakClaimsTransformation
-//   - Policy "Admin"
+//   - "Admin" policy
 // =============================================================================
 
 using DigitalDynamics.Foundation.Authentication.JwtBearer.Extensions;
@@ -72,12 +72,12 @@ public sealed class KeycloakServiceCollectionExtensionsTests
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
-        // Assert — PostConfigure surcharge les valeurs JWT Bearer
+        // Assert — PostConfigure overrides the JWT Bearer values
         JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
             .Get(JwtBearerDefaults.AuthenticationScheme);
 
         jwtOptions.Authority.Should().Be("https://keycloak.test/realms/test");
-        jwtOptions.Audience.Should().Be("test-client", "ClientId est utilisé comme Audience par défaut");
+        jwtOptions.Audience.Should().Be("test-client", "ClientId is used as Audience by default");
         jwtOptions.TokenValidationParameters.NameClaimType.Should().Be("preferred_username");
     }
 
@@ -144,8 +144,8 @@ public sealed class KeycloakServiceCollectionExtensionsTests
         // Assert
         AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
         authOptions.GetPolicy("Admin").Should().NotBeNull();
-        authOptions.GetPolicy("Authenticated").Should().NotBeNull("hérité de Foundation.Authentication.JwtBearer");
+        authOptions.GetPolicy("Authenticated").Should().NotBeNull("inherited from Foundation.Authentication.JwtBearer");
         authOptions.GetPolicy("FhirAccess").Should().BeNull(
-            "FhirAccess est application-specific, pas dans Foundation.Authentication.Keycloak");
+            "FhirAccess is application-specific, not part of Foundation.Authentication.Keycloak");
     }
 }

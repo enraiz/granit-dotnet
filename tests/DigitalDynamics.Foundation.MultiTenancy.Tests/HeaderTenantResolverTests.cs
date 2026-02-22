@@ -1,5 +1,5 @@
 // =============================================================================
-// HeaderTenantResolverTests - Tests unitaires du résolveur header HTTP
+// HeaderTenantResolverTests - Unit tests for the HTTP header tenant resolver
 // =============================================================================
 
 using DigitalDynamics.Foundation.MultiTenancy;

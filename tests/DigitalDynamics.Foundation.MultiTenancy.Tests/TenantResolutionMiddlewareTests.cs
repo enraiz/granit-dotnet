@@ -1,5 +1,5 @@
 // =============================================================================
-// TenantResolutionMiddlewareTests - Tests unitaires du middleware de résolution
+// TenantResolutionMiddlewareTests - Unit tests for the tenant resolution middleware
 // =============================================================================
 
 using DigitalDynamics.Foundation.MultiTenancy;

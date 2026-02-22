@@ -1,7 +1,7 @@
 // =============================================================================
 // Tests - FoundationJwtBearerModule
 // =============================================================================
-// Vérifie que le module enregistre les services JWT Bearer via ConfigureServices.
+// Verifies that the module registers JWT Bearer services via ConfigureServices.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Modularity;

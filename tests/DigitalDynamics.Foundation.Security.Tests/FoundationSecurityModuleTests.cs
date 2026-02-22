@@ -1,8 +1,8 @@
 // =============================================================================
 // Tests - FoundationSecurityModule
 // =============================================================================
-// FoundationSecurityModule est un module marqueur d'abstractions.
-// Aucun service enregistré — l'implémentation JWT est dans
+// FoundationSecurityModule is an abstractions marker module.
+// No services registered — the JWT implementation is in
 // Foundation.Authentication.JwtBearer (FoundationJwtBearerModule).
 // =============================================================================
 

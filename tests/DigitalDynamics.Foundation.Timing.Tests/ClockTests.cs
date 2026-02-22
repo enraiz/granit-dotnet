@@ -1,12 +1,12 @@
 // =============================================================================
 // Tests - Clock
 // =============================================================================
-// Verifie que l'implementation Clock :
-//   - Retourne l'heure UTC via TimeProvider
-//   - Normalise les DateTimeOffset locaux en UTC
-//   - Convertit vers le fuseau utilisateur (ConvertToUserTime)
-//   - Convertit vers UTC (ConvertToUtc)
-//   - Fonctionne sans timezone configuree (retourne la valeur inchangee)
+// Verifies that the Clock implementation:
+//   - Returns UTC time via TimeProvider
+//   - Normalizes local DateTimeOffset values to UTC
+//   - Converts to the user's timezone (ConvertToUserTime)
+//   - Converts to UTC (ConvertToUtc)
+//   - Works without a configured timezone (returns the value unchanged)
 // =============================================================================
 
 using DigitalDynamics.Foundation.Timing;
@@ -52,7 +52,7 @@ public sealed class ClockTests
         var now = _clock.Now;
 
         // Assert
-        now.Offset.Should().Be(TimeSpan.Zero, "le Clock doit toujours retourner UTC (conformite HDS)");
+        now.Offset.Should().Be(TimeSpan.Zero, "Clock must always return UTC (HDS compliance)");
     }
 
     [Fact]
@@ -64,13 +64,13 @@ public sealed class ClockTests
     [Fact]
     public void Normalize_ConvertsLocalOffsetToUtc()
     {
-        // Arrange - DateTimeOffset avec offset +02:00 (Europe/Brussels en ete)
+        // Arrange - DateTimeOffset with offset +02:00 (Europe/Brussels in summer)
         var localTime = new DateTimeOffset(2026, 6, 15, 14, 30, 0, TimeSpan.FromHours(2));
 
         // Act
         var normalized = _clock.Normalize(localTime);
 
-        // Assert - Doit etre converti en UTC (+00:00), meme instant
+        // Assert - Must be converted to UTC (+00:00), same instant
         normalized.Offset.Should().Be(TimeSpan.Zero);
         normalized.Should().Be(new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero));
     }
@@ -91,7 +91,7 @@ public sealed class ClockTests
     [Fact]
     public void Normalize_ConvertsNegativeOffsetToUtc()
     {
-        // Arrange - DateTimeOffset avec offset -05:00 (America/New_York)
+        // Arrange - DateTimeOffset with offset -05:00 (America/New_York)
         var localTime = new DateTimeOffset(2026, 6, 15, 7, 30, 0, TimeSpan.FromHours(-5));
 
         // Act
@@ -112,7 +112,7 @@ public sealed class ClockTests
         // Act
         var userTime = _clock.ConvertToUserTime(utcTime);
 
-        // Assert - Brussels est UTC+2 en ete (CEST)
+        // Assert - Brussels is UTC+2 in summer (CEST)
         userTime.Offset.Should().Be(TimeSpan.FromHours(2));
         userTime.LocalDateTime.Hour.Should().Be(14);
     }
@@ -148,7 +148,7 @@ public sealed class ClockTests
     [Fact]
     public void ConvertToUtc_ConvertsToUtc()
     {
-        // Arrange - DateTimeOffset avec offset +02:00
+        // Arrange - DateTimeOffset with offset +02:00
         var localTime = new DateTimeOffset(2026, 6, 15, 14, 0, 0, TimeSpan.FromHours(2));
 
         // Act

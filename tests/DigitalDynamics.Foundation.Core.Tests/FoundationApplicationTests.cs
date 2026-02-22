@@ -1,10 +1,10 @@
 // =============================================================================
 // Tests - FoundationApplication
 // =============================================================================
-// Verifie que FoundationApplication :
-//   - Appelle ConfigureServices sur chaque module dans l'ordre topologique
-//   - Appelle OnApplicationInitialization dans l'ordre topologique
-//   - Gere les modules sans override (no-op OK)
+// Verifies that FoundationApplication:
+//   - Calls ConfigureServices on each module in topological order
+//   - Calls OnApplicationInitialization in topological order
+//   - Handles modules without overrides (no-op OK)
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Modularity;
@@ -20,7 +20,7 @@ public sealed class FoundationApplicationTests
 {
     private static readonly List<string> CallOrder = [];
 
-    // --- Modules de test avec tracking d'appels ---
+    // --- Test modules with call tracking ---
 
     public sealed class TrackingModuleA : FoundationModule
     {
@@ -49,13 +49,13 @@ public sealed class FoundationApplicationTests
         }
     }
 
-    // --- Module async qui surcharge uniquement ConfigureServicesAsync ---
+    // --- Async module that overrides only ConfigureServicesAsync ---
 
     public sealed class AsyncTrackingModuleA : FoundationModule
     {
         public override async Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            await Task.Delay(1); // Simule une operation async
+            await Task.Delay(1); // Simulates an async operation
             CallOrder.Add("ConfigureServicesAsync:A");
         }
 
@@ -103,7 +103,7 @@ public sealed class FoundationApplicationTests
         // Act
         app.ConfigureServices(context);
 
-        // Assert - A doit etre appele avant B
+        // Assert - A must be called before B
         CallOrder.Should().ContainInOrder("ConfigureServices:A", "ConfigureServices:B");
     }
 
@@ -120,7 +120,7 @@ public sealed class FoundationApplicationTests
         // Act
         app.InitializeApplication(context);
 
-        // Assert - A doit etre appele avant B
+        // Assert - A must be called before B
         CallOrder.Should().ContainInOrder("Initialize:A", "Initialize:B");
     }
 
@@ -156,7 +156,7 @@ public sealed class FoundationApplicationTests
         types[1].Should().Be<TrackingModuleB>();
     }
 
-    // --- Tests async ---
+    // --- Async tests ---
 
     [Fact]
     public async Task ConfigureServicesAsync_CallsModulesInTopologicalOrder()
@@ -173,7 +173,7 @@ public sealed class FoundationApplicationTests
         // Act
         await app.ConfigureServicesAsync(context);
 
-        // Assert - A doit etre appele avant B
+        // Assert - A must be called before B
         CallOrder.Should().ContainInOrder("ConfigureServicesAsync:A", "ConfigureServicesAsync:B");
     }
 
@@ -189,15 +189,15 @@ public sealed class FoundationApplicationTests
         // Act
         await app.InitializeApplicationAsync(context);
 
-        // Assert - A doit etre appele avant B
+        // Assert - A must be called before B
         CallOrder.Should().ContainInOrder("InitializeAsync:A", "InitializeAsync:B");
     }
 
     [Fact]
     public async Task ConfigureServicesAsync_SyncOverride_CalledViaAsyncPath()
     {
-        // Arrange - TrackingModuleA surcharge ConfigureServices (sync)
-        // ConfigureServicesAsync par defaut appelle la version sync
+        // Arrange - TrackingModuleA overrides ConfigureServices (sync)
+        // ConfigureServicesAsync by default calls the sync version
         var modules = ModuleLoader.LoadModules<TrackingModuleB>();
         var app = new FoundationApplication(modules);
         var builder = Host.CreateEmptyApplicationBuilder(null);
@@ -209,7 +209,7 @@ public sealed class FoundationApplicationTests
         // Act
         await app.ConfigureServicesAsync(context);
 
-        // Assert - Les overrides sync sont appeles via le chemin async
+        // Assert - Sync overrides are called via the async path
         CallOrder.Should().ContainInOrder("ConfigureServices:A", "ConfigureServices:B");
     }
 

@@ -1,8 +1,8 @@
 // =============================================================================
 // Tests - ObservabilityOptions
 // =============================================================================
-// Vérifie que les options d'observabilité ont des valeurs par défaut correctes
-// et que le binding depuis la configuration fonctionne.
+// Verifies that observability options have correct default values
+// and that binding from configuration works correctly.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Observability.Options;

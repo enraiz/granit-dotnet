@@ -5,24 +5,24 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace DigitalDynamics.Foundation.Timing.Extensions;
 
 /// <summary>
-/// Extensions pour enregistrer les services du module Timing.
+/// Extensions for registering Timing module services.
 /// </summary>
 public static class TimingServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute les services du module Timing (IClock, ICurrentTimezoneProvider, TimeProvider).
+    /// Adds Timing module services (IClock, ICurrentTimezoneProvider, TimeProvider).
     /// </summary>
     public static IServiceCollection AddFoundationTiming(
         this IServiceCollection services,
         Action<ClockOptions>? configure = null)
     {
-        // TimeProvider.System est le provider standard .NET (thread-safe, stateless)
+        // TimeProvider.System is the standard .NET provider (thread-safe, stateless)
         services.TryAddSingleton(TimeProvider.System);
 
-        // Singleton + AsyncLocal : le runtime isole la valeur par contexte async
+        // Singleton + AsyncLocal: the runtime isolates the value per async context
         services.TryAddSingleton<ICurrentTimezoneProvider, CurrentTimezoneProvider>();
 
-        // Singleton car Clock est stateless (TimeProvider.System est thread-safe)
+        // Singleton because Clock is stateless (TimeProvider.System is thread-safe)
         services.TryAddSingleton<IClock, Clock>();
 
         if (configure is not null)

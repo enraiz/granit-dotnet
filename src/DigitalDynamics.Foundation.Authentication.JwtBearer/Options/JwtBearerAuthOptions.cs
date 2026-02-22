@@ -1,9 +1,9 @@
 // =============================================================================
-// JwtBearerAuthOptions - Configuration JWT Bearer générique (OIDC)
+// JwtBearerAuthOptions - Generic JWT Bearer (OIDC) configuration
 // =============================================================================
-// Bind depuis la section "Authentication" de la configuration (IOptions<T> pattern).
+// Bound from the "Authentication" section of configuration (IOptions<T> pattern).
 //
-// Exemple appsettings.json :
+// Example appsettings.json:
 //   "Authentication": {
 //     "Authority": "https://idp.example.com/realms/myrealm",
 //     "Audience": "my-client",
@@ -11,32 +11,32 @@
 //     "NameClaimType": "sub"
 //   }
 //
-// Pour Keycloak : utiliser FoundationAuthenticationKeycloakModule
-// (lit la section "Keycloak", reconfigure JWT Bearer via PostConfigure).
+// For Keycloak: use FoundationAuthenticationKeycloakModule
+// (reads the "Keycloak" section, reconfigures JWT Bearer via PostConfigure).
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Authentication.JwtBearer.Options;
 
 /// <summary>
-/// Options de configuration pour l'authentification JWT Bearer générique (OIDC-compatible).
+/// Configuration options for generic OIDC-compatible JWT Bearer authentication.
 /// </summary>
 public sealed class JwtBearerAuthOptions
 {
-    /// <summary>Clé de section dans la configuration.</summary>
+    /// <summary>Section key in the configuration.</summary>
     public const string SectionName = "Authentication";
 
-    /// <summary>URL de l'authority OIDC (ex: https://idp.example.com/realms/myrealm).</summary>
+    /// <summary>OIDC authority URL (e.g. https://idp.example.com/realms/myrealm).</summary>
     public string Authority { get; set; } = string.Empty;
 
-    /// <summary>Audience attendue dans le token.</summary>
+    /// <summary>Expected audience in the token.</summary>
     public string Audience { get; set; } = string.Empty;
 
-    /// <summary>Exiger HTTPS pour les métadonnées OIDC. Défaut : true en production.</summary>
+    /// <summary>Require HTTPS for OIDC metadata. Default: true in production.</summary>
     public bool RequireHttpsMetadata { get; set; } = true;
 
     /// <summary>
-    /// Claim utilisé comme nom d'utilisateur (<see cref="System.Security.Principal.IIdentity.Name"/>).
-    /// Défaut : <c>"sub"</c> (RFC 7519 — claim obligatoire, toujours présent dans un JWT valide).
+    /// Claim used as the username (<see cref="System.Security.Principal.IIdentity.Name"/>).
+    /// Default: <c>"sub"</c> (RFC 7519 — mandatory claim, always present in a valid JWT).
     /// </summary>
     public string NameClaimType { get; set; } = "sub";
 }

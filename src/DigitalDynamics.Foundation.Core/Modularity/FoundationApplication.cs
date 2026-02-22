@@ -1,9 +1,9 @@
 namespace DigitalDynamics.Foundation.Core.Modularity;
 
 /// <summary>
-/// Orchestre le cycle de vie des modules Foundation.
-/// Enregistre comme singleton par <c>AddFoundation&lt;T&gt;()</c>
-/// ou <c>AddFoundationAsync&lt;T&gt;()</c>.
+/// Orchestrates the lifecycle of Foundation modules.
+/// Registered as a singleton by <c>AddFoundation&lt;T&gt;()</c>
+/// or <c>AddFoundationAsync&lt;T&gt;()</c>.
 /// </summary>
 public sealed class FoundationApplication
 {
@@ -14,13 +14,13 @@ public sealed class FoundationApplication
         _modules = modules;
     }
 
-    /// <summary>Retourne les types des modules chargés en ordre topologique (pour diagnostics).</summary>
+    /// <summary>Returns the types of loaded modules in topological order (for diagnostics).</summary>
     public IReadOnlyList<Type> GetModuleTypes() =>
         _modules.Select(m => m.ModuleType).ToList();
 
     /// <summary>
-    /// Appelle <see cref="FoundationModule.ConfigureServices"/> sur chaque module
-    /// dans l'ordre topologique (version synchrone).
+    /// Calls <see cref="FoundationModule.ConfigureServices"/> on each module
+    /// in topological order (synchronous version).
     /// </summary>
     internal void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -31,8 +31,8 @@ public sealed class FoundationApplication
     }
 
     /// <summary>
-    /// Appelle <see cref="FoundationModule.ConfigureServicesAsync"/> sur chaque module
-    /// dans l'ordre topologique (version asynchrone).
+    /// Calls <see cref="FoundationModule.ConfigureServicesAsync"/> on each module
+    /// in topological order (asynchronous version).
     /// </summary>
     internal async Task ConfigureServicesAsync(ServiceConfigurationContext context)
     {
@@ -43,8 +43,8 @@ public sealed class FoundationApplication
     }
 
     /// <summary>
-    /// Appelle <see cref="FoundationModule.OnApplicationInitialization"/> sur chaque module
-    /// dans l'ordre topologique (version synchrone).
+    /// Calls <see cref="FoundationModule.OnApplicationInitialization"/> on each module
+    /// in topological order (synchronous version).
     /// </summary>
     internal void InitializeApplication(ApplicationInitializationContext context)
     {
@@ -55,8 +55,8 @@ public sealed class FoundationApplication
     }
 
     /// <summary>
-    /// Appelle <see cref="FoundationModule.OnApplicationInitializationAsync"/> sur chaque module
-    /// dans l'ordre topologique (version asynchrone).
+    /// Calls <see cref="FoundationModule.OnApplicationInitializationAsync"/> on each module
+    /// in topological order (asynchronous version).
     /// </summary>
     internal async Task InitializeApplicationAsync(ApplicationInitializationContext context)
     {

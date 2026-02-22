@@ -1,5 +1,5 @@
 // =============================================================================
-// CurrentTenantTests - Tests unitaires de ICurrentTenant / CurrentTenant
+// CurrentTenantTests - Unit tests for ICurrentTenant / CurrentTenant
 // =============================================================================
 
 using DigitalDynamics.Foundation.MultiTenancy;
@@ -74,7 +74,7 @@ public sealed class CurrentTenantTests
             tenant.Name.Should().Be("Inner");
         }
 
-        // Après dispose du scope interne, le scope externe est restauré
+        // After disposing the inner scope, the outer scope is restored
         tenant.Id.Should().Be(outerTenant);
         tenant.Name.Should().Be("Outer");
     }
@@ -87,7 +87,7 @@ public sealed class CurrentTenantTests
 
         IDisposable scope = tenant.Change(id);
         scope.Dispose();
-        scope.Dispose(); // second dispose ne doit pas planter ni altérer le contexte
+        scope.Dispose(); // second dispose must not throw or alter the context
 
         tenant.IsAvailable.Should().BeFalse();
     }
@@ -95,8 +95,8 @@ public sealed class CurrentTenantTests
     [Fact]
     public async Task AsyncLocal_Isolates_Tasks()
     {
-        // Deux tâches parallèles avec des tenants différents
-        // ne doivent pas interférer (AsyncLocal)
+        // Two parallel tasks with different tenants
+        // must not interfere with each other (AsyncLocal)
         CurrentTenant tenant = Create();
         Guid tenantA = Guid.NewGuid();
         Guid tenantB = Guid.NewGuid();
@@ -105,19 +105,19 @@ public sealed class CurrentTenantTests
         {
             using IDisposable _ = tenant.Change(tenantA, "A");
             await Task.Delay(10, TestContext.Current.CancellationToken);
-            tenant.Id.Should().Be(tenantA, "la tâche A doit voir son propre tenant");
+            tenant.Id.Should().Be(tenantA, "task A must see its own tenant");
         }, TestContext.Current.CancellationToken);
 
         Task taskB = Task.Run(async () =>
         {
             using IDisposable _ = tenant.Change(tenantB, "B");
             await Task.Delay(10, TestContext.Current.CancellationToken);
-            tenant.Id.Should().Be(tenantB, "la tâche B doit voir son propre tenant");
+            tenant.Id.Should().Be(tenantB, "task B must see its own tenant");
         }, TestContext.Current.CancellationToken);
 
         await Task.WhenAll(taskA, taskB);
 
-        // Le contexte racine est intact
+        // The root context is intact
         tenant.IsAvailable.Should().BeFalse();
     }
 

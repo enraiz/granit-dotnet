@@ -1,32 +1,32 @@
 // =============================================================================
-// MultiTenancyOptions - Configuration du module MultiTenancy
+// MultiTenancyOptions - MultiTenancy module configuration
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>
-/// Options de configuration du module MultiTenancy.
+/// Configuration options for the MultiTenancy module.
 /// </summary>
 public sealed class MultiTenancyOptions
 {
-    /// <summary>Nom de la section de configuration.</summary>
+    /// <summary>Configuration section name.</summary>
     public const string SectionName = "MultiTenancy";
 
     /// <summary>
-    /// Active ou désactive la résolution du tenant par le middleware.
-    /// Désactiver en environnement mono-tenant ou pour les tests.
+    /// Enables or disables tenant resolution by the middleware.
+    /// Disable in single-tenant environments or for tests.
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 
     /// <summary>
-    /// Type du claim JWT contenant l'identifiant du tenant.
-    /// Valeur par défaut : "tenant_id" (claim Keycloak standard).
+    /// JWT claim type containing the tenant identifier.
+    /// Default value: "tenant_id" (standard Keycloak claim).
     /// </summary>
     public string TenantIdClaimType { get; set; } = "tenant_id";
 
     /// <summary>
-    /// Nom du header HTTP contenant l'identifiant du tenant.
-    /// Valeur par défaut : "X-Tenant-Id".
+    /// HTTP header name containing the tenant identifier.
+    /// Default value: "X-Tenant-Id".
     /// </summary>
     public string TenantIdHeaderName { get; set; } = "X-Tenant-Id";
 }

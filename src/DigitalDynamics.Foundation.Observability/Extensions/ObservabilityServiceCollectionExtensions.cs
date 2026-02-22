@@ -10,13 +10,13 @@ using Serilog;
 namespace DigitalDynamics.Foundation.Observability.Extensions;
 
 /// <summary>
-/// Extensions pour configurer l'observabilité complète (logs, traces, métriques).
+/// Extensions for configuring full observability (logs, traces, metrics).
 /// </summary>
 public static class ObservabilityServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute Serilog (logs structurés) et OpenTelemetry (traces + métriques)
-    /// avec export OTLP vers la stack LGTM.
+    /// Adds Serilog (structured logs) and OpenTelemetry (traces + metrics)
+    /// with OTLP export to the LGTM stack.
     /// </summary>
     public static IHostApplicationBuilder AddFoundationObservability(
         this IHostApplicationBuilder builder)

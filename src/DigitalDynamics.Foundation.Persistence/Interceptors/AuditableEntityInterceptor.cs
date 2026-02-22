@@ -1,10 +1,10 @@
 // =============================================================================
-// AuditableEntityInterceptor - Remplissage automatique des champs d'audit HDS
+// AuditableEntityInterceptor - Automatic population of HDS audit fields
 // =============================================================================
-// Intercepte les SaveChanges d'EF Core pour remplir automatiquement
-// CreatedAt/CreatedBy et ModifiedAt/ModifiedBy sur toute AuditableEntity.
+// Intercepts EF Core SaveChanges to automatically populate
+// CreatedAt/CreatedBy and ModifiedAt/ModifiedBy on every AuditableEntity.
 //
-// Conformité HDS : chaque modification est tracée avec l'utilisateur et l'horodatage.
+// HDS compliance: every modification is tracked with the user and timestamp.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Domain;
@@ -17,8 +17,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 
 /// <summary>
-/// Intercepteur EF Core qui remplit automatiquement les champs d'audit
-/// sur les entités <see cref="AuditableEntity"/>.
+/// EF Core interceptor that automatically populates audit fields
+/// on <see cref="AuditableEntity"/> entities.
 /// </summary>
 public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
 {
@@ -79,7 +79,7 @@ public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
                 case EntityState.Modified:
                     entry.Entity.ModifiedAt = now;
                     entry.Entity.ModifiedBy = userId;
-                    // Empêcher la modification des champs de création
+                    // Prevent modification of creation fields
                     entry.Property(e => e.CreatedAt).IsModified = false;
                     entry.Property(e => e.CreatedBy).IsModified = false;
                     break;

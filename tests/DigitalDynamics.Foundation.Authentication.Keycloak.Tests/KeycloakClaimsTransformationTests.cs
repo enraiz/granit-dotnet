@@ -1,8 +1,8 @@
 // =============================================================================
 // Tests - KeycloakClaimsTransformation
 // =============================================================================
-// Vérifie que les rôles Keycloak sont correctement mappés vers ClaimTypes.Role.
-// Couvre les deux sources : realm_access (défaut) et resource_access.
+// Verifies that Keycloak roles are correctly mapped to ClaimTypes.Role.
+// Covers both sources: realm_access (default) and resource_access.
 // =============================================================================
 
 using System.Security.Claims;
@@ -87,7 +87,7 @@ public sealed class KeycloakClaimsTransformationTests
     [Fact]
     public async Task TransformAsync_WithUnauthenticatedPrincipal_ReturnsUnmodifiedPrincipal()
     {
-        // Arrange — pas de AuthenticationType → IsAuthenticated = false
+        // Arrange — no AuthenticationType → IsAuthenticated = false
         ClaimsIdentity identity = new ClaimsIdentity();
         ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 

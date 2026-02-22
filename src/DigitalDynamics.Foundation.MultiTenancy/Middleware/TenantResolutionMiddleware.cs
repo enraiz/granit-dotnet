@@ -1,12 +1,12 @@
 // =============================================================================
-// TenantResolutionMiddleware - Résolution et activation du tenant par requête
+// TenantResolutionMiddleware - Per-request tenant resolution and activation
 // =============================================================================
-// Middleware ASP.NET Core (IMiddleware) : résout le tenant via le pipeline de
-// résolveurs, puis active son contexte dans ICurrentTenant pour toute la
-// durée de la requête. Si désactivé ou aucun tenant résolu, passe sans modifier
-// le contexte.
+// ASP.NET Core middleware (IMiddleware): resolves the tenant via the resolver
+// pipeline, then activates its context in ICurrentTenant for the entire
+// duration of the request. If disabled or no tenant resolved, passes through
+// without modifying the context.
 //
-// Enregistrement : app.UseFoundationMultiTenancy() (avant UseAuthorization).
+// Registration: app.UseFoundationMultiTenancy() (before UseAuthorization).
 // =============================================================================
 
 using DigitalDynamics.Foundation.MultiTenancy.Pipeline;
@@ -16,8 +16,8 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.MultiTenancy.Middleware;
 
 /// <summary>
-/// Middleware de résolution du tenant courant par requête HTTP.
-/// Utilise <see cref="TenantResolverPipeline"/> et active <see cref="ICurrentTenant"/>.
+/// Middleware for per-request HTTP tenant resolution.
+/// Uses <see cref="TenantResolverPipeline"/> and activates <see cref="ICurrentTenant"/>.
 /// </summary>
 public sealed class TenantResolutionMiddleware : IMiddleware
 {

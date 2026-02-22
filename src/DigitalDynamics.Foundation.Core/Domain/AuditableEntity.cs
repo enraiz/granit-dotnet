@@ -1,33 +1,33 @@
 // =============================================================================
-// AuditableEntity - Classe de base pour l'audit HDS (3 ans de retention)
+// AuditableEntity - Base class for HDS audit (3-year retention)
 // =============================================================================
-// Toute entite persistee DOIT heriter de AuditableEntity pour garantir
-// la tracabilite requise par la certification HDS.
+// Every persisted entity MUST inherit from AuditableEntity to guarantee
+// the traceability required by HDS certification.
 //
-// Les champs sont remplis automatiquement par AuditableEntityInterceptor
-// dans le package Persistence.
+// Fields are populated automatically by AuditableEntityInterceptor
+// in the Persistence package.
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.Core.Domain;
 
 /// <summary>
-/// Classe de base pour toutes les entites avec audit trail HDS.
-/// Fournit les champs de tracabilite creation/modification.
+/// Base class for all entities with an HDS audit trail.
+/// Provides creation/modification traceability fields.
 /// </summary>
 public abstract class AuditableEntity
 {
-    /// <summary>Identifiant unique de l'entite.</summary>
+    /// <summary>Unique identifier of the entity.</summary>
     public Guid Id { get; set; }
 
-    /// <summary>Date de creation (UTC).</summary>
+    /// <summary>Creation timestamp (UTC).</summary>
     public DateTimeOffset CreatedAt { get; set; }
 
-    /// <summary>Identifiant de l'utilisateur ayant cree l'entite.</summary>
+    /// <summary>Identifier of the user who created the entity.</summary>
     public string CreatedBy { get; set; } = string.Empty;
 
-    /// <summary>Date de derniere modification (UTC).</summary>
+    /// <summary>Last modification timestamp (UTC).</summary>
     public DateTimeOffset? ModifiedAt { get; set; }
 
-    /// <summary>Identifiant de l'utilisateur ayant modifie l'entite.</summary>
+    /// <summary>Identifier of the user who last modified the entity.</summary>
     public string? ModifiedBy { get; set; }
 }

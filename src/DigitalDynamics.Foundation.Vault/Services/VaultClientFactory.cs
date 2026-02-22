@@ -1,11 +1,11 @@
 // =============================================================================
-// VaultClientFactory - Création du client VaultSharp avec authentification
+// VaultClientFactory - VaultSharp client creation with authentication
 // =============================================================================
-// Supporte deux méthodes d'authentification :
-//   - Kubernetes (production) : utilise le ServiceAccount token
-//   - Token (développement) : utilise un token statique
+// Supports two authentication methods:
+//   - Kubernetes (production): uses the ServiceAccount token
+//   - Token (development): uses a static token
 //
-// En production, l'authentification Kubernetes est OBLIGATOIRE.
+// In production, Kubernetes authentication is REQUIRED.
 // =============================================================================
 
 using Microsoft.Extensions.Logging;
@@ -19,7 +19,7 @@ using VaultSharp.V1.AuthMethods.Token;
 namespace DigitalDynamics.Foundation.Vault.Services;
 
 /// <summary>
-/// Factory pour créer un client VaultSharp avec la méthode d'authentification configurée.
+/// Factory for creating a VaultSharp client with the configured authentication method.
 /// </summary>
 public sealed class VaultClientFactory
 {
@@ -32,7 +32,7 @@ public sealed class VaultClientFactory
         _logger = logger;
     }
 
-    /// <summary>Crée un client VaultSharp authentifié.</summary>
+    /// <summary>Creates an authenticated VaultSharp client.</summary>
     public IVaultClient Create()
     {
         IAuthMethodInfo authMethod = _options.AuthMethod.ToLowerInvariant() switch
@@ -40,13 +40,13 @@ public sealed class VaultClientFactory
             "kubernetes" => CreateKubernetesAuth(),
             "token" => CreateTokenAuth(),
             _ => throw new InvalidOperationException(
-                $"Méthode d'authentification Vault inconnue : '{_options.AuthMethod}'. " +
-                "Valeurs autorisées : 'Kubernetes', 'Token'.")
+                $"Unknown Vault authentication method: '{_options.AuthMethod}'. " +
+                "Allowed values: 'Kubernetes', 'Token'.")
         };
 
         var settings = new VaultClientSettings(_options.Address, authMethod);
         _logger.LogInformation(
-            "Client Vault créé avec la méthode {AuthMethod} vers {Address}",
+            "Vault client created with method {AuthMethod} targeting {Address}",
             _options.AuthMethod,
             _options.Address);
 
@@ -56,7 +56,7 @@ public sealed class VaultClientFactory
     private KubernetesAuthMethodInfo CreateKubernetesAuth()
     {
         var jwt = File.ReadAllText(_options.KubernetesTokenPath);
-        _logger.LogDebug("Authentification Kubernetes avec le rôle {Role}", _options.KubernetesRole);
+        _logger.LogDebug("Kubernetes authentication with role {Role}", _options.KubernetesRole);
         return new KubernetesAuthMethodInfo(_options.KubernetesRole, jwt);
     }
 
@@ -65,12 +65,12 @@ public sealed class VaultClientFactory
         if (string.IsNullOrEmpty(_options.Token))
         {
             throw new InvalidOperationException(
-                "Le token Vault est requis pour l'authentification par token. " +
-                "Configurez Vault:Token dans la configuration.");
+                "Vault token is required for token authentication. " +
+                "Set Vault:Token in the configuration.");
         }
 
         _logger.LogWarning(
-            "Authentification Vault par token statique — utiliser uniquement en développement local");
+            "Vault static token authentication — use only for local development");
         return new TokenAuthMethodInfo(_options.Token);
     }
 }

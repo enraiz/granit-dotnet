@@ -1,11 +1,11 @@
 // =============================================================================
-// TenantResolverPipeline - Chaîne de résolution du tenant
+// TenantResolverPipeline - Tenant resolution chain
 // =============================================================================
-// Exécute les ITenantResolver dans l'ordre croissant de leur propriété Order.
-// Retourne le premier résultat non-null (stratégie "first-wins").
+// Executes ITenantResolver instances in ascending order of their Order property.
+// Returns the first non-null result ("first-wins" strategy).
 //
-// Inputs  : IEnumerable<ITenantResolver> (résolveurs triés par Order)
-// Outputs : TenantInfo si un résolveur réussit | null si aucun résolveur ne résout
+// Inputs  : IEnumerable<ITenantResolver> (resolvers sorted by Order)
+// Outputs : TenantInfo if a resolver succeeds | null if no resolver resolves
 // =============================================================================
 
 using Microsoft.AspNetCore.Http;
@@ -14,8 +14,8 @@ using DigitalDynamics.Foundation.MultiTenancy.Resolvers;
 namespace DigitalDynamics.Foundation.MultiTenancy.Pipeline;
 
 /// <summary>
-/// Pipeline de résolution du tenant courant.
-/// Exécute les résolveurs dans l'ordre croissant de <see cref="ITenantResolver.Order"/>.
+/// Pipeline for resolving the current tenant.
+/// Executes resolvers in ascending order of <see cref="ITenantResolver.Order"/>.
 /// </summary>
 public sealed class TenantResolverPipeline
 {
@@ -25,8 +25,8 @@ public sealed class TenantResolverPipeline
         _resolvers = [.. resolvers.OrderBy(r => r.Order)];
 
     /// <summary>
-    /// Résout le tenant courant depuis le contexte HTTP.
-    /// Retourne le résultat du premier résolveur ayant une réponse non-null.
+    /// Resolves the current tenant from the HTTP context.
+    /// Returns the result of the first resolver that produces a non-null response.
     /// </summary>
     public async Task<TenantInfo?> ResolveAsync(
         HttpContext context,

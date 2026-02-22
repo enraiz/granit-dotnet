@@ -1,10 +1,10 @@
 // =============================================================================
 // Tests - SimpleGuidGenerator
 // =============================================================================
-// Verifie que SimpleGuidGenerator :
-//   - Genere des GUID non vides
-//   - Genere des GUID uniques
-//   - Fournit une instance statique
+// Verifies that SimpleGuidGenerator:
+//   - Generates non-empty GUIDs
+//   - Generates unique GUIDs
+//   - Provides a static instance
 // =============================================================================
 
 using FluentAssertions;

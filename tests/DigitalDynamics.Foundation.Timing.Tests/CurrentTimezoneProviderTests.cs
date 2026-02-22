@@ -1,10 +1,10 @@
 // =============================================================================
 // Tests - CurrentTimezoneProvider
 // =============================================================================
-// Verifie que CurrentTimezoneProvider :
-//   - Stocke et retourne la timezone correctement
-//   - Isole les valeurs entre contextes async (AsyncLocal)
-//   - Retourne null par defaut
+// Verifies that CurrentTimezoneProvider:
+//   - Stores and returns the timezone correctly
+//   - Isolates values between async contexts (AsyncLocal)
+//   - Returns null by default
 // =============================================================================
 
 using FluentAssertions;
@@ -60,17 +60,17 @@ public sealed class CurrentTimezoneProviderTests
 
         string? innerTimezone = null;
 
-        // Act - lancer un nouveau contexte async
+        // Act - launch a new async context
         await Task.Run(() =>
         {
-            // Le nouveau contexte async herite de la valeur parente
+            // The new async context inherits the parent value
             innerTimezone = provider.Timezone;
-            // Modifier dans le contexte enfant
+            // Modify within the child context
             provider.Timezone = "America/New_York";
         }, TestContext.Current.CancellationToken);
 
-        // Assert - la valeur dans le contexte parent n'est pas affectee
+        // Assert - the value in the parent context is not affected
         provider.Timezone.Should().Be("Europe/Brussels",
-            "AsyncLocal isole les modifications du contexte enfant");
+            "AsyncLocal isolates modifications from the child context");
     }
 }

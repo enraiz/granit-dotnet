@@ -1,14 +1,14 @@
 // =============================================================================
-// SoftDeleteInterceptor - Suppression logique RGPD
+// SoftDeleteInterceptor - GDPR soft deletion
 // =============================================================================
-// Intercepte les DELETE sur les entités ISoftDeletable et les transforme
-// en UPDATE SET IsDeleted = true.
+// Intercepts DELETE operations on ISoftDeletable entities and converts them
+// to UPDATE SET IsDeleted = true.
 //
-// Les entités supprimées logiquement sont filtrées par le query filter global
-// configuré dans ConfigureModelExtensions.
+// Soft-deleted entities are filtered by the global query filter
+// configured in ConfigureModelExtensions.
 //
-// Conformité RGPD : les données sont marquées comme supprimées mais conservées
-// pour l'audit trail HDS (3 ans). La purge physique est gérée séparément.
+// GDPR compliance: data is marked as deleted but retained
+// for the HDS audit trail (3 years). Physical purge is handled separately.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Domain;
@@ -20,8 +20,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 
 /// <summary>
-/// Intercepteur EF Core qui convertit les suppressions physiques
-/// en suppressions logiques pour les entités <see cref="ISoftDeletable"/>.
+/// EF Core interceptor that converts physical deletions
+/// to soft deletions for <see cref="ISoftDeletable"/> entities.
 /// </summary>
 public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
 {
@@ -68,7 +68,7 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
                 continue;
             }
 
-            // Convertir DELETE → UPDATE (soft delete)
+            // Convert DELETE -> UPDATE (soft delete)
             entry.State = EntityState.Modified;
             entry.Entity.IsDeleted = true;
             entry.Entity.DeletedAt = now;

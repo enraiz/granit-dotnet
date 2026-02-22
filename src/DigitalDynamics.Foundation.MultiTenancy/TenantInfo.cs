@@ -1,10 +1,10 @@
 // =============================================================================
-// TenantInfo - Données d'un tenant résolu
+// TenantInfo - Resolved tenant data
 // =============================================================================
 
 namespace DigitalDynamics.Foundation.MultiTenancy;
 
 /// <summary>
-/// Données immuables d'un tenant résolu par un <see cref="Resolvers.ITenantResolver"/>.
+/// Immutable data for a tenant resolved by an <see cref="Resolvers.ITenantResolver"/>.
 /// </summary>
 public sealed record TenantInfo(Guid? Id, string? Name = null) : ITenantInfo;

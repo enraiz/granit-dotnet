@@ -1,10 +1,10 @@
 // =============================================================================
 // Tests - FoundationAuthenticationKeycloakModule
 // =============================================================================
-// Vérifie le câblage DI complet via ConfigureServices :
-//   - ICurrentUserService résolvable (via dépendance sur FoundationJwtBearerModule)
-//   - KeycloakClaimsTransformation enregistrée
-//   - Policy "Admin" enregistrée
+// Verifies the complete DI wiring via ConfigureServices:
+//   - ICurrentUserService resolvable (via dependency on FoundationJwtBearerModule)
+//   - KeycloakClaimsTransformation registered
+//   - "Admin" policy registered
 // =============================================================================
 
 using DigitalDynamics.Foundation.Authentication.JwtBearer;
@@ -31,7 +31,7 @@ public sealed class FoundationAuthenticationKeycloakModuleTests
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
         builder.Configuration["Keycloak:Authority"] = "https://keycloak.test/realms/test";
         builder.Configuration["Keycloak:ClientId"] = "test-client";
-        // Appeler d'abord FoundationJwtBearerModule (dépendance)
+        // Call FoundationJwtBearerModule first (dependency)
         ServiceConfigurationContext context = new(builder.Services, builder.Configuration, builder);
         new FoundationJwtBearerModule().ConfigureServices(context);
 
@@ -42,7 +42,7 @@ public sealed class FoundationAuthenticationKeycloakModuleTests
 
         // Assert
         ICurrentUserService? userService = sp.GetService<ICurrentUserService>();
-        userService.Should().NotBeNull("hérité de FoundationJwtBearerModule");
+        userService.Should().NotBeNull("inherited from FoundationJwtBearerModule");
     }
 
     [Fact]

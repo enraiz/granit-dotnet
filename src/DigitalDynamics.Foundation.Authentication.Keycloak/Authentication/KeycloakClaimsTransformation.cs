@@ -1,19 +1,19 @@
 // =============================================================================
-// KeycloakClaimsTransformation - Mapping des rôles Keycloak → ClaimTypes.Role
+// KeycloakClaimsTransformation - Mapping Keycloak roles -> ClaimTypes.Role
 // =============================================================================
-// Keycloak stocke les rôles dans deux emplacements selon la configuration :
+// Keycloak stores roles in two locations depending on configuration:
 //
-//   RoleClaimsSource = "realm_access"   (défaut) :
+//   RoleClaimsSource = "realm_access"   (default):
 //     { "realm_access": { "roles": ["admin", "practitioner"] } }
 //
-//   RoleClaimsSource = "resource_access" :
+//   RoleClaimsSource = "resource_access":
 //     { "resource_access": { "my-client": { "roles": ["admin"] } } }
 //
-// Cette transformation extrait les rôles et les ajoute comme ClaimTypes.Role
-// standard .NET, permettant [Authorize(Roles = "admin")].
+// This transformation extracts the roles and adds them as standard
+// .NET ClaimTypes.Role, enabling [Authorize(Roles = "admin")].
 //
 // Inputs  : IOptions<KeycloakOptions> (RoleClaimsSource, ClientId)
-// Outputs : ClaimsPrincipal enrichi avec ClaimTypes.Role pour chaque rôle Keycloak
+// Outputs : ClaimsPrincipal enriched with ClaimTypes.Role for each Keycloak role
 // =============================================================================
 
 using System.Security.Claims;
@@ -25,8 +25,8 @@ using Microsoft.Extensions.Options;
 namespace DigitalDynamics.Foundation.Authentication.Keycloak.Authentication;
 
 /// <summary>
-/// Transforme les claims Keycloak pour mapper les rôles
-/// vers des <see cref="ClaimTypes.Role"/> standard .NET.
+/// Transforms Keycloak claims to map roles
+/// to standard .NET <see cref="ClaimTypes.Role"/>.
 /// </summary>
 public sealed class KeycloakClaimsTransformation : IClaimsTransformation
 {
@@ -57,7 +57,7 @@ public sealed class KeycloakClaimsTransformation : IClaimsTransformation
         using JsonDocument doc = JsonDocument.Parse(accessClaim.Value);
         JsonElement root = doc.RootElement;
 
-        // Pour resource_access, descendre dans le nœud ClientId avant "roles"
+        // For resource_access, descend into the ClientId node before "roles"
         if (opts.RoleClaimsSource == "resource_access" && !string.IsNullOrEmpty(opts.ClientId))
         {
             if (!root.TryGetProperty(opts.ClientId, out root))

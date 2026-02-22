@@ -1,12 +1,12 @@
 // =============================================================================
 // Tests - AuditableEntityInterceptor
 // =============================================================================
-// Vérifie que les champs d'audit HDS sont correctement remplis
-// lors de la création et modification des entités.
+// Verifies that HDS audit fields are correctly populated
+// when entities are created and modified.
 //
-// Approche : on enregistre l'intercepteur dans le DbContext et on appelle
-// SaveChangesAsync directement, ce qui déclenche l'intercepteur naturellement.
-// IClock est mocké pour des assertions exactes (pas de BeCloseTo).
+// Approach: the interceptor is registered in the DbContext and
+// SaveChangesAsync is called directly, which triggers the interceptor naturally.
+// IClock is mocked for exact assertions (no BeCloseTo).
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Domain;
@@ -74,7 +74,7 @@ public sealed class AuditableEntityInterceptorTests
         context.TestEntities.Add(entity);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Modifier l'entité
+        // Modify the entity
         entity.Name = "Modified";
         context.Entry(entity).State = EntityState.Modified;
 
@@ -99,24 +99,24 @@ public sealed class AuditableEntityInterceptorTests
         context.TestEntities.Add(entity);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Capturer les valeurs de création posées par l'intercepteur lors du Add
+        // Capture the creation values set by the interceptor during Add
         var originalCreatedAt = entity.CreatedAt;
         var originalCreatedBy = entity.CreatedBy;
 
-        // Avancer le temps pour le Modify
+        // Advance time for the Modify
         _clock.Now.Returns(FixedNow.AddHours(1));
 
-        // Modifier l'entité
+        // Modify the entity
         entity.Name = "Modified";
         context.Entry(entity).State = EntityState.Modified;
 
         // Act
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Assert — les champs de création ne doivent pas être modifiés
+        // Assert — creation fields must not be overwritten
         entity.CreatedAt.Should().Be(originalCreatedAt);
         entity.CreatedBy.Should().Be(originalCreatedBy);
-        // Mais ModifiedAt doit refléter le nouveau temps
+        // But ModifiedAt must reflect the new time
         entity.ModifiedAt.Should().Be(FixedNow.AddHours(1));
     }
 
@@ -158,7 +158,7 @@ public sealed class AuditableEntityInterceptorTests
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // ValueGeneratedNever : l'intercepteur gere la generation des GUID
+            // ValueGeneratedNever: the interceptor handles GUID generation
             modelBuilder.Entity<TestEntity>().Property(e => e.Id).ValueGeneratedNever();
         }
     }

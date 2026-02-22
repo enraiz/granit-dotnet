@@ -1,12 +1,12 @@
 // =============================================================================
-// MultiTenancyServiceCollectionExtensions - Enregistrement des services
+// MultiTenancyServiceCollectionExtensions - Service registration
 // =============================================================================
-// Usage :
+// Usage:
 //   builder.Services.AddFoundationMultiTenancy(
 //       builder.Configuration.GetSection(MultiTenancyOptions.SectionName));
 //
-// Ensuite dans le pipeline :
-//   app.UseFoundationMultiTenancy();  // avant UseAuthorization
+// Then in the pipeline:
+//   app.UseFoundationMultiTenancy();  // before UseAuthorization
 // =============================================================================
 
 using DigitalDynamics.Foundation.MultiTenancy.Middleware;
@@ -19,15 +19,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace DigitalDynamics.Foundation.MultiTenancy.Extensions;
 
 /// <summary>
-/// Extensions pour configurer les services MultiTenancy dans le conteneur DI.
+/// Extensions for configuring MultiTenancy services in the DI container.
 /// </summary>
 public static class MultiTenancyServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute les services MultiTenancy : ICurrentTenant, résolveurs, pipeline et middleware.
+    /// Adds MultiTenancy services: ICurrentTenant, resolvers, pipeline, and middleware.
     /// </summary>
-    /// <param name="services">Conteneur DI.</param>
-    /// <param name="configuration">Section de configuration "MultiTenancy".</param>
+    /// <param name="services">DI container.</param>
+    /// <param name="configuration">Configuration section "MultiTenancy".</param>
     public static IServiceCollection AddFoundationMultiTenancy(
         this IServiceCollection services,
         IConfigurationSection configuration)
@@ -36,13 +36,13 @@ public static class MultiTenancyServiceCollectionExtensions
 
         services.TryAddSingleton<ICurrentTenant, CurrentTenant>();
 
-        // Résolveurs : Header en premier (order=100), puis JWT (order=200)
+        // Resolvers: Header first (order=100), then JWT (order=200)
         services.AddSingleton<ITenantResolver, HeaderTenantResolver>();
         services.AddSingleton<ITenantResolver, JwtClaimTenantResolver>();
 
         services.TryAddSingleton<TenantResolverPipeline>();
 
-        // IMiddleware pattern : résolu par scope (par requête)
+        // IMiddleware pattern: resolved per scope (per request)
         services.AddScoped<TenantResolutionMiddleware>();
 
         return services;

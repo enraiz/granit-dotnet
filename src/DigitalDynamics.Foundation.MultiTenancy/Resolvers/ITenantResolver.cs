@@ -1,8 +1,8 @@
 // =============================================================================
-// ITenantResolver - Contrat pour la résolution du tenant courant
+// ITenantResolver - Contract for resolving the current tenant
 // =============================================================================
-// Implémenté par HeaderTenantResolver et JwtClaimTenantResolver.
-// L'ordre de résolution est déterminé par la propriété Order (croissant).
+// Implemented by HeaderTenantResolver and JwtClaimTenantResolver.
+// Resolution order is determined by the Order property (ascending).
 // =============================================================================
 
 using Microsoft.AspNetCore.Http;
@@ -10,22 +10,22 @@ using Microsoft.AspNetCore.Http;
 namespace DigitalDynamics.Foundation.MultiTenancy.Resolvers;
 
 /// <summary>
-/// Résolveur de tenant pour un contexte HTTP.
-/// Les résolveurs sont chaînés par ordre croissant de <see cref="Order"/>.
+/// Tenant resolver for an HTTP context.
+/// Resolvers are chained in ascending order of <see cref="Order"/>.
 /// </summary>
 public interface ITenantResolver
 {
     /// <summary>
-    /// Priorité de résolution. Valeur plus faible = résolu en premier.
+    /// Resolution priority. Lower value = resolved first.
     /// HeaderTenantResolver = 100, JwtClaimTenantResolver = 200.
     /// </summary>
     int Order { get; }
 
     /// <summary>
-    /// Tente de résoudre le tenant depuis le contexte HTTP.
+    /// Attempts to resolve the tenant from the HTTP context.
     /// </summary>
-    /// <param name="context">Contexte HTTP de la requête.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Le <see cref="TenantInfo"/> résolu, ou <c>null</c> si non déterminable.</returns>
+    /// <param name="context">HTTP context of the request.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The resolved <see cref="TenantInfo"/>, or <c>null</c> if it cannot be determined.</returns>
     Task<TenantInfo?> ResolveAsync(HttpContext context, CancellationToken cancellationToken = default);
 }

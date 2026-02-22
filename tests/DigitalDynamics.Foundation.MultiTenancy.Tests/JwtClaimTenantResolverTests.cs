@@ -1,5 +1,5 @@
 // =============================================================================
-// JwtClaimTenantResolverTests - Tests unitaires du résolveur JWT
+// JwtClaimTenantResolverTests - Unit tests for the JWT tenant resolver
 // =============================================================================
 
 using System.Security.Claims;
