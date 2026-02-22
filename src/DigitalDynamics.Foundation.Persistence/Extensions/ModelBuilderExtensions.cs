@@ -51,11 +51,11 @@ public static class ModelBuilderExtensions
         // translation of a generic method call (IsEnabled<T>()).
         FilterProxy proxy = new(dataFilter);
 
-        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
+        foreach (Type clrType in modelBuilder.Model.GetEntityTypes().Select(entityType => entityType.ClrType))
         {
-            bool hasSoftDelete = typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType);
-            bool hasActive = typeof(IActive).IsAssignableFrom(entityType.ClrType);
-            bool hasMultiTenant = typeof(IMultiTenant).IsAssignableFrom(entityType.ClrType)
+            bool hasSoftDelete = typeof(ISoftDeletable).IsAssignableFrom(clrType);
+            bool hasActive = typeof(IActive).IsAssignableFrom(clrType);
+            bool hasMultiTenant = typeof(IMultiTenant).IsAssignableFrom(clrType)
                 && currentTenant is not null;
 
             if (!hasSoftDelete && !hasActive && !hasMultiTenant)
@@ -65,7 +65,7 @@ public static class ModelBuilderExtensions
 
             typeof(ModelBuilderExtensions)
                 .GetMethod(nameof(SetEntityFilter), BindingFlags.Static | BindingFlags.NonPublic)! // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection
-                .MakeGenericMethod(entityType.ClrType)
+                .MakeGenericMethod(clrType)
                 .Invoke(null, [modelBuilder, currentTenant, proxy]);
         }
 
