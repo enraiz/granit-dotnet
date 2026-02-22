@@ -20,7 +20,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         0x74, 0x69, 0x6F, 0x6E, 0x45, 0x6E, 0x63, 0x72
     ];
 
-    private const int KeyDerivationIterations = 10_000;
+    private const int KeyDerivationIterations = 100_000;
     private const int IvSize = 16;
 
     private readonly byte[] _key;

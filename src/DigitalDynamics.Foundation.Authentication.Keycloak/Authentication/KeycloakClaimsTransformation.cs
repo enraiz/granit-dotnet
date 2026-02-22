@@ -35,12 +35,11 @@ public sealed class KeycloakClaimsTransformation(IOptions<KeycloakOptions> optio
         JsonElement root = doc.RootElement;
 
         // For resource_access, descend into the ClientId node before "roles"
-        if (opts.RoleClaimsSource == "resource_access" && !string.IsNullOrEmpty(opts.ClientId))
+        if (opts.RoleClaimsSource == "resource_access"
+            && !string.IsNullOrEmpty(opts.ClientId)
+            && !root.TryGetProperty(opts.ClientId, out root))
         {
-            if (!root.TryGetProperty(opts.ClientId, out root))
-            {
-                return Task.FromResult(principal);
-            }
+            return Task.FromResult(principal);
         }
 
         if (!root.TryGetProperty(RolesProperty, out JsonElement rolesElement))
