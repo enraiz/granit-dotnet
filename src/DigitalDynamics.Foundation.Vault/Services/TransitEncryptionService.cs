@@ -1,41 +1,22 @@
-// =============================================================================
-// TransitEncryptionService - Chiffrement/déchiffrement via Vault Transit
-// =============================================================================
-// Implémente ITransitEncryptionService pour le chiffrement des données FHIR
-// via l'engine Transit de Vault (clé AES-256-GCM96).
-//
-// Conformité HDS : les données de santé sont chiffrées au repos via Vault.
-// Vault gère les clés et leur rotation — aucune clé n'est stockée dans l'app.
-// =============================================================================
-
 using System.Text;
 using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
-using VaultSharp.V1.Commons;
-using VaultSharp.V1.SecretsEngines.Transit;
 
 namespace DigitalDynamics.Foundation.Vault.Services;
 
 /// <summary>
-/// Implémentation de <see cref="ITransitEncryptionService"/> via Vault Transit Engine.
+/// Implementation of <see cref="ITransitEncryptionService"/> via Vault Transit Engine.
 /// </summary>
-public sealed partial class TransitEncryptionService : ITransitEncryptionService
+public sealed partial class TransitEncryptionService(
+    IVaultClient vaultClient,
+    IOptions<VaultOptions> options,
+    ILogger<TransitEncryptionService> logger) : ITransitEncryptionService
 {
-    private readonly IVaultClient _vaultClient;
-    private readonly VaultOptions _options;
-    private readonly ILogger<TransitEncryptionService> _logger;
-
-    public TransitEncryptionService(
-        IVaultClient vaultClient,
-        IOptions<VaultOptions> options,
-        ILogger<TransitEncryptionService> logger)
-    {
-        _vaultClient = vaultClient;
-        _options = options.Value;
-        _logger = logger;
-    }
+    private readonly IVaultClient _vaultClient = vaultClient;
+    private readonly VaultOptions _options = options.Value;
+    private readonly ILogger<TransitEncryptionService> _logger = logger;
 
     public async Task<string> EncryptAsync(
         string keyName,
@@ -44,15 +25,15 @@ public sealed partial class TransitEncryptionService : ITransitEncryptionService
     {
         string base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
 
-        Secret<EncryptionResponse> result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
+        var result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
             keyName,
-            new EncryptRequestOptions
+            new VaultSharp.V1.SecretsEngines.Transit.EncryptRequestOptions
             {
                 Base64EncodedPlainText = base64Plaintext
             },
             mountPoint: _options.TransitMountPoint);
 
-        LogDataEncrypted(_logger, keyName);
+        LogEncrypted(_logger, keyName);
         return result.Data.CipherText;
     }
 
@@ -61,22 +42,22 @@ public sealed partial class TransitEncryptionService : ITransitEncryptionService
         string ciphertext,
         CancellationToken cancellationToken = default)
     {
-        Secret<DecryptionResponse> result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
+        var result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
             keyName,
-            new DecryptRequestOptions
+            new VaultSharp.V1.SecretsEngines.Transit.DecryptRequestOptions
             {
                 CipherText = ciphertext
             },
             mountPoint: _options.TransitMountPoint);
 
         byte[] bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
-        LogDataDecrypted(_logger, keyName);
+        LogDecrypted(_logger, keyName);
         return Encoding.UTF8.GetString(bytes);
     }
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Data encrypted with Transit key {KeyName}")]
-    private static partial void LogDataEncrypted(ILogger logger, string keyName);
+    private static partial void LogEncrypted(ILogger logger, string keyName);
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Data decrypted with Transit key {KeyName}")]
-    private static partial void LogDataDecrypted(ILogger logger, string keyName);
+    private static partial void LogDecrypted(ILogger logger, string keyName);
 }

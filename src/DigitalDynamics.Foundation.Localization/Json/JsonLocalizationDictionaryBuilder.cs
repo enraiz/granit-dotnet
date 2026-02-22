@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------
 // JsonLocalizationDictionaryBuilder.cs
-// Lit les fichiers JSON de localisation embarqués dans une assembly et
-// construit des dictionnaires culture → (clé → valeur).
-// Format attendu : { "culture": "fr", "texts": { "Key": "Valeur" } }
-// Supporte les clés imbriquées aplaties avec "." (détection de collisions).
+// Reads localization JSON files embedded in an assembly and builds
+// culture → (key → value) dictionaries.
+// Expected format: { "culture": "fr", "texts": { "Key": "Value" } }
+// Supports nested keys flattened with "." (collision detection).
 // ---------------------------------------------------------------------------
 
 using System.Reflection;
@@ -12,17 +12,17 @@ using System.Text.Json;
 namespace DigitalDynamics.Foundation.Localization.Json;
 
 /// <summary>
-/// Construit des dictionnaires de localisation depuis des fichiers JSON embarqués.
+/// Builds localization dictionaries from embedded JSON files.
 /// </summary>
 internal static class JsonLocalizationDictionaryBuilder
 {
     /// <summary>
-    /// Lit tous les fichiers JSON embarqués correspondant au préfixe donné
-    /// et retourne un dictionnaire culture → (clé → valeur).
+    /// Reads all embedded JSON files matching the given prefix
+    /// and returns a culture → (key → value) dictionary.
     /// </summary>
-    /// <param name="assembly">Assembly contenant les ressources embarquées.</param>
-    /// <param name="resourcePrefix">Préfixe des noms de ressources embarquées.</param>
-    /// <returns>Dictionnaire culture → (clé → valeur).</returns>
+    /// <param name="assembly">Assembly containing the embedded resources.</param>
+    /// <param name="resourcePrefix">Prefix of the embedded resource names.</param>
+    /// <returns>A culture → (key → value) dictionary.</returns>
     public static Dictionary<string, Dictionary<string, string>> Build(Assembly assembly, string resourcePrefix)
     {
         Dictionary<string, Dictionary<string, string>> result = new(StringComparer.OrdinalIgnoreCase);
@@ -61,23 +61,23 @@ internal static class JsonLocalizationDictionaryBuilder
     }
 
     /// <summary>
-    /// Parse un flux JSON et retourne la culture et les textes.
+    /// Parses a JSON stream and returns the culture and texts.
     /// </summary>
     private static (string Culture, Dictionary<string, string> Texts) ParseJsonStream(
         Stream stream, string resourceName)
     {
-        using JsonDocument document = JsonDocument.Parse(stream);
+        using var document = JsonDocument.Parse(stream);
         JsonElement root = document.RootElement;
 
         if (!root.TryGetProperty("culture", out JsonElement cultureElement))
         {
             throw new InvalidOperationException(
-                $"Le fichier JSON '{resourceName}' ne contient pas de propriété 'culture'.");
+                $"The JSON file '{resourceName}' does not contain a 'culture' property.");
         }
 
         string culture = cultureElement.GetString()
             ?? throw new InvalidOperationException(
-                $"La propriété 'culture' est null dans '{resourceName}'.");
+                $"The 'culture' property is null in '{resourceName}'.");
 
         Dictionary<string, string> texts = new(StringComparer.Ordinal);
 
@@ -90,8 +90,8 @@ internal static class JsonLocalizationDictionaryBuilder
     }
 
     /// <summary>
-    /// Aplatit récursivement un élément JSON en clés avec séparateur ".".
-    /// Détecte les collisions entre clés plates et clés imbriquées.
+    /// Recursively flattens a JSON element into keys using "." as separator.
+    /// Detects collisions between flat keys and nested keys.
     /// </summary>
     private static void FlattenJsonElement(
         JsonElement element,
@@ -113,13 +113,13 @@ internal static class JsonLocalizationDictionaryBuilder
             {
                 string value = property.Value.GetString()
                     ?? throw new InvalidOperationException(
-                        $"La valeur de la clé '{key}' est null dans '{resourceName}'.");
+                        $"The value of key '{key}' is null in '{resourceName}'.");
 
                 if (!result.TryAdd(key, value))
                 {
                     throw new InvalidOperationException(
-                        $"Collision de clés détectée dans '{resourceName}' : " +
-                        $"la clé '{key}' existe déjà (conflit entre clé plate et clé imbriquée).");
+                        $"Key collision detected in '{resourceName}': " +
+                        $"key '{key}' already exists (conflict between flat key and nested key).");
                 }
             }
         }

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // FoundationLocalizationResource.cs
-// Classe marker pour la ressource de localisation par défaut de Foundation.
-// Fournit les traductions communes (erreurs, validation, autorisations).
+// Marker class for the default Foundation localization resource.
+// Provides common translations (errors, validation, authorizations).
 // ---------------------------------------------------------------------------
 
 using DigitalDynamics.Foundation.Localization.Attributes;
@@ -9,8 +9,8 @@ using DigitalDynamics.Foundation.Localization.Attributes;
 namespace DigitalDynamics.Foundation.Localization;
 
 /// <summary>
-/// Ressource de localisation par défaut de Foundation.
-/// Fournit les messages communs (erreurs, validation, autorisations).
+/// Default Foundation localization resource.
+/// Provides common messages (errors, validation, authorizations).
 /// </summary>
 [LocalizationResourceName("Foundation")]
 public sealed class FoundationLocalizationResource;

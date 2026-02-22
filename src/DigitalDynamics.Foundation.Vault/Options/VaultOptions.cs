@@ -1,53 +1,37 @@
-// =============================================================================
-// VaultOptions - Configuration du client Vault
-// =============================================================================
-// Bind depuis la section "Vault" de la configuration (IOptions<T> pattern).
-//
-// Exemple appsettings.json :
-//   "Vault": {
-//     "Address": "https://vault.guava-health.com",
-//     "AuthMethod": "Kubernetes",
-//     "KubernetesRole": "guava-backend",
-//     "DatabaseMountPoint": "database",
-//     "DatabaseRoleName": "readwrite",
-//     "TransitMountPoint": "transit"
-//   }
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Vault.Options;
 
 /// <summary>
-/// Options de configuration pour le client HashiCorp Vault.
+/// Configuration options for the HashiCorp Vault client.
 /// </summary>
 public sealed class VaultOptions
 {
-    /// <summary>Clé de section dans la configuration.</summary>
+    /// <summary>Section key in the configuration.</summary>
     public const string SectionName = "Vault";
 
-    /// <summary>Adresse du serveur Vault (ex: https://vault.guava-health.com).</summary>
+    /// <summary>Address of the Vault server (e.g. https://vault.guava-health.com).</summary>
     public string Address { get; set; } = string.Empty;
 
-    /// <summary>Méthode d'authentification : "Kubernetes" ou "Token" (dev uniquement).</summary>
+    /// <summary>Authentication method: "Kubernetes" or "Token" (dev only).</summary>
     public string AuthMethod { get; set; } = "Kubernetes";
 
-    /// <summary>Token Vault (développement local uniquement — JAMAIS en production).</summary>
+    /// <summary>Vault token (local development only — NEVER in production).</summary>
     public string? Token { get; set; }
 
-    /// <summary>Rôle K8s pour l'authentification Kubernetes.</summary>
+    /// <summary>Kubernetes role for Kubernetes authentication.</summary>
     public string KubernetesRole { get; set; } = "guava-backend";
 
-    /// <summary>Chemin du JWT K8s pour l'authentification. Défaut : /var/run/secrets/kubernetes.io/serviceaccount/token.</summary>
+    /// <summary>Path to the Kubernetes JWT for authentication. Default: /var/run/secrets/kubernetes.io/serviceaccount/token.</summary>
     public string KubernetesTokenPath { get; set; } = "/var/run/secrets/kubernetes.io/serviceaccount/token";
 
-    /// <summary>Mount point de l'engine Database. Défaut : "database".</summary>
+    /// <summary>Mount point for the Database engine. Default: "database".</summary>
     public string DatabaseMountPoint { get; set; } = "database";
 
-    /// <summary>Nom du rôle Database pour les credentials dynamiques. Défaut : "readwrite".</summary>
+    /// <summary>Database role name for dynamic credentials. Default: "readwrite".</summary>
     public string DatabaseRoleName { get; set; } = "readwrite";
 
-    /// <summary>Mount point de l'engine Transit. Défaut : "transit".</summary>
+    /// <summary>Mount point for the Transit engine. Default: "transit".</summary>
     public string TransitMountPoint { get; set; } = "transit";
 
-    /// <summary>Intervalle de renouvellement du lease (pourcentage du TTL). Défaut : 0.75 (75%).</summary>
+    /// <summary>Lease renewal interval (percentage of TTL). Default: 0.75 (75%).</summary>
     public double LeaseRenewalThreshold { get; set; } = 0.75;
 }

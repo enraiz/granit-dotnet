@@ -4,6 +4,8 @@
 // Vérifie que les champs d'audit HDS sont correctement remplis
 // lors de la création et modification des entités, pour chaque niveau
 // de la hiérarchie (CreationAuditedEntity, AuditedEntity, FullAuditedEntity).
+// Vérifie également l'injection automatique du TenantId sur les entités
+// implémentant IMultiTenant.
 //
 // Approche : on enregistre l'intercepteur dans le DbContext et on appelle
 // SaveChangesAsync directement, ce qui déclenche l'intercepteur naturellement.
@@ -12,6 +14,7 @@
 
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
@@ -26,10 +29,12 @@ public sealed class AuditedEntityInterceptorTests
 {
     private static readonly DateTimeOffset FixedNow = new(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
     private static readonly Guid FixedGuid = Guid.Parse("12345678-1234-1234-1234-123456789abc");
+    private static readonly Guid TenantId = Guid.Parse("aaaabbbb-0000-0000-0000-000000000001");
 
     private readonly ICurrentUserService _currentUserService;
     private readonly IClock _clock;
     private readonly IGuidGenerator _guidGenerator;
+    private readonly ICurrentTenant _currentTenant;
 
     public AuditedEntityInterceptorTests()
     {
@@ -41,6 +46,9 @@ public sealed class AuditedEntityInterceptorTests
 
         _guidGenerator = Substitute.For<IGuidGenerator>();
         _guidGenerator.Create().Returns(FixedGuid);
+
+        _currentTenant = Substitute.For<ICurrentTenant>();
+        _currentTenant.Id.Returns((Guid?)null);
     }
 
     // -------------------------------------------------------------------------
@@ -241,12 +249,65 @@ public sealed class AuditedEntityInterceptorTests
     }
 
     // -------------------------------------------------------------------------
+    // IMultiTenant — injection automatique du TenantId
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SaveChangesAsync_MultiTenant_OnAdd_SetsTenantId_WhenTenantIsActive()
+    {
+        // Arrange
+        _currentTenant.Id.Returns((Guid?)TenantId);
+        await using TestDbContext context = CreateContext();
+        TestMultiTenantEntity entity = new() { Name = "Fiche patient" };
+        context.MultiTenantEntities.Add(entity);
+
+        // Act
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        entity.TenantId.Should().Be(TenantId);
+    }
+
+    [Fact]
+    public async Task SaveChangesAsync_MultiTenant_OnAdd_TenantIdIsNull_WhenNoTenantActive()
+    {
+        // Arrange — aucun tenant actif (contexte système)
+        _currentTenant.Id.Returns((Guid?)null);
+        await using TestDbContext context = CreateContext();
+        TestMultiTenantEntity entity = new() { Name = "Donnée globale" };
+        context.MultiTenantEntities.Add(entity);
+
+        // Act
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        entity.TenantId.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SaveChangesAsync_MultiTenant_OnAdd_DoesNotOverwriteExistingTenantId()
+    {
+        // Arrange — TenantId déjà défini explicitement (migration, import)
+        var explicitTenant = Guid.NewGuid();
+        _currentTenant.Id.Returns((Guid?)TenantId);
+        await using TestDbContext context = CreateContext();
+        TestMultiTenantEntity entity = new() { Name = "Import", TenantId = explicitTenant };
+        context.MultiTenantEntities.Add(entity);
+
+        // Act
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Assert — le TenantId explicite est conservé
+        entity.TenantId.Should().Be(explicitTenant);
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
     private TestDbContext CreateContext()
     {
-        AuditedEntityInterceptor interceptor = new(_currentUserService, _clock, _guidGenerator);
+        AuditedEntityInterceptor interceptor = new(_currentUserService, _clock, _guidGenerator, _currentTenant);
         DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(interceptor)
@@ -269,12 +330,18 @@ public sealed class AuditedEntityInterceptorTests
         public string Title { get; set; } = string.Empty;
     }
 
-    private sealed class TestDbContext : DbContext
+    private sealed class TestMultiTenantEntity : CreationAuditedEntity, IMultiTenant
     {
-        public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
+        public string Name { get; set; } = string.Empty;
+        public Guid? TenantId { get; set; }
+    }
+
+    private sealed class TestDbContext(DbContextOptions<AuditedEntityInterceptorTests.TestDbContext> options) : DbContext(options)
+    {
         public DbSet<TestCreationAuditedEntity> CreationAuditedEntities => Set<TestCreationAuditedEntity>();
         public DbSet<TestAuditedEntity> AuditedEntities => Set<TestAuditedEntity>();
         public DbSet<TestFullAuditedEntity> FullAuditedEntities => Set<TestFullAuditedEntity>();
+        public DbSet<TestMultiTenantEntity> MultiTenantEntities => Set<TestMultiTenantEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -282,6 +349,7 @@ public sealed class AuditedEntityInterceptorTests
             modelBuilder.Entity<TestCreationAuditedEntity>().Property(e => e.Id).ValueGeneratedNever();
             modelBuilder.Entity<TestAuditedEntity>().Property(e => e.Id).ValueGeneratedNever();
             modelBuilder.Entity<TestFullAuditedEntity>().Property(e => e.Id).ValueGeneratedNever();
+            modelBuilder.Entity<TestMultiTenantEntity>().Property(e => e.Id).ValueGeneratedNever();
         }
     }
 }

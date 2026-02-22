@@ -1,18 +1,3 @@
-// =============================================================================
-// SimpleGuidGenerator - Wrapper autour de Guid.NewGuid()
-// =============================================================================
-// Implementation simple de IGuidGenerator pour les cas ou la sequentialite
-// n'est pas necessaire : tests unitaires, identifiants temporaires,
-// contextes sans injection de dependances.
-//
-// SimpleGuidGenerator.Instance fournit un acces statique sans DI.
-//
-// N'est PAS enregistre dans le conteneur DI (SequentialGuidGenerator est
-// l'implementation par defaut). Utilisation manuelle uniquement.
-//
-// Inspire de Volo.Abp.Guids.SimpleGuidGenerator.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Guids;
 
 /// <summary>

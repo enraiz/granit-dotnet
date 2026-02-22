@@ -1,16 +1,3 @@
-// =============================================================================
-// SoftDeleteInterceptor - Suppression logique RGPD
-// =============================================================================
-// Intercepte les DELETE sur les entités ISoftDeletable et les transforme
-// en UPDATE SET IsDeleted = true.
-//
-// Les entités supprimées logiquement sont filtrées par le query filter global
-// configuré dans ConfigureModelExtensions.
-//
-// Conformité RGPD : les données sont marquées comme supprimées mais conservées
-// pour l'audit trail HDS (3 ans). La purge physique est gérée séparément.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
@@ -20,19 +7,13 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 
 /// <summary>
-/// Intercepteur EF Core qui convertit les suppressions physiques
-/// en suppressions logiques pour les entités <see cref="ISoftDeletable"/>.
+/// EF Core interceptor that converts physical deletions
+/// to soft deletions for <see cref="ISoftDeletable"/> entities.
 /// </summary>
-public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
+public sealed class SoftDeleteInterceptor(ICurrentUserService currentUserService, IClock clock) : SaveChangesInterceptor
 {
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IClock _clock;
-
-    public SoftDeleteInterceptor(ICurrentUserService currentUserService, IClock clock)
-    {
-        _currentUserService = currentUserService;
-        _clock = clock;
-    }
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly IClock _clock = clock;
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
@@ -68,7 +49,7 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
                 continue;
             }
 
-            // Convertir DELETE → UPDATE (soft delete)
+            // Convert DELETE -> UPDATE (soft delete)
             entry.State = EntityState.Modified;
             entry.Entity.IsDeleted = true;
             entry.Entity.DeletedAt = now;

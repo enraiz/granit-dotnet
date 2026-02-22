@@ -1,32 +1,25 @@
-// =============================================================================
-// ICurrentUserService - Acces a l'utilisateur courant
-// =============================================================================
-// Abstraction pour recuperer l'identite de l'utilisateur authentifie.
-// Implemente via HttpContext dans ce meme package.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Security;
 
 /// <summary>
-/// Service pour acceder aux informations de l'utilisateur courant.
+/// Service for accessing information about the current user.
 /// </summary>
 public interface ICurrentUserService
 {
-    /// <summary>Identifiant unique de l'utilisateur (sub claim Keycloak).</summary>
+    /// <summary>Unique identifier of the user (claim "sub").</summary>
     string? UserId { get; }
 
-    /// <summary>Nom d'utilisateur (preferred_username claim).</summary>
+    /// <summary>Username (according to the <c>NameClaimType</c> configured in JWT Bearer).</summary>
     string? UserName { get; }
 
-    /// <summary>Email de l'utilisateur.</summary>
+    /// <summary>Email address of the user.</summary>
     string? Email { get; }
 
-    /// <summary>Indique si l'utilisateur est authentifie.</summary>
+    /// <summary>Indicates whether the user is authenticated.</summary>
     bool IsAuthenticated { get; }
 
-    /// <summary>Roles de l'utilisateur (realm_access.roles de Keycloak).</summary>
+    /// <summary>Roles assigned to the user.</summary>
     IReadOnlyList<string> Roles { get; }
 
-    /// <summary>Verifie si l'utilisateur possede un role donne.</summary>
+    /// <summary>Checks whether the user has a given role.</summary>
     bool IsInRole(string role);
 }

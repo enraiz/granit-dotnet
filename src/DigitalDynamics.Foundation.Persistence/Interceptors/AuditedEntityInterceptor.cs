@@ -1,16 +1,6 @@
-// =============================================================================
-// AuditedEntityInterceptor - Remplissage automatique des champs d'audit HDS
-// =============================================================================
-// Intercepte les SaveChanges d'EF Core pour remplir automatiquement :
-//   - CreatedAt/CreatedBy sur toute CreationAuditedEntity (ajout)
-//   - ModifiedAt/ModifiedBy sur toute AuditedEntity (modification)
-//
-// Conformité HDS : chaque modification est tracée avec l'utilisateur
-// et l'horodatage.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
 using Microsoft.EntityFrameworkCore;
@@ -20,24 +10,20 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace DigitalDynamics.Foundation.Persistence.Interceptors;
 
 /// <summary>
-/// Intercepteur EF Core qui remplit automatiquement les champs d'audit
-/// sur les entités héritant de <see cref="CreationAuditedEntity"/>.
+/// EF Core interceptor that automatically populates audit fields
+/// on entities inheriting from <see cref="CreationAuditedEntity"/>,
+/// and the <see cref="IMultiTenant.TenantId"/> on multi-tenant entities.
 /// </summary>
-public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
+public sealed class AuditedEntityInterceptor(
+    ICurrentUserService currentUserService,
+    IClock clock,
+    IGuidGenerator guidGenerator,
+    ICurrentTenant currentTenant) : SaveChangesInterceptor
 {
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IClock _clock;
-    private readonly IGuidGenerator _guidGenerator;
-
-    public AuditedEntityInterceptor(
-        ICurrentUserService currentUserService,
-        IClock clock,
-        IGuidGenerator guidGenerator)
-    {
-        _currentUserService = currentUserService;
-        _clock = clock;
-        _guidGenerator = guidGenerator;
-    }
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly IClock _clock = clock;
+    private readonly IGuidGenerator _guidGenerator = guidGenerator;
+    private readonly ICurrentTenant _currentTenant = currentTenant;
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
@@ -77,19 +63,27 @@ public sealed class AuditedEntityInterceptor : SaveChangesInterceptor
                     {
                         entry.Entity.Id = _guidGenerator.Create();
                     }
+
+                    // Multi-tenant isolation: inject current TenantId if the entity supports it
+                    if (entry.Entity is IMultiTenant multiTenant && multiTenant.TenantId is null)
+                    {
+                        multiTenant.TenantId = _currentTenant.Id;
+                    }
+
                     break;
 
                 case EntityState.Modified:
-                    // Protéger les champs de création
+                    // Protect creation fields from modification
                     entry.Property(e => e.CreatedAt).IsModified = false;
                     entry.Property(e => e.CreatedBy).IsModified = false;
 
-                    // Remplir les champs de modification uniquement sur AuditedEntity
+                    // Populate modification fields only on AuditedEntity
                     if (entry.Entity is AuditedEntity audited)
                     {
                         audited.ModifiedAt = now;
                         audited.ModifiedBy = userId;
                     }
+
                     break;
             }
         }

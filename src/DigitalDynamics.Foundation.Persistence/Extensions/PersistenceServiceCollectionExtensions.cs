@@ -1,22 +1,15 @@
-// =============================================================================
-// PersistenceServiceCollectionExtensions - Enregistrement des intercepteurs
-// =============================================================================
-// Usage :
-//   builder.Services.AddFoundationPersistence();
-// =============================================================================
-
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitalDynamics.Foundation.Persistence.Extensions;
 
 /// <summary>
-/// Extensions pour enregistrer les services de persistance Foundation.
+/// Extensions for registering Foundation persistence services.
 /// </summary>
 public static class PersistenceServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute les intercepteurs EF Core Foundation (audit HDS + soft delete RGPD).
+    /// Adds Foundation EF Core interceptors (HDS audit + GDPR soft delete).
     /// </summary>
     public static IServiceCollection AddFoundationPersistence(this IServiceCollection services)
     {

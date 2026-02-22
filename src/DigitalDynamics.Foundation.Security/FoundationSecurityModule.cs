@@ -1,18 +1,10 @@
-// =============================================================================
-// FoundationSecurityModule - Module Foundation pour l'authentification Keycloak
-// =============================================================================
-
 using DigitalDynamics.Foundation.Core.Modularity;
-using DigitalDynamics.Foundation.Security.Extensions;
 
 namespace DigitalDynamics.Foundation.Security;
 
 /// <summary>
-/// Module Foundation pour Keycloak authentication et ICurrentUserService.
-/// Aucune dependance sur d'autres modules Foundation.
+/// Foundation module providing security abstractions (<see cref="ICurrentUserService"/>).
+/// No services are registered here — use <c>FoundationJwtBearerModule</c> or
+/// <c>FoundationAuthenticationKeycloakModule</c> for the full implementation.
 /// </summary>
-public sealed class FoundationSecurityModule : FoundationModule
-{
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddFoundationSecurity(context.Configuration);
-}
+public sealed class FoundationSecurityModule : FoundationModule;

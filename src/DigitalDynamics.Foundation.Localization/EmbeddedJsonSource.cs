@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // EmbeddedJsonSource.cs
-// Représente une source de fichiers JSON embarqués dans une assembly.
-// Le ResourcePrefix correspond au préfixe des noms de ressources embarquées
-// (ex: "DigitalDynamics.Foundation.Localization.Localization.Foundation").
+// Represents a source of JSON files embedded in an assembly.
+// The ResourcePrefix corresponds to the prefix of embedded resource names
+// (e.g. "DigitalDynamics.Foundation.Localization.Localization.Foundation").
 // ---------------------------------------------------------------------------
 
 using System.Reflection;
@@ -10,8 +10,8 @@ using System.Reflection;
 namespace DigitalDynamics.Foundation.Localization;
 
 /// <summary>
-/// Source de fichiers JSON de localisation embarqués dans une assembly.
+/// Source of localization JSON files embedded in an assembly.
 /// </summary>
-/// <param name="Assembly">Assembly contenant les ressources embarquées.</param>
-/// <param name="ResourcePrefix">Préfixe des noms de ressources embarquées (séparateur point).</param>
+/// <param name="Assembly">Assembly containing the embedded resources.</param>
+/// <param name="ResourcePrefix">Prefix of embedded resource names (dot separator).</param>
 internal sealed record EmbeddedJsonSource(Assembly Assembly, string ResourcePrefix);

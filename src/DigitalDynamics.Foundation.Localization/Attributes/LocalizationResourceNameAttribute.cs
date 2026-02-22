@@ -1,25 +1,25 @@
 // ---------------------------------------------------------------------------
 // LocalizationResourceNameAttribute.cs
-// Associe un nom court à une classe marker de ressource de localisation.
-// Utilisé par le système pour identifier la ressource dans les logs et le debug.
+// Associates a short name with a localization resource marker class.
+// Used by the system to identify the resource in logs and during debugging.
 // ---------------------------------------------------------------------------
 
 namespace DigitalDynamics.Foundation.Localization.Attributes;
 
 /// <summary>
-/// Associe un nom court à une classe marker de ressource de localisation.
+/// Associates a short name with a localization resource marker class.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 public sealed class LocalizationResourceNameAttribute(string name) : Attribute
 {
     /// <summary>
-    /// Nom court de la ressource (ex: "Foundation", "Vault").
+    /// Short name of the resource (e.g. "Foundation", "Vault").
     /// </summary>
     public string Name { get; } = name;
 
     /// <summary>
-    /// Culture par défaut de la ressource, utilisée comme fallback final.
-    /// Utilisée par l'auto-discovery quand aucun enregistrement explicite n'est présent.
+    /// Default culture of the resource, used as the final fallback.
+    /// Used by auto-discovery when no explicit registration is present.
     /// </summary>
     public string DefaultCulture { get; init; } = "en";
 }

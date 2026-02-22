@@ -1,8 +1,8 @@
 // =============================================================================
 // Tests - TransitEncryptionService
 // =============================================================================
-// Vérifie que le chiffrement/déchiffrement Transit fonctionne correctement.
-// Les appels Vault sont mockés via NSubstitute.
+// Verifies that Transit encryption/decryption works correctly.
+// Vault calls are mocked via NSubstitute.
 // =============================================================================
 
 using System.Text;

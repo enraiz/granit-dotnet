@@ -1,14 +1,3 @@
-// =============================================================================
-// GuidsServiceCollectionExtensions - Enregistrement DI du module Guids
-// =============================================================================
-// Usage :
-//   builder.Services.AddFoundationGuids();
-//   builder.Services.AddFoundationGuids(options =>
-//   {
-//       options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd;
-//   });
-// =============================================================================
-
 using DigitalDynamics.Foundation.Guids;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,19 +5,19 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace DigitalDynamics.Foundation.Guids.Extensions;
 
 /// <summary>
-/// Extensions pour enregistrer les services du module Guids.
+/// Extensions for registering Guids module services.
 /// </summary>
 public static class GuidsServiceCollectionExtensions
 {
     /// <summary>
-    /// Ajoute les services du module Guids (IGuidGenerator avec GUID sequentiels).
+    /// Adds Guids module services (IGuidGenerator with sequential GUIDs).
     /// </summary>
     public static IServiceCollection AddFoundationGuids(
         this IServiceCollection services,
         Action<GuidGeneratorOptions>? configure = null)
     {
-        // Singleton car SequentialGuidGenerator est thread-safe
-        // (RandomNumberGenerator statique, IOptions injecte)
+        // Singleton because SequentialGuidGenerator is thread-safe
+        // (static RandomNumberGenerator, injected IOptions)
         services.TryAddSingleton<IGuidGenerator, SequentialGuidGenerator>();
 
         if (configure is not null)

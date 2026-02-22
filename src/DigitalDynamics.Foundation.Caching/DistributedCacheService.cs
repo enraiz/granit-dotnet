@@ -22,39 +22,28 @@ namespace DigitalDynamics.Foundation.Caching;
 /// Le <see cref="IMemoryCache"/> injecté est dédié aux verrous stampede (clé DI : <c>DigitalDynamics.Foundation.Caching.Locks</c>)
 /// et est séparé du cache mémoire applicatif pour éviter les interférences.
 /// </remarks>
-public partial class DistributedCacheService<TCacheItem> : ICacheService<TCacheItem>
+/// <param name="cache">Le fournisseur de cache distribué (Memory ou Redis).</param>
+/// <param name="lockCache">Cache mémoire dédié aux verrous stampede.</param>
+/// <param name="encryptor">Chiffreur AES (no-op en dev, AES-256 en prod).</param>
+/// <param name="options">Options globales du cache.</param>
+/// <param name="logger">Logger pour le diagnostic.</param>
+public partial class DistributedCacheService<TCacheItem>(
+    IDistributedCache cache,
+    [FromKeyedServices(DistributedCacheService<TCacheItem>.LockCacheKey)] IMemoryCache lockCache,
+    ICacheValueEncryptor encryptor,
+    IOptions<CachingOptions> options,
+    ILogger<DistributedCacheService<TCacheItem>> logger) : ICacheService<TCacheItem>
     where TCacheItem : class
 {
     internal const string LockCacheKey = "DigitalDynamics.Foundation.Caching.Locks";
 
-    private readonly IDistributedCache _cache;
-    private readonly IMemoryCache _lockCache;
-    private readonly ICacheValueEncryptor _encryptor;
-    private readonly IOptions<CachingOptions> _options;
-    private readonly ILogger<DistributedCacheService<TCacheItem>> _logger;
-    private readonly string _cacheName;
-    private readonly bool _shouldEncrypt;
-
-    /// <param name="cache">Le fournisseur de cache distribué (Memory ou Redis).</param>
-    /// <param name="lockCache">Cache mémoire dédié aux verrous stampede.</param>
-    /// <param name="encryptor">Chiffreur AES (no-op en dev, AES-256 en prod).</param>
-    /// <param name="options">Options globales du cache.</param>
-    /// <param name="logger">Logger pour le diagnostic.</param>
-    public DistributedCacheService(
-        IDistributedCache cache,
-        [FromKeyedServices(LockCacheKey)] IMemoryCache lockCache,
-        ICacheValueEncryptor encryptor,
-        IOptions<CachingOptions> options,
-        ILogger<DistributedCacheService<TCacheItem>> logger)
-    {
-        _cache = cache;
-        _lockCache = lockCache;
-        _encryptor = encryptor;
-        _options = options;
-        _logger = logger;
-        _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
-        _shouldEncrypt = CacheEncryptionResolver.ShouldEncrypt(typeof(TCacheItem), options.Value);
-    }
+    private readonly IDistributedCache _cache = cache;
+    private readonly IMemoryCache _lockCache = lockCache;
+    private readonly ICacheValueEncryptor _encryptor = encryptor;
+    private readonly IOptions<CachingOptions> _options = options;
+    private readonly ILogger<DistributedCacheService<TCacheItem>> _logger = logger;
+    private readonly string _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
+    private readonly bool _shouldEncrypt = CacheEncryptionResolver.ShouldEncrypt(typeof(TCacheItem), options.Value);
 
     /// <inheritdoc/>
     public async Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default)

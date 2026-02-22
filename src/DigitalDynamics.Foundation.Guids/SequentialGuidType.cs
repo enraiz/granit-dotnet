@@ -1,15 +1,3 @@
-// =============================================================================
-// SequentialGuidType - Type de GUID sequentiel selon la base de donnees
-// =============================================================================
-// Chaque moteur de base de donnees trie les GUID differemment dans ses index.
-// Le type sequentiel doit correspondre au moteur utilise pour garantir
-// l'ordonnancement correct dans l'index clustered.
-//
-// Digital Dynamics utilise PostgreSQL : le defaut est SequentialAsString.
-//
-// Inspire de Volo.Abp.Guids.SequentialGuidType.
-// =============================================================================
-
 namespace DigitalDynamics.Foundation.Guids;
 
 /// <summary>

@@ -1,13 +1,3 @@
-// =============================================================================
-// VaultClientFactory - Création du client VaultSharp avec authentification
-// =============================================================================
-// Supporte deux méthodes d'authentification :
-//   - Kubernetes (production) : utilise le ServiceAccount token
-//   - Token (développement) : utilise un token statique
-//
-// En production, l'authentification Kubernetes est OBLIGATOIRE.
-// =============================================================================
-
 using DigitalDynamics.Foundation.Vault.Options;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -20,25 +10,18 @@ using VaultSharp.V1.AuthMethods.Token;
 namespace DigitalDynamics.Foundation.Vault.Services;
 
 /// <summary>
-/// Factory pour créer un client VaultSharp avec la méthode d'authentification configurée.
+/// Factory for creating a VaultSharp client with the configured authentication method.
 /// </summary>
-public sealed partial class VaultClientFactory
+public sealed partial class VaultClientFactory(
+    IOptions<VaultOptions> options,
+    ILogger<VaultClientFactory> logger,
+    IStringLocalizer<VaultLocalizationResource> localizer)
 {
-    private readonly VaultOptions _options;
-    private readonly ILogger<VaultClientFactory> _logger;
-    private readonly IStringLocalizer<VaultLocalizationResource> _localizer;
+    private readonly VaultOptions _options = options.Value;
+    private readonly ILogger<VaultClientFactory> _logger = logger;
+    private readonly IStringLocalizer<VaultLocalizationResource> _localizer = localizer;
 
-    public VaultClientFactory(
-        IOptions<VaultOptions> options,
-        ILogger<VaultClientFactory> logger,
-        IStringLocalizer<VaultLocalizationResource> localizer)
-    {
-        _options = options.Value;
-        _logger = logger;
-        _localizer = localizer;
-    }
-
-    /// <summary>Crée un client VaultSharp authentifié.</summary>
+    /// <summary>Creates an authenticated VaultSharp client.</summary>
     public IVaultClient Create()
     {
         IAuthMethodInfo authMethod = _options.AuthMethod.ToLowerInvariant() switch

@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // LocalizationResourceInfo.cs
-// Représente une ressource de localisation enregistrée : type marker,
-// culture par défaut, sources JSON embarquées et chaîne d'héritage.
-// API fluent pour l'enregistrement (AddJson, AddBaseTypes).
+// Represents a registered localization resource: marker type,
+// default culture, embedded JSON sources, and inheritance chain.
+// Fluent API for registration (AddJson, AddBaseTypes).
 // ---------------------------------------------------------------------------
 
 using System.Reflection;
@@ -10,47 +10,41 @@ using System.Reflection;
 namespace DigitalDynamics.Foundation.Localization;
 
 /// <summary>
-/// Informations d'enregistrement d'une ressource de localisation.
+/// Registration information for a localization resource.
 /// </summary>
-public sealed class LocalizationResourceInfo
+/// <remarks>
+/// Creates a new localization resource info.
+/// </remarks>
+/// <param name="resourceType">Marker type of the resource.</param>
+/// <param name="defaultCulture">Default culture.</param>
+public sealed class LocalizationResourceInfo(Type resourceType, string defaultCulture)
 {
     /// <summary>
-    /// Type marker de la ressource (classe vide avec attributs).
+    /// Marker type of the resource (empty class with attributes).
     /// </summary>
-    public Type ResourceType { get; }
+    public Type ResourceType { get; } = resourceType;
 
     /// <summary>
-    /// Culture par défaut pour cette ressource (ex: "fr").
+    /// Default culture for this resource (e.g. "fr").
     /// </summary>
-    public string DefaultCulture { get; }
+    public string DefaultCulture { get; } = defaultCulture;
 
     /// <summary>
-    /// Types des ressources parentes (héritage de traductions).
+    /// Types of parent resources (translation inheritance).
     /// </summary>
     public List<Type> BaseTypes { get; } = [];
 
     /// <summary>
-    /// Sources JSON embarquées associées à cette ressource.
+    /// Embedded JSON sources associated with this resource.
     /// </summary>
     internal List<EmbeddedJsonSource> JsonSources { get; } = [];
 
     /// <summary>
-    /// Crée une nouvelle info de ressource de localisation.
+    /// Adds a source of embedded JSON files.
     /// </summary>
-    /// <param name="resourceType">Type marker de la ressource.</param>
-    /// <param name="defaultCulture">Culture par défaut.</param>
-    public LocalizationResourceInfo(Type resourceType, string defaultCulture)
-    {
-        ResourceType = resourceType;
-        DefaultCulture = defaultCulture;
-    }
-
-    /// <summary>
-    /// Ajoute une source de fichiers JSON embarqués.
-    /// </summary>
-    /// <param name="assembly">Assembly contenant les ressources embarquées.</param>
-    /// <param name="embeddedResourcePrefix">Préfixe des noms de ressources (séparateur point).</param>
-    /// <returns>Cette instance pour chaînage fluent.</returns>
+    /// <param name="assembly">Assembly containing the embedded resources.</param>
+    /// <param name="embeddedResourcePrefix">Prefix of resource names (dot separator).</param>
+    /// <returns>This instance for fluent chaining.</returns>
     public LocalizationResourceInfo AddJson(Assembly assembly, string embeddedResourcePrefix)
     {
         JsonSources.Add(new EmbeddedJsonSource(assembly, embeddedResourcePrefix));
@@ -58,10 +52,10 @@ public sealed class LocalizationResourceInfo
     }
 
     /// <summary>
-    /// Ajoute des types de ressources parentes pour l'héritage de traductions.
+    /// Adds parent resource types for translation inheritance.
     /// </summary>
-    /// <param name="types">Types des ressources parentes.</param>
-    /// <returns>Cette instance pour chaînage fluent.</returns>
+    /// <param name="types">Types of the parent resources.</param>
+    /// <returns>This instance for fluent chaining.</returns>
     public LocalizationResourceInfo AddBaseTypes(params Type[] types)
     {
         BaseTypes.AddRange(types);

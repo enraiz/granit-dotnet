@@ -1,10 +1,10 @@
 // =============================================================================
 // Tests - SimpleGuidGenerator
 // =============================================================================
-// Verifie que SimpleGuidGenerator :
-//   - Genere des GUID non vides
-//   - Genere des GUID uniques
-//   - Fournit une instance statique
+// Verifies that SimpleGuidGenerator:
+//   - Generates non-empty GUIDs
+//   - Generates unique GUIDs
+//   - Provides a static instance
 // =============================================================================
 
 using FluentAssertions;
@@ -18,7 +18,7 @@ public sealed class SimpleGuidGeneratorTests
     public void Create_ReturnsNonEmptyGuid()
     {
         // Arrange
-        SimpleGuidGenerator generator = new SimpleGuidGenerator();
+        var generator = new SimpleGuidGenerator();
 
         // Act
         Guid guid = generator.Create();
@@ -31,7 +31,7 @@ public sealed class SimpleGuidGeneratorTests
     public void Create_GeneratesUniqueGuids()
     {
         // Arrange
-        SimpleGuidGenerator generator = new SimpleGuidGenerator();
+        var generator = new SimpleGuidGenerator();
 
         // Act
         Guid guid1 = generator.Create();

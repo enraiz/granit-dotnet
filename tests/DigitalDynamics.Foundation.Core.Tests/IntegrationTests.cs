@@ -25,8 +25,7 @@ public sealed class IntegrationTests
 
     public sealed class TestLeafModule : FoundationModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context) =>
-            context.Services.AddSingleton<ITestService, TestServiceImpl>();
+        public override void ConfigureServices(ServiceConfigurationContext context) => context.Services.AddSingleton<ITestService, TestServiceImpl>();
     }
 
     private static bool _initializationCalled;
@@ -35,8 +34,7 @@ public sealed class IntegrationTests
     [DependsOn(typeof(TestLeafModule))]
     public sealed class TestRootModule : FoundationModule
     {
-        public override void OnApplicationInitialization(ApplicationInitializationContext context) =>
-            _initializationCalled = true;
+        public override void OnApplicationInitialization(ApplicationInitializationContext context) => _initializationCalled = true;
     }
 
     // --- Modules async ---
@@ -70,17 +68,17 @@ public sealed class IntegrationTests
     public void AddFoundation_RegistersFoundationApplicationAsSingleton()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
 
         // Act
         builder.AddFoundation<TestRootModule>();
-        using WebApplication app = builder.Build();
+        using var app = builder.Build();
 
         // Assert
-        FoundationApplication? foundationApp = app.Services.GetService<FoundationApplication>();
+        var foundationApp = app.Services.GetService<FoundationApplication>();
         foundationApp.Should().NotBeNull();
 
-        FoundationApplication? secondResolve = app.Services.GetService<FoundationApplication>();
+        var secondResolve = app.Services.GetService<FoundationApplication>();
         secondResolve.Should().BeSameAs(foundationApp);
     }
 
@@ -88,14 +86,14 @@ public sealed class IntegrationTests
     public void AddFoundation_ModuleServicesAreRegistered()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
 
         // Act
         builder.AddFoundation<TestRootModule>();
-        using WebApplication app = builder.Build();
+        using var app = builder.Build();
 
         // Assert - TestLeafModule enregistre ITestService
-        ITestService? service = app.Services.GetService<ITestService>();
+        var service = app.Services.GetService<ITestService>();
         service.Should().NotBeNull();
     }
 
@@ -103,9 +101,9 @@ public sealed class IntegrationTests
     public void UseFoundation_CallsOnApplicationInitialization()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
         builder.AddFoundation<TestRootModule>();
-        using WebApplication app = builder.Build();
+        using var app = builder.Build();
 
         // Act
         app.UseFoundation();
@@ -118,15 +116,15 @@ public sealed class IntegrationTests
     public void AddFoundation_ModuleTypesAreInTopologicalOrder()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
 
         // Act
         builder.AddFoundation<TestRootModule>();
-        using WebApplication app = builder.Build();
+        using var app = builder.Build();
 
         // Assert
-        FoundationApplication foundationApp = app.Services.GetRequiredService<FoundationApplication>();
-        foundationApp.ModuleTypes.Should().ContainInOrder(
+        var foundationApp = app.Services.GetRequiredService<FoundationApplication>();
+        foundationApp.GetModuleTypes().Should().ContainInOrder(
             typeof(TestLeafModule),
             typeof(TestRootModule));
     }
@@ -137,17 +135,17 @@ public sealed class IntegrationTests
     public async Task AddFoundationAsync_RegistersFoundationApplicationAsSingleton()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
 
         // Act
         await builder.AddFoundationAsync<AsyncTestRootModule>();
-        await using WebApplication app = builder.Build();
+        await using var app = builder.Build();
 
         // Assert
-        FoundationApplication? foundationApp = app.Services.GetService<FoundationApplication>();
+        var foundationApp = app.Services.GetService<FoundationApplication>();
         foundationApp.Should().NotBeNull();
 
-        FoundationApplication? secondResolve = app.Services.GetService<FoundationApplication>();
+        var secondResolve = app.Services.GetService<FoundationApplication>();
         secondResolve.Should().BeSameAs(foundationApp);
     }
 
@@ -155,14 +153,14 @@ public sealed class IntegrationTests
     public async Task AddFoundationAsync_ModuleServicesAreRegistered()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
 
         // Act
         await builder.AddFoundationAsync<AsyncTestRootModule>();
-        await using WebApplication app = builder.Build();
+        await using var app = builder.Build();
 
         // Assert - AsyncTestLeafModule enregistre ITestService via ConfigureServicesAsync
-        ITestService? service = app.Services.GetService<ITestService>();
+        var service = app.Services.GetService<ITestService>();
         service.Should().NotBeNull();
     }
 
@@ -170,9 +168,9 @@ public sealed class IntegrationTests
     public async Task UseFoundationAsync_CallsOnApplicationInitializationAsync()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
         await builder.AddFoundationAsync<AsyncTestRootModule>();
-        await using WebApplication app = builder.Build();
+        await using var app = builder.Build();
 
         // Act
         await app.UseFoundationAsync();
@@ -185,15 +183,15 @@ public sealed class IntegrationTests
     public async Task AddFoundationAsync_ModuleTypesAreInTopologicalOrder()
     {
         // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
 
         // Act
         await builder.AddFoundationAsync<AsyncTestRootModule>();
-        await using WebApplication app = builder.Build();
+        await using var app = builder.Build();
 
         // Assert
-        FoundationApplication foundationApp = app.Services.GetRequiredService<FoundationApplication>();
-        foundationApp.ModuleTypes.Should().ContainInOrder(
+        var foundationApp = app.Services.GetRequiredService<FoundationApplication>();
+        foundationApp.GetModuleTypes().Should().ContainInOrder(
             typeof(AsyncTestLeafModule),
             typeof(AsyncTestRootModule));
     }

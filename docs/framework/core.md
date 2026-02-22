@@ -153,6 +153,45 @@ Le `SoftDeleteInterceptor` (package [Persistence](persistence.md)) transforme le
 opérations `DELETE` en `UPDATE SET IsDeleted = true`, conservant les données pour
 l'audit trail tout en les excluant des requêtes standard.
 
+### IMultiTenant
+
+Interface pour les entités dont les données sont isolées par tenant. Le `TenantId` est
+automatiquement rempli par `AuditedEntityInterceptor` (package [Persistence](persistence.md))
+lors de la création, depuis `ICurrentTenant` du tenant courant.
+
+```csharp
+public interface IMultiTenant
+{
+    Guid? TenantId { get; set; }
+}
+```
+
+Utilisation typique — combiner avec la hiérarchie d'entités :
+
+```csharp
+using DigitalDynamics.Foundation.Core.Domain;
+
+// Entité dont chaque enregistrement appartient à un tenant
+public sealed class DossierPatient : FullAuditedEntity, IMultiTenant
+{
+    public Guid? TenantId { get; set; }
+    public string NumeroAdmission { get; set; } = string.Empty;
+}
+```
+
+Comportement automatique à la création (`SaveChangesAsync`) :
+
+- Si `TenantId == null` et qu'un tenant est actif → `TenantId = ICurrentTenant.Id`
+- Si `TenantId` est déjà défini (migration, import) → valeur conservée
+- Si aucun tenant actif → `TenantId` reste `null` (donnée globale)
+
+Le query filter multi-tenant (`WHERE TenantId = currentTenant.Id`) est activé en
+passant l'`ICurrentTenant` à `ApplyFoundationConventions` dans `OnModelCreating`
+(voir [persistence.md](persistence.md#query-filters-multi-tenant)).
+
+**Conformité RGPD** : `TenantId` est un GUID pseudonymisé. Ne jamais stocker de
+données nominatives (nom, email) dans ce champ.
+
 ### AuditLogEntry
 
 Classe scellée représentant une entrée de l'audit trail HDS. Enregistre qui a fait
@@ -185,6 +224,7 @@ DigitalDynamics.Foundation.Core
 │   ├── AuditedEntity.cs            (+ ModifiedAt, ModifiedBy)
 │   ├── FullAuditedEntity.cs        (+ ISoftDeletable)
 │   ├── ISoftDeletable.cs           (suppression logique RGPD)
+│   ├── IMultiTenant.cs             (isolation par tenant, TenantId auto-injecté)
 │   └── AuditLogEntry.cs            (entrée d'audit trail)
 ├── Modularity/
 │   ├── FoundationModule.cs         (classe de base des modules)

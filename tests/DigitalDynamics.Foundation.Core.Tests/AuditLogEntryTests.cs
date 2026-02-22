@@ -16,7 +16,7 @@ public sealed class AuditLogEntryTests
     public void AuditLogEntry_PropertiesAreSetCorrectly()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         DateTimeOffset timestamp = DateTimeOffset.UtcNow;
 
         // Act

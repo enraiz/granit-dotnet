@@ -43,7 +43,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
         ICacheService<DistributedCacheServiceTests.UserCacheItem> stringSvc =
             sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem>>();
 
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         DistributedCacheServiceTests.UserCacheItem item = new() { Id = id, Name = "Alice" };
 
         // Act
@@ -66,7 +66,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
         ICacheService<DistributedCacheServiceTests.UserCacheItem> stringSvc =
             sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem>>();
 
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         DistributedCacheServiceTests.UserCacheItem item = new() { Id = id, Name = "Bob" };
 
         // Act
@@ -87,7 +87,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
         ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
             sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
 
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         int callCount = 0;
 
         // Act
@@ -115,7 +115,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
         ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid> typedSvc =
             sp.GetRequiredService<ICacheService<DistributedCacheServiceTests.UserCacheItem, Guid>>();
 
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         await typedSvc.SetAsync(
             id,
             new DistributedCacheServiceTests.UserCacheItem { Id = id, Name = "Diana" },

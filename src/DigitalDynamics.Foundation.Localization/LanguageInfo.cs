@@ -1,31 +1,31 @@
 // ---------------------------------------------------------------------------
 // LanguageInfo.cs
-// Représente une langue disponible dans l'application.
-// Utilisé pour l'UI de sélection de langue.
+// Represents a language available in the application.
+// Used for the language selection UI.
 // ---------------------------------------------------------------------------
 
 namespace DigitalDynamics.Foundation.Localization;
 
 /// <summary>
-/// Représente une langue disponible dans l'application.
+/// Represents a language available in the application.
 /// </summary>
-/// <param name="cultureName">Code culture (ex: "fr", "en", "fr-CA").</param>
-/// <param name="displayName">Nom affiché (ex: "Français", "English").</param>
-/// <param name="flagIcon">Icône de drapeau optionnelle (ex: "fr", "gb").</param>
+/// <param name="cultureName">Culture code (e.g. "fr", "en", "fr-CA").</param>
+/// <param name="displayName">Display name (e.g. "Français", "English").</param>
+/// <param name="flagIcon">Optional flag icon (e.g. "fr", "gb").</param>
 public sealed class LanguageInfo(string cultureName, string displayName, string? flagIcon = null)
 {
     /// <summary>
-    /// Code culture (ex: "fr", "en", "fr-CA").
+    /// Culture code (e.g. "fr", "en", "fr-CA").
     /// </summary>
     public string CultureName { get; } = cultureName;
 
     /// <summary>
-    /// Nom affiché (ex: "Français", "English").
+    /// Display name (e.g. "Français", "English").
     /// </summary>
     public string DisplayName { get; } = displayName;
 
     /// <summary>
-    /// Icône de drapeau optionnelle.
+    /// Optional flag icon.
     /// </summary>
     public string? FlagIcon { get; } = flagIcon;
 }

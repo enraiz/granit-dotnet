@@ -513,7 +513,7 @@ public async Task AddFoundationAsync_RegistersFoundationApplicationAsSingleton()
 | Exigence | Mécanisme |
 | --- | --- |
 | HDS - Audit trail | Modules chargés dans un ordre déterministe et reproductible |
-| HDS - Traçabilité | `FoundationApplication.ModuleTypes` expose la liste des modules chargés (diagnostics) |
+| HDS - Traçabilité | `FoundationApplication.GetModuleTypes()` expose la liste des modules chargés (diagnostics) |
 | ISO 9001 - Reproductibilité | Tri topologique = même ordre à chaque démarrage |
 | Sécurité - Least privilege | Chaque module n'enregistre que ses propres services |
 

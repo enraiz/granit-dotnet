@@ -1,15 +1,16 @@
 // =============================================================================
 // Tests - SoftDeleteInterceptor
 // =============================================================================
-// Vérifie que la suppression physique est convertie en suppression logique
-// pour les entités ISoftDeletable (conformité RGPD).
+// Verifies that physical deletion is converted to logical deletion
+// for ISoftDeletable entities (GDPR compliance).
 //
-// Approche : on enregistre l'intercepteur dans le DbContext et on appelle
-// SaveChangesAsync directement. IClock est mocké pour des assertions exactes.
+// Approach: the interceptor is registered in the DbContext and
+// SaveChangesAsync is called directly. IClock is mocked for exact assertions.
 // =============================================================================
 
 using DigitalDynamics.Foundation.Core.Domain;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
@@ -40,8 +41,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnDelete_ConvertToSoftDelete()
     {
         // Arrange
-        await using TestDbContext context = CreateContext();
-        TestSoftDeletableEntity entity = new()
+        await using var context = CreateContext();
+        var entity = new TestSoftDeletableEntity
         {
             Id = Guid.NewGuid(),
             Name = "ToDelete",
@@ -51,18 +52,18 @@ public sealed class SoftDeleteInterceptorTests
         context.Entities.Add(entity);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Supprimer l'entité
+        // Delete the entity
         context.Entities.Remove(entity);
 
         // Act
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Assert — l'entité est soft-deleted (pas physiquement supprimée)
+        // Assert — the entity is soft-deleted (not physically removed)
         entity.IsDeleted.Should().BeTrue();
         entity.DeletedAt.Should().Be(FixedNow);
         entity.DeletedBy.Should().Be("user-test-123");
 
-        // Vérifier que l'entité existe encore en base (pas supprimée physiquement)
+        // Verify the entity still exists in the database (not physically deleted)
         int count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
         count.Should().Be(1);
     }
@@ -71,8 +72,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnModify_DoesNotTriggerSoftDelete()
     {
         // Arrange
-        await using TestDbContext context = CreateContext();
-        TestSoftDeletableEntity entity = new()
+        await using var context = CreateContext();
+        var entity = new TestSoftDeletableEntity
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -82,37 +83,41 @@ public sealed class SoftDeleteInterceptorTests
         context.Entities.Add(entity);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Modifier l'entité (pas supprimer)
+        // Modify the entity (not delete)
         entity.Name = "Modified";
 
         // Act
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Assert — pas de soft delete
+        // Assert — no soft delete
         entity.IsDeleted.Should().BeFalse();
         entity.DeletedAt.Should().BeNull();
     }
 
     private TestDbContext CreateContext()
     {
-        IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
-        AuditedEntityInterceptor auditInterceptor = new(_currentUserService, _clock, guidGenerator);
-        SoftDeleteInterceptor softDeleteInterceptor = new(_currentUserService, _clock);
-        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
+        var guidGenerator = Substitute.For<IGuidGenerator>();
+        ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
+        currentTenant.IsAvailable.Returns(false);
+        var auditInterceptor = new AuditedEntityInterceptor(_currentUserService, _clock, guidGenerator, currentTenant);
+        var softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
+        var options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(auditInterceptor, softDeleteInterceptor)
             .Options;
         return new TestDbContext(options);
     }
 
-    private sealed class TestSoftDeletableEntity : FullAuditedEntity
+    private sealed class TestSoftDeletableEntity : AuditedEntity, ISoftDeletable
     {
         public string Name { get; set; } = string.Empty;
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
+        public string? DeletedBy { get; set; }
     }
 
-    private sealed class TestDbContext : DbContext
+    private sealed class TestDbContext(DbContextOptions<SoftDeleteInterceptorTests.TestDbContext> options) : DbContext(options)
     {
-        public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
         public DbSet<TestSoftDeletableEntity> Entities => Set<TestSoftDeletableEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.Entity<TestSoftDeletableEntity>().Property(e => e.Id).ValueGeneratedNever();

@@ -1,37 +1,37 @@
 // ---------------------------------------------------------------------------
 // FoundationLocalizationOptions.cs
-// Options de configuration du système de localisation Foundation.
-// Permet d'enregistrer des ressources, définir la ressource par défaut
-// et lister les langues disponibles.
+// Configuration options for the Foundation localization system.
+// Allows registering resources, defining the default resource,
+// and listing available languages.
 // ---------------------------------------------------------------------------
 
 namespace DigitalDynamics.Foundation.Localization;
 
 /// <summary>
-/// Options de configuration du système de localisation Foundation.
+/// Configuration options for the Foundation localization system.
 /// </summary>
 public sealed class FoundationLocalizationOptions
 {
     /// <summary>
-    /// Dictionnaire des ressources de localisation enregistrées.
+    /// Dictionary of registered localization resources.
     /// </summary>
     public LocalizationResourceStore Resources { get; } = new();
 
     /// <summary>
-    /// Type de ressource par défaut (fallback quand aucune IStringLocalizer&lt;T&gt; spécifique).
+    /// Default resource type (fallback when no specific IStringLocalizer&lt;T&gt; is available).
     /// </summary>
     public Type? DefaultResourceType { get; set; }
 
     /// <summary>
-    /// Langues disponibles dans l'application (pour UI de sélection de langue).
+    /// Languages available in the application (for a language selection UI).
     /// </summary>
     public List<LanguageInfo> Languages { get; } = [];
 
     /// <summary>
-    /// Active l'auto-discovery des ressources JSON par convention de nommage.
-    /// Quand activé, les assemblies chargées sont scannées pour détecter les types
-    /// marqués avec <see cref="Attributes.LocalizationResourceNameAttribute"/> et
-    /// leurs fichiers JSON embarqués, sans enregistrement explicite <c>AddJson()</c>.
+    /// Enables auto-discovery of JSON resources by naming convention.
+    /// When enabled, loaded assemblies are scanned to detect types marked with
+    /// <see cref="Attributes.LocalizationResourceNameAttribute"/> and their
+    /// embedded JSON files, without an explicit <c>AddJson()</c> registration.
     /// </summary>
     public bool EnableAutoDiscovery { get; set; }
 }

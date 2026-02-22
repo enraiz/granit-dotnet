@@ -8,6 +8,7 @@
 
 using DigitalDynamics.Foundation.Core.Modularity;
 using DigitalDynamics.Foundation.Guids;
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using DigitalDynamics.Foundation.Security;
 using DigitalDynamics.Foundation.Timing;
@@ -48,10 +49,9 @@ public sealed class FoundationPersistenceModuleTests
     public void DependsOn_DeclaresCorrectDependencies()
     {
         // Arrange
-        DependsOnAttribute[] attributes = typeof(FoundationPersistenceModule)
+        DependsOnAttribute[] attributes = [.. typeof(FoundationPersistenceModule)
             .GetCustomAttributes(typeof(DependsOnAttribute), true)
-            .Cast<DependsOnAttribute>()
-            .ToArray();
+            .Cast<DependsOnAttribute>()];
 
         // Assert
         attributes.Should().HaveCount(1);
@@ -59,5 +59,6 @@ public sealed class FoundationPersistenceModuleTests
         dependedTypes.Should().Contain(typeof(FoundationTimingModule));
         dependedTypes.Should().Contain(typeof(FoundationGuidsModule));
         dependedTypes.Should().Contain(typeof(FoundationSecurityModule));
+        dependedTypes.Should().Contain(typeof(FoundationMultiTenancyModule));
     }
 }

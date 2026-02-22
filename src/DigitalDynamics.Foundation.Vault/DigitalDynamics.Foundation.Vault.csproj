@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DigitalDynamics.Foundation.Core\DigitalDynamics.Foundation.Core.csproj" />
     <ProjectReference Include="..\DigitalDynamics.Foundation.Localization\DigitalDynamics.Foundation.Localization.csproj" />
+    <ProjectReference Include="..\DigitalDynamics.Foundation.Encryption\DigitalDynamics.Foundation.Encryption.csproj" />
   </ItemGroup>
 
   <ItemGroup>

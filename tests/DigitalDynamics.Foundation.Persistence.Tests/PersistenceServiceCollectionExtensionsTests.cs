@@ -4,6 +4,7 @@
 // Vérifie que AddFoundationPersistence enregistre les intercepteurs EF Core.
 // =============================================================================
 
+using DigitalDynamics.Foundation.MultiTenancy;
 using DigitalDynamics.Foundation.Persistence.Extensions;
 using DigitalDynamics.Foundation.Persistence.Interceptors;
 using FluentAssertions;
@@ -69,9 +70,10 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
     private static void AddRequiredDependencies(ServiceCollection services)
     {
-        // AuditedEntityInterceptor requires IClock, IGuidGenerator, ICurrentUserService
+        // AuditedEntityInterceptor requires IClock, IGuidGenerator, ICurrentUserService, ICurrentTenant
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Timing.IClock>());
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Guids.IGuidGenerator>());
         services.AddSingleton(NSubstitute.Substitute.For<DigitalDynamics.Foundation.Security.ICurrentUserService>());
+        services.AddSingleton(NSubstitute.Substitute.For<ICurrentTenant>());
     }
 }

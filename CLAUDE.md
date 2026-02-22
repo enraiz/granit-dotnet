@@ -48,6 +48,18 @@ dotnet format --verify-no-changes
 4. **RGPD** : Minimisation, droit à l'oubli, pseudonymisation
 5. **Secrets** : Aucun secret en clair, rotation obligatoire
 
+## Langues
+
+| Contenu | Langue |
+| --- | --- |
+| Code C# — identifiants, XML docs (`/// <summary>`), commentaires inline (`//`) | **Anglais** |
+| Fichiers `docs/**/*.md` | **Français** |
+| Issues GitLab (titre, description, commentaires) | **Français** |
+| Commits (message Conventional Commits) | **Français** |
+| `CLAUDE.md` | **Français** |
+
+**Diacritiques** : TOUJOURS utiliser les accents français corrects (é, è, ê, à, â, ù, û, ô, î, ï, ç, œ) dans tous les contenus **en français** (docs, issues, commits). Jamais dans le code.
+
 ## Conventions de code
 
 **C#** : PascalCase pour types et méthodes, camelCase pour paramètres et variables locales, `I` prefix pour interfaces, `Async` suffix pour méthodes async. Règles Roslyn strictes :
@@ -63,8 +75,6 @@ dotnet format --verify-no-changes
 **Tests** : chaque package a son projet de tests (`*.Tests`). xUnit + FluentAssertions + NSubstitute + Bogus. Les tests font partie de la DoD de chaque story
 
 **Markdown** : Tous les fichiers `.md` doivent être conformes à markdownlint (config dans `.markdownlint.json`). Vérifier avec `npx markdownlint-cli2 "fichier.md"` avant de committer
-
-**Diacritiques** : TOUJOURS utiliser les accents et diacritiques français corrects (é, è, ê, ë, à, â, ù, û, ô, î, ï, ç, œ) dans tous les contenus : fichiers Markdown, titres et descriptions d'issues GitLab, commentaires, commits
 
 ## Personas (rôles dans les user stories)
 
@@ -83,7 +93,7 @@ Avant toute opération GitLab, **invoquer le skill `/gitlab`** pour charger les 
 
 ## Git workflow
 
-- **Branching** : Trunk-based (main + feature/* + hotfix/*)
+- **Branching** : Trunk-based (main + `feature/*` + `hotfix/*`)
 - **Push direct sur `main` INTERDIT**
 - **Releases** : Tags sémantiques sur main (vMAJOR.MINOR.PATCH)
 - **Commits** : Conventional Commits (feat:, fix:, docs:, chore:)
@@ -100,4 +110,4 @@ Avant toute opération GitLab, **invoquer le skill `/gitlab`** pour charger les 
 - Comprendre le contexte HDS, RGPD, ISO 27001 et ISO 9001 avant de répondre
 - Challenger les mauvaises pratiques de sécurité
 - Fournir du code production-ready (pas de TODOs)
-- Code : inclure header descriptif (description, inputs, outputs, usage)
+- Fournir du code production-ready (pas de TODOs, pas de commentaires évidents)

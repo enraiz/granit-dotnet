@@ -136,7 +136,7 @@ public sealed class SequentialGuidGeneratorTests
         }
 
         // Assert - les 6 derniers octets doivent etre croissants (timestamp a la fin)
-        List<byte[]> lastSixBytesList = guids
+        var lastSixBytesList = guids
             .Select(g => g.ToByteArray()[10..16])
             .ToList();
 

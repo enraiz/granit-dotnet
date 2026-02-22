@@ -86,7 +86,7 @@ public sealed class LocalizationResourceStoreTests
         dictionary.Add<TestResource>("fr");
 
         // Act
-        LocalizationResourceInfo info = dictionary.Add<TestResource>("en");
+        _ = dictionary.Add<TestResource>("en");
 
         // Assert
         dictionary.Get<TestResource>().DefaultCulture.Should().Be("en");
@@ -101,7 +101,7 @@ public sealed class LocalizationResourceStoreTests
         dictionary.Add<ParentTestResource>("fr");
 
         // Act
-        List<LocalizationResourceInfo> all = dictionary.GetAll().ToList();
+        var all = dictionary.GetAll().ToList();
 
         // Assert
         all.Should().HaveCount(2);

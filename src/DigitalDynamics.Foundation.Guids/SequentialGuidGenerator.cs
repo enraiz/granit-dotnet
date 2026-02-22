@@ -1,66 +1,39 @@
-// =============================================================================
-// SequentialGuidGenerator - Generation de GUID sequentiels
-// =============================================================================
-// Genere des GUID sequentiels en combinant un timestamp milliseconde (6 octets)
-// et des octets aleatoires cryptographiquement surs (10 octets).
-//
-// Avantages par rapport a Guid.NewGuid() :
-//   - Index clustered : insertions ordonnees, pas de page splits
-//   - Unicite : 80 bits d'entropie (RandomNumberGenerator)
-//   - Ordonnancement temporel : les GUID successifs sont croissants
-//
-// L'algorithme gere l'endianness pour garantir un tri correct sur toutes
-// les plateformes. Trois variantes existent selon la base de donnees
-// (voir SequentialGuidType).
-//
-// Thread-safe : RandomNumberGenerator est statique et thread-safe.
-// Enregistre en Singleton.
-//
-// Porte de Volo.Abp.Guids.SequentialGuidGenerator (MIT).
-// =============================================================================
-
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 
 namespace DigitalDynamics.Foundation.Guids;
 
 /// <summary>
-/// Implementation de <see cref="IGuidGenerator"/> qui genere des GUID sequentiels
-/// optimises pour les index clustered.
+/// Implementation of <see cref="IGuidGenerator"/> that generates sequential GUIDs
+/// optimized for clustered indexes.
 /// </summary>
-public sealed class SequentialGuidGenerator : IGuidGenerator
+public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> options) : IGuidGenerator
 {
     private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
-    private readonly GuidGeneratorOptions _options;
-
-    public SequentialGuidGenerator(IOptions<GuidGeneratorOptions> options)
-    {
-        _options = options.Value;
-    }
+    private readonly GuidGeneratorOptions _options = options.Value;
 
     /// <inheritdoc />
     public Guid Create() => Create(_options.GetDefaultSequentialGuidType());
 
     /// <summary>
-    /// Cree un nouveau GUID sequentiel du type specifie.
+    /// Creates a new sequential GUID of the specified type.
     /// </summary>
-    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
-    [SuppressMessage("Minor Code Smell", "S2325:Methods and properties that don't access instance data should be static", Justification = "Intentionally non-static for IGuidGenerator interface consistency")]
+#pragma warning disable CA1822 // Intentionally non-static public method for API consistency
     public Guid Create(SequentialGuidType guidType)
+#pragma warning restore CA1822
     {
-        // 10 octets aleatoires cryptographiquement surs
+        // 10 cryptographically secure random bytes
         byte[] randomBytes = new byte[10];
         Rng.GetBytes(randomBytes);
 
-        // Timestamp en millisecondes depuis DateTime.MinValue
+        // Timestamp in milliseconds since DateTime.MinValue
         long timestamp = DateTime.UtcNow.Ticks / 10000L;
 
-        // Convertir le timestamp en tableau d'octets (8 octets)
+        // Convert the timestamp to a byte array (8 bytes)
         byte[] timestampBytes = BitConverter.GetBytes(timestamp);
 
-        // Big-endian pour un tri correct
+        // Big-endian for correct sorting
         if (BitConverter.IsLittleEndian)
         {
             Array.Reverse(timestampBytes);
@@ -72,12 +45,12 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
         {
             case SequentialGuidType.SequentialAsString:
             case SequentialGuidType.SequentialAsBinary:
-                // Timestamp en tete (6 octets), puis random (10 octets)
+                // Timestamp at the front (6 bytes), then random (10 bytes)
                 Buffer.BlockCopy(timestampBytes, 2, guidBytes, 0, 6);
                 Buffer.BlockCopy(randomBytes, 0, guidBytes, 6, 10);
 
-                // Correction endianness pour le format string
-                // Guid(byte[]) interprete Data1 et Data2 en little-endian
+                // Endianness correction for the string format
+                // Guid(byte[]) interprets Data1 and Data2 as little-endian
                 if (guidType == SequentialGuidType.SequentialAsString
                     && BitConverter.IsLittleEndian)
                 {
@@ -88,7 +61,7 @@ public sealed class SequentialGuidGenerator : IGuidGenerator
                 break;
 
             case SequentialGuidType.SequentialAtEnd:
-                // Random en tete (10 octets), puis timestamp (6 octets)
+                // Random at the front (10 bytes), then timestamp (6 bytes)
                 Buffer.BlockCopy(randomBytes, 0, guidBytes, 0, 10);
                 Buffer.BlockCopy(timestampBytes, 2, guidBytes, 10, 6);
                 break;
