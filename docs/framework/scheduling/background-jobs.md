@@ -201,9 +201,11 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 | #129 | ✅ Terminé | Migrations EF Core + schéma `granit_background_jobs` |
 | #130 | ✅ Terminé | Intégration `GranitWolverinePostgresqlModule` |
 | #136 | ✅ Terminé | `CronSchedulerAgent` (`SingularAgent`) — démarrage cluster-safe, anti-doublon |
-| #137 | En cours | Étendre `OutgoingContextMiddleware` pour propager `X-Triggered-By` |
+| #137 | ✅ Terminé | Étendre `OutgoingContextMiddleware` pour propager `X-Triggered-By` |
+| #138 | ✅ Terminé | Tests d'intégration `BackgroundJobsIntegrationTests` |
+| #140 | ✅ Terminé | Scaffolding `Granit.BackgroundJobs.Endpoints` — module, options, `MapBackgroundJobsEndpoints()` |
 | #134 | Planifié | `DeadLetterCount` via `IMessageStore` |
-| #140–144 | Planifié | `Granit.BackgroundJobs.Endpoints` — API Minimal, policy `BackgroundJobs.Admin` |
+| #141–144 | Planifié | `Granit.BackgroundJobs.Endpoints` — endpoints GET/POST, policy `BackgroundJobs.Admin`, tests d'intégration |
 
 ## Conformité HDS
 
