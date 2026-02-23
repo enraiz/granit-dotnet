@@ -65,6 +65,7 @@ Messagerie asynchrone et outbox transactionnelle.
 | Document | Description |
 | --- | --- |
 | [wolverine.md](messaging/wolverine.md) | WolverineFx, Outbox PostgreSQL, propagation de contexte HDS |
+| [background-jobs.md](messaging/background-jobs.md) | Jobs récurrents cron via Outbox Wolverine, `IBackgroundJobManager`, anti-doublon |
 
 ## Utilities
 

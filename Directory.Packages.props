@@ -31,6 +31,9 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.*" />
   </ItemGroup>
+  <ItemGroup Label="Background Jobs">
+    <PackageVersion Include="Cronos" Version="0.8.*" />
+  </ItemGroup>
   <ItemGroup Label="Wolverine">
     <PackageVersion Include="WolverineFx" Version="5.*" />
     <PackageVersion Include="WolverineFx.EntityFrameworkCore" Version="5.*" />
