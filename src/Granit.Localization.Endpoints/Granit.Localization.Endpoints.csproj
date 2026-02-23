@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Localization.Endpoints</PackageId>
+    <Description>Minimal API endpoint exposing registered Granit localization resources for client bootstrapping. Provides GET /api/granit/localization with HTTP caching headers.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Localization.Endpoints.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Localization\Granit.Localization.csproj" />
+  </ItemGroup>
+
+</Project>
