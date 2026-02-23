@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Wolverine</PackageId>
+    <Description>Intégration Wolverine pour Granit : module, behaviors de contexte et
+    routing IDomainEvent/IIntegrationEvent. Provider-agnostique — ne dépend pas de
+    PostgreSQL, SQL Server ou tout autre fournisseur de transport.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Wolverine.Tests" />
+    <InternalsVisibleTo Include="Granit.Wolverine.Postgresql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WolverineFx" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
+    <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+  </ItemGroup>
+
+</Project>
