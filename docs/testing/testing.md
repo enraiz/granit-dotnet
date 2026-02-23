@@ -1,13 +1,13 @@
 # Tests
 
 Ce guide décrit l'infrastructure, les conventions et les patterns de tests utilisés
-dans les packages Digital Dynamics Foundation.
+dans les packages Granit.
 
 Inspiré du guide [`Testing`](https://abp.io/docs/latest/testing/overall) d'ABP Framework.
 
 ## Philosophie
 
-Digital Dynamics Foundation privilégie une **approche mixte** : écrire des tests
+Granit privilégie une **approche mixte** : écrire des tests
 unitaires ou d'intégration là où c'est le plus efficace à écrire et à maintenir.
 
 - **Tests unitaires** : testent une classe isolée en mockant ses dépendances.
@@ -36,7 +36,7 @@ Les versions sont centralisées dans [Directory.Packages.props](../../Directory.
 
 ## Structure des projets de tests
 
-Chaque package Foundation a un projet de tests dédié, nommé `*.Tests` :
+Chaque package Granit a un projet de tests dédié, nommé `*.Tests` :
 
 ```text
 src/
@@ -444,7 +444,7 @@ Des packages spécifiques sont ajoutés selon les besoins :
 
 ## Bonnes pratiques
 
-1. **Un projet de tests par package** — chaque package Foundation a son projet
+1. **Un projet de tests par package** — chaque package Granit a son projet
    `*.Tests` correspondant, pas de projet de tests partagé
 2. **Classes scellées, pas d'héritage** — chaque classe de test est `sealed` et
    autonome, sans base class partagée

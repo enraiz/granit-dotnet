@@ -3,7 +3,7 @@
 ## Project
 
 - **Type**: Shared NuGet packages for Digital Dynamics .NET applications
-- **Repo**: `dd-foundation-dotnet` (company-level, not product-specific)
+- **Repo**: `granit-dotnet` (company-level, not product-specific)
 - **Cloud**: OVHcloud (Roubaix, FR) — European sovereignty
 - **Compliance**: HDS + RGPD | Criticality: HIGH
 - **Publication**: GitLab Package Registry (NuGet)
@@ -68,7 +68,7 @@ in all French content (docs, issues, commits). Never in code.
 
 **Core**: `Granit.Core` provides the module system and domain types.
 Each module is self-contained (interface + implementation in the same package).
-All Foundation packages reference Core.
+All Granit packages reference Core.
 
 **Tests**: each package has a test project (`*.Tests`). xUnit + FluentAssertions +
 NSubstitute + Bogus. Tests are part of the DoD for every story.

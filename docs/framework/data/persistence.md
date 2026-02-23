@@ -13,8 +13,8 @@ dotnet add package Granit.Persistence
 
 ### Avec le système de modules (recommandé)
 
-`FoundationPersistenceModule` déclare ses dépendances via `[DependsOn]` sur Timing,
-Guids, Security et MultiTenancy. Il suffit d'utiliser `AddFoundation<T>()` dans `Program.cs`
+`GranitPersistenceModule` déclare ses dépendances via `[DependsOn]` sur Timing,
+Guids, Security et MultiTenancy. Il suffit d'utiliser `AddGranit<T>()` dans `Program.cs`
 et les dépendances sont chargées automatiquement dans le bon ordre
 (voir [modularity.md](../core/modularity.md)).
 
@@ -24,11 +24,11 @@ Pour les projets qui n'utilisent pas le système de modules, l'ordre d'appel est
 important :
 
 ```csharp
-builder.Services.AddFoundationTiming();      // IClock (requis par les intercepteurs)
-builder.Services.AddFoundationGuids();       // IGuidGenerator (requis par AuditedEntityInterceptor)
-builder.Services.AddFoundationSecurity(builder.Configuration); // ICurrentUserService
-builder.Services.AddFoundationMultiTenancy(builder.Configuration); // ICurrentTenant (requis par AuditedEntityInterceptor)
-builder.Services.AddFoundationPersistence();
+builder.Services.AddGranitTiming();      // IClock (requis par les intercepteurs)
+builder.Services.AddGranitGuids();       // IGuidGenerator (requis par AuditedEntityInterceptor)
+builder.Services.AddGranitSecurity(builder.Configuration); // ICurrentUserService
+builder.Services.AddGranitMultiTenancy(builder.Configuration); // ICurrentTenant (requis par AuditedEntityInterceptor)
+builder.Services.AddGranitPersistence();
 ```
 
 ## AuditedEntityInterceptor
@@ -123,11 +123,11 @@ await db.SaveChangesAsync();
 
 ## Query Filters
 
-`ModelBuilderExtensions.ApplyFoundationConventions()` applique automatiquement des
-filtres globaux EF Core sur toutes les entités Foundation détectées dans le modèle.
+`ModelBuilderExtensions.ApplyGranitConventions()` applique automatiquement des
+filtres globaux EF Core sur toutes les entités Granit détectées dans le modèle.
 
 ```csharp
-public static ModelBuilder ApplyFoundationConventions(
+public static ModelBuilder ApplyGranitConventions(
     this ModelBuilder modelBuilder,
     ICurrentTenant? currentTenant = null,
     IDataFilter? dataFilter = null)
@@ -152,7 +152,7 @@ Toutes les entités `ISoftDeletable` reçoivent un filtre `WHERE IsDeleted = fal
 protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     base.OnModelCreating(modelBuilder);
-    modelBuilder.ApplyFoundationConventions();
+    modelBuilder.ApplyGranitConventions();
 }
 ```
 
@@ -180,7 +180,7 @@ public sealed class Etablissement : AuditedEntity, IActive
 }
 
 // Dans OnModelCreating — filtre IActive appliqué automatiquement
-modelBuilder.ApplyFoundationConventions();
+modelBuilder.ApplyGranitConventions();
 
 // Seuls les établissements actifs sont retournés
 List<Etablissement> actifs = await db.Etablissements.ToListAsync();
@@ -205,7 +205,7 @@ public sealed class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyFoundationConventions(_currentTenant);
+        modelBuilder.ApplyGranitConventions(_currentTenant);
     }
 }
 ```
@@ -217,14 +217,14 @@ Le filtre est évalué dynamiquement à chaque requête (closure sur l'instance
 > EF Core met en cache le modèle par type de DbContext — la closure doit référencer
 > l'objet pour observer les changements de tenant entre requêtes.
 
-Si `ApplyFoundationConventions()` est appelé sans `ICurrentTenant`, seul le filtre
+Si `ApplyGranitConventions()` est appelé sans `ICurrentTenant`, seul le filtre
 soft delete est appliqué (pas d'isolation multi-tenant).
 
 ### Bypass sélectif via IDataFilter
 
 `IDataFilter` permet de désactiver un filtre individuel pour le flux async courant,
 sans toucher aux autres filtres. Injecter `IDataFilter` dans le DbContext et le passer
-à `ApplyFoundationConventions` :
+à `ApplyGranitConventions` :
 
 ```csharp
 public sealed class AppDbContext : DbContext
@@ -245,7 +245,7 @@ public sealed class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyFoundationConventions(_currentTenant, _dataFilter);
+        modelBuilder.ApplyGranitConventions(_currentTenant, _dataFilter);
     }
 }
 ```
@@ -279,9 +279,9 @@ Granit.Persistence
 │   ├── AuditedEntityInterceptor.cs       (audit HDS : CreatedAt/By, ModifiedAt/By)
 │   └── SoftDeleteInterceptor.cs          (soft delete RGPD : IsDeleted, DeletedAt/By)
 └── Extensions/
-    ├── ModelBuilderExtensions.cs          (ApplyFoundationConventions : ISoftDeletable,
+    ├── ModelBuilderExtensions.cs          (ApplyGranitConventions : ISoftDeletable,
     │                                       IActive, IMultiTenant, IDataFilter bypass)
-    └── PersistenceServiceCollectionExtensions.cs  (AddFoundationPersistence)
+    └── PersistenceServiceCollectionExtensions.cs  (AddGranitPersistence)
 ```
 
 ## Services enregistrés
@@ -322,6 +322,6 @@ AuditedEntityInterceptor interceptor = new(currentUser, clock, guidGenerator, cu
 | HDS - Horodatage UTC | `IClock.Now` (jamais `DateTimeOffset.UtcNow`) |
 | RGPD - Droit à l'oubli | `SoftDeleteInterceptor` (suppression logique) |
 | RGPD - Minimisation | Query filters (entités supprimées et inactives exclues par défaut) |
-| RGPD - Isolation tenant | Query filter multi-tenant (`ApplyFoundationConventions(currentTenant)`) |
+| RGPD - Isolation tenant | Query filter multi-tenant (`ApplyGranitConventions(currentTenant)`) |
 | RGPD - Pseudonymisation | `TenantId` GUID — jamais de données nominatives dans ce champ |
 | Maintenance HDS | `IDataFilter.Disable<ISoftDeletable>()` — accès aux données supprimées en scope contrôlé |

@@ -58,7 +58,7 @@ git commit -m "docs: update Vault integration guide"
 
 ### Architecture des packages
 
-- `Abstractions` ne dépend d'**aucun** autre package (ni Foundation, ni tiers)
+- `Abstractions` ne dépend d'**aucun** autre package (ni Granit, ni tiers)
 - Tous les autres packages référencent `Abstractions`
 - Zéro référence circulaire entre packages
 - Un projet = un package NuGet

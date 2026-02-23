@@ -13,8 +13,8 @@ dotnet add package Granit.Encryption
 ## Configuration rapide
 
 ```csharp
-[DependsOn(typeof(FoundationEncryptionModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitEncryptionModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ## appsettings.json
@@ -29,14 +29,14 @@ public sealed class AppModule : FoundationModule { }
 ```
 
 > **Sécurité** : `PassPhrase` ne doit **jamais** être stockée en clair dans la config.
-> Utiliser `Foundation.Vault` comme fournisseur de configuration (voir [vault.md](vault.md)).
+> Utiliser `Granit.Vault` comme fournisseur de configuration (voir [vault.md](vault.md)).
 
 ## Providers disponibles
 
 | Provider | `ProviderName` | Latence | Quand l'utiliser |
 | --- | --- | --- | --- |
 | `AesStringEncryptionProvider` | `"Aes"` | < 1 ms | Settings, cache, opérations fréquentes |
-| `VaultStringEncryptionProvider` | `"Vault"` | 10-20 ms | Opérations rares, haute sécurité (enregistré par `Foundation.Vault`) |
+| `VaultStringEncryptionProvider` | `"Vault"` | 10-20 ms | Opérations rares, haute sécurité (enregistré par `Granit.Vault`) |
 
 ## Utilisation
 
@@ -96,7 +96,7 @@ src/Granit.Encryption/
 │   └── AesStringEncryptionProvider.cs     (AES-256-CBC + PBKDF2, IV aléatoire)
 ├── Services/
 │   └── DefaultStringEncryptionService.cs  (délègue au provider actif)
-├── FoundationEncryptionModule.cs
+├── GranitEncryptionModule.cs
 └── Extensions/
     └── EncryptionServiceCollectionExtensions.cs
 ```
@@ -108,10 +108,10 @@ src/Granit.Encryption/
 | `IStringEncryptionService` | `DefaultStringEncryptionService` | Singleton |
 | `IStringEncryptionProvider` | `AesStringEncryptionProvider` | Singleton |
 
-`Foundation.Vault` enregistre `VaultStringEncryptionProvider` en tant que
+`Granit.Vault` enregistre `VaultStringEncryptionProvider` en tant que
 `IStringEncryptionProvider` supplémentaire lors de son chargement.
 
-## Intégration avec Foundation.Settings
+## Intégration avec Granit.Settings
 
 Les paramètres déclarés avec `IsEncrypted = true` utilisent automatiquement
 `IStringEncryptionService` à la couche `ISettingStore` (chiffrement au repos).

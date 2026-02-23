@@ -19,7 +19,7 @@ public static class ApiVersioningServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        GranitApiVersioningOptions foundationOptions = configuration
+        GranitApiVersioningOptions granitOptions = configuration
             .GetSection(GranitApiVersioningOptions.SectionName)
             .Get<GranitApiVersioningOptions>() ?? new GranitApiVersioningOptions();
 
@@ -28,9 +28,9 @@ public static class ApiVersioningServiceCollectionExtensions
 
         services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = new ApiVersion(foundationOptions.DefaultMajorVersion);
+            options.DefaultApiVersion = new ApiVersion(granitOptions.DefaultMajorVersion);
             options.AssumeDefaultVersionWhenUnspecified = true;
-            options.ReportApiVersions = foundationOptions.ReportApiVersions;
+            options.ReportApiVersions = granitOptions.ReportApiVersions;
             options.ApiVersionReader = ApiVersionReader.Combine(
                 new UrlSegmentApiVersionReader(),
                 new QueryStringApiVersionReader("api-version"));

@@ -19,8 +19,8 @@ dotnet add package Granit.Settings.EntityFrameworkCore
 ## Configuration rapide
 
 ```csharp
-[DependsOn(typeof(FoundationSettingsModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitSettingsModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ## Déclarer des paramètres
@@ -154,9 +154,9 @@ par les valeurs Global, Tenant et User stockées en base.
 Pour les paramètres sensibles (`IsEncrypted = true`) :
 
 - **Chiffrement** appliqué uniquement à la couche `ISettingStore` (persistance)
-- **Le cache stocke le plaintext** — `Foundation.Caching` chiffre déjà le backend
+- **Le cache stocke le plaintext** — `Granit.Caching` chiffre déjà le backend
   Redis via `AesCacheValueEncryptor`, évitant un double chiffrement coûteux
-- Requiert `FoundationEncryptionModule` avec une `PassPhrase` depuis Vault
+- Requiert `GranitEncryptionModule` avec une `PassPhrase` depuis Vault
 
 ```csharp
 context.Add(new SettingDefinition("Integrations.FhirApiKey")
@@ -185,11 +185,11 @@ L'expiration est configurable via `SettingsOptions.CacheExpiration` (défaut : 3
 ## Store par défaut
 
 `InMemorySettingStore` (development/tests) est remplacé en production par
-`EfCoreSettingStore` via `FoundationSettingsEntityFrameworkCoreModule` :
+`EfCoreSettingStore` via `GranitSettingsEntityFrameworkCoreModule` :
 
 ```csharp
-[DependsOn(typeof(FoundationSettingsEntityFrameworkCoreModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitSettingsEntityFrameworkCoreModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ## Architecture
@@ -222,7 +222,7 @@ src/Granit.Settings/
 │   └── SettingManager.cs                   (écrit store + invalide cache)
 ├── Options/
 │   └── SettingsOptions.cs                  (CacheExpiration)
-├── FoundationSettingsModule.cs
+├── GranitSettingsModule.cs
 └── Extensions/
     └── SettingsServiceCollectionExtensions.cs
 ```
@@ -241,9 +241,9 @@ src/Granit.Settings/
 ## Dépendances du module
 
 ```text
-FoundationSettingsModule
-  ├── FoundationCachingModule      (ICacheService<SettingValue>)
-  ├── FoundationMultiTenancyModule (ICurrentTenant pour provider T)
-  ├── FoundationEncryptionModule   (IStringEncryptionService pour IsEncrypted)
-  └── FoundationSecurityModule     (ICurrentUserService pour provider U)
+GranitSettingsModule
+  ├── GranitCachingModule      (ICacheService<SettingValue>)
+  ├── GranitMultiTenancyModule (ICurrentTenant pour provider T)
+  ├── GranitEncryptionModule   (IStringEncryptionService pour IsEncrypted)
+  └── GranitSecurityModule     (ICurrentUserService pour provider U)
 ```

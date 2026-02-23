@@ -32,11 +32,11 @@ dotnet add package Granit.Idempotency
 ## Configuration rapide
 
 ```csharp
-[DependsOn(typeof(FoundationIdempotencyModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitIdempotencyModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
-Le module appelle automatiquement `AddFoundationIdempotency` en lisant la section
+Le module appelle automatiquement `AddGranitIdempotency` en lisant la section
 `Idempotency` de `appsettings.json`.
 
 Enregistrer le middleware dans le pipeline ASP.NET Core **après**
@@ -45,7 +45,7 @@ authentication/authorization :
 ```csharp
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseFoundationIdempotency(); // après auth — ICurrentUserService doit être peuplé
+app.UseGranitIdempotency(); // après auth — ICurrentUserService doit être peuplé
 app.MapControllers();
 ```
 
@@ -177,8 +177,8 @@ src/
   ├── Attributes/
   │   └── IdempotentAttribute.cs      ([Idempotent], IIdempotencyMetadata)
   ├── Extensions/
-  │   ├── IdempotencyApplicationBuilderExtensions.cs  (UseFoundationIdempotency)
-  │   └── IdempotencyServiceCollectionExtensions.cs   (AddFoundationIdempotency)
+  │   ├── IdempotencyApplicationBuilderExtensions.cs  (UseGranitIdempotency)
+  │   └── IdempotencyServiceCollectionExtensions.cs   (AddGranitIdempotency)
   ├── Internal/
   │   ├── IdempotencyJsonContext.cs   (source-generated JSON)
   │   ├── IdempotencyMiddleware.cs    (machine à états, SHA-256, capture réponse)
@@ -189,7 +189,7 @@ src/
   │   └── IdempotencyState.cs         (InProgress | Completed)
   ├── Redis/
   │   └── RedisIdempotencyStore.cs    (SET NX PX / SET XX PX + chiffrement AES)
-  └── FoundationIdempotencyModule.cs
+  └── GranitIdempotencyModule.cs
 
 tests/
   Granit.Idempotency.Tests/
@@ -198,7 +198,7 @@ tests/
 
 ## Services enregistrés
 
-### `FoundationIdempotencyModule`
+### `GranitIdempotencyModule`
 
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |

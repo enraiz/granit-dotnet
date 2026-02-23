@@ -98,9 +98,9 @@ public sealed class GranitMultiTenancyModuleTests
     {
         using WebApplication app = BuildApp();
 
-        GranitApplication foundationApp = app.Services.GetRequiredService<GranitApplication>();
+        GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
 
-        foundationApp.GetModuleTypes().Should().Contain(
+        granitApp.GetModuleTypes().Should().Contain(
             typeof(GranitMultiTenancyModule),
             because: "MultiTenancy module is standalone with no Security dependency");
     }

@@ -75,7 +75,7 @@ public sealed class GranitLocalizationModuleTests : IDisposable
         // Act
         IStringLocalizer<GranitLocalizationResource> localizer =
             sp.GetRequiredService<IStringLocalizer<GranitLocalizationResource>>();
-        LocalizedString result = localizer["Foundation:EntityNotFound", "Patient", "123"];
+        LocalizedString result = localizer["Granit:EntityNotFound", "Patient", "123"];
 
         // Assert
         result.ResourceNotFound.Should().BeFalse();
@@ -103,7 +103,7 @@ public sealed class GranitLocalizationModuleTests : IDisposable
         // Act
         IStringLocalizer<GranitLocalizationResource> localizer =
             sp.GetRequiredService<IStringLocalizer<GranitLocalizationResource>>();
-        LocalizedString result = localizer["Foundation:EntityNotFound", "Patient", "123"];
+        LocalizedString result = localizer["Granit:EntityNotFound", "Patient", "123"];
 
         // Assert
         result.ResourceNotFound.Should().BeFalse();
@@ -133,9 +133,9 @@ public sealed class GranitLocalizationModuleTests : IDisposable
             sp.GetRequiredService<IStringLocalizer<GranitLocalizationResource>>();
 
         // Assert
-        localizer["Foundation:ValidationError"].ResourceNotFound.Should().BeFalse();
-        localizer["Foundation:Unauthorized"].ResourceNotFound.Should().BeFalse();
-        localizer["Foundation:Forbidden"].ResourceNotFound.Should().BeFalse();
-        localizer["Foundation:InternalError"].ResourceNotFound.Should().BeFalse();
+        localizer["Granit:ValidationError"].ResourceNotFound.Should().BeFalse();
+        localizer["Granit:Unauthorized"].ResourceNotFound.Should().BeFalse();
+        localizer["Granit:Forbidden"].ResourceNotFound.Should().BeFalse();
+        localizer["Granit:InternalError"].ResourceNotFound.Should().BeFalse();
     }
 }

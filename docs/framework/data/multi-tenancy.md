@@ -1,6 +1,6 @@
 # Multi-Tenancy
 
-`Foundation.MultiTenancy` fournit l'isolation de tenant par requête HTTP via
+`Granit.MultiTenancy` fournit l'isolation de tenant par requête HTTP via
 `ICurrentTenant`. La résolution du tenant est automatique : le middleware lit
 le claim JWT ou l'en-tête HTTP, active le contexte, puis le restaure en fin de requête.
 
@@ -40,20 +40,20 @@ dotnet add package Granit.MultiTenancy
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
-await builder.AddFoundationAsync<GuavaHostModule>();
+await builder.AddGranitAsync<GuavaHostModule>();
 
 var app = builder.Build();
 
 // Ordre obligatoire dans le pipeline
 app.UseAuthentication();
-app.UseFoundationMultiTenancy();   // après Authentication, avant Authorization
+app.UseGranitMultiTenancy();   // après Authentication, avant Authorization
 app.UseAuthorization();
 
-await app.UseFoundationAsync();
+await app.UseGranitAsync();
 await app.RunAsync();
 ```
 
-> `UseFoundationMultiTenancy()` doit être placé **après** `UseAuthentication()` :
+> `UseGranitMultiTenancy()` doit être placé **après** `UseAuthentication()` :
 > `JwtClaimTenantResolver` lit `HttpContext.User`, qui n'est rempli qu'après la
 > validation du token JWT.
 
@@ -227,7 +227,7 @@ parallèles.
 
 ## Intégration EF Core
 
-`Foundation.Persistence` lit `ICurrentTenant` dans ses intercepteurs pour
+`Granit.Persistence` lit `ICurrentTenant` dans ses intercepteurs pour
 filtrer et affecter automatiquement `TenantId` sur les entités `ITenantAware` :
 
 ```csharp

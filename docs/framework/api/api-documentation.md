@@ -2,7 +2,7 @@
 
 `Granit.ApiDocumentation` génère les documents OpenAPI et expose
 l'UI Scalar multi-version pour toutes les APIs Digital Dynamics. Il dépend de
-`Foundation.ApiVersioning`.
+`Granit.ApiVersioning`.
 
 > **Voir aussi** : [api-versioning.md](api-versioning.md) pour la configuration du
 > versioning des routes.
@@ -19,16 +19,16 @@ et Microsoft fournit désormais une solution native de première partie.
 ## Installation
 
 ```csharp
-[DependsOn(typeof(FoundationApiDocumentationModule))]
-public sealed class MyApplicationModule : FoundationModule { }
+[DependsOn(typeof(GranitApiDocumentationModule))]
+public sealed class MyApplicationModule : GranitModule { }
 ```
 
-Appeler `UseFoundationApiDocumentation()` dans `Program.cs` **après** `app.Build()` :
+Appeler `UseGranitApiDocumentation()` dans `Program.cs` **après** `app.Build()` :
 
 ```csharp
 WebApplication app = builder.Build();
 
-app.UseFoundationApiDocumentation(); // → /openapi/v1.json et /scalar/v1
+app.UseGranitApiDocumentation(); // → /openapi/v1.json et /scalar/v1
 
 app.Run();
 ```
@@ -60,7 +60,7 @@ app.Run();
 Quand les versions ou les métadonnées doivent être définies en code :
 
 ```csharp
-builder.Services.AddFoundationApiDocumentation(opts =>
+builder.Services.AddGranitApiDocumentation(opts =>
 {
     opts.Title = "Guava API";
     opts.MajorVersions = [1, 2];
@@ -118,7 +118,7 @@ public sealed class AppointmentController : ControllerBase
 
 ## Intégration JWT Bearer
 
-Si `FoundationJwtBearerModule` (ou tout schéma `JwtBearerDefaults.AuthenticationScheme`)
+Si `GranitJwtBearerModule` (ou tout schéma `JwtBearerDefaults.AuthenticationScheme`)
 est enregistré dans l'application, le transformer JWT ajoute automatiquement :
 
 - La définition de sécurité `Bearer` dans le document OpenAPI

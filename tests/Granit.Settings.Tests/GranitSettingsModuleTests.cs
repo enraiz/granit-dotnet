@@ -135,9 +135,9 @@ public sealed class GranitSettingsModuleTests
     {
         using WebApplication app = BuildApp();
 
-        GranitApplication foundationApp = app.Services.GetRequiredService<GranitApplication>();
+        GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
 
-        foundationApp.GetModuleTypes().Should().ContainInOrder(
+        granitApp.GetModuleTypes().Should().ContainInOrder(
             typeof(GranitSettingsModule));
     }
 

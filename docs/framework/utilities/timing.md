@@ -48,22 +48,22 @@ dotnet add package Granit.Timing
 
 ### Avec le système de modules (recommandé)
 
-Le module `FoundationTimingModule` est automatiquement chargé via `[DependsOn]` quand
+Le module `GranitTimingModule` est automatiquement chargé via `[DependsOn]` quand
 un module dépendant (ex : Persistence) en a besoin. Il suffit d'utiliser
-`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
+`AddGranit<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
 
 ### Enregistrement direct
 
 Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
-builder.Services.AddFoundationTiming();
+builder.Services.AddGranitTiming();
 ```
 
 Avec options :
 
 ```csharp
-builder.Services.AddFoundationTiming(options =>
+builder.Services.AddGranitTiming(options =>
 {
     options.DefaultTimezone = "Europe/Brussels";
 });
@@ -392,9 +392,9 @@ Granit.Timing
 ├── ClockOptions.cs                       (options configurables)
 ├── CurrentTimezoneProvider.cs            (AsyncLocal, Singleton)
 ├── DisableDateTimeNormalizationAttribute.cs
-├── FoundationTimingModule.cs             (module Foundation)
+├── GranitTimingModule.cs             (module Granit)
 └── Extensions/
-    └── TimingServiceCollectionExtensions.cs  (AddFoundationTiming)
+    └── TimingServiceCollectionExtensions.cs  (AddGranitTiming)
 ```
 
 ## Services enregistrés

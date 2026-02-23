@@ -1,17 +1,17 @@
 # Core
 
 `Granit.Core` est le package fondation de tous les autres packages
-Foundation. Il fournit :
+Granit. Il fournit :
 
-- Le **système de modules** (voir [modularity.md](modularity.md)) : `FoundationModule`,
-  `[DependsOn]`, `AddFoundationAsync<T>()`, tri topologique
+- Le **système de modules** (voir [modularity.md](modularity.md)) : `GranitModule`,
+  `[DependsOn]`, `AddGranitAsync<T>()`, tri topologique
 - Les **types domaine partagés** (voir [domain.md](../data/domain.md)) : hiérarchie d'entités
   (`Entity`, `CreationAuditedEntity`, `AuditedEntity`, `FullAuditedEntity`),
   `ISoftDeletable`, `IMultiTenant`, `IActive`, `AuditLogEntry`
 - Le **service de data filtering** (voir [data-filtering.md](../data/data-filtering.md)) :
   `IDataFilter` — bypass sélectif des query filters globaux EF Core
 
-Ce package remplace l'ancien `Foundation.Abstractions`. Les interfaces de service
+Ce package remplace l'ancien `Granit.Abstractions`. Les interfaces de service
 (`IClock`, `IGuidGenerator`, `ICurrentUserService`, `ITransitEncryptionService`) vivent
 désormais dans leurs modules respectifs (voir section
 [Migration depuis Abstractions](#migration-depuis-abstractions)).
@@ -23,8 +23,8 @@ dotnet add package Granit.Core
 ```
 
 Ce package est automatiquement tiré comme dépendance transitive par tous les packages
-Foundation. Il n'est nécessaire de le référencer explicitement que dans les projets qui
-utilisent les types domaine sans autre package Foundation.
+Granit. Il n'est nécessaire de le référencer explicitement que dans les projets qui
+utilisent les types domaine sans autre package Granit.
 
 ## Système de modules
 
@@ -57,21 +57,21 @@ Granit.Core
 │   ├── IDataFilter.cs              (interface de contrôle runtime des query filters)
 │   └── DataFilter.cs               (implémentation AsyncLocal, Singleton)
 ├── Modularity/
-│   ├── FoundationModule.cs         (classe de base des modules)
+│   ├── GranitModule.cs         (classe de base des modules)
 │   ├── DependsOnAttribute.cs       (déclaration de dépendances)
 │   ├── ServiceConfigurationContext.cs
 │   ├── ApplicationInitializationContext.cs
 │   ├── ModuleDescriptor.cs         (internal)
 │   ├── ModuleLoader.cs             (internal, tri topologique)
-│   └── FoundationApplication.cs    (singleton, orchestrateur lifecycle)
+│   └── GranitApplication.cs    (singleton, orchestrateur lifecycle)
 └── Extensions/
-    ├── FoundationHostBuilderExtensions.cs   (AddFoundation<T> / AddFoundationAsync<T>)
-    └── FoundationApplicationExtensions.cs   (UseFoundation / UseFoundationAsync)
+    ├── GranitHostBuilderExtensions.cs   (AddGranit<T> / AddGranitAsync<T>)
+    └── GranitApplicationExtensions.cs   (UseGranit / UseGranitAsync)
 ```
 
 ## Migration depuis Abstractions
 
-`Foundation.Abstractions` a été supprimé. Les types ont été déplacés :
+`Granit.Abstractions` a été supprimé. Les types ont été déplacés :
 
 | Ancien namespace | Nouveau namespace | Package |
 | --- | --- | --- |
@@ -108,7 +108,7 @@ Granit.Core
    using Granit.Security;
    ```
 
-3. Remplacer les `AddFoundation*()` individuels par `await builder.AddFoundationAsync<T>()`
+3. Remplacer les `AddGranit*()` individuels par `await builder.AddGranitAsync<T>()`
    (voir [modularity.md](modularity.md)).
 
 ## Conformité

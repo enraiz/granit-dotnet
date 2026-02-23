@@ -1,7 +1,7 @@
 # Configuration
 
 `Granit` s'appuie entièrement sur le système de configuration natif
-d'ASP.NET Core. Aucune abstraction supplémentaire n'est introduite — les packages Foundation
+d'ASP.NET Core. Aucune abstraction supplémentaire n'est introduite — les packages Granit
 exploitent le pattern `IOptions<T>` standard et respectent la hiérarchie de configuration
 de la plateforme.
 
@@ -33,7 +33,7 @@ User Secrets (développement local uniquement)
 ## Pattern IOptions\<T\>
 
 Le pattern `IOptions<T>` est la manière standard d'accéder à la configuration dans les
-services Foundation. Il offre :
+services Granit. Il offre :
 
 - **Typage fort** : les options sont des classes C# fortement typées
 - **Validation** : possibilité de valider les options au démarrage
@@ -42,7 +42,7 @@ services Foundation. Il offre :
 
 ### Déclarer un bloc d'options
 
-Chaque package Foundation qui nécessite de la configuration expose une classe d'options
+Chaque package Granit qui nécessite de la configuration expose une classe d'options
 avec une constante `SectionName` :
 
 ```csharp
@@ -59,7 +59,7 @@ public sealed class KeycloakOptions
 
 ### Enregistrer les options
 
-Les méthodes d'extension Foundation lient automatiquement les options à la configuration :
+Les méthodes d'extension Granit lient automatiquement les options à la configuration :
 
 ```csharp
 // Dans JwtBearerServiceCollectionExtensions.cs
@@ -81,14 +81,14 @@ public class MyService
 }
 ```
 
-## Accès à la configuration dans les modules Foundation
+## Accès à la configuration dans les modules Granit
 
-Le système de modules Foundation transmet la configuration via `ServiceConfigurationContext`.
+Le système de modules Granit transmet la configuration via `ServiceConfigurationContext`.
 C'est le point d'accès à la configuration lors de la phase d'initialisation d'un module :
 
 ```csharp
-[DependsOn(typeof(FoundationSecurityModule))]
-public class GuavaHostModule : FoundationModule
+[DependsOn(typeof(GranitSecurityModule))]
+public class GuavaHostModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -132,7 +132,7 @@ public class MyService
 
 ## Convention SectionName
 
-Tous les packages Foundation qui exposent des options respectent cette convention :
+Tous les packages Granit qui exposent des options respectent cette convention :
 
 - La classe d'options déclare `public const string SectionName = "...";`
 - La section correspond à une clé de premier niveau dans `appsettings.json`
@@ -140,15 +140,15 @@ Tous les packages Foundation qui exposent des options respectent cette conventio
 
 ```text
 appsettings.json
-├── "Authentication"    → JwtBearerAuthOptions    (Foundation.Authentication.JwtBearer)
-├── "Keycloak"          → KeycloakOptions          (Foundation.Authentication.Keycloak)
-├── "Vault"             → VaultOptions             (Foundation.Vault)
-└── "Observability"     → ObservabilityOptions     (Foundation.Observability)
+├── "Authentication"    → JwtBearerAuthOptions    (Granit.Authentication.JwtBearer)
+├── "Keycloak"          → KeycloakOptions          (Granit.Authentication.Keycloak)
+├── "Vault"             → VaultOptions             (Granit.Vault)
+└── "Observability"     → ObservabilityOptions     (Granit.Observability)
 ```
 
-## Configuration par package Foundation
+## Configuration par package Granit
 
-### Foundation.Authentication.JwtBearer
+### Granit.Authentication.JwtBearer
 
 ```json
 {
@@ -161,12 +161,12 @@ appsettings.json
 ```
 
 ```csharp
-builder.AddFoundation<GuavaHostModule>();
+builder.AddGranit<GuavaHostModule>();
 // ou directement :
-builder.Services.AddFoundationJwtBearer(builder.Configuration);
+builder.Services.AddGranitJwtBearer(builder.Configuration);
 ```
 
-### Foundation.Authentication.Keycloak
+### Granit.Authentication.Keycloak
 
 ```json
 {
@@ -180,10 +180,10 @@ builder.Services.AddFoundationJwtBearer(builder.Configuration);
 ```
 
 ```csharp
-builder.Services.AddFoundationKeycloak(builder.Configuration);
+builder.Services.AddGranitKeycloak(builder.Configuration);
 ```
 
-### Foundation.Vault
+### Granit.Vault
 
 ```json
 {
@@ -199,25 +199,25 @@ builder.Services.AddFoundationKeycloak(builder.Configuration);
 ```
 
 ```csharp
-builder.Services.AddFoundationVault(builder.Configuration);
+builder.Services.AddGranitVault(builder.Configuration);
 ```
 
 > **En développement local**, `AuthMethod` peut être `"Token"` avec `"Token": "root-token-dev"`.
 > Ce mode est **interdit en production**.
 
-### Foundation.Timing
+### Granit.Timing
 
 `ClockOptions` est configuré via le callback de la méthode d'extension (pas via `appsettings.json`)
 car il n'a qu'une seule option, rarement modifiée par environnement :
 
 ```csharp
-builder.Services.AddFoundationTiming(options =>
+builder.Services.AddGranitTiming(options =>
 {
     options.DefaultTimezone = "Europe/Brussels"; // null = UTC (défaut)
 });
 ```
 
-### Foundation.Observability
+### Granit.Observability
 
 ```json
 {
@@ -233,7 +233,7 @@ builder.Services.AddFoundationTiming(options =>
 ```
 
 ```csharp
-builder.AddFoundationObservability(builder.Configuration);
+builder.AddGranitObservability(builder.Configuration);
 ```
 
 ## Surcharge par environnement
@@ -283,8 +283,8 @@ Le `Program.cs` type d'une application Guava :
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
-// Foundation charge tous les modules et leur configuration via IConfiguration
-await builder.AddFoundationAsync<GuavaHostModule>();
+// Granit charge tous les modules et leur configuration via IConfiguration
+await builder.AddGranitAsync<GuavaHostModule>();
 
 var app = builder.Build();
 
@@ -292,7 +292,7 @@ app.UseAuthentication();
 app.UseMultiTenancy();
 app.UseAuthorization();
 
-await app.UseFoundationAsync();
+await app.UseGranitAsync();
 await app.RunAsync();
 ```
 
@@ -313,19 +313,19 @@ builder.Services
     .ValidateOnStart();
 ```
 
-Les packages Foundation n'activent pas `ValidateOnStart()` par défaut pour laisser
+Les packages Granit n'activent pas `ValidateOnStart()` par défaut pour laisser
 le choix à l'application hôte, mais la validation est recommandée en production.
 
 ## Secrets via HashiCorp Vault
 
 Les valeurs sensibles (mots de passe, tokens, clés de chiffrement) ne sont pas dans
 les fichiers de configuration. Elles sont injectées depuis Vault via le package
-`Foundation.Vault` :
+`Granit.Vault` :
 
 ```csharp
 // Les credentials PostgreSQL sont obtenus dynamiquement depuis Vault
 // et injectés dans le DbContext via IVaultCredentialLeaseManager
-builder.Services.AddFoundationVault(builder.Configuration);
+builder.Services.AddGranitVault(builder.Configuration);
 ```
 
 Voir [vault.md](../security/vault.md) pour le détail de l'intégration Vault.
@@ -347,7 +347,7 @@ Voir [vault.md](../security/vault.md) pour le détail de l'intégration Vault.
 
 ## Comparaison avec ABP ISettingProvider
 
-Foundation n'implémente pas l'équivalent d'`ISettingProvider` d'ABP (paramètres
+Granit n'implémente pas l'équivalent d'`ISettingProvider` d'ABP (paramètres
 dynamiques stockés en base de données). Les raisons :
 
 | Critère | ASP.NET Core `IOptions<T>` | ABP `ISettingProvider` |
@@ -359,5 +359,5 @@ dynamiques stockés en base de données). Les raisons :
 | Complexité | Faible | Élevée |
 
 Pour les paramètres dynamiques par tenant ou par utilisateur, utiliser le package
-`Foundation.MultiTenancy` (voir [multi-tenancy.md](../data/multi-tenancy.md)) et une table de
+`Granit.MultiTenancy` (voir [multi-tenancy.md](../data/multi-tenancy.md)) et une table de
 configuration dédiée dans la base de données applicative.

@@ -35,22 +35,22 @@ dotnet add package Granit.Caching.Hybrid
 ### Dev — Memory seul
 
 ```csharp
-[DependsOn(typeof(FoundationCachingModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitCachingModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ### Production simple — Redis + chiffrement AES
 
 ```csharp
-[DependsOn(typeof(FoundationCachingRedisModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitCachingRedisModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ### Production Kubernetes — HybridCache L1+L2 + chiffrement AES
 
 ```csharp
-[DependsOn(typeof(FoundationCachingHybridModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitCachingHybridModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ## appsettings.json
@@ -306,27 +306,27 @@ src/
   ├── TypedKeyCacheServiceAdapter.cs        (adaptateur clé typée → string)
   ├── CachingOptions.cs
   ├── CacheEncryptionOptions.cs
-  ├── FoundationCachingModule.cs
+  ├── GranitCachingModule.cs
   └── Extensions/
       └── CachingServiceCollectionExtensions.cs
 
   Granit.Caching.StackExchangeRedis/
   ├── RedisCachingOptions.cs
-  ├── FoundationCachingRedisModule.cs
+  ├── GranitCachingRedisModule.cs
   └── Extensions/
       └── RedisCachingServiceCollectionExtensions.cs
 
   Granit.Caching.Hybrid/
   ├── HybridCachingOptions.cs
   ├── HybridCacheService.cs
-  ├── FoundationCachingHybridModule.cs
+  ├── GranitCachingHybridModule.cs
   └── Extensions/
       └── HybridCachingServiceCollectionExtensions.cs
 ```
 
 ## Services enregistrés
 
-### `FoundationCachingModule`
+### `GranitCachingModule`
 
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
@@ -336,14 +336,14 @@ src/
 | `ICacheService<T>` | `DistributedCacheService<T>` | Singleton |
 | `ICacheService<T, TKey>` | `TypedKeyCacheServiceAdapter<T, TKey>` | Singleton |
 
-### `FoundationCachingRedisModule` (surcharge Memory)
+### `GranitCachingRedisModule` (surcharge Memory)
 
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `IDistributedCache` | `RedisCache` | Singleton |
 | `ICacheValueEncryptor` | `AesCacheValueEncryptor` (si `EncryptValues=true`) | Singleton |
 
-### `FoundationCachingHybridModule` (surcharge Redis)
+### `GranitCachingHybridModule` (surcharge Redis)
 
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |

@@ -15,8 +15,8 @@ qui n'ont pas besoin d'une UI de documentation.
 ## Installation
 
 ```csharp
-[DependsOn(typeof(FoundationApiVersioningModule))]
-public sealed class MyApplicationModule : FoundationModule { }
+[DependsOn(typeof(GranitApiVersioningModule))]
+public sealed class MyApplicationModule : GranitModule { }
 ```
 
 ## Configuration

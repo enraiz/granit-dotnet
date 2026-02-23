@@ -9,7 +9,7 @@ d'ABP Framework.
 ## Pourquoi utiliser des GUID comme clés primaires ?
 
 Le GUID est le type de clé primaire par défaut pour les modules Digital Dynamics
-Foundation. Ce choix repose sur plusieurs avantages :
+Granit. Ce choix repose sur plusieurs avantages :
 
 - **Compatibilité universelle** : utilisable avec tous les fournisseurs de bases de
   données (PostgreSQL, SQL Server, Oracle, MySQL)
@@ -53,23 +53,23 @@ dotnet add package Granit.Guids
 
 ### Avec le système de modules (recommandé)
 
-Le module `FoundationGuidsModule` est automatiquement chargé via `[DependsOn]` quand
+Le module `GranitGuidsModule` est automatiquement chargé via `[DependsOn]` quand
 un module dépendant (ex : Persistence) en a besoin. Il suffit d'utiliser
-`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
+`AddGranit<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
 
 ### Enregistrement direct
 
 Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
-builder.Services.AddFoundationGuids();
+builder.Services.AddGranitGuids();
 ```
 
 Par défaut, le générateur utilise `SequentialGuidType.SequentialAsString` (optimisé
 pour PostgreSQL). Pour changer le type :
 
 ```csharp
-builder.Services.AddFoundationGuids(options =>
+builder.Services.AddGranitGuids(options =>
 {
     options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd; // SQL Server
 });
@@ -121,7 +121,7 @@ public enum SequentialGuidType
 
 ## SequentialGuidGenerator
 
-Implémentation par défaut enregistrée par `AddFoundationGuids()`. Génère des GUID
+Implémentation par défaut enregistrée par `AddGranitGuids()`. Génère des GUID
 séquentiels en combinant un timestamp milliseconde et des octets aléatoires
 cryptographiquement sûrs.
 
@@ -310,9 +310,9 @@ Granit.Guids
 ├── SimpleGuidGenerator.cs
 ├── SequentialGuidType.cs
 ├── GuidGeneratorOptions.cs
-├── FoundationGuidsModule.cs          (module Foundation)
+├── GranitGuidsModule.cs          (module Granit)
 └── Extensions/
-    └── GuidsServiceCollectionExtensions.cs  (AddFoundationGuids)
+    └── GuidsServiceCollectionExtensions.cs  (AddGranitGuids)
 ```
 
 ## Services enregistrés

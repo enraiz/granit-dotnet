@@ -19,7 +19,7 @@ public interface IDataFilter
 }
 ```
 
-Enregistré comme **Singleton** par `AddFoundationPersistence()`. L'état est stocké
+Enregistré comme **Singleton** par `AddGranitPersistence()`. L'état est stocké
 dans un `static AsyncLocal` — chaque flux async a son propre état indépendant, isolé
 des autres requêtes en cours (identique au pattern `ICurrentTenant`).
 
@@ -60,7 +60,7 @@ using IDisposable reEnableScope = _dataFilter.Enable<ISoftDeletable>();
 ## Injection dans le DbContext
 
 Pour activer le bypass, injecter `IDataFilter` dans le DbContext et le passer à
-`ApplyFoundationConventions` :
+`ApplyGranitConventions` :
 
 ```csharp
 public sealed class AppDbContext : DbContext
@@ -81,7 +81,7 @@ public sealed class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyFoundationConventions(_currentTenant, _dataFilter);
+        modelBuilder.ApplyGranitConventions(_currentTenant, _dataFilter);
     }
 }
 ```
@@ -137,7 +137,7 @@ Ce pattern est identique à `CurrentTenant` (package MultiTenancy).
 
 | Service | Implémentation | Lifetime | Enregistré par |
 | --- | --- | --- | --- |
-| `IDataFilter` | `DataFilter` | Singleton | `AddFoundationPersistence()` |
+| `IDataFilter` | `DataFilter` | Singleton | `AddGranitPersistence()` |
 
 `IDataFilter` est **défini dans Core** (zéro dépendance externe) mais **enregistré par
 Persistence**. Les projets qui utilisent Core sans Persistence peuvent injecter leur

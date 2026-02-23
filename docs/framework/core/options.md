@@ -2,7 +2,7 @@
 
 `Granit` utilise le **pattern Options** de Microsoft.Extensions.Options,
 qui est la manière standard de configurer et consommer des paramètres typés dans ASP.NET Core.
-Les packages Foundation s'appuient entièrement sur cette infrastructure — aucune abstraction
+Les packages Granit s'appuient entièrement sur cette infrastructure — aucune abstraction
 supplémentaire n'est introduite.
 
 > **Référence Microsoft** :
@@ -30,9 +30,9 @@ appsettings.json              classe d'options             service consommateur
 
 ## Déclarer une classe d'options
 
-### Convention Foundation
+### Convention Granit
 
-Chaque classe d'options Foundation suit cette convention :
+Chaque classe d'options Granit suit cette convention :
 
 ```csharp
 namespace Granit.Authentication.Keycloak.Options;
@@ -50,7 +50,7 @@ public sealed class KeycloakOptions
 }
 ```
 
-**Règles appliquées dans Foundation** :
+**Règles appliquées dans Granit** :
 
 - `sealed` — pas de dérivation (les options sont des DTOs)
 - `SectionName` constant — convention de nommage, évite les chaînes magiques
@@ -61,12 +61,12 @@ public sealed class KeycloakOptions
 
 ### Binding depuis la configuration (recommandé)
 
-La méthode d'extension Foundation lie automatiquement la section de configuration
+La méthode d'extension Granit lie automatiquement la section de configuration
 via `BindConfiguration` :
 
 ```csharp
 // Dans JwtBearerServiceCollectionExtensions.cs
-public static IServiceCollection AddFoundationJwtBearer(
+public static IServiceCollection AddGranitJwtBearer(
     this IServiceCollection services,
     IConfiguration configuration)
 {
@@ -93,12 +93,12 @@ L'application hôte fournit uniquement la configuration dans `appsettings.json` 
 
 ### Binding via callback (sans appsettings.json)
 
-Pour les options rarement modifiées par environnement, Foundation expose un callback
+Pour les options rarement modifiées par environnement, Granit expose un callback
 dans la méthode d'extension :
 
 ```csharp
 // Dans TimingServiceCollectionExtensions.cs
-public static IServiceCollection AddFoundationTiming(
+public static IServiceCollection AddGranitTiming(
     this IServiceCollection services,
     Action<ClockOptions>? configure = null)
 {
@@ -115,7 +115,7 @@ public static IServiceCollection AddFoundationTiming(
 Usage dans `Program.cs` :
 
 ```csharp
-builder.Services.AddFoundationTiming(options =>
+builder.Services.AddGranitTiming(options =>
 {
     options.DefaultTimezone = "Europe/Brussels";
 });
@@ -159,14 +159,14 @@ public class KeycloakClaimsTransformation : IClaimsTransformation
 }
 ```
 
-### Dans un module Foundation
+### Dans un module Granit
 
 Pendant la phase `ConfigureServices`, les options ne sont pas encore disponibles via
 `IOptions<T>` (le conteneur DI n'est pas encore construit). Pour lire la configuration
 à ce stade, utiliser `IConfiguration` directement depuis le `ServiceConfigurationContext` :
 
 ```csharp
-public class FoundationAuthenticationKeycloakModule : FoundationModule
+public class GranitAuthenticationKeycloakModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -175,8 +175,8 @@ public class FoundationAuthenticationKeycloakModule : FoundationModule
         // Lecture directe (DI non disponible ici)
         var keycloakSection = configuration.GetSection(KeycloakOptions.SectionName);
 
-        context.Services.AddFoundationJwtBearer(configuration);
-        context.Services.AddFoundationKeycloak(configuration);
+        context.Services.AddGranitJwtBearer(configuration);
+        context.Services.AddGranitKeycloak(configuration);
     }
 }
 ```
@@ -199,13 +199,13 @@ var transformation = new KeycloakClaimsTransformation(options);
 
 ## IOptions\<T\> vs IOptionsSnapshot\<T\> vs IOptionsMonitor\<T\>
 
-| Interface | Lifetime | Rechargement | Usage Foundation |
+| Interface | Lifetime | Rechargement | Usage Granit |
 | --- | --- | --- | --- |
 | `IOptions<T>` | Singleton | Non | Standard — valeurs fixes au démarrage |
 | `IOptionsSnapshot<T>` | Scoped | Par requête | Non utilisé |
 | `IOptionsMonitor<T>` | Singleton | À chaud (fichier) | Non utilisé |
 
-Foundation utilise exclusivement `IOptions<T>`. Les options sont lues au démarrage
+Granit utilise exclusivement `IOptions<T>`. Les options sont lues au démarrage
 et restent fixes pendant toute la durée de vie de l'application. Un redémarrage du pod
 K8s est nécessaire pour appliquer un changement de configuration — ce comportement
 est intentionnel dans une architecture cloud-native.
@@ -213,8 +213,8 @@ est intentionnel dans une architecture cloud-native.
 ## PostConfigure — surcharge après binding
 
 `PostConfigure<T>` s'exécute **après** tous les `Configure<T>`, quel que soit leur ordre.
-Foundation l'utilise dans `Foundation.Authentication.Keycloak` pour surcharger les options
-JWT Bearer (configurées par `Foundation.Authentication.JwtBearer`) avec les valeurs Keycloak :
+Granit l'utilise dans `Granit.Authentication.Keycloak` pour surcharger les options
+JWT Bearer (configurées par `Granit.Authentication.JwtBearer`) avec les valeurs Keycloak :
 
 ```csharp
 // Dans KeycloakServiceCollectionExtensions.cs
@@ -230,25 +230,25 @@ services.PostConfigureAll<JwtBearerOptions>(jwtOptions =>
 });
 ```
 
-Ce mécanisme permet à `Foundation.Authentication.Keycloak` de reconfigurer le JWT Bearer
+Ce mécanisme permet à `Granit.Authentication.Keycloak` de reconfigurer le JWT Bearer
 sans que l'application hôte ait à gérer l'ordre d'initialisation manuellement.
 
 ```text
-Configure<JwtBearerOptions>      (via AddFoundationJwtBearer — section "Authentication")
+Configure<JwtBearerOptions>      (via AddGranitJwtBearer — section "Authentication")
          ↓
-PostConfigureAll<JwtBearerOptions> (via AddFoundationKeycloak — écrase avec Keycloak)
+PostConfigureAll<JwtBearerOptions> (via AddGranitKeycloak — écrase avec Keycloak)
 ```
 
-## Référence des options Foundation
+## Référence des options Granit
 
 | Classe | Package | Section | Configuré via |
 | --- | --- | --- | --- |
-| `JwtBearerAuthOptions` | `Foundation.Authentication.JwtBearer` | `"Authentication"` | `BindConfiguration` |
-| `KeycloakOptions` | `Foundation.Authentication.Keycloak` | `"Keycloak"` | `BindConfiguration` |
-| `VaultOptions` | `Foundation.Vault` | `"Vault"` | `BindConfiguration` |
-| `ObservabilityOptions` | `Foundation.Observability` | `"Observability"` | `BindConfiguration` |
-| `ClockOptions` | `Foundation.Timing` | — | Callback `Action<T>` |
-| `GuidGeneratorOptions` | `Foundation.Guids` | — | Callback `Action<T>` |
+| `JwtBearerAuthOptions` | `Granit.Authentication.JwtBearer` | `"Authentication"` | `BindConfiguration` |
+| `KeycloakOptions` | `Granit.Authentication.Keycloak` | `"Keycloak"` | `BindConfiguration` |
+| `VaultOptions` | `Granit.Vault` | `"Vault"` | `BindConfiguration` |
+| `ObservabilityOptions` | `Granit.Observability` | `"Observability"` | `BindConfiguration` |
+| `ClockOptions` | `Granit.Timing` | — | Callback `Action<T>` |
+| `GuidGeneratorOptions` | `Granit.Guids` | — | Callback `Action<T>` |
 
 ## Créer des options pour un nouveau module
 
@@ -272,7 +272,7 @@ public sealed class MyModuleOptions
 ### 2. Lier dans la méthode d'extension
 
 ```csharp
-public static IServiceCollection AddFoundationMyModule(
+public static IServiceCollection AddGranitMyModule(
     this IServiceCollection services,
     IConfiguration configuration)
 {
@@ -351,7 +351,7 @@ services
     .ValidateOnStart();   // Exception au démarrage si invalide
 ```
 
-Les packages Foundation n'activent pas `ValidateOnStart()` par défaut — ce choix
+Les packages Granit n'activent pas `ValidateOnStart()` par défaut — ce choix
 appartient à l'application hôte.
 
 ## Bonnes pratiques

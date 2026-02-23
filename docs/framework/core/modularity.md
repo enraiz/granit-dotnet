@@ -2,23 +2,23 @@
 
 `Granit.Core` fournit un système de modules inspiré de
 [Volo.Abp.Modularity](https://abp.io/docs/latest/framework/architecture/modularity/basics).
-Chaque package Foundation déclare un **module** qui s'enregistre automatiquement dans le
+Chaque package Granit déclare un **module** qui s'enregistre automatiquement dans le
 conteneur DI. Les dépendances entre modules sont résolues par tri topologique et chargées
 dans le bon ordre.
 
-L'objectif : **un seul appel** dans `Program.cs` remplace tous les `AddFoundation*()` individuels.
+L'objectif : **un seul appel** dans `Program.cs` remplace tous les `AddGranit*()` individuels.
 
 ```csharp
 // Avant (6 appels manuels, ordre à respecter)
-builder.AddFoundationObservability();
-builder.Services.AddFoundationSecurity(builder.Configuration);
-builder.Services.AddFoundationTiming();
-builder.Services.AddFoundationGuids();
-builder.Services.AddFoundationPersistence();
-builder.Services.AddFoundationVault(builder.Configuration);
+builder.AddGranitObservability();
+builder.Services.AddGranitSecurity(builder.Configuration);
+builder.Services.AddGranitTiming();
+builder.Services.AddGranitGuids();
+builder.Services.AddGranitPersistence();
+builder.Services.AddGranitVault(builder.Configuration);
 
 // Après (single entry point, async recommandé)
-await builder.AddFoundationAsync<GuavaHostModule>();
+await builder.AddGranitAsync<GuavaHostModule>();
 ```
 
 ## Installation
@@ -28,7 +28,7 @@ dotnet add package Granit.Core
 ```
 
 Ce package est automatiquement tiré comme dépendance transitive par tous les packages
-Foundation. Il n'est nécessaire de le référencer explicitement que dans le projet Host
+Granit. Il n'est nécessaire de le référencer explicitement que dans le projet Host
 (composition root) et dans les projets qui utilisent les types domaine (`AuditedEntity`,
 `FullAuditedEntity`, `ISoftDeletable`).
 
@@ -36,21 +36,21 @@ Foundation. Il n'est nécessaire de le référencer explicitement que dans le pr
 
 ### Module = package auto-contenu
 
-Chaque package Foundation est un **module** au sens ABP : il contient à la fois ses
+Chaque package Granit est un **module** au sens ABP : il contient à la fois ses
 **interfaces** (contrats) et ses **implémentations**. Il n'y a pas de package
 `Abstractions` centralisé. Les interfaces vivent dans le même package que leur
 implémentation :
 
 | Package | Interface | Implémentation |
 | --- | --- | --- |
-| Foundation.Timing | `IClock`, `ICurrentTimezoneProvider` | `Clock`, `CurrentTimezoneProvider` |
-| Foundation.Guids | `IGuidGenerator` | `SequentialGuidGenerator`, `SimpleGuidGenerator` |
-| Foundation.Security | `ICurrentUserService` | `KeycloakCurrentUserService` |
-| Foundation.Vault | `ITransitEncryptionService` | `VaultTransitEncryptionService` |
+| Granit.Timing | `IClock`, `ICurrentTimezoneProvider` | `Clock`, `CurrentTimezoneProvider` |
+| Granit.Guids | `IGuidGenerator` | `SequentialGuidGenerator`, `SimpleGuidGenerator` |
+| Granit.Security | `ICurrentUserService` | `KeycloakCurrentUserService` |
+| Granit.Vault | `ITransitEncryptionService` | `VaultTransitEncryptionService` |
 
 Les types domaine partagés (`Entity`, `CreationAuditedEntity`, `AuditedEntity`,
 `FullAuditedEntity`, `ISoftDeletable`, `AuditLogEntry`) vivent dans
-`Foundation.Core.Domain` car ils n'ont pas d'implémentation associée.
+`Granit.Core.Domain` car ils n'ont pas d'implémentation associée.
 
 ### Lifecycle (sync + async)
 
@@ -69,7 +69,7 @@ Un module peut surcharger **l'une ou l'autre** selon ses besoins :
 - **Async** : pour les modules nécessitant une initialisation asynchrone (lecture de
   secrets distants, vérification de connectivité, etc.)
 
-`AddFoundationAsync<T>()` appelle `ConfigureServicesAsync()` sur chaque module, ce qui
+`AddGranitAsync<T>()` appelle `ConfigureServicesAsync()` sur chaque module, ce qui
 par défaut délègue à `ConfigureServices()`. Ainsi, les modules existants avec uniquement
 des overrides sync fonctionnent sans modification.
 
@@ -82,21 +82,21 @@ change :
 
 ## Classe de module
 
-Tout module Foundation hérite de `FoundationModule` et surcharge les méthodes lifecycle
+Tout module Granit hérite de `GranitModule` et surcharge les méthodes lifecycle
 nécessaires :
 
 ```csharp
 // Module sync (cas standard)
-public sealed class FoundationTimingModule : FoundationModule
+public sealed class GranitTimingModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddFoundationTiming();
+        context.Services.AddGranitTiming();
     }
 }
 
 // Module async (pour les initialisations asynchrones)
-public sealed class MyRemoteConfigModule : FoundationModule
+public sealed class MyRemoteConfigModule : GranitModule
 {
     public override async Task ConfigureServicesAsync(ServiceConfigurationContext context)
     {
@@ -124,19 +124,19 @@ Le contexte passé à `ConfigureServices` expose :
 Exemple avec accès à la configuration et au builder :
 
 ```csharp
-public sealed class FoundationSecurityModule : FoundationModule
+public sealed class GranitSecurityModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddFoundationSecurity(context.Configuration);
+        context.Services.AddGranitSecurity(context.Configuration);
     }
 }
 
-public sealed class FoundationObservabilityModule : FoundationModule
+public sealed class GranitObservabilityModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Builder.AddFoundationObservability();
+        context.Builder.AddGranitObservability();
     }
 }
 ```
@@ -163,14 +163,14 @@ L'attribut `[DependsOn]` déclare les dépendances d'un module. Le système gara
 les modules dépendants sont chargés **avant** le module qui en dépend :
 
 ```csharp
-[DependsOn(typeof(FoundationTimingModule))]
-[DependsOn(typeof(FoundationGuidsModule))]
-[DependsOn(typeof(FoundationSecurityModule))]
-public sealed class FoundationPersistenceModule : FoundationModule
+[DependsOn(typeof(GranitTimingModule))]
+[DependsOn(typeof(GranitGuidsModule))]
+[DependsOn(typeof(GranitSecurityModule))]
+public sealed class GranitPersistenceModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddFoundationPersistence();
+        context.Services.AddGranitPersistence();
     }
 }
 ```
@@ -179,10 +179,10 @@ Syntaxe alternative avec un seul attribut et plusieurs types :
 
 ```csharp
 [DependsOn(
-    typeof(FoundationTimingModule),
-    typeof(FoundationGuidsModule),
-    typeof(FoundationSecurityModule))]
-public sealed class FoundationPersistenceModule : FoundationModule { ... }
+    typeof(GranitTimingModule),
+    typeof(GranitGuidsModule),
+    typeof(GranitSecurityModule))]
+public sealed class GranitPersistenceModule : GranitModule { ... }
 ```
 
 Les deux syntaxes sont équivalentes. `AllowMultiple = true` et `params Type[]` sont
@@ -191,12 +191,12 @@ supportés.
 ### Résolution transitive
 
 Les dépendances sont résolues **transitivement**. Déclarer une dépendance sur
-`FoundationPersistenceModule` tire automatiquement `Timing`, `Guids` et `Security` :
+`GranitPersistenceModule` tire automatiquement `Timing`, `Guids` et `Security` :
 
 ```csharp
 // Persistence tire automatiquement Timing + Guids + Security
-[DependsOn(typeof(FoundationPersistenceModule))]
-public sealed class MyModule : FoundationModule { ... }
+[DependsOn(typeof(GranitPersistenceModule))]
+public sealed class MyModule : GranitModule { ... }
 ```
 
 ### Déduplication
@@ -206,11 +206,11 @@ il n'est chargé qu'**une seule fois** :
 
 ```text
 GuavaHostModule
-├── FoundationPersistenceModule
-│   ├── FoundationTimingModule      ← chargé une fois
-│   ├── FoundationGuidsModule
-│   └── FoundationSecurityModule    ← chargé une fois
-└── FoundationSecurityModule        ← déjà chargé, ignoré
+├── GranitPersistenceModule
+│   ├── GranitTimingModule      ← chargé une fois
+│   ├── GranitGuidsModule
+│   └── GranitSecurityModule    ← chargé une fois
+└── GranitSecurityModule        ← déjà chargé, ignoré
 ```
 
 ### Détection de cycles
@@ -222,16 +222,16 @@ avec la liste des modules impliqués :
 InvalidOperationException: Dependance circulaire detectee entre les modules : ModuleA, ModuleB.
 ```
 
-## Graphe de dépendances Foundation
+## Graphe de dépendances Granit
 
 ```text
-FoundationTimingModule        ── (standalone → Core)
-FoundationGuidsModule         ── (standalone → Core)
-FoundationSecurityModule      ── (standalone → Core)
-FoundationObservabilityModule ── (standalone → Core)
-FoundationVaultModule         ── (standalone → Core)
+GranitTimingModule        ── (standalone → Core)
+GranitGuidsModule         ── (standalone → Core)
+GranitSecurityModule      ── (standalone → Core)
+GranitObservabilityModule ── (standalone → Core)
+GranitVaultModule         ── (standalone → Core)
 
-FoundationPersistenceModule   ── → Timing, Guids, Security
+GranitPersistenceModule   ── → Timing, Guids, Security
 
 GuavaHostModule (application) ── → Observability, Security, Persistence, Vault
 ```
@@ -239,43 +239,43 @@ GuavaHostModule (application) ── → Observability, Security, Persistence, V
 Ordre de chargement résolu pour `GuavaHostModule` (tri topologique) :
 
 ```text
-1. FoundationTimingModule
-2. FoundationGuidsModule
-3. FoundationSecurityModule
-4. FoundationObservabilityModule
-5. FoundationVaultModule
-6. FoundationPersistenceModule    (après Timing, Guids, Security)
+1. GranitTimingModule
+2. GranitGuidsModule
+3. GranitSecurityModule
+4. GranitObservabilityModule
+5. GranitVaultModule
+6. GranitPersistenceModule    (après Timing, Guids, Security)
 7. GuavaHostModule                (après tous les autres)
 ```
 
-## Point d'entrée : AddFoundationAsync / UseFoundationAsync
+## Point d'entrée : AddGranitAsync / UseGranitAsync
 
-### AddFoundationAsync (recommandé)
+### AddGranitAsync (recommandé)
 
-`AddFoundationAsync<TModule>()` est le point d'entrée recommandé dans `Program.cs`. Il :
+`AddGranitAsync<TModule>()` est le point d'entrée recommandé dans `Program.cs`. Il :
 
 1. Découvre récursivement tous les modules via `[DependsOn]`
 2. Les trie par ordre topologique (algorithme de Kahn)
 3. Appelle `ConfigureServicesAsync()` sur chaque module dans l'ordre
-4. Enregistre `FoundationApplication` comme singleton dans le conteneur
+4. Enregistre `GranitApplication` comme singleton dans le conteneur
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
-await builder.AddFoundationAsync<GuavaHostModule>();
+await builder.AddGranitAsync<GuavaHostModule>();
 ```
 
-Une variante synchrone `AddFoundation<TModule>()` existe pour les cas où l'async n'est
+Une variante synchrone `AddGranit<TModule>()` existe pour les cas où l'async n'est
 pas souhaité. Elle appelle `ConfigureServices()` (sync) au lieu de
 `ConfigureServicesAsync()`.
 
-### UseFoundationAsync (recommandé)
+### UseGranitAsync (recommandé)
 
-`UseFoundationAsync()` est appelé après `Build()`, avant `Run()`. Il résout le singleton
-`FoundationApplication` et appelle `OnApplicationInitializationAsync()` sur chaque module :
+`UseGranitAsync()` est appelé après `Build()`, avant `Run()`. Il résout le singleton
+`GranitApplication` et appelle `OnApplicationInitializationAsync()` sur chaque module :
 
 ```csharp
 var app = builder.Build();
-await app.UseFoundationAsync();
+await app.UseGranitAsync();
 app.Run();
 ```
 
@@ -283,14 +283,14 @@ Les surcharges sync et async sont disponibles selon le type d'hôte :
 
 | Type | Sync | Async |
 | --- | --- | --- |
-| `WebApplication` | `app.UseFoundation()` | `await app.UseFoundationAsync()` |
-| `IApplicationBuilder` | `app.UseFoundation()` | `await app.UseFoundationAsync()` |
-| `IHost` | `host.UseFoundation()` | `await host.UseFoundationAsync()` |
+| `WebApplication` | `app.UseGranit()` | `await app.UseGranitAsync()` |
+| `IApplicationBuilder` | `app.UseGranit()` | `await app.UseGranitAsync()` |
+| `IHost` | `host.UseGranit()` | `await host.UseGranitAsync()` |
 
 ## Créer un module applicatif
 
 Un module applicatif (ex : `GuavaHostModule`) suit le même pattern que les modules
-Foundation :
+Granit :
 
 ```csharp
 using Asp.Versioning;
@@ -302,11 +302,11 @@ using Granit.Vault;
 
 namespace Guava.Host;
 
-[DependsOn(typeof(FoundationObservabilityModule))]
-[DependsOn(typeof(FoundationSecurityModule))]
-[DependsOn(typeof(FoundationPersistenceModule))]
-[DependsOn(typeof(FoundationVaultModule))]
-public sealed class GuavaHostModule : FoundationModule
+[DependsOn(typeof(GranitObservabilityModule))]
+[DependsOn(typeof(GranitSecurityModule))]
+[DependsOn(typeof(GranitPersistenceModule))]
+[DependsOn(typeof(GranitVaultModule))]
+public sealed class GuavaHostModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -337,8 +337,8 @@ using Wolverine.Http.FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Foundation (single entry point) ---
-await builder.AddFoundationAsync<GuavaHostModule>();
+// --- Granit (single entry point) ---
+await builder.AddGranitAsync<GuavaHostModule>();
 
 // --- Modules applicatifs ---
 AuthModule.ConfigureServices(builder.Services, builder.Configuration);
@@ -352,7 +352,7 @@ builder.Host.UseWolverine(opts =>
 
 var app = builder.Build();
 
-await app.UseFoundationAsync();
+await app.UseGranitAsync();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHealthChecks("/healthz");
@@ -374,7 +374,7 @@ Le `ModuleLoader` utilise l'algorithme de Kahn pour le tri topologique :
 1. DiscoverModules(rootType)
    ├── Récursion via [DependsOn] sur chaque type
    ├── Déduplication par Type (Dictionary<Type, ModuleDescriptor>)
-   ├── Validation : chaque type doit hériter de FoundationModule
+   ├── Validation : chaque type doit hériter de GranitModule
    └── Instanciation : Activator.CreateInstance() (constructeur sans paramètre)
 
 2. TopologicalSort(descriptors)
@@ -390,12 +390,12 @@ Le `ModuleLoader` utilise l'algorithme de Kahn pour le tri topologique :
 | --- | --- | --- |
 | `ModuleLoader` | `internal` | Découverte + tri topologique |
 | `ModuleDescriptor` | `internal` | Associe Type + Instance + Dependencies |
-| `FoundationApplication` | `public` | Singleton, orchestre le lifecycle |
+| `GranitApplication` | `public` | Singleton, orchestre le lifecycle |
 
-`FoundationApplication` est le seul type public du moteur. Ses méthodes (`ConfigureServices`,
+`GranitApplication` est le seul type public du moteur. Ses méthodes (`ConfigureServices`,
 `ConfigureServicesAsync`, `InitializeApplication`, `InitializeApplicationAsync`) sont
-`internal` pour que seules les extensions `AddFoundation`/`AddFoundationAsync` et
-`UseFoundation`/`UseFoundationAsync` puissent les appeler.
+`internal` pour que seules les extensions `AddGranit`/`AddGranitAsync` et
+`UseGranit`/`UseGranitAsync` puissent les appeler.
 
 ### Structure des fichiers
 
@@ -409,16 +409,16 @@ Granit.Core
 │   ├── ISoftDeletable.cs
 │   └── AuditLogEntry.cs
 ├── Modularity/
-│   ├── FoundationModule.cs         (classe de base)
+│   ├── GranitModule.cs         (classe de base)
 │   ├── DependsOnAttribute.cs       (déclaration de dépendances)
 │   ├── ServiceConfigurationContext.cs
 │   ├── ApplicationInitializationContext.cs
 │   ├── ModuleDescriptor.cs         (internal)
 │   ├── ModuleLoader.cs             (internal, tri topologique)
-│   └── FoundationApplication.cs    (singleton, lifecycle)
+│   └── GranitApplication.cs    (singleton, lifecycle)
 └── Extensions/
-    ├── FoundationHostBuilderExtensions.cs   (AddFoundation<T> / AddFoundationAsync<T>)
-    └── FoundationApplicationExtensions.cs   (UseFoundation / UseFoundationAsync)
+    ├── GranitHostBuilderExtensions.cs   (AddGranit<T> / AddGranitAsync<T>)
+    └── GranitApplicationExtensions.cs   (UseGranit / UseGranitAsync)
 ```
 
 ## Tests
@@ -456,10 +456,10 @@ Scénarios couverts :
 - Chaîne linéaire A → B → C
 - Diamant (shared dependency chargée une fois)
 - Dépendance circulaire (exception)
-- Type non-FoundationModule (exception)
+- Type non-GranitModule (exception)
 - Dépendances dupliquées (déduplication)
 
-### FoundationApplicationTests
+### GranitApplicationTests
 
 Vérifie l'ordre d'appel des méthodes lifecycle (sync et async) :
 
@@ -468,7 +468,7 @@ Vérifie l'ordre d'appel des méthodes lifecycle (sync et async) :
 public void ConfigureServices_CallsModulesInTopologicalOrder()
 {
     var modules = ModuleLoader.LoadModules<TrackingModuleB>();
-    var app = new FoundationApplication(modules);
+    var app = new GranitApplication(modules);
     // ...
     app.ConfigureServices(context);
     CallOrder.Should().ContainInOrder("ConfigureServices:A", "ConfigureServices:B");
@@ -478,7 +478,7 @@ public void ConfigureServices_CallsModulesInTopologicalOrder()
 public async Task ConfigureServicesAsync_CallsModulesInTopologicalOrder()
 {
     var modules = ModuleLoader.LoadModules<AsyncTrackingModuleB>();
-    var app = new FoundationApplication(modules);
+    var app = new GranitApplication(modules);
     // ...
     await app.ConfigureServicesAsync(context);
     CallOrder.Should().ContainInOrder("ConfigureServicesAsync:A", "ConfigureServicesAsync:B");
@@ -497,14 +497,14 @@ Vérifie le pipeline complet sync et async :
 
 ```csharp
 [Fact]
-public async Task AddFoundationAsync_RegistersFoundationApplicationAsSingleton()
+public async Task AddGranitAsync_RegistersGranitApplicationAsSingleton()
 {
     var builder = WebApplication.CreateBuilder();
-    await builder.AddFoundationAsync<AsyncTestRootModule>();
+    await builder.AddGranitAsync<AsyncTestRootModule>();
     await using var app = builder.Build();
 
-    var foundationApp = app.Services.GetService<FoundationApplication>();
-    foundationApp.Should().NotBeNull();
+    var granitApp = app.Services.GetService<GranitApplication>();
+    granitApp.Should().NotBeNull();
 }
 ```
 
@@ -513,16 +513,16 @@ public async Task AddFoundationAsync_RegistersFoundationApplicationAsSingleton()
 | Exigence | Mécanisme |
 | --- | --- |
 | HDS - Audit trail | Modules chargés dans un ordre déterministe et reproductible |
-| HDS - Traçabilité | `FoundationApplication.GetModuleTypes()` expose la liste des modules chargés (diagnostics) |
+| HDS - Traçabilité | `GranitApplication.GetModuleTypes()` expose la liste des modules chargés (diagnostics) |
 | ISO 9001 - Reproductibilité | Tri topologique = même ordre à chaque démarrage |
 | Sécurité - Least privilege | Chaque module n'enregistre que ses propres services |
 
 ## Différences avec ABP
 
-| Aspect | ABP | Foundation |
+| Aspect | ABP | Granit |
 | --- | --- | --- |
 | Lifecycle | 7 méthodes (Pre/Post + Shutdown) | 2 méthodes (extensible) |
-| Async | `AddApplicationAsync` + `*Async` lifecycle | `AddFoundationAsync` + `*Async` lifecycle |
+| Async | `AddApplicationAsync` + `*Async` lifecycle | `AddGranitAsync` + `*Async` lifecycle |
 | Constructeur | Sans paramètre | Sans paramètre |
 | Découverte | Récursive via `[DependsOn]` | Idem |
 | Tri | Topologique | Idem (Kahn) |

@@ -30,13 +30,13 @@ dotnet add package Granit.Observability
 
 ### Program.cs
 
-Avec le système de modules (recommandé), `FoundationObservabilityModule` est chargé
-automatiquement via `AddFoundation<T>()` (voir [modularity.md](../core/modularity.md)).
+Avec le système de modules (recommandé), `GranitObservabilityModule` est chargé
+automatiquement via `AddGranit<T>()` (voir [modularity.md](../core/modularity.md)).
 
 Pour un enregistrement direct :
 
 ```csharp
-builder.AddFoundationObservability();
+builder.AddGranitObservability();
 ```
 
 Cette méthode configure automatiquement Serilog et OpenTelemetry.
@@ -148,9 +148,9 @@ Les traces et métriques peuvent être désactivées individuellement :
 Granit.Observability
 ├── Options/
 │   └── ObservabilityOptions.cs
-├── FoundationObservabilityModule.cs        (module Foundation)
+├── GranitObservabilityModule.cs        (module Granit)
 └── Extensions/
-    └── ObservabilityServiceCollectionExtensions.cs  (AddFoundationObservability)
+    └── ObservabilityServiceCollectionExtensions.cs  (AddGranitObservability)
 ```
 
 ## Resource attributes

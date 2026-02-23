@@ -18,10 +18,10 @@ public static class GranitApplicationExtensions
     /// </summary>
     public static IApplicationBuilder UseGranit(this IApplicationBuilder app)
     {
-        GranitApplication foundationApp = app.ApplicationServices
+        GranitApplication granitApp = app.ApplicationServices
             .GetRequiredService<GranitApplication>();
         ApplicationInitializationContext context = new(app.ApplicationServices);
-        foundationApp.InitializeApplication(context);
+        granitApp.InitializeApplication(context);
         return app;
     }
 
@@ -39,10 +39,10 @@ public static class GranitApplicationExtensions
     /// </summary>
     public static IHost UseGranit(this IHost host)
     {
-        GranitApplication foundationApp = host.Services
+        GranitApplication granitApp = host.Services
             .GetRequiredService<GranitApplication>();
         ApplicationInitializationContext context = new(host.Services);
-        foundationApp.InitializeApplication(context);
+        granitApp.InitializeApplication(context);
         return host;
     }
 
@@ -54,10 +54,10 @@ public static class GranitApplicationExtensions
     /// </summary>
     public static async Task<IApplicationBuilder> UseGranitAsync(this IApplicationBuilder app)
     {
-        GranitApplication foundationApp = app.ApplicationServices
+        GranitApplication granitApp = app.ApplicationServices
             .GetRequiredService<GranitApplication>();
         ApplicationInitializationContext context = new(app.ApplicationServices);
-        await foundationApp.InitializeApplicationAsync(context);
+        await granitApp.InitializeApplicationAsync(context);
         return app;
     }
 
@@ -75,10 +75,10 @@ public static class GranitApplicationExtensions
     /// </summary>
     public static async Task<IHost> UseGranitAsync(this IHost host)
     {
-        GranitApplication foundationApp = host.Services
+        GranitApplication granitApp = host.Services
             .GetRequiredService<GranitApplication>();
         ApplicationInitializationContext context = new(host.Services);
-        await foundationApp.InitializeApplicationAsync(context);
+        await granitApp.InitializeApplicationAsync(context);
         return host;
     }
 }

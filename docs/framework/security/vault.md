@@ -29,8 +29,8 @@ dotnet add package Granit.Vault
 
 ### Program.cs
 
-Avec le système de modules (recommandé), `FoundationVaultModule` est chargé
-automatiquement via `AddFoundation<T>()`. Le module skip l'enregistrement en
+Avec le système de modules (recommandé), `GranitVaultModule` est chargé
+automatiquement via `AddGranit<T>()`. Le module skip l'enregistrement en
 environnement Development (voir [modularity.md](../core/modularity.md)).
 
 Pour un enregistrement direct :
@@ -39,7 +39,7 @@ Pour un enregistrement direct :
 // Vault n'est activé qu'en production (credentials dynamiques, Transit)
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddFoundationVault(builder.Configuration);
+    builder.Services.AddGranitVault(builder.Configuration);
 }
 ```
 
@@ -136,9 +136,9 @@ Granit.Vault
 │   ├── VaultClientFactory.cs               (création du client VaultSharp)
 │   ├── VaultCredentialLeaseManager.cs      (BackgroundService, credentials dynamiques)
 │   └── TransitEncryptionService.cs         (chiffrement/déchiffrement Transit)
-├── FoundationVaultModule.cs                (module Foundation)
+├── GranitVaultModule.cs                (module Granit)
 └── Extensions/
-    └── VaultServiceCollectionExtensions.cs  (AddFoundationVault)
+    └── VaultServiceCollectionExtensions.cs  (AddGranitVault)
 ```
 
 ## Services enregistrés

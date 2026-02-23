@@ -75,11 +75,11 @@ public sealed class IntegrationTests
         using var app = builder.Build();
 
         // Assert
-        var foundationApp = app.Services.GetService<GranitApplication>();
-        foundationApp.Should().NotBeNull();
+        var granitApp = app.Services.GetService<GranitApplication>();
+        granitApp.Should().NotBeNull();
 
         var secondResolve = app.Services.GetService<GranitApplication>();
-        secondResolve.Should().BeSameAs(foundationApp);
+        secondResolve.Should().BeSameAs(granitApp);
     }
 
     [Fact]
@@ -123,8 +123,8 @@ public sealed class IntegrationTests
         using var app = builder.Build();
 
         // Assert
-        var foundationApp = app.Services.GetRequiredService<GranitApplication>();
-        foundationApp.GetModuleTypes().Should().ContainInOrder(
+        var granitApp = app.Services.GetRequiredService<GranitApplication>();
+        granitApp.GetModuleTypes().Should().ContainInOrder(
             typeof(TestLeafModule),
             typeof(TestRootModule));
     }
@@ -142,11 +142,11 @@ public sealed class IntegrationTests
         await using var app = builder.Build();
 
         // Assert
-        var foundationApp = app.Services.GetService<GranitApplication>();
-        foundationApp.Should().NotBeNull();
+        var granitApp = app.Services.GetService<GranitApplication>();
+        granitApp.Should().NotBeNull();
 
         var secondResolve = app.Services.GetService<GranitApplication>();
-        secondResolve.Should().BeSameAs(foundationApp);
+        secondResolve.Should().BeSameAs(granitApp);
     }
 
     [Fact]
@@ -190,8 +190,8 @@ public sealed class IntegrationTests
         await using var app = builder.Build();
 
         // Assert
-        var foundationApp = app.Services.GetRequiredService<GranitApplication>();
-        foundationApp.GetModuleTypes().Should().ContainInOrder(
+        var granitApp = app.Services.GetRequiredService<GranitApplication>();
+        granitApp.GetModuleTypes().Should().ContainInOrder(
             typeof(AsyncTestLeafModule),
             typeof(AsyncTestRootModule));
     }

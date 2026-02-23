@@ -1,7 +1,7 @@
 # Types domaine
 
 `Granit.Core.Domain` fournit la hiérarchie d'entités persistées
-et les interfaces domaine partagées par tous les packages Foundation.
+et les interfaces domaine partagées par tous les packages Granit.
 
 ```csharp
 using Granit.Core.Domain;
@@ -164,7 +164,7 @@ Comportement automatique à la création (`SaveChangesAsync`) :
 - Si aucun tenant actif → `TenantId` reste `null` (donnée globale)
 
 Le query filter multi-tenant (`WHERE TenantId = currentTenant.Id`) est activé en
-passant l'`ICurrentTenant` à `ApplyFoundationConventions` dans `OnModelCreating`
+passant l'`ICurrentTenant` à `ApplyGranitConventions` dans `OnModelCreating`
 (voir [persistence.md](persistence.md#query-filters)).
 
 **Conformité RGPD** : `TenantId` est un GUID pseudonymisé. Ne jamais stocker de
@@ -194,7 +194,7 @@ public sealed class Etablissement : AuditedEntity, IActive
 }
 ```
 
-Le query filter `IActive` est activé automatiquement par `ApplyFoundationConventions`
+Le query filter `IActive` est activé automatiquement par `ApplyGranitConventions`
 (voir [persistence.md](persistence.md#query-filter-iactive)). Il peut être désactivé
 ponctuellement via `IDataFilter` (voir [data-filtering.md](data-filtering.md)).
 
@@ -241,5 +241,5 @@ Granit.Core
 | --- | --- |
 | HDS - Audit trail 3 ans | Hiérarchie `AuditedEntity` / `FullAuditedEntity` + `AuditLogEntry` |
 | RGPD - Droit à l'oubli | `ISoftDeletable` (suppression logique) |
-| RGPD - Isolation tenant | `IMultiTenant` + query filter (`ApplyFoundationConventions`) |
+| RGPD - Isolation tenant | `IMultiTenant` + query filter (`ApplyGranitConventions`) |
 | RGPD - Pseudonymisation | `TenantId` GUID — jamais de données nominatives dans ce champ |
