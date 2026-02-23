@@ -55,7 +55,7 @@ internal sealed class PermissionChecker(
         }
 
         Guid? tenantId = currentTenant.Id;
-        IReadOnlyList<string> roles = currentUserService.Roles;
+        IReadOnlyList<string> roles = currentUserService.GetRoles();
 
         foreach (string role in roles)
         {

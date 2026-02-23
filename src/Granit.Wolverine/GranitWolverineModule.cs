@@ -1,0 +1,27 @@
+using Granit.Core.Modularity;
+using Granit.MultiTenancy;
+using Granit.Security;
+using Granit.Wolverine.Extensions;
+
+namespace Granit.Wolverine;
+
+/// <summary>
+/// Granit module for Wolverine messaging (provider-agnostic core).
+/// </summary>
+/// <remarks>
+/// This module configures the core Wolverine infrastructure: IDomainEvent local routing
+/// and context behavior registration. It does not configure any persistence or Outbox.
+/// <para>
+/// For durable messaging, add a provider module after this one:
+/// <list type="bullet">
+///   <item><c>GranitWolverinePostgresqlModule</c> — PostgreSQL Outbox (HDS, OVHcloud FR)</item>
+/// </list>
+/// </para>
+/// </remarks>
+[DependsOn(typeof(GranitSecurityModule), typeof(GranitMultiTenancyModule))]
+public sealed class GranitWolverineModule : GranitModule
+{
+    /// <inheritdoc/>
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Builder.AddGranitWolverine();
+}

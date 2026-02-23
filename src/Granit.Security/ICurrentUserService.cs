@@ -18,7 +18,7 @@ public interface ICurrentUserService
     bool IsAuthenticated { get; }
 
     /// <summary>Roles assigned to the user.</summary>
-    IReadOnlyList<string> Roles { get; }
+    IReadOnlyList<string> GetRoles();
 
     /// <summary>Checks whether the user has a given role.</summary>
     bool IsInRole(string role);

@@ -259,7 +259,7 @@ public sealed class PermissionCheckerTests
     {
         ICurrentUserService user = Substitute.For<ICurrentUserService>();
         user.IsAuthenticated.Returns(isAuthenticated);
-        user.Roles.Returns((roles ?? []).ToList().AsReadOnly());
+        user.GetRoles().Returns((roles ?? []).ToList().AsReadOnly());
         user.IsInRole(Arg.Any<string>()).Returns(false);
         foreach (string role in roles ?? [])
         {
