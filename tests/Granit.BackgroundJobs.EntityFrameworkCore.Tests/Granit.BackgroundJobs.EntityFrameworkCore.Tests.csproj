@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Granit.BackgroundJobs.EntityFrameworkCore\Granit.BackgroundJobs.EntityFrameworkCore.csproj" />
+    <!-- Direct reference required for InternalsVisibleTo access to Granit.BackgroundJobs internal types -->
+    <ProjectReference Include="..\..\src\Granit.BackgroundJobs\Granit.BackgroundJobs.csproj" />
   </ItemGroup>
 
 </Project>

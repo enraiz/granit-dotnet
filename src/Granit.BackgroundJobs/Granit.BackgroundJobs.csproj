@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.BackgroundJobs.Tests" />
+    <InternalsVisibleTo Include="Granit.BackgroundJobs.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.BackgroundJobs.EntityFrameworkCore.Tests" />
     <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal interfaces in tests -->
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
