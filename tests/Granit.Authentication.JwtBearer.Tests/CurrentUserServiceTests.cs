@@ -75,7 +75,7 @@ public sealed class CurrentUserServiceTests
             new Claim(ClaimTypes.Role, "practitioner"));
 
         // Act & Assert
-        sut.Roles.Should().BeEquivalentTo(["admin", "practitioner"]);
+        sut.GetRoles().Should().BeEquivalentTo(["admin", "practitioner"]);
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public sealed class CurrentUserServiceTests
         sut.UserName.Should().BeNull();
         sut.Email.Should().BeNull();
         sut.IsAuthenticated.Should().BeFalse();
-        sut.Roles.Should().BeEmpty();
+        sut.GetRoles().Should().BeEmpty();
     }
 
     // --- Helpers ---

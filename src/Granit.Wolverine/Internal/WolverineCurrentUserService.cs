@@ -65,7 +65,7 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
             : HttpUser?.FindFirstValue(ClaimTypes.Email) ?? HttpUser?.FindFirstValue("email");
 
     /// <inheritdoc/>
-    public IReadOnlyList<string> Roles =>
+    public IReadOnlyList<string> GetRoles() =>
         _overrideUserId.Value != null
             ? []
             : (IReadOnlyList<string>)(HttpUser?.FindAll(ClaimTypes.Role)
@@ -74,7 +74,7 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
 
     /// <inheritdoc/>
     public bool IsInRole(string role) =>
-        _overrideUserId.Value != null ? false : HttpUser?.IsInRole(role) ?? false;
+        _overrideUserId.Value == null && (HttpUser?.IsInRole(role) ?? false);
 
     private sealed class UserScope(string? previous) : IDisposable
     {

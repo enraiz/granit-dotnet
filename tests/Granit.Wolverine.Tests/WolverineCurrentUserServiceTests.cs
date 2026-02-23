@@ -134,7 +134,7 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change("user");
 
-        sut.Roles.Should().BeEmpty();
+        sut.GetRoles().Should().BeEmpty();
     }
 
     [Fact]
@@ -255,7 +255,7 @@ public sealed class WolverineCurrentUserServiceTests
             new Claim(ClaimTypes.Role, "admin"),
             new Claim(ClaimTypes.Role, "editor"));
 
-        sut.Roles.Should().BeEquivalentTo(["admin", "editor"]);
+        sut.GetRoles().Should().BeEquivalentTo(["admin", "editor"]);
     }
 
     [Fact]
