@@ -197,10 +197,11 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 | Story | Statut | Description |
 | --- | --- | --- |
 | #127 | ✅ Terminé | `BackgroundJobDefinition` EF Core entity + `BackgroundJobsDbContext` (package `Granit.BackgroundJobs.EntityFrameworkCore`) |
-| #128 | Planifié | `EfBackgroundJobStore` (SQL Server / PostgreSQL) |
-| #129 | Planifié | Migrations EF Core + schéma `granit_background_jobs` |
-| #130 | Planifié | Intégration `GranitWolverinePostgresqlModule` |
-| #136 | Planifié | `CronSchedulerAgent` (`IAgent`) — démarrage cluster-safe |
+| #128 | ✅ Terminé | `EfBackgroundJobStore` (SQL Server / PostgreSQL) + `AddGranitBackgroundJobsEntityFrameworkCore()` |
+| #129 | ✅ Terminé | Migrations EF Core + schéma `granit_background_jobs` |
+| #130 | ✅ Terminé | Intégration `GranitWolverinePostgresqlModule` |
+| #136 | ✅ Terminé | `CronSchedulerAgent` (`SingularAgent`) — démarrage cluster-safe, anti-doublon |
+| #137 | En cours | Étendre `OutgoingContextMiddleware` pour propager `X-Triggered-By` |
 | #134 | Planifié | `DeadLetterCount` via `IMessageStore` |
 | #140–144 | Planifié | `Granit.BackgroundJobs.Endpoints` — API Minimal, policy `BackgroundJobs.Admin` |
 
