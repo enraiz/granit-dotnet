@@ -74,4 +74,4 @@ Briques utilitaires transverses.
 | --- | --- |
 | [timing.md](utilities/timing.md) | IClock, ICurrentTimezoneProvider, FakeTimeProvider |
 | [guids.md](utilities/guids.md) | IGuidGenerator, GUID séquentiels pour index clustered |
-| [localization.md](utilities/localization.md) | Localisation, ressources multilingues |
+| [localization.md](utilities/localization.md) | Localisation, ressources multilingues, endpoint HTTP SPA |
