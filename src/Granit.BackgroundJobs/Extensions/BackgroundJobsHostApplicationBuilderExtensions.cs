@@ -56,17 +56,10 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
             .GetSection(BackgroundJobsOptions.SectionName)
             .Bind(options);
 
-        // Register the appropriate store implementation.
-        if (options.Mode == JobStoreMode.InMemory)
-        {
-            builder.Services.AddSingleton<IBackgroundJobStore, InMemoryBackgroundJobStore>();
-        }
-        else
-        {
-            // EF Core store: Story #128 (Granit.BackgroundJobs — EfBackgroundJobStore).
-            // Registered here when implemented. Fallback to InMemory to avoid build failure.
-            builder.Services.AddSingleton<IBackgroundJobStore, InMemoryBackgroundJobStore>();
-        }
+        // Register InMemory store as the default. When Mode = Durable, the host application
+        // must call AddGranitBackgroundJobsEntityFrameworkCore() (Granit.BackgroundJobs.EntityFrameworkCore)
+        // which replaces this registration with EfBackgroundJobStore.
+        builder.Services.AddSingleton<IBackgroundJobStore, InMemoryBackgroundJobStore>();
 
         builder.Services.AddScoped<IBackgroundJobManager, BackgroundJobManager>();
 
