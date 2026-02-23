@@ -3,9 +3,10 @@
 // =============================================================================
 // Verifies that the AsyncLocal override takes precedence over HttpContext,
 // that Change() creates a restoring scope, and that nested scopes unwind
-// correctly.
+// correctly. Also covers the IHttpContextAccessor HTTP-context fallback path.
 // =============================================================================
 
+using System.Security.Claims;
 using FluentAssertions;
 using Granit.Wolverine.Internal;
 using Microsoft.AspNetCore.Http;
@@ -20,6 +21,17 @@ public sealed class WolverineCurrentUserServiceTests
     {
         IHttpContextAccessor accessor = Substitute.For<IHttpContextAccessor>();
         accessor.HttpContext.Returns((HttpContext?)null);
+        return new WolverineCurrentUserService(accessor);
+    }
+
+    private static WolverineCurrentUserService CreateWithHttpContext(
+        bool isAuthenticated, params Claim[] claims)
+    {
+        ClaimsIdentity identity = new(claims, isAuthenticated ? "test" : null);
+        ClaimsPrincipal principal = new(identity);
+        DefaultHttpContext httpContext = new() { User = principal };
+        IHttpContextAccessor accessor = Substitute.For<IHttpContextAccessor>();
+        accessor.HttpContext.Returns(httpContext);
         return new WolverineCurrentUserService(accessor);
     }
 
@@ -153,5 +165,132 @@ public sealed class WolverineCurrentUserServiceTests
         using IDisposable scope = sut.Change("user");
 
         sut.Email.Should().BeNull();
+    }
+
+    // -------------------------------------------------------------------------
+    // HTTP context fallback path — no AsyncLocal override
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void UserId_WithSubClaim_ReturnsSubValue()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim("sub", "sub-user-123"));
+
+        sut.UserId.Should().Be("sub-user-123");
+    }
+
+    [Fact]
+    public void UserId_WithNameIdentifierClaim_ReturnsNameIdentifier()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim(ClaimTypes.NameIdentifier, "ni-user-456"));
+
+        sut.UserId.Should().Be("ni-user-456");
+    }
+
+    [Fact]
+    public void UserId_WithNoRelevantClaim_ReturnsNull()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim(ClaimTypes.Email, "user@example.com"));
+
+        sut.UserId.Should().BeNull();
+    }
+
+    [Fact]
+    public void IsAuthenticated_WithAuthenticatedHttpContext_ReturnsTrue()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(isAuthenticated: true);
+
+        sut.IsAuthenticated.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsAuthenticated_WithUnauthenticatedHttpContext_ReturnsFalse()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(isAuthenticated: false);
+
+        sut.IsAuthenticated.Should().BeFalse();
+    }
+
+    [Fact]
+    public void UserName_WithHttpContext_ReturnsIdentityName()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim(ClaimTypes.Name, "jean.dupont"));
+
+        sut.UserName.Should().Be("jean.dupont");
+    }
+
+    [Fact]
+    public void Email_WithClaimTypesEmail_ReturnsEmail()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim(ClaimTypes.Email, "user@example.com"));
+
+        sut.Email.Should().Be("user@example.com");
+    }
+
+    [Fact]
+    public void Email_WithEmailClaim_ReturnsEmail()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim("email", "shorthand@example.com"));
+
+        sut.Email.Should().Be("shorthand@example.com");
+    }
+
+    [Fact]
+    public void Roles_WithMultipleRoleClaims_ReturnsAll()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim(ClaimTypes.Role, "admin"),
+            new Claim(ClaimTypes.Role, "editor"));
+
+        sut.Roles.Should().BeEquivalentTo(["admin", "editor"]);
+    }
+
+    [Fact]
+    public void IsInRole_WithMatchingRole_ReturnsTrue()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim(ClaimTypes.Role, "admin"));
+
+        sut.IsInRole("admin").Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsInRole_WithNonMatchingRole_ReturnsFalse()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim(ClaimTypes.Role, "editor"));
+
+        sut.IsInRole("admin").Should().BeFalse();
+    }
+
+    // -------------------------------------------------------------------------
+    // Override takes precedence over HTTP context
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void UserId_WithOverrideAndHttpContext_IgnoresHttpContext()
+    {
+        WolverineCurrentUserService sut = CreateWithHttpContext(
+            isAuthenticated: true,
+            new Claim("sub", "http-user"));
+
+        using IDisposable scope = sut.Change("override-user");
+
+        sut.UserId.Should().Be("override-user");
     }
 }
