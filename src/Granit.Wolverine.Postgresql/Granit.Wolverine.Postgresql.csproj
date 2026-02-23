@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Wolverine.Postgresql</PackageId>
+    <Description>Intégration Wolverine + PostgreSQL pour Granit : Outbox durable, transport PostgreSQL et
+    intégration EF Core. Conçu pour OVHcloud FR (souveraineté HDS, RGPD).</Description>
+    <IsPackable>true</IsPackable>
+    <!--
+      NU1608: WolverineFx.EntityFrameworkCore 5.x depends on EF Core Design 10.0.0 which pulls
+      Microsoft.CodeAnalysis.Workspaces.MSBuild 4.14.0 (exact constraint on Common=4.14.0),
+      while EF Core 10.0.3 pulls Workspaces.Common 5.0.0 via design 10.0.3.
+      This is a known transitive conflict with no runtime impact — suppress until
+      WolverineFx updates its EF Core Design dependency.
+    -->
+    <NoWarn>$(NoWarn);NU1608</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Wolverine.Postgresql.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WolverineFx.Postgresql" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Wolverine\Granit.Wolverine.csproj" />
+    <ProjectReference Include="..\Granit.Persistence\Granit.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
