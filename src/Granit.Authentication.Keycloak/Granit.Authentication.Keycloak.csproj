@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Authentication.Keycloak</PackageId>
+    <Description>Extension Keycloak pour Granit.Authentication.JwtBearer : transformation des claims realm_access/resource_access, policy Admin, configuration JWT Bearer depuis la section "Keycloak".</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <!-- ASP.NET Core shared framework (IClaimsTransformation, JwtBearerOptions, etc.) -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Authentication.JwtBearer\Granit.Authentication.JwtBearer.csproj" />
+  </ItemGroup>
+
+</Project>

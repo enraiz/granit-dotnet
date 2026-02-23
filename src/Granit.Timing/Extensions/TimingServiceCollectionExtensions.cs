@@ -1,0 +1,35 @@
+using Granit.Timing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
+namespace Granit.Timing.Extensions;
+
+/// <summary>
+/// Extensions for registering Timing module services.
+/// </summary>
+public static class TimingServiceCollectionExtensions
+{
+    /// <summary>
+    /// Adds Timing module services (IClock, ICurrentTimezoneProvider, TimeProvider).
+    /// </summary>
+    public static IServiceCollection AddGranitTiming(
+        this IServiceCollection services,
+        Action<ClockOptions>? configure = null)
+    {
+        // TimeProvider.System is the standard .NET provider (thread-safe, stateless)
+        services.TryAddSingleton(TimeProvider.System);
+
+        // Singleton + AsyncLocal: the runtime isolates the value per async context
+        services.TryAddSingleton<ICurrentTimezoneProvider, CurrentTimezoneProvider>();
+
+        // Singleton because Clock is stateless (TimeProvider.System is thread-safe)
+        services.TryAddSingleton<IClock, Clock>();
+
+        if (configure is not null)
+        {
+            services.Configure(configure);
+        }
+
+        return services;
+    }
+}
