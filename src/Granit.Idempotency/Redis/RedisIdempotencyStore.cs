@@ -64,12 +64,8 @@ internal sealed class RedisIdempotencyStore(
     // Serialization helpers
     // -------------------------------------------------------------------------
 
-    private RedisValue Serialize(IdempotencyEntry entry)
-    {
-        byte[] json = JsonSerializer.SerializeToUtf8Bytes(entry, IdempotencyJsonContext.Default.IdempotencyEntry);
-        byte[] encrypted = _encryptor.Encrypt(json);
-        return encrypted;
-    }
+    private RedisValue Serialize(IdempotencyEntry entry) =>
+        _encryptor.Encrypt(JsonSerializer.SerializeToUtf8Bytes(entry, IdempotencyJsonContext.Default.IdempotencyEntry));
 
     private IdempotencyEntry? Deserialize(RedisValue raw)
     {
