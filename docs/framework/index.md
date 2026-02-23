@@ -1,6 +1,6 @@
 # Granit — Documentation framework
 
-Cette documentation est organisée en six sections thématiques.
+Cette documentation est organisée en sept sections thématiques.
 
 ## Core
 
@@ -65,7 +65,14 @@ Messagerie asynchrone et outbox transactionnelle.
 | Document | Description |
 | --- | --- |
 | [wolverine.md](messaging/wolverine.md) | WolverineFx, Outbox PostgreSQL, propagation de contexte HDS |
-| [background-jobs.md](messaging/background-jobs.md) | Jobs récurrents cron via Outbox Wolverine, `IBackgroundJobManager`, anti-doublon |
+
+## Scheduling
+
+Planification et exécution des tâches de fond récurrentes.
+
+| Document | Description |
+| --- | --- |
+| [background-jobs.md](scheduling/background-jobs.md) | Jobs récurrents cron via Outbox Wolverine, `IBackgroundJobManager`, anti-doublon |
 
 ## Utilities
 
