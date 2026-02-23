@@ -1,4 +1,8 @@
+using Granit.Security;
+using Granit.Wolverine.Behaviors;
 using Granit.Wolverine.Internal;
+using Granit.Wolverine.Middleware;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +25,9 @@ public static class WolverineHostApplicationBuilderExtensions
     /// <list type="bullet">
     ///   <item>Local routing for <see cref="Granit.Core.Events.IDomainEvent"/> — never routed to external transports.</item>
     ///   <item>Retry policy from <see cref="WolverineMessagingOptions"/> (default: 5 s / 30 s / 5 min).</item>
+    ///   <item><see cref="OutgoingContextMiddleware"/> — injects <c>X-Tenant-Id</c> / <c>X-User-Id</c> into outgoing envelopes.</item>
+    ///   <item><see cref="TenantContextBehavior"/> — restores <c>ICurrentTenant</c> in background handlers.</item>
+    ///   <item><see cref="UserContextBehavior"/> — restores <c>ICurrentUserService</c> in background handlers.</item>
     ///   <item>No Outbox — add a provider module (e.g., <c>AddGranitWolverineWithPostgresql()</c>).</item>
     /// </list>
     /// </remarks>
@@ -46,6 +53,16 @@ public static class WolverineHostApplicationBuilderExtensions
             .GetSection(WolverineMessagingOptions.SectionName)
             .Bind(messagingOptions);
 
+        // WolverineCurrentUserService: AsyncLocal override + IHttpContextAccessor fallback.
+        // Registered as the ICurrentUserService for Wolverine — restores user identity in
+        // background handlers so EF Core audit interceptors record the correct ModifiedBy.
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<WolverineCurrentUserService>();
+        builder.Services.AddScoped<ICurrentUserService>(
+            sp => sp.GetRequiredService<WolverineCurrentUserService>());
+        builder.Services.AddScoped<IWolverineUserContextSetter>(
+            sp => sp.GetRequiredService<WolverineCurrentUserService>());
+
         builder.UseWolverine(opts =>
         {
             // IDomainEvent — force local routing, never forward to external transports.
@@ -59,6 +76,11 @@ public static class WolverineHostApplicationBuilderExtensions
                 .ToArray();
 
             opts.OnAnyException().RetryWithCooldown(delays);
+
+            // Context propagation middlewares — applied to all handler chains.
+            opts.Policies.AddMiddleware<OutgoingContextMiddleware>();
+            opts.Policies.AddMiddleware<TenantContextBehavior>();
+            opts.Policies.AddMiddleware<UserContextBehavior>();
 
             configure?.Invoke(opts);
         });
