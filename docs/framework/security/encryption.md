@@ -1,20 +1,20 @@
 # Encryption
 
-`DigitalDynamics.Foundation.Encryption` fournit un service de chiffrement/déchiffrement
+`Granit.Encryption` fournit un service de chiffrement/déchiffrement
 de chaînes avec provider AES-256-CBC par défaut et support optionnel du Transit Engine
 de HashiCorp Vault pour les opérations haute sécurité.
 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Encryption
+dotnet add package Granit.Encryption
 ```
 
 ## Configuration rapide
 
 ```csharp
-[DependsOn(typeof(FoundationEncryptionModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitEncryptionModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ## appsettings.json
@@ -29,14 +29,14 @@ public sealed class AppModule : FoundationModule { }
 ```
 
 > **Sécurité** : `PassPhrase` ne doit **jamais** être stockée en clair dans la config.
-> Utiliser `Foundation.Vault` comme fournisseur de configuration (voir [vault.md](vault.md)).
+> Utiliser `Granit.Vault` comme fournisseur de configuration (voir [vault.md](vault.md)).
 
 ## Providers disponibles
 
 | Provider | `ProviderName` | Latence | Quand l'utiliser |
 | --- | --- | --- | --- |
 | `AesStringEncryptionProvider` | `"Aes"` | < 1 ms | Settings, cache, opérations fréquentes |
-| `VaultStringEncryptionProvider` | `"Vault"` | 10-20 ms | Opérations rares, haute sécurité (enregistré par `Foundation.Vault`) |
+| `VaultStringEncryptionProvider` | `"Vault"` | 10-20 ms | Opérations rares, haute sécurité (enregistré par `Granit.Vault`) |
 
 ## Utilisation
 
@@ -88,7 +88,7 @@ clé.
 ## Architecture
 
 ```text
-src/DigitalDynamics.Foundation.Encryption/
+src/Granit.Encryption/
 ├── IStringEncryptionService.cs            (interface publique principale)
 ├── IStringEncryptionProvider.cs           (interface provider)
 ├── StringEncryptionOptions.cs             (options : PassPhrase, KeySize, ProviderName)
@@ -96,7 +96,7 @@ src/DigitalDynamics.Foundation.Encryption/
 │   └── AesStringEncryptionProvider.cs     (AES-256-CBC + PBKDF2, IV aléatoire)
 ├── Services/
 │   └── DefaultStringEncryptionService.cs  (délègue au provider actif)
-├── FoundationEncryptionModule.cs
+├── GranitEncryptionModule.cs
 └── Extensions/
     └── EncryptionServiceCollectionExtensions.cs
 ```
@@ -108,10 +108,10 @@ src/DigitalDynamics.Foundation.Encryption/
 | `IStringEncryptionService` | `DefaultStringEncryptionService` | Singleton |
 | `IStringEncryptionProvider` | `AesStringEncryptionProvider` | Singleton |
 
-`Foundation.Vault` enregistre `VaultStringEncryptionProvider` en tant que
+`Granit.Vault` enregistre `VaultStringEncryptionProvider` en tant que
 `IStringEncryptionProvider` supplémentaire lors de son chargement.
 
-## Intégration avec Foundation.Settings
+## Intégration avec Granit.Settings
 
 Les paramètres déclarés avec `IsEncrypted = true` utilisent automatiquement
 `IStringEncryptionService` à la couche `ISettingStore` (chiffrement au repos).

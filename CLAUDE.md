@@ -1,9 +1,9 @@
-# CLAUDE.md - DigitalDynamics.Foundation
+# CLAUDE.md - Granit
 
 ## Project
 
 - **Type**: Shared NuGet packages for Digital Dynamics .NET applications
-- **Repo**: `dd-foundation-dotnet` (company-level, not product-specific)
+- **Repo**: `granit-dotnet` (company-level, not product-specific)
 - **Cloud**: OVHcloud (Roubaix, FR) — European sovereignty
 - **Compliance**: HDS + RGPD | Criticality: HIGH
 - **Publication**: GitLab Package Registry (NuGet)
@@ -16,13 +16,13 @@
 
 | Package | Role |
 | ------- | ---- |
-| `DigitalDynamics.Foundation.Core` | Module system (ABP-inspired), shared domain types |
-| `DigitalDynamics.Foundation.Timing` | IClock, ICurrentTimezoneProvider, TimeProvider |
-| `DigitalDynamics.Foundation.Guids` | IGuidGenerator, sequential GUIDs for clustered indexes |
-| `DigitalDynamics.Foundation.Security` | JWT Keycloak, ICurrentUserService, authorization policies |
-| `DigitalDynamics.Foundation.Persistence` | EF Core interceptors (HDS audit, RGPD soft delete) |
-| `DigitalDynamics.Foundation.Vault` | VaultSharp client, ITransitEncryptionService, dynamic credentials |
-| `DigitalDynamics.Foundation.Observability` | Serilog + OpenTelemetry → OTLP → Loki/Tempo/Mimir |
+| `Granit.Core` | Module system (ABP-inspired), shared domain types |
+| `Granit.Timing` | IClock, ICurrentTimezoneProvider, TimeProvider |
+| `Granit.Guids` | IGuidGenerator, sequential GUIDs for clustered indexes |
+| `Granit.Security` | JWT Keycloak, ICurrentUserService, authorization policies |
+| `Granit.Persistence` | EF Core interceptors (HDS audit, RGPD soft delete) |
+| `Granit.Vault` | VaultSharp client, ITransitEncryptionService, dynamic credentials |
+| `Granit.Observability` | Serilog + OpenTelemetry → OTLP → Loki/Tempo/Mimir |
 
 ## Commands
 
@@ -66,9 +66,9 @@ in all French content (docs, issues, commits). Never in code.
 
 **Projects**: one project = one NuGet package, namespace = project name, zero circular references
 
-**Core**: `DigitalDynamics.Foundation.Core` provides the module system and domain types.
+**Core**: `Granit.Core` provides the module system and domain types.
 Each module is self-contained (interface + implementation in the same package).
-All Foundation packages reference Core.
+All Granit packages reference Core.
 
 **Tests**: each package has a test project (`*.Tests`). xUnit + FluentAssertions +
 NSubstitute + Bogus. Tests are part of the DoD for every story.

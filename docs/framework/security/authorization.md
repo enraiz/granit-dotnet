@@ -1,19 +1,19 @@
 # Authorization — RBAC et gestion des permissions
 
-Deux packages constituent la couche d'autorisation de Foundation.
+Deux packages constituent la couche d'autorisation de Granit.
 
 ```text
-Foundation.Authorization
+Granit.Authorization
   ├── Abstractions : IPermissionDefinitionProvider, IPermissionChecker
   ├── Services : PermissionDefinitionManager (Singleton), PermissionChecker (Scoped)
   ├── ASP.NET Core : DynamicPermissionPolicyProvider, PermissionAuthorizationHandler
   └── DependsOn : Core, Security, MultiTenancy, Caching
 
-Foundation.Authorization.EntityFrameworkCore
+Granit.Authorization.EntityFrameworkCore
   ├── Entité : PermissionGrant (AuditedEntity + IMultiTenant)
   ├── Store : EfCorePermissionGrantStore
   ├── Manager : PermissionManager (cache + audit HDS)
-  └── DependsOn : Foundation.Authorization, Persistence
+  └── DependsOn : Granit.Authorization, Persistence
 ```
 
 ## Principes fondamentaux
@@ -32,15 +32,15 @@ Si un utilisateur a besoin d'un droit spécifique, la bonne pratique est de cré
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Authorization
-dotnet add package DigitalDynamics.Foundation.Authorization.EntityFrameworkCore
+dotnet add package Granit.Authorization
+dotnet add package Granit.Authorization.EntityFrameworkCore
 ```
 
 ---
 
 ## Configuration
 
-### Foundation.Authorization
+### Granit.Authorization
 
 ```json
 {
@@ -58,7 +58,7 @@ dotnet add package DigitalDynamics.Foundation.Authorization.EntityFrameworkCore
 | `CacheDuration` | `TimeSpan` | `00:05:00` | Durée du cache par `(TenantId, RoleName, PermissionName)`. |
 | `AlwaysAllow` | `bool` | `false` | Dev/test uniquement : accorde toutes les permissions sans DB. |
 
-### Foundation.Authorization.EntityFrameworkCore
+### Granit.Authorization.EntityFrameworkCore
 
 Le DbContext de l'application hôte doit implémenter `IPermissionGrantDbContext` :
 
@@ -81,14 +81,14 @@ public class AppDbContext : DbContext, IPermissionGrantDbContext
 
 ```csharp
 [DependsOn(
-    typeof(FoundationAuthorizationEntityFrameworkCoreModule),
+    typeof(GranitAuthorizationEntityFrameworkCoreModule),
     // ... autres modules
 )]
-public sealed class AppModule : FoundationModule
+public sealed class AppModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddFoundationAuthorizationEntityFrameworkCore<AppDbContext>();
+        context.Services.AddGranitAuthorizationEntityFrameworkCore<AppDbContext>();
 
         // Enregistrer les providers de permissions
         context.Services.AddSingleton<IPermissionDefinitionProvider, InvoicesPermissionProvider>();

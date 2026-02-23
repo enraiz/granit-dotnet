@@ -1,5 +1,5 @@
 # =============================================================================
-# GitLab CI/CD - DigitalDynamics.Foundation
+# GitLab CI/CD - Granit
 # =============================================================================
 # Pipeline : quality -> security -> analysis -> pack -> publish
 #
@@ -152,8 +152,8 @@ sonarqube:
     - export PATH="$PATH:$HOME/.dotnet/tools"
     - >
       dotnet sonarscanner begin
-      /k:"DD-Foundation"
-      /n:"DD Foundation"
+      /k:"Granit"
+      /n:"Granit"
       /v:"${CI_COMMIT_REF_NAME}"
       /d:sonar.host.url="${SONAR_HOST_URL}"
       /d:sonar.token="${SONAR_TOKEN}"

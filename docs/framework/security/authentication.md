@@ -1,39 +1,39 @@
 # Authentication & Security
 
-Trois packages constituent la couche d'authentification de Foundation,
+Trois packages constituent la couche d'authentification de Granit,
 suivant le pattern ABP Framework : abstractions / implémentation générique / extension IDP.
 
 ```text
-Foundation.Core
+Granit.Core
       ↑
-Foundation.Security                   ← ICurrentUserService (interface seule)
+Granit.Security                   ← ICurrentUserService (interface seule)
       ↑
-Foundation.Authentication.JwtBearer   ← JWT Bearer générique, CurrentUserService,
+Granit.Authentication.JwtBearer   ← JWT Bearer générique, CurrentUserService,
       ↑                                  policy "Authenticated"
-Foundation.Authentication.Keycloak    ← Claims Keycloak, PostConfigure JWT Bearer,
+Granit.Authentication.Keycloak    ← Claims Keycloak, PostConfigure JWT Bearer,
                                          policy "Admin"
       (futur)
-Foundation.Authentication.Auth0       ← [DependsOn(JwtBearer)]
+Granit.Authentication.Auth0       ← [DependsOn(JwtBearer)]
 ```
 
 ## Packages
 
 | Package | Rôle | Module |
 | --- | --- | --- |
-| `Foundation.Security` | `ICurrentUserService` (abstraction) | `FoundationSecurityModule` |
-| `Foundation.Authentication.JwtBearer` | JWT Bearer générique, `CurrentUserService` | `FoundationJwtBearerModule` |
-| `Foundation.Authentication.Keycloak` | Claims Keycloak, policy `Admin` | `FoundationAuthenticationKeycloakModule` |
+| `Granit.Security` | `ICurrentUserService` (abstraction) | `GranitSecurityModule` |
+| `Granit.Authentication.JwtBearer` | JWT Bearer générique, `CurrentUserService` | `GranitJwtBearerModule` |
+| `Granit.Authentication.Keycloak` | Claims Keycloak, policy `Admin` | `GranitAuthenticationKeycloakModule` |
 
 ---
 
-## Foundation.Security
+## Granit.Security
 
 Package d'abstractions pures. Ne contient aucune dépendance sur ASP.NET Core.
 
 ### Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Security
+dotnet add package Granit.Security
 ```
 
 ### ICurrentUserService
@@ -51,7 +51,7 @@ public interface ICurrentUserService
 ```
 
 Utilisable dans n'importe quel module applicatif via injection de dépendances.
-L'implémentation (`CurrentUserService`) est fournie par `Foundation.Authentication.JwtBearer`.
+L'implémentation (`CurrentUserService`) est fournie par `Granit.Authentication.JwtBearer`.
 
 ```csharp
 // Dans un handler Wolverine (method injection)
@@ -67,14 +67,14 @@ public static async Task Handle(
 
 ---
 
-## Foundation.Authentication.JwtBearer
+## Granit.Authentication.JwtBearer
 
 Implémentation JWT Bearer générique (OIDC-compatible). Ne connaît aucun IDP spécifique.
 
 ### Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Authentication.JwtBearer
+dotnet add package Granit.Authentication.JwtBearer
 ```
 
 ### Configuration
@@ -93,21 +93,21 @@ dotnet add package DigitalDynamics.Foundation.Authentication.JwtBearer
 > `NameClaimType` définit quel claim alimente `User.Identity.Name` (et donc
 > `ICurrentUserService.UserName`). La valeur par défaut `"sub"` est conforme RFC 7519
 > (toujours présente dans un JWT valide). Keycloak la surcharge à `"preferred_username"`
-> via `PostConfigure` dans `Foundation.Authentication.Keycloak`.
+> via `PostConfigure` dans `Granit.Authentication.Keycloak`.
 
 ### Program.cs
 
 Via le système de modules (recommandé) :
 
 ```csharp
-[DependsOn(typeof(FoundationJwtBearerModule))]
-public sealed class MyAppModule : FoundationModule { ... }
+[DependsOn(typeof(GranitJwtBearerModule))]
+public sealed class MyAppModule : GranitModule { ... }
 ```
 
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddFoundationJwtBearer(builder.Configuration);
+builder.Services.AddGranitJwtBearer(builder.Configuration);
 ```
 
 ### JwtBearerAuthOptions
@@ -139,18 +139,18 @@ public sealed class JwtBearerAuthOptions
 
 ---
 
-## Foundation.Authentication.Keycloak
+## Granit.Authentication.Keycloak
 
-Extension Keycloak pour `Foundation.Authentication.JwtBearer`.
-Dépend transitivement de `Foundation.Security` et `Foundation.Authentication.JwtBearer`.
+Extension Keycloak pour `Granit.Authentication.JwtBearer`.
+Dépend transitivement de `Granit.Security` et `Granit.Authentication.JwtBearer`.
 
 ### Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Authentication.Keycloak
+dotnet add package Granit.Authentication.Keycloak
 ```
 
-Un seul package suffit — `Foundation.Security` et `Foundation.Authentication.JwtBearer`
+Un seul package suffit — `Granit.Security` et `Granit.Authentication.JwtBearer`
 sont amenés transitivement.
 
 ### Configuration
@@ -177,17 +177,17 @@ applique les valeurs Keycloak après l'initialisation du JWT Bearer.
 Via le système de modules (recommandé) :
 
 ```csharp
-[DependsOn(typeof(FoundationAuthenticationKeycloakModule))]
-public sealed class MyAppModule : FoundationModule { ... }
-// FoundationAuthenticationKeycloakModule amène automatiquement :
-// → FoundationJwtBearerModule → FoundationSecurityModule
+[DependsOn(typeof(GranitAuthenticationKeycloakModule))]
+public sealed class MyAppModule : GranitModule { ... }
+// GranitAuthenticationKeycloakModule amène automatiquement :
+// → GranitJwtBearerModule → GranitSecurityModule
 ```
 
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddFoundationJwtBearer(builder.Configuration);
-builder.Services.AddFoundationKeycloak(builder.Configuration);
+builder.Services.AddGranitJwtBearer(builder.Configuration);
+builder.Services.AddGranitKeycloak(builder.Configuration);
 ```
 
 ### KeycloakOptions
@@ -243,27 +243,27 @@ standard .NET, permettant `[Authorize(Roles = "admin")]` et `User.IsInRole("admi
 | `Admin` | Rôle configuré dans `KeycloakOptions.AdminRole` (défaut : `admin`) |
 
 > Les policies métier (`FhirAccess`, `PractitionerOnly`…) sont à définir dans
-> l'application, pas dans Foundation.
+> l'application, pas dans Granit.
 
 ---
 
 ## Architecture des fichiers
 
 ```text
-Foundation.Security
+Granit.Security
 └── ICurrentUserService.cs
 
-Foundation.Authentication.JwtBearer
+Granit.Authentication.JwtBearer
 ├── Options/JwtBearerAuthOptions.cs
 ├── Authentication/CurrentUserService.cs
-├── Extensions/JwtBearerServiceCollectionExtensions.cs   (AddFoundationJwtBearer)
-└── FoundationJwtBearerModule.cs                         [DependsOn(Security)]
+├── Extensions/JwtBearerServiceCollectionExtensions.cs   (AddGranitJwtBearer)
+└── GranitJwtBearerModule.cs                         [DependsOn(Security)]
 
-Foundation.Authentication.Keycloak
+Granit.Authentication.Keycloak
 ├── Options/KeycloakOptions.cs
 ├── Authentication/KeycloakClaimsTransformation.cs
-├── Extensions/KeycloakServiceCollectionExtensions.cs    (AddFoundationKeycloak)
-└── FoundationAuthenticationKeycloakModule.cs            [DependsOn(JwtBearer)]
+├── Extensions/KeycloakServiceCollectionExtensions.cs    (AddGranitKeycloak)
+└── GranitAuthenticationKeycloakModule.cs            [DependsOn(JwtBearer)]
 ```
 
 ## Validation du token
@@ -277,20 +277,20 @@ La configuration JWT Bearer valide :
 
 ## Ajouter un nouveau provider (ex. Auth0)
 
-Créer `Foundation.Authentication.Auth0` en dépendant uniquement de
-`Foundation.Authentication.JwtBearer` :
+Créer `Granit.Authentication.Auth0` en dépendant uniquement de
+`Granit.Authentication.JwtBearer` :
 
 ```xml
-<ProjectReference Include="..\DigitalDynamics.Foundation.Authentication.JwtBearer\..." />
+<ProjectReference Include="..\Granit.Authentication.JwtBearer\..." />
 ```
 
 ```csharp
-[DependsOn(typeof(FoundationJwtBearerModule))]
-public sealed class FoundationAuthenticationAuth0Module : FoundationModule
+[DependsOn(typeof(GranitJwtBearerModule))]
+public sealed class GranitAuthenticationAuth0Module : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddFoundationAuth0(context.Configuration);
+        context.Services.AddGranitAuth0(context.Configuration);
 }
 ```
 
-`Foundation.Security` et `Foundation.Authentication.Keycloak` ne sont pas impactés.
+`Granit.Security` et `Granit.Authentication.Keycloak` ne sont pas impactés.

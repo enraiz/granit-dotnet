@@ -1,6 +1,6 @@
 # Génération de GUID
 
-`DigitalDynamics.Foundation.Guids` fournit une abstraction pour la génération de GUID,
+`Granit.Guids` fournit une abstraction pour la génération de GUID,
 avec support des GUID séquentiels optimisés pour les index clustered des bases de données.
 
 Inspiré du module [`Volo.Abp.Guids`](https://abp.io/docs/latest/framework/infrastructure/guid-generation)
@@ -9,7 +9,7 @@ d'ABP Framework.
 ## Pourquoi utiliser des GUID comme clés primaires ?
 
 Le GUID est le type de clé primaire par défaut pour les modules Digital Dynamics
-Foundation. Ce choix repose sur plusieurs avantages :
+Granit. Ce choix repose sur plusieurs avantages :
 
 - **Compatibilité universelle** : utilisable avec tous les fournisseurs de bases de
   données (PostgreSQL, SQL Server, Oracle, MySQL)
@@ -46,46 +46,46 @@ dans l'index.
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Guids
+dotnet add package Granit.Guids
 ```
 
 ## Configuration
 
 ### Avec le système de modules (recommandé)
 
-Le module `FoundationGuidsModule` est automatiquement chargé via `[DependsOn]` quand
+Le module `GranitGuidsModule` est automatiquement chargé via `[DependsOn]` quand
 un module dépendant (ex : Persistence) en a besoin. Il suffit d'utiliser
-`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
+`AddGranit<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
 
 ### Enregistrement direct
 
 Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
-builder.Services.AddFoundationGuids();
+builder.Services.AddGranitGuids();
 ```
 
 Par défaut, le générateur utilise `SequentialGuidType.SequentialAsString` (optimisé
 pour PostgreSQL). Pour changer le type :
 
 ```csharp
-builder.Services.AddFoundationGuids(options =>
+builder.Services.AddGranitGuids(options =>
 {
     options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd; // SQL Server
 });
 ```
 
-> Le package `DigitalDynamics.Foundation.Persistence` configure automatiquement le type
+> Le package `Granit.Persistence` configure automatiquement le type
 > séquentiel adapté au fournisseur de base de données utilisé. Dans la plupart des cas,
 > il n'est pas nécessaire de définir cette option manuellement si le package Persistence
 > est utilisé.
 
 ## IGuidGenerator
 
-Interface définie dans le package `DigitalDynamics.Foundation.Guids` :
+Interface définie dans le package `Granit.Guids` :
 
 ```csharp
-namespace DigitalDynamics.Foundation.Guids;
+namespace Granit.Guids;
 
 public interface IGuidGenerator
 {
@@ -121,7 +121,7 @@ public enum SequentialGuidType
 
 ## SequentialGuidGenerator
 
-Implémentation par défaut enregistrée par `AddFoundationGuids()`. Génère des GUID
+Implémentation par défaut enregistrée par `AddGranitGuids()`. Génère des GUID
 séquentiels en combinant un timestamp milliseconde et des octets aléatoires
 cryptographiquement sûrs.
 
@@ -304,15 +304,15 @@ if (entry.Entity is Entity entity)
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Guids
+Granit.Guids
 ├── IGuidGenerator.cs                 (interface, contrat public)
 ├── SequentialGuidGenerator.cs
 ├── SimpleGuidGenerator.cs
 ├── SequentialGuidType.cs
 ├── GuidGeneratorOptions.cs
-├── FoundationGuidsModule.cs          (module Foundation)
+├── GranitGuidsModule.cs          (module Granit)
 └── Extensions/
-    └── GuidsServiceCollectionExtensions.cs  (AddFoundationGuids)
+    └── GuidsServiceCollectionExtensions.cs  (AddGranitGuids)
 ```
 
 ## Services enregistrés

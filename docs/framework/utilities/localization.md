@@ -1,6 +1,6 @@
 # Localization
 
-`DigitalDynamics.Foundation.Localization` fournit un système de localisation JSON modulaire. Il s'intègre avec `IStringLocalizer<T>` de
+`Granit.Localization` fournit un système de localisation JSON modulaire. Il s'intègre avec `IStringLocalizer<T>` de
 `Microsoft.Extensions.Localization` et ajoute : ressources embarquées par assembly,
 héritage inter-modules, culture fallback natif via `CultureInfo.Parent`, et cache
 thread-safe.
@@ -24,29 +24,29 @@ pas aux packages NuGet. Ce module apporte :
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Localization
+dotnet add package Granit.Localization
 ```
 
 ## Configuration
 
 ### Avec le système de modules (recommandé)
 
-Ajouter `[DependsOn(typeof(FoundationLocalizationModule))]` sur le module applicatif :
+Ajouter `[DependsOn(typeof(GranitLocalizationModule))]` sur le module applicatif :
 
 ```csharp
-[DependsOn(typeof(FoundationLocalizationModule))]
-public sealed class MyAppModule : FoundationModule
+[DependsOn(typeof(GranitLocalizationModule))]
+public sealed class MyAppModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.Configure<FoundationLocalizationOptions>(options =>
+        context.Services.Configure<GranitLocalizationOptions>(options =>
         {
             options.Resources
                 .Add<MyAppResource>(defaultCulture: "fr")
                 .AddJson(
                     typeof(MyAppModule).Assembly,
                     "MyApp.Localization.MyApp")
-                .AddBaseTypes(typeof(FoundationLocalizationResource));
+                .AddBaseTypes(typeof(GranitLocalizationResource));
 
             options.DefaultResourceType = typeof(MyAppResource);
             options.Languages.Add(new LanguageInfo("fr", "Français"));
@@ -61,12 +61,12 @@ public sealed class MyAppModule : FoundationModule
 Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
-builder.Services.AddFoundationLocalization(options =>
+builder.Services.AddGranitLocalization(options =>
 {
     options.Resources
         .Add<MyAppResource>(defaultCulture: "fr")
         .AddJson(typeof(Program).Assembly, "MyApp.Localization.MyApp")
-        .AddBaseTypes(typeof(FoundationLocalizationResource));
+        .AddBaseTypes(typeof(GranitLocalizationResource));
 });
 ```
 
@@ -137,7 +137,7 @@ embarqués (les `/` deviennent des `.`) : `"MyApp.Localization.MyApp"`.
 Chaque ressource est représentée par une classe vide annotée avec des attributs :
 
 ```csharp
-using DigitalDynamics.Foundation.Localization.Attributes;
+using Granit.Localization.Attributes;
 
 [LocalizationResourceName("MyApp")]
 public sealed class MyAppResource;
@@ -149,7 +149,7 @@ L'attribut `[InheritResource]` déclare un héritage statique (connu à la compi
 
 ```csharp
 [LocalizationResourceName("MyApp")]
-[InheritResource(typeof(FoundationLocalizationResource))]
+[InheritResource(typeof(GranitLocalizationResource))]
 public sealed class MyAppResource;
 ```
 
@@ -164,7 +164,7 @@ L'API fluent `AddBaseTypes()` permet un héritage dynamique (défini à l'enregi
 options.Resources
     .Add<MyAppResource>(defaultCulture: "fr")
     .AddJson(assembly, "MyApp.Localization.MyApp")
-    .AddBaseTypes(typeof(FoundationLocalizationResource));
+    .AddBaseTypes(typeof(GranitLocalizationResource));
 ```
 
 Les deux mécanismes peuvent être combinés. Les clés sont résolues dans cet ordre :
@@ -284,10 +284,10 @@ public string GetExpiredMessage()
     => _localizer["Lease:Expired"];
 ```
 
-## FoundationLocalizationOptions
+## GranitLocalizationOptions
 
 ```csharp
-public sealed class FoundationLocalizationOptions
+public sealed class GranitLocalizationOptions
 {
     public LocalizationResourceStore Resources { get; }
     public Type? DefaultResourceType { get; set; }
@@ -334,26 +334,26 @@ public sealed class LanguageInfo
 
 Utilisé pour peupler un sélecteur de langue en interface utilisateur.
 
-## Ressource Foundation intégrée
+## Ressource Granit intégrée
 
-`FoundationLocalizationResource` est la ressource de base fournie par ce package.
+`GranitLocalizationResource` est la ressource de base fournie par ce package.
 Elle contient les messages d'erreur communs à tous les modules :
 
 | Clé | FR | EN |
 | --- | --- | --- |
-| `Foundation:EntityNotFound` | L'entité de type {0} avec l'identifiant {1} n'a pas été trouvée. | Entity of type {0} with identifier {1} was not found. |
-| `Foundation:ValidationError` | Erreur de validation. | Validation error. |
-| `Foundation:Unauthorized` | Accès non autorisé. | Unauthorized access. |
-| `Foundation:Forbidden` | Accès interdit. | Forbidden. |
-| `Foundation:InternalError` | Une erreur interne est survenue. | An internal error occurred. |
+| `Granit:EntityNotFound` | L'entité de type {0} avec l'identifiant {1} n'a pas été trouvée. | Entity of type {0} with identifier {1} was not found. |
+| `Granit:ValidationError` | Erreur de validation. | Validation error. |
+| `Granit:Unauthorized` | Accès non autorisé. | Unauthorized access. |
+| `Granit:Forbidden` | Accès interdit. | Forbidden. |
+| `Granit:InternalError` | Une erreur interne est survenue. | An internal error occurred. |
 
-Les modules applicatifs peuvent hériter de `FoundationLocalizationResource` pour
+Les modules applicatifs peuvent hériter de `GranitLocalizationResource` pour
 réutiliser ces messages sans les redéfinir.
 
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Localization
+Granit.Localization
 ├── Attributes/
 │   ├── LocalizationResourceNameAttribute.cs   (nom court de la ressource)
 │   └── InheritResourceAttribute.cs            (héritage statique par attribut)
@@ -362,16 +362,16 @@ DigitalDynamics.Foundation.Localization
 │   ├── JsonStringLocalizer.cs                 (IStringLocalizer avec cache Lazy<T>)
 │   └── JsonStringLocalizerFactory.cs          (IStringLocalizerFactory, cache par type)
 ├── Extensions/
-│   └── LocalizationServiceCollectionExtensions.cs  (AddFoundationLocalization)
+│   └── LocalizationServiceCollectionExtensions.cs  (AddGranitLocalization)
 ├── EmbeddedJsonSource.cs                      (Assembly + préfixe de ressource)
-├── FoundationLocalizationModule.cs            (module Foundation)
-├── FoundationLocalizationOptions.cs           (options de configuration)
-├── FoundationLocalizationResource.cs          (marker — ressource de base)
+├── GranitLocalizationModule.cs            (module Granit)
+├── GranitLocalizationOptions.cs           (options de configuration)
+├── GranitLocalizationResource.cs          (marker — ressource de base)
 ├── LanguageInfo.cs                            (info langue pour UI)
 ├── LocalizationResourceInfo.cs               (info ressource + API fluent)
 ├── LocalizationResourceStore.cs              (registre des ressources)
 └── Localization/
-    └── Foundation/
+    └── Granit/
         ├── fr.json
         └── en.json
 ```
@@ -394,7 +394,7 @@ Tous les enregistrements utilisent `TryAdd*` pour permettre le remplacement dans
 public void GivenFrenchCulture_WhenLocalizing_ThenReturnsFrenchTranslation()
 {
     ServiceCollection services = new();
-    services.AddFoundationLocalization(options =>
+    services.AddGranitLocalization(options =>
     {
         options.Resources
             .Add<MyAppResource>(defaultCulture: "fr")
@@ -457,8 +457,8 @@ localizer["PatientNotFound", Arg.Any<object[]>()]
 1. **Un marker par module** — créer une classe marker par package/module pour isoler
    les espaces de noms des clés
 2. **Préfixer les clés** — utiliser un préfixe cohérent pour éviter les collisions
-   (ex. `"Foundation:EntityNotFound"`, `"Patient:NotFound"`)
-3. **Hériter `FoundationLocalizationResource`** — pour bénéficier des messages d'erreur
+   (ex. `"Granit:EntityNotFound"`, `"Patient:NotFound"`)
+3. **Hériter `GranitLocalizationResource`** — pour bénéficier des messages d'erreur
    de base sans les redupliquer
 4. **Ne pas traduire les templates LoggerMessage** — garder les templates stables pour
    la corrélation dans Loki ; traduire uniquement les messages utilisateur
@@ -474,5 +474,5 @@ localizer["PatientNotFound", Arg.Any<object[]>()]
 | Package | Rôle |
 | --- | --- |
 | `Microsoft.Extensions.Localization` | `IStringLocalizer`, `IStringLocalizerFactory`, `StringLocalizer<>` |
-| `Microsoft.Extensions.Options` | `IOptions<FoundationLocalizationOptions>` |
-| `DigitalDynamics.Foundation.Core` | Système de modules (`FoundationModule`, `[DependsOn]`) |
+| `Microsoft.Extensions.Options` | `IOptions<GranitLocalizationOptions>` |
+| `Granit.Core` | Système de modules (`GranitModule`, `[DependsOn]`) |

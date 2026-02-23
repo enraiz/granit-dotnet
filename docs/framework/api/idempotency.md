@@ -1,6 +1,6 @@
 # Idempotency
 
-`DigitalDynamics.Foundation.Idempotency` implémente l'idempotence HTTP style Stripe
+`Granit.Idempotency` implémente l'idempotence HTTP style Stripe
 pour les API publiques Digital Dynamics. Un client peut renvoyer la même requête
 (panne réseau, timeout, double-clic) et obtenir la réponse originale sans
 ré-exécution de la logique métier.
@@ -8,7 +8,7 @@ ré-exécution de la logique métier.
 > **Conformité HDS** : les entrées d'idempotence stockées dans Redis contiennent
 > potentiellement des données de santé (corps de réponse). Elles sont chiffrées
 > avec `ICacheValueEncryptor` (AES-256-CBC) via le module
-> `DigitalDynamics.Foundation.Caching`.
+> `Granit.Caching`.
 
 ## Machine à états
 
@@ -26,17 +26,17 @@ Absent ──(TryAcquire SET NX PX)──► InProgress ──(SetCompleted SET 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Idempotency
+dotnet add package Granit.Idempotency
 ```
 
 ## Configuration rapide
 
 ```csharp
-[DependsOn(typeof(FoundationIdempotencyModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitIdempotencyModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
-Le module appelle automatiquement `AddFoundationIdempotency` en lisant la section
+Le module appelle automatiquement `AddGranitIdempotency` en lisant la section
 `Idempotency` de `appsettings.json`.
 
 Enregistrer le middleware dans le pipeline ASP.NET Core **après**
@@ -45,7 +45,7 @@ authentication/authorization :
 ```csharp
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseFoundationIdempotency(); // après auth — ICurrentUserService doit être peuplé
+app.UseGranitIdempotency(); // après auth — ICurrentUserService doit être peuplé
 app.MapControllers();
 ```
 
@@ -170,15 +170,15 @@ La validation est appliquée au démarrage via `IValidateOptions<IdempotencyOpti
 
 ```text
 src/
-  DigitalDynamics.Foundation.Idempotency/
+  Granit.Idempotency/
   ├── Abstractions/
   │   ├── IIdempotencyMetadata.cs     (contrat metadata endpoint)
   │   └── IIdempotencyStore.cs        (TryAcquire / Get / SetCompleted / Delete)
   ├── Attributes/
   │   └── IdempotentAttribute.cs      ([Idempotent], IIdempotencyMetadata)
   ├── Extensions/
-  │   ├── IdempotencyApplicationBuilderExtensions.cs  (UseFoundationIdempotency)
-  │   └── IdempotencyServiceCollectionExtensions.cs   (AddFoundationIdempotency)
+  │   ├── IdempotencyApplicationBuilderExtensions.cs  (UseGranitIdempotency)
+  │   └── IdempotencyServiceCollectionExtensions.cs   (AddGranitIdempotency)
   ├── Internal/
   │   ├── IdempotencyJsonContext.cs   (source-generated JSON)
   │   ├── IdempotencyMiddleware.cs    (machine à états, SHA-256, capture réponse)
@@ -189,16 +189,16 @@ src/
   │   └── IdempotencyState.cs         (InProgress | Completed)
   ├── Redis/
   │   └── RedisIdempotencyStore.cs    (SET NX PX / SET XX PX + chiffrement AES)
-  └── FoundationIdempotencyModule.cs
+  └── GranitIdempotencyModule.cs
 
 tests/
-  DigitalDynamics.Foundation.Idempotency.Tests/
+  Granit.Idempotency.Tests/
   └── IdempotencyMiddlewareTests.cs   (4 scénarios critiques)
 ```
 
 ## Services enregistrés
 
-### `FoundationIdempotencyModule`
+### `GranitIdempotencyModule`
 
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
@@ -220,7 +220,7 @@ partagé entre tous les threads, ce qui est son mode d'utilisation normal.
 - La valeur du header `Idempotency-Key` est **hachée** (SHA-256) avant d'être
   incluse dans la clé Redis, évitant toute injection de caractères spéciaux.
 - Les entrées Redis sont **chiffrées AES-256-CBC** via `ICacheValueEncryptor`
-  (fourni par `DigitalDynamics.Foundation.Caching`) — obligatoire pour la
+  (fourni par `Granit.Caching`) — obligatoire pour la
   conformité HDS sur les corps de réponse contenant des données de santé.
 - Le middleware n'est **jamais déclenché** sur les endpoints sans `[Idempotent]`
   (vérification via `IIdempotencyMetadata` dans les endpoint metadata).

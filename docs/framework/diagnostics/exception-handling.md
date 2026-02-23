@@ -1,6 +1,6 @@
 # Exception Handling
 
-`DigitalDynamics.Foundation.ExceptionHandling` fournit la gestion centralisée des
+`Granit.ExceptionHandling` fournit la gestion centralisée des
 exceptions pour les API ASP.NET Core. Il intercepte toutes les exceptions non gérées
 et retourne une réponse JSON standardisée au format **RFC 7807 Problem Details**.
 
@@ -18,7 +18,7 @@ non gérées exposent potentiellement des stack traces contenant des données m�
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.ExceptionHandling
+dotnet add package Granit.ExceptionHandling
 ```
 
 ## Configuration
@@ -27,11 +27,11 @@ dotnet add package DigitalDynamics.Foundation.ExceptionHandling
 
 ```csharp
 // Program.cs
-await builder.AddFoundationAsync<AppModule>();
+await builder.AddGranitAsync<AppModule>();
 var app = builder.Build();
 
 // Doit être le premier middleware, avant routing et auth
-app.UseFoundationExceptionHandling();
+app.UseGranitExceptionHandling();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -40,26 +40,26 @@ app.MapControllers();
 
 ```csharp
 // AppModule.cs
-[DependsOn(typeof(FoundationExceptionHandlingModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitExceptionHandlingModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ### Enregistrement direct
 
 ```csharp
-builder.Services.AddFoundationExceptionHandling(opts =>
+builder.Services.AddGranitExceptionHandling(opts =>
 {
     // true en Development uniquement — jamais en production (règle HDS)
     opts.ExposeInternalErrorDetails = builder.Environment.IsDevelopment();
 });
 
 var app = builder.Build();
-app.UseFoundationExceptionHandling(); // Premier middleware obligatoire
+app.UseGranitExceptionHandling(); // Premier middleware obligatoire
 ```
 
 ## Exceptions disponibles
 
-Les types d'exceptions sont définis dans `Foundation.Core` afin que tous les packages
+Les types d'exceptions sont définis dans `Granit.Core` afin que tous les packages
 (Vault, Persistence, etc.) puissent les lancer sans dépendance sur un package web.
 
 | Classe | Code HTTP | Interfaces | Usage |
@@ -99,7 +99,7 @@ throw new ValidationException(errors);
 
 ## Format de réponse RFC 7807
 
-Chaque réponse d'erreur est un JSON conforme RFC 7807 avec des extensions Foundation :
+Chaque réponse d'erreur est un JSON conforme RFC 7807 avec des extensions Granit :
 
 ```json
 {
@@ -165,22 +165,22 @@ Le premier mapper retournant un entier non-null gagne. Le mapper par défaut
 (`DefaultExceptionStatusCodeMapper`) est toujours consulté en dernier et retourne
 `500` pour tout type inconnu.
 
-## Intégration avec Foundation.Persistence (EF Core)
+## Intégration avec Granit.Persistence (EF Core)
 
-`Foundation.Persistence` enregistre automatiquement `EfCoreExceptionStatusCodeMapper`
-lorsque `Foundation.ExceptionHandling` est actif dans le conteneur.
+`Granit.Persistence` enregistre automatiquement `EfCoreExceptionStatusCodeMapper`
+lorsque `Granit.ExceptionHandling` est actif dans le conteneur.
 Ce mapper mappe `DbUpdateConcurrencyException → 409 Conflict`.
 
-L'enregistrement est conditionnel : si `Foundation.ExceptionHandling` n'est pas
+L'enregistrement est conditionnel : si `Granit.ExceptionHandling` n'est pas
 configuré, aucun mapper EF Core n'est ajouté.
 
 ## Localisation des titres d'erreur
 
-Si `Foundation.Localization` est configuré dans l'application, le handler tente de
+Si `Granit.Localization` est configuré dans l'application, le handler tente de
 résoudre une traduction pour les exceptions implémentant `IHasErrorCode` :
 
 1. Le `ErrorCode` (ex : `"Appointment:SlotUnavailable"`) est utilisé comme clé de
-   localisation dans la ressource `"Foundation"`.
+   localisation dans la ressource `"Granit"`.
 2. Si une traduction est trouvée, elle remplace le message de l'exception dans `title`.
 3. Si aucune traduction n'existe, le message original est utilisé (pour les exceptions
    `IUserFriendlyException`) ou le message générique (pour les 5xx).

@@ -1,13 +1,13 @@
 # Vault
 
-`DigitalDynamics.Foundation.Vault` fournit l'intégration HashiCorp Vault pour les
+`Granit.Vault` fournit l'intégration HashiCorp Vault pour les
 applications .NET Digital Dynamics : credentials dynamiques PostgreSQL, chiffrement
 Transit et gestion automatique des leases.
 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Vault
+dotnet add package Granit.Vault
 ```
 
 ## Configuration
@@ -29,8 +29,8 @@ dotnet add package DigitalDynamics.Foundation.Vault
 
 ### Program.cs
 
-Avec le système de modules (recommandé), `FoundationVaultModule` est chargé
-automatiquement via `AddFoundation<T>()`. Le module skip l'enregistrement en
+Avec le système de modules (recommandé), `GranitVaultModule` est chargé
+automatiquement via `AddGranit<T>()`. Le module skip l'enregistrement en
 environnement Development (voir [modularity.md](../core/modularity.md)).
 
 Pour un enregistrement direct :
@@ -39,7 +39,7 @@ Pour un enregistrement direct :
 // Vault n'est activé qu'en production (credentials dynamiques, Transit)
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddFoundationVault(builder.Configuration);
+    builder.Services.AddGranitVault(builder.Configuration);
 }
 ```
 
@@ -128,7 +128,7 @@ var decrypted = await transitService.DecryptAsync("fhir-data", encrypted);
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Vault
+Granit.Vault
 ├── ITransitEncryptionService.cs             (interface, contrat public)
 ├── Options/
 │   └── VaultOptions.cs
@@ -136,9 +136,9 @@ DigitalDynamics.Foundation.Vault
 │   ├── VaultClientFactory.cs               (création du client VaultSharp)
 │   ├── VaultCredentialLeaseManager.cs      (BackgroundService, credentials dynamiques)
 │   └── TransitEncryptionService.cs         (chiffrement/déchiffrement Transit)
-├── FoundationVaultModule.cs                (module Foundation)
+├── GranitVaultModule.cs                (module Granit)
 └── Extensions/
-    └── VaultServiceCollectionExtensions.cs  (AddFoundationVault)
+    └── VaultServiceCollectionExtensions.cs  (AddGranitVault)
 ```
 
 ## Services enregistrés

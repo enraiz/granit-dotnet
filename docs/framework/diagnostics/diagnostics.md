@@ -1,6 +1,6 @@
 # Diagnostics
 
-`DigitalDynamics.Foundation.Diagnostics` fournit l'infrastructure de health checks
+`Granit.Diagnostics` fournit l'infrastructure de health checks
 production-ready pour les applications Digital Dynamics déployées sur Kubernetes :
 exposition des trois sondes (`/health/live`, `/health/ready`, `/health/startup`),
 cache anti-stampede et format de réponse JSON structuré pour l'observabilité.
@@ -8,7 +8,7 @@ cache anti-stampede et format de réponse JSON structuré pour l'observabilité.
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Diagnostics
+dotnet add package Granit.Diagnostics
 ```
 
 ## La trinité Kubernetes
@@ -32,30 +32,30 @@ des incidents en production.
 
 ```csharp
 // Program.cs
-builder.AddFoundation<AppModule>();
+builder.AddGranit<AppModule>();
 // ...
-app.UseFoundation();
-app.MapFoundationHealthChecks();
+app.UseGranit();
+app.MapGranitHealthChecks();
 ```
 
 ```csharp
 // AppModule.cs
-[DependsOn(typeof(FoundationDiagnosticsModule))]
-public sealed class AppModule : FoundationModule { }
+[DependsOn(typeof(GranitDiagnosticsModule))]
+public sealed class AppModule : GranitModule { }
 ```
 
 ### Enregistrement direct
 
 ```csharp
-builder.Services.AddFoundationDiagnostics();
+builder.Services.AddGranitDiagnostics();
 // ...
-app.MapFoundationHealthChecks();
+app.MapGranitHealthChecks();
 ```
 
 ### Personnalisation des chemins
 
 ```csharp
-app.MapFoundationHealthChecks(options =>
+app.MapGranitHealthChecks(options =>
 {
     options.LivenessPath  = "/health/live";   // défaut
     options.ReadinessPath = "/health/ready";  // défaut
@@ -88,15 +88,15 @@ seul exécute le check pendant que les autres attendent son résultat.
 Durée de cache configurable via `DiagnosticsOptions` (défaut : **10 secondes**) :
 
 ```csharp
-builder.Services.AddFoundationDiagnostics(options =>
+builder.Services.AddGranitDiagnostics(options =>
 {
     options.DefaultCacheDuration = TimeSpan.FromSeconds(10);
 });
 ```
 
 Le décorateur est appliqué automatiquement à tous les checks enregistrés via les
-extensions Foundation (`AddFoundationDbContextCheck`, `AddFoundationVaultCheck`,
-`AddFoundationRedisCheck`).
+extensions Granit (`AddGranitDbContextCheck`, `AddGranitVaultCheck`,
+`AddGranitRedisCheck`).
 
 ## Format de réponse JSON
 
@@ -129,7 +129,7 @@ Les endpoints retournent un payload structuré, utile pour les alertes et dashbo
 
 ## Health checks par module
 
-Chaque module Foundation expose son propre check, opt-in, taggué `readiness`.
+Chaque module Granit expose son propre check, opt-in, taggué `readiness`.
 
 ### Persistence (EF Core)
 
@@ -143,7 +143,7 @@ dotnet add package Microsoft.Extensions.Diagnostics.HealthChecks.EntityFramework
 ```csharp
 builder.Services
     .AddHealthChecks()
-    .AddFoundationDbContextCheck<AppDbContext>();
+    .AddGranitDbContextCheck<AppDbContext>();
 ```
 
 Le check exécute `CanConnectAsync()` sur le `DbContext`. Timeout configurable
@@ -154,7 +154,7 @@ Le check exécute `CanConnectAsync()` sur le `DbContext`. Timeout configurable
 ```csharp
 builder.Services
     .AddHealthChecks()
-    .AddFoundationVaultCheck();
+    .AddGranitVaultCheck();
 ```
 
 Appelle `sys/health` via `IVaultClient` (VaultSharp). Les trois états possibles :
@@ -170,7 +170,7 @@ Appelle `sys/health` via `IVaultClient` (VaultSharp). Les trois états possibles
 ```csharp
 builder.Services
     .AddHealthChecks()
-    .AddFoundationRedisCheck();
+    .AddGranitRedisCheck();
 ```
 
 Effectue un `PING` via `IConnectionMultiplexer`. La latence est mesurée :
@@ -181,7 +181,7 @@ Effectue un `PING` via `IConnectionMultiplexer`. La latence est mesurée :
 | ≥ 100 ms | `Degraded` | 200 |
 | Inaccessible | `Unhealthy` | 503 |
 
-Seuil configurable via `AddFoundationRedisCheck(degradedThreshold: TimeSpan.FromMilliseconds(100))`.
+Seuil configurable via `AddGranitRedisCheck(degradedThreshold: TimeSpan.FromMilliseconds(100))`.
 
 ## Configuration Kubernetes
 
@@ -218,7 +218,7 @@ startupProbe:
 
 ## Observabilité
 
-Le module `Foundation.Observability` exclut automatiquement les endpoints `/health/*`
+Le module `Granit.Observability` exclut automatiquement les endpoints `/health/*`
 des traces OpenTelemetry (voir [observability.md](observability.md)). Avec 50 pods
 sondés toutes les 3 secondes, l'exclusion économise **~86 400 spans inutiles par jour
 par pod** dans Tempo.
@@ -226,16 +226,16 @@ par pod** dans Tempo.
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Diagnostics
+Granit.Diagnostics
 ├── Caching/
 │   └── CachedHealthCheck.cs          (SemaphoreSlim + double-check locking)
 ├── ResponseWriters/
-│   └── FoundationHealthCheckWriter.cs (JSON structuré, sans PII)
+│   └── GranitHealthCheckWriter.cs (JSON structuré, sans PII)
 ├── Extensions/
-│   ├── DiagnosticsServiceCollectionExtensions.cs  (AddFoundationDiagnostics)
-│   └── DiagnosticsEndpointRouteBuilderExtensions.cs (MapFoundationHealthChecks)
+│   ├── DiagnosticsServiceCollectionExtensions.cs  (AddGranitDiagnostics)
+│   └── DiagnosticsEndpointRouteBuilderExtensions.cs (MapGranitHealthChecks)
 ├── DiagnosticsOptions.cs
-└── FoundationDiagnosticsModule.cs
+└── GranitDiagnosticsModule.cs
 ```
 
 ## Conformité

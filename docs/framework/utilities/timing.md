@@ -1,6 +1,6 @@
 # Timing
 
-`DigitalDynamics.Foundation.Timing` fournit une abstraction pour l'accès au temps système
+`Granit.Timing` fournit une abstraction pour l'accès au temps système
 et les conversions de fuseau horaire. Il remplace tous les appels directs à
 `DateTimeOffset.UtcNow` dans le code applicatif.
 
@@ -41,29 +41,29 @@ PostgreSQL (`timestamptz`).
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Timing
+dotnet add package Granit.Timing
 ```
 
 ## Configuration
 
 ### Avec le système de modules (recommandé)
 
-Le module `FoundationTimingModule` est automatiquement chargé via `[DependsOn]` quand
+Le module `GranitTimingModule` est automatiquement chargé via `[DependsOn]` quand
 un module dépendant (ex : Persistence) en a besoin. Il suffit d'utiliser
-`AddFoundation<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
+`AddGranit<T>()` dans `Program.cs` (voir [modularity.md](../core/modularity.md)).
 
 ### Enregistrement direct
 
 Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
-builder.Services.AddFoundationTiming();
+builder.Services.AddGranitTiming();
 ```
 
 Avec options :
 
 ```csharp
-builder.Services.AddFoundationTiming(options =>
+builder.Services.AddGranitTiming(options =>
 {
     options.DefaultTimezone = "Europe/Brussels";
 });
@@ -72,11 +72,11 @@ builder.Services.AddFoundationTiming(options =>
 ## IClock
 
 `IClock` est l'interface principale du module, définie dans le package
-`DigitalDynamics.Foundation.Timing`. Elle doit être injectée partout où le code a besoin
+`Granit.Timing`. Elle doit être injectée partout où le code a besoin
 de l'heure courante ou de conversions de fuseau horaire.
 
 ```csharp
-namespace DigitalDynamics.Foundation.Timing;
+namespace Granit.Timing;
 
 public interface IClock
 {
@@ -385,16 +385,16 @@ public static AppointmentResponse ToResponse(
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Timing
+Granit.Timing
 ├── IClock.cs                             (interface, contrat public)
 ├── ICurrentTimezoneProvider.cs           (interface, contrat public)
 ├── Clock.cs                              (implémentation, délègue à TimeProvider)
 ├── ClockOptions.cs                       (options configurables)
 ├── CurrentTimezoneProvider.cs            (AsyncLocal, Singleton)
 ├── DisableDateTimeNormalizationAttribute.cs
-├── FoundationTimingModule.cs             (module Foundation)
+├── GranitTimingModule.cs             (module Granit)
 └── Extensions/
-    └── TimingServiceCollectionExtensions.cs  (AddFoundationTiming)
+    └── TimingServiceCollectionExtensions.cs  (AddGranitTiming)
 ```
 
 ## Services enregistrés

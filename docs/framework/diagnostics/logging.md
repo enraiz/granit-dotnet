@@ -1,8 +1,8 @@
 # Logging
 
-Foundation n'introduit aucune abstraction de logging. Le logging repose entièrement sur
+Granit n'introduit aucune abstraction de logging. Le logging repose entièrement sur
 `Microsoft.Extensions.Logging.ILogger<T>`, le système standard d'ASP.NET Core.
-`Foundation.Observability` configure Serilog comme implémentation et exporte les logs
+`Granit.Observability` configure Serilog comme implémentation et exporte les logs
 vers Loki via OTLP.
 
 > **Référence Microsoft** :
@@ -73,10 +73,10 @@ public static async Task<PatientCreated> Handle(
 }
 ```
 
-### Dans un module Foundation
+### Dans un module Granit
 
 ```csharp
-public class GuavaAuthModule : FoundationModule
+public class GuavaAuthModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -106,7 +106,7 @@ public class GuavaAuthModule : FoundationModule
 | `Error` | `LogError` | Erreurs impactant une opération |
 | `Critical` | `LogCritical` | Défaillances systémiques |
 
-**Convention Foundation** :
+**Convention Granit** :
 
 ```csharp
 // Information — événements métier normaux
@@ -154,7 +154,7 @@ Les propriétés apparaissent dans Loki comme labels ou champs JSON :
 
 ## Enrichissement automatique
 
-`Foundation.Observability` enrichit automatiquement chaque log avec :
+`Granit.Observability` enrichit automatiquement chaque log avec :
 
 | Propriété | Source | Description |
 | --- | --- | --- |
@@ -268,7 +268,7 @@ de sécurité sociale, diagnostic, etc.).
 ## Corrélation avec les traces OpenTelemetry
 
 Chaque requête HTTP génère automatiquement un `TraceId` et un `SpanId` via
-`Foundation.Observability`. Ces identifiants sont injectés dans chaque log par Serilog,
+`Granit.Observability`. Ces identifiants sont injectés dans chaque log par Serilog,
 permettant la corrélation dans Grafana :
 
 ```text

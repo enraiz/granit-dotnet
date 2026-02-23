@@ -1,6 +1,6 @@
 # API Versioning
 
-`DigitalDynamics.Foundation.ApiVersioning` gère le versioning HTTP pour toutes les
+`Granit.ApiVersioning` gère le versioning HTTP pour toutes les
 APIs Digital Dynamics. Il peut être utilisé seul dans les services inter-services
 qui n'ont pas besoin d'une UI de documentation.
 
@@ -15,8 +15,8 @@ qui n'ont pas besoin d'une UI de documentation.
 ## Installation
 
 ```csharp
-[DependsOn(typeof(FoundationApiVersioningModule))]
-public sealed class MyApplicationModule : FoundationModule { }
+[DependsOn(typeof(GranitApiVersioningModule))]
+public sealed class MyApplicationModule : GranitModule { }
 ```
 
 ## Configuration

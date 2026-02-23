@@ -1,0 +1,17 @@
+using Granit.Authentication.JwtBearer;
+using Granit.Authentication.Keycloak.Extensions;
+using Granit.Core.Modularity;
+
+namespace Granit.Authentication.Keycloak;
+
+/// <summary>
+/// Granit module for Keycloak extras (claims transformation, Admin policy).
+/// Depends on <see cref="GranitJwtBearerModule"/> for generic JWT Bearer.
+/// </summary>
+[DependsOn(typeof(GranitJwtBearerModule))]
+public sealed class GranitAuthenticationKeycloakModule : GranitModule
+{
+    /// <inheritdoc/>
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Services.AddGranitKeycloak(context.Configuration);
+}
