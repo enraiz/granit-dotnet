@@ -76,6 +76,23 @@ public sealed class RecurringJobSchedulingMiddlewareTests
     }
 
     [Fact]
+    public async Task BeforeAsync_WithoutTriggeredByHeader_DoesNotCallSetTriggeredBy()
+    {
+        // Arrange — no X-Triggered-By header (normal scheduled execution)
+        _clock.Now.Returns(DateTimeOffset.UtcNow);
+        Envelope envelope = new(new FakeDailyReportMessage());
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+        CancellationToken ct = TestContext.Current.CancellationToken;
+
+        // Act
+        await sut.BeforeAsync(envelope, ct);
+
+        // Assert — header absent → SetTriggeredByAsync must not be called
+        await _store.DidNotReceive().SetTriggeredByAsync(
+            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task BeforeAsync_UndecoratedMessage_SkipsRecording()
     {
         // Arrange
