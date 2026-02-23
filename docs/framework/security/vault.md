@@ -1,13 +1,13 @@
 # Vault
 
-`DigitalDynamics.Foundation.Vault` fournit l'intégration HashiCorp Vault pour les
+`Granit.Vault` fournit l'intégration HashiCorp Vault pour les
 applications .NET Digital Dynamics : credentials dynamiques PostgreSQL, chiffrement
 Transit et gestion automatique des leases.
 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Vault
+dotnet add package Granit.Vault
 ```
 
 ## Configuration
@@ -128,7 +128,7 @@ var decrypted = await transitService.DecryptAsync("fhir-data", encrypted);
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Vault
+Granit.Vault
 ├── ITransitEncryptionService.cs             (interface, contrat public)
 ├── Options/
 │   └── VaultOptions.cs

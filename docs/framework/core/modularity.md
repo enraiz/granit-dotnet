@@ -1,6 +1,6 @@
 # Modularity
 
-`DigitalDynamics.Foundation.Core` fournit un système de modules inspiré de
+`Granit.Core` fournit un système de modules inspiré de
 [Volo.Abp.Modularity](https://abp.io/docs/latest/framework/architecture/modularity/basics).
 Chaque package Foundation déclare un **module** qui s'enregistre automatiquement dans le
 conteneur DI. Les dépendances entre modules sont résolues par tri topologique et chargées
@@ -24,7 +24,7 @@ await builder.AddFoundationAsync<GuavaHostModule>();
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Core
+dotnet add package Granit.Core
 ```
 
 Ce package est automatiquement tiré comme dépendance transitive par tous les packages
@@ -294,11 +294,11 @@ Foundation :
 
 ```csharp
 using Asp.Versioning;
-using DigitalDynamics.Foundation.Core.Modularity;
-using DigitalDynamics.Foundation.Observability;
-using DigitalDynamics.Foundation.Persistence;
-using DigitalDynamics.Foundation.Security;
-using DigitalDynamics.Foundation.Vault;
+using Granit.Core.Modularity;
+using Granit.Observability;
+using Granit.Persistence;
+using Granit.Security;
+using Granit.Vault;
 
 namespace Guava.Host;
 
@@ -327,7 +327,7 @@ public sealed class GuavaHostModule : FoundationModule
 Le `Program.cs` résultant est minimal :
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Extensions;
+using Granit.Core.Extensions;
 using Guava.Host;
 using Guava.Modules.Auth;
 using Wolverine;
@@ -400,7 +400,7 @@ Le `ModuleLoader` utilise l'algorithme de Kahn pour le tri topologique :
 ### Structure des fichiers
 
 ```text
-DigitalDynamics.Foundation.Core
+Granit.Core
 ├── Domain/
 │   ├── Entity.cs                   (classe de base, identifiant)
 │   ├── CreationAuditedEntity.cs    (+ CreatedAt, CreatedBy)
@@ -423,7 +423,7 @@ DigitalDynamics.Foundation.Core
 
 ## Tests
 
-Le projet `DigitalDynamics.Foundation.Core.Tests` couvre trois aspects :
+Le projet `Granit.Core.Tests` couvre trois aspects :
 
 ### ModuleLoaderTests
 

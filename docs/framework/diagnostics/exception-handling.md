@@ -1,6 +1,6 @@
 # Exception Handling
 
-`DigitalDynamics.Foundation.ExceptionHandling` fournit la gestion centralisée des
+`Granit.ExceptionHandling` fournit la gestion centralisée des
 exceptions pour les API ASP.NET Core. Il intercepte toutes les exceptions non gérées
 et retourne une réponse JSON standardisée au format **RFC 7807 Problem Details**.
 
@@ -18,7 +18,7 @@ non gérées exposent potentiellement des stack traces contenant des données m�
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.ExceptionHandling
+dotnet add package Granit.ExceptionHandling
 ```
 
 ## Configuration

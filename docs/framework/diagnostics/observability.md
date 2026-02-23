@@ -1,13 +1,13 @@
 # Observability
 
-`DigitalDynamics.Foundation.Observability` configure Serilog (logs structurés) et
+`Granit.Observability` configure Serilog (logs structurés) et
 OpenTelemetry (traces + métriques) avec export OTLP vers la stack LGTM
 (Loki/Grafana/Tempo/Mimir).
 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Observability
+dotnet add package Granit.Observability
 ```
 
 ## Configuration
@@ -145,7 +145,7 @@ Les traces et métriques peuvent être désactivées individuellement :
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Observability
+Granit.Observability
 ├── Options/
 │   └── ObservabilityOptions.cs
 ├── FoundationObservabilityModule.cs        (module Foundation)

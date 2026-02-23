@@ -1,12 +1,12 @@
 # Persistence
 
-`DigitalDynamics.Foundation.Persistence` fournit les intercepteurs EF Core pour
+`Granit.Persistence` fournit les intercepteurs EF Core pour
 l'audit trail HDS et la suppression logique RGPD.
 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Persistence
+dotnet add package Granit.Persistence
 ```
 
 ## Configuration
@@ -274,7 +274,7 @@ Pour la documentation complète de `IDataFilter`, voir [data-filtering.md](data-
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Persistence
+Granit.Persistence
 ├── Interceptors/
 │   ├── AuditedEntityInterceptor.cs       (audit HDS : CreatedAt/By, ModifiedAt/By)
 │   └── SoftDeleteInterceptor.cs          (soft delete RGPD : IsDeleted, DeletedAt/By)

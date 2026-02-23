@@ -40,22 +40,22 @@ Chaque package Foundation a un projet de tests dédié, nommé `*.Tests` :
 
 ```text
 src/
-├── DigitalDynamics.Foundation.Core/
-├── DigitalDynamics.Foundation.Guids/
-├── DigitalDynamics.Foundation.Observability/
-├── DigitalDynamics.Foundation.Persistence/
-├── DigitalDynamics.Foundation.Security/
-├── DigitalDynamics.Foundation.Timing/
-└── DigitalDynamics.Foundation.Vault/
+├── Granit.Core/
+├── Granit.Guids/
+├── Granit.Observability/
+├── Granit.Persistence/
+├── Granit.Security/
+├── Granit.Timing/
+└── Granit.Vault/
 
 tests/
-├── DigitalDynamics.Foundation.Core.Tests/
-├── DigitalDynamics.Foundation.Guids.Tests/
-├── DigitalDynamics.Foundation.Observability.Tests/
-├── DigitalDynamics.Foundation.Persistence.Tests/
-├── DigitalDynamics.Foundation.Security.Tests/
-├── DigitalDynamics.Foundation.Timing.Tests/
-└── DigitalDynamics.Foundation.Vault.Tests/
+├── Granit.Core.Tests/
+├── Granit.Guids.Tests/
+├── Granit.Observability.Tests/
+├── Granit.Persistence.Tests/
+├── Granit.Security.Tests/
+├── Granit.Timing.Tests/
+└── Granit.Vault.Tests/
 ```
 
 Chaque projet de tests référence uniquement le projet source correspondant. Pas de
@@ -68,7 +68,7 @@ base classes partagées : chaque classe de test est **autonome et scellée** (`s
 dotnet test
 
 # Exécuter les tests d'un package spécifique
-dotnet test tests/DigitalDynamics.Foundation.Timing.Tests
+dotnet test tests/Granit.Timing.Tests
 
 # Avec couverture de code (coverlet)
 dotnet test --collect:"XPlat Code Coverage"

@@ -5,7 +5,7 @@ pour le flux async courant, sans appeler `IgnoreQueryFilters()` qui désactivera
 tous les filtres simultanément.
 
 ```csharp
-using DigitalDynamics.Foundation.Core.DataFiltering;
+using Granit.Core.DataFiltering;
 ```
 
 ## IDataFilter
@@ -117,7 +117,7 @@ public sealed class PurgeService(IDataFilter dataFilter, AppDbContext context)
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Core
+Granit.Core
 └── DataFiltering/
     ├── IDataFilter.cs    (interface : Disable<T>, Enable<T>, IsEnabled<T>)
     └── DataFilter.cs     (implémentation AsyncLocal<ImmutableDictionary<Type, bool>>)

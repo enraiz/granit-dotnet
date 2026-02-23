@@ -33,7 +33,7 @@ Package d'abstractions pures. Ne contient aucune dépendance sur ASP.NET Core.
 ### Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Security
+dotnet add package Granit.Security
 ```
 
 ### ICurrentUserService
@@ -74,7 +74,7 @@ Implémentation JWT Bearer générique (OIDC-compatible). Ne connaît aucun IDP 
 ### Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Authentication.JwtBearer
+dotnet add package Granit.Authentication.JwtBearer
 ```
 
 ### Configuration
@@ -147,7 +147,7 @@ Dépend transitivement de `Foundation.Security` et `Foundation.Authentication.Jw
 ### Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Authentication.Keycloak
+dotnet add package Granit.Authentication.Keycloak
 ```
 
 Un seul package suffit — `Foundation.Security` et `Foundation.Authentication.JwtBearer`
@@ -281,7 +281,7 @@ Créer `Foundation.Authentication.Auth0` en dépendant uniquement de
 `Foundation.Authentication.JwtBearer` :
 
 ```xml
-<ProjectReference Include="..\DigitalDynamics.Foundation.Authentication.JwtBearer\..." />
+<ProjectReference Include="..\Granit.Authentication.JwtBearer\..." />
 ```
 
 ```csharp

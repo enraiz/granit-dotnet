@@ -1,6 +1,6 @@
 # Idempotency
 
-`DigitalDynamics.Foundation.Idempotency` implémente l'idempotence HTTP style Stripe
+`Granit.Idempotency` implémente l'idempotence HTTP style Stripe
 pour les API publiques Digital Dynamics. Un client peut renvoyer la même requête
 (panne réseau, timeout, double-clic) et obtenir la réponse originale sans
 ré-exécution de la logique métier.
@@ -8,7 +8,7 @@ ré-exécution de la logique métier.
 > **Conformité HDS** : les entrées d'idempotence stockées dans Redis contiennent
 > potentiellement des données de santé (corps de réponse). Elles sont chiffrées
 > avec `ICacheValueEncryptor` (AES-256-CBC) via le module
-> `DigitalDynamics.Foundation.Caching`.
+> `Granit.Caching`.
 
 ## Machine à états
 
@@ -26,7 +26,7 @@ Absent ──(TryAcquire SET NX PX)──► InProgress ──(SetCompleted SET 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Idempotency
+dotnet add package Granit.Idempotency
 ```
 
 ## Configuration rapide
@@ -170,7 +170,7 @@ La validation est appliquée au démarrage via `IValidateOptions<IdempotencyOpti
 
 ```text
 src/
-  DigitalDynamics.Foundation.Idempotency/
+  Granit.Idempotency/
   ├── Abstractions/
   │   ├── IIdempotencyMetadata.cs     (contrat metadata endpoint)
   │   └── IIdempotencyStore.cs        (TryAcquire / Get / SetCompleted / Delete)
@@ -192,7 +192,7 @@ src/
   └── FoundationIdempotencyModule.cs
 
 tests/
-  DigitalDynamics.Foundation.Idempotency.Tests/
+  Granit.Idempotency.Tests/
   └── IdempotencyMiddlewareTests.cs   (4 scénarios critiques)
 ```
 
@@ -220,7 +220,7 @@ partagé entre tous les threads, ce qui est son mode d'utilisation normal.
 - La valeur du header `Idempotency-Key` est **hachée** (SHA-256) avant d'être
   incluse dans la clé Redis, évitant toute injection de caractères spéciaux.
 - Les entrées Redis sont **chiffrées AES-256-CBC** via `ICacheValueEncryptor`
-  (fourni par `DigitalDynamics.Foundation.Caching`) — obligatoire pour la
+  (fourni par `Granit.Caching`) — obligatoire pour la
   conformité HDS sur les corps de réponse contenant des données de santé.
 - Le middleware n'est **jamais déclenché** sur les endpoints sans `[Idempotent]`
   (vérification via `IIdempotencyMetadata` dans les endpoint metadata).

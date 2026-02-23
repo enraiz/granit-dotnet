@@ -1,6 +1,6 @@
 # API Documentation
 
-`DigitalDynamics.Foundation.ApiDocumentation` génère les documents OpenAPI et expose
+`Granit.ApiDocumentation` génère les documents OpenAPI et expose
 l'UI Scalar multi-version pour toutes les APIs Digital Dynamics. Il dépend de
 `Foundation.ApiVersioning`.
 
@@ -88,7 +88,7 @@ les documents OpenAPI générés. Il est idéal pour :
 ### Application sur un contrôleur entier
 
 ```csharp
-using DigitalDynamics.Foundation.ApiDocumentation.Attributes;
+using Granit.ApiDocumentation.Attributes;
 
 [InternalApi]
 [ApiController]

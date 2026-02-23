@@ -1,6 +1,6 @@
 # Diagnostics
 
-`DigitalDynamics.Foundation.Diagnostics` fournit l'infrastructure de health checks
+`Granit.Diagnostics` fournit l'infrastructure de health checks
 production-ready pour les applications Digital Dynamics déployées sur Kubernetes :
 exposition des trois sondes (`/health/live`, `/health/ready`, `/health/startup`),
 cache anti-stampede et format de réponse JSON structuré pour l'observabilité.
@@ -8,7 +8,7 @@ cache anti-stampede et format de réponse JSON structuré pour l'observabilité.
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Diagnostics
+dotnet add package Granit.Diagnostics
 ```
 
 ## La trinité Kubernetes
@@ -226,7 +226,7 @@ par pod** dans Tempo.
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Diagnostics
+Granit.Diagnostics
 ├── Caching/
 │   └── CachedHealthCheck.cs          (SemaphoreSlim + double-check locking)
 ├── ResponseWriters/

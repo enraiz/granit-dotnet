@@ -1,4 +1,4 @@
-# DigitalDynamics.Foundation — Documentation framework
+# Granit — Documentation framework
 
 Cette documentation est organisée en six sections thématiques.
 

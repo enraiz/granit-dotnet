@@ -1,6 +1,6 @@
 # Configuration
 
-`DigitalDynamics.Foundation` s'appuie entièrement sur le système de configuration natif
+`Granit` s'appuie entièrement sur le système de configuration natif
 d'ASP.NET Core. Aucune abstraction supplémentaire n'est introduite — les packages Foundation
 exploitent le pattern `IOptions<T>` standard et respectent la hiérarchie de configuration
 de la plateforme.

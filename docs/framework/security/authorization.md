@@ -32,8 +32,8 @@ Si un utilisateur a besoin d'un droit spécifique, la bonne pratique est de cré
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Authorization
-dotnet add package DigitalDynamics.Foundation.Authorization.EntityFrameworkCore
+dotnet add package Granit.Authorization
+dotnet add package Granit.Authorization.EntityFrameworkCore
 ```
 
 ---

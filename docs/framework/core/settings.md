@@ -1,19 +1,19 @@
 # Settings
 
-`DigitalDynamics.Foundation.Settings` fournit un système de paramètres dynamiques
+`Granit.Settings` fournit un système de paramètres dynamiques
 avec résolution en cascade `User → Tenant → Global → Configuration → Default`,
 cache intégré et chiffrement optionnel pour les paramètres sensibles.
 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Settings
+dotnet add package Granit.Settings
 ```
 
 Pour la persistance en base de données (production) :
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Settings.EntityFrameworkCore
+dotnet add package Granit.Settings.EntityFrameworkCore
 ```
 
 ## Configuration rapide
@@ -195,7 +195,7 @@ public sealed class AppModule : FoundationModule { }
 ## Architecture
 
 ```text
-src/DigitalDynamics.Foundation.Settings/
+src/Granit.Settings/
 ├── Definitions/
 │   ├── SettingDefinition.cs                (métadonnées statiques)
 │   ├── ISettingDefinitionContext.cs        (Add, GetOrNull)

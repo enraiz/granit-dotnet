@@ -1,6 +1,6 @@
 # Core
 
-`DigitalDynamics.Foundation.Core` est le package fondation de tous les autres packages
+`Granit.Core` est le package fondation de tous les autres packages
 Foundation. Il fournit :
 
 - Le **système de modules** (voir [modularity.md](modularity.md)) : `FoundationModule`,
@@ -19,7 +19,7 @@ désormais dans leurs modules respectifs (voir section
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Core
+dotnet add package Granit.Core
 ```
 
 Ce package est automatiquement tiré comme dépendance transitive par tous les packages
@@ -43,7 +43,7 @@ La hiérarchie d'entités et les interfaces domaine (`ISoftDeletable`, `IMultiTe
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Core
+Granit.Core
 ├── Domain/
 │   ├── Entity.cs                   (classe de base, identifiant)
 │   ├── CreationAuditedEntity.cs    (+ CreatedAt, CreatedBy)
@@ -75,10 +75,10 @@ DigitalDynamics.Foundation.Core
 
 | Ancien namespace | Nouveau namespace | Package |
 | --- | --- | --- |
-| `DigitalDynamics.Foundation.Abstractions.Domain` | `DigitalDynamics.Foundation.Core.Domain` | Core |
-| `DigitalDynamics.Foundation.Abstractions.Timing` | `DigitalDynamics.Foundation.Timing` | Timing |
-| `DigitalDynamics.Foundation.Abstractions.Guids` | `DigitalDynamics.Foundation.Guids` | Guids |
-| `DigitalDynamics.Foundation.Abstractions.Security` | `DigitalDynamics.Foundation.Security` | Security |
+| `Granit.Abstractions.Domain` | `Granit.Core.Domain` | Core |
+| `Granit.Abstractions.Timing` | `Granit.Timing` | Timing |
+| `Granit.Abstractions.Guids` | `Granit.Guids` | Guids |
+| `Granit.Abstractions.Security` | `Granit.Security` | Security |
 
 ### Guide de migration
 
@@ -86,26 +86,26 @@ DigitalDynamics.Foundation.Core
 
    ```xml
    <!-- Avant -->
-   <PackageReference Include="DigitalDynamics.Foundation.Abstractions" />
+   <PackageReference Include="Granit.Abstractions" />
 
    <!-- Après -->
-   <PackageReference Include="DigitalDynamics.Foundation.Core" />
+   <PackageReference Include="Granit.Core" />
    ```
 
 2. Mettre à jour les `using` :
 
    ```csharp
    // Avant
-   using DigitalDynamics.Foundation.Abstractions.Domain;
-   using DigitalDynamics.Foundation.Abstractions.Timing;
-   using DigitalDynamics.Foundation.Abstractions.Guids;
-   using DigitalDynamics.Foundation.Abstractions.Security;
+   using Granit.Abstractions.Domain;
+   using Granit.Abstractions.Timing;
+   using Granit.Abstractions.Guids;
+   using Granit.Abstractions.Security;
 
    // Après
-   using DigitalDynamics.Foundation.Core.Domain;
-   using DigitalDynamics.Foundation.Timing;
-   using DigitalDynamics.Foundation.Guids;
-   using DigitalDynamics.Foundation.Security;
+   using Granit.Core.Domain;
+   using Granit.Timing;
+   using Granit.Guids;
+   using Granit.Security;
    ```
 
 3. Remplacer les `AddFoundation*()` individuels par `await builder.AddFoundationAsync<T>()`

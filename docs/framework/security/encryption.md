@@ -1,13 +1,13 @@
 # Encryption
 
-`DigitalDynamics.Foundation.Encryption` fournit un service de chiffrement/déchiffrement
+`Granit.Encryption` fournit un service de chiffrement/déchiffrement
 de chaînes avec provider AES-256-CBC par défaut et support optionnel du Transit Engine
 de HashiCorp Vault pour les opérations haute sécurité.
 
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Encryption
+dotnet add package Granit.Encryption
 ```
 
 ## Configuration rapide
@@ -88,7 +88,7 @@ clé.
 ## Architecture
 
 ```text
-src/DigitalDynamics.Foundation.Encryption/
+src/Granit.Encryption/
 ├── IStringEncryptionService.cs            (interface publique principale)
 ├── IStringEncryptionProvider.cs           (interface provider)
 ├── StringEncryptionOptions.cs             (options : PassPhrase, KeySize, ProviderName)

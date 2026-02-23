@@ -1,6 +1,6 @@
 # Localization
 
-`DigitalDynamics.Foundation.Localization` fournit un système de localisation JSON modulaire. Il s'intègre avec `IStringLocalizer<T>` de
+`Granit.Localization` fournit un système de localisation JSON modulaire. Il s'intègre avec `IStringLocalizer<T>` de
 `Microsoft.Extensions.Localization` et ajoute : ressources embarquées par assembly,
 héritage inter-modules, culture fallback natif via `CultureInfo.Parent`, et cache
 thread-safe.
@@ -24,7 +24,7 @@ pas aux packages NuGet. Ce module apporte :
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Localization
+dotnet add package Granit.Localization
 ```
 
 ## Configuration
@@ -137,7 +137,7 @@ embarqués (les `/` deviennent des `.`) : `"MyApp.Localization.MyApp"`.
 Chaque ressource est représentée par une classe vide annotée avec des attributs :
 
 ```csharp
-using DigitalDynamics.Foundation.Localization.Attributes;
+using Granit.Localization.Attributes;
 
 [LocalizationResourceName("MyApp")]
 public sealed class MyAppResource;
@@ -353,7 +353,7 @@ réutiliser ces messages sans les redéfinir.
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Localization
+Granit.Localization
 ├── Attributes/
 │   ├── LocalizationResourceNameAttribute.cs   (nom court de la ressource)
 │   └── InheritResourceAttribute.cs            (héritage statique par attribut)
@@ -475,4 +475,4 @@ localizer["PatientNotFound", Arg.Any<object[]>()]
 | --- | --- |
 | `Microsoft.Extensions.Localization` | `IStringLocalizer`, `IStringLocalizerFactory`, `StringLocalizer<>` |
 | `Microsoft.Extensions.Options` | `IOptions<FoundationLocalizationOptions>` |
-| `DigitalDynamics.Foundation.Core` | Système de modules (`FoundationModule`, `[DependsOn]`) |
+| `Granit.Core` | Système de modules (`FoundationModule`, `[DependsOn]`) |

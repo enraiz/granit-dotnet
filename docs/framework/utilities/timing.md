@@ -1,6 +1,6 @@
 # Timing
 
-`DigitalDynamics.Foundation.Timing` fournit une abstraction pour l'accès au temps système
+`Granit.Timing` fournit une abstraction pour l'accès au temps système
 et les conversions de fuseau horaire. Il remplace tous les appels directs à
 `DateTimeOffset.UtcNow` dans le code applicatif.
 
@@ -41,7 +41,7 @@ PostgreSQL (`timestamptz`).
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Timing
+dotnet add package Granit.Timing
 ```
 
 ## Configuration
@@ -72,11 +72,11 @@ builder.Services.AddFoundationTiming(options =>
 ## IClock
 
 `IClock` est l'interface principale du module, définie dans le package
-`DigitalDynamics.Foundation.Timing`. Elle doit être injectée partout où le code a besoin
+`Granit.Timing`. Elle doit être injectée partout où le code a besoin
 de l'heure courante ou de conversions de fuseau horaire.
 
 ```csharp
-namespace DigitalDynamics.Foundation.Timing;
+namespace Granit.Timing;
 
 public interface IClock
 {
@@ -385,7 +385,7 @@ public static AppointmentResponse ToResponse(
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Timing
+Granit.Timing
 ├── IClock.cs                             (interface, contrat public)
 ├── ICurrentTimezoneProvider.cs           (interface, contrat public)
 ├── Clock.cs                              (implémentation, délègue à TimeProvider)

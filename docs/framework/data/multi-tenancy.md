@@ -32,7 +32,7 @@ l'emporte. L'en-tête HTTP est prioritaire sur le claim JWT.
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.MultiTenancy
+dotnet add package Granit.MultiTenancy
 ```
 
 ## Configuration dans Program.cs

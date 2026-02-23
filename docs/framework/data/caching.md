@@ -1,6 +1,6 @@
 # Caching
 
-`DigitalDynamics.Foundation.Caching` fournit une abstraction de cache typée
+`Granit.Caching` fournit une abstraction de cache typée
 (`ICacheService<T>`) au-dessus de `IDistributedCache` avec trois fournisseurs
 interchangeables, une protection stampede sans fuite mémoire, et un chiffrement
 AES-256 opt-in pour la conformité HDS/RGPD.
@@ -9,9 +9,9 @@ AES-256 opt-in pour la conformité HDS/RGPD.
 
 | Package | Fournisseur | Dépend de | Quand l'utiliser |
 | --- | --- | --- | --- |
-| `DigitalDynamics.Foundation.Caching` | Memory (défaut) | — | Développement, tests locaux |
-| `DigitalDynamics.Foundation.Caching.StackExchangeRedis` | Redis | `Caching` | Production simple |
-| `DigitalDynamics.Foundation.Caching.Hybrid` | L1 Memory + L2 Redis | `Caching` + `StackExchangeRedis` | Production Kubernetes multi-pods |
+| `Granit.Caching` | Memory (défaut) | — | Développement, tests locaux |
+| `Granit.Caching.StackExchangeRedis` | Redis | `Caching` | Production simple |
+| `Granit.Caching.Hybrid` | L1 Memory + L2 Redis | `Caching` + `StackExchangeRedis` | Production Kubernetes multi-pods |
 
 `Caching.Hybrid` utilise `IDistributedCache` (Redis) comme couche L2. Il dépend donc
 de `Caching.StackExchangeRedis` en tant que **dépendance transitive** : installer
@@ -21,13 +21,13 @@ de `Caching.StackExchangeRedis` en tant que **dépendance transitive** : install
 
 ```bash
 # Développement — Memory seul
-dotnet add package DigitalDynamics.Foundation.Caching
+dotnet add package Granit.Caching
 
 # Production simple — Redis (inclut Caching en transitif)
-dotnet add package DigitalDynamics.Foundation.Caching.StackExchangeRedis
+dotnet add package Granit.Caching.StackExchangeRedis
 
 # Production Kubernetes — Hybrid L1+L2 (inclut Caching + StackExchangeRedis en transitif)
-dotnet add package DigitalDynamics.Foundation.Caching.Hybrid
+dotnet add package Granit.Caching.Hybrid
 ```
 
 ## Configuration rapide
@@ -220,7 +220,7 @@ même sous forte concurrence (10+ requêtes simultanées sur la même clé absen
 ```
 
 Les `SemaphoreSlim` sont stockés dans un `IMemoryCache` dédié (clé DI :
-`DigitalDynamics.Foundation.Caching.Locks`, `SizeLimit = 10 000`) et non
+`Granit.Caching.Locks`, `SizeLimit = 10 000`) et non
 dans un `ConcurrentDictionary` non borné : le GC nettoie automatiquement
 les verrous inutilisés après 30 secondes.
 
@@ -292,7 +292,7 @@ Native dans `HybridCache` — aucun `SemaphoreSlim` supplémentaire nécessaire.
 
 ```text
 src/
-  DigitalDynamics.Foundation.Caching/
+  Granit.Caching/
   ├── ICacheService.cs                      (clé string)
   ├── ICacheServiceOfTKey.cs                (clé typée, ABP-style)
   ├── ICacheValueEncryptor.cs               (interface chiffrement)
@@ -310,13 +310,13 @@ src/
   └── Extensions/
       └── CachingServiceCollectionExtensions.cs
 
-  DigitalDynamics.Foundation.Caching.StackExchangeRedis/
+  Granit.Caching.StackExchangeRedis/
   ├── RedisCachingOptions.cs
   ├── FoundationCachingRedisModule.cs
   └── Extensions/
       └── RedisCachingServiceCollectionExtensions.cs
 
-  DigitalDynamics.Foundation.Caching.Hybrid/
+  Granit.Caching.Hybrid/
   ├── HybridCachingOptions.cs
   ├── HybridCacheService.cs
   ├── FoundationCachingHybridModule.cs

@@ -1,10 +1,10 @@
 # Types domaine
 
-`DigitalDynamics.Foundation.Core.Domain` fournit la hiérarchie d'entités persistées
+`Granit.Core.Domain` fournit la hiérarchie d'entités persistées
 et les interfaces domaine partagées par tous les packages Foundation.
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 ```
 
 ## Hiérarchie d'entités
@@ -35,7 +35,7 @@ Classe de base abstraite minimale pour toutes les entités persistées. Fournit
 uniquement l'identifiant.
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 public abstract class Entity
 {
@@ -49,7 +49,7 @@ Ajoute les champs de traçabilité de création. Pour les entités qui n'ont pas
 de tracer les modifications.
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 public abstract class CreationAuditedEntity : Entity
 {
@@ -64,7 +64,7 @@ Ajoute les champs de traçabilité de modification. C'est le choix par défaut p
 plupart des entités nécessitant un audit trail HDS.
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 public abstract class AuditedEntity : CreationAuditedEntity
 {
@@ -77,7 +77,7 @@ Toute entité persistée nécessitant un audit trail complet **doit** hériter d
 classe (ou de `FullAuditedEntity`) pour garantir la traçabilité HDS.
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 public sealed class Patient : AuditedEntity
 {
@@ -92,7 +92,7 @@ Ajoute la suppression logique conforme au RGPD en implémentant `ISoftDeletable`
 les entités contenant des données personnelles qui doivent supporter le droit à l'oubli.
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 public abstract class FullAuditedEntity : AuditedEntity, ISoftDeletable
 {
@@ -103,7 +103,7 @@ public abstract class FullAuditedEntity : AuditedEntity, ISoftDeletable
 ```
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 public sealed class Patient : FullAuditedEntity
 {
@@ -147,7 +147,7 @@ public interface IMultiTenant
 Utilisation typique — combiner avec la hiérarchie d'entités :
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 // Entité dont chaque enregistrement appartient à un tenant
 public sealed class DossierPatient : FullAuditedEntity, IMultiTenant
@@ -185,7 +185,7 @@ public interface IActive
 Utilisation typique :
 
 ```csharp
-using DigitalDynamics.Foundation.Core.Domain;
+using Granit.Core.Domain;
 
 public sealed class Etablissement : AuditedEntity, IActive
 {
@@ -223,7 +223,7 @@ Conformité HDS : les entrées d'audit sont conservées 3 ans.
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Core
+Granit.Core
 └── Domain/
     ├── Entity.cs                   (classe de base, identifiant)
     ├── CreationAuditedEntity.cs    (+ CreatedAt, CreatedBy)

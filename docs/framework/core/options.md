@@ -1,6 +1,6 @@
 # Options
 
-`DigitalDynamics.Foundation` utilise le **pattern Options** de Microsoft.Extensions.Options,
+`Granit` utilise le **pattern Options** de Microsoft.Extensions.Options,
 qui est la manière standard de configurer et consommer des paramètres typés dans ASP.NET Core.
 Les packages Foundation s'appuient entièrement sur cette infrastructure — aucune abstraction
 supplémentaire n'est introduite.
@@ -35,7 +35,7 @@ appsettings.json              classe d'options             service consommateur
 Chaque classe d'options Foundation suit cette convention :
 
 ```csharp
-namespace DigitalDynamics.Foundation.Authentication.Keycloak.Options;
+namespace Granit.Authentication.Keycloak.Options;
 
 public sealed class KeycloakOptions
 {
@@ -257,7 +257,7 @@ Exemple complet d'intégration du pattern Options dans un nouveau module :
 ### 1. Déclarer la classe d'options
 
 ```csharp
-namespace DigitalDynamics.Foundation.MyModule.Options;
+namespace Granit.MyModule.Options;
 
 public sealed class MyModuleOptions
 {

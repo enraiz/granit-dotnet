@@ -1,6 +1,6 @@
 # Guide de contribution
 
-> Comment contribuer aux packages DigitalDynamics.Foundation
+> Comment contribuer aux packages Granit
 
 ---
 
@@ -54,7 +54,7 @@ git commit -m "docs: update Vault integration guide"
 - **Nullable** : activé (`<Nullable>enable</Nullable>`)
 - **Warnings as errors** : activé
 - **Central Package Management** : toutes les versions dans `Directory.Packages.props`
-- **Namespaces** : `DigitalDynamics.Foundation.{Package}.{Sous-dossier}`
+- **Namespaces** : `Granit.{Package}.{Sous-dossier}`
 
 ### Architecture des packages
 
@@ -70,7 +70,7 @@ git commit -m "docs: update Vault integration guide"
 dotnet test
 
 # Tests d'un package spécifique
-dotnet test tests/DigitalDynamics.Foundation.Security.Tests
+dotnet test tests/Granit.Security.Tests
 
 # Avec couverture
 dotnet test --collect:"XPlat Code Coverage"

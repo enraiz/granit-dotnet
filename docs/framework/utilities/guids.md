@@ -1,6 +1,6 @@
 # Génération de GUID
 
-`DigitalDynamics.Foundation.Guids` fournit une abstraction pour la génération de GUID,
+`Granit.Guids` fournit une abstraction pour la génération de GUID,
 avec support des GUID séquentiels optimisés pour les index clustered des bases de données.
 
 Inspiré du module [`Volo.Abp.Guids`](https://abp.io/docs/latest/framework/infrastructure/guid-generation)
@@ -46,7 +46,7 @@ dans l'index.
 ## Installation
 
 ```bash
-dotnet add package DigitalDynamics.Foundation.Guids
+dotnet add package Granit.Guids
 ```
 
 ## Configuration
@@ -75,17 +75,17 @@ builder.Services.AddFoundationGuids(options =>
 });
 ```
 
-> Le package `DigitalDynamics.Foundation.Persistence` configure automatiquement le type
+> Le package `Granit.Persistence` configure automatiquement le type
 > séquentiel adapté au fournisseur de base de données utilisé. Dans la plupart des cas,
 > il n'est pas nécessaire de définir cette option manuellement si le package Persistence
 > est utilisé.
 
 ## IGuidGenerator
 
-Interface définie dans le package `DigitalDynamics.Foundation.Guids` :
+Interface définie dans le package `Granit.Guids` :
 
 ```csharp
-namespace DigitalDynamics.Foundation.Guids;
+namespace Granit.Guids;
 
 public interface IGuidGenerator
 {
@@ -304,7 +304,7 @@ if (entry.Entity is Entity entity)
 ## Architecture
 
 ```text
-DigitalDynamics.Foundation.Guids
+Granit.Guids
 ├── IGuidGenerator.cs                 (interface, contrat public)
 ├── SequentialGuidGenerator.cs
 ├── SimpleGuidGenerator.cs
