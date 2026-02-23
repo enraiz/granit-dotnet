@@ -886,9 +886,6 @@
           "Granit.Core": "[1.0.0, )",
           "Granit.MultiTenancy": "[1.0.0, )",
           "Granit.Security": "[1.0.0, )",
-          "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
-          "Microsoft.Extensions.Options": "[10.*, )",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )",
           "WolverineFx": "[5.*, )"
         }
       },

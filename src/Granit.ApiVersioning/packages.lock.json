@@ -23,10 +23,7 @@
       "Asp.Versioning.Abstractions": {
         "type": "Transitive",
         "resolved": "10.0.0-preview.1",
-        "contentHash": "mO7KcQU0kAjaEy1DVfBaIX2T/Uszc856nLaxKeWfvUmepm9qsIwGTqIY733CR/rkxXybve/q55ypFvmo+a3ypA==",
-        "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.0"
-        }
+        "contentHash": "mO7KcQU0kAjaEy1DVfBaIX2T/Uszc856nLaxKeWfvUmepm9qsIwGTqIY733CR/rkxXybve/q55ypFvmo+a3ypA=="
       },
       "Asp.Versioning.Http": {
         "type": "Transitive",
@@ -35,11 +32,6 @@
         "dependencies": {
           "Asp.Versioning.Abstractions": "10.0.0-preview.1"
         }
-      },
-      "Microsoft.Extensions.Primitives": {
-        "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "inRnbpCS0nwO/RuoZIAqxQUuyjaknOOnCEZB55KSMMjRhl0RQDttSmLSGsUJN3RQ3ocf5NDLFd2mOQViHqMK5w=="
       },
       "granit.core": {
         "type": "Project"
