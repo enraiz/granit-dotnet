@@ -9,6 +9,7 @@ using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Persistence;
 using Granit.Wolverine.Postgresql.Extensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
@@ -45,10 +46,20 @@ public sealed class GranitWolverinePostgresqlModuleTests
     [Fact]
     public void AddGranitWolverineWithPostgresql_RegistersWolverineServices()
     {
-        IHostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        // Provide a minimal in-memory config so PersistMessagesWithPostgresql
+        // receives a non-empty connection string (validation fires at app build).
+        HostApplicationBuilderSettings settings = new()
+        {
+            Configuration = new ConfigurationManager(),
+        };
+        settings.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["WolverinePostgresql:TransportConnectionString"] =
+                "Host=localhost;Database=test;Username=test;Password=test",
+        });
+        IHostApplicationBuilder builder = Host.CreateApplicationBuilder(settings);
 
-        Action act = () => builder.AddGranitWolverineWithPostgresql(
-            "Host=localhost;Database=test;Username=test;Password=test");
+        Action act = () => builder.AddGranitWolverineWithPostgresql();
 
         act.Should().NotThrow();
     }

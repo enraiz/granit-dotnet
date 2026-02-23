@@ -1,4 +1,8 @@
+using Granit.Wolverine.Postgresql.Internal;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
 using Wolverine.Postgresql;
@@ -20,10 +24,15 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
     /// automatically via <see cref="Granit.Core.Modularity.DependsOnAttribute"/>.
     /// </para>
     /// <para>
+    /// Reads <see cref="WolverinePostgresqlOptions"/> from the
+    /// <c>"WolverinePostgresql"</c> configuration section and validates at startup.
+    /// </para>
+    /// <para>
     /// Configures:
     /// <list type="bullet">
     ///   <item>PostgreSQL Outbox — durable at-least-once delivery (HDS-compliant).</item>
     ///   <item>EF Core transaction integration — message dispatch atomic with DB write.</item>
+    ///   <item><see cref="WolverinePostgresqlOptions.TransactionMode"/> applied to all handlers.</item>
     /// </list>
     /// </para>
     /// <para>
@@ -33,18 +42,31 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
     /// </para>
     /// </remarks>
     /// <param name="builder">The host application builder.</param>
-    /// <param name="connectionString">PostgreSQL connection string for the Wolverine Outbox tables.</param>
     /// <param name="configure">Optional additional Wolverine configuration.</param>
     /// <returns>The builder for chaining.</returns>
     public static IHostApplicationBuilder AddGranitWolverineWithPostgresql(
         this IHostApplicationBuilder builder,
-        string connectionString,
         Action<WolverineOptions>? configure = null)
     {
+        // Bind and validate options at startup via DI.
+        builder.Services
+            .AddOptions<WolverinePostgresqlOptions>()
+            .BindConfiguration(WolverinePostgresqlOptions.SectionName)
+            .ValidateOnStart();
+        builder.Services.AddSingleton<IValidateOptions<WolverinePostgresqlOptions>,
+            WolverinePostgresqlOptionsValidator>();
+
+        // Read options directly from IConfiguration: the DI container is not yet
+        // built at this point, so IOptions<> is not resolvable inside UseWolverine().
+        WolverinePostgresqlOptions options = new();
+        builder.Configuration
+            .GetSection(WolverinePostgresqlOptions.SectionName)
+            .Bind(options);
+
         builder.UseWolverine(opts =>
         {
-            opts.PersistMessagesWithPostgresql(connectionString);
-            opts.UseEntityFrameworkCoreTransactions();
+            opts.PersistMessagesWithPostgresql(options.TransportConnectionString);
+            opts.UseEntityFrameworkCoreTransactions(options.TransactionMode);
             opts.Policies.AutoApplyTransactions();
 
             configure?.Invoke(opts);

@@ -1,7 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Persistence;
 using Granit.Wolverine.Postgresql.Extensions;
-using Microsoft.Extensions.Configuration;
 
 namespace Granit.Wolverine.Postgresql;
 
@@ -12,8 +11,8 @@ namespace Granit.Wolverine.Postgresql;
 /// Adds a PostgreSQL Outbox and EF Core transaction integration on top of the
 /// provider-agnostic core configured by <see cref="GranitWolverineModule"/>.
 /// <para>
-/// Reads the PostgreSQL connection string from
-/// <c>ConnectionStrings:Wolverine</c> in <c>appsettings.json</c>.
+/// Reads <see cref="WolverinePostgresqlOptions"/> from the <c>"WolverinePostgresql"</c>
+/// section in <c>appsettings.json</c>. The connection string is validated at startup.
 /// </para>
 /// <para>
 /// For EF Core transaction integration, the consuming service must register its
@@ -25,14 +24,6 @@ namespace Granit.Wolverine.Postgresql;
 public sealed class GranitWolverinePostgresqlModule : GranitModule
 {
     /// <inheritdoc/>
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        string connectionString = context.Configuration.GetConnectionString("Wolverine")
-            ?? throw new InvalidOperationException(
-                "Missing 'ConnectionStrings:Wolverine' in configuration. " +
-                "This connection string is required by GranitWolverinePostgresqlModule " +
-                "to configure the PostgreSQL Outbox.");
-
-        context.Builder.AddGranitWolverineWithPostgresql(connectionString);
-    }
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Builder.AddGranitWolverineWithPostgresql();
 }
