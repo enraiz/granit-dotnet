@@ -37,6 +37,12 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.*" />
   </ItemGroup>
 
+  <ItemGroup Label="Wolverine">
+    <PackageVersion Include="WolverineFx" Version="5.*" />
+    <PackageVersion Include="WolverineFx.EntityFrameworkCore" Version="5.*" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="5.*" />
+  </ItemGroup>
+
   <ItemGroup Label="Vault">
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
   </ItemGroup>
