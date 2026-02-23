@@ -1,0 +1,228 @@
+using FluentAssertions;
+using Granit.BackgroundJobs.Internal;
+using Granit.Timing;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
+using Wolverine;
+using Xunit;
+
+namespace Granit.BackgroundJobs.Tests;
+
+public sealed class RecurringJobSchedulingMiddlewareTests
+{
+    private readonly IBackgroundJobStore _store = Substitute.For<IBackgroundJobStore>();
+    private readonly IClock _clock = Substitute.For<IClock>();
+    private readonly ILogger<RecurringJobSchedulingMiddleware> _logger =
+        Substitute.For<ILogger<RecurringJobSchedulingMiddleware>>();
+
+    public RecurringJobSchedulingMiddlewareTests()
+    {
+        // Allow [LoggerMessage] generated code to execute both branches (IsEnabled check)
+        _logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+    }
+
+    private RecurringJobSchedulingMiddleware MakeSut() =>
+        new(_store, _clock, _logger);
+
+    private static BackgroundJobDefinition MakeJob(
+        string name = "fake-daily-report",
+        string cron = "0 8 * * *",
+        bool enabled = true) =>
+        new()
+        {
+            Id = Guid.NewGuid(),
+            JobName = name,
+            CronExpression = cron,
+            MessageType = typeof(FakeDailyReportMessage).AssemblyQualifiedName!,
+            IsEnabled = enabled,
+        };
+
+    // =========================================================================
+    // BeforeAsync
+    // =========================================================================
+
+    [Fact]
+    public async Task BeforeAsync_DecoratedMessage_RecordsExecutionStart()
+    {
+        // Arrange
+        DateTimeOffset now = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
+        _clock.Now.Returns(now);
+        Envelope envelope = new(new FakeDailyReportMessage());
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+        CancellationToken ct = TestContext.Current.CancellationToken;
+
+        // Act
+        await sut.BeforeAsync(envelope, ct);
+
+        // Assert
+        await _store.Received(1).RecordExecutionStartAsync("fake-daily-report", now, ct);
+    }
+
+    [Fact]
+    public async Task BeforeAsync_WithTriggeredByHeader_CallsSetTriggeredBy()
+    {
+        // Arrange
+        _clock.Now.Returns(DateTimeOffset.UtcNow);
+        Envelope envelope = new(new FakeDailyReportMessage());
+        envelope.Headers[RecurringJobSchedulingMiddleware.TriggeredByHeader] = "admin-user";
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+        CancellationToken ct = TestContext.Current.CancellationToken;
+
+        // Act
+        await sut.BeforeAsync(envelope, ct);
+
+        // Assert
+        await _store.Received(1).SetTriggeredByAsync("fake-daily-report", "admin-user", ct);
+    }
+
+    [Fact]
+    public async Task BeforeAsync_UndecoratedMessage_SkipsRecording()
+    {
+        // Arrange
+        Envelope envelope = new(new UndecoratedMessage());
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+
+        // Act
+        await sut.BeforeAsync(envelope, TestContext.Current.CancellationToken);
+
+        // Assert — store must not be called at all
+        await _store.DidNotReceive()
+            .RecordExecutionStartAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<CancellationToken>());
+    }
+
+    // =========================================================================
+    // AfterAsync
+    // =========================================================================
+
+    [Fact]
+    public async Task AfterAsync_EnabledJob_SchedulesNextOccurrence()
+    {
+        // Arrange
+        DateTimeOffset now = new(2026, 1, 15, 7, 0, 0, TimeSpan.Zero); // before 08:00
+        _clock.Now.Returns(now);
+        BackgroundJobDefinition job = MakeJob("fake-daily-report", "0 8 * * *");
+        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
+
+        Envelope envelope = new(new FakeDailyReportMessage());
+        IMessageContext context = Substitute.For<IMessageContext>();
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+        CancellationToken ct = TestContext.Current.CancellationToken;
+
+        // Act
+        await sut.AfterAsync(envelope, context, ct);
+
+        // Assert — next occurrence is today at 08:00 UTC
+        DateTimeOffset expectedNext = new(2026, 1, 15, 8, 0, 0, TimeSpan.Zero);
+        await _store.Received(1).RecordNextExecutionAsync(
+            "fake-daily-report", expectedNext, ct);
+    }
+
+    [Fact]
+    public async Task AfterAsync_PausedJob_SkipsRescheduling()
+    {
+        // Arrange
+        _clock.Now.Returns(DateTimeOffset.UtcNow);
+        BackgroundJobDefinition job = MakeJob(enabled: false);
+        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
+
+        Envelope envelope = new(new FakeDailyReportMessage());
+        IMessageContext context = Substitute.For<IMessageContext>();
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+
+        // Act
+        await sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
+
+        // Assert — paused job must not be rescheduled
+        await _store.DidNotReceive()
+            .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AfterAsync_UndecoratedMessage_SkipsAllProcessing()
+    {
+        // Arrange
+        Envelope envelope = new(new UndecoratedMessage());
+        IMessageContext context = Substitute.For<IMessageContext>();
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+
+        // Act
+        await sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
+
+        // Assert
+        await _store.DidNotReceive()
+            .FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AfterAsync_NoCronNextOccurrence_LogsWarningAndSkips()
+    {
+        // Arrange — Feb 31 never exists, GetNextOccurrence returns null
+        _clock.Now.Returns(new DateTimeOffset(2026, 2, 28, 8, 0, 0, TimeSpan.Zero));
+        BackgroundJobDefinition job = MakeJob("fake-daily-report", "0 8 31 2 *");
+        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
+
+        Envelope envelope = new(new FakeDailyReportMessage());
+        IMessageContext context = Substitute.For<IMessageContext>();
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+
+        // Act
+        Func<Task> act = () =>
+            sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
+
+        // Assert — must not throw, no next execution recorded
+        await act.Should().NotThrowAsync();
+        await _store.DidNotReceive()
+            .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AfterAsync_JobNotFoundInStore_SkipsRescheduling()
+    {
+        // Arrange — store returns null (job was removed between BeforeAsync and AfterAsync)
+        _clock.Now.Returns(DateTimeOffset.UtcNow);
+        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<BackgroundJobDefinition?>(null));
+
+        Envelope envelope = new(new FakeDailyReportMessage());
+        IMessageContext context = Substitute.For<IMessageContext>();
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+
+        // Act
+        await sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
+
+        // Assert
+        await _store.DidNotReceive()
+            .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AfterAsync_SixFieldCron_ParsesAndSchedules()
+    {
+        // Arrange — 6-field cron (with seconds): every minute at second 0
+        DateTimeOffset now = new(2026, 1, 15, 10, 0, 30, TimeSpan.Zero);
+        _clock.Now.Returns(now);
+        BackgroundJobDefinition job = MakeJob("fake-daily-report", "0 * * * * *"); // every minute, second 0
+        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
+
+        Envelope envelope = new(new FakeDailyReportMessage());
+        IMessageContext context = Substitute.For<IMessageContext>();
+        RecurringJobSchedulingMiddleware sut = MakeSut();
+        CancellationToken ct = TestContext.Current.CancellationToken;
+
+        // Act
+        await sut.AfterAsync(envelope, context, ct);
+
+        // Assert — next occurrence: next minute at second 0
+        DateTimeOffset expectedNext = new(2026, 1, 15, 10, 1, 0, TimeSpan.Zero);
+        await _store.Received(1)
+            .RecordNextExecutionAsync("fake-daily-report", expectedNext, ct);
+    }
+}
