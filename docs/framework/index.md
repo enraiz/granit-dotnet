@@ -1,6 +1,6 @@
 # Granit — Documentation framework
 
-Cette documentation est organisée en sept sections thématiques.
+Cette documentation est organisée en huit sections thématiques.
 
 ## Core
 
