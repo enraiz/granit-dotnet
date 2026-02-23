@@ -7,6 +7,7 @@ sans aucun doublon possible en cluster multi-nœuds.
 | Package | Rôle |
 | --- | --- |
 | `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager` |
+| `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `granit_background_jobs` (SQL Server / PostgreSQL) |
 
 ## Concepts clés
 
@@ -58,7 +59,21 @@ L'Outbox transactionnelle est fournie par `GranitWolverinePostgresqlModule` (ré
 > **Mode `InMemory`** : état perdu au redémarrage. Parfait pour le développement et les tests.
 >
 > **Mode `Durable`** : store EF Core (SQL Server / PostgreSQL). L'état admin (pause, historique)
-> survit aux redémarrages. Implémentation disponible dans Story #127–#128.
+> survit aux redémarrages. Nécessite `Granit.BackgroundJobs.EntityFrameworkCore` (Story #128).
+
+### Mode durable — EF Core
+
+Ajouter le module EF Core et enregistrer le DbContext :
+
+```csharp
+[DependsOn(
+    typeof(GranitBackgroundJobsModule),
+    typeof(GranitBackgroundJobsEntityFrameworkCoreModule))]
+public sealed class MyAppModule : GranitModule { }
+```
+
+La table `granit_background_jobs` est créée par la migration EF Core (Story #129).
+Compatible SQL Server et PostgreSQL.
 
 ### 3 — Assemblies additionnelles (optionnel)
 
@@ -181,7 +196,7 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 
 | Story | Statut | Description |
 | --- | --- | --- |
-| #127 | Planifié | `BackgroundJobDefinition` EF Core entity + `BackgroundJobsDbContext` |
+| #127 | ✅ Terminé | `BackgroundJobDefinition` EF Core entity + `BackgroundJobsDbContext` (package `Granit.BackgroundJobs.EntityFrameworkCore`) |
 | #128 | Planifié | `EfBackgroundJobStore` (SQL Server / PostgreSQL) |
 | #129 | Planifié | Migrations EF Core + schéma `granit_background_jobs` |
 | #130 | Planifié | Intégration `GranitWolverinePostgresqlModule` |
