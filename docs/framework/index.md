@@ -58,6 +58,14 @@ Contrat HTTP : versioning des routes et documentation OpenAPI.
 | [api-documentation.md](api/api-documentation.md) | OpenAPI natif .NET 10, UI Scalar multi-version |
 | [idempotency.md](api/idempotency.md) | Idempotence HTTP style Stripe, Redis SET NX PX, conformité HDS |
 
+## Messaging
+
+Messagerie asynchrone et outbox transactionnelle.
+
+| Document | Description |
+| --- | --- |
+| [wolverine.md](messaging/wolverine.md) | WolverineFx, Outbox PostgreSQL, propagation de contexte HDS |
+
 ## Utilities
 
 Briques utilitaires transverses.
