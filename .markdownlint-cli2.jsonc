@@ -1,0 +1,13 @@
+{
+  // Merged from .markdownlint.json — this file takes priority over .markdownlint.json
+  "config": {
+    "MD013": false,
+    "MD024": { "siblings_only": true }
+  },
+  // AnalyzerReleases.*.md are Roslyn metadata files with a special ';' comment syntax
+  // that is not compatible with standard markdown linting rules.
+  "ignores": [
+    "**/AnalyzerReleases.Shipped.md",
+    "**/AnalyzerReleases.Unshipped.md"
+  ]
+}
