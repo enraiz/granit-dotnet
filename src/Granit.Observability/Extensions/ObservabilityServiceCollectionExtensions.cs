@@ -73,6 +73,9 @@ public static class ObservabilityServiceCollectionExtensions
                 }
 
                 tracing
+                    // Granit.Wolverine bridge spans (trace context restored from Outbox envelopes).
+                    // No-op if Granit.Wolverine is not installed — the source emits no spans.
+                    .AddSource("Granit.Wolverine")
                     .AddAspNetCoreInstrumentation(aspnet =>
                     {
                         aspnet.RecordException = true;
