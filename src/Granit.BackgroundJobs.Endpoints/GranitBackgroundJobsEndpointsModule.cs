@@ -1,5 +1,8 @@
 using Granit.Authorization;
+using Granit.Authorization.Abstractions;
+using Granit.BackgroundJobs.Endpoints.Permissions;
 using Granit.Core.Modularity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.BackgroundJobs.Endpoints;
 
@@ -15,4 +18,10 @@ namespace Granit.BackgroundJobs.Endpoints;
 [DependsOn(
     typeof(GranitBackgroundJobsModule),
     typeof(GranitAuthorizationModule))]
-public sealed class GranitBackgroundJobsEndpointsModule : GranitModule;
+public sealed class GranitBackgroundJobsEndpointsModule : GranitModule
+{
+    /// <inheritdoc />
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Services.AddSingleton<IPermissionDefinitionProvider,
+            BackgroundJobsPermissionDefinitionProvider>();
+}

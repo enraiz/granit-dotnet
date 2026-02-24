@@ -209,12 +209,70 @@ public sealed class MyAppModule : GranitModule { }
 | `POST` | `/{prefix}/{name}/resume` | `204` / `404` | Relance le scheduling |
 | `POST` | `/{prefix}/{name}/trigger` | `202 Accepted` / `404` | Exécution immédiate |
 
-### Autorisation
+### Sécurisation — couches de protection
 
-La politique `BackgroundJobs.Admin` est enregistrée automatiquement à l'appel de
-`MapBackgroundJobsEndpoints()`. Elle exige le rôle configuré via `RequiredRole`.
-Les endpoints retournent `401` si l'utilisateur n'est pas authentifié, `403` s'il
-ne possède pas le rôle requis.
+#### 1 — Authentification (JWT Keycloak)
+
+L'application hôte doit charger `GranitAuthenticationKeycloakModule` (ou
+`GranitJwtBearerModule`). Aucune configuration supplémentaire n'est nécessaire
+dans `Granit.BackgroundJobs.Endpoints` — les endpoints rejettent automatiquement
+les requêtes sans token valide (`401`).
+
+#### 2 — Autorisation (système de permissions Granit)
+
+`GranitBackgroundJobsEndpointsModule` enregistre `BackgroundJobsPermissionDefinitionProvider`,
+qui déclare la permission `BackgroundJobs.Admin` dans le registre de permissions Granit.
+
+Lorsque `GranitAuthorizationModule` est chargé (toujours le cas via `[DependsOn]`),
+`DynamicPermissionPolicyProvider` intercepte la politique `BackgroundJobs.Admin` et
+active le pipeline complet `IPermissionChecker` :
+
+```text
+Requête → DynamicPermissionPolicyProvider → PermissionRequirement("BackgroundJobs.Admin")
+  → IPermissionChecker.IsGrantedAsync("BackgroundJobs.Admin")
+      1. AlwaysAllow = true  → accordé  (dev/tests uniquement)
+      2. AdminRoles bypass   → accordé  (root of trust, sans DB)
+      3. Cache               → hit ou miss
+      4. IPermissionGrantStore.IsGrantedAsync(role, "BackgroundJobs.Admin")
+```
+
+#### 3 — Configurer l'accès en production
+
+**Option A — AdminRoles bypass (simple)** : ajouter le rôle Keycloak des opérateurs
+dans `GranitAuthorizationOptions.AdminRoles`. Aucune table DB nécessaire.
+
+```json
+// appsettings.json
+{
+  "Authorization": {
+    "AdminRoles": ["admin", "granit-background-jobs-admin"]
+  }
+}
+```
+
+**Option B — IPermissionManager (contrôle fin par tenant)** : accorder la permission
+au démarrage (nécessite `Granit.Authorization.EntityFrameworkCore`) :
+
+```csharp
+// Program.cs / hosted service
+await permissionManager.SetAsync(
+    "BackgroundJobs.Admin",
+    "granit-background-jobs-admin",
+    tenantId: null,   // null = toutes les tenants
+    isGranted: true);
+```
+
+#### 4 — Tests sans GranitAuthorizationModule
+
+En tests unitaires qui n'utilisent pas le module Granit (plain `AddAuthorization()`),
+`DynamicPermissionPolicyProvider` n'est pas actif et la politique tombe en fallback
+sur le `RequireRole()` enregistré par `MapBackgroundJobsEndpoints()` :
+
+```csharp
+builder.Services.AddAuthorization();  // sans GranitAuthorizationModule
+app.MapBackgroundJobsEndpoints(opts => opts.RequiredRole = "granit-background-jobs-admin");
+// → RequireRole("granit-background-jobs-admin") actif
+```
 
 ## Architecture interne
 
