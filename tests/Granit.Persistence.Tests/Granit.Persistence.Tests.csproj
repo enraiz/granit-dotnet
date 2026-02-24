@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.Persistence\Granit.Persistence.csproj" />
     <ProjectReference Include="..\..\src\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Persistence\Granit.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

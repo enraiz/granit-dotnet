@@ -3,24 +3,22 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <!-- EF1001: false positive — EF Core 10 analyzer incorrectly flags our own internal types
+         (SettingRecord, EfCoreSettingStore) as EF Core infrastructure APIs. -->
+    <NoWarn>$(NoWarn);EF1001</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
-    <ProjectReference Include="..\..\src\Granit.Wolverine\Granit.Wolverine.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Settings.EntityFrameworkCore\Granit.Settings.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>
