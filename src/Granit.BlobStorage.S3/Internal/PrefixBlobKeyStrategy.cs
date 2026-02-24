@@ -8,7 +8,8 @@ namespace Granit.BlobStorage.S3.Internal;
 /// Default <see cref="IBlobKeyStrategy"/> using tenant-prefix isolation.
 /// </summary>
 /// <remarks>
-/// Object key format: <c>{tenantId}/{containerName}/{yyyy}/{MM}/{blobId}</c>
+/// Object key format (multi-tenant): <c>{tenantId}/{containerName}/{yyyy}/{MM}/{blobId}</c>
+/// Object key format (single-tenant): <c>{containerName}/{yyyy}/{MM}/{blobId}</c>
 /// <para>
 /// The date components improve S3 performance on large buckets by distributing
 /// keys across a wider key-space prefix, reducing hot-spot partitions.
@@ -22,9 +23,13 @@ internal sealed class PrefixBlobKeyStrategy(
     /// <inheritdoc/>
     public string BuildObjectKey(string containerName, Guid blobId)
     {
-        string tenantId = GetRequiredTenantId();
+        string? tenantId = currentTenant.IsAvailable && currentTenant.Id is not null
+            ? currentTenant.Id.Value.ToString()
+            : null;
         DateTimeOffset now = clock.Now;
-        return $"{tenantId}/{containerName}/{now:yyyy}/{now:MM}/{blobId}";
+        return tenantId is not null
+            ? $"{tenantId}/{containerName}/{now:yyyy}/{now:MM}/{blobId}"
+            : $"{containerName}/{now:yyyy}/{now:MM}/{blobId}";
     }
 
     /// <inheritdoc/>
@@ -50,14 +55,4 @@ internal sealed class PrefixBlobKeyStrategy(
         return !string.IsNullOrEmpty(tenantId);
     }
 
-    private string GetRequiredTenantId()
-    {
-        if (!currentTenant.IsAvailable || currentTenant.Id is null)
-        {
-            throw new InvalidOperationException(
-                "Cannot build a blob object key without an active tenant context.");
-        }
-
-        return currentTenant.Id.Value.ToString();
-    }
 }

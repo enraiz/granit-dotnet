@@ -27,19 +27,16 @@ internal sealed class DefaultBlobStorage(
         BlobUploadRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (!currentTenant.IsAvailable || currentTenant.Id is null)
-        {
-            throw new InvalidOperationException(
-                "Cannot initiate a blob upload outside of an active tenant context.");
-        }
-
         Guid blobId = guidGenerator.Create();
         string objectKey = keyStrategy.BuildObjectKey(containerName, blobId);
         string bucket = keyStrategy.ResolveBucketName(containerName);
+        string tenantId = currentTenant.IsAvailable && currentTenant.Id is not null
+            ? currentTenant.Id.Value.ToString()
+            : string.Empty;
 
         BlobDescriptor descriptor = BlobDescriptor.Create(
             id: blobId,
-            tenantId: currentTenant.Id.Value.ToString(),
+            tenantId: tenantId,
             containerName: containerName,
             objectKey: objectKey,
             request: request,
