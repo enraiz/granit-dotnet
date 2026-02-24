@@ -208,7 +208,7 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 | #142 | ✅ Terminé | POST pause / resume / trigger (204, 202 Accepted, 404) |
 | #143 | ✅ Terminé | Policy `BackgroundJobs.Admin` — `RequiredRole` configurable via options |
 | #144 | ✅ Terminé | 17 tests d'intégration — 401/403/404, désérialisation JSON, custom role |
-| #134 | Planifié | `DeadLetterCount` via `IMessageStore` |
+| #134 | ✅ Terminé | `DeadLetterCount` via `IMessageStore` — `BackgroundJobManager.GetAllAsync()` intègre les stats DLQ Wolverine (dégradation gracieuse si `IMessageStore` absent) |
 
 ## Conformité HDS
 
