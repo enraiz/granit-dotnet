@@ -1,7 +1,9 @@
+using Granit.Core.MultiTenancy;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Persistence.Extensions;
@@ -102,6 +104,126 @@ public static class PersistenceTenantExtensions
 
         services.TryAddScoped<IDbContextFactory<TContext>,
             TenantPerSchemaDbContextFactory<TContext>>();
+
+        services.TryAddScoped<TContext>(
+            static sp => sp.GetRequiredService<IDbContextFactory<TContext>>().CreateDbContext());
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers a unified <see cref="IDbContextFactory{TContext}"/> that dynamically dispatches
+    /// to the appropriate isolation strategy (SharedDatabase, DatabasePerTenant, or SchemaPerTenant)
+    /// based on the result of <see cref="ITenantIsolationStrategyProvider"/>.
+    /// </summary>
+    /// <typeparam name="TContext">The <see cref="DbContext"/> to register.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configureShared">
+    /// Configures the <see cref="DbContextOptionsBuilder{TContext}"/> for the
+    /// <see cref="TenantIsolationStrategy.SharedDatabase"/> strategy.
+    /// Typically: <c>opts =&gt; opts.UseNpgsql(connectionString)</c>.
+    /// </param>
+    /// <param name="configureDatabasePerTenant">
+    /// Optionally configures <see cref="DbContextOptionsBuilder{TContext}"/> for the
+    /// <see cref="TenantIsolationStrategy.DatabasePerTenant"/> strategy.
+    /// Required if <c>TenantIsolation:Strategy = DatabasePerTenant</c> in configuration.
+    /// </param>
+    /// <param name="configureSchemaPerTenant">
+    /// Optionally configures <see cref="DbContextOptionsBuilder{TContext}"/> for the
+    /// <see cref="TenantIsolationStrategy.SchemaPerTenant"/> strategy.
+    /// Required if <c>TenantIsolation:Strategy = SchemaPerTenant</c> in configuration.
+    /// </param>
+    /// <param name="configureTenantSchema">
+    /// Optional action to configure <see cref="TenantSchemaOptions"/> (prefix, naming convention).
+    /// Only relevant when <paramref name="configureSchemaPerTenant"/> is provided.
+    /// </param>
+    /// <returns>The service collection for chaining.</returns>
+    /// <remarks>
+    /// <para>
+    /// The active strategy is resolved from <c>TenantIsolation:Strategy</c> in
+    /// <c>appsettings.json</c> via <see cref="ConfigurationTenantIsolationStrategyProvider"/>.
+    /// Register a custom <see cref="ITenantIsolationStrategyProvider"/> before this call to
+    /// override the default (e.g., for per-tenant dynamic routing).
+    /// </para>
+    /// <para>
+    /// An invalid <c>TenantIsolation:Strategy</c> value triggers a fail-fast
+    /// <see cref="OptionsValidationException"/> at application startup.
+    /// </para>
+    /// <para>
+    /// Each underlying factory is registered as a keyed scoped service using the
+    /// <see cref="TenantIsolationStrategy"/> enum value as the key. Calling the
+    /// individual <c>AddTenantPer*DbContext</c> extensions alongside this method is
+    /// not required and may cause duplicate registrations.
+    /// </para>
+    /// </remarks>
+    public static IServiceCollection AddGranitIsolatedDbContext<TContext>(
+        this IServiceCollection services,
+        Action<DbContextOptionsBuilder<TContext>> configureShared,
+        Action<DbContextOptionsBuilder<TContext>, string>? configureDatabasePerTenant = null,
+        Action<DbContextOptionsBuilder<TContext>>? configureSchemaPerTenant = null,
+        Action<TenantSchemaOptions>? configureTenantSchema = null)
+        where TContext : DbContext
+    {
+        // Isolation options — fail-fast on invalid appsettings value.
+        services.AddOptions<TenantIsolationOptions>()
+            .BindConfiguration("TenantIsolation")
+            .Validate(
+                opts => Enum.IsDefined(opts.Strategy),
+                "TenantIsolation:Strategy is not a valid TenantIsolationStrategy value. " +
+                "Valid values: SharedDatabase, DatabasePerTenant, SchemaPerTenant.")
+            .ValidateOnStart();
+
+        services.TryAddSingleton<ITenantIsolationStrategyProvider,
+            ConfigurationTenantIsolationStrategyProvider>();
+
+        // SharedDatabase — always registered; the default fallback strategy.
+        SharedDatabaseDbContextOptions<TContext> sharedOpts = new()
+        {
+            Configure = configureShared,
+        };
+        services.AddKeyedScoped<IDbContextFactory<TContext>>(
+            TenantIsolationStrategy.SharedDatabase,
+            (sp, _) => new SharedDatabaseDbContextFactory<TContext>(sp, sharedOpts));
+
+        // DatabasePerTenant — registered only when a configure delegate is provided.
+        if (configureDatabasePerTenant is not null)
+        {
+            TenantPerDatabaseDbContextOptions<TContext> perDbOpts = new()
+            {
+                Configure = configureDatabasePerTenant,
+            };
+            services.AddKeyedScoped<IDbContextFactory<TContext>>(
+                TenantIsolationStrategy.DatabasePerTenant,
+                (sp, _) => new TenantPerDatabaseDbContextFactory<TContext>(
+                    sp.GetRequiredService<ICurrentTenant>(),
+                    sp.GetRequiredService<ITenantConnectionStringProvider>(),
+                    sp,
+                    perDbOpts));
+        }
+
+        // SchemaPerTenant — registered only when a configure delegate is provided.
+        if (configureSchemaPerTenant is not null)
+        {
+            services.AddOptions<TenantSchemaOptions>()
+                .Configure(configureTenantSchema ?? (_ => { }));
+
+            services.TryAddSingleton<ITenantSchemaProvider, DefaultTenantSchemaProvider>();
+
+            TenantPerSchemaDbContextOptions<TContext> perSchemaOpts = new()
+            {
+                Configure = configureSchemaPerTenant,
+            };
+            services.AddKeyedScoped<IDbContextFactory<TContext>>(
+                TenantIsolationStrategy.SchemaPerTenant,
+                (sp, _) => new TenantPerSchemaDbContextFactory<TContext>(
+                    sp.GetRequiredService<ICurrentTenant>(),
+                    sp.GetRequiredService<ITenantSchemaProvider>(),
+                    sp,
+                    perSchemaOpts));
+        }
+
+        // Facade — dispatches to the keyed factory resolved at runtime.
+        services.TryAddScoped<IDbContextFactory<TContext>, IsolatedDbContextFactory<TContext>>();
 
         services.TryAddScoped<TContext>(
             static sp => sp.GetRequiredService<IDbContextFactory<TContext>>().CreateDbContext());
