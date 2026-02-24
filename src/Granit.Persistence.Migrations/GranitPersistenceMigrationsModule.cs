@@ -34,5 +34,6 @@ public sealed class GranitPersistenceMigrationsModule : GranitModule
     {
         context.Services.TryAddSingleton<IMigrationCycleRegistry, MigrationCycleRegistry>();
         context.Services.TryAddSingleton<ITenantDbIsolator, NullTenantDbIsolator>();
+        context.Services.TryAddSingleton<ITenantEnumerator, NullTenantEnumerator>();
     }
 }

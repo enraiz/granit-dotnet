@@ -62,6 +62,9 @@ builder.AddGranitPersistenceMigrations(opts => opts.UseNpgsql(connectionString))
 > - `MigrationProgressDbContext` — suivi des cycles dans `granit_migration_progress`
 > - `IMigrationCycleRegistry` — registre singleton des cycles
 > - `ITenantDbIsolator` — no-op par défaut (shared DB et DB-per-tenant)
+> - `ITenantEnumerator` — no-op par défaut (retourne un flux vide)
+> - `MigrationStartupService` — service hébergé de reprise au démarrage
+> - `MigrationStartupOptions` — options liées depuis la section `GranitMigrations`
 
 ## Déclaration d'un cycle
 
@@ -115,19 +118,47 @@ await bus.SendAsync(new RunMigrationBatchCommand(
 Le handler `RunMigrationBatchHandler` cascade automatiquement le message suivant
 tant que `NextCursor != null`.
 
+## Reprise au démarrage
+
+`MigrationStartupService` est un service hébergé qui, au démarrage de l'application,
+interroge la table `granit_migration_progress` et publie un `RunMigrationBatchCommand`
+pour chaque cycle en statut `Pending` ou `InProgress`.
+
+Le comportement dépend de `ITenantEnumerator` :
+
+- **Enumerateur vide** (défaut) : un message par ligne de progression, le `TenantId` stocké
+  dans la ligne est utilisé (`null` → `Guid.Empty`).
+- **Enumerateur personnalisé** : un message par tenant par cycle, le curseur stocké permet
+  la reprise. Les tenants sans ligne de progression démarrent depuis le début (`Cursor = null`).
+
+Les exceptions sont capturées et logguées ; le démarrage de l'application n'est jamais bloqué.
+
+### Options de démarrage
+
+```json
+// appsettings.json
+{
+  "GranitMigrations": {
+    "DefaultBatchSize": 500
+  }
+}
+```
+
 ## Multi-tenant
 
-| Topologie | Comportement | Configuration |
-| --------- | ------------ | ------------- |
-| **Shared DB** (colonne TenantId) | No-op — les query filters EF Core filtrent automatiquement | Aucune |
-| **Tenant-per-Database** | No-op — la connexion est déjà résolue par `PerTenantDbContextFactory` | Aucune |
-| **Tenant-per-Schema** | `SET search_path = schema_{tenantId}` avant chaque batch | Implémenter `ITenantDbIsolator` |
+| Topologie | `ITenantDbIsolator` | `ITenantEnumerator` |
+| --------- | ------------------- | ------------------- |
+| **Single-tenant** | No-op (défaut) | No-op (défaut) |
+| **Shared DB** (colonne TenantId) | No-op (défaut) | No-op (défaut) |
+| **Tenant-per-Database** | No-op (défaut) | No-op (défaut) |
+| **Tenant-per-Schema** | Implémenter `ITenantDbIsolator` | Implémenter `ITenantEnumerator` |
 
 ### Isolation Tenant-per-Schema
 
 ```csharp
 // Enregistrer avant AddGranitPersistenceMigrations()
 builder.Services.AddSingleton<ITenantDbIsolator, MySchemaIsolator>();
+builder.Services.AddSingleton<ITenantEnumerator, MyTenantEnumerator>();
 builder.AddGranitPersistenceMigrations(opts => opts.UseNpgsql(connectionString));
 ```
 
@@ -139,6 +170,24 @@ public sealed class MySchemaIsolator : ITenantDbIsolator
         string schema = $"schema_{tenantId:N}";
         await context.Database.ExecuteSqlAsync(
             $"SET search_path = {schema}", ct);
+    }
+}
+```
+
+```csharp
+public sealed class MyTenantEnumerator : ITenantEnumerator
+{
+    private readonly ITenantRepository _repository;
+
+    public MyTenantEnumerator(ITenantRepository repository) => _repository = repository;
+
+    public async IAsyncEnumerable<Guid> GetActiveTenantIdsAsync(
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        await foreach (Guid id in _repository.GetActiveIdsAsync(ct))
+        {
+            yield return id;
+        }
     }
 }
 ```

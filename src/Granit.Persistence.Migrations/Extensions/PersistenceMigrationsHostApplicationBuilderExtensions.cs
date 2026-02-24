@@ -19,7 +19,7 @@ public static class PersistenceMigrationsHostApplicationBuilderExtensions
     /// Registers:
     /// <list type="bullet">
     ///   <item>
-    ///     <see cref="MigrationProgressDbContext"/> — system <c>DbContext</c> for progress tracking.
+    ///     <see cref="MigrationProgressDbContext"/> — system <c>DbContext</c> factory for progress tracking.
     ///     Uses its own connection, never affected by tenant schema switches.
     ///     Committed independently from the tenant data transaction (best-effort progress).
     ///   </item>
@@ -33,6 +33,18 @@ public static class PersistenceMigrationsHostApplicationBuilderExtensions
     ///     register a custom <see cref="ITenantDbIsolator"/> with
     ///     <c>services.AddSingleton&lt;ITenantDbIsolator, MySchemaIsolator&gt;()</c>
     ///     <b>before</b> calling this method.
+    ///   </item>
+    ///   <item>
+    ///     <see cref="ITenantEnumerator"/> — default no-op implementation (empty stream).
+    ///     For Tenant-per-Schema or Tenant-per-Database topologies, register a custom
+    ///     <see cref="ITenantEnumerator"/> <b>before</b> calling this method.
+    ///   </item>
+    ///   <item>
+    ///     <c>MigrationStartupService</c> — hosted service that resumes pending cycles at startup.
+    ///   </item>
+    ///   <item>
+    ///     <see cref="MigrationStartupOptions"/> — bound from the
+    ///     <c>"GranitMigrations"</c> configuration section.
     ///   </item>
     /// </list>
     /// </para>
@@ -52,9 +64,9 @@ public static class PersistenceMigrationsHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configureProgressDb)
     {
-        // System DbContext — registered WITHOUT Wolverine EF Core transaction integration
+        // System DbContext factory — registered WITHOUT Wolverine EF Core transaction integration
         // so that progress commits are independent from the tenant data transaction.
-        builder.Services.AddDbContext<MigrationProgressDbContext>(configureProgressDb);
+        builder.Services.AddDbContextFactory<MigrationProgressDbContext>(configureProgressDb);
 
         // Thread-safe singleton registry — populated at startup via Register<TContext>().
         builder.Services.TryAddSingleton<IMigrationCycleRegistry, MigrationCycleRegistry>();
@@ -62,6 +74,17 @@ public static class PersistenceMigrationsHostApplicationBuilderExtensions
         // Default no-op isolator. Applications using Tenant-per-Schema must register
         // their own ITenantDbIsolator BEFORE calling this method.
         builder.Services.TryAddSingleton<ITenantDbIsolator, NullTenantDbIsolator>();
+
+        // Default no-op enumerator. Applications using Tenant-per-Schema or Tenant-per-Database
+        // must register their own ITenantEnumerator BEFORE calling this method.
+        builder.Services.TryAddSingleton<ITenantEnumerator, NullTenantEnumerator>();
+
+        // Hosted service — resumes pending and in-progress cycles at startup.
+        builder.Services.AddHostedService<MigrationStartupService>();
+
+        // Options — bound from the "GranitMigrations" configuration section.
+        builder.Services.Configure<MigrationStartupOptions>(
+            builder.Configuration.GetSection(MigrationStartupOptions.SectionName));
 
         return builder;
     }
