@@ -20,6 +20,7 @@ internal sealed class DefaultExceptionStatusCodeMapper : IExceptionStatusCodeMap
         ValidationException => StatusCodes.Status422UnprocessableEntity,
         IHasValidationErrors => StatusCodes.Status422UnprocessableEntity,
         ConflictException => StatusCodes.Status409Conflict,
+        BusinessRuleViolationException => StatusCodes.Status422UnprocessableEntity,
         BusinessException => StatusCodes.Status400BadRequest,
         IHasErrorCode => StatusCodes.Status400BadRequest,
         NotImplementedException => StatusCodes.Status501NotImplemented,
