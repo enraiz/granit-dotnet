@@ -2,6 +2,7 @@ using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Persistence.Extensions;
 
@@ -47,6 +48,60 @@ public static class PersistenceTenantExtensions
 
         services.TryAddScoped<IDbContextFactory<TContext>,
             TenantPerDatabaseDbContextFactory<TContext>>();
+
+        services.TryAddScoped<TContext>(
+            static sp => sp.GetRequiredService<IDbContextFactory<TContext>>().CreateDbContext());
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers <typeparamref name="TContext"/> as a per-schema <see cref="IDbContextFactory{TContext}"/>:
+    /// each connection is routed to the current tenant's dedicated PostgreSQL schema via
+    /// <c>SET search_path TO {schema}, public</c>, executed unconditionally at connection open.
+    /// </summary>
+    /// <typeparam name="TContext">The <see cref="DbContext"/> to register.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configureOptions">
+    /// Configures the <see cref="DbContextOptionsBuilder{TContext}"/> with the shared
+    /// connection string. Typically: <c>opts =&gt; opts.UseNpgsql(sharedConnectionString)</c>.
+    /// Do not set <c>search_path</c> here — it is managed by
+    /// <see cref="TenantSchemaConnectionInterceptor"/>.
+    /// </param>
+    /// <param name="configureTenantSchema">
+    /// Optional action to configure <see cref="TenantSchemaOptions"/> (prefix, naming convention).
+    /// </param>
+    /// <returns>The service collection for chaining.</returns>
+    /// <remarks>
+    /// <para>
+    /// <strong>Connection pool safety</strong> — <see cref="TenantSchemaConnectionInterceptor"/>
+    /// runs unconditionally on every connection lease from the Npgsql pool, overwriting any
+    /// previous tenant's <c>search_path</c>. No bypass condition exists.
+    /// </para>
+    /// <para>
+    /// If no custom <see cref="ITenantSchemaProvider"/> is registered, the default
+    /// <see cref="DefaultTenantSchemaProvider"/> is used (convention from
+    /// <see cref="TenantSchemaOptions"/>).
+    /// </para>
+    /// </remarks>
+    public static IServiceCollection AddTenantPerSchemaDbContext<TContext>(
+        this IServiceCollection services,
+        Action<DbContextOptionsBuilder<TContext>> configureOptions,
+        Action<TenantSchemaOptions>? configureTenantSchema = null)
+        where TContext : DbContext
+    {
+        services.AddOptions<TenantSchemaOptions>()
+            .Configure(configureTenantSchema ?? (_ => { }));
+
+        services.TryAddSingleton<ITenantSchemaProvider, DefaultTenantSchemaProvider>();
+
+        services.AddSingleton(new TenantPerSchemaDbContextOptions<TContext>
+        {
+            Configure = configureOptions,
+        });
+
+        services.TryAddScoped<IDbContextFactory<TContext>,
+            TenantPerSchemaDbContextFactory<TContext>>();
 
         services.TryAddScoped<TContext>(
             static sp => sp.GetRequiredService<IDbContextFactory<TContext>>().CreateDbContext());
