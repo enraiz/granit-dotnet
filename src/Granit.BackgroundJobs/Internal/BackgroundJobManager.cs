@@ -4,6 +4,8 @@ using Granit.Security;
 using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using Wolverine;
+using Wolverine.Persistence.Durability;
+using Wolverine.Persistence.Durability.DeadLetterManagement;
 
 namespace Granit.BackgroundJobs.Internal;
 
@@ -16,20 +18,28 @@ internal sealed partial class BackgroundJobManager(
     IMessageBus bus,
     IClock clock,
     ICurrentUserService currentUserService,
-    ILogger<BackgroundJobManager> logger) : IBackgroundJobManager
+    ILogger<BackgroundJobManager> logger,
+    IMessageStore messageStore) : IBackgroundJobManager
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default)
     {
         IReadOnlyList<BackgroundJobDefinition> jobs = await store.GetAllJobsAsync(ct);
-        return jobs.Select(ToStatus).ToList();
+        Dictionary<string, long> dlqCounts = await GetDlqCountsAsync(ct);
+        return jobs.Select(j => ToStatus(j, dlqCounts)).ToList();
     }
 
     /// <inheritdoc/>
     public async Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken ct = default)
     {
         BackgroundJobDefinition? job = await store.FindAsync(jobName, ct);
-        return job is null ? null : ToStatus(job);
+        if (job is null)
+        {
+            return null;
+        }
+
+        Dictionary<string, long> dlqCounts = await GetDlqCountsAsync(ct);
+        return ToStatus(job, dlqCounts);
     }
 
     /// <inheritdoc/>
@@ -90,6 +100,51 @@ internal sealed partial class BackgroundJobManager(
         return job;
     }
 
+    /// <summary>
+    /// Fetches Dead Letter Queue counts from the Wolverine message store.
+    /// Returns an empty dictionary if the store is unavailable or the query fails,
+    /// ensuring graceful degradation (DeadLetterCount = 0) without crashing.
+    /// </summary>
+    private async Task<Dictionary<string, long>> GetDlqCountsAsync(CancellationToken ct)
+    {
+        try
+        {
+            IReadOnlyList<DeadLetterQueueCount> counts =
+                await messageStore.DeadLetters.SummarizeAllAsync(
+                    string.Empty, TimeRange.AllTime(), ct);
+
+            return counts.ToDictionary(
+                c => c.MessageType,
+                c => (long)c.Count,
+                StringComparer.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            LogDlqQueryFailed(logger, ex);
+            return new Dictionary<string, long>();
+        }
+    }
+
+    private static BackgroundJobStatus ToStatus(
+        BackgroundJobDefinition job,
+        Dictionary<string, long> dlqCounts)
+    {
+        // BackgroundJobDefinition.MessageType is assembly-qualified (e.g. "MyApp.MyMsg, MyApp, ...").
+        // DeadLetterQueueCount.MessageType contains only the type's full name (no assembly suffix).
+        string shortTypeName = job.MessageType.Split(',')[0].Trim();
+        long dlqCount = dlqCounts.GetValueOrDefault(shortTypeName);
+
+        return new(
+            JobName: job.JobName,
+            CronExpression: job.CronExpression,
+            IsEnabled: job.IsEnabled,
+            LastExecutedAt: job.LastExecutedAt,
+            NextExecutionAt: job.NextExecutionAt,
+            ConsecutiveFailures: job.ConsecutiveFailureCount,
+            DeadLetterCount: dlqCount,
+            LastError: job.LastErrorMessage);
+    }
+
     private DateTimeOffset? ComputeNext(string cronExpression)
     {
         try
@@ -127,17 +182,6 @@ internal sealed partial class BackgroundJobManager(
                 $"Cannot instantiate message type '{type.Name}' for job '{jobName}'.");
     }
 
-    private static BackgroundJobStatus ToStatus(BackgroundJobDefinition job) =>
-        new(
-            JobName: job.JobName,
-            CronExpression: job.CronExpression,
-            IsEnabled: job.IsEnabled,
-            LastExecutedAt: job.LastExecutedAt,
-            NextExecutionAt: job.NextExecutionAt,
-            ConsecutiveFailures: job.ConsecutiveFailureCount,
-            DeadLetterCount: 0, // DLQ stats: Story #134 (requires IMessageStore)
-            LastError: job.LastErrorMessage);
-
     // =========================================================================
     // Source-generated logger messages (CA1873 / CA1848 compliance)
     // =========================================================================
@@ -153,4 +197,7 @@ internal sealed partial class BackgroundJobManager(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "BackgroundJob '{JobName}' triggered manually by '{UserId}'.")]
     private static partial void LogJobTriggered(ILogger logger, string jobName, string userId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to query Wolverine Dead Letter Queue; DeadLetterCount will be 0 for all jobs.")]
+    private static partial void LogDlqQueryFailed(ILogger logger, Exception exception);
 }

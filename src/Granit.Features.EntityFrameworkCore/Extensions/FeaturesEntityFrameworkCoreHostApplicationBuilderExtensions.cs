@@ -1,0 +1,63 @@
+using Granit.Features.EntityFrameworkCore.Internal;
+using Granit.Features.Store;
+using Granit.Persistence.Interceptors;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+
+namespace Granit.Features.EntityFrameworkCore.Extensions;
+
+/// <summary>
+/// Extension methods for registering EF Core persistence for Granit feature overrides.
+/// </summary>
+public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
+{
+    /// <summary>
+    /// Registers EF Core persistence for Granit feature value overrides.
+    /// </summary>
+    /// <remarks>
+    /// Replaces the default <c>InMemoryFeatureStore</c> registered by
+    /// <c>AddGranitFeatures()</c> with <see cref="EfCoreFeatureStore"/>,
+    /// backed by <see cref="GranitFeaturesDbContext"/> (table <c>feature_overrides</c>).
+    /// <para>
+    /// <see cref="AuditedEntityInterceptor"/> is added automatically when
+    /// <c>Granit.Persistence</c> is configured, enabling the HDS 3-year audit trail
+    /// (<c>created_at</c>, <c>created_by</c>, <c>modified_at</c>, <c>modified_by</c>).
+    /// </para>
+    /// <para>
+    /// Must be called after <c>AddGranitFeatures()</c>.
+    /// </para>
+    /// <para>
+    /// The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// Never use a service subject to the US Cloud Act for health data.
+    /// </para>
+    /// </remarks>
+    /// <param name="builder">The host application builder.</param>
+    /// <param name="configure">EF Core <see cref="DbContextOptionsBuilder"/> configuration (provider + connection string).</param>
+    /// <returns>The builder for chaining.</returns>
+    public static IHostApplicationBuilder AddGranitFeaturesEntityFrameworkCore(
+        this IHostApplicationBuilder builder,
+        Action<DbContextOptionsBuilder> configure)
+    {
+        builder.Services.AddDbContextFactory<GranitFeaturesDbContext>((sp, options) =>
+        {
+            configure(options);
+
+            // Automatically wire the HDS audit interceptor when Granit.Persistence is present.
+            // The interceptor is Scoped — using a Scoped factory (ServiceLifetime.Scoped)
+            // ensures it is resolved from the current request/message scope.
+            AuditedEntityInterceptor? auditInterceptor =
+                sp.GetService<AuditedEntityInterceptor>();
+            if (auditInterceptor is not null)
+            {
+                options.AddInterceptors(auditInterceptor);
+            }
+        }, ServiceLifetime.Scoped);
+
+        builder.Services.Replace(
+            ServiceDescriptor.Scoped<IFeatureStore, EfCoreFeatureStore>());
+
+        return builder;
+    }
+}

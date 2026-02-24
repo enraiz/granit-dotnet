@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.BlobStorage</PackageId>
+    <Description>Module de stockage de fichiers mutables pour Granit. Architecture Direct-to-Cloud : génération de Pre-signed URLs (upload/download) S3-compatibles, isolation multi-tenant par préfixe TenantId, pipeline de validation post-upload (IBlobValidator), cycle de vie BlobDescriptor avec Crypto-Shredding RGPD.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.BlobStorage.Tests" />
+    <InternalsVisibleTo Include="Granit.BlobStorage.S3" />
+    <InternalsVisibleTo Include="Granit.BlobStorage.S3.Tests" />
+    <InternalsVisibleTo Include="Granit.BlobStorage.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.BlobStorage.EntityFrameworkCore.Tests" />
+    <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal interfaces in tests -->
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
+    <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
+  </ItemGroup>
+
+</Project>

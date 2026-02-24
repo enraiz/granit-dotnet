@@ -197,12 +197,18 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 | Story | Statut | Description |
 | --- | --- | --- |
 | #127 | ✅ Terminé | `BackgroundJobDefinition` EF Core entity + `BackgroundJobsDbContext` (package `Granit.BackgroundJobs.EntityFrameworkCore`) |
-| #128 | Planifié | `EfBackgroundJobStore` (SQL Server / PostgreSQL) |
-| #129 | Planifié | Migrations EF Core + schéma `granit_background_jobs` |
-| #130 | Planifié | Intégration `GranitWolverinePostgresqlModule` |
-| #136 | Planifié | `CronSchedulerAgent` (`IAgent`) — démarrage cluster-safe |
-| #134 | Planifié | `DeadLetterCount` via `IMessageStore` |
-| #140–144 | Planifié | `Granit.BackgroundJobs.Endpoints` — API Minimal, policy `BackgroundJobs.Admin` |
+| #128 | ✅ Terminé | `EfBackgroundJobStore` (SQL Server / PostgreSQL) + `AddGranitBackgroundJobsEntityFrameworkCore()` |
+| #129 | ✅ Terminé | Migrations EF Core + schéma `granit_background_jobs` |
+| #130 | ✅ Terminé | Intégration `GranitWolverinePostgresqlModule` |
+| #136 | ✅ Terminé | `CronSchedulerAgent` (`SingularAgent`) — démarrage cluster-safe, anti-doublon |
+| #137 | ✅ Terminé | Étendre `OutgoingContextMiddleware` pour propager `X-Triggered-By` |
+| #138 | ✅ Terminé | Tests d'intégration `BackgroundJobsIntegrationTests` |
+| #140 | ✅ Terminé | Scaffolding `Granit.BackgroundJobs.Endpoints` — module, options, `MapBackgroundJobsEndpoints()` |
+| #141 | ✅ Terminé | GET /background-jobs + GET /background-jobs/{name} (TypedResults, OpenAPI) |
+| #142 | ✅ Terminé | POST pause / resume / trigger (204, 202 Accepted, 404) |
+| #143 | ✅ Terminé | Policy `BackgroundJobs.Admin` — `RequiredRole` configurable via options |
+| #144 | ✅ Terminé | 17 tests d'intégration — 401/403/404, désérialisation JSON, custom role |
+| #134 | ✅ Terminé | `DeadLetterCount` via `IMessageStore` — `BackgroundJobManager.GetAllAsync()` intègre les stats DLQ Wolverine (dégradation gracieuse si `IMessageStore` absent) |
 
 ## Conformité HDS
 

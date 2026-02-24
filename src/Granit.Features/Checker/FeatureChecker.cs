@@ -1,0 +1,82 @@
+using Granit.Features.Cache;
+using Granit.Features.Definitions;
+using Granit.Features.Exceptions;
+using Granit.Features.ValueProviders;
+using Granit.MultiTenancy;
+using Microsoft.Extensions.Caching.Hybrid;
+
+namespace Granit.Features.Checker;
+
+/// <summary>
+/// Resolves feature values using the Tenant → Plan → Default cascade,
+/// backed by <see cref="HybridCache"/> (L1 in-process + L2 Redis).
+/// </summary>
+internal sealed class FeatureChecker(
+    IFeatureDefinitionStore definitionStore,
+    IEnumerable<IFeatureValueProvider> valueProviders,
+    ICurrentTenant currentTenant,
+    HybridCache hybridCache) : IFeatureChecker
+{
+    private readonly IFeatureDefinitionStore _definitionStore = definitionStore;
+    private readonly IReadOnlyList<IFeatureValueProvider> _providers =
+        [.. valueProviders.OrderBy(p => p.Order)];
+    private readonly ICurrentTenant _currentTenant = currentTenant;
+    private readonly HybridCache _hybridCache = hybridCache;
+
+    /// <inheritdoc/>
+    public async Task<bool> IsEnabledAsync(string featureName, CancellationToken ct = default)
+    {
+        string value = await GetValueAsync(featureName, ct);
+        return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <inheritdoc/>
+    public async Task<long> GetNumericAsync(string featureName, CancellationToken ct = default)
+    {
+        string value = await GetValueAsync(featureName, ct);
+        return long.TryParse(value, out long parsed) ? parsed : 0L;
+    }
+
+    /// <inheritdoc/>
+    public async Task<string> GetValueAsync(string featureName, CancellationToken ct = default)
+    {
+        FeatureDefinition definition = _definitionStore.GetRequired(featureName);
+        Guid? tenantId = _currentTenant.IsAvailable ? _currentTenant.Id : null;
+        string cacheKey = FeatureCacheKey.Build(tenantId, featureName);
+
+        string resolved = await _hybridCache.GetOrCreateAsync<string>(
+            cacheKey,
+            async innerCt =>
+            {
+                string? value = await ResolveAsync(definition, innerCt);
+                return value ?? definition.DefaultValue;
+            },
+            cancellationToken: ct);
+
+        return resolved;
+    }
+
+    /// <inheritdoc/>
+    public async Task RequireEnabledAsync(string featureName, CancellationToken ct = default)
+    {
+        bool enabled = await IsEnabledAsync(featureName, ct);
+        if (!enabled)
+        {
+            throw new FeatureNotEnabledException(featureName);
+        }
+    }
+
+    private async Task<string?> ResolveAsync(FeatureDefinition definition, CancellationToken ct)
+    {
+        foreach (IFeatureValueProvider provider in _providers)
+        {
+            string? value = await provider.GetOrNullAsync(definition, ct);
+            if (value is not null)
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
+}

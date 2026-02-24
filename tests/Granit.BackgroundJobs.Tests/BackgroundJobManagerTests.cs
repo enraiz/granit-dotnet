@@ -5,7 +5,10 @@ using Granit.Security;
 using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Wolverine;
+using Wolverine.Persistence.Durability;
+using Wolverine.Persistence.Durability.DeadLetterManagement;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
@@ -18,15 +21,23 @@ public sealed class BackgroundJobManagerTests
     private readonly ICurrentUserService _user = Substitute.For<ICurrentUserService>();
     private readonly ILogger<BackgroundJobManager> _logger =
         Substitute.For<ILogger<BackgroundJobManager>>();
+    private readonly IMessageStore _messageStore = Substitute.For<IMessageStore>();
+    private readonly IDeadLetters _deadLetters = Substitute.For<IDeadLetters>();
 
     public BackgroundJobManagerTests()
     {
         // Allow [LoggerMessage] generated code to execute both branches (IsEnabled check)
         _logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+
+        // Default: no dead letters (graceful baseline)
+        _messageStore.DeadLetters.Returns(_deadLetters);
+        _deadLetters
+            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([]));
     }
 
     private BackgroundJobManager MakeSut() =>
-        new(_store, _bus, _clock, _user, _logger);
+        new(_store, _bus, _clock, _user, _logger, _messageStore);
 
     private static BackgroundJobDefinition MakeJob(
         string name = "test-job",
@@ -64,6 +75,67 @@ public sealed class BackgroundJobManagerTests
         result[0].JobName.Should().Be("daily-report");
         result[0].CronExpression.Should().Be("0 8 * * *");
         result[0].IsEnabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WithDlqEntries_PopulatesDeadLetterCount()
+    {
+        // Arrange
+        string messageTypeShortName =
+            typeof(FakeDailyReportMessage).AssemblyQualifiedName!.Split(',')[0].Trim();
+
+        BackgroundJobDefinition job = MakeJob("daily-report", "0 8 * * *");
+        job.ConsecutiveFailureCount = 3;
+        job.LastErrorMessage = "timeout";
+        _store.GetAllJobsAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
+
+        DeadLetterQueueCount dlqEntry = new(
+            ServiceName: "my-app",
+            ReceivedAt: new Uri("queue://test"),
+            MessageType: messageTypeShortName,
+            ExceptionType: "TimeoutException",
+            Database: new Uri("db://test"),
+            Count: 5);
+
+        _deadLetters
+            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([dlqEntry]));
+
+        BackgroundJobManager sut = MakeSut();
+
+        // Act
+        IReadOnlyList<BackgroundJobStatus> result =
+            await sut.GetAllAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result[0].ConsecutiveFailures.Should().Be(3);
+        result[0].LastError.Should().Be("timeout");
+        result[0].DeadLetterCount.Should().Be(5);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WhenDlqQueryThrows_ReturnsZeroDeadLetterCount()
+    {
+        // Arrange
+        BackgroundJobDefinition job = MakeJob("daily-report");
+        _store.GetAllJobsAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
+
+        _deadLetters
+            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("DLQ unavailable"));
+
+        BackgroundJobManager sut = MakeSut();
+
+        // Act — must not throw
+        IReadOnlyList<BackgroundJobStatus> result =
+            await sut.GetAllAsync(TestContext.Current.CancellationToken);
+
+        // Assert — graceful degradation
+        result.Should().HaveCount(1);
+        result[0].DeadLetterCount.Should().Be(0);
     }
 
     // =========================================================================

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Wolverine;
 using Wolverine.Runtime.Handlers;
+using static Wolverine.HostBuilderExtensions;
 
 namespace Granit.BackgroundJobs.Extensions;
 
@@ -62,6 +63,7 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
         builder.Services.AddSingleton<IBackgroundJobStore, InMemoryBackgroundJobStore>();
 
         builder.Services.AddScoped<IBackgroundJobManager, BackgroundJobManager>();
+        builder.Services.AddSingularAgent<CronSchedulerAgent>();
 
         // Discover and seed recurring jobs from all relevant assemblies.
         IEnumerable<Assembly> scanAssemblies = new[] { Assembly.GetEntryAssembly()! }
