@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     /// Registers the following services:
     /// <list type="bullet">
-    ///   <item><see cref="IFeatureDefinitionStore"/> (singleton) — aggregates all <see cref="FeatureDefinitionProvider"/> registrations.</item>
+    ///   <item><see cref="IFeatureDefinitionStore"/> (singleton) — aggregates all <see cref="IFeatureDefinitionProvider"/> registrations.</item>
     ///   <item><see cref="IFeatureStore"/> (singleton) — defaults to <see cref="InMemoryFeatureStore"/>; replace with EF Core store via <c>Granit.Features.EntityFrameworkCore</c>.</item>
     ///   <item>Value providers: Default, Plan, Tenant (scoped).</item>
     ///   <item><see cref="IFeatureChecker"/> (scoped) — resolves feature values with hybrid cache.</item>
@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
     /// implementations of <c>IPlanIdProvider</c> and <c>IPlanFeatureStore</c>.
     /// </para>
     /// <para>
-    /// To declare features, register a <see cref="FeatureDefinitionProvider"/>:
+    /// To declare features, register a <see cref="IFeatureDefinitionProvider"/>:
     /// <code>services.AddFeatureDefinitions&lt;MyFeatureDefinitionProvider&gt;();</code>
     /// </para>
     /// </remarks>

@@ -5,7 +5,7 @@ namespace Granit.Features.Definitions;
 /// </summary>
 /// <remarks>
 /// Built once (singleton) by aggregating all registered
-/// <see cref="FeatureDefinitionProvider"/> instances. Immutable after startup.
+/// <see cref="IFeatureDefinitionProvider"/> instances. Immutable after startup.
 /// </remarks>
 public interface IFeatureDefinitionStore
 {

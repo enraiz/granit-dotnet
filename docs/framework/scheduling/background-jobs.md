@@ -8,6 +8,7 @@ sans aucun doublon possible en cluster multi-nœuds.
 | --- | --- |
 | `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager` |
 | `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `granit_background_jobs` (SQL Server / PostgreSQL) |
+| `Granit.BackgroundJobs.Endpoints` | Administration HTTP : endpoints Minimal API, politique d'autorisation `BackgroundJobs.Admin` |
 
 ## Concepts clés
 
@@ -170,6 +171,51 @@ public sealed record BackgroundJobStatus(
 `TriggeredBy` est write-once par cycle d'exécution et conservé pour audit.
 Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 
+## Endpoints d'administration
+
+Le package `Granit.BackgroundJobs.Endpoints` expose 5 routes Minimal API protégées
+par la politique `BackgroundJobs.Admin`.
+
+### Enregistrement
+
+```csharp
+app.MapBackgroundJobsEndpoints();
+
+// Avec options personnalisées
+app.MapBackgroundJobsEndpoints(opts =>
+{
+    opts.RoutePrefix  = "admin/jobs";          // défaut : "background-jobs"
+    opts.RequiredRole = "ops-team";            // défaut : "granit-background-jobs-admin"
+    opts.TagName      = "Background Jobs";     // défaut : "Background Jobs"
+});
+```
+
+Le module doit être déclaré dans l'application hôte :
+
+```csharp
+[DependsOn(
+    typeof(GranitBackgroundJobsModule),
+    typeof(GranitBackgroundJobsEndpointsModule))]
+public sealed class MyAppModule : GranitModule { }
+```
+
+### Routes
+
+| Méthode | Route | Réponse | Description |
+| --- | --- | --- | --- |
+| `GET` | `/{prefix}` | `200 Ok<IReadOnlyList<BackgroundJobStatus>>` | Liste tous les jobs |
+| `GET` | `/{prefix}/{name}` | `200 Ok<BackgroundJobStatus>` / `404` | Détail d'un job |
+| `POST` | `/{prefix}/{name}/pause` | `204` / `404` | Suspend le scheduling |
+| `POST` | `/{prefix}/{name}/resume` | `204` / `404` | Relance le scheduling |
+| `POST` | `/{prefix}/{name}/trigger` | `202 Accepted` / `404` | Exécution immédiate |
+
+### Autorisation
+
+La politique `BackgroundJobs.Admin` est enregistrée automatiquement à l'appel de
+`MapBackgroundJobsEndpoints()`. Elle exige le rôle configuré via `RequiredRole`.
+Les endpoints retournent `401` si l'utilisateur n'est pas authentifié, `403` s'il
+ne possède pas le rôle requis.
+
 ## Architecture interne
 
 ```text
@@ -180,6 +226,15 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 [WolverineOptions]
   opts.Policies.AddMiddleware<RecurringJobSchedulingMiddleware>(
       chain => chain.MessageType.GetCustomAttribute<RecurringJobAttribute>() is not null)
+  services.AddSingularAgent<CronSchedulerAgent>()  ← agent singleton cluster-safe
+
+[Cluster — CronSchedulerAgent]
+  startAsync()
+    → store.GetEnabledJobsAsync()
+    → si NextExecutionAt > Now : skip (déjà planifié via Outbox)
+    → Cronos.GetNextOccurrence()
+    → bus.ScheduleAsync(message, next)
+    → store.RecordNextExecutionAsync()
 
 [Runtime — par message récurrent]
   RecurringJobSchedulingMiddleware.BeforeAsync()
