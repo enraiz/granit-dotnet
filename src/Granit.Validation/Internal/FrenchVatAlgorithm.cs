@@ -38,21 +38,15 @@ internal static class FrenchVatAlgorithm
         string sirenPart = normalized[4..];
 
         // Key must be 2 digits.
-        foreach (char c in keyPart)
+        if (!keyPart.All(char.IsDigit))
         {
-            if (!char.IsDigit(c))
-            {
-                return false;
-            }
+            return false;
         }
 
         // SIREN must be exactly 9 digits.
-        foreach (char c in sirenPart)
+        if (!sirenPart.All(char.IsDigit))
         {
-            if (!char.IsDigit(c))
-            {
-                return false;
-            }
+            return false;
         }
 
         if (!long.TryParse(sirenPart, out long siren))

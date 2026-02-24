@@ -29,7 +29,7 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
     [InlineData("185072A10000146")]        // Corse 2A — replaced by 19 before check
     public void FrenchNir_ValidValues_PassValidation(string nir)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchNir();
 
         ValidationResult result = validator.Validate(new TestModel(nir));
@@ -46,7 +46,7 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
     [InlineData("ABCDE0000000047")]         // non-digit characters
     public void FrenchNir_InvalidValues_FailValidation(string? nir)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchNir();
 
         ValidationResult result = validator.Validate(new TestModel(nir));
@@ -69,7 +69,7 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
     [InlineData("592-0000000-16")]         // formatted, base=5920000000, mod 97=81, key=16
     public void BelgianEid_ValidValues_PassValidation(string eid)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianEid();
 
         ValidationResult result = validator.Validate(new TestModel(eid));
@@ -85,7 +85,7 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
     [InlineData("123456789096")]            // wrong check (should be 95)
     public void BelgianEid_InvalidValues_FailValidation(string? eid)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianEid();
 
         ValidationResult result = validator.Validate(new TestModel(eid));

@@ -24,7 +24,7 @@ public sealed class ContactValidatorExtensionsTests
     [InlineData("admin@granit.io")]
     public void Email_ValidValues_PassValidation(string email)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Email();
 
         ValidationResult result = validator.Validate(new TestModel(email));
@@ -41,7 +41,7 @@ public sealed class ContactValidatorExtensionsTests
     [InlineData("spaces in@email.com")]    // space in local part
     public void Email_InvalidValues_FailValidation(string? email)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Email();
 
         ValidationResult result = validator.Validate(new TestModel(email));

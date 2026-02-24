@@ -27,7 +27,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
     [InlineData("BE100000070")]            // 9-digit form (leading 0 implicit)
     public void BelgianVat_ValidValues_PassValidation(string vat)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianVat();
 
         ValidationResult result = validator.Validate(new TestModel(vat));
@@ -43,7 +43,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
     [InlineData("BE010000071")]            // 9-digit form — wrong check (should be 07, not 71)
     public void BelgianVat_InvalidValues_FailValidation(string? vat)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianVat();
 
         ValidationResult result = validator.Validate(new TestModel(vat));
@@ -66,7 +66,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
     [InlineData("fr44732829320")]          // lowercase accepted
     public void FrenchVat_ValidValues_PassValidation(string vat)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchVat();
 
         ValidationResult result = validator.Validate(new TestModel(vat));
@@ -83,7 +83,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
     [InlineData("FRAA732829320")]          // alpha key — not supported by this validator
     public void FrenchVat_InvalidValues_FailValidation(string? vat)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchVat();
 
         ValidationResult result = validator.Validate(new TestModel(vat));
@@ -106,7 +106,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
     [InlineData("NL123456789B01")]         // Netherlands — format check
     public void EuropeanVat_ValidValues_PassValidation(string vat)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).EuropeanVat();
 
         ValidationResult result = validator.Validate(new TestModel(vat));
@@ -123,7 +123,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
     [InlineData("DE12345678")]             // DE too short (8 not 9 digits)
     public void EuropeanVat_InvalidValues_FailValidation(string? vat)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).EuropeanVat();
 
         ValidationResult result = validator.Validate(new TestModel(vat));

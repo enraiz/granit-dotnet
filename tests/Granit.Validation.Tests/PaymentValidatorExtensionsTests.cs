@@ -25,7 +25,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("gebabebb")]               // lowercase — normalised to uppercase
     public void BicSwift_ValidValues_PassValidation(string bic)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BicSwift();
 
         ValidationResult result = validator.Validate(new TestModel(bic));
@@ -43,7 +43,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("GEBABEBB36AB")]          // 12 chars — too long
     public void BicSwift_InvalidValues_FailValidation(string? bic)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BicSwift();
 
         ValidationResult result = validator.Validate(new TestModel(bic));
@@ -66,7 +66,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("FR20ZZZ123456")]          // French SCI
     public void SepaCreditorIdentifier_ValidValues_PassValidation(string sci)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).SepaCreditorIdentifier();
 
         ValidationResult result = validator.Validate(new TestModel(sci));
@@ -83,7 +83,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("BEAAZZZ000000000")]       // check not digits
     public void SepaCreditorIdentifier_InvalidValues_FailValidation(string? sci)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).SepaCreditorIdentifier();
 
         ValidationResult result = validator.Validate(new TestModel(sci));
@@ -107,7 +107,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("00000000000000000000097")]            // all-zero account, key = 97
     public void FrenchRib_ValidValues_PassValidation(string rib)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchRib();
 
         ValidationResult result = validator.Validate(new TestModel(rib));
@@ -123,7 +123,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("30004000010000000404530")]            // wrong key (29 → 30)
     public void FrenchRib_InvalidValues_FailValidation(string? rib)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchRib();
 
         ValidationResult result = validator.Validate(new TestModel(rib));
@@ -146,7 +146,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("123-4567890-02")]          // formatted with dashes
     public void BelgianAccountNumber_ValidValues_PassValidation(string account)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianAccountNumber();
 
         ValidationResult result = validator.Validate(new TestModel(account));
@@ -162,7 +162,7 @@ public sealed class PaymentValidatorExtensionsTests
     [InlineData("123456789003")]            // wrong key (02 → 03)
     public void BelgianAccountNumber_InvalidValues_FailValidation(string? account)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianAccountNumber();
 
         ValidationResult result = validator.Validate(new TestModel(account));

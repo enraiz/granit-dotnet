@@ -58,12 +58,9 @@ internal static class NirAlgorithm
     private static string Normalize(string value)
     {
         System.Text.StringBuilder sb = new(NirLength + 2);
-        foreach (char c in value)
+        foreach (char c in value.Where(c => !char.IsWhiteSpace(c) && c != '.' && c != '-'))
         {
-            if (!char.IsWhiteSpace(c) && c != '.' && c != '-')
-            {
-                sb.Append(c);
-            }
+            sb.Append(c);
         }
 
         return sb.ToString();

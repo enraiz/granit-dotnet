@@ -90,7 +90,7 @@ public sealed class GranitErrorCodeLanguageManagerTests
         Microsoft.Extensions.DependencyInjection.ServiceCollection services = new();
         services.AddGranitValidation();
 
-        InlineValidator<string> validator = new();
+        InlineValidator<string> validator = [];
         validator.RuleFor(x => x).NotEmpty();
 
         ValidationResult result = validator.Validate(string.Empty);

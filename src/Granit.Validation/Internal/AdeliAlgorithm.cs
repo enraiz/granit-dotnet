@@ -28,12 +28,9 @@ internal static class AdeliAlgorithm
             return false;
         }
 
-        foreach (char c in digits)
+        if (!digits.All(char.IsDigit))
         {
-            if (!char.IsDigit(c))
-            {
-                return false;
-            }
+            return false;
         }
 
         return true;

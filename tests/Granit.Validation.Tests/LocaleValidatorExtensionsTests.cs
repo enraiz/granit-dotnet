@@ -26,7 +26,7 @@ public sealed class LocaleValidatorExtensionsTests
     [InlineData("be")]             // lowercase — normalised to uppercase
     public void Iso3166Alpha2CountryCode_ValidValues_PassValidation(string code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Iso3166Alpha2CountryCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -42,7 +42,7 @@ public sealed class LocaleValidatorExtensionsTests
     [InlineData("12")]             // digits not letters
     public void Iso3166Alpha2CountryCode_InvalidValues_FailValidation(string? code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Iso3166Alpha2CountryCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -68,7 +68,7 @@ public sealed class LocaleValidatorExtensionsTests
     [InlineData("FR-be")]          // case-insensitive
     public void Bcp47LanguageTag_ValidValues_PassValidation(string tag)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Bcp47LanguageTag();
 
         ValidationResult result = validator.Validate(new TestModel(tag));
@@ -86,7 +86,7 @@ public sealed class LocaleValidatorExtensionsTests
     [InlineData("fr-FR-extra")]    // too many subtags
     public void Bcp47LanguageTag_InvalidValues_FailValidation(string? tag)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Bcp47LanguageTag();
 
         ValidationResult result = validator.Validate(new TestModel(tag));

@@ -37,12 +37,9 @@ internal static class IbanAlgorithm
             return false;
         }
 
-        foreach (char c in normalized)
+        if (!normalized.All(char.IsLetterOrDigit))
         {
-            if (!char.IsLetterOrDigit(c))
-            {
-                return false;
-            }
+            return false;
         }
 
         // Move first 4 chars to end, then convert letters to digits

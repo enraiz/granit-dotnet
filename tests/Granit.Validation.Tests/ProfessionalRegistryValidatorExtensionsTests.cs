@@ -27,7 +27,7 @@ public sealed class ProfessionalRegistryValidatorExtensionsTests
     [InlineData("123456/789-58")]          // formatted XXXXXX/XXX-XX
     public void BelgianInami_ValidValues_PassValidation(string inami)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianInami();
 
         ValidationResult result = validator.Validate(new TestModel(inami));
@@ -43,7 +43,7 @@ public sealed class ProfessionalRegistryValidatorExtensionsTests
     [InlineData("12345678959")]            // wrong check (should be 58)
     public void BelgianInami_InvalidValues_FailValidation(string? inami)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianInami();
 
         ValidationResult result = validator.Validate(new TestModel(inami));

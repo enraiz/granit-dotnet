@@ -28,12 +28,9 @@ internal static class FinesAlgorithm
             return false;
         }
 
-        foreach (char c in normalized)
+        if (!normalized.All(char.IsDigit))
         {
-            if (!char.IsDigit(c))
-            {
-                return false;
-            }
+            return false;
         }
 
         return LuhnCheck(normalized);

@@ -80,29 +80,15 @@ internal static class FrenchRibAlgorithm
     private static string Normalize(string value)
     {
         System.Text.StringBuilder sb = new(RibLength);
-        foreach (char c in value)
+        foreach (char c in value.Where(c => c != ' ' && c != '-'))
         {
-            if (c != ' ' && c != '-')
-            {
-                sb.Append(char.ToUpperInvariant(c));
-            }
+            sb.Append(char.ToUpperInvariant(c));
         }
 
         return sb.ToString();
     }
 
-    private static bool IsAllDigits(string s)
-    {
-        foreach (char c in s)
-        {
-            if (c < '0' || c > '9')
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    private static bool IsAllDigits(string s) => s.All(c => c >= '0' && c <= '9');
 
     private static string ConvertAccountLetters(string account)
     {

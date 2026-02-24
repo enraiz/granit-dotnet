@@ -28,7 +28,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("732 829 320")]            // spaces stripped
     public void FrenchSiren_ValidValues_PassValidation(string siren)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchSiren();
 
         ValidationResult result = validator.Validate(new TestModel(siren));
@@ -45,7 +45,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("73282932A")]              // non-digit character
     public void FrenchSiren_InvalidValues_FailValidation(string? siren)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchSiren();
 
         ValidationResult result = validator.Validate(new TestModel(siren));
@@ -66,7 +66,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("732 829 320 00074")]       // spaces stripped
     public void FrenchSiret_ValidValues_PassValidation(string siret)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchSiret();
 
         ValidationResult result = validator.Validate(new TestModel(siret));
@@ -83,7 +83,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("7328293200007A")]          // non-digit character
     public void FrenchSiret_InvalidValues_FailValidation(string? siret)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchSiret();
 
         ValidationResult result = validator.Validate(new TestModel(siret));
@@ -107,7 +107,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("0100.000.070")]           // formatted with dots
     public void BelgianBce_ValidValues_PassValidation(string bce)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianBce();
 
         ValidationResult result = validator.Validate(new TestModel(bce));
@@ -123,7 +123,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("0100000071")]             // wrong check (should be 70)
     public void BelgianBce_InvalidValues_FailValidation(string? bce)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianBce();
 
         ValidationResult result = validator.Validate(new TestModel(bce));
@@ -144,7 +144,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("6201z")]          // lowercase — normalised to uppercase
     public void FrenchNafCode_ValidValues_PassValidation(string code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchNafCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -161,7 +161,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
     [InlineData("62011")]          // ends with digit, not letter
     public void FrenchNafCode_InvalidValues_FailValidation(string? code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchNafCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));

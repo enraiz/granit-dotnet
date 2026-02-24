@@ -25,7 +25,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("01012500182")]         // born 2001
     public void BelgianNiss_ValidValues_PassValidation(string niss)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianNiss();
 
         ValidationResult result = validator.Validate(new TestModel(niss));
@@ -42,7 +42,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("abcdefghijk")]         // not digits
     public void BelgianNiss_InvalidValues_FailValidation(string? niss)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianNiss();
 
         ValidationResult result = validator.Validate(new TestModel(niss));
@@ -61,7 +61,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("10000000009")]         // minimal valid
     public void FrenchRpps_ValidValues_PassValidation(string rpps)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchRpps();
 
         ValidationResult result = validator.Validate(new TestModel(rpps));
@@ -78,7 +78,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("1000345678A")]         // non-digit character
     public void FrenchRpps_InvalidValues_FailValidation(string? rpps)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchRpps();
 
         ValidationResult result = validator.Validate(new TestModel(rpps));
@@ -98,7 +98,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("+442071234567")]       // UK
     public void E164Phone_ValidValues_PassValidation(string phone)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).E164Phone();
 
         ValidationResult result = validator.Validate(new TestModel(phone));
@@ -116,7 +116,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("+32 475 12 34 56")]    // spaces not allowed
     public void E164Phone_InvalidValues_FailValidation(string? phone)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).E164Phone();
 
         ValidationResult result = validator.Validate(new TestModel(phone));
@@ -134,7 +134,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("000000001")]
     public void FrenchAdeli_ValidValues_PassValidation(string adeli)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchAdeli();
 
         ValidationResult result = validator.Validate(new TestModel(adeli));
@@ -150,7 +150,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("12345678A")]           // non-digit
     public void FrenchAdeli_InvalidValues_FailValidation(string? adeli)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchAdeli();
 
         ValidationResult result = validator.Validate(new TestModel(adeli));
@@ -171,7 +171,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("GB29NWBK60161331926819")]       // UK IBAN
     public void Iban_ValidValues_PassValidation(string iban)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Iban();
 
         ValidationResult result = validator.Validate(new TestModel(iban));
@@ -188,7 +188,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("123456789")]               // no country code
     public void Iban_InvalidValues_FailValidation(string? iban)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).Iban();
 
         ValidationResult result = validator.Validate(new TestModel(iban));
@@ -205,7 +205,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("750100018")]           // valid Luhn 9-digit Finess
     public void FrenchFiness_ValidValues_PassValidation(string finess)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchFiness();
 
         ValidationResult result = validator.Validate(new TestModel(finess));
@@ -222,7 +222,7 @@ public sealed class IdentifierValidatorExtensionsTests
     [InlineData("75010001A")]           // non-digit
     public void FrenchFiness_InvalidValues_FailValidation(string? finess)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchFiness();
 
         ValidationResult result = validator.Validate(new TestModel(finess));

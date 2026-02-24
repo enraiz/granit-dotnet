@@ -28,7 +28,7 @@ public sealed class AddressValidatorExtensionsTests
     [InlineData("20000")]          // Corse — historical 20xxx still valid
     public void FrenchPostalCode_ValidValues_PassValidation(string code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchPostalCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -45,7 +45,7 @@ public sealed class AddressValidatorExtensionsTests
     [InlineData("ABCDE")]          // not digits
     public void FrenchPostalCode_InvalidValues_FailValidation(string? code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchPostalCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -66,7 +66,7 @@ public sealed class AddressValidatorExtensionsTests
     [InlineData("1234")]
     public void BelgianPostalCode_ValidValues_PassValidation(string code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianPostalCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -83,7 +83,7 @@ public sealed class AddressValidatorExtensionsTests
     [InlineData("ABCD")]           // not digits
     public void BelgianPostalCode_InvalidValues_FailValidation(string? code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).BelgianPostalCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -106,7 +106,7 @@ public sealed class AddressValidatorExtensionsTests
     [InlineData("97209")]          // Fort-de-France — Martinique (dept 972)
     public void FrenchInseeCode_ValidValues_PassValidation(string code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchInseeCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));
@@ -124,7 +124,7 @@ public sealed class AddressValidatorExtensionsTests
     [InlineData("ABCDE")]          // not valid pattern
     public void FrenchInseeCode_InvalidValues_FailValidation(string? code)
     {
-        InlineValidator<TestModel> validator = new();
+        InlineValidator<TestModel> validator = [];
         validator.RuleFor(x => x.Value).FrenchInseeCode();
 
         ValidationResult result = validator.Validate(new TestModel(code));

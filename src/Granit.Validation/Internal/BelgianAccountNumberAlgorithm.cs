@@ -52,12 +52,9 @@ internal static class BelgianAccountNumberAlgorithm
     private static string ExtractDigits(string value)
     {
         System.Text.StringBuilder sb = new(RequiredLength);
-        foreach (char c in value)
+        foreach (char c in value.Where(char.IsDigit))
         {
-            if (char.IsDigit(c))
-            {
-                sb.Append(c);
-            }
+            sb.Append(c);
         }
 
         return sb.ToString();

@@ -28,12 +28,9 @@ internal static class RppsAlgorithm
             return false;
         }
 
-        foreach (char c in digits)
+        if (!digits.All(char.IsDigit))
         {
-            if (!char.IsDigit(c))
-            {
-                return false;
-            }
+            return false;
         }
 
         return LuhnCheck(digits);
