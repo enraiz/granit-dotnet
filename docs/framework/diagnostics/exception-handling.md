@@ -65,7 +65,8 @@ Les types d'exceptions sont définis dans `Granit.Core` afin que tous les packag
 | Classe | Code HTTP | Interfaces | Usage |
 | --- | --- | --- | --- |
 | `BusinessException` | 400 | `IHasErrorCode`, `IUserFriendlyException` | Règle métier non respectée |
-| `EntityNotFoundException` | 404 | `IUserFriendlyException` | Entité introuvable |
+| `NotFoundException` | 404 | `IUserFriendlyException` | Ressource non trouvée (cas génériques, non-entité) |
+| `EntityNotFoundException` | 404 | `IUserFriendlyException` | Entité de domaine introuvable |
 | `ForbiddenException` | 403 | `IUserFriendlyException` | Accès refusé (authentifié) |
 | `ConflictException` | 409 | `IHasErrorCode`, `IUserFriendlyException` | Conflit de ressource |
 | `ValidationException` | 422 | `IHasValidationErrors`, `IUserFriendlyException` | Erreurs de validation par champ |
@@ -179,11 +180,38 @@ configuré, aucun mapper EF Core n'est ajouté.
 Si `Granit.Localization` est configuré dans l'application, le handler tente de
 résoudre une traduction pour les exceptions implémentant `IHasErrorCode` :
 
-1. Le `ErrorCode` (ex : `"Appointment:SlotUnavailable"`) est utilisé comme clé de
-   localisation dans la ressource `"Granit"`.
-2. Si une traduction est trouvée, elle remplace le message de l'exception dans `title`.
+1. Le préfixe du `ErrorCode` identifie la ressource de localisation.
+   Exemple : `"BlobStorage:NotFound"` → préfixe `"BlobStorage"` → ressource
+   `BlobStorageLocalizationResource` (annotée `[LocalizationResourceName("BlobStorage")]`).
+2. Si une traduction est trouvée pour la clé complète, elle remplace le message
+   de l'exception dans `title`.
 3. Si aucune traduction n'existe, le message original est utilisé (pour les exceptions
-   `IUserFriendlyException`) ou le message générique (pour les 5xx).
+   `IUserFriendlyException`) ou le message générique `"An unexpected error occurred."`
+   (pour les 5xx en production).
+
+Chaque module qui définit des exceptions avec `IHasErrorCode` doit donc :
+
+- Créer une classe `XxxLocalizationResource` annotée `[LocalizationResourceName("Xxx")]`
+- Fournir des fichiers JSON `Localization/Xxx/{culture}.json` embarqués comme ressource
+- Enregistrer la ressource dans son module via `GranitLocalizationOptions`
+
+```csharp
+// Exemple : BlobStorageLocalizationResource
+[LocalizationResourceName("BlobStorage")]
+[InheritResource(typeof(GranitLocalizationResource))]
+public sealed class BlobStorageLocalizationResource;
+```
+
+```json
+// Localization/BlobStorage/fr.json
+{
+  "culture": "fr",
+  "texts": {
+    "BlobStorage:NotFound": "Le fichier demandé est introuvable.",
+    "BlobStorage:NotValid": "Le fichier n'est pas disponible au téléchargement."
+  }
+}
+```
 
 ## Contraintes HDS/RGPD
 
