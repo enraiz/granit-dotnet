@@ -91,7 +91,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddFeatureDefinitions<FakeProvider>();
 
         services.Should().Contain(d =>
-            d.ServiceType == typeof(FeatureDefinitionProvider) &&
+            d.ServiceType == typeof(IFeatureDefinitionProvider) &&
             d.ImplementationType == typeof(FakeProvider) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -103,19 +103,19 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddFeatureDefinitions<FakeProvider>();
         services.AddFeatureDefinitions<AnotherFakeProvider>();
 
-        services.Count(d => d.ServiceType == typeof(FeatureDefinitionProvider))
+        services.Count(d => d.ServiceType == typeof(IFeatureDefinitionProvider))
                 .Should().Be(2);
     }
 
     // --- Helpers ---
 
-    private sealed class FakeProvider : FeatureDefinitionProvider
+    private sealed class FakeProvider : IFeatureDefinitionProvider
     {
-        public override void Define(IFeatureDefinitionContext context) { }
+        public void Define(IFeatureDefinitionContext context) { }
     }
 
-    private sealed class AnotherFakeProvider : FeatureDefinitionProvider
+    private sealed class AnotherFakeProvider : IFeatureDefinitionProvider
     {
-        public override void Define(IFeatureDefinitionContext context) { }
+        public void Define(IFeatureDefinitionContext context) { }
     }
 }

@@ -54,12 +54,12 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers a <see cref="FeatureDefinitionProvider"/> that declares application features.
+    /// Registers a <see cref="IFeatureDefinitionProvider"/> that declares application features.
     /// </summary>
     /// <typeparam name="TProvider">The concrete provider type.</typeparam>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddFeatureDefinitions<TProvider>(
-        this IServiceCollection services) where TProvider : FeatureDefinitionProvider =>
-        services.AddSingleton<FeatureDefinitionProvider, TProvider>();
+        this IServiceCollection services) where TProvider : class, IFeatureDefinitionProvider =>
+        services.AddSingleton<IFeatureDefinitionProvider, TProvider>();
 }

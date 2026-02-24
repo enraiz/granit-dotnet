@@ -22,9 +22,9 @@ public sealed class FeatureGroupDefinitionTests
     }
 
     private sealed class FakeContextProvider(Action<IFeatureDefinitionContext> define)
-        : FeatureDefinitionProvider
+        : IFeatureDefinitionProvider
     {
-        public override void Define(IFeatureDefinitionContext context) => define(context);
+        public void Define(IFeatureDefinitionContext context) => define(context);
     }
 
     [Fact]

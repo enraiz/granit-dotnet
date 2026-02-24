@@ -4,16 +4,16 @@ namespace Granit.Features.Definitions;
 
 /// <summary>
 /// Singleton registry built at startup from all registered
-/// <see cref="FeatureDefinitionProvider"/> instances.
+/// <see cref="IFeatureDefinitionProvider"/> instances.
 /// </summary>
 internal sealed class FeatureDefinitionStore : IFeatureDefinitionStore
 {
     private readonly IReadOnlyDictionary<string, FeatureDefinition> _definitions;
 
-    public FeatureDefinitionStore(IEnumerable<FeatureDefinitionProvider> providers)
+    public FeatureDefinitionStore(IEnumerable<IFeatureDefinitionProvider> providers)
     {
         FeatureDefinitionContext context = new();
-        foreach (FeatureDefinitionProvider provider in providers)
+        foreach (IFeatureDefinitionProvider provider in providers)
         {
             provider.Define(context);
         }
