@@ -32,10 +32,12 @@ Granit.Validation
 ├── RuleBuilderExtensions.cs                      (WithErrorCodeAndMessage)
 ├── PersonalIdentifierValidatorExtensions.cs      (BelgianNiss, FrenchNir, BelgianEid)
 ├── ProfessionalRegistryValidatorExtensions.cs    (FrenchRpps, FrenchAdeli, FrenchFiness, BelgianInami)
-├── CompanyIdentifierValidatorExtensions.cs       (FrenchSiren, FrenchSiret, BelgianBce)
+├── CompanyIdentifierValidatorExtensions.cs       (FrenchSiren, FrenchSiret, BelgianBce, FrenchNafCode)
 ├── TaxIdentifierValidatorExtensions.cs           (BelgianVat, FrenchVat, EuropeanVat)
-├── PaymentValidatorExtensions.cs                 (Iban, BicSwift, SepaCreditorIdentifier)
-├── ContactValidatorExtensions.cs                 (E164Phone)
+├── PaymentValidatorExtensions.cs                 (Iban, BicSwift, SepaCreditorIdentifier, FrenchRib, BelgianAccountNumber)
+├── ContactValidatorExtensions.cs                 (Email, E164Phone)
+├── AddressValidatorExtensions.cs                 (FrenchPostalCode, BelgianPostalCode, FrenchInseeCode)
+├── LocaleValidatorExtensions.cs                  (Iso3166Alpha2CountryCode, Bcp47LanguageTag)
 ├── Extensions/
 │   └── ValidationServiceCollectionExtensions.cs (AddGranitValidation)
 ├── Internal/                                     (algorithmes — non exposés publiquement)
@@ -58,10 +60,14 @@ Granit.Validation
 │   ├── Fiscalité
 │   │   ├── FrenchVatAlgorithm.cs
 │   │   └── EuropeanVatAlgorithm.cs               (27 pays UE)
-│   └── Paiement
-│       ├── IbanAlgorithm.cs
-│       ├── BicSwiftAlgorithm.cs
-│       └── SepaCreditorIdentifierAlgorithm.cs
+│   ├── Paiement
+│   │   ├── IbanAlgorithm.cs
+│   │   ├── BicSwiftAlgorithm.cs
+│   │   ├── SepaCreditorIdentifierAlgorithm.cs
+│   │   ├── FrenchRibAlgorithm.cs               (clé RIB — pondération 89/15/3)
+│   │   └── BelgianAccountNumberAlgorithm.cs    (mod 97 sur 10 chiffres de base)
+│   └── Entreprises
+│       └── NafAlgorithm.cs                     (regex format NNNNL)
 └── Localization/Validation/
     ├── en.json
     └── fr.json
@@ -156,9 +162,13 @@ Les départements 2A et 2B (Corse) sont remplacés par 19 et 18 avant le calcul.
 | `.FrenchSiren()` | SIREN | Luhn, 9 chiffres | Espaces internes |
 | `.FrenchSiret()` | SIRET | Luhn, 14 chiffres | Espaces internes |
 | `.BelgianBce()` | BCE / KBO | 97-mod, 10 chiffres | Points, espaces (`XXXX.XXX.XXX`) |
+| `.FrenchNafCode()` | Code NAF / APE | Regex format `NNNNL` | Majusculation automatique |
 
 **BCE** — Format : `DDDDDDDDCC` où `CC = 97 − (8 premiers chiffres mod 97)`.
 Le numéro peut être saisi avec ou sans points : `0100.000.070` ≡ `0100000070`.
+
+**NAF/APE** — Format : 4 chiffres + 1 lettre majuscule (ex. `6201Z`). Seul le format est vérifié,
+pas l'appartenance à la nomenclature officielle. La lettre est normalisée en majuscule.
 
 ### Fiscalité
 
@@ -186,6 +196,8 @@ Un code pays non reconnu retourne `false`. Insensible à la casse et aux espaces
 | `.Iban()` | IBAN | ISO 7064 MOD 97-10 | Espaces (`FR76 3000...` accepté) |
 | `.BicSwift()` | BIC/SWIFT | Regex ISO 9362 | Majusculation automatique |
 | `.SepaCreditorIdentifier()` | ICS / Identifiant Créancier SEPA | ISO 7064 MOD 97-10 | Espaces |
+| `.FrenchRib()` | RIB français | Clé pondérée 89/15/3, mod 97 | Espaces, tirets |
+| `.BelgianAccountNumber()` | Numéro de compte belge | mod 97 sur 10 chiffres de base | Tirets (`NNN-NNNNNNN-NN`) |
 
 **BIC/SWIFT** — 8 caractères (`GEBABEBB`) ou 11 avec code de branche (`GEBABEBB36A`).
 Format : 4 lettres (banque) + 2 lettres (pays) + 2 alphanums (lieu) + 3 alphanums optionnels (branche).
@@ -194,11 +206,40 @@ Format : 4 lettres (banque) + 2 lettres (pays) + 2 alphanums (lieu) + 3 alphanum
 La vérification est identique à l'IBAN : les 4 premiers caractères sont déplacés en fin de chaîne,
 les lettres sont converties en chiffres (A=10…Z=35), et le résultat modulo 97 doit être égal à 1.
 
+**RIB français** — Format : `BBBBBGGGGGGCCCCCCCCCCCCKK` (5 banque + 5 guichet + 11 compte + 2 clé).
+Clé = `97 − (89 × banque + 15 × guichet + 3 × compte) mod 97` (97 si reste = 0).
+Les lettres dans le compte sont substituées (A,J→1 ; B,K,S→2 ; … ; I,R,Z→9) avant calcul.
+
+**Compte belge** — Format : `NNN-NNNNNNN-NN` (12 chiffres, les tirets sont optionnels).
+Clé = `(10 premiers chiffres) mod 97`, ou 97 si le reste est 0.
+
 ### Contact
 
 | Méthode | Format | Algorithme |
 | --- | --- | --- |
+| `.Email()` | Adresse e-mail | Regex RFC 5321 pratique — null et espaces rejetés |
 | `.E164Phone()` | E.164 (`+32...`, `+33...`) | Regex `^\+[1-9]\d{7,14}$` |
+
+### Adresse
+
+| Méthode | Identifiant | Format | Normalisation |
+| --- | --- | --- | --- |
+| `.FrenchPostalCode()` | Code postal français | 5 chiffres, range 01000–99999 | — |
+| `.BelgianPostalCode()` | Code postal belge | 4 chiffres, range 1000–9999 | — |
+| `.FrenchInseeCode()` | Code INSEE commune | 5 chars : depts 01–95, 2A/2B, DOM 971–976 | Insensible à la casse |
+
+**Code INSEE** — Métropole : `(01–95 ou 2A/2B) + 3 chiffres commune`. DOM : `97[1-6] + 2 chiffres commune`.
+Les départements 96–99 n'existent pas et sont rejetés.
+
+### Locale
+
+| Méthode | Identifiant | Format | Normalisation |
+| --- | --- | --- | --- |
+| `.Iso3166Alpha2CountryCode()` | Code pays ISO 3166-1 alpha-2 | 2 lettres majuscules (ex. `BE`, `FR`) | Majusculation + trim |
+| `.Bcp47LanguageTag()` | Balise de langue BCP 47 | `ll[-Script][-rr]` (ex. `fr`, `fr-BE`, `zh-Hans-CN`) | Insensible à la casse |
+
+**BCP 47 (sous-ensemble pratique)** : langue 2–3 chars + script optionnel 4 chars + région optionnelle 2 chars.
+Les sous-balises numériques de région (ex. `419`) et les extensions ne sont pas supportées.
 
 ## Codes d'erreur
 
@@ -222,7 +263,16 @@ Tous les codes suivent la convention `Granit:Validation:{ValidatorName}` :
 | `Granit:Validation:InvalidIban` | IBAN invalide |
 | `Granit:Validation:InvalidBicSwift` | Code BIC/SWIFT invalide |
 | `Granit:Validation:InvalidSepaCreditorIdentifier` | Identifiant Créancier SEPA invalide |
+| `Granit:Validation:InvalidFrenchRib` | RIB français invalide |
+| `Granit:Validation:InvalidBelgianAccountNumber` | Numéro de compte belge invalide |
+| `Granit:Validation:InvalidEmail` | Adresse e-mail invalide |
 | `Granit:Validation:InvalidE164Phone` | Numéro de téléphone E.164 invalide |
+| `Granit:Validation:InvalidFrenchPostalCode` | Code postal français invalide |
+| `Granit:Validation:InvalidBelgianPostalCode` | Code postal belge invalide |
+| `Granit:Validation:InvalidFrenchInseeCode` | Code INSEE commune invalide |
+| `Granit:Validation:InvalidFrenchNafCode` | Code NAF / APE invalide |
+| `Granit:Validation:InvalidIso3166Alpha2` | Code pays ISO 3166-1 alpha-2 invalide |
+| `Granit:Validation:InvalidBcp47LanguageTag` | Balise de langue BCP 47 invalide |
 
 Les codes intégrés de FluentValidation (`NotEmpty`, `EmailAddress`, etc.) sont également
 réécrits sous la forme `Granit:Validation:{NomDuValidateur}` par `GranitErrorCodeLanguageManager`.
