@@ -9,7 +9,6 @@
 
 using FluentAssertions;
 using Granit.Wolverine.Postgresql.Extensions;
-using Granit.Wolverine.Postgresql.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +16,10 @@ using Microsoft.Extensions.Hosting;
 using Xunit;
 
 namespace Granit.Wolverine.Postgresql.Tests;
+
+// Minimal DbContext stub used across Wolverine.Postgresql test files.
+internal sealed class StubTenantDbContext(DbContextOptions<StubTenantDbContext> options)
+    : DbContext(options);
 
 public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
 {
@@ -69,7 +72,7 @@ public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
     }
 
     [Fact]
-    public void AddGranitWolverineWithPostgresqlPerTenant_RegistersPerTenantDbContextFactory()
+    public void AddGranitWolverineWithPostgresqlPerTenant_RegistersDbContextFactory_WithImplementation()
     {
         HostApplicationBuilder builder = CreateBuilder();
         builder.AddGranitWolverineWithPostgresqlPerTenant<StubTenantDbContext>();
@@ -77,9 +80,11 @@ public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
         ServiceDescriptor? descriptor = builder.Services.FirstOrDefault(
             s => s.ServiceType == typeof(IDbContextFactory<StubTenantDbContext>));
 
+        // The concrete factory type is internal to Granit.Persistence; we verify
+        // a named implementation type is registered (not a factory lambda).
         descriptor.Should().NotBeNull();
-        descriptor!.ImplementationType.Should()
-            .Be<PerTenantDbContextFactory<StubTenantDbContext>>();
+        descriptor!.ImplementationType.Should().NotBeNull();
+        descriptor.ImplementationType!.Name.Should().Contain("TenantPerDatabase");
     }
 
     // -----------------------------------------------------------------------

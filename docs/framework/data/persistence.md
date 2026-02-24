@@ -325,3 +325,12 @@ AuditedEntityInterceptor interceptor = new(currentUser, clock, guidGenerator, cu
 | RGPD - Isolation tenant | Query filter multi-tenant (`ApplyGranitConventions(currentTenant)`) |
 | RGPD - Pseudonymisation | `TenantId` GUID — jamais de données nominatives dans ce champ |
 | Maintenance HDS | `IDataFilter.Disable<ISoftDeletable>()` — accès aux données supprimées en scope contrôlé |
+
+## Isolation multi-tenant — patterns avancés
+
+Pour aller au-delà du filtre `TenantId` partagé, Granit.Persistence propose des patterns
+d'isolation physique :
+
+- [Tenant-per-Database](isolation-tenant-per-database.md) — base de données dédiée par tenant
+- [Tenant-per-Schema](isolation-tenant-per-schema.md) — schéma PostgreSQL dédié par tenant
+- [Sélection de stratégie](isolation-strategie.md) — choisir statiquement ou dynamiquement le pattern

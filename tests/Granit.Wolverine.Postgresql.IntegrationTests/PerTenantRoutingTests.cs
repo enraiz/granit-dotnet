@@ -1,5 +1,5 @@
 // =============================================================================
-// Tests d'intégration - PerTenantDbContextFactory — routage physique par tenant
+// Tests d'intégration - TenantPerDatabaseDbContextFactory — routage physique par tenant
 // =============================================================================
 // Valide l'isolation physique de données :
 //   - Tenant A écrit dans la base A uniquement.
@@ -13,7 +13,8 @@
 
 using FluentAssertions;
 using Granit.Core.MultiTenancy;
-using Granit.Wolverine.Postgresql.Internal;
+using Granit.Persistence;
+using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -105,7 +106,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
     private static readonly Guid TenantAId = Guid.NewGuid();
     private static readonly Guid TenantBId = Guid.NewGuid();
 
-    private PerTenantDbContextFactory<TenantIntegrationDbContext> BuildFactory(
+    private TenantPerDatabaseDbContextFactory<TenantIntegrationDbContext> BuildFactory(
         Guid activeTenantId)
     {
         ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
@@ -123,8 +124,13 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
         ServiceCollection services = new();
         IServiceProvider sp = services.BuildServiceProvider();
 
-        return new PerTenantDbContextFactory<TenantIntegrationDbContext>(
-            currentTenant, provider, sp);
+        TenantPerDatabaseDbContextOptions<TenantIntegrationDbContext> options = new()
+        {
+            Configure = static (opts, cs) => opts.UseNpgsql(cs),
+        };
+
+        return new TenantPerDatabaseDbContextFactory<TenantIntegrationDbContext>(
+            currentTenant, provider, sp, options);
     }
 
     // -----------------------------------------------------------------------
@@ -134,7 +140,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
     [Fact]
     public async Task Write_WithTenantA_InsertsInDatabaseA()
     {
-        PerTenantDbContextFactory<TenantIntegrationDbContext> factory =
+        TenantPerDatabaseDbContextFactory<TenantIntegrationDbContext> factory =
             BuildFactory(TenantAId);
 
         await using TenantIntegrationDbContext ctx =
@@ -154,7 +160,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
     [Fact]
     public async Task Write_WithTenantB_InsertsInDatabaseB()
     {
-        PerTenantDbContextFactory<TenantIntegrationDbContext> factory =
+        TenantPerDatabaseDbContextFactory<TenantIntegrationDbContext> factory =
             BuildFactory(TenantBId);
 
         await using TenantIntegrationDbContext ctx =
@@ -225,9 +231,15 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
 
         ITenantConnectionStringProvider provider =
             Substitute.For<ITenantConnectionStringProvider>();
+
         ServiceCollection services = new();
-        PerTenantDbContextFactory<TenantIntegrationDbContext> factory = new(
-            currentTenant, provider, services.BuildServiceProvider());
+        TenantPerDatabaseDbContextOptions<TenantIntegrationDbContext> options = new()
+        {
+            Configure = static (opts, cs) => opts.UseNpgsql(cs),
+        };
+
+        TenantPerDatabaseDbContextFactory<TenantIntegrationDbContext> factory = new(
+            currentTenant, provider, services.BuildServiceProvider(), options);
 
         Func<Task> act = async () =>
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);

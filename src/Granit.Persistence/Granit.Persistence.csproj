@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.Persistence.Tests" />
+    <InternalsVisibleTo Include="Granit.Wolverine.Postgresql.IntegrationTests" />
   </ItemGroup>
 
   <ItemGroup>
