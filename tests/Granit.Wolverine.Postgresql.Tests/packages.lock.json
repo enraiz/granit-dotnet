@@ -944,13 +944,13 @@
       "granit.exceptionhandling": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.guids": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -958,18 +958,18 @@
       "granit.multitenancy": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.persistence": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
-          "Granit.ExceptionHandling": "[1.0.0, )",
-          "Granit.Guids": "[1.0.0, )",
-          "Granit.MultiTenancy": "[1.0.0, )",
-          "Granit.Security": "[1.0.0, )",
-          "Granit.Timing": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore": "[10.*, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
@@ -979,13 +979,13 @@
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -993,17 +993,17 @@
       "granit.wolverine": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
-          "Granit.MultiTenancy": "[1.0.0, )",
-          "Granit.Security": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "WolverineFx": "[5.*, )"
         }
       },
       "granit.wolverine.postgresql": {
         "type": "Project",
         "dependencies": {
-          "Granit.Persistence": "[1.0.0, )",
-          "Granit.Wolverine": "[1.0.0, )",
+          "Granit.Persistence": "[0.1.0-dev, )",
+          "Granit.Wolverine": "[0.1.0-dev, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )",

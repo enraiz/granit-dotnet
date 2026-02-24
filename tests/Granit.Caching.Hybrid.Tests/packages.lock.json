@@ -252,7 +252,7 @@
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
           "Microsoft.Extensions.Configuration.Binder": "[10.*, )",
@@ -264,15 +264,15 @@
       "granit.caching.hybrid": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[1.0.0, )",
-          "Granit.Caching.StackExchangeRedis": "[1.0.0, )",
+          "Granit.Caching": "[0.1.0-dev, )",
+          "Granit.Caching.StackExchangeRedis": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Hybrid": "[10.*, )"
         }
       },
       "granit.caching.stackexchangeredis": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[1.0.0, )",
+          "Granit.Caching": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "[10.*, )",
           "StackExchange.Redis": "[2.*, )"
         }

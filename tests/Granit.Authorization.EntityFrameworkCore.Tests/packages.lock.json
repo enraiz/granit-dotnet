@@ -314,23 +314,23 @@
       "granit.authorization": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[1.0.0, )",
-          "Granit.MultiTenancy": "[1.0.0, )",
-          "Granit.Security": "[1.0.0, )"
+          "Granit.Caching": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )"
         }
       },
       "granit.authorization.entityframeworkcore": {
         "type": "Project",
         "dependencies": {
-          "Granit.Authorization": "[1.0.0, )",
-          "Granit.Persistence": "[1.0.0, )",
+          "Granit.Authorization": "[0.1.0-dev, )",
+          "Granit.Persistence": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore": "[10.*, )"
         }
       },
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
           "Microsoft.Extensions.Configuration.Binder": "[10.*, )",
@@ -345,13 +345,13 @@
       "granit.exceptionhandling": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.guids": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -359,18 +359,18 @@
       "granit.multitenancy": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.persistence": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
-          "Granit.ExceptionHandling": "[1.0.0, )",
-          "Granit.Guids": "[1.0.0, )",
-          "Granit.MultiTenancy": "[1.0.0, )",
-          "Granit.Security": "[1.0.0, )",
-          "Granit.Timing": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore": "[10.*, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
@@ -380,13 +380,13 @@
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }

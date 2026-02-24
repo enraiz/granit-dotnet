@@ -477,7 +477,7 @@
         "dependencies": {
           "Asp.Versioning.Mvc": "[10.0.0-preview.*, )",
           "Asp.Versioning.Mvc.ApiExplorer": "[10.0.0-preview.*, )",
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.core": {

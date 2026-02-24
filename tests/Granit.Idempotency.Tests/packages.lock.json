@@ -228,7 +228,7 @@
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.core": {
@@ -237,10 +237,10 @@
       "granit.idempotency": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[1.0.0, )",
-          "Granit.Core": "[1.0.0, )",
-          "Granit.MultiTenancy": "[1.0.0, )",
-          "Granit.Security": "[1.0.0, )",
+          "Granit.Caching": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.IO.RecyclableMemoryStream": "[3.*, )",
           "StackExchange.Redis": "[2.*, )"
         }
@@ -248,13 +248,13 @@
       "granit.multitenancy": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "Microsoft.IO.RecyclableMemoryStream": {

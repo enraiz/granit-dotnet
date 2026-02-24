@@ -198,7 +198,7 @@
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.core": {
@@ -207,29 +207,29 @@
       "granit.encryption": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.multitenancy": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.settings": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[1.0.0, )",
-          "Granit.Core": "[1.0.0, )",
-          "Granit.Encryption": "[1.0.0, )",
-          "Granit.MultiTenancy": "[1.0.0, )",
-          "Granit.Security": "[1.0.0, )"
+          "Granit.Caching": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Encryption": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )"
         }
       }
     }

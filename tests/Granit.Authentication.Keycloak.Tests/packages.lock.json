@@ -253,14 +253,14 @@
       "granit.authentication.jwtbearer": {
         "type": "Project",
         "dependencies": {
-          "Granit.Security": "[1.0.0, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.*, )"
         }
       },
       "granit.authentication.keycloak": {
         "type": "Project",
         "dependencies": {
-          "Granit.Authentication.JwtBearer": "[1.0.0, )",
+          "Granit.Authentication.JwtBearer": "[0.1.0-dev, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.*, )"
         }
       },
@@ -270,7 +270,7 @@
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {
