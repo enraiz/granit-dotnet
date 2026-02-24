@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using Granit.Core.MultiTenancy;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -28,12 +29,44 @@ namespace Granit.Persistence.MultiTenancy;
 /// operate outside any tenant context.
 /// </para>
 /// </remarks>
-internal sealed class TenantSchemaConnectionInterceptor(
+internal sealed partial class TenantSchemaConnectionInterceptor(
     ICurrentTenant currentTenant,
     ITenantSchemaProvider schemaProvider) : DbConnectionInterceptor
 {
     private readonly ICurrentTenant _currentTenant = currentTenant;
     private readonly ITenantSchemaProvider _schemaProvider = schemaProvider;
+
+    /// <summary>
+    /// Matches valid PostgreSQL unquoted identifiers: lower-case letters, digits, underscores,
+    /// starting with a letter or underscore, 1–63 characters (NAMEDATALEN - 1).
+    /// </summary>
+    [GeneratedRegex(@"^[a-z_][a-z0-9_]{0,62}$")]
+    private static partial Regex SafeSchemaNameRegex();
+
+    /// <summary>
+    /// Validates that <paramref name="schema"/> is a safe PostgreSQL identifier before
+    /// it is embedded verbatim in a <c>SET search_path</c> command.
+    /// </summary>
+    /// <remarks>
+    /// <c>SET search_path</c> is a session-variable command and does not accept bound
+    /// parameters, so identifier injection must be prevented by strict allowlist validation
+    /// rather than parameterization.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the schema name contains characters outside the allowed set, preventing
+    /// the malformed command from reaching PostgreSQL.
+    /// </exception>
+    private static string ValidateSchemaName(string schema)
+    {
+        if (!SafeSchemaNameRegex().IsMatch(schema))
+        {
+            throw new InvalidOperationException(
+                $"Schema name '{schema}' rejected: not a valid PostgreSQL identifier. " +
+                "Only lower-case letters, digits, and underscores are allowed (1\u201363 characters).");
+        }
+
+        return schema;
+    }
 
     /// <inheritdoc/>
     public override void ConnectionOpened(DbConnection connection, ConnectionEndEventData eventData)
@@ -78,7 +111,7 @@ internal sealed class TenantSchemaConnectionInterceptor(
     private static void SetSearchPath(DbConnection connection, string schema)
     {
         using DbCommand cmd = connection.CreateCommand();
-        cmd.CommandText = $"SET search_path TO {schema}, public";
+        cmd.CommandText = $"SET search_path TO {ValidateSchemaName(schema)}, public";
         cmd.ExecuteNonQuery();
     }
 
@@ -88,7 +121,7 @@ internal sealed class TenantSchemaConnectionInterceptor(
         CancellationToken cancellationToken)
     {
         await using DbCommand cmd = connection.CreateCommand();
-        cmd.CommandText = $"SET search_path TO {schema}, public";
+        cmd.CommandText = $"SET search_path TO {ValidateSchemaName(schema)}, public";
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 }

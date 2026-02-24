@@ -1,0 +1,4 @@
+# Roslyn analyzer release tracking files use a special comment syntax (;)
+# that is not compatible with standard markdown linting rules.
+**/AnalyzerReleases.Shipped.md
+**/AnalyzerReleases.Unshipped.md

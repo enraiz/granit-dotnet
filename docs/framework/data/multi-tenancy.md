@@ -10,7 +10,6 @@ le claim JWT ou l'en-tête HTTP, active le contexte, puis le restaure en fin de 
 > enregistré par défaut. `Granit.MultiTenancy` remplace cet enregistrement par
 > l'implémentation réelle à l'initialisation. Voir
 > [core.md — Dépendance optionnelle sur le multi-tenancy](../core/core.md#dépendance-optionnelle-sur-le-multi-tenancy).
-
 > **Référence Microsoft** :
 > [Middleware ASP.NET Core](https://learn.microsoft.com/fr-fr/aspnet/core/fundamentals/middleware)
 
@@ -337,3 +336,10 @@ factory.WithWebHostBuilder(builder =>
    contexte HTTP (workers, tâches de fond, EF Core intercepteurs)
 5. **Isolation en parallèle** : chaque tâche `Task.Run(...)` hérite du contexte
    tenant de son parent, mais les modifications ultérieures sont indépendantes
+
+## Voir aussi
+
+- [Isolation Tenant-per-Database](isolation-tenant-per-database.md)
+- [Isolation Tenant-per-Schema](isolation-tenant-per-schema.md)
+- [Sélection de stratégie d'isolation](isolation-strategie.md)
+- [Persistence — intercepteurs EF Core](persistence.md)

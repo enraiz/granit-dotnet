@@ -1,0 +1,22 @@
+using FluentAssertions;
+using Granit.Persistence.Migrations.Internal;
+using Microsoft.EntityFrameworkCore;
+using NSubstitute;
+using Xunit;
+
+namespace Granit.Persistence.Migrations.Tests;
+
+public sealed class NullTenantDbIsolatorTests
+{
+    [Fact]
+    public async Task IsolateAsync_AlwaysCompletes_WithoutTouchingContext()
+    {
+        NullTenantDbIsolator isolator = new();
+        DbContext context = Substitute.For<DbContext>();
+
+        Func<Task> act = () => isolator.IsolateAsync(context, Guid.NewGuid(), CancellationToken.None);
+
+        await act.Should().NotThrowAsync();
+        context.ReceivedCalls().Should().BeEmpty();
+    }
+}

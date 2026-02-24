@@ -59,6 +59,10 @@ est conservée sans modification.
 
 ### Avec HashiCorp Vault (recommandé en production HDS)
 
+> `TenantDatabaseOptions`, `GetEncryptedCredential` et `BuildConnectionString` sont des
+> exemples d'implémentation côté application — à adapter à votre configuration Vault et
+> à votre catalogue de tenants.
+
 ```csharp
 public sealed class VaultTenantConnectionStringProvider(
     ITransitEncryptionService vault,
