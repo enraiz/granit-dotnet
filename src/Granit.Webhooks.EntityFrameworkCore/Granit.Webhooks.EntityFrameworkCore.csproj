@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Webhooks.EntityFrameworkCore</PackageId>
+    <Description>EF Core persistence layer for Granit.Webhooks. Provides EfWebhookSubscriptionStore and EfWebhookDeliveryStore (HDS audit trail) for PostgreSQL. Replaces the default InMemory stores registered by AddGranitWebhooks().</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Webhooks.EntityFrameworkCore.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Webhooks\Granit.Webhooks.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Webhooks</PackageId>
+    <Description>Moteur d'envoi de webhooks sortants pour Granit. Dispatch asynchrone via l'Outbox Wolverine, signature HMAC-SHA256 anti-replay, backoff exponentiel durable, agnostique au type de payload (thin HDS ou fat standard).</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Webhooks.Tests" />
+    <InternalsVisibleTo Include="Granit.Webhooks.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.Webhooks.EntityFrameworkCore.Tests" />
+    <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal interfaces in tests -->
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Wolverine\Granit.Wolverine.csproj" />
+  </ItemGroup>
+
+</Project>
