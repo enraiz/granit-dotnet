@@ -7,6 +7,7 @@ using Granit.Features.ValueProviders;
 using Granit.Features.ValueTypes;
 using Granit.MultiTenancy;
 using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
 
@@ -61,11 +62,25 @@ public sealed class FeatureCheckerTests
         return ct;
     }
 
+    private static ServiceProvider BuildServiceProvider(ICurrentTenant? currentTenant = null)
+    {
+        ServiceCollection sc = new();
+        if (currentTenant is not null)
+        {
+            sc.AddSingleton(currentTenant);
+        }
+
+        return sc.BuildServiceProvider();
+    }
+
     private static FeatureChecker BuildChecker(
         IFeatureDefinitionStore store,
-        ICurrentTenant currentTenant,
-        params IFeatureValueProvider[] providers) =>
-        new(store, providers, currentTenant, new NoopHybridCache());
+        ICurrentTenant? currentTenant,
+        params IFeatureValueProvider[] providers)
+    {
+        ServiceProvider sp = BuildServiceProvider(currentTenant);
+        return new(store, providers, sp, new NoopHybridCache());
+    }
 
     // -------------------------------------------------------------------------
     // IsEnabledAsync
@@ -162,11 +177,12 @@ public sealed class FeatureCheckerTests
             .Returns(new FeatureDefinition("App.VideoConsultation", "false", FeatureValueType.Toggle));
 
         ICurrentTenant currentTenant = WithTenant(tenantId);
-        TenantFeatureValueProvider tenantProvider = new(currentTenant, featureStore);
-
-        FeatureChecker checker = BuildChecker(store, currentTenant,
-            tenantProvider,
-            new DefaultValueFeatureValueProvider());
+        ServiceProvider sp = BuildServiceProvider(currentTenant);
+        TenantFeatureValueProvider tenantProvider = new(sp, featureStore);
+        FeatureChecker checker = new(store,
+            [tenantProvider, new DefaultValueFeatureValueProvider()],
+            sp,
+            new NoopHybridCache());
 
         bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
 
@@ -181,14 +197,66 @@ public sealed class FeatureCheckerTests
         store.GetRequired("App.VideoConsultation")
             .Returns(new FeatureDefinition("App.VideoConsultation", "false", FeatureValueType.Toggle));
 
-        TenantFeatureValueProvider tenantProvider = new(NoTenant(), featureStore);
-
-        FeatureChecker checker = BuildChecker(store, NoTenant(),
-            tenantProvider,
-            new DefaultValueFeatureValueProvider());
+        ICurrentTenant noTenant = NoTenant();
+        ServiceProvider sp = BuildServiceProvider(noTenant);
+        TenantFeatureValueProvider tenantProvider = new(sp, featureStore);
+        FeatureChecker checker = new(store,
+            [tenantProvider, new DefaultValueFeatureValueProvider()],
+            sp,
+            new NoopHybridCache());
 
         bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
 
         result.Should().BeFalse("no tenant context, falls back to default 'false'");
+    }
+
+    // -------------------------------------------------------------------------
+    // Optional multi-tenancy: ICurrentTenant not registered
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task NoCurrentTenant_Registered_FallsBack_To_Default()
+    {
+        InMemoryFeatureStore featureStore = new();
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.VideoConsultation")
+            .Returns(new FeatureDefinition("App.VideoConsultation", "false", FeatureValueType.Toggle));
+
+        // No ICurrentTenant registered — simulates a single-tenant application
+        ServiceProvider sp = BuildServiceProvider(currentTenant: null);
+        TenantFeatureValueProvider tenantProvider = new(sp, featureStore);
+        FeatureChecker checker = new(store,
+            [tenantProvider, new DefaultValueFeatureValueProvider()],
+            sp,
+            new NoopHybridCache());
+
+        bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
+
+        result.Should().BeFalse("ICurrentTenant not registered, cascade falls through to default 'false'");
+    }
+
+    [Fact]
+    public async Task NoCurrentTenant_Registered_TenantOverride_NotApplied()
+    {
+        Guid tenantId = Guid.NewGuid();
+        InMemoryFeatureStore featureStore = new();
+        await featureStore.SetAsync("App.VideoConsultation", tenantId.ToString(), "true",
+            TestContext.Current.CancellationToken);
+
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.VideoConsultation")
+            .Returns(new FeatureDefinition("App.VideoConsultation", "false", FeatureValueType.Toggle));
+
+        // No ICurrentTenant — tenant override in the store must be ignored
+        ServiceProvider sp = BuildServiceProvider(currentTenant: null);
+        TenantFeatureValueProvider tenantProvider = new(sp, featureStore);
+        FeatureChecker checker = new(store,
+            [tenantProvider, new DefaultValueFeatureValueProvider()],
+            sp,
+            new NoopHybridCache());
+
+        bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
+
+        result.Should().BeFalse("no ICurrentTenant registered, store override must not be resolved");
     }
 }

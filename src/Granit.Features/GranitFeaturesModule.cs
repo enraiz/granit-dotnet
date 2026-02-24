@@ -1,6 +1,5 @@
 using Granit.Caching.Hybrid;
 using Granit.Core.Modularity;
-using Granit.MultiTenancy;
 
 namespace Granit.Features;
 
@@ -19,9 +18,13 @@ namespace Granit.Features;
 /// <see cref="Plans.IPlanFeatureStore"/> to activate plan-level resolution.
 /// Without these, features fall back to their default values.
 /// </para>
+/// <para>
+/// Multi-tenancy support is optional. If <c>GranitMultiTenancyModule</c> is registered,
+/// tenant-level feature overrides are resolved automatically. Without it, the cascade
+/// falls through Plan → Default with no DI error.
+/// </para>
 /// </remarks>
 [DependsOn(typeof(GranitCachingHybridModule))]
-[DependsOn(typeof(GranitMultiTenancyModule))]
 public sealed class GranitFeaturesModule : GranitModule
 {
     /// <inheritdoc/>
