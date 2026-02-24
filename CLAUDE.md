@@ -70,6 +70,19 @@ in all French content (docs, issues, commits). Never in code.
 Each module is self-contained (interface + implementation in the same package).
 All Granit packages reference Core.
 
+**Multi-tenancy — soft dependency rule**: `ICurrentTenant` lives in `Granit.Core.MultiTenancy`
+and is available in every module without referencing `Granit.MultiTenancy`.
+
+- New Granit modules that read `ICurrentTenant`: use `using Granit.Core.MultiTenancy;`, do NOT
+  add `[DependsOn(typeof(GranitMultiTenancyModule))]` or a `<ProjectReference>` to
+  `Granit.MultiTenancy`. A `NullTenantContext` (`IsAvailable = false`) is registered by default.
+- Always check `IsAvailable` before using `Id` — the null object is the normal state when
+  multi-tenancy is not installed.
+- Hard dependency on `Granit.MultiTenancy` is allowed **only** when the module must enforce
+  strict tenant isolation (example: BlobStorage — throws if no tenant context, RGPD/HDS).
+- Application modules (`GuavaHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
+  as usual when multi-tenancy is required in the application.
+
 **Tests**: each package has a test project (`*.Tests`). xUnit + FluentAssertions +
 NSubstitute + Bogus. Tests are part of the DoD for every story.
 
