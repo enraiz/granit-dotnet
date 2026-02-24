@@ -1,6 +1,8 @@
 using Granit.Wolverine.Postgresql.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Wolverine;
@@ -62,6 +64,76 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
         builder.Configuration
             .GetSection(WolverinePostgresqlOptions.SectionName)
             .Bind(options);
+
+        builder.UseWolverine(opts =>
+        {
+            opts.PersistMessagesWithPostgresql(options.TransportConnectionString);
+            opts.UseEntityFrameworkCoreTransactions(options.TransactionMode);
+            opts.Policies.AutoApplyTransactions();
+
+            configure?.Invoke(opts);
+        });
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds per-tenant database support for Wolverine: each tenant has its own isolated
+    /// PostgreSQL database, required for the strictest HDS/RGPD physical isolation mandates.
+    /// </summary>
+    /// <typeparam name="TContext">The tenant-specific <see cref="DbContext"/> type.</typeparam>
+    /// <param name="builder">The host application builder.</param>
+    /// <param name="configure">Optional additional Wolverine configuration.</param>
+    /// <returns>The builder for chaining.</returns>
+    /// <remarks>
+    /// <para>
+    /// Requires <c>AddGranitWolverine()</c> to be called first on the builder,
+    /// and an <see cref="ITenantConnectionStringProvider"/> registered in DI
+    /// before the host is built.
+    /// </para>
+    /// <para>
+    /// Reads <see cref="WolverinePostgresqlOptions"/> from the <c>"WolverinePostgresql"</c>
+    /// configuration section. The <c>TransportConnectionString</c> targets the shared Wolverine
+    /// Outbox database; per-tenant application data is routed by
+    /// <see cref="ITenantConnectionStringProvider"/>.
+    /// </para>
+    /// <para>
+    /// Relies on <see cref="Granit.Wolverine.Behaviors.TenantContextBehavior"/> (registered by
+    /// <c>AddGranitWolverine()</c>) to restore <see cref="Granit.Core.MultiTenancy.ICurrentTenant"/>
+    /// from the <c>X-Tenant-Id</c> envelope header before the handler resolves its
+    /// <typeparamref name="TContext"/>.
+    /// </para>
+    /// <para>
+    /// <see cref="AddGranitWolverineWithPostgresqlPerTenant{TContext}"/> and
+    /// <see cref="AddGranitWolverineWithPostgresql"/> are mutually exclusive: call only one per host.
+    /// </para>
+    /// </remarks>
+    public static IHostApplicationBuilder AddGranitWolverineWithPostgresqlPerTenant<TContext>(
+        this IHostApplicationBuilder builder,
+        Action<WolverineOptions>? configure = null)
+        where TContext : DbContext
+    {
+        // Bind and validate options at startup via DI.
+        builder.Services
+            .AddOptions<WolverinePostgresqlOptions>()
+            .BindConfiguration(WolverinePostgresqlOptions.SectionName)
+            .ValidateOnStart();
+        builder.Services.AddSingleton<IValidateOptions<WolverinePostgresqlOptions>,
+            WolverinePostgresqlOptionsValidator>();
+
+        // Read options directly from IConfiguration: the DI container is not yet
+        // built at this point, so IOptions<> is not resolvable inside UseWolverine().
+        WolverinePostgresqlOptions options = new();
+        builder.Configuration
+            .GetSection(WolverinePostgresqlOptions.SectionName)
+            .Bind(options);
+
+        // Register the per-tenant factory and DbContext as Scoped.
+        // TryAdd preserves any existing registration (e.g., overrides from integration tests).
+        builder.Services.TryAddScoped<IDbContextFactory<TContext>,
+            PerTenantDbContextFactory<TContext>>();
+        builder.Services.TryAddScoped<TContext>(
+            static sp => sp.GetRequiredService<IDbContextFactory<TContext>>().CreateDbContext());
 
         builder.UseWolverine(opts =>
         {

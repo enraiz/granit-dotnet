@@ -3,7 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
-    <!-- NU1608: same transitive Roslyn conflict as in Granit.Wolverine.Postgresql — no runtime impact. -->
+    <!--
+      NU1608: same transitive Roslyn conflict as in Granit.Wolverine.Postgresql — no runtime impact.
+    -->
     <NoWarn>$(NoWarn);NU1608</NoWarn>
   </PropertyGroup>
 
@@ -14,6 +16,9 @@
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,11 +17,13 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.Wolverine.Postgresql.Tests" />
+    <InternalsVisibleTo Include="Granit.Wolverine.Postgresql.IntegrationTests" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WolverineFx.Postgresql" />
     <PackageReference Include="WolverineFx.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
