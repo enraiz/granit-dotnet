@@ -15,11 +15,11 @@ internal sealed class NullTenantContext : ICurrentTenant
     public Guid? Id => null;
     public string? Name => null;
 
-    public IDisposable Change(Guid? id, string? name = null) => NullScope.Instance;
+    public IDisposable Change(Guid? id, string? name = null) => NullScope.Value;
 
     private sealed class NullScope : IDisposable
     {
-        internal static readonly NullScope Instance = new();
+        internal static readonly NullScope Value = new();
         public void Dispose() { }
     }
 }
