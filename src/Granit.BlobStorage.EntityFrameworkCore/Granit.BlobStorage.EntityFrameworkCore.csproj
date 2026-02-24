@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.BlobStorage.EntityFrameworkCore</PackageId>
+    <Description>EF Core persistence layer for Granit.BlobStorage. Provides BlobStorageDbContext and EfBlobDescriptorStore, compatible with SQL Server and PostgreSQL.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.BlobStorage.EntityFrameworkCore.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.BlobStorage\Granit.BlobStorage.csproj" />
+    <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+  </ItemGroup>
+
+</Project>

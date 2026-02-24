@@ -1,6 +1,6 @@
 # Granit — Documentation framework
 
-Cette documentation est organisée en huit sections thématiques.
+Cette documentation est organisée en neuf sections thématiques.
 
 ## Core
 
@@ -73,6 +73,14 @@ Planification et exécution des tâches de fond récurrentes.
 | Document | Description |
 | --- | --- |
 | [background-jobs.md](scheduling/background-jobs.md) | Jobs récurrents cron via Outbox Wolverine, `IBackgroundJobManager`, anti-doublon |
+
+## Storage
+
+Stockage d'objets souverain, Direct-to-Cloud, conforme HDS et RGPD.
+
+| Document | Description |
+| --- | --- |
+| [blob-storage.md](storage/blob-storage.md) | Stockage de fichiers S3, URL pré-signées, pipeline de validation, Crypto-Shredding |
 
 ## Utilities
 
