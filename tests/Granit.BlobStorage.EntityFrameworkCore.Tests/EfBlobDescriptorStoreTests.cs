@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Granit.BlobStorage.EntityFrameworkCore.Internal;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using Xunit;

@@ -1,0 +1,62 @@
+using FluentAssertions;
+using Granit.Authorization.Abstractions;
+using Granit.BackgroundJobs.Endpoints.Permissions;
+using Xunit;
+
+namespace Granit.BackgroundJobs.Endpoints.Tests;
+
+public sealed class BackgroundJobsPermissionDefinitionProviderTests
+{
+    [Fact]
+    public void DefinePermissions_RegistersBackgroundJobsAdminPermission()
+    {
+        // Arrange
+        FakePermissionDefinitionContext context = new();
+        BackgroundJobsPermissionDefinitionProvider provider = new();
+
+        // Act
+        provider.DefinePermissions(context);
+
+        // Assert — group and permission declared
+        context.Groups.Should().ContainSingle(g => g.Name == BackgroundJobsPermissions.GroupName);
+        PermissionGroup group = context.Groups.Single();
+        group.Permissions.Should().ContainSingle(p => p.Name == BackgroundJobsPermissions.Admin.Default);
+    }
+
+    [Fact]
+    public void DefinePermissions_CalledTwice_DoesNotDuplicateGroup()
+    {
+        // Arrange — same context receives two calls (multi-provider scenario)
+        FakePermissionDefinitionContext context = new();
+        BackgroundJobsPermissionDefinitionProvider provider = new();
+
+        // Act
+        provider.DefinePermissions(context);
+        provider.DefinePermissions(context); // second call via same context uses GetOrAdd semantics
+
+        // Assert — AddGroup is idempotent (GetOrAdd): only one group in context
+        context.Groups.Select(g => g.Name)
+            .Should().ContainSingle(n => n == BackgroundJobsPermissions.GroupName);
+    }
+
+    // ── Test double ────────────────────────────────────────────────────────────
+
+    private sealed class FakePermissionDefinitionContext : IPermissionDefinitionContext
+    {
+        private readonly Dictionary<string, PermissionGroup> _groups = new(StringComparer.Ordinal);
+
+        public IReadOnlyCollection<PermissionGroup> Groups => _groups.Values;
+
+        public PermissionGroup AddGroup(string name, string? displayName = null)
+        {
+            if (_groups.TryGetValue(name, out PermissionGroup? existing))
+            {
+                return existing;
+            }
+
+            PermissionGroup group = new(name, displayName);
+            _groups[name] = group;
+            return group;
+        }
+    }
+}

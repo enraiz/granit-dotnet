@@ -1,5 +1,4 @@
 using Granit.Core.Modularity;
-using Granit.MultiTenancy;
 using Granit.Security;
 using Granit.Wolverine.Extensions;
 
@@ -18,7 +17,7 @@ namespace Granit.Wolverine;
 /// </list>
 /// </para>
 /// </remarks>
-[DependsOn(typeof(GranitSecurityModule), typeof(GranitMultiTenancyModule))]
+[DependsOn(typeof(GranitSecurityModule))]
 public sealed class GranitWolverineModule : GranitModule
 {
     /// <inheritdoc/>

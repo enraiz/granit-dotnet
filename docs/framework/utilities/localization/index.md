@@ -63,3 +63,4 @@ Tous les enregistrements utilisent `TryAdd*` pour permettre le remplacement dans
 | [configuration.md](configuration.md) | Installation, ressources JSON, classes marker, options |
 | [localizer.md](localizer.md) | IStringLocalizer, culture fallback, tests, bonnes pratiques |
 | [endpoints.md](endpoints.md) | Endpoint HTTP `GET /api/granit/localization` pour clients SPA |
+| [overrides.md](overrides.md) | Surcharges DB (PostgreSQL + cache mémoire), endpoints CRUD admin |

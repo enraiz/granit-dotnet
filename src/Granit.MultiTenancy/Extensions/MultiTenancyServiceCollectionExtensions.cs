@@ -23,7 +23,8 @@ public static class MultiTenancyServiceCollectionExtensions
     {
         services.Configure<MultiTenancyOptions>(configuration);
 
-        services.TryAddSingleton<ICurrentTenant, CurrentTenant>();
+        // Replace the NullTenantContext registered by AddGranit<T>() with the real implementation.
+        services.Replace(ServiceDescriptor.Singleton<ICurrentTenant, CurrentTenant>());
 
         // Resolvers: Header first (order=100), then JWT (order=200)
         services.AddSingleton<ITenantResolver, HeaderTenantResolver>();

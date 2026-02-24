@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <PackageId>Granit.Localization.Endpoints</PackageId>
-    <Description>Minimal API endpoint exposing registered Granit localization resources for client bootstrapping. Provides GET /api/granit/localization with HTTP caching headers.</Description>
+    <Description>Minimal API endpoints for Granit localization: anonymous GET /api/granit/localization for SPA bootstrapping, and CRUD /api/granit/localization/overrides for admin management of translation overrides (requires Localization.Overrides.Manage permission).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.Localization.Endpoints.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Granit.Authorization\Granit.Authorization.csproj" />
     <ProjectReference Include="..\Granit.Localization\Granit.Localization.csproj" />
   </ItemGroup>
 

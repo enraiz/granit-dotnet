@@ -14,6 +14,7 @@ internal sealed class DefaultExceptionStatusCodeMapper : IExceptionStatusCodeMap
     public int? TryGetStatusCode(Exception exception) => exception switch
     {
         EntityNotFoundException => StatusCodes.Status404NotFound,
+        NotFoundException => StatusCodes.Status404NotFound,
         ForbiddenException => StatusCodes.Status403Forbidden,
         UnauthorizedAccessException => StatusCodes.Status403Forbidden,
         ValidationException => StatusCodes.Status422UnprocessableEntity,

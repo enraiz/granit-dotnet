@@ -693,7 +693,7 @@
         "type": "Project",
         "dependencies": {
           "Granit.Caching": "[0.1.0-dev, )",
-          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )"
         }
       },
@@ -732,12 +732,6 @@
       "granit.core": {
         "type": "Project"
       },
-      "granit.multitenancy": {
-        "type": "Project",
-        "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
-        }
-      },
       "granit.security": {
         "type": "Project",
         "dependencies": {
@@ -756,7 +750,6 @@
         "type": "Project",
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
-          "Granit.MultiTenancy": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
           "WolverineFx": "[5.*, )"
         }

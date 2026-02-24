@@ -34,6 +34,26 @@ public sealed class DefaultExceptionStatusCodeMapperTests
     }
 
     [Fact]
+    public void NotFoundException_Returns404()
+    {
+        DefaultExceptionStatusCodeMapper mapper = Create();
+
+        int? result = mapper.TryGetStatusCode(new NotFoundException("Resource not found"));
+
+        result.Should().Be(StatusCodes.Status404NotFound);
+    }
+
+    [Fact]
+    public void SubclassOfNotFoundException_Returns404()
+    {
+        DefaultExceptionStatusCodeMapper mapper = Create();
+
+        int? result = mapper.TryGetStatusCode(new CustomNotFoundException());
+
+        result.Should().Be(StatusCodes.Status404NotFound);
+    }
+
+    [Fact]
     public void ForbiddenException_Returns403()
     {
         DefaultExceptionStatusCodeMapper mapper = Create();
@@ -193,4 +213,6 @@ public sealed class DefaultExceptionStatusCodeMapperTests
         public IReadOnlyDictionary<string, string[]> ValidationErrors =>
             new Dictionary<string, string[]> { ["Field"] = ["Error"] };
     }
+
+    private sealed class CustomNotFoundException() : NotFoundException("Custom resource not found");
 }
