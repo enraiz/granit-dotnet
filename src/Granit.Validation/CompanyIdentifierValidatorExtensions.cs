@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FluentValidation;
 using Granit.Validation.Internal;
 
@@ -8,6 +9,10 @@ namespace Granit.Validation;
 /// </summary>
 public static class CompanyIdentifierValidatorExtensions
 {
+    // NAF/APE code: 4 digits + 1 uppercase letter (e.g. 6201Z).
+    private static readonly Regex NafCodeRegex =
+        new(@"^\d{4}[A-Z]$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+
     /// <summary>
     /// Validates a French SIREN number (Système d'Identification du Répertoire des ENtreprises).
     /// </summary>
@@ -43,4 +48,16 @@ public static class CompanyIdentifierValidatorExtensions
         ruleBuilder
             .Must(BceAlgorithm.IsValid)
             .WithErrorCodeAndMessage("Granit:Validation:InvalidBelgianBce");
+
+    /// <summary>
+    /// Validates a French NAF/APE activity code (Nomenclature des Activités Françaises).
+    /// </summary>
+    /// <remarks>
+    /// Format: 4 digits followed by 1 uppercase letter (e.g. <c>6201Z</c> for software development).
+    /// Case-insensitive — input is normalised to uppercase before matching.
+    /// </remarks>
+    public static IRuleBuilderOptions<T, string?> FrenchNafCode<T>(this IRuleBuilder<T, string?> ruleBuilder) =>
+        ruleBuilder
+            .Must(value => value != null && NafCodeRegex.IsMatch(value.Trim().ToUpperInvariant()))
+            .WithErrorCodeAndMessage("Granit:Validation:InvalidFrenchNafCode");
 }

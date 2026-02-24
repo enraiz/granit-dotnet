@@ -10,6 +10,25 @@ public static class ContactValidatorExtensions
 {
     private static readonly Regex E164Regex = new(@"^\+[1-9]\d{6,14}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
+    // Practical RFC 5321 subset: local-part chars + @ + domain + dot + TLD (2+ letters).
+    // Rejects null, empty, missing @, spaces, and missing TLD.
+    private static readonly Regex EmailRegex =
+        new(@"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$",
+            RegexOptions.Compiled,
+            TimeSpan.FromMilliseconds(100));
+
+    /// <summary>
+    /// Validates an e-mail address against a practical RFC 5321 subset.
+    /// </summary>
+    /// <remarks>
+    /// Accepts the common <c>local@domain.tld</c> format.
+    /// Rejects null, empty strings, addresses without a domain, or those containing spaces.
+    /// </remarks>
+    public static IRuleBuilderOptions<T, string?> Email<T>(this IRuleBuilder<T, string?> ruleBuilder) =>
+        ruleBuilder
+            .Must(value => value != null && EmailRegex.IsMatch(value))
+            .WithErrorCodeAndMessage("Granit:Validation:InvalidEmail");
+
     /// <summary>
     /// Validates a phone number in E.164 international format.
     /// </summary>

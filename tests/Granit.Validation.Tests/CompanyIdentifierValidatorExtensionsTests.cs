@@ -133,6 +133,44 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
         result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianBce");
     }
 
+    // =========================================================================
+    // FrenchNafCode
+    // =========================================================================
+
+    [Theory]
+    [InlineData("6201Z")]          // software development
+    [InlineData("8621Z")]          // general medical practice
+    [InlineData("0111Z")]          // cereal farming
+    [InlineData("6201z")]          // lowercase — normalised to uppercase
+    public void FrenchNafCode_ValidValues_PassValidation(string code)
+    {
+        InlineValidator<TestModel> validator = new();
+        validator.RuleFor(x => x.Value).FrenchNafCode();
+
+        ValidationResult result = validator.Validate(new TestModel(code));
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("620Z")]           // 4 chars — too short
+    [InlineData("6201ZZ")]         // 6 chars — too long
+    [InlineData("ABCDZ")]          // letters before the letter suffix — invalid
+    [InlineData("62011")]          // ends with digit, not letter
+    public void FrenchNafCode_InvalidValues_FailValidation(string? code)
+    {
+        InlineValidator<TestModel> validator = new();
+        validator.RuleFor(x => x.Value).FrenchNafCode();
+
+        ValidationResult result = validator.Validate(new TestModel(code));
+
+        result.IsValid.Should().BeFalse();
+        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchNafCode");
+        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchNafCode");
+    }
+
     // -------------------------------------------------------------------------
     // Test doubles
     // -------------------------------------------------------------------------
