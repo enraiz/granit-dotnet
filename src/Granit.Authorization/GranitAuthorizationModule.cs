@@ -1,7 +1,6 @@
 using Granit.Authorization.Extensions;
 using Granit.Caching;
 using Granit.Core.Modularity;
-using Granit.MultiTenancy;
 using Granit.Security;
 
 namespace Granit.Authorization;
@@ -13,7 +12,6 @@ namespace Granit.Authorization;
 /// </summary>
 [DependsOn(
     typeof(GranitSecurityModule),
-    typeof(GranitMultiTenancyModule),
     typeof(GranitCachingModule))]
 public sealed class GranitAuthorizationModule : GranitModule
 {

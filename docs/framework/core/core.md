@@ -10,6 +10,9 @@ Granit. Il fournit :
   `ISoftDeletable`, `IMultiTenant`, `IActive`, `AuditLogEntry`
 - Le **service de data filtering** (voir [data-filtering.md](../data/data-filtering.md)) :
   `IDataFilter` — bypass sélectif des query filters globaux EF Core
+- Le **contexte de tenant minimal** : `ICurrentTenant` (namespace `Granit.Core.MultiTenancy`) —
+  interface disponible dans tous les modules sans référencer `Granit.MultiTenancy`
+  (voir [Dépendance optionnelle sur le multi-tenancy](#dépendance-optionnelle-sur-le-multi-tenancy))
 
 Ce package remplace l'ancien `Granit.Abstractions`. Les interfaces de service
 (`IClock`, `IGuidGenerator`, `ICurrentUserService`, `ITransitEncryptionService`) vivent
@@ -56,6 +59,9 @@ Granit.Core
 ├── DataFiltering/
 │   ├── IDataFilter.cs              (interface de contrôle runtime des query filters)
 │   └── DataFilter.cs               (implémentation AsyncLocal, Singleton)
+├── MultiTenancy/
+│   ├── ICurrentTenant.cs           (interface — disponible sans Granit.MultiTenancy)
+│   └── NullTenantContext.cs        (Null Object, enregistré par défaut via TryAddSingleton)
 ├── Modularity/
 │   ├── GranitModule.cs         (classe de base des modules)
 │   ├── DependsOnAttribute.cs       (déclaration de dépendances)
@@ -68,6 +74,49 @@ Granit.Core
     ├── GranitHostBuilderExtensions.cs   (AddGranit<T> / AddGranitAsync<T>)
     └── GranitApplicationExtensions.cs   (UseGranit / UseGranitAsync)
 ```
+
+## Dépendance optionnelle sur le multi-tenancy
+
+`ICurrentTenant` a été promu dans `Granit.Core.MultiTenancy` afin de rompre le couplage
+entre les modules métier (`Granit.Persistence`, `Granit.Settings`, `Granit.Wolverine`, etc.)
+et `Granit.MultiTenancy`.
+
+### Principe
+
+`AddGranit<T>()` enregistre un **Null Object** comme valeur par défaut avant d'exécuter les
+modules :
+
+```csharp
+// GranitHostBuilderExtensions.cs — exécuté avant ConfigureServices de chaque module
+builder.Services.TryAddSingleton<ICurrentTenant>(NullTenantContext.Instance);
+```
+
+`NullTenantContext` retourne `IsAvailable = false`, `Id = null` et une implémentation
+no-op de `Change()`. Si `Granit.MultiTenancy` est présent dans le graphe de modules,
+il remplace l'enregistrement par défaut avec l'implémentation réelle :
+
+```csharp
+// MultiTenancyServiceCollectionExtensions.cs
+services.Replace(ServiceDescriptor.Singleton<ICurrentTenant, CurrentTenant>());
+```
+
+### Conséquences
+
+| Scénario | `ICurrentTenant.IsAvailable` | Comportement |
+| --- | --- | --- |
+| `Granit.MultiTenancy` absent | `false` | `NullTenantContext` — pas d'isolation tenant |
+| `Granit.MultiTenancy` présent, pas de requête active | `false` | Hors requête HTTP / job sans tenant |
+| `Granit.MultiTenancy` présent, requête avec tenant | `true` | Tenant résolu via JWT ou en-tête |
+
+Les modules qui consomment `ICurrentTenant` doivent **toujours vérifier `IsAvailable`**
+avant d'utiliser `Id` — ce comportement était déjà attendu avant ce changement.
+
+### Modules avec dépendance forte maintenue
+
+Les modules `Granit.BlobStorage`, `Granit.BlobStorage.S3` et
+`Granit.BlobStorage.EntityFrameworkCore` conservent une dépendance **explicite** sur
+`Granit.MultiTenancy` : le stockage de blobs impose une isolation tenant stricte pour
+des raisons RGPD/HDS. Tenter de les utiliser sans contexte tenant lève une exception.
 
 ## Migration depuis Abstractions
 

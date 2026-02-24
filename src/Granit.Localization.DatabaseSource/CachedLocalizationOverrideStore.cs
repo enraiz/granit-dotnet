@@ -1,5 +1,5 @@
+using Granit.Core.MultiTenancy;
 using Granit.Localization;
-using Granit.MultiTenancy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

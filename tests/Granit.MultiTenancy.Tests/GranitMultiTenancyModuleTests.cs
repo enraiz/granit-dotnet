@@ -11,6 +11,7 @@
 using FluentAssertions;
 using Granit.Core.Extensions;
 using Granit.Core.Modularity;
+using Granit.Core.MultiTenancy;
 using Granit.MultiTenancy.Middleware;
 using Granit.MultiTenancy.Pipeline;
 using Granit.MultiTenancy.Resolvers;

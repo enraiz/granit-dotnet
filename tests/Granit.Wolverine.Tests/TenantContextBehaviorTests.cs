@@ -6,7 +6,7 @@
 // =============================================================================
 
 using FluentAssertions;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Granit.Wolverine.Behaviors;
 using Granit.Wolverine.Middleware;
 using NSubstitute;

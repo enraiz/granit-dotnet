@@ -8,6 +8,7 @@
 
 using FluentAssertions;
 using Granit.Core.Modularity;
+using Granit.Core.MultiTenancy;
 using Granit.MultiTenancy;
 using Granit.Security;
 using Granit.Wolverine.Extensions;
@@ -37,12 +38,13 @@ public sealed class GranitWolverineModuleTests
     }
 
     [Fact]
-    public void GranitWolverineModule_DependsOn_MultiTenancyModule()
+    public void GranitWolverineModule_DoesNotDependOn_MultiTenancyModule()
     {
         DependsOnAttribute[] attributes = (DependsOnAttribute[])
             typeof(GranitWolverineModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
-        attributes.Should().ContainSingle(a => a.DependedTypes.Contains(typeof(GranitMultiTenancyModule)));
+        attributes.Should().NotContain(a => a.DependedTypes.Contains(typeof(GranitMultiTenancyModule)),
+            "ICurrentTenant is now sourced from Granit.Core.MultiTenancy — Granit.MultiTenancy is a soft dependency");
     }
 
     [Fact]

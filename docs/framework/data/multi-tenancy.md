@@ -4,6 +4,13 @@
 `ICurrentTenant`. La résolution du tenant est automatique : le middleware lit
 le claim JWT ou l'en-tête HTTP, active le contexte, puis le restaure en fin de requête.
 
+> **`ICurrentTenant` dans `Granit.Core`** : l'interface `ICurrentTenant` est définie
+> dans `Granit.Core.MultiTenancy` et accessible dans **tous** les modules Granit sans
+> référencer `Granit.MultiTenancy`. Un `NullTenantContext` (`IsAvailable = false`) est
+> enregistré par défaut. `Granit.MultiTenancy` remplace cet enregistrement par
+> l'implémentation réelle à l'initialisation. Voir
+> [core.md — Dépendance optionnelle sur le multi-tenancy](../core/core.md#dépendance-optionnelle-sur-le-multi-tenancy).
+
 > **Référence Microsoft** :
 > [Middleware ASP.NET Core](https://learn.microsoft.com/fr-fr/aspnet/core/fundamentals/middleware)
 
@@ -212,6 +219,7 @@ Cas d'usage :
 ## ICurrentTenant — API complète
 
 ```csharp
+// Namespace : Granit.Core.MultiTenancy (package Granit.Core)
 public interface ICurrentTenant
 {
     bool IsAvailable { get; }      // true si Id est non-nul
@@ -221,9 +229,9 @@ public interface ICurrentTenant
 }
 ```
 
-L'implémentation repose sur `AsyncLocal<T>` — le contexte est propagé
-automatiquement dans les chaînes `async/await` et isolé entre les requêtes
-parallèles.
+L'interface est définie dans `Granit.Core.MultiTenancy`. L'implémentation `CurrentTenant`
+fournie par `Granit.MultiTenancy` repose sur `AsyncLocal<T>` — le contexte est propagé
+automatiquement dans les chaînes `async/await` et isolé entre les requêtes parallèles.
 
 ## Intégration EF Core
 
