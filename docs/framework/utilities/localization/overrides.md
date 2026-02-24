@@ -1,6 +1,6 @@
 # Surcharges de traduction en base de données
 
-`Granit.Localization.DatabaseSource` et `Granit.Localization.DatabaseSource.EntityFrameworkCore`
+`Granit.Localization` et `Granit.Localization.EntityFrameworkCore`
 permettent de surcharger à chaud les traductions JSON sans redéploiement.
 Les surcharges sont stockées en PostgreSQL, mises en cache en mémoire, et
 prennent priorité sur les fichiers embarqués.
@@ -32,17 +32,17 @@ JsonStringLocalizer
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.Localization.DatabaseSource` | `CachedLocalizationOverrideStore` (Singleton, `IMemoryCache`) |
-| `Granit.Localization.DatabaseSource.EntityFrameworkCore` | `EfCoreLocalizationOverrideStore` (Scoped, PostgreSQL) |
+| `Granit.Localization` | `CachedLocalizationOverrideStore` (Singleton, `IMemoryCache`) — inclus dans le module de base |
+| `Granit.Localization.EntityFrameworkCore` | `EfCoreLocalizationOverrideStore` (Scoped, PostgreSQL) |
 | `Granit.Localization.Endpoints` | Endpoints CRUD d'administration (optionnel) |
 
 ## Installation
 
 ```bash
-dotnet add package Granit.Localization.DatabaseSource.EntityFrameworkCore
+dotnet add package Granit.Localization.EntityFrameworkCore
 ```
 
-`Granit.Localization.DatabaseSource` est tiré automatiquement en transitif.
+`Granit.Localization` est tiré automatiquement en transitif.
 
 ## Configuration
 
@@ -50,7 +50,7 @@ dotnet add package Granit.Localization.DatabaseSource.EntityFrameworkCore
 
 ```csharp
 [DependsOn(
-    typeof(GranitLocalizationDatabaseSourceEntityFrameworkCoreModule),
+    typeof(GranitLocalizationEntityFrameworkCoreModule),
     typeof(GranitPersistenceModule))]
 public sealed class AppModule : GranitModule { }
 ```
@@ -68,7 +68,7 @@ builder.AddGranitLocalizationEntityFrameworkCore(opt =>
 
 ```json
 {
-  "LocalizationDatabaseSource": {
+  "LocalizationOverridesCache": {
     "CacheTtl": "00:05:00"
   }
 }
@@ -223,12 +223,15 @@ pour que l'intercepteur Scoped soit disponible depuis le Singleton de cache.
 
 ## Services enregistrés
 
-### `GranitLocalizationDatabaseSourceModule`
+### `AddGranitLocalization()` — module de base
 
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `IMemoryCache` | `MemoryCache` | Singleton |
 | `ILocalizationOverrideStore` | `CachedLocalizationOverrideStore` | Singleton |
+
+Sans `Granit.Localization.EntityFrameworkCore`, le store renvoie des dictionnaires
+vides — les traductions proviennent uniquement des fichiers JSON embarqués.
 
 ### `AddGranitLocalizationEntityFrameworkCore()`
 

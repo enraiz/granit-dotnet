@@ -1,10 +1,9 @@
 using Granit.Core.MultiTenancy;
-using Granit.Localization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Granit.Localization.DatabaseSource;
+namespace Granit.Localization;
 
 /// <summary>
 /// Caching decorator for <see cref="ILocalizationOverrideStore"/>.
@@ -14,9 +13,9 @@ namespace Granit.Localization.DatabaseSource;
 /// with an <see cref="IMemoryCache"/> L1 cache, making read access synchronous-safe for use inside
 /// <c>IStringLocalizer</c>.
 /// <para>
-/// An <see cref="Microsoft.Extensions.DependencyInjection.AsyncServiceScope"/> is created per DB
-/// operation so that the underlying store (Scoped) is resolved with its full dependency graph,
-/// including <c>AuditedEntityInterceptor</c> for HDS audit compliance on write operations.
+/// An <see cref="AsyncServiceScope"/> is created per DB operation so that the underlying store
+/// (Scoped) is resolved with its full dependency graph, including <c>AuditedEntityInterceptor</c>
+/// for HDS audit compliance on write operations.
 /// </para>
 /// <para>
 /// Cache is invalidated on every write or delete.
@@ -25,12 +24,12 @@ namespace Granit.Localization.DatabaseSource;
 /// </remarks>
 internal sealed class CachedLocalizationOverrideStore(
     IMemoryCache memoryCache,
-    IOptions<LocalizationDatabaseSourceOptions> options,
+    IOptions<LocalizationOverridesCacheOptions> options,
     IServiceScopeFactory scopeFactory,
     IServiceProvider serviceProvider) : ILocalizationOverrideStore
 {
     private readonly IMemoryCache _memoryCache = memoryCache;
-    private readonly LocalizationDatabaseSourceOptions _options = options.Value;
+    private readonly LocalizationOverridesCacheOptions _options = options.Value;
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
@@ -82,11 +81,14 @@ internal sealed class CachedLocalizationOverrideStore(
         string cacheKey, string resourceName, string culture, CancellationToken ct)
     {
         await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
-        ILocalizationOverrideStore inner =
-            scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStore>(RawStoreKey);
+        ILocalizationOverrideStore? inner =
+            scope.ServiceProvider.GetKeyedService<ILocalizationOverrideStore>(RawStoreKey);
 
-        IReadOnlyDictionary<string, string> overrides =
-            await inner.GetOverridesAsync(resourceName, culture, ct);
+        // No raw store registered (EF Core package not installed): fall back to empty overrides
+        // so the localizer resolves translations from embedded JSON files transparently.
+        IReadOnlyDictionary<string, string> overrides = inner is not null
+            ? await inner.GetOverridesAsync(resourceName, culture, ct)
+            : new Dictionary<string, string>(StringComparer.Ordinal);
 
         MemoryCacheEntryOptions entryOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(_options.CacheTtl);

@@ -1,7 +1,6 @@
-using Granit.Localization;
 using Microsoft.EntityFrameworkCore;
 
-namespace Granit.Localization.DatabaseSource.EntityFrameworkCore.Internal;
+namespace Granit.Localization.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core implementation of <see cref="ILocalizationOverrideStore"/>.
