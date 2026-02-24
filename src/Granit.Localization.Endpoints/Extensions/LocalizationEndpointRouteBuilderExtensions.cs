@@ -30,6 +30,11 @@ public static class LocalizationEndpointRouteBuilderExtensions
     private static readonly Regex Bcp47Pattern =
         new(@"^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$", RegexOptions.Compiled);
 
+    // Column size constraints (must match LocalizationOverrideConfiguration).
+    private const int MaxResourceNameLength = 200;
+    private const int MaxKeyLength = 500;
+    private const int MaxValueLength = 4000;
+
     /// <summary>
     /// Maps <c>GET /api/granit/localization</c> — returns all registered localization
     /// resources for the requested culture, plus the list of available languages.
@@ -170,6 +175,13 @@ public static class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
+        if (resourceName.Length > MaxResourceNameLength)
+        {
+            return Results.Problem(
+                detail: $"resourceName must not exceed {MaxResourceNameLength} characters.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
         if (!Bcp47Pattern.IsMatch(cultureName))
         {
             return Results.Problem(
@@ -201,6 +213,13 @@ public static class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status501NotImplemented);
         }
 
+        if (resourceName.Length > MaxResourceNameLength)
+        {
+            return Results.Problem(
+                detail: $"resourceName must not exceed {MaxResourceNameLength} characters.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
         if (!Bcp47Pattern.IsMatch(cultureName))
         {
             return Results.Problem(
@@ -208,10 +227,24 @@ public static class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
+        if (key.Length > MaxKeyLength)
+        {
+            return Results.Problem(
+                detail: $"key must not exceed {MaxKeyLength} characters.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
         if (string.IsNullOrWhiteSpace(body.Value))
         {
             return Results.Problem(
                 detail: "Override value must not be empty.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        if (body.Value.Length > MaxValueLength)
+        {
+            return Results.Problem(
+                detail: $"value must not exceed {MaxValueLength} characters.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
@@ -236,10 +269,24 @@ public static class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status501NotImplemented);
         }
 
+        if (resourceName.Length > MaxResourceNameLength)
+        {
+            return Results.Problem(
+                detail: $"resourceName must not exceed {MaxResourceNameLength} characters.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
         if (!Bcp47Pattern.IsMatch(cultureName))
         {
             return Results.Problem(
                 detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        if (key.Length > MaxKeyLength)
+        {
+            return Results.Problem(
+                detail: $"key must not exceed {MaxKeyLength} characters.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
