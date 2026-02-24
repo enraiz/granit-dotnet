@@ -55,14 +55,16 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
     {
         // Resolve by [LocalizationResourceName] attribute name (e.g. "Granit", "Features").
         // This is the primary resolution path used by GranitExceptionHandler and the SPA endpoint.
-        foreach (LocalizationResourceInfo resourceInfo in _options.Value.Resources.GetAll())
+        Type? matchingType = _options.Value.Resources.GetAll()
+            .Select(resourceInfo => resourceInfo.ResourceType)
+            .FirstOrDefault(t => string.Equals(
+                t.GetCustomAttribute<LocalizationResourceNameAttribute>()?.Name,
+                baseName,
+                StringComparison.Ordinal));
+
+        if (matchingType is not null)
         {
-            string? name = resourceInfo.ResourceType
-                .GetCustomAttribute<LocalizationResourceNameAttribute>()?.Name;
-            if (string.Equals(name, baseName, StringComparison.Ordinal))
-            {
-                return Create(resourceInfo.ResourceType);
-            }
+            return Create(matchingType);
         }
 
         // Fallback: resolve by fully-qualified CLR type name (e.g. "Granit.Localization.GranitLocalizationResource, Granit.Localization").

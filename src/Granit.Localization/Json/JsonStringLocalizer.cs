@@ -116,12 +116,11 @@ internal sealed class JsonStringLocalizer(
         }
 
         // Inheritance: include keys from parent resources
-        foreach (IStringLocalizer baseLocalizer in _baseLocalizers)
+        foreach (LocalizedString localizedString in _baseLocalizers
+            .SelectMany(b => b.GetAllStrings(includeParentCultures))
+            .Where(s => seen.Add(s.Name)))
         {
-            foreach (LocalizedString localizedString in baseLocalizer.GetAllStrings(includeParentCultures).Where(s => seen.Add(s.Name)))
-            {
-                yield return localizedString;
-            }
+            yield return localizedString;
         }
     }
 
