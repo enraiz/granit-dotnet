@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Idempotency</PackageId>
+    <Description>Middleware d'idempotence HTTP pour les API publiques (style Stripe).
+    Stockage atomique via Redis SET NX PX. Machine à états Absent → InProgress → Completed.
+    Chiffrement AES-256 opt-in via ICacheValueEncryptor. Conforme HDS/RGPD.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Idempotency.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Caching\Granit.Caching.csproj" />
+    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
+    <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+  </ItemGroup>
+
+</Project>

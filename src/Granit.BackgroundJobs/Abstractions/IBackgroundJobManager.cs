@@ -1,0 +1,56 @@
+namespace Granit.BackgroundJobs;
+
+/// <summary>
+/// Service for administrative control of Granit recurring background jobs.
+/// Injectable in API controllers, Minimal API handlers, and any DI-aware component.
+/// </summary>
+/// <remarks>
+/// All write operations (<see cref="PauseAsync"/>, <see cref="ResumeAsync"/>,
+/// <see cref="TriggerNowAsync"/>) are persisted in the
+/// <see cref="BackgroundJobsOptions.Mode"/> store and survive application restarts
+/// (in <see cref="JobStoreMode.Durable"/> mode).
+/// <para>
+/// HDS compliance: <see cref="TriggerNowAsync"/> propagates the caller's identity
+/// via the <c>X-Triggered-By</c> Wolverine envelope header, which is persisted
+/// in <see cref="BackgroundJobDefinition.TriggeredBy"/> by the scheduling middleware.
+/// </para>
+/// </remarks>
+public interface IBackgroundJobManager
+{
+    /// <summary>Returns the current status of all registered recurring jobs.</summary>
+    Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Returns the status of a specific job, or <c>null</c> if not found.
+    /// </summary>
+    Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken ct = default);
+
+    /// <summary>
+    /// Pauses a recurring job. The current execution (if running) completes normally,
+    /// but rescheduling is skipped. The pause state persists across restarts.
+    /// </summary>
+    /// <exception cref="Granit.Core.Exceptions.EntityNotFoundException">
+    /// Thrown when no job with <paramref name="jobName"/> exists in the store.
+    /// </exception>
+    Task PauseAsync(string jobName, CancellationToken ct = default);
+
+    /// <summary>
+    /// Resumes a paused job and immediately schedules its next occurrence
+    /// based on the current time and the job's cron expression.
+    /// </summary>
+    /// <exception cref="Granit.Core.Exceptions.EntityNotFoundException">
+    /// Thrown when no job with <paramref name="jobName"/> exists in the store.
+    /// </exception>
+    Task ResumeAsync(string jobName, CancellationToken ct = default);
+
+    /// <summary>
+    /// Triggers an immediate execution of a job, independent of its scheduled cycle.
+    /// The next scheduled execution is not affected.
+    /// The caller's identity (<see cref="Granit.Security.ICurrentUserService.UserId"/>)
+    /// is propagated for HDS audit trail.
+    /// </summary>
+    /// <exception cref="Granit.Core.Exceptions.EntityNotFoundException">
+    /// Thrown when no job with <paramref name="jobName"/> exists in the store.
+    /// </exception>
+    Task TriggerNowAsync(string jobName, CancellationToken ct = default);
+}

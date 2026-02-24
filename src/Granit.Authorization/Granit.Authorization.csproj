@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Granit.Authorization</PackageId>
+    <Description>RBAC (Role-Based Access Control) permission system for Digital Dynamics Granit applications. Provides permission definitions, ASP.NET Core integration, and caching-aware permission checks.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Authorization.Tests" />
+    <InternalsVisibleTo Include="Granit.Authorization.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.Authorization.EntityFrameworkCore.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
+    <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+    <ProjectReference Include="..\Granit.Caching\Granit.Caching.csproj" />
+  </ItemGroup>
+</Project>

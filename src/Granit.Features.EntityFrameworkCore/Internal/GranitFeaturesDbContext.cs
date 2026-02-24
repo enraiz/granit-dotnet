@@ -1,0 +1,30 @@
+using Microsoft.EntityFrameworkCore;
+
+namespace Granit.Features.EntityFrameworkCore.Internal;
+
+/// <summary>
+/// Dedicated EF Core DbContext for Granit feature value overrides.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Isolated from the host application's DbContext to avoid coupling.
+/// Stores only <see cref="TenantFeatureOverride"/> records — the feature definitions
+/// and default values live in code via <c>FeatureDefinitionProvider</c>.
+/// </para>
+/// <para>
+/// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, HDS compliant).
+/// </para>
+/// </remarks>
+internal sealed class GranitFeaturesDbContext(DbContextOptions<GranitFeaturesDbContext> options)
+    : DbContext(options)
+{
+    /// <summary>Tenant-level feature value overrides.</summary>
+    public DbSet<TenantFeatureOverride> FeatureOverrides { get; set; } = null!;
+
+    /// <inheritdoc/>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new TenantFeatureOverrideConfiguration());
+    }
+}

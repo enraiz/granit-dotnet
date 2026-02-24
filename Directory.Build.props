@@ -7,7 +7,16 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <NoWarn>CA1848;CA1707;CA1305;CA1861</NoWarn>
+    <NoWarn>CA1848;CA1873;CA1707;CA1305;CA1861</NoWarn>
+    <!-- NuGet lock files: résolution locale, mode verrouillé en CI -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
+  </PropertyGroup>
+
+  <!-- Version par défaut (écrasée en CI par -p:PackageVersion=0.1.0-dev.{CI_PIPELINE_IID}) -->
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix>dev</VersionSuffix>
   </PropertyGroup>
 
   <!-- NuGet Package Metadata -->
@@ -17,8 +26,8 @@
     <Copyright>Copyright (c) 2026 Digital Dynamics. All rights reserved.</Copyright>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://gitlab.digitaldynamics.be/digital-dynamics/dd-foundation-dotnet</RepositoryUrl>
-    <PackageProjectUrl>https://gitlab.digitaldynamics.be/digital-dynamics/dd-foundation-dotnet</PackageProjectUrl>
-    <Description>DigitalDynamics.Foundation - Packages partagés pour les applications .NET Digital Dynamics</Description>
+    <RepositoryUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</RepositoryUrl>
+    <PackageProjectUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</PackageProjectUrl>
+    <Description>Granit - Packages partagés pour les applications .NET Digital Dynamics</Description>
   </PropertyGroup>
 </Project>

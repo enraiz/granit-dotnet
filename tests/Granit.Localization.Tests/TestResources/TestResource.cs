@@ -1,0 +1,6 @@
+using Granit.Localization.Attributes;
+
+namespace Granit.Localization.Tests.TestResources;
+
+[LocalizationResourceName("Test")]
+public sealed class TestResource;

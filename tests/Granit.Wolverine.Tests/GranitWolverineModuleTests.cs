@@ -1,0 +1,130 @@
+// =============================================================================
+// Tests - GranitWolverineModule
+// =============================================================================
+// Verifies module inheritance, DependsOn declarations, that AddGranitWolverine()
+// registers Wolverine services without throwing, and that all DI registrations
+// are present in the service collection.
+// =============================================================================
+
+using FluentAssertions;
+using Granit.Core.Modularity;
+using Granit.MultiTenancy;
+using Granit.Security;
+using Granit.Wolverine.Extensions;
+using Granit.Wolverine.Internal;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Wolverine;
+using Xunit;
+
+namespace Granit.Wolverine.Tests;
+
+public sealed class GranitWolverineModuleTests
+{
+    [Fact]
+    public void GranitWolverineModule_IsGranitModule() =>
+        typeof(GranitWolverineModule).Should().BeAssignableTo<GranitModule>();
+
+    [Fact]
+    public void GranitWolverineModule_DependsOn_SecurityModule()
+    {
+        DependsOnAttribute[] attributes = (DependsOnAttribute[])
+            typeof(GranitWolverineModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
+
+        attributes.Should().ContainSingle(a => a.DependedTypes.Contains(typeof(GranitSecurityModule)));
+    }
+
+    [Fact]
+    public void GranitWolverineModule_DependsOn_MultiTenancyModule()
+    {
+        DependsOnAttribute[] attributes = (DependsOnAttribute[])
+            typeof(GranitWolverineModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
+
+        attributes.Should().ContainSingle(a => a.DependedTypes.Contains(typeof(GranitMultiTenancyModule)));
+    }
+
+    [Fact]
+    public void GranitWolverineModule_IsSealed() =>
+        typeof(GranitWolverineModule).IsSealed.Should().BeTrue();
+
+    [Fact]
+    public void AddGranitWolverine_RegistersWolverineServices()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+
+        Action act = () => builder.AddGranitWolverine();
+
+        act.Should().NotThrow();
+    }
+
+    // -------------------------------------------------------------------------
+    // DI registration verification (inspects IServiceCollection directly,
+    // no host build needed — avoids starting Wolverine background services)
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void AddGranitWolverine_RegistersICurrentUserService_Scoped()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.AddGranitWolverine();
+
+        builder.Services.Should().Contain(d =>
+            d.ServiceType == typeof(ICurrentUserService) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitWolverine_RegistersIWolverineUserContextSetter_Scoped()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.AddGranitWolverine();
+
+        builder.Services.Should().Contain(d =>
+            d.ServiceType == typeof(IWolverineUserContextSetter) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitWolverine_RegistersWolverineCurrentUserService_Scoped()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.AddGranitWolverine();
+
+        builder.Services.Should().Contain(d =>
+            d.ServiceType == typeof(WolverineCurrentUserService) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitWolverine_RegistersHttpContextAccessor()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.AddGranitWolverine();
+
+        builder.Services.Should().Contain(d =>
+            d.ServiceType == typeof(IHttpContextAccessor));
+    }
+
+    [Fact]
+    public void AddGranitWolverine_RegistersMessagingOptionsValidator()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.AddGranitWolverine();
+
+        builder.Services.Should().Contain(d =>
+            d.ServiceType == typeof(IValidateOptions<WolverineMessagingOptions>));
+    }
+
+    [Fact]
+    public void AddGranitWolverine_WithConfigureCallback_InvokesCallback()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        bool callbackInvoked = false;
+
+        builder.AddGranitWolverine(opts => { callbackInvoked = true; });
+
+        callbackInvoked.Should().BeTrue();
+    }
+}

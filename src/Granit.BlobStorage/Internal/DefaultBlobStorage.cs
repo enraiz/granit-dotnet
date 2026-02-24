@@ -1,0 +1,134 @@
+using Granit.BlobStorage.Exceptions;
+using Granit.Guids;
+using Granit.MultiTenancy;
+using Granit.Timing;
+using Microsoft.Extensions.Options;
+
+namespace Granit.BlobStorage.Internal;
+
+/// <summary>
+/// Default orchestrator for blob storage operations.
+/// Coordinates tenant resolution, key strategy, pre-signed URL generation, and descriptor persistence.
+/// </summary>
+internal sealed class DefaultBlobStorage(
+    IBlobDescriptorStore store,
+    IBlobKeyStrategy keyStrategy,
+    IBlobStorageClient storageClient,
+    IGuidGenerator guidGenerator,
+    IClock clock,
+    ICurrentTenant currentTenant,
+    IOptions<BlobStorageOptions> options) : IBlobStorage
+{
+    private BlobStorageOptions Options => options.Value;
+
+    /// <inheritdoc/>
+    public async Task<PresignedUploadTicket> InitiateUploadAsync(
+        string containerName,
+        BlobUploadRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (!currentTenant.IsAvailable || currentTenant.Id is null)
+        {
+            throw new InvalidOperationException(
+                "Cannot initiate a blob upload outside of an active tenant context.");
+        }
+
+        Guid blobId = guidGenerator.Create();
+        string objectKey = keyStrategy.BuildObjectKey(containerName, blobId);
+        string bucket = keyStrategy.ResolveBucketName(containerName);
+
+        BlobDescriptor descriptor = BlobDescriptor.Create(
+            id: blobId,
+            tenantId: currentTenant.Id.Value.ToString(),
+            containerName: containerName,
+            objectKey: objectKey,
+            request: request,
+            createdAt: clock.Now);
+
+        await store.SaveAsync(descriptor, cancellationToken);
+
+        PresignedUploadTicket ticket = await storageClient.GenerateUploadTicketAsync(
+            bucket,
+            objectKey,
+            blobId,
+            request,
+            Options.UploadUrlExpiry,
+            cancellationToken);
+
+        return ticket;
+    }
+
+    /// <inheritdoc/>
+    public async Task<PresignedDownloadUrl> CreateDownloadUrlAsync(
+        string containerName,
+        Guid blobId,
+        DownloadUrlOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        BlobDescriptor descriptor = await FindOrThrowAsync(containerName, blobId, cancellationToken);
+
+        if (descriptor.Status != BlobStatus.Valid)
+        {
+            throw new BlobNotValidException(blobId, descriptor.Status);
+        }
+
+        TimeSpan expiry = options?.Expiry ?? Options.DownloadUrlExpiry;
+        string bucket = keyStrategy.ResolveBucketName(containerName);
+
+        return await storageClient.GenerateDownloadUrlAsync(
+            bucket,
+            descriptor.ObjectKey,
+            options,
+            expiry,
+            cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<BlobDescriptor?> GetDescriptorAsync(
+        string containerName,
+        Guid blobId,
+        CancellationToken cancellationToken = default) =>
+        await store.FindAsync(blobId, cancellationToken);
+
+    /// <inheritdoc/>
+    public async Task DeleteAsync(
+        string containerName,
+        Guid blobId,
+        string? deletionReason = null,
+        CancellationToken cancellationToken = default)
+    {
+        BlobDescriptor? descriptor = await store.FindAsync(blobId, cancellationToken);
+
+        if (descriptor is null)
+        {
+            throw new BlobNotFoundException(blobId, containerName);
+        }
+
+        // Idempotency: already deleted -> no-op.
+        if (descriptor.Status == BlobStatus.Deleted)
+        {
+            return;
+        }
+
+        string bucket = keyStrategy.ResolveBucketName(containerName);
+
+        await storageClient.DeleteObjectAsync(bucket, descriptor.ObjectKey, cancellationToken);
+
+        descriptor.MarkAsDeleted(clock.Now, deletionReason);
+        await store.UpdateAsync(descriptor, cancellationToken);
+    }
+
+    private async Task<BlobDescriptor> FindOrThrowAsync(
+        string containerName,
+        Guid blobId,
+        CancellationToken cancellationToken)
+    {
+        BlobDescriptor? descriptor = await store.FindAsync(blobId, cancellationToken);
+        if (descriptor is null)
+        {
+            throw new BlobNotFoundException(blobId, containerName);
+        }
+
+        return descriptor;
+    }
+}

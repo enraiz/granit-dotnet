@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.MultiTenancy</PackageId>
+    <Description>Gestion multi-tenant avec résolution du tenant courant depuis JWT/Header, AsyncLocal context et middleware ASP.NET Core pour les applications .NET Digital Dynamics.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+  </ItemGroup>
+
+</Project>

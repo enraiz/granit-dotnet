@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Authentication.JwtBearer</PackageId>
+    <Description>Authentification JWT Bearer générique (OIDC) pour les applications .NET Digital Dynamics. ICurrentUserService, JwtBearerAuthOptions, policy Authenticated.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <!-- ASP.NET Core shared framework (IHttpContextAccessor, Authentication, Authorization) -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
+  </ItemGroup>
+
+</Project>

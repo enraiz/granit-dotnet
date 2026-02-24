@@ -1,0 +1,47 @@
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using StackExchange.Redis;
+
+namespace Granit.Caching.StackExchangeRedis.HealthChecks;
+
+/// <summary>
+/// Health check that verifies Redis connectivity by issuing a PING command
+/// and measuring round-trip latency via <see cref="IConnectionMultiplexer"/>.
+/// </summary>
+/// <remarks>
+/// <list type="bullet">
+///   <item>Latency &lt; threshold → <see cref="HealthCheckResult.Healthy"/></item>
+///   <item>Latency ≥ threshold → <see cref="HealthCheckResult.Degraded"/>
+///   (pod remains in load balancer)</item>
+///   <item>Unreachable → <see cref="HealthCheckResult.Unhealthy"/>
+///   (pod removed from load balancer)</item>
+/// </list>
+/// The response never exposes connection strings or authentication credentials.
+/// </remarks>
+internal sealed class RedisHealthCheck(
+    IConnectionMultiplexer connection,
+    TimeSpan degradedThreshold) : IHealthCheck
+{
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            TimeSpan latency = await connection.GetDatabase().PingAsync();
+
+            if (latency >= degradedThreshold)
+            {
+                return HealthCheckResult.Degraded(
+                    $"Redis latency: {latency.TotalMilliseconds:0} ms (threshold: {degradedThreshold.TotalMilliseconds:0} ms)");
+            }
+
+            return HealthCheckResult.Healthy(
+                $"Redis latency: {latency.TotalMilliseconds:0} ms");
+        }
+        catch (Exception ex)
+        {
+            // Sanitize: never expose connection strings or passwords in the message
+            return HealthCheckResult.Unhealthy($"Redis unreachable: {ex.GetType().Name}");
+        }
+    }
+}
