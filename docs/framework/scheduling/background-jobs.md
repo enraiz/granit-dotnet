@@ -204,8 +204,11 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 | #137 | ✅ Terminé | Étendre `OutgoingContextMiddleware` pour propager `X-Triggered-By` |
 | #138 | ✅ Terminé | Tests d'intégration `BackgroundJobsIntegrationTests` |
 | #140 | ✅ Terminé | Scaffolding `Granit.BackgroundJobs.Endpoints` — module, options, `MapBackgroundJobsEndpoints()` |
+| #141 | ✅ Terminé | GET /background-jobs + GET /background-jobs/{name} (TypedResults, OpenAPI) |
+| #142 | ✅ Terminé | POST pause / resume / trigger (204, 202 Accepted, 404) |
+| #143 | ✅ Terminé | Policy `BackgroundJobs.Admin` — `RequiredRole` configurable via options |
+| #144 | ✅ Terminé | 17 tests d'intégration — 401/403/404, désérialisation JSON, custom role |
 | #134 | Planifié | `DeadLetterCount` via `IMessageStore` |
-| #141–144 | Planifié | `Granit.BackgroundJobs.Endpoints` — endpoints GET/POST, policy `BackgroundJobs.Admin`, tests d'intégration |
 
 ## Conformité HDS
 
