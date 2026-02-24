@@ -3,17 +3,18 @@ using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Granit.Wolverine.Postgresql.Internal;
+namespace Granit.Persistence.MultiTenancy;
 
 /// <summary>
 /// Scoped <see cref="IDbContextFactory{TContext}"/> that builds a <typeparamref name="TContext"/>
-/// configured for the current tenant's isolated PostgreSQL database.
+/// configured for the current tenant's isolated database.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Reads <see cref="ICurrentTenant.Id"/> — set by
-/// <see cref="Granit.Wolverine.Behaviors.TenantContextBehavior"/> before the handler runs —
-/// and delegates connection string resolution to <see cref="ITenantConnectionStringProvider"/>.
+/// Reads <see cref="ICurrentTenant.Id"/> and delegates connection string resolution to
+/// <see cref="ITenantConnectionStringProvider"/>. The database provider (Npgsql, SQL Server…)
+/// is configured by the <c>Action&lt;DbContextOptionsBuilder, string&gt;</c> delegate
+/// registered at startup via <c>AddTenantPerDatabaseDbContext&lt;TContext&gt;()</c>.
 /// </para>
 /// <para>
 /// Throws <see cref="InvalidOperationException"/> when no tenant is active.
@@ -21,8 +22,8 @@ namespace Granit.Wolverine.Postgresql.Internal;
 /// HDS/RGPD inter-tenant isolation requirements.
 /// </para>
 /// <para>
-/// <see cref="Granit.Persistence.Interceptors.AuditedEntityInterceptor"/> is wired automatically
-/// when available in DI, satisfying the 3-year HDS audit trail requirement.
+/// <see cref="AuditedEntityInterceptor"/> is wired automatically when available in DI,
+/// satisfying the 3-year HDS audit trail requirement.
 /// </para>
 /// <para>
 /// Prefer <see cref="CreateDbContextAsync"/> over <see cref="CreateDbContext"/>: the synchronous
@@ -31,15 +32,17 @@ namespace Granit.Wolverine.Postgresql.Internal;
 /// </para>
 /// </remarks>
 /// <typeparam name="TContext">The tenant-specific <see cref="DbContext"/> type.</typeparam>
-internal sealed class PerTenantDbContextFactory<TContext>(
+internal sealed class TenantPerDatabaseDbContextFactory<TContext>(
     ICurrentTenant currentTenant,
     ITenantConnectionStringProvider connectionStringProvider,
-    IServiceProvider serviceProvider) : IDbContextFactory<TContext>
+    IServiceProvider serviceProvider,
+    TenantPerDatabaseDbContextOptions<TContext> options) : IDbContextFactory<TContext>
     where TContext : DbContext
 {
     private readonly ICurrentTenant _currentTenant = currentTenant;
     private readonly ITenantConnectionStringProvider _connectionStringProvider = connectionStringProvider;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly TenantPerDatabaseDbContextOptions<TContext> _options = options;
 
     /// <inheritdoc/>
     public TContext CreateDbContext() =>
@@ -50,8 +53,8 @@ internal sealed class PerTenantDbContextFactory<TContext>(
     {
         Guid tenantId = _currentTenant.Id
             ?? throw new InvalidOperationException(
-                "No active tenant context. Ensure TenantContextBehavior is registered " +
-                "and the message carries the X-Tenant-Id header.");
+                "No active tenant context. Ensure the tenant is resolved before accessing " +
+                "per-tenant data (HTTP: TenantResolutionMiddleware; messaging: TenantContextBehavior).");
 
         string connectionString = await _connectionStringProvider
             .GetConnectionStringAsync(tenantId, cancellationToken)
@@ -63,7 +66,7 @@ internal sealed class PerTenantDbContextFactory<TContext>(
     private TContext BuildContext(string connectionString)
     {
         DbContextOptionsBuilder<TContext> optionsBuilder = new();
-        optionsBuilder.UseNpgsql(connectionString);
+        _options.Configure(optionsBuilder, connectionString);
 
         AuditedEntityInterceptor? auditInterceptor =
             _serviceProvider.GetService<AuditedEntityInterceptor>();

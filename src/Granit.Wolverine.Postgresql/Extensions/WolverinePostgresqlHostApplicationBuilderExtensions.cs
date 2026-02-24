@@ -1,8 +1,8 @@
+using Granit.Persistence.Extensions;
 using Granit.Wolverine.Postgresql.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Wolverine;
@@ -128,12 +128,10 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
             .GetSection(WolverinePostgresqlOptions.SectionName)
             .Bind(options);
 
-        // Register the per-tenant factory and DbContext as Scoped.
-        // TryAdd preserves any existing registration (e.g., overrides from integration tests).
-        builder.Services.TryAddScoped<IDbContextFactory<TContext>,
-            PerTenantDbContextFactory<TContext>>();
-        builder.Services.TryAddScoped<TContext>(
-            static sp => sp.GetRequiredService<IDbContextFactory<TContext>>().CreateDbContext());
+        // Register the per-tenant factory and DbContext as Scoped via Granit.Persistence.
+        // TryAdd semantics preserve any existing registration (e.g., overrides from integration tests).
+        builder.Services.AddTenantPerDatabaseDbContext<TContext>(
+            static (opts, connectionString) => opts.UseNpgsql(connectionString));
 
         builder.UseWolverine(opts =>
         {

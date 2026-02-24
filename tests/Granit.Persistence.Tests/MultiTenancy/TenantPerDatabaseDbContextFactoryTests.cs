@@ -1,29 +1,30 @@
 // =============================================================================
-// Tests - PerTenantDbContextFactory<TContext>
+// Tests - TenantPerDatabaseDbContextFactory<TContext>
 // =============================================================================
-// Verifies tenant routing, missing-tenant guard, and provider call correctness.
-// No real PostgreSQL connection required: Npgsql DbContextOptions are created but
-// never opened (connection only happens on query execution, not on DbContext construction).
+// Verifies tenant routing, missing-tenant guard, provider call correctness,
+// and async isolation between concurrent tenant contexts.
+// No real database connection required: DbContextOptions are built but the
+// connection is never opened (only happens on query execution, not construction).
 // =============================================================================
 
 using FluentAssertions;
 using Granit.Core.MultiTenancy;
-using Granit.Wolverine.Postgresql.Internal;
+using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
 
-namespace Granit.Wolverine.Postgresql.Tests;
+namespace Granit.Persistence.Tests.MultiTenancy;
 
 // ---------------------------------------------------------------------------
-// Minimal DbContext stub — single constructor (DbContextOptions<T>) required
-// by PerTenantDbContextFactory<T>'s Activator.CreateInstance path.
+// Minimal DbContext stub — constructor (DbContextOptions<T>) required
+// by TenantPerDatabaseDbContextFactory<T>'s Activator.CreateInstance path.
 // ---------------------------------------------------------------------------
-internal sealed class StubTenantDbContext(DbContextOptions<StubTenantDbContext> options)
+internal sealed class StubPerTenantDbContext(DbContextOptions<StubPerTenantDbContext> options)
     : DbContext(options);
 
-public sealed class PerTenantDbContextFactoryTests
+public sealed class TenantPerDatabaseDbContextFactoryTests
 {
     private static readonly Guid TenantA = Guid.NewGuid();
     private static readonly Guid TenantB = Guid.NewGuid();
@@ -35,7 +36,7 @@ public sealed class PerTenantDbContextFactoryTests
     // Helper — builds a factory with fully controlled dependencies.
     // -----------------------------------------------------------------------
 
-    private static (PerTenantDbContextFactory<StubTenantDbContext> factory,
+    private static (TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory,
                     ITenantConnectionStringProvider provider)
         BuildFactoryWithProvider(Guid? tenantId, string connectionString)
     {
@@ -51,11 +52,16 @@ public sealed class PerTenantDbContextFactoryTests
         ServiceCollection services = new();
         IServiceProvider sp = services.BuildServiceProvider();
 
-        return (new PerTenantDbContextFactory<StubTenantDbContext>(
-            currentTenant, provider, sp), provider);
+        TenantPerDatabaseDbContextOptions<StubPerTenantDbContext> options = new()
+        {
+            Configure = static (opts, cs) => opts.UseInMemoryDatabase(cs),
+        };
+
+        return (new TenantPerDatabaseDbContextFactory<StubPerTenantDbContext>(
+            currentTenant, provider, sp, options), provider);
     }
 
-    private static PerTenantDbContextFactory<StubTenantDbContext> BuildFactory(
+    private static TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> BuildFactory(
         Guid? tenantId, string connectionString) =>
         BuildFactoryWithProvider(tenantId, connectionString).factory;
 
@@ -66,9 +72,10 @@ public sealed class PerTenantDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_WhenTenantActive_ReturnsDbContext()
     {
-        PerTenantDbContextFactory<StubTenantDbContext> factory = BuildFactory(TenantA, ConnA);
+        TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory =
+            BuildFactory(TenantA, ConnA);
 
-        await using StubTenantDbContext ctx =
+        await using StubPerTenantDbContext ctx =
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
         ctx.Should().NotBeNull();
@@ -77,23 +84,25 @@ public sealed class PerTenantDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_WhenTenantActive_CallsProviderWithCorrectTenantId()
     {
-        (PerTenantDbContextFactory<StubTenantDbContext> factory,
-         ITenantConnectionStringProvider provider) = BuildFactoryWithProvider(TenantA, ConnA);
+        (TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory,
+         ITenantConnectionStringProvider provider) =
+            BuildFactoryWithProvider(TenantA, ConnA);
 
-        await using StubTenantDbContext ctx =
+        await using StubPerTenantDbContext ctx =
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
-        // NSubstitute verification is synchronous; discard Task<string> return value.
         _ = provider.Received(1).GetConnectionStringAsync(TenantA, Arg.Any<CancellationToken>());
+        _ = ctx;
     }
 
     [Fact]
     public async Task CreateDbContextAsync_TenantB_CallsProviderWithTenantBId()
     {
-        (PerTenantDbContextFactory<StubTenantDbContext> factory,
-         ITenantConnectionStringProvider provider) = BuildFactoryWithProvider(TenantB, ConnB);
+        (TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory,
+         ITenantConnectionStringProvider provider) =
+            BuildFactoryWithProvider(TenantB, ConnB);
 
-        await using StubTenantDbContext ctx =
+        await using StubPerTenantDbContext ctx =
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
         _ = provider.Received(1).GetConnectionStringAsync(TenantB, Arg.Any<CancellationToken>());
@@ -101,13 +110,13 @@ public sealed class PerTenantDbContextFactoryTests
     }
 
     // -----------------------------------------------------------------------
-    // CreateDbContextAsync — missing tenant guard
+    // CreateDbContextAsync — missing tenant guard (HDS: no silent fallback)
     // -----------------------------------------------------------------------
 
     [Fact]
     public async Task CreateDbContextAsync_WhenNoTenantActive_ThrowsInvalidOperationException()
     {
-        PerTenantDbContextFactory<StubTenantDbContext> factory =
+        TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory =
             BuildFactory(tenantId: null, connectionString: ConnA);
 
         Func<Task> act = async () =>
@@ -121,9 +130,9 @@ public sealed class PerTenantDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_WhenNoTenantActive_DoesNotCallProvider()
     {
-        (PerTenantDbContextFactory<StubTenantDbContext> factory,
-         ITenantConnectionStringProvider provider) = BuildFactoryWithProvider(
-            tenantId: null, connectionString: ConnA);
+        (TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory,
+         ITenantConnectionStringProvider provider) =
+            BuildFactoryWithProvider(tenantId: null, connectionString: ConnA);
 
         try
         {
@@ -142,9 +151,10 @@ public sealed class PerTenantDbContextFactoryTests
     [Fact]
     public void CreateDbContext_WhenTenantActive_ReturnsDbContext()
     {
-        PerTenantDbContextFactory<StubTenantDbContext> factory = BuildFactory(TenantA, ConnA);
+        TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory =
+            BuildFactory(TenantA, ConnA);
 
-        using StubTenantDbContext ctx = factory.CreateDbContext();
+        using StubPerTenantDbContext ctx = factory.CreateDbContext();
 
         ctx.Should().NotBeNull();
     }
@@ -152,7 +162,7 @@ public sealed class PerTenantDbContextFactoryTests
     [Fact]
     public void CreateDbContext_WhenNoTenantActive_ThrowsInvalidOperationException()
     {
-        PerTenantDbContextFactory<StubTenantDbContext> factory =
+        TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factory =
             BuildFactory(tenantId: null, connectionString: ConnA);
 
         Action act = () => factory.CreateDbContext();
@@ -160,5 +170,53 @@ public sealed class PerTenantDbContextFactoryTests
         act.Should()
             .Throw<InvalidOperationException>()
             .WithMessage("*No active tenant context*");
+    }
+
+    // -----------------------------------------------------------------------
+    // Async isolation — two concurrent tenants must not share connection strings
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public async Task CreateDbContextAsync_ConcurrentTenants_IsolateConnectionStrings()
+    {
+        List<string> capturedConnections = [];
+
+        ICurrentTenant tenantA = Substitute.For<ICurrentTenant>();
+        tenantA.Id.Returns(TenantA);
+
+        ICurrentTenant tenantB = Substitute.For<ICurrentTenant>();
+        tenantB.Id.Returns(TenantB);
+
+        ITenantConnectionStringProvider provider =
+            Substitute.For<ITenantConnectionStringProvider>();
+        provider.GetConnectionStringAsync(TenantA, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ConnA));
+        provider.GetConnectionStringAsync(TenantB, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ConnB));
+
+        ServiceCollection services = new();
+        IServiceProvider sp = services.BuildServiceProvider();
+
+        TenantPerDatabaseDbContextOptions<StubPerTenantDbContext> options = new()
+        {
+            Configure = (opts, cs) =>
+            {
+                capturedConnections.Add(cs);
+                opts.UseInMemoryDatabase(cs);
+            },
+        };
+
+        TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factoryA =
+            new(tenantA, provider, sp, options);
+        TenantPerDatabaseDbContextFactory<StubPerTenantDbContext> factoryB =
+            new(tenantB, provider, sp, options);
+
+        await using StubPerTenantDbContext ctxA =
+            await factoryA.CreateDbContextAsync(TestContext.Current.CancellationToken);
+        await using StubPerTenantDbContext ctxB =
+            await factoryB.CreateDbContextAsync(TestContext.Current.CancellationToken);
+
+        capturedConnections.Should().Contain(ConnA).And.Contain(ConnB);
+        capturedConnections.Should().OnlyHaveUniqueItems();
     }
 }
