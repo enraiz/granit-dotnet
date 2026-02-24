@@ -66,6 +66,7 @@ Messagerie asynchrone et outbox transactionnelle.
 | Document | Description |
 | --- | --- |
 | [wolverine.md](messaging/wolverine.md) | WolverineFx, Outbox PostgreSQL, propagation de contexte HDS |
+| [webhooks.md](messaging/webhooks.md) | Webhooks sortants, fan-out Wolverine, HMAC-SHA256, audit trail HDS |
 
 ## Scheduling
 
