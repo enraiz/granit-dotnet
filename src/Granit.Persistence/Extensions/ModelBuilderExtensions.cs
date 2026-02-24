@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Granit.Core.DataFiltering;
 using Granit.Core.Domain;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 

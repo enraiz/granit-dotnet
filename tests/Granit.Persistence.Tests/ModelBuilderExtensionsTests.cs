@@ -28,7 +28,7 @@ using System.Linq.Expressions;
 using FluentAssertions;
 using Granit.Core.DataFiltering;
 using Granit.Core.Domain;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;

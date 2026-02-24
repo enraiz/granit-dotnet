@@ -1,4 +1,4 @@
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Granit.Security;
 using Wolverine;
 

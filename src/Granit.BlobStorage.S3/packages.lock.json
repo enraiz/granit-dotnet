@@ -5,10 +5,10 @@
       "AWSSDK.S3": {
         "type": "Direct",
         "requested": "[3.*, )",
-        "resolved": "3.7.510.9",
-        "contentHash": "zYPQ1aO3A/KIhWlwZJWMsDjFgyXXzlLVGcZ42qy8e7uJdNZivmwpxfAsI4f0ajxVXdZ/3usct9tzrG2AELUitg==",
+        "resolved": "3.7.510.10",
+        "contentHash": "Lmrb8pnEfvrq62HwsfN6tz6FXM82CzyRCWkqRdWxBfmRoLVHs1HKQPRtAar7n98zSLMMslEqXiOSkZ0X+L4+sg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.500.83, 4.0.0)"
+          "AWSSDK.Core": "[3.7.500.84, 4.0.0)"
         }
       },
       "Microsoft.Extensions.Hosting.Abstractions": {
@@ -49,8 +49,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.500.83",
-        "contentHash": "FZ0pPM/aHFoR/aAQE7D6PvGYuyBBOFDpPPZYkQrw0bBdVBGGXMveYPuxMcXf3+P92w0J8glY/M4uOmS7HLVNyQ=="
+        "resolved": "3.7.500.84",
+        "contentHash": "eIEQGIkwrJDRRZ+on9gq+hY4K1ENiObko+DpQRSKDiOSoqzTQhiRUBMFp7Y1Wq2Ex2jopVKEMxPJl/33veGfTw=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",
@@ -86,6 +86,11 @@
           "Microsoft.Extensions.Primitives": "10.0.3"
         }
       },
+      "Microsoft.Extensions.Localization.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.3",
+        "contentHash": "GkJqsJuyzNYALUzQCv5K+NQpzQHagEBCxSXVPnhEF/ieIC6IEgCiA7nm/V8vw0ldLpF2S8GUE26IPX2P7Xhq0A=="
+      },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
         "resolved": "10.0.3",
@@ -104,6 +109,7 @@
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Localization": "[0.1.0-dev, )",
           "Granit.MultiTenancy": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
@@ -119,6 +125,14 @@
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Options": "[10.*, )"
+        }
+      },
+      "granit.localization": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Microsoft.Extensions.Localization": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
       },
@@ -151,6 +165,18 @@
         "requested": "[10.*, )",
         "resolved": "10.0.3",
         "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
+      },
+      "Microsoft.Extensions.Localization": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.0.3",
+        "contentHash": "IKaMZ30I+Q/hi3vapU5LnTR2OsnPL26zc1Np/uqfAaSSK4t+kqGkhXEfTlELtt0OMOocINCxH9jVFQ5bYAmQAg==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3",
+          "Microsoft.Extensions.Localization.Abstractions": "10.0.3",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
+          "Microsoft.Extensions.Options": "10.0.3"
+        }
       }
     }
   }

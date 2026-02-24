@@ -49,6 +49,11 @@ token.json
 *.log
 logs/
 
+# --- Coverage (généré par dotnet test + ReportGenerator) ---
+**/coverage.opencover.xml
+**/coverage.cobertura.xml
+coverage-report/
+
 # --- Temporaire ---
 tmp/
 temp/

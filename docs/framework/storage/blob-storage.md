@@ -172,6 +172,28 @@ PresignedDownloadUrl url = await blobStorage.CreateDownloadUrlAsync(
 Lève `BlobNotFoundException` si le blob n'existe pas pour le tenant actif.
 Lève `BlobNotValidException` si le blob n'est pas à l'état `Valid`.
 
+## Exceptions
+
+| Classe | Code HTTP | `ErrorCode` | Déclencheur |
+| --- | --- | --- | --- |
+| `BlobNotFoundException` | 404 | `BlobStorage:NotFound` | Blob introuvable pour le tenant actif |
+| `BlobNotValidException` | 400 | `BlobStorage:NotValid` | Blob non à l'état `Valid` lors du téléchargement |
+
+Les deux exceptions implémentent `IHasErrorCode`. Si `Granit.Localization` est configuré,
+le titre renvoyé au client est résolu depuis les fichiers JSON du module
+(`Localization/BlobStorage/{culture}.json`) :
+
+```json
+// fr
+{
+  "BlobStorage:NotFound": "Le fichier demandé est introuvable.",
+  "BlobStorage:NotValid": "Le fichier n'est pas disponible au téléchargement."
+}
+```
+
+`BlobNotFoundException` hérite de `NotFoundException` (→ 404).
+`BlobNotValidException` hérite de `Exception` (→ 400 via `IHasErrorCode`).
+
 ### Supprimer un fichier (Crypto-Shredding RGPD)
 
 ```csharp

@@ -1,5 +1,5 @@
 using Granit.Caching;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Granit.Settings.Definitions;
 using Granit.Settings.Options;
 using Granit.Settings.Values;

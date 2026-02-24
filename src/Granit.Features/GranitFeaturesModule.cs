@@ -1,6 +1,8 @@
 using Granit.Caching.Hybrid;
 using Granit.Core.Modularity;
+using Granit.Localization;
 using Granit.MultiTenancy;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Features;
 
@@ -21,10 +23,22 @@ namespace Granit.Features;
 /// </para>
 /// </remarks>
 [DependsOn(typeof(GranitCachingHybridModule))]
+[DependsOn(typeof(GranitLocalizationModule))]
 [DependsOn(typeof(GranitMultiTenancyModule))]
 public sealed class GranitFeaturesModule : GranitModule
 {
     /// <inheritdoc/>
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
         context.Services.AddGranitFeatures();
+
+        context.Services.Configure<GranitLocalizationOptions>(options =>
+        {
+            options.Resources
+                .Add<FeaturesLocalizationResource>("fr")
+                .AddJson(
+                    typeof(FeaturesLocalizationResource).Assembly,
+                    "Granit.Features.Localization.Features");
+        });
+    }
 }

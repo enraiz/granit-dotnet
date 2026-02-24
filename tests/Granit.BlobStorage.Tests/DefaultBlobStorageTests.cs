@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Granit.BlobStorage.Exceptions;
 using Granit.BlobStorage.Internal;
+using Granit.Core.MultiTenancy;
 using Granit.Guids;
-using Granit.MultiTenancy;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 using NSubstitute;

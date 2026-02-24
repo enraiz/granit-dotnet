@@ -17,7 +17,7 @@ using Granit.Authorization.Cache;
 using Granit.Authorization.Options;
 using Granit.Authorization.Services;
 using Granit.Caching;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Granit.Security;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
