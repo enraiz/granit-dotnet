@@ -173,4 +173,49 @@ public sealed class TenantSchemaConnectionInterceptorTests
 
         cmd.DidNotReceiveWithAnyArgs().ExecuteNonQuery();
     }
+
+    // -----------------------------------------------------------------------
+    // Validation du nom de schéma — protection injection SQL
+    // -----------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("'; DROP TABLE users--")]
+    [InlineData("tenant_a, public; DROP SCHEMA other--")]
+    [InlineData("UPPERCASE_SCHEMA")]
+    [InlineData("123startswithdigit")]
+    [InlineData("")]
+    public async Task ConnectionOpenedAsync_WithInvalidSchemaName_ThrowsInvalidOperationException(
+        string badSchema)
+    {
+        CancellationToken ct = TestContext.Current.CancellationToken;
+        (DbConnection conn, DbCommand _) = MakeConnection();
+        TenantSchemaConnectionInterceptor interceptor = new(
+            MakeTenant(TenantA),
+            MakeProvider(TenantA, badSchema));
+
+        Func<Task> act = () => interceptor.ConnectionOpenedAsync(conn, MakeEventData(), ct);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*not a valid PostgreSQL identifier*");
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE users--")]
+    [InlineData("tenant_a, public; DROP SCHEMA other--")]
+    [InlineData("UPPERCASE_SCHEMA")]
+    [InlineData("123startswithdigit")]
+    [InlineData("")]
+    public void ConnectionOpened_WithInvalidSchemaName_ThrowsInvalidOperationException(
+        string badSchema)
+    {
+        (DbConnection conn, DbCommand _) = MakeConnection();
+        TenantSchemaConnectionInterceptor interceptor = new(
+            MakeTenant(TenantA),
+            MakeProvider(TenantA, badSchema));
+
+        Action act = () => interceptor.ConnectionOpened(conn, MakeEventData());
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*not a valid PostgreSQL identifier*");
+    }
 }
