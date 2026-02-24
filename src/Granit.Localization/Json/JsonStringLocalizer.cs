@@ -2,7 +2,8 @@
 // JsonStringLocalizer.cs
 // Implements IStringLocalizer with resolution from JSON dictionaries.
 // Supports: native culture fallback (CultureInfo.Parent), parent resource
-// inheritance, {0} formatting, and thread-safe cache via Lazy<T>.
+// inheritance, {0} formatting, thread-safe cache via Lazy<T>, and optional
+// DB override resolution via ILocalizationOverrideStore (DB > JSON).
 // ---------------------------------------------------------------------------
 
 using System.Collections.Concurrent;
@@ -13,22 +14,31 @@ namespace Granit.Localization.Json;
 
 /// <summary>
 /// Localizer based on embedded JSON dictionaries with culture fallback and inheritance.
+/// DB overrides (when <see cref="ILocalizationOverrideStore"/> is registered) take priority
+/// over every embedded JSON file.
 /// </summary>
 /// <remarks>
-/// Creates a new JSON localizer.
+/// Resolution order: DB override → JSON (culture chain) → JSON (default culture) → inheritance.
 /// </remarks>
 /// <param name="sources">Embedded JSON sources for this resource.</param>
 /// <param name="defaultCulture">Default culture of the resource.</param>
 /// <param name="baseLocalizers">Localizers of parent resources (inheritance).</param>
+/// <param name="resourceName">Logical resource name used for DB override lookup. Null when not available.</param>
+/// <param name="overrideStore">Optional DB override store. Null when not configured.</param>
 internal sealed class JsonStringLocalizer(
     List<EmbeddedJsonSource> sources,
     string defaultCulture,
-    List<IStringLocalizer> baseLocalizers) : IStringLocalizer
+    List<IStringLocalizer> baseLocalizers,
+    string? resourceName = null,
+    ILocalizationOverrideStore? overrideStore = null) : IStringLocalizer
 {
     private readonly ConcurrentDictionary<string, Lazy<Dictionary<string, string>>> _cultureCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, Lazy<IReadOnlyDictionary<string, string>>> _overrideCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<EmbeddedJsonSource> _sources = sources;
     private readonly string _defaultCulture = defaultCulture;
     private readonly List<IStringLocalizer> _baseLocalizers = baseLocalizers;
+    private readonly string? _resourceName = resourceName;
+    private readonly ILocalizationOverrideStore? _overrideStore = overrideStore;
 
     /// <inheritdoc />
     public LocalizedString this[string name]
@@ -67,7 +77,19 @@ internal sealed class JsonStringLocalizer(
     {
         HashSet<string> seen = [];
 
-        // Walk the culture chain
+        // 0. DB overrides for current culture — highest priority
+        if (_overrideStore is not null && _resourceName is not null)
+        {
+            IReadOnlyDictionary<string, string> dbOverrides =
+                GetOrLoadOverrides(CultureInfo.CurrentUICulture.Name);
+
+            foreach (KeyValuePair<string, string> kvp in dbOverrides.Where(kvp => seen.Add(kvp.Key)))
+            {
+                yield return new LocalizedString(kvp.Key, kvp.Value, resourceNotFound: false);
+            }
+        }
+
+        // Walk the culture chain (JSON)
         CultureInfo currentCulture = CultureInfo.CurrentUICulture;
         while (true)
         {
@@ -104,11 +126,20 @@ internal sealed class JsonStringLocalizer(
     }
 
     /// <summary>
-    /// Resolves a translation by walking up the culture chain,
-    /// then searching in parent resources.
+    /// Resolves a translation: DB override first, then JSON culture chain, then inheritance.
     /// </summary>
     private string? GetTranslation(string name, CultureInfo culture)
     {
+        // 0. DB override — highest priority
+        if (_overrideStore is not null && _resourceName is not null)
+        {
+            IReadOnlyDictionary<string, string> dbOverrides = GetOrLoadOverrides(culture.Name);
+            if (dbOverrides.TryGetValue(name, out string? dbValue))
+            {
+                return dbValue;
+            }
+        }
+
         // 1. Walk up the culture chain via CultureInfo.Parent
         CultureInfo currentCulture = culture;
         while (currentCulture != CultureInfo.InvariantCulture)
@@ -141,6 +172,21 @@ internal sealed class JsonStringLocalizer(
 
         // 4. Key not found
         return null;
+    }
+
+    /// <summary>
+    /// Returns DB overrides for the given culture, loading them once per culture via Lazy&lt;T&gt;.
+    /// Blocking call is safe because <see cref="CachedLocalizationOverrideStore"/> returns
+    /// from in-memory cache, making the Task complete synchronously.
+    /// </summary>
+    private IReadOnlyDictionary<string, string> GetOrLoadOverrides(string cultureName)
+    {
+        Lazy<IReadOnlyDictionary<string, string>> lazy = _overrideCache.GetOrAdd(
+            cultureName,
+            name => new Lazy<IReadOnlyDictionary<string, string>>(
+                () => _overrideStore!.GetOverridesAsync(_resourceName!, name).GetAwaiter().GetResult()));
+
+        return lazy.Value;
     }
 
     /// <summary>

@@ -2,10 +2,12 @@
 // JsonStringLocalizerFactory.cs
 // Implements IStringLocalizerFactory to create JsonStringLocalizer instances.
 // Thread-safe cache via ConcurrentDictionary<Type, Lazy<IStringLocalizer>>.
-// Resolves resource inheritance and registered JSON sources.
+// Resolves resource inheritance, registered JSON sources, and optional DB overrides.
 // ---------------------------------------------------------------------------
 
 using System.Collections.Concurrent;
+using System.Reflection;
+using Granit.Localization.Attributes;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
@@ -19,10 +21,18 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
 {
     private readonly ConcurrentDictionary<Type, Lazy<IStringLocalizer>> _cache = new();
     private readonly IOptions<GranitLocalizationOptions> _options;
+    private readonly ILocalizationOverrideStore? _overrideStore;
 
-    public JsonStringLocalizerFactory(IOptions<GranitLocalizationOptions> options)
+    /// <summary>
+    /// Creates a new factory. <paramref name="overrideStore"/> is optional:
+    /// when <c>null</c>, DB overrides are not applied (transparent fallback to JSON only).
+    /// </summary>
+    public JsonStringLocalizerFactory(
+        IOptions<GranitLocalizationOptions> options,
+        ILocalizationOverrideStore? overrideStore = null)
     {
         _options = options;
+        _overrideStore = overrideStore;
 
         if (options.Value.EnableAutoDiscovery)
         {
@@ -44,7 +54,7 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
     public IStringLocalizer Create(string baseName, string location)
     {
         // Try to resolve the type from the fully-qualified name
-        var resourceType = Type.GetType($"{baseName}, {location}");
+        Type? resourceType = Type.GetType($"{baseName}, {location}");
         if (resourceType is not null)
         {
             return Create(resourceType);
@@ -75,11 +85,11 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
         }
 
         // Check [InheritResource] attributes on the marker class
-        var inheritAttributes =
-            (Attributes.InheritResourceAttribute[])resourceType
-                .GetCustomAttributes(typeof(Attributes.InheritResourceAttribute), true);
+        InheritResourceAttribute[] inheritAttributes =
+            (InheritResourceAttribute[])resourceType
+                .GetCustomAttributes(typeof(InheritResourceAttribute), true);
 
-        foreach (Attributes.InheritResourceAttribute attr in inheritAttributes)
+        foreach (InheritResourceAttribute attr in inheritAttributes)
         {
             foreach (Type baseResourceType in attr.BaseResourceTypes.Where(t => !info.BaseTypes.Contains(t)))
             {
@@ -87,6 +97,11 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
             }
         }
 
-        return new JsonStringLocalizer(info.JsonSources, info.DefaultCulture, baseLocalizers);
+        string resourceName = resourceType
+            .GetCustomAttribute<LocalizationResourceNameAttribute>()?.Name
+            ?? resourceType.Name;
+
+        return new JsonStringLocalizer(
+            info.JsonSources, info.DefaultCulture, baseLocalizers, resourceName, _overrideStore);
     }
 }
