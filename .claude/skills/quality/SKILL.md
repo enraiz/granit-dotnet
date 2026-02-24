@@ -1,6 +1,6 @@
 ---
 name: quality
-description: "QA/DevSecOps engineer: full project quality audit or targeted MR review. Analyzes format, tests, SonarQube (quality gate, issues, hotspots, coverage). Detects regressions on modified files. Invoke before a merge or to reduce technical debt."
+description: "QA/DevSecOps engineer: full project quality audit or targeted MR review. Analyzes format, tests, local coverage (ReportGenerator), then SonarQube (quality gate, issues, hotspots, coverage). Detects regressions on modified files. Invoke before a merge or to reduce technical debt."
 argument-hint: "[review | projectKey]"
 ---
 
@@ -14,7 +14,7 @@ then fix — in that order.
 
 | Argument | Mode | Scope |
 |----------|------|-------|
-| _(none)_ | Full audit | Format + tests + SonarQube on whole project |
+| _(none)_ | Full audit | Format + tests + local coverage + SonarQube on whole project |
 | `review` | MR Code Review | Targeted analysis on files modified since `main` |
 | `{projectKey}` | Targeted audit | Full audit on the specified SonarQube project |
 
@@ -30,16 +30,68 @@ dotnet format --verify-no-changes
 
 List non-compliant files. Do not auto-fix unless explicitly asked.
 
-### 2. Tests
+### 2. Tests + local coverage
+
+#### 2a. Run tests with coverage collection
 
 ```bash
-dotnet test --no-build -q
+dotnet test -c Release \
+  --collect:"XPlat Code Coverage;Format=opencover" \
+  --results-directory ./TestResults \
+  -q
 ```
 
 Show: total passed / failed / skipped. List failed test names and their error message.
 
-Coverage rule: if global coverage is available in SonarQube and is < 80%, flag it as
-top priority before addressing any code smell.
+#### 2b. Generate HTML report with ReportGenerator
+
+Install ReportGenerator if not already available:
+
+```bash
+DOTNET_ROOT=/usr/share/dotnet \
+  dotnet tool install dotnet-reportgenerator-globaltool \
+  --tool-path /tmp/reportgen \
+  2>/dev/null || true
+```
+
+Generate the report:
+
+```bash
+DOTNET_ROOT=/usr/share/dotnet \
+  /tmp/reportgen/reportgenerator \
+  -reports:"**/coverage.opencover.xml" \
+  -targetdir:"/tmp/coverage-report" \
+  -reporttypes:"Html;TextSummary" \
+  -assemblyfilters:"-*.Tests"
+```
+
+Read the summary:
+
+```bash
+cat /tmp/coverage-report/Summary.txt
+```
+
+Report per-assembly and per-class coverage. Flag any class below 80%.
+
+#### 2c. Cleanup — MANDATORY after reading the report
+
+Remove all generated coverage XML files to keep the working tree clean:
+
+```bash
+find . -name "coverage.opencover.xml" -not -path "./.git/*" -delete
+find . -name "coverage.cobertura.xml" -not -path "./.git/*" -delete
+```
+
+Verify the working tree is clean:
+
+```bash
+git status --short
+```
+
+If any coverage XML file still appears as untracked, delete it explicitly.
+
+Coverage rule: if global line coverage is < 80%, flag it as top priority before
+addressing any code smell.
 
 ### 3. SonarQube
 
@@ -60,7 +112,7 @@ Call `sonar_quality_gate`. If FAILED:
 1. `severities: "BLOCKER"` — must fix immediately, blocks everything
 2. `severities: "CRITICAL"` — must fix before merge
 3. `types: "VULNERABILITY"` — security, absolute priority regardless of severity
-4. `severities: "MAJOR"` — fix if file technical debt ≤ 5%
+4. `severities: "MAJOR"` — fix if file technical debt <= 5%
 5. `severities: "MINOR,INFO"` — report only, do not fix without explicit request
 
 Debt rule: if a file has > 5% technical debt, flag it at the top of the report and
@@ -109,6 +161,8 @@ If the SonarQube score degrades compared to `main`, propose a fix before approvi
 
 ### 3. Coverage on new code
 
+Run steps 2a to 2c (tests + ReportGenerator + cleanup) restricted to modified assemblies.
+
 For each new method or class introduced:
 
 - Check whether a unit test covers it
@@ -126,8 +180,13 @@ Same as full audit, restricted to modified files.
 ## Quality Audit — {mode} — {date}
 
 ### Format       : OK | FAILED ({n} files)
-### Tests        : {n} passed | {n} failed | coverage: {x}%
+### Tests        : {n} passed | {n} failed
+### Coverage     : {x}% line | {y}% branch  (local — ReportGenerator)
 ### Quality Gate : OK | FAILED — {projectKey}
+
+### Coverage gaps (< 80%)
+| Assembly | Class | Line% | Branch% |
+|----------|-------|-------|---------|
 
 ### Regressions (review mode)
 | File | New issues | Impact |
@@ -137,7 +196,7 @@ Same as full audit, restricted to modified files.
 | Severity | Type | File:Line | Message | Recurring? |
 |----------|------|-----------|---------|-----------|
 
-### Recurring patterns → suggested rules
+### Recurring patterns -> suggested rules
 - ...
 
 ### Actions taken
