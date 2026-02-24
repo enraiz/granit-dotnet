@@ -121,6 +121,18 @@ Before any GitLab operation, **invoke skill `/gitlab`** to load commands and con
 - **Commits**: Conventional Commits (feat:, fix:, docs:, chore:)
 - **MR**: 1 approval minimum for main
 
+**MR target — STRICT RULE:**
+
+| Branch type | Default target | Exception |
+| ----------- | -------------- | --------- |
+| `feature/*` | `develop` | Only if user explicitly says "target main" |
+| `hotfix/*` | `main` + `develop` | Both, always |
+| `release/*` | `main` + `develop` | Both, always |
+| `fix/*` | `develop` | Only if user explicitly says "target main" |
+
+NEVER target `main` for a `feature/*` or `fix/*` branch unless the user explicitly
+requests it. When in doubt, ask before creating the MR.
+
 ## Security — strict rules
 
 **ALWAYS:**
