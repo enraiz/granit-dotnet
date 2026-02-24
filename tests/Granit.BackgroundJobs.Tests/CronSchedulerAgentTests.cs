@@ -152,6 +152,56 @@ public sealed class CronSchedulerAgentTests
     }
 
     // =========================================================================
+    // Scénario: invalid cron → skip without scheduling
+    // =========================================================================
+
+    [Fact]
+    public async Task StartAsync_JobWithInvalidCron_SkipsWithoutScheduling()
+    {
+        BackgroundJobDefinition job = MakeJob("bad-cron", cron: "NOT_A_CRON");
+        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>()).Returns([job]);
+
+        await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
+            .StartAsync(TestContext.Current.CancellationToken);
+
+        await _bus.DidNotReceive().PublishAsync(Arg.Any<object>(), Arg.Any<DeliveryOptions>());
+        await _store.DidNotReceive().RecordNextExecutionAsync(
+            Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>());
+    }
+
+    // =========================================================================
+    // Scénario: 6-field cron (with seconds) → schedules using IncludeSeconds parse
+    // =========================================================================
+
+    [Fact]
+    public async Task StartAsync_JobWithSixFieldCron_SchedulesSuccessfully()
+    {
+        // "*/30 * * * * *" = every 30 seconds — 6-field cron parsed with IncludeSeconds
+        BackgroundJobDefinition job = MakeJob("seconds-job", cron: "*/30 * * * * *");
+        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>()).Returns([job]);
+
+        await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
+            .StartAsync(TestContext.Current.CancellationToken);
+
+        await _bus.Received(1).PublishAsync(
+            Arg.Any<FakeJobMessage>(), Arg.Any<DeliveryOptions>());
+    }
+
+    // =========================================================================
+    // CreateMessage — unknown type throws
+    // =========================================================================
+
+    [Fact]
+    public void CreateMessage_UnknownType_ThrowsInvalidOperationException()
+    {
+        Action act = () =>
+            CronSchedulerAgent.CreateMessage("Unknown.Type, UnknownAssembly", "test-job");
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Cannot resolve message type*");
+    }
+
+    // =========================================================================
     // StopAsync — no-op
     // =========================================================================
 

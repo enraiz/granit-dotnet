@@ -1,6 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using Granit.BlobStorage.Internal;
 using Granit.BlobStorage.S3.Internal;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -10,6 +10,8 @@ namespace Granit.BlobStorage.S3.Extensions;
 /// <summary>
 /// Extension methods for registering the S3-compatible blob storage provider.
 /// </summary>
+// DI wiring only — no logic to unit test.
+[ExcludeFromCodeCoverage]
 public static class BlobStorageS3HostApplicationBuilderExtensions
 {
     /// <summary>
@@ -33,11 +35,10 @@ public static class BlobStorageS3HostApplicationBuilderExtensions
 
         builder.Services.AddSingleton<IValidateOptions<S3BlobOptions>, S3BlobOptionsValidator>();
 
-        // S3BlobClient implements both IBlobPresignedUrlGenerator and IBlobObjectClient.
+        // S3BlobClient implements IBlobStorageClient (pre-signed URLs + object operations).
         // Registered as Singleton: AmazonS3Client is thread-safe and intended for reuse.
         builder.Services.AddSingleton<S3BlobClient>();
-        builder.Services.AddSingleton<IBlobPresignedUrlGenerator>(sp => sp.GetRequiredService<S3BlobClient>());
-        builder.Services.AddSingleton<IBlobObjectClient>(sp => sp.GetRequiredService<S3BlobClient>());
+        builder.Services.AddSingleton<IBlobStorageClient>(sp => sp.GetRequiredService<S3BlobClient>());
 
         builder.Services.AddScoped<IBlobKeyStrategy, PrefixBlobKeyStrategy>();
         builder.Services.AddScoped<IBlobStorage, DefaultBlobStorage>();

@@ -7,7 +7,7 @@ namespace Granit.Features.Definitions;
 /// </summary>
 /// <remarks>
 /// Created by <see cref="IFeatureDefinitionContext.AddGroup"/> inside a
-/// <see cref="FeatureDefinitionProvider.Define"/> implementation.
+/// <see cref="IFeatureDefinitionProvider.Define"/> implementation.
 /// Use the fluent <c>AddToggle</c>, <c>AddNumeric</c>, and <c>AddSelection</c>
 /// methods to declare individual features.
 /// </remarks>

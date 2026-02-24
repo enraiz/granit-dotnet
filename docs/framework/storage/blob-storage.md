@@ -134,8 +134,8 @@ et un index composite sur `(TenantId, ContainerName)`.
 PresignedUploadTicket ticket = await blobStorage.InitiateUploadAsync(
     containerName: "prescriptions",
     request: new BlobUploadRequest(
-        OriginalFileName: "ordonnance.pdf",
-        DeclaredContentType: "application/pdf",
+        FileName: "ordonnance.pdf",
+        ContentType: "application/pdf",
         MaxAllowedBytes: 10_000_000L),   // limite par upload, persistée dans BlobDescriptor
     cancellationToken: ct);
 
@@ -249,10 +249,8 @@ IBlobStorage (DefaultBlobStorage)
   │     └── {tenantId}/{containerName}/{yyyy}/{MM}/{blobId}
   ├── IBlobDescriptorStore (EfBlobDescriptorStore)
   │     └── BlobStorageDbContext → table granit_blob_descriptors
-  ├── IBlobPresignedUrlGenerator (S3BlobClient)
-  │     └── AmazonS3Client (thread-safe, Singleton)
-  ├── IBlobObjectClient (S3BlobClient)
-  │     └── Range GET (magic bytes) + HEAD (taille) + DELETE (shredding)
+  ├── IBlobStorageClient (S3BlobClient)
+  │     └── AmazonS3Client — URL pré-signées, Range GET, HEAD, DELETE (thread-safe, Singleton)
   └── IEnumerable<IBlobValidator> (pipeline ordonné)
         ├── MagicBytesValidator (Order=10) — MagicByteDetector.Detect()
         └── MaxSizeValidator (Order=20)

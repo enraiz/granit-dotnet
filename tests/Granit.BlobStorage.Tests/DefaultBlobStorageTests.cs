@@ -17,8 +17,7 @@ public sealed class DefaultBlobStorageTests
 
     private readonly IBlobDescriptorStore _store = Substitute.For<IBlobDescriptorStore>();
     private readonly IBlobKeyStrategy _keyStrategy = Substitute.For<IBlobKeyStrategy>();
-    private readonly IBlobPresignedUrlGenerator _urlGenerator = Substitute.For<IBlobPresignedUrlGenerator>();
-    private readonly IBlobObjectClient _objectClient = Substitute.For<IBlobObjectClient>();
+    private readonly IBlobStorageClient _storageClient = Substitute.For<IBlobStorageClient>();
     private readonly IGuidGenerator _guidGenerator = Substitute.For<IGuidGenerator>();
     private readonly IClock _clock = Substitute.For<IClock>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
@@ -33,8 +32,7 @@ public sealed class DefaultBlobStorageTests
         _sut = new DefaultBlobStorage(
             _store,
             _keyStrategy,
-            _urlGenerator,
-            _objectClient,
+            _storageClient,
             _guidGenerator,
             _clock,
             _currentTenant,
@@ -60,7 +58,7 @@ public sealed class DefaultBlobStorageTests
             Now.AddMinutes(15),
             new Dictionary<string, string> { ["Content-Type"] = "image/jpeg" });
 
-        _urlGenerator.GenerateUploadTicketAsync(
+        _storageClient.GenerateUploadTicketAsync(
             "granit-blobs",
             Arg.Any<string>(),
             blobId,
@@ -88,7 +86,7 @@ public sealed class DefaultBlobStorageTests
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
 
         PresignedUploadTicket ticket = new(blobId, new Uri("https://s3.example.com/up"), "PUT", Now.AddMinutes(15), new Dictionary<string, string>());
-        _urlGenerator.GenerateUploadTicketAsync(
+        _storageClient.GenerateUploadTicketAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid>(),
             Arg.Any<BlobUploadRequest>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
             .Returns(ticket);
@@ -120,14 +118,14 @@ public sealed class DefaultBlobStorageTests
         _guidGenerator.Create().Returns(blobId);
         _keyStrategy.BuildObjectKey(Arg.Any<string>(), Arg.Any<Guid>()).Returns("key");
         _keyStrategy.ResolveBucketName(Arg.Any<string>()).Returns("bucket");
-        _urlGenerator.GenerateUploadTicketAsync(
+        _storageClient.GenerateUploadTicketAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid>(),
             Arg.Any<BlobUploadRequest>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
             .Returns(new PresignedUploadTicket(blobId, new Uri("https://s3.example.com/up"), "PUT", Now.AddMinutes(15), new Dictionary<string, string>()));
 
         BlobStorageOptions customOptions = new() { UploadUrlExpiry = TimeSpan.FromMinutes(30) };
         DefaultBlobStorage sutWithCustomOptions = new(
-            _store, _keyStrategy, _urlGenerator, _objectClient,
+            _store, _keyStrategy, _storageClient,
             _guidGenerator, _clock, _currentTenant,
             Options.Create(customOptions));
 
@@ -135,7 +133,7 @@ public sealed class DefaultBlobStorageTests
         await sutWithCustomOptions.InitiateUploadAsync("docs", new BlobUploadRequest("file.pdf", "application/pdf", 1_000_000), TestContext.Current.CancellationToken);
 
         // Assert
-        await _urlGenerator.Received(1).GenerateUploadTicketAsync(
+        await _storageClient.Received(1).GenerateUploadTicketAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<BlobUploadRequest>(),
             TimeSpan.FromMinutes(30),
             Arg.Any<CancellationToken>());
@@ -169,7 +167,7 @@ public sealed class DefaultBlobStorageTests
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
 
         PresignedDownloadUrl expectedUrl = new(new Uri("https://s3.example.com/download"), Now.AddMinutes(5));
-        _urlGenerator.GenerateDownloadUrlAsync(
+        _storageClient.GenerateDownloadUrlAsync(
             "granit-blobs", Arg.Any<string>(), Arg.Any<DownloadUrlOptions?>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
             .Returns(expectedUrl);
 
@@ -224,7 +222,7 @@ public sealed class DefaultBlobStorageTests
         await _sut.DeleteAsync("medical-images", blobId, "RGPD Art. 17", TestContext.Current.CancellationToken);
 
         // Assert — S3 physically deleted
-        await _objectClient.Received(1).DeleteObjectAsync("granit-blobs", descriptor.ObjectKey, Arg.Any<CancellationToken>());
+        await _storageClient.Received(1).DeleteObjectAsync("granit-blobs", descriptor.ObjectKey, Arg.Any<CancellationToken>());
         // Assert — descriptor updated in store with Deleted status
         await _store.Received(1).UpdateAsync(
             Arg.Is<BlobDescriptor>(d =>
@@ -246,7 +244,7 @@ public sealed class DefaultBlobStorageTests
         await _sut.DeleteAsync("medical-images", blobId, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert — no S3 call, no store update
-        await _objectClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _storageClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _store.DidNotReceive().UpdateAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
     }
 
@@ -262,7 +260,7 @@ public sealed class DefaultBlobStorageTests
 
         // Assert
         await act.Should().ThrowAsync<BlobNotFoundException>();
-        await _objectClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _storageClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -322,9 +320,7 @@ public sealed class DefaultBlobStorageTests
             tenantId: TenantId.ToString(),
             containerName: "medical-images",
             objectKey: $"{TenantId}/medical-images/2026/02/{blobId}",
-            originalFileName: "radio.jpg",
-            declaredContentType: "image/jpeg",
-            maxAllowedBytes: 10_000_000L,
+            request: new BlobUploadRequest("radio.jpg", "image/jpeg", 10_000_000L),
             createdAt: Now);
         descriptor.MarkAsUploading();
         descriptor.MarkAsValid("image/jpeg", 512_000, Now.AddSeconds(5));
@@ -338,9 +334,7 @@ public sealed class DefaultBlobStorageTests
             tenantId: TenantId.ToString(),
             containerName: "medical-images",
             objectKey: $"{TenantId}/medical-images/2026/02/{blobId}",
-            originalFileName: "file.jpg",
-            declaredContentType: "image/jpeg",
-            maxAllowedBytes: 10_000_000L,
+            request: new BlobUploadRequest("file.jpg", "image/jpeg", 10_000_000L),
             createdAt: Now);
 
         switch (target)

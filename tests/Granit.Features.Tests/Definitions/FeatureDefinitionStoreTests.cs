@@ -8,9 +8,9 @@ namespace Granit.Features.Tests.Definitions;
 
 public sealed class FeatureDefinitionStoreTests
 {
-    private sealed class FakeProvider(params FeatureDefinition[] definitions) : FeatureDefinitionProvider
+    private sealed class FakeProvider(params FeatureDefinition[] definitions) : IFeatureDefinitionProvider
     {
-        public override void Define(IFeatureDefinitionContext context)
+        public void Define(IFeatureDefinitionContext context)
         {
             FeatureGroupDefinition group = context.AddGroup("Test");
             foreach (FeatureDefinition def in definitions)
@@ -20,9 +20,9 @@ public sealed class FeatureDefinitionStoreTests
         }
     }
 
-    private sealed class DirectProvider(Action<IFeatureDefinitionContext> define) : FeatureDefinitionProvider
+    private sealed class DirectProvider(Action<IFeatureDefinitionContext> define) : IFeatureDefinitionProvider
     {
-        public override void Define(IFeatureDefinitionContext context) => define(context);
+        public void Define(IFeatureDefinitionContext context) => define(context);
     }
 
     [Fact]

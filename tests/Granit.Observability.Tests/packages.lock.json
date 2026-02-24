@@ -309,7 +309,7 @@
       "granit.observability": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[1.0.0, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "OpenTelemetry": "[1.15.*, )",
           "OpenTelemetry.Api": "[1.15.*, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.*, )",

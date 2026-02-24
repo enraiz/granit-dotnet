@@ -2,7 +2,7 @@ namespace Granit.Features.Definitions;
 
 /// <summary>
 /// Provides the API for declaring feature groups and features inside a
-/// <see cref="FeatureDefinitionProvider.Define"/> implementation.
+/// <see cref="IFeatureDefinitionProvider.Define"/> implementation.
 /// </summary>
 public interface IFeatureDefinitionContext
 {

@@ -6,7 +6,7 @@ namespace Granit.Features.Definitions;
 /// Describes a feature's static metadata: its name, default value, value type, and constraints.
 /// </summary>
 /// <remarks>
-/// Feature definitions are declared in code via <see cref="FeatureDefinitionProvider"/>
+/// Feature definitions are declared in code via <see cref="IFeatureDefinitionProvider"/>
 /// and aggregated at startup by <see cref="IFeatureDefinitionStore"/>.
 /// They are immutable after application startup.
 /// </remarks>

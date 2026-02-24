@@ -51,9 +51,7 @@ public sealed class EfBlobDescriptorStoreTests
             tenantId: tenantId ?? TenantId.ToString(),
             containerName: containerName,
             objectKey: $"{tenantId ?? TenantId.ToString()}/{containerName}/2026/02/{id ?? Guid.NewGuid()}",
-            originalFileName: "prescription.pdf",
-            declaredContentType: "application/pdf",
-            maxAllowedBytes: 5_000_000L,
+            request: new BlobUploadRequest("prescription.pdf", "application/pdf", 5_000_000L),
             createdAt: new DateTimeOffset(2026, 2, 23, 10, 0, 0, TimeSpan.Zero));
 
     // =========================================================================
@@ -106,9 +104,7 @@ public sealed class EfBlobDescriptorStoreTests
             tenantId: TenantId.ToString(),
             containerName: "medical-images",
             objectKey: $"{TenantId}/medical-images/2026/02/{blobId}",
-            originalFileName: "scan.dcm",
-            declaredContentType: "application/dicom",
-            maxAllowedBytes: 20_000_000L,
+            request: new BlobUploadRequest("scan.dcm", "application/dicom", 20_000_000L),
             createdAt: createdAt);
 
         await store.SaveAsync(descriptor, TestContext.Current.CancellationToken);
@@ -204,7 +200,7 @@ public sealed class EfBlobDescriptorStoreTests
         Guid blobId = Guid.NewGuid();
         await store.SaveAsync(MakeDescriptor(id: blobId), TestContext.Current.CancellationToken);
 
-        // Advance through Pending → Uploading → Valid → Deleted.
+        // Advance through Pending -> Uploading -> Valid -> Deleted.
         BlobDescriptor? pending = await store.FindAsync(blobId, TestContext.Current.CancellationToken);
         pending!.MarkAsUploading();
         await store.UpdateAsync(pending, TestContext.Current.CancellationToken);
@@ -241,7 +237,7 @@ public sealed class EfBlobDescriptorStoreTests
             id: blobId, tenantId: OtherTenantId.ToString());
         await storeOther.SaveAsync(descriptorOther, TestContext.Current.CancellationToken);
 
-        // Attempt to retrieve it as TenantId (current tenant) → must return null.
+        // Attempt to retrieve it as TenantId (current tenant) -> must return null.
         EfBlobDescriptorStore storeTenant = CreateStore(db, TenantId);
         BlobDescriptor? result = await storeTenant.FindAsync(
             blobId, TestContext.Current.CancellationToken);

@@ -13,9 +13,7 @@ public sealed class BlobDescriptorTests
         tenantId: "tenant-abc",
         containerName: "medical-images",
         objectKey: "tenant-abc/medical-images/2026/02/some-guid",
-        originalFileName: "radio.jpg",
-        declaredContentType: "image/jpeg",
-        maxAllowedBytes: 10_000_000L,
+        request: new BlobUploadRequest("radio.jpg", "image/jpeg", 10_000_000L),
         createdAt: Now);
 
     // ── Factory ─────────────────────────────────────────────────────────────
@@ -30,9 +28,7 @@ public sealed class BlobDescriptorTests
             tenantId: "tenant-abc",
             containerName: "medical-images",
             objectKey: "tenant-abc/medical-images/2026/02/some-guid",
-            originalFileName: "radio.jpg",
-            declaredContentType: "image/jpeg",
-            maxAllowedBytes: 10_000_000L,
+            request: new BlobUploadRequest("radio.jpg", "image/jpeg", 10_000_000L),
             createdAt: Now);
 
         descriptor.Id.Should().Be(id);

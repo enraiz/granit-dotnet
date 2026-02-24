@@ -8,6 +8,7 @@ sans aucun doublon possible en cluster multi-nœuds.
 | --- | --- |
 | `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager` |
 | `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `granit_background_jobs` (SQL Server / PostgreSQL) |
+| `Granit.BackgroundJobs.Endpoints` | Administration HTTP : endpoints Minimal API, politique d'autorisation `BackgroundJobs.Admin` |
 
 ## Concepts clés
 
@@ -170,6 +171,109 @@ public sealed record BackgroundJobStatus(
 `TriggeredBy` est write-once par cycle d'exécution et conservé pour audit.
 Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 
+## Endpoints d'administration
+
+Le package `Granit.BackgroundJobs.Endpoints` expose 5 routes Minimal API protégées
+par la politique `BackgroundJobs.Admin`.
+
+### Enregistrement
+
+```csharp
+app.MapBackgroundJobsEndpoints();
+
+// Avec options personnalisées
+app.MapBackgroundJobsEndpoints(opts =>
+{
+    opts.RoutePrefix  = "admin/jobs";          // défaut : "background-jobs"
+    opts.RequiredRole = "ops-team";            // défaut : "granit-background-jobs-admin"
+    opts.TagName      = "Background Jobs";     // défaut : "Background Jobs"
+});
+```
+
+Le module doit être déclaré dans l'application hôte :
+
+```csharp
+[DependsOn(
+    typeof(GranitBackgroundJobsModule),
+    typeof(GranitBackgroundJobsEndpointsModule))]
+public sealed class MyAppModule : GranitModule { }
+```
+
+### Routes
+
+| Méthode | Route | Réponse | Description |
+| --- | --- | --- | --- |
+| `GET` | `/{prefix}` | `200 Ok<IReadOnlyList<BackgroundJobStatus>>` | Liste tous les jobs |
+| `GET` | `/{prefix}/{name}` | `200 Ok<BackgroundJobStatus>` / `404` | Détail d'un job |
+| `POST` | `/{prefix}/{name}/pause` | `204` / `404` | Suspend le scheduling |
+| `POST` | `/{prefix}/{name}/resume` | `204` / `404` | Relance le scheduling |
+| `POST` | `/{prefix}/{name}/trigger` | `202 Accepted` / `404` | Exécution immédiate |
+
+### Sécurisation — couches de protection
+
+#### 1 — Authentification (JWT Keycloak)
+
+L'application hôte doit charger `GranitAuthenticationKeycloakModule` (ou
+`GranitJwtBearerModule`). Aucune configuration supplémentaire n'est nécessaire
+dans `Granit.BackgroundJobs.Endpoints` — les endpoints rejettent automatiquement
+les requêtes sans token valide (`401`).
+
+#### 2 — Autorisation (système de permissions Granit)
+
+`GranitBackgroundJobsEndpointsModule` enregistre `BackgroundJobsPermissionDefinitionProvider`,
+qui déclare la permission `BackgroundJobs.Admin` dans le registre de permissions Granit.
+
+Lorsque `GranitAuthorizationModule` est chargé (toujours le cas via `[DependsOn]`),
+`DynamicPermissionPolicyProvider` intercepte la politique `BackgroundJobs.Admin` et
+active le pipeline complet `IPermissionChecker` :
+
+```text
+Requête → DynamicPermissionPolicyProvider → PermissionRequirement("BackgroundJobs.Admin")
+  → IPermissionChecker.IsGrantedAsync("BackgroundJobs.Admin")
+      1. AlwaysAllow = true  → accordé  (dev/tests uniquement)
+      2. AdminRoles bypass   → accordé  (root of trust, sans DB)
+      3. Cache               → hit ou miss
+      4. IPermissionGrantStore.IsGrantedAsync(role, "BackgroundJobs.Admin")
+```
+
+#### 3 — Configurer l'accès en production
+
+**Option A — AdminRoles bypass (simple)** : ajouter le rôle Keycloak des opérateurs
+dans `GranitAuthorizationOptions.AdminRoles`. Aucune table DB nécessaire.
+
+```json
+// appsettings.json
+{
+  "Authorization": {
+    "AdminRoles": ["admin", "granit-background-jobs-admin"]
+  }
+}
+```
+
+**Option B — IPermissionManager (contrôle fin par tenant)** : accorder la permission
+au démarrage (nécessite `Granit.Authorization.EntityFrameworkCore`) :
+
+```csharp
+// Program.cs / hosted service
+await permissionManager.SetAsync(
+    "BackgroundJobs.Admin",
+    "granit-background-jobs-admin",
+    tenantId: null,   // null = toutes les tenants
+    isGranted: true);
+```
+
+#### 4 — Tests sans GranitAuthorizationModule
+
+En tests unitaires qui n'utilisent pas le module Granit (plain `AddAuthorization()`),
+`DynamicPermissionPolicyProvider` n'est pas actif et la politique tombe en fallback
+sur le `RequireRole()` enregistré par `MapBackgroundJobsEndpoints()` :
+
+```csharp
+builder.Services.AddAuthorization();  // sans GranitAuthorizationModule
+app.MapBackgroundJobsEndpoints(opts => opts.RequiredRole = "granit-background-jobs-admin");
+// → RequireRole("granit-background-jobs-admin") actif
+```
+
 ## Architecture interne
 
 ```text
@@ -180,6 +284,15 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 [WolverineOptions]
   opts.Policies.AddMiddleware<RecurringJobSchedulingMiddleware>(
       chain => chain.MessageType.GetCustomAttribute<RecurringJobAttribute>() is not null)
+  services.AddSingularAgent<CronSchedulerAgent>()  ← agent singleton cluster-safe
+
+[Cluster — CronSchedulerAgent]
+  startAsync()
+    → store.GetEnabledJobsAsync()
+    → si NextExecutionAt > Now : skip (déjà planifié via Outbox)
+    → Cronos.GetNextOccurrence()
+    → bus.ScheduleAsync(message, next)
+    → store.RecordNextExecutionAsync()
 
 [Runtime — par message récurrent]
   RecurringJobSchedulingMiddleware.BeforeAsync()

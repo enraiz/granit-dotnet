@@ -32,9 +32,9 @@ internal sealed partial class CronSchedulerAgent(
     ILogger<CronSchedulerAgent> logger) : SingularAgent("granit-background-jobs")
 {
     /// <inheritdoc/>
-    protected override async Task startAsync(CancellationToken ct)
+    protected override async Task startAsync(CancellationToken cancellationToken)
     {
-        IReadOnlyList<BackgroundJobDefinition> jobs = await store.GetEnabledJobsAsync(ct);
+        IReadOnlyList<BackgroundJobDefinition> jobs = await store.GetEnabledJobsAsync(cancellationToken);
 
         foreach (BackgroundJobDefinition job in jobs)
         {
@@ -53,13 +53,13 @@ internal sealed partial class CronSchedulerAgent(
 
             object message = CreateMessage(job.MessageType, job.JobName);
             await bus.ScheduleAsync(message, next.Value);
-            await store.RecordNextExecutionAsync(job.JobName, next.Value, ct);
+            await store.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken);
             LogJobScheduled(logger, job.JobName, next.Value);
         }
     }
 
     /// <inheritdoc/>
-    protected override Task stopAsync(CancellationToken ct) => Task.CompletedTask;
+    protected override Task stopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     private DateTimeOffset? ComputeNext(string cronExpression)
     {

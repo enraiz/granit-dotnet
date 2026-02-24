@@ -16,7 +16,7 @@ namespace Granit.Features.Wolverine;
 /// When a required feature is disabled, <see cref="Exceptions.FeatureNotEnabledException"/> is thrown
 /// and mapped to HTTP 403 by <c>DefaultExceptionStatusCodeMapper</c>.
 /// </remarks>
-public sealed class RequiresFeatureMiddleware
+public static class RequiresFeatureMiddleware
 {
     /// <summary>
     /// Wolverine "before" hook — invoked before the message handler.
