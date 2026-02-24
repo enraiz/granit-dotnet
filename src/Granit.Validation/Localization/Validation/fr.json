@@ -1,0 +1,33 @@
+{
+  "culture": "fr",
+  "texts": {
+    "Granit:Validation:InvalidBelgianNiss": "Le numéro national d'identification belge (NISS) est invalide.",
+    "Granit:Validation:InvalidFrenchRpps": "Le numéro RPPS (identifiant du professionnel de santé) est invalide.",
+    "Granit:Validation:InvalidE164Phone": "Le numéro de téléphone doit être au format international E.164 (ex : +32475123456).",
+    "Granit:Validation:InvalidFrenchAdeli": "Le numéro ADELI (professionnel de santé) est invalide.",
+    "Granit:Validation:InvalidIban": "L'IBAN est invalide.",
+    "Granit:Validation:InvalidFrenchFiness": "Le numéro FINESS (établissement de santé) est invalide.",
+    "Granit:Validation:NotNullValidator": "'{PropertyName}' ne peut pas être vide.",
+    "Granit:Validation:NotEmptyValidator": "'{PropertyName}' ne peut pas être vide.",
+    "Granit:Validation:LengthValidator": "'{PropertyName}' doit contenir entre {MinLength} et {MaxLength} caractères. Vous avez saisi {TotalLength} caractères.",
+    "Granit:Validation:ExactLengthValidator": "'{PropertyName}' doit contenir exactement {MaxLength} caractères. Vous avez saisi {TotalLength} caractères.",
+    "Granit:Validation:MaximumLengthValidator": "'{PropertyName}' doit contenir au maximum {MaxLength} caractères. Vous avez saisi {TotalLength} caractères.",
+    "Granit:Validation:MinimumLengthValidator": "'{PropertyName}' doit contenir au minimum {MinLength} caractères. Vous avez saisi {TotalLength} caractères.",
+    "Granit:Validation:RegularExpressionValidator": "'{PropertyName}' n'est pas dans le format attendu.",
+    "Granit:Validation:EmailValidator": "'{PropertyName}' n'est pas une adresse e-mail valide.",
+    "Granit:Validation:EqualValidator": "'{PropertyName}' doit être égal à '{ComparisonValue}'.",
+    "Granit:Validation:NotEqualValidator": "'{PropertyName}' ne peut pas être égal à '{ComparisonValue}'.",
+    "Granit:Validation:InclusiveBetweenValidator": "'{PropertyName}' doit être compris entre {From} et {To}. Vous avez saisi {Value}.",
+    "Granit:Validation:ExclusiveBetweenValidator": "'{PropertyName}' doit être strictement compris entre {From} et {To}. Vous avez saisi {Value}.",
+    "Granit:Validation:GreaterThanValidator": "'{PropertyName}' doit être supérieur à '{ComparisonValue}'.",
+    "Granit:Validation:GreaterThanOrEqualValidator": "'{PropertyName}' doit être supérieur ou égal à '{ComparisonValue}'.",
+    "Granit:Validation:LessThanValidator": "'{PropertyName}' doit être inférieur à '{ComparisonValue}'.",
+    "Granit:Validation:LessThanOrEqualValidator": "'{PropertyName}' doit être inférieur ou égal à '{ComparisonValue}'.",
+    "Granit:Validation:PredicateValidator": "La condition spécifiée n'a pas été remplie pour '{PropertyName}'.",
+    "Granit:Validation:AsyncPredicateValidator": "La condition spécifiée n'a pas été remplie pour '{PropertyName}'.",
+    "Granit:Validation:CreditCardValidator": "'{PropertyName}' n'est pas un numéro de carte bancaire valide.",
+    "Granit:Validation:ScalePrecisionValidator": "'{PropertyName}' ne doit pas avoir plus de {ExpectedPrecision} chiffres au total, dont {ExpectedScale} décimaux.",
+    "Granit:Validation:EmptyValidator": "'{PropertyName}' doit être vide.",
+    "Granit:Validation:NullValidator": "'{PropertyName}' doit être vide."
+  }
+}

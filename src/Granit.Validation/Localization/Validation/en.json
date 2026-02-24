@@ -1,0 +1,33 @@
+{
+  "culture": "en",
+  "texts": {
+    "Granit:Validation:InvalidBelgianNiss": "The Belgian national identification number (NISS) is invalid.",
+    "Granit:Validation:InvalidFrenchRpps": "The French RPPS professional identifier is invalid.",
+    "Granit:Validation:InvalidE164Phone": "The phone number must be in E.164 international format (e.g. +32475123456).",
+    "Granit:Validation:InvalidFrenchAdeli": "The French ADELI professional number is invalid.",
+    "Granit:Validation:InvalidIban": "The IBAN is invalid.",
+    "Granit:Validation:InvalidFrenchFiness": "The French Finess establishment number is invalid.",
+    "Granit:Validation:NotNullValidator": "'{PropertyName}' must not be empty.",
+    "Granit:Validation:NotEmptyValidator": "'{PropertyName}' must not be empty.",
+    "Granit:Validation:LengthValidator": "'{PropertyName}' must be between {MinLength} and {MaxLength} characters. You entered {TotalLength} characters.",
+    "Granit:Validation:ExactLengthValidator": "'{PropertyName}' must be {MaxLength} characters in length. You entered {TotalLength} characters.",
+    "Granit:Validation:MaximumLengthValidator": "'{PropertyName}' must be {MaxLength} characters or fewer. You entered {TotalLength} characters.",
+    "Granit:Validation:MinimumLengthValidator": "'{PropertyName}' must be at least {MinLength} characters. You entered {TotalLength} characters.",
+    "Granit:Validation:RegularExpressionValidator": "'{PropertyName}' is not in the correct format.",
+    "Granit:Validation:EmailValidator": "'{PropertyName}' is not a valid email address.",
+    "Granit:Validation:EqualValidator": "'{PropertyName}' must be equal to '{ComparisonValue}'.",
+    "Granit:Validation:NotEqualValidator": "'{PropertyName}' must not be equal to '{ComparisonValue}'.",
+    "Granit:Validation:InclusiveBetweenValidator": "'{PropertyName}' must be between {From} and {To}. You entered {Value}.",
+    "Granit:Validation:ExclusiveBetweenValidator": "'{PropertyName}' must be exclusively between {From} and {To}. You entered {Value}.",
+    "Granit:Validation:GreaterThanValidator": "'{PropertyName}' must be greater than '{ComparisonValue}'.",
+    "Granit:Validation:GreaterThanOrEqualValidator": "'{PropertyName}' must be greater than or equal to '{ComparisonValue}'.",
+    "Granit:Validation:LessThanValidator": "'{PropertyName}' must be less than '{ComparisonValue}'.",
+    "Granit:Validation:LessThanOrEqualValidator": "'{PropertyName}' must be less than or equal to '{ComparisonValue}'.",
+    "Granit:Validation:PredicateValidator": "The specified condition was not met for '{PropertyName}'.",
+    "Granit:Validation:AsyncPredicateValidator": "The specified condition was not met for '{PropertyName}'.",
+    "Granit:Validation:CreditCardValidator": "'{PropertyName}' is not a valid credit card number.",
+    "Granit:Validation:ScalePrecisionValidator": "'{PropertyName}' must not be more than {ExpectedPrecision} digits in total, with allowance for {ExpectedScale} decimals.",
+    "Granit:Validation:EmptyValidator": "'{PropertyName}' must be empty.",
+    "Granit:Validation:NullValidator": "'{PropertyName}' must be empty."
+  }
+}
