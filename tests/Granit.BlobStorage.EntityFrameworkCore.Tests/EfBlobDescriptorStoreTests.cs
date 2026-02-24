@@ -250,7 +250,7 @@ public sealed class EfBlobDescriptorStoreTests
     // =========================================================================
 
     [Fact]
-    public async Task FindAsync_WithNoActiveTenant_Throws()
+    public async Task FindAsync_WithNoActiveTenant_ReturnsNull()
     {
         ICurrentTenant noTenant = Substitute.For<ICurrentTenant>();
         noTenant.IsAvailable.Returns(false);
@@ -258,10 +258,9 @@ public sealed class EfBlobDescriptorStoreTests
         EfBlobDescriptorStore store = new(
             new InMemoryContextFactory(Guid.NewGuid().ToString()), noTenant);
 
-        Func<Task> act = () => store.FindAsync(
+        BlobDescriptor? result = await store.FindAsync(
             Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*tenant*");
+        result.Should().BeNull("no blob exists with TenantId = string.Empty");
     }
 }

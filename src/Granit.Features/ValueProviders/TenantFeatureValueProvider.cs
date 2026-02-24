@@ -1,6 +1,7 @@
 using Granit.Core.MultiTenancy;
 using Granit.Features.Definitions;
 using Granit.Features.Store;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Features.ValueProviders;
 
@@ -9,13 +10,14 @@ namespace Granit.Features.ValueProviders;
 /// Runs first in the cascade (order = 100) — highest priority.
 /// </summary>
 /// <remarks>
-/// Returns <c>null</c> when no tenant context is available (host / global requests).
+/// Returns <c>null</c> when no tenant context is available (host / global requests)
+/// or when <see cref="ICurrentTenant"/> is not registered (single-tenant applications).
 /// </remarks>
 internal sealed class TenantFeatureValueProvider(
-    ICurrentTenant currentTenant,
+    IServiceProvider serviceProvider,
     IFeatureStore featureStore) : IFeatureValueProvider
 {
-    private readonly ICurrentTenant _currentTenant = currentTenant;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly IFeatureStore _featureStore = featureStore;
 
     /// <inheritdoc/>
@@ -27,12 +29,13 @@ internal sealed class TenantFeatureValueProvider(
     /// <inheritdoc/>
     public async Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken ct = default)
     {
-        if (!_currentTenant.IsAvailable)
+        ICurrentTenant? currentTenant = _serviceProvider.GetService<ICurrentTenant>();
+        if (currentTenant is null || !currentTenant.IsAvailable)
         {
             return null;
         }
 
-        string tenantId = _currentTenant.Id!.Value.ToString();
+        string tenantId = currentTenant.Id!.Value.ToString();
         return await _featureStore.GetOrNullAsync(definition.Name, tenantId, ct);
     }
 }

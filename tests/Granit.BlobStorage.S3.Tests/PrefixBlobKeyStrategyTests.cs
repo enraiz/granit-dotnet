@@ -81,18 +81,20 @@ public sealed class PrefixBlobKeyStrategyTests
     }
 
     [Fact]
-    public void BuildObjectKey_WhenNoActiveTenant_ShouldThrowInvalidOperationException()
+    public void BuildObjectKey_WhenNoActiveTenant_ShouldOmitTenantPrefix()
     {
         // Arrange
         _currentTenant.IsAvailable.Returns(false);
         _currentTenant.Id.Returns((Guid?)null);
+        Guid blobId = Guid.NewGuid();
 
         // Act
-        Action act = () => _sut.BuildObjectKey("medical-images", Guid.NewGuid());
+        string key = _sut.BuildObjectKey("docs", blobId);
 
-        // Assert
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*tenant*");
+        // Assert — single-tenant format: {containerName}/{yyyy}/{MM}/{blobId}
+        key.Should().StartWith("docs/");
+        key.Should().EndWith(blobId.ToString());
+        key.Should().NotContain(TenantId.ToString());
     }
 
     // ── ResolveBucketName ─────────────────────────────────────────────────────

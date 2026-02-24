@@ -20,7 +20,7 @@ internal sealed class EfBlobDescriptorStore(
         Guid blobId,
         CancellationToken cancellationToken = default)
     {
-        string tenantId = GetRequiredTenantId();
+        string tenantId = GetOptionalTenantId();
         await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
         return await context.Blobs
             .FirstOrDefaultAsync(b => b.Id == blobId && b.TenantId == tenantId, cancellationToken);
@@ -46,14 +46,8 @@ internal sealed class EfBlobDescriptorStore(
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    private string GetRequiredTenantId()
-    {
-        if (!currentTenant.IsAvailable || currentTenant.Id is null)
-        {
-            throw new InvalidOperationException(
-                "Cannot query blob descriptors without an active tenant context.");
-        }
-
-        return currentTenant.Id.Value.ToString();
-    }
+    private string GetOptionalTenantId() =>
+        currentTenant.IsAvailable && currentTenant.Id is not null
+            ? currentTenant.Id.Value.ToString()
+            : string.Empty;
 }

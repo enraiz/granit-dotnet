@@ -26,7 +26,7 @@
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
     <ProjectReference Include="..\Granit.Caching.Hybrid\Granit.Caching.Hybrid.csproj" />
     <ProjectReference Include="..\Granit.Localization\Granit.Localization.csproj" />
-    <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+    <!-- Optional at runtime: ICurrentTenant resolved via GetService — no GranitMultiTenancyModule required -->
   </ItemGroup>
 
   <ItemGroup>

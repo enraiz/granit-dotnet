@@ -4,6 +4,7 @@ using Granit.Features.Definitions;
 using Granit.Features.Exceptions;
 using Granit.Features.ValueProviders;
 using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Features.Checker;
 
@@ -14,13 +15,13 @@ namespace Granit.Features.Checker;
 internal sealed class FeatureChecker(
     IFeatureDefinitionStore definitionStore,
     IEnumerable<IFeatureValueProvider> valueProviders,
-    ICurrentTenant currentTenant,
+    IServiceProvider serviceProvider,
     HybridCache hybridCache) : IFeatureChecker
 {
     private readonly IFeatureDefinitionStore _definitionStore = definitionStore;
     private readonly IReadOnlyList<IFeatureValueProvider> _providers =
         [.. valueProviders.OrderBy(p => p.Order)];
-    private readonly ICurrentTenant _currentTenant = currentTenant;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly HybridCache _hybridCache = hybridCache;
 
     /// <inheritdoc/>
@@ -41,7 +42,8 @@ internal sealed class FeatureChecker(
     public async Task<string> GetValueAsync(string featureName, CancellationToken ct = default)
     {
         FeatureDefinition definition = _definitionStore.GetRequired(featureName);
-        Guid? tenantId = _currentTenant.IsAvailable ? _currentTenant.Id : null;
+        ICurrentTenant? currentTenant = _serviceProvider.GetService<ICurrentTenant>();
+        Guid? tenantId = currentTenant?.IsAvailable == true ? currentTenant.Id : null;
         string cacheKey = FeatureCacheKey.Build(tenantId, featureName);
 
         string resolved = await _hybridCache.GetOrCreateAsync<string>(

@@ -1,6 +1,6 @@
 # Granit — Documentation framework
 
-Cette documentation est organisée en neuf sections thématiques.
+Cette documentation est organisée en dix sections thématiques.
 
 ## Core
 
@@ -81,6 +81,14 @@ Stockage d'objets souverain, Direct-to-Cloud, conforme HDS et RGPD.
 | Document | Description |
 | --- | --- |
 | [blob-storage.md](storage/blob-storage.md) | Stockage de fichiers S3, URL pré-signées, pipeline de validation, Crypto-Shredding |
+
+## SaaS
+
+Gestion des fonctionnalités par plan commercial et quotas.
+
+| Document | Description |
+| --- | --- |
+| [features.md](saas/features.md) | Feature Management (Toggle/Numeric/Selection), résolution Default → Plan → Tenant, cache hybride, `[RequiresFeature]`, `IFeatureLimitGuard` |
 
 ## Utilities
 

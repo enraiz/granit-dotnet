@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Granit.BlobStorage\Granit.BlobStorage.csproj" />
-    <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
   </ItemGroup>
 

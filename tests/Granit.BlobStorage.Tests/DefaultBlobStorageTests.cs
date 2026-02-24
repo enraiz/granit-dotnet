@@ -140,7 +140,7 @@ public sealed class DefaultBlobStorageTests
     }
 
     [Fact]
-    public async Task InitiateUploadAsync_WhenNoActiveTenant_ShouldThrowInvalidOperationException()
+    public async Task InitiateUploadAsync_WhenNoActiveTenant_ShouldSucceedWithEmptyTenantId()
     {
         // Arrange
         _currentTenant.IsAvailable.Returns(false);
@@ -148,11 +148,13 @@ public sealed class DefaultBlobStorageTests
 
         // Act
         Func<Task> act = async () =>
-            await _sut.InitiateUploadAsync("medical-images", new BlobUploadRequest("f.jpg", "image/jpeg", 1_000));
+            await _sut.InitiateUploadAsync("docs", new BlobUploadRequest("f.pdf", "application/pdf", 1_000));
 
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*tenant*");
+        // Assert — single-tenant apps must not be blocked
+        await act.Should().NotThrowAsync();
+        await _store.Received(1).SaveAsync(
+            Arg.Is<BlobDescriptor>(d => d.TenantId == string.Empty),
+            Arg.Any<CancellationToken>());
     }
 
     // ── CreateDownloadUrlAsync ───────────────────────────────────────────────
