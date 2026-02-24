@@ -53,14 +53,26 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
     /// <inheritdoc />
     public IStringLocalizer Create(string baseName, string location)
     {
-        // Try to resolve the type from the fully-qualified name
+        // Resolve by [LocalizationResourceName] attribute name (e.g. "Granit", "Features").
+        // This is the primary resolution path used by GranitExceptionHandler and the SPA endpoint.
+        foreach (LocalizationResourceInfo resourceInfo in _options.Value.Resources.GetAll())
+        {
+            string? name = resourceInfo.ResourceType
+                .GetCustomAttribute<LocalizationResourceNameAttribute>()?.Name;
+            if (string.Equals(name, baseName, StringComparison.Ordinal))
+            {
+                return Create(resourceInfo.ResourceType);
+            }
+        }
+
+        // Fallback: resolve by fully-qualified CLR type name (e.g. "Granit.Localization.GranitLocalizationResource, Granit.Localization").
         Type? resourceType = Type.GetType($"{baseName}, {location}");
         if (resourceType is not null)
         {
             return Create(resourceType);
         }
 
-        // Fallback: create an empty localizer (key = returned value)
+        // No matching resource — return empty localizer (key = returned value).
         return new JsonStringLocalizer([], "fr", []);
     }
 
