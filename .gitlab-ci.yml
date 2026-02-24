@@ -158,7 +158,7 @@ sonarqube:
       /d:sonar.host.url="${SONAR_HOST_URL}"
       /d:sonar.token="${SONAR_TOKEN}"
       /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
-      /d:sonar.coverage.exclusions="**/Tests/**,**/test/**"
+      /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs"
       /d:sonar.exclusions=".nuget/**"
       /d:sonar.qualitygate.wait=true
     - dotnet build -c $CONFIGURATION
