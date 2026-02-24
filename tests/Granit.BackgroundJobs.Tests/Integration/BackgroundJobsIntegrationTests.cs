@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.Core;
 using Wolverine;
+using Wolverine.Persistence.Durability;
+using Wolverine.Persistence.Durability.DeadLetterManagement;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests.Integration;
@@ -104,8 +106,15 @@ public sealed class BackgroundJobsIntegrationTests
         user.UserId.Returns("user-admin");
 
         IMessageBus bus = Substitute.For<IMessageBus>();
+        IMessageStore messageStore = Substitute.For<IMessageStore>();
+        IDeadLetters deadLetters = Substitute.For<IDeadLetters>();
+        messageStore.DeadLetters.Returns(deadLetters);
+        deadLetters
+            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([]));
+
         BackgroundJobManager manager = new(
-            store, bus, clock, user, NullLogger<BackgroundJobManager>.Instance);
+            store, bus, clock, user, NullLogger<BackgroundJobManager>.Instance, messageStore);
         RecurringJobSchedulingMiddleware middleware = new(
             store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
 
