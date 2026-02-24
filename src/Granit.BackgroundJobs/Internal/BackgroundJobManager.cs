@@ -121,7 +121,7 @@ internal sealed partial class BackgroundJobManager(
         catch (Exception ex)
         {
             LogDlqQueryFailed(logger, ex);
-            return new Dictionary<string, long>();
+            return [];
         }
     }
 
