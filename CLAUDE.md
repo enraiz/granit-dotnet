@@ -113,6 +113,20 @@ Before any GitLab operation, **invoke skill `/gitlab`** to load commands and con
 - **Hierarchy**: GitLab Free — `relates_to` links via API + references in parent description
 - **Templates**: `.gitlab/issue_templates/` (Story, Feature, Epic, Bug, Spike, Tech_Debt)
 
+## Definition of Done — mandatory before any push
+
+**NEVER push or create an MR without all of the following being complete:**
+
+1. **Unit tests**: every modified package has its `*.Tests` project updated or extended
+   to cover the new/changed behaviour. `dotnet test` passes with zero failures.
+2. **Documentation**: any public API change, new feature, or behaviour change is reflected
+   in `docs/**/*.md` (French). Create the file if it does not exist; update it otherwise.
+3. **Format**: `dotnet format --verify-no-changes` exits with code 0.
+4. **Markdownlint**: every modified `.md` file passes `npx markdownlint-cli2 "<file>"`.
+
+These four checks are **blocking**. If the user asks to push without them, remind them
+and refuse until the DoD is satisfied or the user explicitly overrides each item.
+
 ## Git workflow
 
 - **Branching**: GitFlow (main + develop + `feature/*` + `release/*` + `hotfix/*`)
