@@ -25,8 +25,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
     <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
+    <ProjectReference Include="..\Granit.Localization\Granit.Localization.csproj" />
     <ProjectReference Include="..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\**\*.json" />
   </ItemGroup>
 
 </Project>
