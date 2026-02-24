@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <!-- EF1001 fires when testing internal DbContext via InternalsVisibleTo — expected for internal infrastructure tests -->
+    <NoWarn>$(NoWarn);EF1001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,13 +12,12 @@
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="NSubstitute" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.Localization.DatabaseSource\Granit.Localization.DatabaseSource.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Localization.EntityFrameworkCore\Granit.Localization.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

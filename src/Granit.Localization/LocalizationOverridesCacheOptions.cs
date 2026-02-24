@@ -1,9 +1,9 @@
-namespace Granit.Localization.DatabaseSource;
+namespace Granit.Localization;
 
 /// <summary>
 /// Configuration options for the localization DB override cache.
 /// </summary>
-public sealed class LocalizationDatabaseSourceOptions
+public sealed class LocalizationOverridesCacheOptions
 {
     /// <summary>
     /// Duration for which override dictionaries are kept in memory before being reloaded.

@@ -1,13 +1,11 @@
 using FluentAssertions;
-using Granit.Localization;
-using Granit.Localization.DatabaseSource;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Xunit;
 
-namespace Granit.Localization.DatabaseSource.Tests;
+namespace Granit.Localization.Tests;
 
 public sealed class CachedLocalizationOverrideStoreTests
 {
@@ -24,8 +22,8 @@ public sealed class CachedLocalizationOverrideStoreTests
             CachedLocalizationOverrideStore.RawStoreKey, (_, _) => inner);
 
         IMemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
-        IOptions<LocalizationDatabaseSourceOptions> options = Options.Create(
-            new LocalizationDatabaseSourceOptions { CacheTtl = cacheTtl ?? TimeSpan.FromMinutes(5) });
+        IOptions<LocalizationOverridesCacheOptions> options = Options.Create(
+            new LocalizationOverridesCacheOptions { CacheTtl = cacheTtl ?? TimeSpan.FromMinutes(5) });
 
         ServiceProvider sp = services.BuildServiceProvider();
         IServiceScopeFactory scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();

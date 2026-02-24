@@ -1,9 +1,9 @@
 using FluentAssertions;
-using Granit.Localization.DatabaseSource.EntityFrameworkCore.Internal;
+using Granit.Localization.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Granit.Localization.DatabaseSource.EntityFrameworkCore.Tests;
+namespace Granit.Localization.EntityFrameworkCore.Tests;
 
 public sealed class EfCoreLocalizationOverrideStoreTests
 {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Granit.Localization.DatabaseSource.EntityFrameworkCore.Internal;
+namespace Granit.Localization.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="LocalizationOverride"/>.

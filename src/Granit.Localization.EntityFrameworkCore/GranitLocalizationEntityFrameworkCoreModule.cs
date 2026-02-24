@@ -1,7 +1,7 @@
 using Granit.Core.Modularity;
 using Granit.Persistence;
 
-namespace Granit.Localization.DatabaseSource.EntityFrameworkCore;
+namespace Granit.Localization.EntityFrameworkCore;
 
 /// <summary>
 /// Granit module for EF Core persistence of localization overrides.
@@ -16,6 +16,6 @@ namespace Granit.Localization.DatabaseSource.EntityFrameworkCore;
 /// </code>
 /// </remarks>
 [DependsOn(
-    typeof(GranitLocalizationDatabaseSourceModule),
+    typeof(GranitLocalizationModule),
     typeof(GranitPersistenceModule))]
-public sealed class GranitLocalizationDatabaseSourceEntityFrameworkCoreModule : GranitModule;
+public sealed class GranitLocalizationEntityFrameworkCoreModule : GranitModule;

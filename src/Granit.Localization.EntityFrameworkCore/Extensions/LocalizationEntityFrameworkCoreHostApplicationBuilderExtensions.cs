@@ -1,13 +1,11 @@
-using Granit.Localization;
-using Granit.Localization.DatabaseSource;
-using Granit.Localization.DatabaseSource.EntityFrameworkCore.Internal;
+using Granit.Localization.EntityFrameworkCore.Internal;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Granit.Localization.DatabaseSource.EntityFrameworkCore.Extensions;
+namespace Granit.Localization.EntityFrameworkCore.Extensions;
 
 /// <summary>
 /// Extension methods for registering EF Core persistence for Granit localization overrides.
@@ -22,13 +20,13 @@ public static class LocalizationEntityFrameworkCoreHostApplicationBuilderExtensi
     /// Registers <see cref="EfCoreLocalizationOverrideStore"/> as a keyed Scoped service
     /// (<see cref="CachedLocalizationOverrideStore.RawStoreKey"/>). The Singleton
     /// <see cref="CachedLocalizationOverrideStore"/> — registered by
-    /// <c>GranitLocalizationDatabaseSourceModule</c> — resolves it via
+    /// <c>GranitLocalizationModule</c> — resolves it via
     /// <c>IServiceScopeFactory</c> per DB operation, ensuring HDS audit compliance
     /// through <see cref="AuditedEntityInterceptor"/> on write operations.
     /// </para>
     /// <para>
     /// Must be called after the module system has been initialized (i.e. after
-    /// <c>GranitLocalizationDatabaseSourceEntityFrameworkCoreModule</c> is loaded).
+    /// <c>GranitLocalizationEntityFrameworkCoreModule</c> is loaded).
     /// </para>
     /// <para>
     /// The connection string must point to a database hosted in Europe (OVHcloud FR).

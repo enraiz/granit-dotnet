@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Granit.Localization.DatabaseSource.EntityFrameworkCore.Internal;
+namespace Granit.Localization.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// Dedicated EF Core DbContext for Granit localization overrides.

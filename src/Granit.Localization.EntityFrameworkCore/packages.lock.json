@@ -141,17 +141,10 @@
         "type": "Project",
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Microsoft.Extensions.Caching.Memory": "[10.*, )",
           "Microsoft.Extensions.Localization": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
-        }
-      },
-      "granit.localization.databasesource": {
-        "type": "Project",
-        "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
-          "Granit.Localization": "[0.1.0-dev, )",
-          "Granit.MultiTenancy": "[0.1.0-dev, )",
-          "Microsoft.Extensions.Caching.Memory": "[10.*, )"
         }
       },
       "granit.multitenancy": {
@@ -166,7 +159,6 @@
           "Granit.Core": "[0.1.0-dev, )",
           "Granit.ExceptionHandling": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
-          "Granit.MultiTenancy": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore": "[10.*, )",
