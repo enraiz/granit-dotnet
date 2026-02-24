@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
     <ProjectReference Include="..\..\src\Granit.Wolverine\Granit.Wolverine.csproj" />
   </ItemGroup>
 

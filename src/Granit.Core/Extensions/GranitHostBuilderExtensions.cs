@@ -1,5 +1,7 @@
 using Granit.Core.Modularity;
+using Granit.Core.MultiTenancy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace Granit.Core.Extensions;
@@ -29,6 +31,9 @@ public static class GranitHostBuilderExtensions
             builder.Configuration,
             builder);
 
+        // Default: NullTenantContext (no-op). Granit.MultiTenancy replaces it if present.
+        builder.Services.TryAddSingleton<ICurrentTenant>(NullTenantContext.Instance);
+
         application.ConfigureServices(context);
 
         builder.Services.AddSingleton(application);
@@ -55,6 +60,9 @@ public static class GranitHostBuilderExtensions
             builder.Services,
             builder.Configuration,
             builder);
+
+        // Default: NullTenantContext (no-op). Granit.MultiTenancy replaces it if present.
+        builder.Services.TryAddSingleton<ICurrentTenant>(NullTenantContext.Instance);
 
         await application.ConfigureServicesAsync(context);
 

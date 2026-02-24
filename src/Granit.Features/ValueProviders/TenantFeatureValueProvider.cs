@@ -1,6 +1,6 @@
+using Granit.Core.MultiTenancy;
 using Granit.Features.Definitions;
 using Granit.Features.Store;
-using Granit.MultiTenancy;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Features.ValueProviders;

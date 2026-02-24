@@ -70,6 +70,19 @@ in all French content (docs, issues, commits). Never in code.
 Each module is self-contained (interface + implementation in the same package).
 All Granit packages reference Core.
 
+**Multi-tenancy — soft dependency rule**: `ICurrentTenant` lives in `Granit.Core.MultiTenancy`
+and is available in every module without referencing `Granit.MultiTenancy`.
+
+- New Granit modules that read `ICurrentTenant`: use `using Granit.Core.MultiTenancy;`, do NOT
+  add `[DependsOn(typeof(GranitMultiTenancyModule))]` or a `<ProjectReference>` to
+  `Granit.MultiTenancy`. A `NullTenantContext` (`IsAvailable = false`) is registered by default.
+- Always check `IsAvailable` before using `Id` — the null object is the normal state when
+  multi-tenancy is not installed.
+- Hard dependency on `Granit.MultiTenancy` is allowed **only** when the module must enforce
+  strict tenant isolation (example: BlobStorage — throws if no tenant context, RGPD/HDS).
+- Application modules (`GuavaHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
+  as usual when multi-tenancy is required in the application.
+
 **Tests**: each package has a test project (`*.Tests`). xUnit + FluentAssertions +
 NSubstitute + Bogus. Tests are part of the DoD for every story.
 
@@ -107,6 +120,18 @@ Before any GitLab operation, **invoke skill `/gitlab`** to load commands and con
 - **Releases**: Semantic tags on main (vMAJOR.MINOR.PATCH), `release/*` branches for stabilization
 - **Commits**: Conventional Commits (feat:, fix:, docs:, chore:)
 - **MR**: 1 approval minimum for main
+
+**MR target — STRICT RULE:**
+
+| Branch type | Default target | Exception |
+| ----------- | -------------- | --------- |
+| `feature/*` | `develop` | Only if user explicitly says "target main" |
+| `hotfix/*` | `main` + `develop` | Both, always |
+| `release/*` | `main` + `develop` | Both, always |
+| `fix/*` | `develop` | Only if user explicitly says "target main" |
+
+NEVER target `main` for a `feature/*` or `fix/*` branch unless the user explicitly
+requests it. When in doubt, ask before creating the MR.
 
 ## Security — strict rules
 

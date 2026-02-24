@@ -14,8 +14,8 @@
 
 using FluentAssertions;
 using Granit.Core.Domain;
+using Granit.Core.MultiTenancy;
 using Granit.Guids;
-using Granit.MultiTenancy;
 using Granit.Persistence.Interceptors;
 using Granit.Security;
 using Granit.Timing;

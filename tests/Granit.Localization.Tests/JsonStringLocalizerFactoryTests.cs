@@ -125,6 +125,23 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
     }
 
     [Fact]
+    public void Create_ByResourceName_ResolvesRegisteredResource()
+    {
+        // Arrange — TestResource is registered and carries [LocalizationResourceName("Test")].
+        // GranitExceptionHandler calls Create(resourceName, assemblyName) where resourceName
+        // is the prefix extracted from the error code (e.g. "BlobStorage" from "BlobStorage:NotFound").
+        JsonStringLocalizerFactory factory = CreateFactory();
+        CultureInfo.CurrentUICulture = new CultureInfo("fr");
+
+        // Act — resolve by [LocalizationResourceName] name, not by CLR type name
+        IStringLocalizer localizer = factory.Create("Test", "any.location");
+
+        // Assert
+        localizer["Test:Hello"].Value.Should().Be("Bonjour");
+        localizer["Test:Hello"].ResourceNotFound.Should().BeFalse();
+    }
+
+    [Fact]
     public void Create_ByNameAndLocation_FallsBackToEmptyLocalizer()
     {
         // Arrange

@@ -137,12 +137,16 @@ internal sealed partial class GranitExceptionHandler(
     private string ResolveTitle(Exception exception, int statusCode)
     {
         // Try localized title via error code if the localizer is available.
+        // The resource is derived from the error code prefix: "Features:NotEnabled" → "Features".
+        // JsonStringLocalizerFactory.Create(string, string) resolves by [LocalizationResourceName] name.
         if (exception is IHasErrorCode hasErrorCode && localizerFactory is not null)
         {
-            IStringLocalizer localizer = localizerFactory.Create(
-                "Granit",
-                typeof(GranitExceptionHandler).Assembly.GetName().Name!);
-            LocalizedString localized = localizer[hasErrorCode.ErrorCode];
+            string errorCode = hasErrorCode.ErrorCode;
+            string resourceName = ExtractResourcePrefix(errorCode);
+            string assemblyName = typeof(GranitExceptionHandler).Assembly.GetName().Name!;
+
+            IStringLocalizer localizer = localizerFactory.Create(resourceName, assemblyName);
+            LocalizedString localized = localizer[errorCode];
             if (!localized.ResourceNotFound)
             {
                 return localized.Value;
@@ -164,6 +168,17 @@ internal sealed partial class GranitExceptionHandler(
 
         // For 4xx without user-friendly marker: use the message (technical but not sensitive).
         return exception.Message;
+    }
+
+    /// <summary>
+    /// Extracts the resource name prefix from an error code.
+    /// For example, <c>"Features:NotEnabled"</c> returns <c>"Features"</c>.
+    /// Falls back to <c>"Granit"</c> when no prefix is present.
+    /// </summary>
+    private static string ExtractResourcePrefix(string errorCode)
+    {
+        int colonIndex = errorCode.IndexOf(':', StringComparison.Ordinal);
+        return colonIndex > 0 ? errorCode[..colonIndex] : "Granit";
     }
 
     private string? ResolveDetail(Exception exception, int statusCode)

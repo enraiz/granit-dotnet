@@ -230,11 +230,24 @@ GranitGuidsModule         ── (standalone → Core)
 GranitSecurityModule      ── (standalone → Core)
 GranitObservabilityModule ── (standalone → Core)
 GranitVaultModule         ── (standalone → Core)
+GranitMultiTenancyModule  ── (standalone → Core)   ← dépendance optionnelle
 
 GranitPersistenceModule   ── → Timing, Guids, Security
+GranitSettingsModule      ── → Security
+GranitWolverineModule     ── → Security
+GranitAuthorizationModule ── → Security
+GranitIdempotencyModule   ── → (standalone → Core)
 
-GuavaHostModule (application) ── → Observability, Security, Persistence, Vault
+GuavaHostModule (application) ── → Observability, Security, Persistence, Vault, MultiTenancy
 ```
+
+> **Dépendance souple sur `ICurrentTenant`** : `Granit.Persistence`, `Granit.Settings`,
+> `Granit.Wolverine`, `Granit.Authorization` et `Granit.Idempotency` consomment
+> `ICurrentTenant` (namespace `Granit.Core.MultiTenancy`) sans déclarer de `[DependsOn]`
+> vers `GranitMultiTenancyModule`. Un `NullTenantContext` est enregistré par défaut par
+> `AddGranit<T>()`. Si `GranitMultiTenancyModule` est dans le graphe, il remplace cet
+> enregistrement par l'implémentation réelle. Voir
+> [core.md — Dépendance optionnelle sur le multi-tenancy](core.md#dépendance-optionnelle-sur-le-multi-tenancy).
 
 Ordre de chargement résolu pour `GuavaHostModule` (tri topologique) :
 
@@ -244,8 +257,9 @@ Ordre de chargement résolu pour `GuavaHostModule` (tri topologique) :
 3. GranitSecurityModule
 4. GranitObservabilityModule
 5. GranitVaultModule
-6. GranitPersistenceModule    (après Timing, Guids, Security)
-7. GuavaHostModule                (après tous les autres)
+6. GranitMultiTenancyModule
+7. GranitPersistenceModule    (après Timing, Guids, Security)
+8. GuavaHostModule            (après tous les autres)
 ```
 
 ## Point d'entrée : AddGranitAsync / UseGranitAsync
@@ -408,6 +422,9 @@ Granit.Core
 │   ├── FullAuditedEntity.cs        (+ ISoftDeletable)
 │   ├── ISoftDeletable.cs
 │   └── AuditLogEntry.cs
+├── MultiTenancy/
+│   ├── ICurrentTenant.cs           (interface — disponible sans Granit.MultiTenancy)
+│   └── NullTenantContext.cs        (Null Object, enregistré par défaut)
 ├── Modularity/
 │   ├── GranitModule.cs         (classe de base)
 │   ├── DependsOnAttribute.cs       (déclaration de dépendances)

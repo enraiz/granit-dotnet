@@ -5,7 +5,7 @@ using Granit.Features.Exceptions;
 using Granit.Features.Store;
 using Granit.Features.ValueProviders;
 using Granit.Features.ValueTypes;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;

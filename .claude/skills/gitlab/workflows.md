@@ -3,6 +3,30 @@
 Detailed workflows for issue management.
 In all examples, `$PROJECT` and `$PROJECT_ENCODED` are injected dynamically by SKILL.md.
 
+## Create a Merge Request — GitFlow rules
+
+**Default target branch:**
+
+| Source branch | Target | Exception |
+| ------------- | ------ | --------- |
+| `feature/*` | `develop` | Only if user explicitly says "target main" |
+| `fix/*` | `develop` | Only if user explicitly says "target main" |
+| `hotfix/*` | `main` **and** `develop` | Always both |
+| `release/*` | `main` **and** `develop` | Always both |
+
+**NEVER** create a MR targeting `main` for a `feature/*` or `fix/*` branch unless
+the user explicitly requests it. If the target is ambiguous, ask before creating.
+
+```bash
+# Standard feature MR
+glab mr create \
+  -R "$PROJECT" \
+  --source-branch feature/my-feature \
+  --target-branch develop \
+  --title "feat: ..." \
+  --no-editor
+```
+
 ## Create a Story
 
 1. Read any existing related issues or the parent Feature before creating, to avoid

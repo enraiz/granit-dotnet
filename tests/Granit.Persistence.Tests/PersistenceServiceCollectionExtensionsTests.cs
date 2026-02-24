@@ -8,7 +8,7 @@
 
 using FluentAssertions;
 using Granit.Core.DataFiltering;
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Granit.Persistence.Extensions;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;

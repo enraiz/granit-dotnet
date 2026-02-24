@@ -43,6 +43,13 @@
       "granit.core": {
         "type": "Project"
       },
+      "granit.localization": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )"
+        }
+      },
       "granit.multitenancy": {
         "type": "Project",
         "dependencies": {

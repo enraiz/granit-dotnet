@@ -1,12 +1,16 @@
 {
   "permissions": {
     "allow": [
-<<<<<<< HEAD
       "WebFetch(domain:abp.io)",
-      "Bash(git merge:*)"
-=======
-      "mcp__sonarqube__sonar_quality_gate"
->>>>>>> feature/settings-module
+      "Bash(git merge:*)",
+      "mcp__sonarqube__sonar_quality_gate",
+      "Bash(glab *)",
+      "Bash(glab -R:*)",
+      "Bash(dotnet *)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(python3:*)"
     ]
   }
 }

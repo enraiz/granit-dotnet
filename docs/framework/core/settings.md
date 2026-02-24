@@ -182,15 +182,77 @@ Format des clés de cache : `{ProviderName}:{ProviderKey}:{SettingName}`
 
 L'expiration est configurable via `SettingsOptions.CacheExpiration` (défaut : 30 min).
 
-## Store par défaut
+## Persistance EF Core (production)
 
-`InMemorySettingStore` (development/tests) est remplacé en production par
-`EfCoreSettingStore` via `GranitSettingsEntityFrameworkCoreModule` :
+`InMemorySettingStore` est uniquement destiné aux tests et au développement.
+En production, utiliser `Granit.Settings.EntityFrameworkCore` qui persiste les
+valeurs dans la base de données de l'application (zéro connexion supplémentaire).
+
+### 1 — Module
 
 ```csharp
-[DependsOn(typeof(GranitSettingsEntityFrameworkCoreModule))]
+[DependsOn(
+    typeof(GranitSettingsModule),
+    typeof(GranitSettingsEntityFrameworkCoreModule))]
 public sealed class AppModule : GranitModule { }
 ```
+
+### 2 — DbContext hôte
+
+Le DbContext de l'application doit implémenter `ISettingsDbContext` et appeler
+`modelBuilder.ConfigureSettingsModule()` dans `OnModelCreating` :
+
+```csharp
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+    : DbContext(options), ISettingsDbContext
+{
+    public DbSet<SettingRecord> SettingRecords { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ConfigureSettingsModule();  // crée granit_setting_records
+    }
+}
+```
+
+### 3 — Enregistrement du store
+
+```csharp
+// Program.cs — remplace InMemorySettingStore par EfCoreSettingStore
+builder.AddGranitSettingsEfCore<AppDbContext>();
+```
+
+Cette extension utilise `IServiceScopeFactory` pour résoudre le DbContext
+depuis un Singleton (pattern standard pour consommer un service Scoped depuis
+un Singleton).
+
+### 4 — Migration
+
+```bash
+dotnet ef migrations add InitSettings \
+  --project src/MyApp \
+  --startup-project src/MyApp
+```
+
+La migration crée la table `granit_setting_records` avec un index unique sur
+`(Name, ProviderName, ProviderKey)`.
+
+### Schéma de la table
+
+| Colonne | Type | Contraintes |
+| --- | --- | --- |
+| `Id` | `uuid` | PK |
+| `Name` | `varchar(256)` | NOT NULL |
+| `ProviderName` | `varchar(4)` | NOT NULL (`"G"`, `"T"`, `"U"`) |
+| `ProviderKey` | `varchar(256)` | NULL (null = global) |
+| `Value` | `text` | NULL |
+| `CreatedAt` | `timestamptz` | NOT NULL — audit HDS |
+| `CreatedBy` | `varchar(256)` | NOT NULL — audit HDS |
+| `ModifiedAt` | `timestamptz` | NULL |
+| `ModifiedBy` | `varchar(256)` | NULL |
+
+Index unique : `uq_granit_setting_records_name_provider` sur `(Name, ProviderName, ProviderKey)`.
 
 ## Architecture
 

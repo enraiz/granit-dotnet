@@ -1,4 +1,4 @@
-using Granit.MultiTenancy;
+using Granit.Core.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.BlobStorage.EntityFrameworkCore.Internal;

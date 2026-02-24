@@ -1,6 +1,6 @@
 using Granit.BlobStorage.Exceptions;
+using Granit.Core.MultiTenancy;
 using Granit.Guids;
-using Granit.MultiTenancy;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 
