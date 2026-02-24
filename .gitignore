@@ -12,6 +12,13 @@ out/
 nupkgs/
 TestResults/
 
+# --- Coverage (généré par dotnet test + ReportGenerator) ---
+coverage.opencover.xml
+coverage.cobertura.xml
+**/coverage.opencover.xml
+**/coverage.cobertura.xml
+coverage-report/
+
 # --- Environnement ---
 .env
 .env.*
