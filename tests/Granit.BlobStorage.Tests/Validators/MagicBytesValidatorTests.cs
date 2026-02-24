@@ -14,9 +14,7 @@ public sealed class MagicBytesValidatorTests
             tenantId: "tenant-abc",
             containerName: "prescriptions",
             objectKey: "tenant-abc/prescriptions/2026/02/some-id",
-            originalFileName: "file",
-            declaredContentType: contentType,
-            maxAllowedBytes: 10_000_000L,
+            request: new BlobUploadRequest("file", contentType, 10_000_000L),
             createdAt: Now);
 
     private static BlobValidationContext MakeContext(BlobDescriptor descriptor, byte[] bytes) =>

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Granit.BlobStorage.Internal;
@@ -6,29 +7,30 @@ using Microsoft.Extensions.Options;
 namespace Granit.BlobStorage.S3.Internal;
 
 /// <summary>
-/// S3 implementation of <see cref="IBlobPresignedUrlGenerator"/> and <see cref="IBlobObjectClient"/>.
+/// S3 implementation of <see cref="IBlobStorageClient"/>.
 /// Uses AWSSDK.S3 with a configurable <see cref="S3BlobOptions.ServiceUrl"/> for S3-compatible providers.
 /// </summary>
-internal sealed class S3BlobClient : IBlobPresignedUrlGenerator, IBlobObjectClient, IDisposable
+// Infrastructure adapter over AmazonS3Client. Unit testing requires a live S3-compatible endpoint.
+[ExcludeFromCodeCoverage]
+internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
 {
     private readonly AmazonS3Client _s3;
-    private readonly S3BlobOptions _options;
 
     public S3BlobClient(IOptions<S3BlobOptions> options)
     {
-        _options = options.Value;
+        S3BlobOptions opts = options.Value;
 
         AmazonS3Config config = new()
         {
-            ServiceURL = _options.ServiceUrl,
-            ForcePathStyle = _options.ForcePathStyle,
-            AuthenticationRegion = _options.Region,
+            ServiceURL = opts.ServiceUrl,
+            ForcePathStyle = opts.ForcePathStyle,
+            AuthenticationRegion = opts.Region,
             // Disable AWS SDK telemetry — we are consuming the S3 protocol, not AWS infrastructure.
             LogResponse = false,
             LogMetrics = false,
         };
 
-        Amazon.Runtime.BasicAWSCredentials credentials = new(_options.AccessKey, _options.SecretKey);
+        Amazon.Runtime.BasicAWSCredentials credentials = new(opts.AccessKey, opts.SecretKey);
         _s3 = new AmazonS3Client(credentials, config);
     }
 

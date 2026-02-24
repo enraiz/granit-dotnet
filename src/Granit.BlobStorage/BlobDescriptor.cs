@@ -10,8 +10,8 @@ namespace Granit.BlobStorage;
 /// </para>
 /// <para>
 /// Legal state transitions:
-/// <c>Pending → Uploading → Valid → Deleted</c> or
-/// <c>Pending → Uploading → Rejected</c>.
+/// <c>Pending -> Uploading -> Valid -> Deleted</c> or
+/// <c>Pending -> Uploading -> Rejected</c>.
 /// </para>
 /// <para>
 /// RGPD / HDS: records are <b>never deleted from the database</b>.
@@ -31,18 +31,16 @@ public sealed class BlobDescriptor
         string tenantId,
         string containerName,
         string objectKey,
-        string originalFileName,
-        string declaredContentType,
-        long maxAllowedBytes,
+        BlobUploadRequest request,
         DateTimeOffset createdAt) => new()
         {
             Id = id,
             TenantId = tenantId,
             ContainerName = containerName,
             ObjectKey = objectKey,
-            OriginalFileName = originalFileName,
-            DeclaredContentType = declaredContentType,
-            MaxAllowedBytes = maxAllowedBytes,
+            OriginalFileName = request.FileName,
+            DeclaredContentType = request.ContentType,
+            MaxAllowedBytes = request.MaxAllowedBytes,
             Status = BlobStatus.Pending,
             CreatedAt = createdAt,
         };

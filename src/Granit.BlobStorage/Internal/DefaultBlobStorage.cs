@@ -13,8 +13,7 @@ namespace Granit.BlobStorage.Internal;
 internal sealed class DefaultBlobStorage(
     IBlobDescriptorStore store,
     IBlobKeyStrategy keyStrategy,
-    IBlobPresignedUrlGenerator urlGenerator,
-    IBlobObjectClient objectClient,
+    IBlobStorageClient storageClient,
     IGuidGenerator guidGenerator,
     IClock clock,
     ICurrentTenant currentTenant,
@@ -43,14 +42,12 @@ internal sealed class DefaultBlobStorage(
             tenantId: currentTenant.Id.Value.ToString(),
             containerName: containerName,
             objectKey: objectKey,
-            originalFileName: request.FileName,
-            declaredContentType: request.ContentType,
-            maxAllowedBytes: request.MaxAllowedBytes,
+            request: request,
             createdAt: clock.Now);
 
         await store.SaveAsync(descriptor, cancellationToken);
 
-        PresignedUploadTicket ticket = await urlGenerator.GenerateUploadTicketAsync(
+        PresignedUploadTicket ticket = await storageClient.GenerateUploadTicketAsync(
             bucket,
             objectKey,
             blobId,
@@ -78,7 +75,7 @@ internal sealed class DefaultBlobStorage(
         TimeSpan expiry = options?.Expiry ?? Options.DownloadUrlExpiry;
         string bucket = keyStrategy.ResolveBucketName(containerName);
 
-        return await urlGenerator.GenerateDownloadUrlAsync(
+        return await storageClient.GenerateDownloadUrlAsync(
             bucket,
             descriptor.ObjectKey,
             options,
@@ -107,7 +104,7 @@ internal sealed class DefaultBlobStorage(
             throw new BlobNotFoundException(blobId, containerName);
         }
 
-        // Idempotency: already deleted → no-op.
+        // Idempotency: already deleted -> no-op.
         if (descriptor.Status == BlobStatus.Deleted)
         {
             return;
@@ -115,7 +112,7 @@ internal sealed class DefaultBlobStorage(
 
         string bucket = keyStrategy.ResolveBucketName(containerName);
 
-        await objectClient.DeleteObjectAsync(bucket, descriptor.ObjectKey, cancellationToken);
+        await storageClient.DeleteObjectAsync(bucket, descriptor.ObjectKey, cancellationToken);
 
         descriptor.MarkAsDeleted(clock.Now, deletionReason);
         await store.UpdateAsync(descriptor, cancellationToken);
