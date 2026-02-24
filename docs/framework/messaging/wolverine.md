@@ -44,7 +44,7 @@ Configure :
 
 - Routing local des `IDomainEvent` → queue `"domain-events"` (jamais routés vers des transports externes)
 - Politique de retry globale lue depuis `WolverineMessagingOptions`
-- Propagation de contexte : `OutgoingContextMiddleware`, `TenantContextBehavior`, `UserContextBehavior`
+- Propagation de contexte : `OutgoingContextMiddleware`, `TenantContextBehavior`, `UserContextBehavior`, `TraceContextBehavior`
 - `WolverineCurrentUserService` comme implémentation de `ICurrentUserService`
 
 ### GranitWolverinePostgresqlModule
@@ -84,23 +84,31 @@ explicitement avant tout write. Ne pas utiliser `Lightweight` en production.
 
 ## Propagation du contexte
 
-Lors de l'émission d'un message, deux headers sont injectés automatiquement dans l'enveloppe :
+Lors de l'émission d'un message, trois headers sont injectés automatiquement dans l'enveloppe :
 
 | Header | Source | Comportement |
 | --- | --- | --- |
 | `X-Tenant-Id` | `ICurrentTenant.Id` | Omis si aucun tenant actif |
 | `X-User-Id` | `ICurrentUserService.UserId` | Omis si non authentifié |
+| `traceparent` | `Activity.Current?.Id` (W3C) | Omis si aucune trace OTel active |
 
 À la réception, les behaviors restaurent le contexte avant l'exécution du handler :
 
 ```text
 [Incoming message]
-  → TenantContextBehavior.Before()   — restaure ICurrentTenant via AsyncLocal
-  → UserContextBehavior.Before()     — restaure ICurrentUserService via AsyncLocal
+  → TenantContextBehavior.Before()    — restaure ICurrentTenant via AsyncLocal
+  → UserContextBehavior.Before()      — restaure ICurrentUserService via AsyncLocal
+  → TraceContextBehavior.Before()     — démarre une activity bridge liée au trace-id d'origine
   → [Handler]
-  → UserContextBehavior.After()      — dispose le scope
-  → TenantContextBehavior.After()    — dispose le scope
+  → TraceContextBehavior.After()      — dispose l'activity bridge
+  → UserContextBehavior.After()       — dispose le scope
+  → TenantContextBehavior.After()     — dispose le scope
 ```
+
+La propagation du `traceparent` permet de corréler visuellement une requête HTTP et tous
+ses traitements Wolverine asynchrones dans Grafana/Tempo sous un même `trace-id`.
+
+→ Voir [diagnostics/wolverine-tracing.md](../diagnostics/wolverine-tracing.md) pour le détail.
 
 ### WolverineCurrentUserService
 

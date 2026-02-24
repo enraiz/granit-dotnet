@@ -45,6 +45,7 @@ Surveillance, débogage et exposition du comportement de l'application.
 | --- | --- |
 | [logging.md](diagnostics/logging.md) | Serilog, enrichisseurs, bonnes pratiques HDS |
 | [observability.md](diagnostics/observability.md) | OpenTelemetry, OTLP, Loki/Tempo/Mimir |
+| [wolverine-tracing.md](diagnostics/wolverine-tracing.md) | Traçage distribué Wolverine — propagation W3C Trace Context dans l'Outbox |
 | [diagnostics.md](diagnostics/diagnostics.md) | Health checks, métriques, ActivitySource |
 | [exception-handling.md](diagnostics/exception-handling.md) | Gestion des erreurs, ProblemDetails |
 
@@ -98,4 +99,5 @@ Briques utilitaires transverses.
 | --- | --- |
 | [timing.md](utilities/timing.md) | IClock, ICurrentTimezoneProvider, FakeTimeProvider |
 | [guids.md](utilities/guids.md) | IGuidGenerator, GUID séquentiels pour index clustered |
+| [validation/index.md](utilities/validation/index.md) | Validation FluentValidation : identifiants légaux BE/FR, TVA UE, paiements, contacts |
 | [localization/index.md](utilities/localization/index.md) | Localisation, ressources multilingues, endpoint HTTP SPA |

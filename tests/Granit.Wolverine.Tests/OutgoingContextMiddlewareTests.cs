@@ -1,10 +1,11 @@
 // =============================================================================
 // Tests - OutgoingContextMiddleware
 // =============================================================================
-// Verifies that X-Tenant-Id and X-User-Id headers are correctly injected into
-// outgoing Wolverine envelopes according to the current tenant/user context.
+// Verifies that X-Tenant-Id, X-User-Id, and traceparent headers are correctly
+// injected into outgoing Wolverine envelopes according to the current context.
 // =============================================================================
 
+using System.Diagnostics;
 using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Security;
@@ -15,9 +16,38 @@ using Xunit;
 
 namespace Granit.Wolverine.Tests;
 
-public sealed class OutgoingContextMiddlewareTests
+public sealed class OutgoingContextMiddlewareTests : IDisposable
 {
+    private static readonly ActivitySource TestSource = new("test-source");
+    private readonly ActivityListener _listener;
+
+    public OutgoingContextMiddlewareTests()
+    {
+        _listener = new ActivityListener
+        {
+            ShouldListenTo = _ => true,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) =>
+                ActivitySamplingResult.AllDataAndRecorded
+        };
+        ActivitySource.AddActivityListener(_listener);
+    }
+
+    public void Dispose() => _listener.Dispose();
+
     private static Envelope CreateEnvelope() => new();
+
+    private static (ICurrentTenant, ICurrentUserService) CreateNullContext()
+    {
+        ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
+        tenant.Id.Returns((Guid?)null);
+        ICurrentUserService userService = Substitute.For<ICurrentUserService>();
+        userService.IsAuthenticated.Returns(false);
+        return (tenant, userService);
+    }
+
+    // -------------------------------------------------------------------------
+    // Tenant + User headers (existing behaviour)
+    // -------------------------------------------------------------------------
 
     [Fact]
     public void Before_WithTenantAndUser_SetsBothHeaders()
@@ -134,5 +164,55 @@ public sealed class OutgoingContextMiddlewareTests
         middleware.Before(envelope);
 
         envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).Should().BeFalse();
+    }
+
+    // -------------------------------------------------------------------------
+    // traceparent header (W3C Trace Context propagation)
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void Before_WithActiveActivity_SetsTraceParentHeader()
+    {
+        (ICurrentTenant tenant, ICurrentUserService userService) = CreateNullContext();
+        OutgoingContextMiddleware middleware = new(tenant, userService);
+        Envelope envelope = CreateEnvelope();
+
+        using Activity activity = TestSource.StartActivity("http.request")!;
+
+        middleware.Before(envelope);
+
+        envelope.Headers[OutgoingContextMiddleware.TraceParentHeader]
+            .Should().Be(activity.Id);
+    }
+
+    [Fact]
+    public void Before_WithActiveActivity_TraceParentMatchesW3CFormat()
+    {
+        (ICurrentTenant tenant, ICurrentUserService userService) = CreateNullContext();
+        OutgoingContextMiddleware middleware = new(tenant, userService);
+        Envelope envelope = CreateEnvelope();
+
+        using Activity _ = TestSource.StartActivity("http.request")!;
+
+        middleware.Before(envelope);
+
+        string? traceParent = envelope.Headers[OutgoingContextMiddleware.TraceParentHeader];
+        // W3C format: 00-{32 hex}-{16 hex}-{2 hex}
+        traceParent.Should().MatchRegex(@"^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$");
+    }
+
+    [Fact]
+    public void Before_WithoutActiveActivity_DoesNotSetTraceParentHeader()
+    {
+        // Ensure no ambient activity is active for this test.
+        Activity.Current = null;
+
+        (ICurrentTenant tenant, ICurrentUserService userService) = CreateNullContext();
+        OutgoingContextMiddleware middleware = new(tenant, userService);
+        Envelope envelope = CreateEnvelope();
+
+        middleware.Before(envelope);
+
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.TraceParentHeader).Should().BeFalse();
     }
 }

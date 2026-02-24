@@ -1,5 +1,7 @@
+using FluentValidation;
 using Granit.Security;
 using Granit.Wolverine.Behaviors;
+using Granit.Wolverine.Diagnostics;
 using Granit.Wolverine.Internal;
 using Granit.Wolverine.Middleware;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Wolverine;
 using Wolverine.ErrorHandling;
+using Wolverine.FluentValidation;
 
 namespace Granit.Wolverine.Extensions;
 
@@ -24,10 +27,13 @@ public static class WolverineHostApplicationBuilderExtensions
     /// Configures Wolverine with:
     /// <list type="bullet">
     ///   <item>Local routing for <see cref="Granit.Core.Events.IDomainEvent"/> — never routed to external transports.</item>
-    ///   <item>Retry policy from <see cref="WolverineMessagingOptions"/> (default: 5 s / 30 s / 5 min).</item>
-    ///   <item><see cref="OutgoingContextMiddleware"/> — injects <c>X-Tenant-Id</c> / <c>X-User-Id</c> into outgoing envelopes.</item>
+    ///   <item>FluentValidation bus middleware — validates messages before handler execution via <see cref="RegistrationBehavior.DiscoverAndRegisterValidators"/>.</item>
+    ///   <item>DLQ policy — <see cref="FluentValidation.ValidationException"/> is moved to the error queue immediately (no retry, deterministic failure).</item>
+    ///   <item>Retry policy from <see cref="WolverineMessagingOptions"/> (default: 5 s / 30 s / 5 min) for all other exceptions.</item>
+    ///   <item><see cref="OutgoingContextMiddleware"/> — injects <c>X-Tenant-Id</c> / <c>X-User-Id</c> / <c>traceparent</c> into outgoing envelopes.</item>
     ///   <item><see cref="TenantContextBehavior"/> — restores <c>ICurrentTenant</c> in background handlers.</item>
     ///   <item><see cref="UserContextBehavior"/> — restores <c>ICurrentUserService</c> in background handlers.</item>
+    ///   <item><see cref="TraceContextBehavior"/> — restores W3C Trace Context in background handlers, linking Outbox spans to the originating HTTP request trace (source: <see cref="WolverineActivitySource.Name"/>).</item>
     ///   <item>No Outbox — add a provider module (e.g., <c>AddGranitWolverineWithPostgresql()</c>).</item>
     /// </list>
     /// </remarks>
@@ -70,7 +76,15 @@ public static class WolverineHostApplicationBuilderExtensions
             opts.PublishMessage<Core.Events.IDomainEvent>()
                 .ToLocalQueue("domain-events");
 
-            // Global retry policy — applied to all unhandled exceptions.
+            // FluentValidation bus middleware: validates incoming messages before handler
+            // execution using IValidator<T> instances discovered from the DI container.
+            opts.UseFluentValidation(RegistrationBehavior.DiscoverAndRegisterValidators);
+
+            // DLQ policy for validation failures: deterministic failures must not be retried.
+            // MUST be declared before OnAnyException() so it takes priority.
+            opts.OnException<ValidationException>().MoveToErrorQueue();
+
+            // Global retry policy — applied to all other unhandled exceptions.
             TimeSpan[] delays = messagingOptions.RetryDelays
                 .Take(messagingOptions.MaxRetryAttempts)
                 .ToArray();
@@ -81,6 +95,7 @@ public static class WolverineHostApplicationBuilderExtensions
             opts.Policies.AddMiddleware<OutgoingContextMiddleware>();
             opts.Policies.AddMiddleware<TenantContextBehavior>();
             opts.Policies.AddMiddleware<UserContextBehavior>();
+            opts.Policies.AddMiddleware<TraceContextBehavior>();
 
             configure?.Invoke(opts);
         });

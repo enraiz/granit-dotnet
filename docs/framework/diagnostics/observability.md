@@ -175,3 +175,15 @@ Les attributs de ressource OpenTelemetry sont configurés automatiquement :
 | `OpenTelemetry.Instrumentation.Http` | Instrumentation automatique HttpClient |
 | `OpenTelemetry.Instrumentation.EntityFrameworkCore` | Instrumentation automatique EF Core |
 | `OpenTelemetry.Exporter.OpenTelemetryProtocol` | Export gRPC vers le collecteur |
+
+## Intégration Granit.Wolverine
+
+Lorsque `Granit.Wolverine` est installé, `AddGranitObservability()` enregistre
+automatiquement la source `Granit.Wolverine` dans le tracer OTel. Cela permet
+d'exporter les **spans bridge** créés par `TraceContextBehavior` lors du traitement
+des messages Outbox.
+
+Résultat : une requête HTTP et tous les traitements Wolverine asynchrones qu'elle
+déclenche apparaissent sous le **même `trace-id`** dans Grafana/Tempo.
+
+→ Voir [wolverine-tracing.md](wolverine-tracing.md) pour le détail.

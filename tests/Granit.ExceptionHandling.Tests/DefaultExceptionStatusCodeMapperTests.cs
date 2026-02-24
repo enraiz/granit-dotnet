@@ -74,6 +74,27 @@ public sealed class DefaultExceptionStatusCodeMapperTests
     }
 
     [Fact]
+    public void BusinessRuleViolationException_Returns422()
+    {
+        DefaultExceptionStatusCodeMapper mapper = Create();
+
+        int? result = mapper.TryGetStatusCode(new BusinessRuleViolationException("Appointment:SlotUnavailable"));
+
+        result.Should().Be(StatusCodes.Status422UnprocessableEntity);
+    }
+
+    [Fact]
+    public void BusinessRuleViolationException_TreatedAs422_NotInheritedAs400()
+    {
+        DefaultExceptionStatusCodeMapper mapper = Create();
+        BusinessException exception = new BusinessRuleViolationException("Appointment:SlotUnavailable");
+
+        int? result = mapper.TryGetStatusCode(exception);
+
+        result.Should().Be(StatusCodes.Status422UnprocessableEntity);
+    }
+
+    [Fact]
     public void ConflictException_Returns409()
     {
         DefaultExceptionStatusCodeMapper mapper = Create();
