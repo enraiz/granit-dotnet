@@ -54,6 +54,8 @@ app.Run();
 | `Description` | `string?` | `null` | Description Markdown dans l'info block OpenAPI |
 | `ContactEmail` | `string?` | `null` | Email de contact dans l'info block OpenAPI |
 | `EnableInProduction` | `bool` | `false` | Expose l'UI Scalar en production si `true` |
+| `EnableTenantHeader` | `bool` | `false` | Ajoute le header tenant comme paramètre requis |
+| `TenantHeaderName` | `string` | `"X-Tenant-Id"` | Nom du header tenant dans la documentation |
 
 ### Configuration programmatique
 
@@ -76,16 +78,31 @@ Pour `MajorVersions: [1, 2]`, les endpoints suivants sont créés :
 - `/openapi/v2.json` — document OpenAPI version 2
 - `/scalar/{documentName}` — UI Scalar avec sélecteur de version
 
+## Compatibilité Wolverine HTTP
+
+Le module supporte nativement les endpoints Wolverine HTTP en plus des contrôleurs MVC.
+Tous les transformers (InternalApi, JWT Bearer, tenant header, réponses d'erreur)
+fonctionnent de manière identique sur les deux types d'endpoints.
+
+Wolverine expose ses endpoints via `IApiDescriptionProvider`, et les métadonnées
+(`[Authorize]`, `[AllowAnonymous]`, attributs personnalisés) sont propagées dans
+`EndpointMetadata`. Aucune configuration supplémentaire n'est nécessaire.
+
+> **Note** : Wolverine ajoute une réponse 404 fantôme sur tous les endpoints.
+> Le transformer RFC 7807 supprime automatiquement ces 404 sur les endpoints
+> sans paramètre de route.
+
 ## Attribut `[InternalApi]`
 
 L'attribut `[InternalApi]` exclut silencieusement un contrôleur ou une action de tous
-les documents OpenAPI générés. Il est idéal pour :
+les documents OpenAPI générés. Il fonctionne sur les contrôleurs MVC et les endpoints
+Wolverine HTTP. Il est idéal pour :
 
 - Les webhooks de réception d'événements
 - Les endpoints de synchronisation inter-microservices
 - Les routes d'administration brutes qui ne doivent pas figurer dans la documentation
 
-### Application sur un contrôleur entier
+### Application sur un contrôleur MVC
 
 ```csharp
 using Granit.ApiDocumentation.Attributes;
@@ -115,6 +132,76 @@ public sealed class AppointmentController : ControllerBase
     public IActionResult BulkImport() => Ok(); // absent du document OpenAPI
 }
 ```
+
+### Application sur un endpoint Wolverine HTTP
+
+```csharp
+using Granit.ApiDocumentation.Attributes;
+
+public static class InternalSyncEndpoint
+{
+    [InternalApi]
+    [WolverinePost("/api/v1/internal/sync")]
+    public static SyncResponse Post(SyncCommand command) => new();
+}
+```
+
+## Header multi-tenant
+
+Quand `EnableTenantHeader = true`, le module ajoute automatiquement un paramètre de
+header requis (`X-Tenant-Id` par défaut) sur toutes les opérations OpenAPI. Cela
+permet aux consommateurs de l'API de voir le header tenant dans la documentation
+et de l'envoyer depuis l'UI Scalar.
+
+```json
+{
+  "ApiDocumentation": {
+    "EnableTenantHeader": true,
+    "TenantHeaderName": "X-Tenant-Id"
+  }
+}
+```
+
+### Exclure un endpoint du header tenant
+
+L'attribut `[AllowAnonymousTenant]` (dans `Granit.Core.MultiTenancy`) exclut un
+endpoint du header tenant dans la documentation. Cela suit le pattern de dépendance
+souple : l'attribut est disponible partout via `Granit.Core` sans dépendance dure
+sur `Granit.MultiTenancy`.
+
+```csharp
+using Granit.Core.MultiTenancy;
+
+public static class HealthCheckEndpoint
+{
+    [AllowAnonymousTenant]
+    [WolverineGet("/api/v1/health")]
+    public static HealthResponse Get() => new();
+}
+```
+
+## Réponses d'erreur RFC 7807
+
+Le module ajoute automatiquement des réponses d'erreur
+`application/problem+json` (RFC 7807) sur les opérations OpenAPI en fonction
+des métadonnées de l'endpoint :
+
+| Code | Condition | Description |
+| ---- | --------- | ----------- |
+| 401 | `[Authorize]` sans `[AllowAnonymous]` | Non authentifié |
+| 403 | `[Authorize]` sans `[AllowAnonymous]` | Non autorisé |
+| 422 | Opération avec un corps de requête | Erreur de validation |
+| 500 | Toujours | Erreur interne du serveur |
+
+Les réponses existantes ne sont pas écrasées. Si l'opération définit déjà une
+réponse 500 personnalisée, le transformer la conserve.
+
+### Nettoyage des 404 fantômes Wolverine
+
+Wolverine ajoute une réponse 404 sur tous les endpoints, y compris ceux qui n'ont
+pas de paramètre de route. Le transformer supprime automatiquement ces 404 fantômes
+sur les endpoints sans paramètre `{id}` dans la route, tout en les conservant sur les
+endpoints avec paramètre de route (où un 404 est légitime).
 
 ## Intégration JWT Bearer
 

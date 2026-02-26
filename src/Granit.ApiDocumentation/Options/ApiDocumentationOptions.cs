@@ -29,4 +29,17 @@ public sealed class ApiDocumentationOptions
     /// Default: <c>false</c> — UI is enabled in Development only.
     /// </summary>
     public bool EnableInProduction { get; set; }
+
+    /// <summary>
+    /// When <c>true</c>, documents a required tenant header on all endpoints except those
+    /// decorated with <c>[AllowAnonymousTenant]</c>.
+    /// Default: <c>false</c>.
+    /// </summary>
+    public bool EnableTenantHeader { get; set; }
+
+    /// <summary>
+    /// Name of the HTTP header that carries the tenant identifier.
+    /// Default: <c>"X-Tenant-Id"</c>.
+    /// </summary>
+    public string TenantHeaderName { get; set; } = "X-Tenant-Id";
 }

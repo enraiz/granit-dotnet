@@ -80,7 +80,7 @@ public sealed class InternalApiDocumentTransformerTests
         document.Paths.Should().ContainKey("/api/v1/public");
     }
 
-    // --- Non-ControllerActionDescriptor → path kept ---
+    // --- Non-ControllerActionDescriptor without [InternalApi] → path kept ---
 
     [Fact]
     public async Task TransformAsync_NonControllerDescriptor_PathKept()
@@ -89,7 +89,6 @@ public sealed class InternalApiDocumentTransformerTests
         InternalApiDocumentTransformer transformer = new();
         OpenApiDocument document = BuildDocument("/api/v1/minimal");
 
-        // ApiDescription with a non-ControllerActionDescriptor (e.g. minimal API endpoint)
         Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor nonControllerDescriptor = new();
         ApiDescription apiDesc = new()
         {
@@ -109,6 +108,39 @@ public sealed class InternalApiDocumentTransformerTests
 
         // Assert
         document.Paths.Should().ContainKey("/api/v1/minimal");
+    }
+
+    // --- Non-ControllerActionDescriptor with [InternalApi] in EndpointMetadata → path removed ---
+    // Covers Wolverine HTTP endpoints where attributes are in EndpointMetadata, not on a ControllerActionDescriptor.
+
+    [Fact]
+    public async Task TransformAsync_WolverineEndpointWithInternalApiMetadata_PathRemoved()
+    {
+        // Arrange
+        InternalApiDocumentTransformer transformer = new();
+        OpenApiDocument document = BuildDocument("/api/v1/wolverine-internal");
+
+        Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor descriptor = new();
+        descriptor.EndpointMetadata = [new InternalApiAttribute()];
+
+        ApiDescription apiDesc = new()
+        {
+            ActionDescriptor = descriptor,
+            RelativePath = "api/v1/wolverine-internal",
+        };
+
+        OpenApiDocumentTransformerContext context = new()
+        {
+            DocumentName = "v1",
+            DescriptionGroups = [new ApiDescriptionGroup("v1", [apiDesc])],
+            ApplicationServices = Substitute.For<IServiceProvider>(),
+        };
+
+        // Act
+        await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
+
+        // Assert
+        document.Paths.Should().NotContainKey("/api/v1/wolverine-internal");
     }
 
     // --- Helpers ---
