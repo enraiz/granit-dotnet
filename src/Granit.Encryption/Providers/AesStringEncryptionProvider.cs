@@ -11,11 +11,13 @@ namespace Granit.Encryption.Providers;
 /// </summary>
 public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
 {
-    // SECURITY: Fixed internal salt for PBKDF2 key derivation.
-    // This is acceptable because the PassPhrase MUST come from Vault (high entropy, 256-bit minimum).
-    // The salt's purpose is to prevent rainbow table attacks on weak PassPhrases;
-    // with a Vault-sourced PassPhrase, the fixed salt does not degrade security.
-    // Changing this salt would invalidate all previously encrypted data — do NOT modify.
+    /// <remarks>
+    /// SECURITY: Fixed internal salt for PBKDF2 key derivation.
+    /// This is acceptable because the PassPhrase MUST come from Vault (high entropy, 256-bit minimum).
+    /// The salt's purpose is to prevent rainbow table attacks on weak PassPhrases;
+    /// with a Vault-sourced PassPhrase, the fixed salt does not degrade security.
+    /// Changing this salt would invalidate all previously encrypted data — do NOT modify.
+    /// </remarks>
     private static readonly byte[] KeyDerivationSalt =
     [
         0x44, 0x44, 0x46, 0x6F, 0x75, 0x6E, 0x64, 0x61,

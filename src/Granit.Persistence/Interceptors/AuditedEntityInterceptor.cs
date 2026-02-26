@@ -57,36 +57,44 @@ public sealed class AuditedEntityInterceptor(
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.CreatedAt = now;
-                    entry.Entity.CreatedBy = userId;
-                    if (entry.Entity.Id == Guid.Empty)
-                    {
-                        entry.Entity.Id = _guidGenerator.Create();
-                    }
-
-                    // Multi-tenant isolation: inject current TenantId if the entity supports it.
-                    // Explicit IsAvailable check per soft-dependency contract (NullTenantContext returns null).
-                    if (entry.Entity is IMultiTenant multiTenant && multiTenant.TenantId is null)
-                    {
-                        multiTenant.TenantId = _currentTenant.IsAvailable ? _currentTenant.Id : null;
-                    }
-
+                    ApplyCreationFields(entry, now, userId);
                     break;
 
                 case EntityState.Modified:
-                    // Protect creation fields from modification
-                    entry.Property(e => e.CreatedAt).IsModified = false;
-                    entry.Property(e => e.CreatedBy).IsModified = false;
-
-                    // Populate modification fields only on AuditedEntity
-                    if (entry.Entity is AuditedEntity audited)
-                    {
-                        audited.ModifiedAt = now;
-                        audited.ModifiedBy = userId;
-                    }
-
+                    ApplyModificationFields(entry, now, userId);
                     break;
             }
+        }
+    }
+
+    private void ApplyCreationFields(EntityEntry<CreationAuditedEntity> entry, DateTimeOffset now, string userId)
+    {
+        entry.Entity.CreatedAt = now;
+        entry.Entity.CreatedBy = userId;
+
+        if (entry.Entity.Id == Guid.Empty)
+        {
+            entry.Entity.Id = _guidGenerator.Create();
+        }
+
+        // Multi-tenant isolation: inject current TenantId if the entity supports it.
+        // Explicit IsAvailable check per soft-dependency contract (NullTenantContext returns null).
+        if (entry.Entity is IMultiTenant multiTenant && multiTenant.TenantId is null)
+        {
+            multiTenant.TenantId = _currentTenant.IsAvailable ? _currentTenant.Id : null;
+        }
+    }
+
+    private static void ApplyModificationFields(EntityEntry<CreationAuditedEntity> entry, DateTimeOffset now, string userId)
+    {
+        // Protect creation fields from modification
+        entry.Property(e => e.CreatedAt).IsModified = false;
+        entry.Property(e => e.CreatedBy).IsModified = false;
+
+        if (entry.Entity is AuditedEntity audited)
+        {
+            audited.ModifiedAt = now;
+            audited.ModifiedBy = userId;
         }
     }
 }
