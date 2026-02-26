@@ -216,6 +216,162 @@ Le bouton **Authorize** apparaît alors dans l'UI Scalar sans configuration supp
 Si l'application n'utilise pas de JWT Bearer, aucune définition de sécurité n'est ajoutée.
 Le transformer vérifie dynamiquement la présence du schéma au démarrage.
 
+## Génération de clients typés
+
+Les documents OpenAPI générés par Granit (`/openapi/v1.json`) peuvent alimenter
+des outils de codegen pour produire des clients HTTP typés. Cela élimine le code
+fetch/HttpClient écrit à la main et garantit la synchronisation client-serveur.
+
+### Clients TypeScript (frontend)
+
+#### orval (recommandé)
+
+[orval](https://orval.dev/) génère des hooks TanStack Query (React Query) typés
+directement depuis le document OpenAPI. Chaque endpoint produit un hook prêt à
+l'emploi.
+
+Installation :
+
+```bash
+npm install -D orval
+```
+
+Configuration `orval.config.ts` :
+
+```typescript
+import { defineConfig } from "orval";
+
+export default defineConfig({
+  guavaApi: {
+    input: {
+      target: "http://localhost:5000/openapi/v1.json",
+    },
+    output: {
+      target: "./src/api/generated.ts",
+      client: "react-query",
+      mode: "tags-split",
+      override: {
+        mutator: {
+          path: "./src/api/custom-fetch.ts",
+          name: "customFetch",
+        },
+        header: (info) => [
+          "/* eslint-disable */",
+          `/* Generated from OpenAPI spec — ${info.title} ${info.version} */`,
+        ],
+      },
+    },
+  },
+});
+```
+
+Génération :
+
+```bash
+npx orval
+```
+
+Le `customFetch` doit injecter le header `X-Tenant-Id` si le multi-tenant est actif :
+
+```typescript
+// src/api/custom-fetch.ts
+export const customFetch = async <T>(url: string, options: RequestInit): Promise<T> => {
+  const tenantId = getTenantId(); // depuis le contexte applicatif
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      ...(tenantId && { "X-Tenant-Id": tenantId }),
+    },
+  });
+  if (!response.ok) throw response;
+  return response.json();
+};
+```
+
+#### openapi-typescript (alternative légère)
+
+[openapi-typescript](https://openapi-ts.dev/) génère uniquement des types TypeScript,
+sans code runtime. Idéal si le projet n'utilise pas React ou préfère un contrôle
+total sur les appels HTTP.
+
+```bash
+npx openapi-typescript http://localhost:5000/openapi/v1.json -o ./src/api/schema.d.ts
+```
+
+Les types générés s'utilisent avec `openapi-fetch` pour un client typé minimal :
+
+```typescript
+import createClient from "openapi-fetch";
+import type { paths } from "./schema";
+
+const client = createClient<paths>({ baseUrl: "http://localhost:5000" });
+
+const { data, error } = await client.GET("/api/v1/patients/{id}", {
+  params: { path: { id: "abc-123" } },
+});
+```
+
+### Clients C# (inter-microservices)
+
+#### Kiota (recommandé)
+
+[Kiota](https://learn.microsoft.com/fr-fr/openapi/kiota/overview) est l'outil
+Microsoft de génération de clients HTTP depuis OpenAPI. Il produit des request
+builders granulaires avec un typage fort.
+
+Installation en outil global :
+
+```bash
+dotnet tool install -g Microsoft.OpenApi.Kiota
+```
+
+Génération :
+
+```bash
+kiota generate \
+  --openapi http://localhost:5000/openapi/v1.json \
+  --language CSharp \
+  --output ./Generated/PatientService \
+  --namespace-name MyApp.Clients.PatientService \
+  --class-name PatientServiceClient
+```
+
+Pour automatiser la régénération au build, ajouter un Target MSBuild dans le
+`.csproj` du projet consommateur :
+
+```xml
+<Target Name="GenerateApiClient" BeforeTargets="CoreCompile"
+        Inputs="$(OpenApiSpec)" Outputs="$(GeneratedDir)/.timestamp">
+  <Exec Command="kiota generate
+    --openapi $(OpenApiSpec)
+    --language CSharp
+    --output $(GeneratedDir)
+    --namespace-name $(RootNamespace).Clients
+    --class-name ApiClient
+    --clean-output" />
+  <Touch Files="$(GeneratedDir)/.timestamp" AlwaysCreate="true" />
+</Target>
+```
+
+> **Note** : NSwag est déprécié de facto (maintenance minimale depuis 2024). Préférer
+> Kiota pour tout nouveau projet.
+
+### Bonnes pratiques
+
+- **Générer depuis le document servi** : pointer vers l'URL de l'API
+  (`/openapi/v1.json`), pas vers un fichier JSON copié manuellement. Cela garantit
+  que le client reflète toujours l'état réel de l'API.
+- **Régénérer en CI** : ajouter une étape dans le pipeline qui régénère le client
+  et échoue si les types changent sans mise à jour du consommateur.
+- **Ne pas committer le code généré** : ajouter le répertoire de sortie dans
+  `.gitignore` et régénérer au build. Si le projet l'exige, marquer les fichiers
+  avec `linguist-generated=true` dans `.gitattributes`.
+- **Header tenant** : si `EnableTenantHeader = true`, le header `X-Tenant-Id`
+  apparaît dans le document OpenAPI et les clients générés l'incluront dans
+  leurs signatures. Configurer l'injection du tenant dans le HTTP handler
+  (middleware DelegatingHandler en C#, intercepteur fetch en TypeScript).
+
 ## Considérations HDS
 
 ### UI en production
