@@ -9,6 +9,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using Microsoft.Extensions.Localization;
+using SmartFormat;
 
 namespace Granit.Localization.Json;
 
@@ -66,7 +67,7 @@ internal sealed class JsonStringLocalizer(
 
             string formatted = arguments.Length == 0
                 ? value
-                : string.Format(CultureInfo.CurrentCulture, value, arguments);
+                : Smart.Format(CultureInfo.CurrentCulture, value, arguments);
 
             return new LocalizedString(name, formatted, resourceNotFound: false);
         }

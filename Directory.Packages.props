@@ -9,6 +9,7 @@
   <!-- =================================================================== -->
   <ItemGroup Label="Localisation">
     <PackageVersion Include="Microsoft.Extensions.Localization" Version="10.*" />
+    <PackageVersion Include="SmartFormat" Version="3.*" />
   </ItemGroup>
   <ItemGroup Label="ASP.NET Core">
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.*" />

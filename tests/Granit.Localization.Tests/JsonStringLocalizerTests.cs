@@ -150,9 +150,50 @@ public sealed class JsonStringLocalizerTests : IDisposable
         var all = localizer.GetAllStrings(includeParentCultures: false).ToList();
 
         // Assert
-        all.Should().HaveCount(3);
+        all.Should().HaveCount(4);
         all.Select(s => s.Name).Should().Contain("Test:Hello");
         all.Select(s => s.Name).Should().Contain("Test:Welcome");
         all.Select(s => s.Name).Should().Contain("Test:Goodbye");
+        all.Select(s => s.Name).Should().Contain("Test:Files:Count");
+    }
+
+    [Theory]
+    [InlineData(0, "Aucun fichier")]
+    [InlineData(1, "Un fichier")]
+    [InlineData(5, "5 fichiers")]
+    [InlineData(100, "100 fichiers")]
+    public void Indexer_WithPluralization_FormatsCorrectly_Fr(int count, string expected)
+    {
+        // Arrange
+        IStringLocalizer localizer = CreateTestLocalizer();
+        CultureInfo.CurrentUICulture = new CultureInfo("fr");
+        CultureInfo.CurrentCulture = new CultureInfo("fr");
+
+        // Act
+        LocalizedString result = localizer["Test:Files:Count", count];
+
+        // Assert
+        result.Value.Should().Be(expected);
+        result.ResourceNotFound.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData(0, "No file")]
+    [InlineData(1, "One file")]
+    [InlineData(5, "5 files")]
+    [InlineData(100, "100 files")]
+    public void Indexer_WithPluralization_FormatsCorrectly_En(int count, string expected)
+    {
+        // Arrange
+        IStringLocalizer localizer = CreateTestLocalizer();
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        CultureInfo.CurrentCulture = new CultureInfo("en");
+
+        // Act
+        LocalizedString result = localizer["Test:Files:Count", count];
+
+        // Assert
+        result.Value.Should().Be(expected);
+        result.ResourceNotFound.Should().BeFalse();
     }
 }
