@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Localization.SourceGenerator</PackageId>
+    <!-- Source generators must target netstandard2.0 for Roslyn compatibility -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Roslyn source generator that produces type-safe C# constants from Granit JSON localization files.</Description>
+    <IsPackable>true</IsPackable>
+    <!-- Generator packages: DLL goes in analyzers/, not in lib/ -->
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!-- Enable extended analyzer correctness rules (RS1xxx) -->
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- NU5128: expected for analyzer/generator packages — output goes to analyzers/, not lib/ -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Pack the generator DLL into the correct NuGet path -->
+    <None Include="$(TargetPath)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Json" PrivateAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <!-- Bundle System.Text.Json into the analyzer package so it resolves at design-time -->
+  <ItemGroup>
+    <None Include="$(PkgSystem_Text_Json)/lib/netstandard2.0/System.Text.Json.dll"
+          Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+</Project>

@@ -3,6 +3,7 @@
   "texts": {
     "Test:Hello": "Hello",
     "Test:Welcome": "Welcome {0}, you have {1} messages",
-    "Test:Goodbye": "Goodbye"
+    "Test:Goodbye": "Goodbye",
+    "Test:Files:Count": "{0:No file|One file|{} files}"
   }
 }
