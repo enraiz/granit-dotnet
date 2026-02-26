@@ -56,6 +56,7 @@ app.Run();
 | `EnableInProduction` | `bool` | `false` | Expose l'UI Scalar en production si `true` |
 | `EnableTenantHeader` | `bool` | `false` | Ajoute le header tenant comme paramètre requis |
 | `TenantHeaderName` | `string` | `"X-Tenant-Id"` | Nom du header tenant dans la documentation |
+| `AuthorizationPolicy` | `string?` | `null` | Policy d'autorisation sur les endpoints doc (voir ci-dessous) |
 
 ### Configuration programmatique
 
@@ -380,8 +381,49 @@ Par défaut, `EnableInProduction = false` : le document OpenAPI et l'UI Scalar
 sont désactivés en production, conformément aux recommandations de sécurité Microsoft.
 
 Si une documentation interne est nécessaire en production (portail développeur interne),
-activer `EnableInProduction = true` en s'assurant que l'endpoint Scalar est protégé
-par un middleware d'authentification.
+activer `EnableInProduction = true` et configurer `AuthorizationPolicy` pour
+protéger l'accès.
+
+### Protection des endpoints de documentation
+
+L'option `AuthorizationPolicy` contrôle l'accès aux endpoints `/openapi/v*.json`
+et `/scalar/*` :
+
+| Valeur | Comportement |
+| ------ | ------------ |
+| `null` (défaut) | Aucune policy — hérite du comportement global de l'application |
+| `""` (chaîne vide) | Accès anonyme explicite (`.AllowAnonymous()`) |
+| `"PolicyName"` | Accès protégé par la policy nommée (`.RequireAuthorization()`) |
+
+#### Portail développeur interne (HDS)
+
+```json
+{
+  "ApiDocumentation": {
+    "EnableInProduction": true,
+    "AuthorizationPolicy": "InternalDeveloper"
+  }
+}
+```
+
+Seuls les utilisateurs authentifiés avec la policy `InternalDeveloper` accèdent
+à la documentation. Le document OpenAPI et l'UI Scalar retournent 401/403 sinon.
+
+#### API publique avec fallback policy globale
+
+Si l'application a une fallback authorization policy (toutes les routes protégées
+par défaut) mais que la documentation doit rester accessible :
+
+```json
+{
+  "ApiDocumentation": {
+    "AuthorizationPolicy": ""
+  }
+}
+```
+
+La chaîne vide applique `.AllowAnonymous()` explicitement sur les endpoints de
+documentation, contournant la fallback policy.
 
 ### Endpoints internes
 

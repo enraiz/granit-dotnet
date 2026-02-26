@@ -16,6 +16,8 @@ public static class ApiDocumentationApplicationBuilderExtensions
     /// Maps OpenAPI JSON endpoints (<c>/openapi/v{n}.json</c>) and the Scalar interactive UI.
     /// Always enabled in Development; in Production only when
     /// <see cref="ApiDocumentationOptions.EnableInProduction"/> is <c>true</c>.
+    /// When <see cref="ApiDocumentationOptions.AuthorizationPolicy"/> is set, the endpoints
+    /// are protected by the specified policy; when empty, anonymous access is explicitly allowed.
     /// </summary>
     public static WebApplication UseGranitApiDocumentation(this WebApplication app)
     {
@@ -30,11 +32,33 @@ public static class ApiDocumentationApplicationBuilderExtensions
 
         foreach (int majorVersion in options.MajorVersions)
         {
-            app.MapOpenApi($"/openapi/v{majorVersion}.json");
+            IEndpointConventionBuilder openApiEndpoint =
+                app.MapOpenApi($"/openapi/v{majorVersion}.json");
+            ApplyAuthorizationPolicy(openApiEndpoint, options.AuthorizationPolicy);
         }
 
-        app.MapScalarApiReference(scalarOptions => scalarOptions.WithTitle(options.Title));
+        IEndpointConventionBuilder scalarEndpoint =
+            app.MapScalarApiReference(scalarOptions => scalarOptions.WithTitle(options.Title));
+        ApplyAuthorizationPolicy(scalarEndpoint, options.AuthorizationPolicy);
 
         return app;
+    }
+
+    private static void ApplyAuthorizationPolicy(
+        IEndpointConventionBuilder endpoint,
+        string? policy)
+    {
+        if (policy is null)
+        {
+            return;
+        }
+
+        if (policy.Length == 0)
+        {
+            endpoint.AllowAnonymous();
+            return;
+        }
+
+        endpoint.RequireAuthorization(policy);
     }
 }

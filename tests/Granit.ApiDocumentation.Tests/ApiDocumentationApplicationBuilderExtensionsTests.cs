@@ -85,4 +85,72 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         // Assert
         result.Should().BeSameAs(app);
     }
+
+    // --- AuthorizationPolicy = null → no explicit policy applied ---
+
+    [Fact]
+    public void UseGranitApiDocumentation_NullPolicy_MapsRoutesWithoutPolicy()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Environment.EnvironmentName = Environments.Development;
+        builder.Services.AddGranitApiDocumentation(opts =>
+        {
+            opts.MajorVersions = [1];
+            opts.AuthorizationPolicy = null;
+        });
+        WebApplication app = builder.Build();
+
+        // Act
+        WebApplication result = app.UseGranitApiDocumentation();
+
+        // Assert
+        result.Should().BeSameAs(app);
+    }
+
+    // --- AuthorizationPolicy = "" → AllowAnonymous applied ---
+
+    [Fact]
+    public void UseGranitApiDocumentation_EmptyPolicy_MapsRoutesWithAllowAnonymous()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Environment.EnvironmentName = Environments.Development;
+        builder.Services.AddGranitApiDocumentation(opts =>
+        {
+            opts.MajorVersions = [1];
+            opts.AuthorizationPolicy = "";
+        });
+        WebApplication app = builder.Build();
+
+        // Act
+        WebApplication result = app.UseGranitApiDocumentation();
+
+        // Assert
+        result.Should().BeSameAs(app);
+    }
+
+    // --- AuthorizationPolicy = "InternalDeveloper" → RequireAuthorization applied ---
+
+    [Fact]
+    public void UseGranitApiDocumentation_NamedPolicy_MapsRoutesWithAuthorization()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Environment.EnvironmentName = Environments.Development;
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy("InternalDeveloper", p => p.RequireAuthenticatedUser());
+        builder.Services.AddGranitApiDocumentation(opts =>
+        {
+            opts.MajorVersions = [1];
+            opts.AuthorizationPolicy = "InternalDeveloper";
+        });
+        WebApplication app = builder.Build();
+
+        // Act
+        WebApplication result = app.UseGranitApiDocumentation();
+
+        // Assert
+        result.Should().BeSameAs(app);
+    }
 }

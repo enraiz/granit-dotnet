@@ -42,4 +42,14 @@ public sealed class ApiDocumentationOptions
     /// Default: <c>"X-Tenant-Id"</c>.
     /// </summary>
     public string TenantHeaderName { get; set; } = "X-Tenant-Id";
+
+    /// <summary>
+    /// Authorization policy applied to the OpenAPI JSON and Scalar UI endpoints.
+    /// <list type="bullet">
+    ///   <item><c>null</c> (default): no explicit policy — inherits the application's global behavior.</item>
+    ///   <item>Empty string (<c>""</c>): explicitly allows anonymous access (<c>.AllowAnonymous()</c>).</item>
+    ///   <item>Policy name (e.g. <c>"InternalDeveloper"</c>): requires authorization with that policy.</item>
+    /// </list>
+    /// </summary>
+    public string? AuthorizationPolicy { get; set; }
 }
