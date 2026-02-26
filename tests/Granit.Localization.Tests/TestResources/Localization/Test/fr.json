@@ -3,6 +3,7 @@
   "texts": {
     "Test:Hello": "Bonjour",
     "Test:Welcome": "Bienvenue {0}, vous avez {1} messages",
-    "Test:Goodbye": "Au revoir"
+    "Test:Goodbye": "Au revoir",
+    "Test:Files:Count": "{0:Aucun fichier|Un fichier|{} fichiers}"
   }
 }

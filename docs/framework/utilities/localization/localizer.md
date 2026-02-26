@@ -27,15 +27,63 @@ string message = localizer["MyKey"];
 
 ## Traduction avec paramètres
 
-Les paramètres `{0}`, `{1}`, etc. sont substitués via `string.Format` :
+Les paramètres `{0}`, `{1}`, etc. sont substitués via
+[SmartFormat.NET](https://github.com/axuno/SmartFormat) (drop-in compatible
+`string.Format`) :
 
 ```csharp
 string message = localizer["Validation.MaxLength", 100];
 // → "Maximum 100 caractères."
 ```
 
-> Quand aucun argument n'est passé, `string.Format` est bypassé pour optimiser les
+> Quand aucun argument n'est passé, le formatage est bypassé pour optimiser les
 > performances (pas d'allocation inutile).
+
+## Pluralisation
+
+SmartFormat.NET fournit la pluralisation automatique basée sur les règles CLDR. La
+syntaxe utilise le pipe (`|`) pour séparer les formes : zéro, singulier, pluriel.
+
+### Format JSON
+
+```json
+{
+  "culture": "fr",
+  "texts": {
+    "Files:Count": "{0:Aucun fichier|Un fichier|{} fichiers}"
+  }
+}
+```
+
+```json
+{
+  "culture": "en",
+  "texts": {
+    "Files:Count": "{0:No file|One file|{} files}"
+  }
+}
+```
+
+Les trois formes séparées par `|` sont :
+
+1. **Zéro** — quand l'argument vaut 0
+2. **Singulier** — quand l'argument vaut 1
+3. **Pluriel** — pour toutes les autres valeurs
+
+`{}` (accolades vides) est remplacé par la valeur de l'argument courant.
+
+### Utilisation en C\#
+
+```csharp
+string zero = localizer["Files:Count", 0];    // → "Aucun fichier"
+string one = localizer["Files:Count", 1];      // → "Un fichier"
+string many = localizer["Files:Count", 42];    // → "42 fichiers"
+```
+
+### Rétrocompatibilité
+
+SmartFormat.NET est un surensemble de `string.Format`. Toutes les traductions
+existantes utilisant `{0}`, `{1}`, etc. continuent de fonctionner sans modification.
 
 ## Vérifier si une traduction existe
 
@@ -202,4 +250,5 @@ localizer["PatientNotFound", Arg.Any<object[]>()]
 | --- | --- |
 | `Microsoft.Extensions.Localization` | `IStringLocalizer`, `IStringLocalizerFactory`, `StringLocalizer<>` |
 | `Microsoft.Extensions.Options` | `IOptions<GranitLocalizationOptions>` |
+| `SmartFormat` | Moteur de formatage avec pluralisation CLDR (remplace `string.Format`) |
 | `Granit.Core` | Système de modules (`GranitModule`, `[DependsOn]`) |
