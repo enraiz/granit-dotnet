@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../images/granit-logo.svg" alt="granit" width="160" />
+</p>
+
 # Granit — Documentation framework
 
 Cette documentation est organisée en dix sections thématiques.
