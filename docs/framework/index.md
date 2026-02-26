@@ -52,6 +52,7 @@ Surveillance, débogage et exposition du comportement de l'application.
 | [wolverine-tracing.md](diagnostics/wolverine-tracing.md) | Traçage distribué Wolverine — propagation W3C Trace Context dans l'Outbox |
 | [diagnostics.md](diagnostics/diagnostics.md) | Health checks, métriques, ActivitySource |
 | [exception-handling.md](diagnostics/exception-handling.md) | Gestion des erreurs, ProblemDetails |
+| [analyzers.md](diagnostics/analyzers.md) | Analyseurs Roslyn — migrations, sécurité, conventions EF Core |
 
 ## API
 

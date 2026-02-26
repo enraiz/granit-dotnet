@@ -7,8 +7,9 @@ using Microsoft.OpenApi;
 namespace Granit.ApiDocumentation.Transformers;
 
 /// <summary>
-/// Removes from the OpenAPI document all paths whose controller or action
+/// Removes from the OpenAPI document all paths whose controller, action, or endpoint
 /// is decorated with <see cref="InternalApiAttribute"/>.
+/// Supports both MVC controllers and Wolverine HTTP endpoints.
 /// </summary>
 internal sealed class InternalApiDocumentTransformer : IOpenApiDocumentTransformer
 {
@@ -34,16 +35,24 @@ internal sealed class InternalApiDocumentTransformer : IOpenApiDocumentTransform
 
     private static bool IsInternal(ApiDescription description)
     {
-        if (description.ActionDescriptor is not ControllerActionDescriptor actionDescriptor)
+        // Check EndpointMetadata first — works for both MVC and Wolverine endpoints.
+        IList<object> endpointMetadata = description.ActionDescriptor.EndpointMetadata;
+        if (endpointMetadata.OfType<InternalApiAttribute>().Any())
         {
-            return false;
+            return true;
         }
 
-        return actionDescriptor.MethodInfo
-                   .GetCustomAttributes(typeof(InternalApiAttribute), inherit: true)
-                   .Length > 0
-               || actionDescriptor.ControllerTypeInfo
-                   .GetCustomAttributes(typeof(InternalApiAttribute), inherit: true)
-                   .Length > 0;
+        // Fallback: check MVC-specific reflection metadata for method-level and class-level attributes.
+        if (description.ActionDescriptor is ControllerActionDescriptor actionDescriptor)
+        {
+            return actionDescriptor.MethodInfo
+                       .GetCustomAttributes(typeof(InternalApiAttribute), inherit: true)
+                       .Length > 0
+                   || actionDescriptor.ControllerTypeInfo
+                       .GetCustomAttributes(typeof(InternalApiAttribute), inherit: true)
+                       .Length > 0;
+        }
+
+        return false;
     }
 }

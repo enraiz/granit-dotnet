@@ -222,3 +222,19 @@ La table `granit_migration_progress` contient une ligne par cycle et par tenant.
   (`OnAnyException().RetryWithCooldown(...)`).
 - **Pas de `COUNT(*)`** : `TotalRows` n'est jamais calculé automatiquement
   (risque de lock sur les grandes tables HDS). Setter manuellement si nécessaire.
+
+## Analyseurs Roslyn
+
+Le package `Granit.Analyzers` impose les conventions Expand & Contract au build
+et dans l'IDE via quatre règles Roslyn :
+
+| Règle | Sévérité | Description |
+| ----- | -------- | ----------- |
+| GRMIGA001 | Error | `DropColumn` sans `[MigrationCycle(MigrationPhase.Contract, ...)]` |
+| GRMIGA002 | Error | `RenameColumn` interdit — utiliser AddColumn + DropColumn |
+| GRMIGA003 | Warning | `AddColumn` NOT NULL sans `defaultValue` ni `defaultValueSql` |
+| GRMIGA004 | Warning | `AlterColumn` avec changement de type sans annotation Contract |
+
+Ces règles s'activent automatiquement quand `Granit.Persistence.Migrations` est
+référencé (opt-in). Voir la [documentation complète des analyseurs](../diagnostics/analyzers.md)
+pour le détail de chaque règle, les exemples et la suppression des diagnostics.

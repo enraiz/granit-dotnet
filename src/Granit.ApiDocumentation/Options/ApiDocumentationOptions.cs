@@ -29,4 +29,27 @@ public sealed class ApiDocumentationOptions
     /// Default: <c>false</c> — UI is enabled in Development only.
     /// </summary>
     public bool EnableInProduction { get; set; }
+
+    /// <summary>
+    /// When <c>true</c>, documents a required tenant header on all endpoints except those
+    /// decorated with <c>[AllowAnonymousTenant]</c>.
+    /// Default: <c>false</c>.
+    /// </summary>
+    public bool EnableTenantHeader { get; set; }
+
+    /// <summary>
+    /// Name of the HTTP header that carries the tenant identifier.
+    /// Default: <c>"X-Tenant-Id"</c>.
+    /// </summary>
+    public string TenantHeaderName { get; set; } = "X-Tenant-Id";
+
+    /// <summary>
+    /// Authorization policy applied to the OpenAPI JSON and Scalar UI endpoints.
+    /// <list type="bullet">
+    ///   <item><c>null</c> (default): no explicit policy — inherits the application's global behavior.</item>
+    ///   <item>Empty string (<c>""</c>): explicitly allows anonymous access (<c>.AllowAnonymous()</c>).</item>
+    ///   <item>Policy name (e.g. <c>"InternalDeveloper"</c>): requires authorization with that policy.</item>
+    /// </list>
+    /// </summary>
+    public string? AuthorizationPolicy { get; set; }
 }
