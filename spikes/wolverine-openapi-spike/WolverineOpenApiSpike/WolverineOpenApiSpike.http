@@ -1,6 +1,0 @@
-@WolverineOpenApiSpike_HostAddress = http://localhost:5212
-
-GET {{WolverineOpenApiSpike_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
