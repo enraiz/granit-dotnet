@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Framework .NET partagé pour les applications Digital Dynamics</strong>
+  <strong>Framework .NET modulaire pour applications métier souveraines</strong>
 </p>
 
 <p align="center">
@@ -12,28 +12,75 @@
 
 ---
 
-Granit fournit un socle modulaire de **41 packages NuGet** couvrant les besoins
-transversaux des applications métier : sécurité, persistance, observabilité,
-multi-tenancy, chiffrement, messaging et plus encore.
-
-Conçu pour un hébergement souverain (OVHcloud, Roubaix) et conforme aux
+Granit est le socle technique partagé des applications .NET de Digital Dynamics.
+Il regroupe **41 packages NuGet** organisés en modules indépendants, conçus pour
+un hébergement **souverain européen** (OVHcloud, Roubaix) et conformes aux
 exigences **HDS** et **RGPD**.
+
+## Fonctionnalités
+
+| Domaine | Ce que Granit apporte |
+| --- | --- |
+| **Modularité** | Système de modules auto-configurés, tri topologique des dépendances |
+| **Sécurité** | JWT Keycloak, RBAC, chiffrement Transit Vault, credentials dynamiques |
+| **Persistance** | Intercepteurs EF Core : audit trail HDS 3 ans, soft delete RGPD, multi-tenancy |
+| **Multi-tenancy** | Isolation par schéma ou par base, résolution automatique, filtrage transparent |
+| **Observabilité** | Serilog + OpenTelemetry → OTLP (Loki, Tempo, Mimir), health checks, métriques |
+| **Messaging** | Outbox transactionnelle WolverineFx, webhooks HMAC-SHA256, jobs cron |
+| **API** | Versioning, OpenAPI Scalar, idempotence Stripe-style, ProblemDetails |
+| **Stockage** | Blob storage S3 souverain, URL pré-signées, Crypto-Shredding |
+| **SaaS** | Feature flags par plan commercial, quotas, résolution Default → Plan → Tenant |
+| **Qualité** | Analyseurs Roslyn embarqués, validation FluentValidation (TVA, SIREN, NISS) |
 
 ## Démarrage rapide
 
 ```bash
+# Ajouter le package fondation à votre projet
 dotnet add package Granit.Core
-dotnet build
-dotnet test
+
+# Ajouter les modules nécessaires
+dotnet add package Granit.Persistence
+dotnet add package Granit.Security
+dotnet add package Granit.Observability
+```
+
+```csharp
+// Program.cs
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+await builder.AddGranitAsync<MyAppModule>();
+
+WebApplication app = builder.Build();
+app.Run();
+```
+
+```csharp
+// MyAppModule.cs
+[DependsOn(
+    typeof(GranitPersistenceModule),
+    typeof(GranitSecurityModule),
+    typeof(GranitObservabilityModule))]
+public sealed class MyAppModule : GranitModule
+{
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        // Les modules Granit sont déjà configurés automatiquement.
+        // Ajoutez ici la configuration spécifique à votre application.
+    }
+}
 ```
 
 ## Documentation
 
-La documentation complète est disponible dans [`docs/`](docs/index.md).
+| Section | Contenu |
+| --- | --- |
+| [Framework](docs/framework/index.md) | Architecture, modules, sécurité, données, API, messaging, stockage |
+| [Tests](docs/testing/index.md) | Conventions xUnit, mocking, assertions, intégration EF Core |
+| [Catalogue des packages](docs/index.md) | Liste complète des 41 packages avec leur rôle |
 
 ## Contribuer
 
-Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions de développement et le workflow de contribution.
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions et le workflow de contribution.
 
 ## Changelog
 

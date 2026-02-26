@@ -108,10 +108,26 @@ internal sealed partial class TenantSchemaConnectionInterceptor(
             .ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Builds the <c>SET search_path</c> command text with a validated and double-quoted
+    /// PostgreSQL identifier.
+    /// </summary>
+    /// <remarks>
+    /// <c>SET search_path</c> is a session-variable command and does not accept bound
+    /// parameters. Safety is ensured by two layers:
+    /// <list type="number">
+    ///   <item><see cref="ValidateSchemaName"/>: strict regex allowlist (lower-case, digits, underscores).</item>
+    ///   <item>Double-quoting: the identifier is wrapped in <c>"…"</c> per SQL standard,
+    ///         making it a delimited identifier even if the regex were ever relaxed.</item>
+    /// </list>
+    /// </remarks>
+    private static string BuildSetSearchPathCommand(string schema) =>
+        string.Concat("SET search_path TO \"", ValidateSchemaName(schema), "\", public");
+
     private static void SetSearchPath(DbConnection connection, string schema)
     {
         using DbCommand cmd = connection.CreateCommand();
-        cmd.CommandText = $"SET search_path TO {ValidateSchemaName(schema)}, public";
+        cmd.CommandText = BuildSetSearchPathCommand(schema);
         cmd.ExecuteNonQuery();
     }
 
@@ -121,7 +137,7 @@ internal sealed partial class TenantSchemaConnectionInterceptor(
         CancellationToken cancellationToken)
     {
         await using DbCommand cmd = connection.CreateCommand();
-        cmd.CommandText = $"SET search_path TO {ValidateSchemaName(schema)}, public";
+        cmd.CommandText = BuildSetSearchPathCommand(schema);
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 }

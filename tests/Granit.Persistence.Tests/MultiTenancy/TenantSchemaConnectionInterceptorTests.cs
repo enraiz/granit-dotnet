@@ -91,7 +91,7 @@ public sealed class TenantSchemaConnectionInterceptorTests
 
         await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), ct);
 
-        cmd.CommandText.Should().Be("SET search_path TO tenant_a, public");
+        cmd.CommandText.Should().Be("SET search_path TO \"tenant_a\", public");
         await cmd.Received(1).ExecuteNonQueryAsync(ct);
     }
 
@@ -121,7 +121,7 @@ public sealed class TenantSchemaConnectionInterceptorTests
         // ne peut pas sauter la seconde exécution même si la connexion est "déjà ouverte".
         await cmd.Received(2).ExecuteNonQueryAsync(ct);
         // Le search_path final correspond au tenant B.
-        cmd.CommandText.Should().Be("SET search_path TO tenant_b, public");
+        cmd.CommandText.Should().Be("SET search_path TO \"tenant_b\", public");
     }
 
     // -----------------------------------------------------------------------
@@ -157,7 +157,7 @@ public sealed class TenantSchemaConnectionInterceptorTests
         TenantSchemaConnectionInterceptor interceptor = new(MakeTenant(TenantA), provider);
         interceptor.ConnectionOpened(conn, MakeEventData());
 
-        cmd.CommandText.Should().StartWith("SET search_path TO tenant_");
+        cmd.CommandText.Should().StartWith("SET search_path TO \"tenant_");
         cmd.Received(1).ExecuteNonQuery();
     }
 
