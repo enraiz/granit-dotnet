@@ -39,7 +39,7 @@ internal static class ModuleLoader
                 $"Type '{moduleType.FullName}' does not inherit from GranitModule.");
         }
 
-        var instance = (GranitModule)Activator.CreateInstance(moduleType)!;
+        GranitModule instance = (GranitModule)Activator.CreateInstance(moduleType)!;
 
         Type[] dependencies = [.. moduleType
             .GetCustomAttributes(typeof(DependsOnAttribute), true)
@@ -63,8 +63,8 @@ internal static class ModuleLoader
         Dictionary<Type, ModuleDescriptor> descriptors)
     {
         // Compute the in-degree of each node
-        var inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
-        var adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
+        Dictionary<Type, int> inDegree = descriptors.ToDictionary(kv => kv.Key, _ => 0);
+        Dictionary<Type, List<Type>> adjacency = descriptors.ToDictionary(kv => kv.Key, _ => new List<Type>());
 
         foreach ((Type type, ModuleDescriptor descriptor) in descriptors)
         {

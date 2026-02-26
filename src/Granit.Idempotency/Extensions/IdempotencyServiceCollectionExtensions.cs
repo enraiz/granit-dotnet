@@ -22,7 +22,12 @@ public static class IdempotencyServiceCollectionExtensions
         this IServiceCollection services,
         IConfigurationSection configurationSection)
     {
-        services.Configure<IdempotencyOptions>(configurationSection);
+        services
+            .AddOptions<IdempotencyOptions>()
+            .Bind(configurationSection)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         return services.AddGranitIdempotencyCore();
     }
 
@@ -33,9 +38,14 @@ public static class IdempotencyServiceCollectionExtensions
         this IServiceCollection services,
         Action<IdempotencyOptions>? configure = null)
     {
+        OptionsBuilder<IdempotencyOptions> optionsBuilder = services
+            .AddOptions<IdempotencyOptions>()
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         if (configure is not null)
         {
-            services.Configure(configure);
+            optionsBuilder.Configure(configure);
         }
 
         return services.AddGranitIdempotencyCore();

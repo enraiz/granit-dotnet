@@ -1,10 +1,10 @@
-namespace Granit.BackgroundJobs.Internal;
+namespace Granit.BackgroundJobs;
 
 /// <summary>
 /// Immutable descriptor of a recurring job discovered at startup via
-/// <see cref="RecurringJobDiscovery"/>.
+/// <see cref="Internal.RecurringJobDiscovery"/>.
 /// </summary>
-internal sealed record RecurringJobRegistration(
+public sealed record RecurringJobRegistration(
     string JobName,
     string CronExpression,
     string MessageType);

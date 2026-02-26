@@ -11,9 +11,13 @@ namespace Granit.Encryption.Providers;
 /// </summary>
 public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
 {
-    // Fixed internal salt for PBKDF2 key derivation.
-    // Acceptable here: the PassPhrase comes from Vault (high entropy).
-    // The salt protects against attacks on weak PassPhrases.
+    /// <remarks>
+    /// SECURITY: Fixed internal salt for PBKDF2 key derivation.
+    /// This is acceptable because the PassPhrase MUST come from Vault (high entropy, 256-bit minimum).
+    /// The salt's purpose is to prevent rainbow table attacks on weak PassPhrases;
+    /// with a Vault-sourced PassPhrase, the fixed salt does not degrade security.
+    /// Changing this salt would invalidate all previously encrypted data — do NOT modify.
+    /// </remarks>
     private static readonly byte[] KeyDerivationSalt =
     [
         0x44, 0x44, 0x46, 0x6F, 0x75, 0x6E, 0x64, 0x61,
@@ -53,7 +57,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         byte[] iv = RandomNumberGenerator.GetBytes(IvSize);
         byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
 
-        using var aes = Aes.Create();
+        using Aes aes = Aes.Create();
         aes.Key = _key;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;
@@ -96,7 +100,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         byte[] iv = input[..IvSize];
         byte[] cipherBytes = input[IvSize..];
 
-        using var aes = Aes.Create();
+        using Aes aes = Aes.Create();
         aes.Key = _key;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;

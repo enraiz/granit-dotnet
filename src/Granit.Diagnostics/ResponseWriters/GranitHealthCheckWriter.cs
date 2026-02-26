@@ -38,7 +38,8 @@ public static class GranitHealthCheckWriter
                 Tags: [.. e.Value.Tags]))]);
 
         return context.Response.WriteAsync(
-            JsonSerializer.Serialize(response, SerializerOptions));
+            JsonSerializer.Serialize(response, SerializerOptions),
+            context.RequestAborted);
     }
 
     private sealed record HealthResponse(

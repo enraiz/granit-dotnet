@@ -66,7 +66,7 @@ internal static class JsonLocalizationDictionaryBuilder
     private static (string Culture, Dictionary<string, string> Texts) ParseJsonStream(
         Stream stream, string resourceName)
     {
-        using var document = JsonDocument.Parse(stream);
+        using JsonDocument document = JsonDocument.Parse(stream);
         JsonElement root = document.RootElement;
 
         if (!root.TryGetProperty("culture", out JsonElement cultureElement))

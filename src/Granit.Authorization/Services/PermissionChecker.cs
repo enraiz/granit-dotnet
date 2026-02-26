@@ -54,7 +54,8 @@ internal sealed class PermissionChecker(
                 $"Permission '{permissionName}' is not defined. Register it via IPermissionDefinitionProvider.");
         }
 
-        Guid? tenantId = currentTenant.Id;
+        // Explicit IsAvailable check per soft-dependency contract (NullTenantContext returns null).
+        Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         IReadOnlyList<string> roles = currentUserService.GetRoles();
 
         foreach (string role in roles)

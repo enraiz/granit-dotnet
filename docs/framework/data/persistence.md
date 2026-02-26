@@ -308,7 +308,12 @@ IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
 guidGenerator.Create().Returns(Guid.NewGuid());
 
 ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
+currentTenant.IsAvailable.Returns(false);  // pas de tenant actif
 currentTenant.Id.Returns((Guid?)null);
+
+// Avec tenant actif :
+// currentTenant.IsAvailable.Returns(true);
+// currentTenant.Id.Returns((Guid?)tenantId);
 
 AuditedEntityInterceptor interceptor = new(currentUser, clock, guidGenerator, currentTenant);
 // ... assertions exactes avec Be() au lieu de BeCloseTo()

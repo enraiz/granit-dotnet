@@ -267,6 +267,7 @@ public sealed class PermissionCheckerTests
         }
 
         ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
+        tenant.IsAvailable.Returns(tenantId.HasValue);
         tenant.Id.Returns(tenantId);
 
         IPermissionDefinitionManager manager = Substitute.For<IPermissionDefinitionManager>();

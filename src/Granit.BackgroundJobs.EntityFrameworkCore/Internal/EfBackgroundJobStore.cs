@@ -86,7 +86,7 @@ internal sealed class EfBackgroundJobStore(
     }
 
     /// <inheritdoc/>
-    public async Task RecordNextExecutionAsync(string jobName, DateTimeOffset next, CancellationToken ct = default)
+    public async Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default)
     {
         await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct);
         BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, ct);
@@ -95,7 +95,7 @@ internal sealed class EfBackgroundJobStore(
             return;
         }
 
-        job.NextExecutionAt = next;
+        job.NextExecutionAt = nextExecution;
         await context.SaveChangesAsync(ct);
     }
 

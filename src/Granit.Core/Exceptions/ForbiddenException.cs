@@ -5,10 +5,17 @@ namespace Granit.Core.Exceptions;
 /// Maps to <c>403 Forbidden</c>.
 /// </summary>
 /// <remarks>
+/// <para>
+/// This exception intentionally does NOT implement <see cref="IHasErrorCode"/> to prevent
+/// leaking internal permission schema or resource names to unauthenticated/unauthorized callers.
+/// The generic 403 message is a security best practice (OWASP).
+/// </para>
+/// <para>
 /// Use this exception for explicit authorization failures within application logic
 /// (e.g. multi-tenancy boundary violations, resource ownership checks).
 /// ASP.NET Core's authorization middleware handles most 403 cases automatically;
 /// this exception is for cases that reach domain or application service code.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
