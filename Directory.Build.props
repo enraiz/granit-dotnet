@@ -30,9 +30,11 @@
     <PackageProjectUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</PackageProjectUrl>
     <Description>Granit - Packages partagés pour les applications .NET Digital Dynamics</Description>
     <PackageIcon>granit-icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)docs/images/granit-icon.png" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
 </Project>
