@@ -11,6 +11,8 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <!-- Enable extended analyzer correctness rules (RS1xxx) -->
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- NU5128: expected for analyzer packages — output goes to analyzers/, not lib/ -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
