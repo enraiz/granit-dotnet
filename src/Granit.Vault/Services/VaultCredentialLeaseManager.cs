@@ -3,6 +3,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
+using VaultSharp.V1.Commons;
+using VaultSharp.V1.SecretsEngines;
+using VaultSharp.V1.SystemBackend;
 
 namespace Granit.Vault.Services;
 
@@ -51,7 +54,7 @@ public sealed partial class VaultCredentialLeaseManager(
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            var renewalDelay = TimeSpan.FromSeconds(
+            TimeSpan renewalDelay = TimeSpan.FromSeconds(
                 _leaseDurationSeconds * _options.LeaseRenewalThreshold);
 
             LogNextRenewalIn(_logger, renewalDelay);
@@ -76,14 +79,15 @@ public sealed partial class VaultCredentialLeaseManager(
         _logger.LogInformation("Stopping Vault dynamic credential manager");
     }
 
-    private async Task ObtainCredentialsAsync(CancellationToken cancellationToken) // NOSONAR S1172 - VaultSharp API does not expose cancellation
+    private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
     {
         string path = $"{_options.DatabaseMountPoint}/creds/{_options.DatabaseRoleName}";
         LogObtainingCredentials(_logger, path);
 
-        var secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
+        // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
+        Secret<UsernamePasswordCredentials> secret = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(
             _options.DatabaseRoleName,
-            mountPoint: _options.DatabaseMountPoint);
+            mountPoint: _options.DatabaseMountPoint).WaitAsync(cancellationToken);
 
         _username = secret.Data.Username;
         _password = secret.Data.Password;
@@ -93,13 +97,14 @@ public sealed partial class VaultCredentialLeaseManager(
         LogCredentialsObtained(_logger, _username, _leaseId, _leaseDurationSeconds);
     }
 
-    private async Task RenewLeaseAsync(CancellationToken cancellationToken) // NOSONAR S1172 - VaultSharp API does not expose cancellation
+    private async Task RenewLeaseAsync(CancellationToken cancellationToken)
     {
         LogRenewingLease(_logger, _leaseId);
 
-        var renewed = await _vaultClient.V1.System.RenewLeaseAsync(
+        // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
+        Secret<RenewedLease> renewed = await _vaultClient.V1.System.RenewLeaseAsync(
             _leaseId,
-            _leaseDurationSeconds);
+            _leaseDurationSeconds).WaitAsync(cancellationToken);
 
         _leaseDurationSeconds = renewed.LeaseDurationSeconds;
 

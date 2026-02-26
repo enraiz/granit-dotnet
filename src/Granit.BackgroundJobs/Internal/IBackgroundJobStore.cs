@@ -1,10 +1,11 @@
-namespace Granit.BackgroundJobs.Internal;
+namespace Granit.BackgroundJobs;
 
 /// <summary>
-/// Internal abstraction for reading and updating the administrative job store.
-/// Implemented by <see cref="InMemoryBackgroundJobStore"/> and <c>EfBackgroundJobStore</c>.
+/// Abstraction for reading and updating the administrative job store.
+/// Implemented by <see cref="Internal.InMemoryBackgroundJobStore"/> and <c>EfBackgroundJobStore</c>.
+/// Consumers may provide custom implementations (Redis, MongoDB, etc.).
 /// </summary>
-internal interface IBackgroundJobStore
+public interface IBackgroundJobStore
 {
     /// <summary>Returns a job by name, or <c>null</c> if not found.</summary>
     Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default);
@@ -26,7 +27,7 @@ internal interface IBackgroundJobStore
     Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken ct = default);
 
     /// <summary>Updates the next scheduled execution time.</summary>
-    Task RecordNextExecutionAsync(string jobName, DateTimeOffset next, CancellationToken ct = default);
+    Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default);
 
     /// <summary>Increments the failure counter and stores the error message.</summary>
     Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken ct = default);

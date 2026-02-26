@@ -25,7 +25,9 @@ internal sealed class VaultHealthCheck(IVaultClient vaultClient) : IHealthCheck
     {
         try
         {
-            VaultSystemHealth status = await vaultClient.V1.System.GetHealthStatusAsync();
+            // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
+            VaultSystemHealth status = await vaultClient.V1.System.GetHealthStatusAsync()
+                .WaitAsync(cancellationToken);
 
             if (status.Sealed)
             {

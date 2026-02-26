@@ -64,10 +64,11 @@ public sealed class AuditedEntityInterceptor(
                         entry.Entity.Id = _guidGenerator.Create();
                     }
 
-                    // Multi-tenant isolation: inject current TenantId if the entity supports it
+                    // Multi-tenant isolation: inject current TenantId if the entity supports it.
+                    // Explicit IsAvailable check per soft-dependency contract (NullTenantContext returns null).
                     if (entry.Entity is IMultiTenant multiTenant && multiTenant.TenantId is null)
                     {
-                        multiTenant.TenantId = _currentTenant.Id;
+                        multiTenant.TenantId = _currentTenant.IsAvailable ? _currentTenant.Id : null;
                     }
 
                     break;

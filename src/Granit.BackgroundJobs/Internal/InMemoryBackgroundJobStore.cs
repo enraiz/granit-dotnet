@@ -66,11 +66,11 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStore
     }
 
     /// <inheritdoc/>
-    public Task RecordNextExecutionAsync(string jobName, DateTimeOffset next, CancellationToken ct = default)
+    public Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default)
     {
         if (_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job))
         {
-            job.NextExecutionAt = next;
+            job.NextExecutionAt = nextExecution;
         }
 
         return Task.CompletedTask;

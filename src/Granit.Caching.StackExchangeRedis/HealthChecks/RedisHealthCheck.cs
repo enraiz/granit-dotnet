@@ -27,6 +27,7 @@ internal sealed class RedisHealthCheck(
     {
         try
         {
+            // StackExchange.Redis PingAsync() does not accept CancellationToken (library limitation).
             TimeSpan latency = await connection.GetDatabase().PingAsync();
 
             if (latency >= degradedThreshold)

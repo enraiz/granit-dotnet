@@ -3,6 +3,8 @@ using Granit.Vault.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
+using VaultSharp.V1.Commons;
+using VaultSharp.V1.SecretsEngines.Transit;
 
 namespace Granit.Vault.Services;
 
@@ -25,13 +27,14 @@ public sealed partial class TransitEncryptionService(
     {
         string base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
 
-        var result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
+        // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
+        Secret<EncryptionResponse> result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
             keyName,
-            new VaultSharp.V1.SecretsEngines.Transit.EncryptRequestOptions
+            new EncryptRequestOptions
             {
                 Base64EncodedPlainText = base64Plaintext
             },
-            mountPoint: _options.TransitMountPoint);
+            mountPoint: _options.TransitMountPoint).WaitAsync(cancellationToken);
 
         LogEncrypted(_logger, keyName);
         return result.Data.CipherText;
@@ -42,13 +45,14 @@ public sealed partial class TransitEncryptionService(
         string ciphertext,
         CancellationToken cancellationToken = default)
     {
-        var result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
+        // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
+        Secret<DecryptionResponse> result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
             keyName,
-            new VaultSharp.V1.SecretsEngines.Transit.DecryptRequestOptions
+            new DecryptRequestOptions
             {
                 CipherText = ciphertext
             },
-            mountPoint: _options.TransitMountPoint);
+            mountPoint: _options.TransitMountPoint).WaitAsync(cancellationToken);
 
         byte[] bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
         LogDecrypted(_logger, keyName);

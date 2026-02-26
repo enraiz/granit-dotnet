@@ -256,6 +256,7 @@ public sealed class AuditedEntityInterceptorTests
     public async Task SaveChangesAsync_MultiTenant_OnAdd_SetsTenantId_WhenTenantIsActive()
     {
         // Arrange
+        _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns((Guid?)TenantId);
         await using TestDbContext context = CreateContext();
         TestMultiTenantEntity entity = new() { Name = "Fiche patient" };
@@ -288,7 +289,8 @@ public sealed class AuditedEntityInterceptorTests
     public async Task SaveChangesAsync_MultiTenant_OnAdd_DoesNotOverwriteExistingTenantId()
     {
         // Arrange — TenantId déjà défini explicitement (migration, import)
-        var explicitTenant = Guid.NewGuid();
+        Guid explicitTenant = Guid.NewGuid();
+        _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns((Guid?)TenantId);
         await using TestDbContext context = CreateContext();
         TestMultiTenantEntity entity = new() { Name = "Import", TenantId = explicitTenant };

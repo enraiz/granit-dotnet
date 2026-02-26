@@ -5,9 +5,16 @@ namespace Granit.Core.Exceptions;
 /// Maps to <c>404 Not Found</c>.
 /// </summary>
 /// <remarks>
+/// <para>
+/// This exception intentionally does NOT implement <see cref="IHasErrorCode"/> to prevent
+/// leaking internal resource types or identifiers to unauthenticated callers.
+/// The generic 404 message is a security best practice (OWASP).
+/// </para>
+/// <para>
 /// Prefer the more specific <see cref="EntityNotFoundException"/> for domain aggregate lookups.
 /// Use this base class for non-entity resources (files, blobs, external references)
 /// that require a 404 response without leaking domain schema information.
+/// </para>
 /// </remarks>
 public class NotFoundException : Exception, IUserFriendlyException
 {

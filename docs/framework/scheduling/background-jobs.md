@@ -6,7 +6,7 @@ sans aucun doublon possible en cluster multi-nœuds.
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager` |
+| `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager`, `IBackgroundJobStore` |
 | `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `granit_background_jobs` (SQL Server / PostgreSQL) |
 | `Granit.BackgroundJobs.Endpoints` | Administration HTTP : endpoints Minimal API, politique d'autorisation `BackgroundJobs.Admin` |
 
@@ -272,6 +272,39 @@ sur le `RequireRole()` enregistré par `MapBackgroundJobsEndpoints()` :
 builder.Services.AddAuthorization();  // sans GranitAuthorizationModule
 app.MapBackgroundJobsEndpoints(opts => opts.RequiredRole = "granit-background-jobs-admin");
 // → RequireRole("granit-background-jobs-admin") actif
+```
+
+## Store personnalisé — IBackgroundJobStore
+
+`IBackgroundJobStore` est une interface **publique** permettant de fournir une
+implémentation de persistance alternative (Redis, MongoDB, etc.) :
+
+```csharp
+public interface IBackgroundJobStore
+{
+    Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default);
+    Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken ct = default);
+    Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken ct = default);
+    Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken ct = default);
+    Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default);
+    Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken ct = default);
+    Task SetEnabledAsync(string jobName, bool enabled, CancellationToken ct = default);
+    Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken ct = default);
+}
+```
+
+Deux implémentations sont fournies :
+
+| Implémentation | Package | Mode |
+| --- | --- | --- |
+| `InMemoryBackgroundJobStore` | `Granit.BackgroundJobs` | `JobStoreMode.InMemory` |
+| `EfBackgroundJobStore` | `Granit.BackgroundJobs.EntityFrameworkCore` | `JobStoreMode.Durable` |
+
+Pour une implémentation Redis ou MongoDB, enregistrer le service **en Singleton** :
+
+```csharp
+services.AddSingleton<IBackgroundJobStore, RedisBackgroundJobStore>();
 ```
 
 ## Architecture interne

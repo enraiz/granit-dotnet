@@ -66,6 +66,22 @@ in all French content (docs, issues, commits). Never in code.
 
 **Projects**: one project = one NuGet package, namespace = project name, zero circular references
 
+**Extension method receiver — `IServiceCollection` vs `IHostApplicationBuilder`**:
+
+- Use `IServiceCollection` for composable library packages (the default). This keeps the
+  package usable from any DI setup and avoids coupling to the host.
+- Use `IHostApplicationBuilder` only when the package needs `Configuration` **and** registers
+  framework-level services (Wolverine, background jobs, Observability, Persistence.Migrations,
+  BlobStorage.S3, Webhooks) or calls `ValidateOnStart()`.
+- Preferred options-binding pattern for new code:
+
+  ```csharp
+  services.AddOptions<TOptions>()
+      .BindConfiguration(SectionName)
+      .ValidateDataAnnotations()
+      .ValidateOnStart();
+  ```
+
 **Core**: `Granit.Core` provides the module system and domain types.
 Each module is self-contained (interface + implementation in the same package).
 All Granit packages reference Core.

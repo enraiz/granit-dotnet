@@ -46,6 +46,7 @@ public sealed partial class VaultClientFactory(
 
     private TokenAuthMethodInfo CreateTokenAuth()
     {
+        // SECURITY: Never log the Vault token — it grants full Vault access.
         if (string.IsNullOrEmpty(_options.Token))
         {
             throw new VaultConfigurationException(
