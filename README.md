@@ -31,6 +31,14 @@ dotnet test
 
 La documentation complète est disponible dans [`docs/`](docs/index.md).
 
+## Contribuer
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions de développement et le workflow de contribution.
+
+## Changelog
+
+Les changements sont documentés dans [CHANGELOG.md](CHANGELOG.md).
+
 ## Licence
 
 Propriétaire — Digital Dynamics. Tous droits réservés. Voir [LICENSE](LICENSE).
