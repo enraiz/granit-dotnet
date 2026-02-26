@@ -1,5 +1,5 @@
+using Granit.Vault.Exceptions;
 using Granit.Vault.Options;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VaultSharp;
@@ -14,12 +14,10 @@ namespace Granit.Vault.Services;
 /// </summary>
 public sealed partial class VaultClientFactory(
     IOptions<VaultOptions> options,
-    ILogger<VaultClientFactory> logger,
-    IStringLocalizer<VaultLocalizationResource> localizer)
+    ILogger<VaultClientFactory> logger)
 {
     private readonly VaultOptions _options = options.Value;
     private readonly ILogger<VaultClientFactory> _logger = logger;
-    private readonly IStringLocalizer<VaultLocalizationResource> _localizer = localizer;
 
     /// <summary>Creates an authenticated VaultSharp client.</summary>
     public IVaultClient Create()
@@ -28,8 +26,9 @@ public sealed partial class VaultClientFactory(
         {
             "kubernetes" => CreateKubernetesAuth(),
             "token" => CreateTokenAuth(),
-            _ => throw new InvalidOperationException(
-                _localizer["Vault:UnknownAuthMethod", _options.AuthMethod])
+            _ => throw new VaultConfigurationException(
+                "Vault:UnknownAuthMethod",
+                $"Unknown Vault authentication method: '{_options.AuthMethod}'. Allowed values: 'Kubernetes', 'Token'.")
         };
 
         VaultClientSettings settings = new(_options.Address, authMethod);
@@ -49,7 +48,9 @@ public sealed partial class VaultClientFactory(
     {
         if (string.IsNullOrEmpty(_options.Token))
         {
-            throw new InvalidOperationException(_localizer["Vault:TokenRequired"]);
+            throw new VaultConfigurationException(
+                "Vault:TokenRequired",
+                "Vault token is required for token authentication. Configure Vault:Token in configuration.");
         }
 
         LogTokenAuth(_logger);

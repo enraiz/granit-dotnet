@@ -300,7 +300,7 @@ src/Granit.Settings/
 | `ISettingProvider` | `SettingProvider` | Scoped |
 | `ISettingManager` | `SettingManager` | Scoped |
 
-## Dépendances du module
+## Dépendances Granit
 
 ```text
 GranitSettingsModule
@@ -309,3 +309,11 @@ GranitSettingsModule
   ├── GranitEncryptionModule   (IStringEncryptionService pour IsEncrypted)
   └── GranitSecurityModule     (ICurrentUserService pour provider U)
 ```
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Caching`, `Granit.Encryption`, `Granit.Security` |
+| **Utilisé par** | `Granit.Settings.EntityFrameworkCore` |
+| **Package EF Core** | `Granit.Settings.EntityFrameworkCore` → ajoute `Granit.Persistence` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

@@ -294,3 +294,13 @@ public sealed class GranitAuthenticationAuth0Module : GranitModule
 ```
 
 `Granit.Security` et `Granit.Authentication.Keycloak` ne sont pas impactés.
+
+## Dépendances Granit
+
+| Package | Dépend de | Utilisé par |
+|---------|-----------|-------------|
+| `Granit.Security` | `Granit.Core` | `Persistence`, `Authorization`, `Wolverine`, `BackgroundJobs`, `Settings`, `Idempotency`, `ApiDocumentation`, `Authentication.JwtBearer` |
+| `Granit.Authentication.JwtBearer` | `Granit.Security` | `Granit.Authentication.Keycloak` |
+| `Granit.Authentication.Keycloak` | `Granit.Authentication.JwtBearer` | Module feuille |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

@@ -250,3 +250,12 @@ OpenTelemetry. Pour corréler une erreur client avec les logs Loki :
 1. Récupérer le `traceId` dans la réponse JSON de l'API
 2. Dans Grafana → Explorer → Loki, rechercher : `{app="guava-backend"} |= "traceId"`
 3. Ou directement dans Tempo via le `traceId` complet
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | `Granit.Persistence`, `Granit.Validation` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

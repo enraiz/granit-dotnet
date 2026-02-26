@@ -1,12 +1,11 @@
-using Granit.Localization;
-using Granit.Localization.Attributes;
+using Granit.Core.Localization;
 
 namespace Granit.BlobStorage;
 
 /// <summary>
 /// Marker class for the <c>BlobStorage</c> localization resource.
 /// JSON files: <c>Localization/BlobStorage/{culture}.json</c>, embedded in this assembly.
+/// Auto-discovered by <see cref="LocalizationResourceNameAttribute"/>.
 /// </summary>
-[LocalizationResourceName("BlobStorage")]
-[InheritResource(typeof(GranitLocalizationResource))]
+[LocalizationResourceName("BlobStorage", DefaultCulture = "fr")]
 public sealed class BlobStorageLocalizationResource;

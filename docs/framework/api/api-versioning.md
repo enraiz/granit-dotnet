@@ -66,3 +66,12 @@ peuvent ainsi identifier avec précision quelle version de l'API a traité une r
 
 Le fallback query string (`?api-version=1.0`) est également visible dans les access logs,
 contrairement aux headers HTTP souvent omis par les reverse proxies.
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | `Granit.ApiDocumentation` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

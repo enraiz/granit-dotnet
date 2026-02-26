@@ -64,3 +64,16 @@ Tous les enregistrements utilisent `TryAdd*` pour permettre le remplacement dans
 | [localizer.md](localizer.md) | IStringLocalizer, culture fallback, tests, bonnes pratiques |
 | [endpoints.md](endpoints.md) | Endpoint HTTP `GET /api/granit/localization` pour clients SPA |
 | [overrides.md](overrides.md) | Surcharges DB (PostgreSQL + cache mémoire), endpoints CRUD admin |
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | `Granit.Validation`, `Granit.Features`, `Granit.Localization.EntityFrameworkCore`, `Granit.Localization.Endpoints` |
+
+> `Granit.BlobStorage` et `Granit.Vault` ne dépendent plus de `Localization` :
+> leurs JSON embarqués sont découverts par `LocalizationAutoDiscovery` et les
+> messages d'erreur sont résolus par `GranitExceptionHandler` via `IHasErrorCode`.
+>
+> Voir le [graphe de dépendances complet](../../dependencies.md).

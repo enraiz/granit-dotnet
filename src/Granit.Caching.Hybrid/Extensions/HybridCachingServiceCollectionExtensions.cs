@@ -37,7 +37,9 @@ public static class HybridCachingServiceCollectionExtensions
             .GetSection(CachingOptions.SectionName)
             .Get<CachingOptions>() ?? new CachingOptions();
 
-        services.AddHybridCache(hybridCache =>
+        // Reconfigure les options HybridCache enregistrées par GranitCachingModule
+        // pour ajouter LocalCacheExpiration (L1 courte) en mode multi-pods
+        services.Configure<HybridCacheOptions>(hybridCache =>
         {
             hybridCache.DefaultEntryOptions = new HybridCacheEntryOptions
             {

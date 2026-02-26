@@ -217,3 +217,15 @@ corrections en cascade.
 | RGPD — Pas de secrets exposés | GRSEC003 détecte les secrets codés en dur |
 | Performance | GREF001 impose l'asynchrone pour `SaveChanges` |
 | Qualité des index | GRSEC002 impose les GUID séquentiels |
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | Aucun (analyseur Roslyn, pas de dépendance runtime) |
+| **Utilisé par** | `Granit.Analyzers.CodeFixes` |
+
+> Les analyseurs sont des packages indépendants qui s'exécutent au build.
+> Ils n'ont aucune dépendance runtime vers les autres modules Granit.
+>
+> Voir le [graphe de dépendances complet](../dependencies.md).

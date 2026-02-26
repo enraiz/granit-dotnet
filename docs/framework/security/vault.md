@@ -157,3 +157,17 @@ Granit.Vault
 - L'authentification Kubernetes est **obligatoire** en production
 - Les logs ne doivent **jamais** exposer de secrets (les credentials sont masqués)
 - Le `LeaseRenewalThreshold` (75%) garantit le renouvellement avant expiration
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Encryption` |
+| **Utilisé par** | Module feuille (consommé par les applications, pas par d'autres modules) |
+
+> `VaultConfigurationException` implémente `IHasErrorCode` — les messages
+> d'erreur sont localisés par `GranitExceptionHandler` à la frontière HTTP
+> via les JSON embarqués (`Localization/Vault/{culture}.json`), découverts
+> automatiquement par `LocalizationAutoDiscovery`.
+>
+> Voir le [graphe de dépendances complet](../dependencies.md).

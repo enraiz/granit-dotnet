@@ -1,17 +1,11 @@
-// ---------------------------------------------------------------------------
-// VaultLocalizationResource.cs
-// Classe marker de la ressource de localisation du module Vault.
-// Hérite de GranitLocalizationResource pour les messages communs.
-// ---------------------------------------------------------------------------
-
-using Granit.Localization;
-using Granit.Localization.Attributes;
+using Granit.Core.Localization;
 
 namespace Granit.Vault;
 
 /// <summary>
-/// Ressource de localisation du module Vault.
+/// Marker class for the <c>Vault</c> localization resource.
+/// JSON files: <c>Localization/Vault/{culture}.json</c>, embedded in this assembly.
+/// Auto-discovered by <see cref="LocalizationResourceNameAttribute"/>.
 /// </summary>
-[LocalizationResourceName("Vault")]
-[InheritResource(typeof(GranitLocalizationResource))]
+[LocalizationResourceName("Vault", DefaultCulture = "fr")]
 public sealed class VaultLocalizationResource;

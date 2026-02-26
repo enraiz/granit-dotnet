@@ -331,3 +331,13 @@ app.MapBackgroundJobsEndpoints(opts => opts.RequiredRole = "granit-background-jo
 - La chaîne de connexion du store durable doit pointer sur une base **en Europe (OVHcloud FR)**,
   jamais sur un service soumis au Cloud Act américain.
 - Les données de scheduling (cron, horodatages) ne contiennent aucune donnée de santé (DPS).
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Security`, `Granit.Timing`, `Granit.Wolverine` |
+| **Utilisé par** | `Granit.BackgroundJobs.EntityFrameworkCore`, `Granit.BackgroundJobs.Endpoints` |
+| **Package Endpoints** | `Granit.BackgroundJobs.Endpoints` → ajoute `Granit.Authorization` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

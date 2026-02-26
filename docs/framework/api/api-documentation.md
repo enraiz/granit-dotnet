@@ -430,3 +430,12 @@ documentation, contournant la fallback policy.
 Utiliser `[InternalApi]` pour tous les endpoints qui ne doivent pas figurer dans
 la documentation publique. Cela réduit la surface d'attaque exposée dans la documentation
 et évite de révéler l'architecture interne aux auditeurs externes.
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.ApiVersioning`, `Granit.Security` |
+| **Utilisé par** | Module feuille (consommé par les applications) |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

@@ -9,7 +9,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Granit.Localization.Attributes;
+using Granit.Core.Localization;
 using Granit.Localization.Endpoints.Dto;
 using Granit.Localization.Endpoints.Permissions;
 using Microsoft.AspNetCore.Builder;

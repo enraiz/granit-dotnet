@@ -187,3 +187,12 @@ Résultat : une requête HTTP et tous les traitements Wolverine asynchrones qu'e
 déclenche apparaissent sous le **même `trace-id`** dans Grafana/Tempo.
 
 → Voir [wolverine-tracing.md](wolverine-tracing.md) pour le détail.
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | Module feuille (consommé par les applications) |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

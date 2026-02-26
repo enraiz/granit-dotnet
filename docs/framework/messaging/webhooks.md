@@ -288,3 +288,12 @@ Cela garantit que le module fonctionne avec ou sans `GranitMultiTenancyModule` i
 - L'infrastructure de livraison doit rester **en Europe** (OVHcloud FR) — jamais sur AWS/Azure/GCP
 - La durée de conservation des `WebhookDeliveryAttempt` est à paramétrer à **3 ans minimum** via
   une politique de purge applicative (pas de TTL automatique au niveau du module)
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Wolverine` |
+| **Utilisé par** | `Granit.Webhooks.EntityFrameworkCore` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

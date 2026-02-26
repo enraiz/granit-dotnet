@@ -305,3 +305,24 @@ IBlobStorage (DefaultBlobStorage)
 - **Validation** : `MagicBytesValidator` détecte les fichiers malveillants déguisés
   (ex. exécutable renommé en `.pdf`). Tout blob non reconnu passe par défaut
   (pas de faux négatif sur un format légitime inconnu).
+
+## Dépendances Granit
+
+| Package | Dépend de | Utilisé par |
+|---------|-----------|-------------|
+| `Granit.BlobStorage` | `Granit.Core`, `Granit.Guids`, `Granit.Timing` | `BlobStorage.EntityFrameworkCore`, `BlobStorage.S3` |
+| `Granit.BlobStorage.S3` | `Granit.BlobStorage`, `Granit.Timing` | Module feuille |
+| `Granit.BlobStorage.EntityFrameworkCore` | `Granit.BlobStorage` | Module feuille |
+
+> **Dépendance justifiée** : `BlobStorage.S3 → Timing` — `PrefixBlobKeyStrategy`
+> injecte `IClock` directement pour intégrer des segments `yyyy/MM` dans les clés
+> S3. Ce sharding par date distribue les objets sur plusieurs partitions de préfixe,
+> évitant les hot-spots sur les buckets volumineux. La référence explicite dans le
+> csproj est correcte (ne pas se fier aux transitives pour les types consommés
+> directement).
+>
+> Les messages d'erreur (`BlobStorage:NotFound`, `BlobStorage:NotValid`) sont
+> localisés par `GranitExceptionHandler` via les JSON embarqués, découverts
+> automatiquement par `LocalizationAutoDiscovery`.
+>
+> Voir le [graphe de dépendances complet](../dependencies.md).

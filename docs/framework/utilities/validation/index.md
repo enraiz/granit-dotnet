@@ -304,3 +304,12 @@ Résidu = valeur numérique mod 97
 
 Le calcul est effectué chiffre par chiffre (`remainder = (remainder * 10 + digit) % 97`) pour
 éviter tout débordement de type entier avec de longs identifiants numériques.
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.ExceptionHandling`, `Granit.Localization` |
+| **Utilisé par** | Module feuille (consommé par les applications) |
+
+> Voir le [graphe de dépendances complet](../../dependencies.md).

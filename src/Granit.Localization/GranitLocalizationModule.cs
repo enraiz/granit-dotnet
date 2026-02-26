@@ -16,6 +16,8 @@ public sealed class GranitLocalizationModule : GranitModule
 
         context.Services.Configure<GranitLocalizationOptions>(options =>
         {
+            options.EnableAutoDiscovery = true;
+
             options.Resources
                 .Add<GranitLocalizationResource>("fr")
                 .AddJson(

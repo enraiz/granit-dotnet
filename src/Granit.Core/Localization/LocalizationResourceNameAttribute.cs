@@ -1,10 +1,4 @@
-// ---------------------------------------------------------------------------
-// LocalizationResourceNameAttribute.cs
-// Associates a short name with a localization resource marker class.
-// Used by the system to identify the resource in logs and during debugging.
-// ---------------------------------------------------------------------------
-
-namespace Granit.Localization.Attributes;
+namespace Granit.Core.Localization;
 
 /// <summary>
 /// Associates a short name with a localization resource marker class.

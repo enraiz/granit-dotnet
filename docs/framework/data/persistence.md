@@ -334,3 +334,18 @@ d'isolation physique :
 - [Tenant-per-Database](isolation-tenant-per-database.md) — base de données dédiée par tenant
 - [Tenant-per-Schema](isolation-tenant-per-schema.md) — schéma PostgreSQL dédié par tenant
 - [Sélection de stratégie](isolation-strategie.md) — choisir statiquement ou dynamiquement le pattern
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Timing`, `Granit.Guids`, `Granit.Security`, `Granit.ExceptionHandling` |
+| **Utilisé par** | `Granit.Authorization.EntityFrameworkCore`, `Granit.Wolverine.Postgresql`, `Granit.Localization.EntityFrameworkCore`, `Granit.Features.EntityFrameworkCore`, `Granit.Settings.EntityFrameworkCore`, `Granit.Persistence.Migrations` |
+
+> **5 dépendances directes** — c'est le module avec le plus de dépendances dans le
+> framework. Ce couplage est justifié : `Timing` fournit `IClock` pour l'horodatage
+> HDS, `Guids` fournit les identifiants séquentiels, `Security` fournit
+> `ICurrentUserService` pour l'audit trail, et `ExceptionHandling` fournit les
+> exceptions métier pour les violations de contraintes.
+>
+> Voir le [graphe de dépendances complet](../dependencies.md).
