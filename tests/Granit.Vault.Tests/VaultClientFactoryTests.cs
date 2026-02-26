@@ -5,12 +5,9 @@
 // =============================================================================
 
 using FluentAssertions;
-using Granit.Localization;
-using Granit.Localization.Extensions;
+using Granit.Vault.Exceptions;
 using Granit.Vault.Options;
 using Granit.Vault.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using VaultSharp;
@@ -20,22 +17,6 @@ namespace Granit.Vault.Tests;
 
 public sealed class VaultClientFactoryTests
 {
-    private static IStringLocalizer<VaultLocalizationResource> CreateLocalizer()
-    {
-        ServiceCollection services = new();
-        services.AddGranitLocalization(options =>
-        {
-            options.Resources
-                .Add<VaultLocalizationResource>(defaultCulture: "fr")
-                .AddJson(
-                    typeof(VaultLocalizationResource).Assembly,
-                    "Granit.Vault.Localization.Vault")
-                .AddBaseTypes(typeof(GranitLocalizationResource));
-        });
-        ServiceProvider provider = services.BuildServiceProvider();
-        return provider.GetRequiredService<IStringLocalizer<VaultLocalizationResource>>();
-    }
-
     [Fact]
     public void Create_WithTokenAuth_ReturnsClient()
     {
@@ -46,7 +27,7 @@ public sealed class VaultClientFactoryTests
             AuthMethod = "Token",
             Token = "dev-token-123"
         });
-        var factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
+        VaultClientFactory factory = new(options, NullLogger<VaultClientFactory>.Instance);
 
         // Act
         IVaultClient client = factory.Create();
@@ -56,7 +37,7 @@ public sealed class VaultClientFactoryTests
     }
 
     [Fact]
-    public void Create_WithTokenAuth_WithoutToken_Throws()
+    public void Create_WithTokenAuth_WithoutToken_ThrowsVaultConfigurationException()
     {
         // Arrange
         IOptions<VaultOptions> options = Microsoft.Extensions.Options.Options.Create(new VaultOptions
@@ -65,16 +46,16 @@ public sealed class VaultClientFactoryTests
             AuthMethod = "Token",
             Token = null
         });
-        var factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
+        VaultClientFactory factory = new(options, NullLogger<VaultClientFactory>.Instance);
 
         // Act & Assert
         Action act = () => factory.Create();
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*token*");
+        act.Should().Throw<VaultConfigurationException>()
+            .Which.ErrorCode.Should().Be("Vault:TokenRequired");
     }
 
     [Fact]
-    public void Create_WithUnknownAuthMethod_Throws()
+    public void Create_WithUnknownAuthMethod_ThrowsVaultConfigurationException()
     {
         // Arrange
         IOptions<VaultOptions> options = Microsoft.Extensions.Options.Options.Create(new VaultOptions
@@ -82,11 +63,11 @@ public sealed class VaultClientFactoryTests
             Address = "http://localhost:8200",
             AuthMethod = "Unknown"
         });
-        var factory = new VaultClientFactory(options, NullLogger<VaultClientFactory>.Instance, CreateLocalizer());
+        VaultClientFactory factory = new(options, NullLogger<VaultClientFactory>.Instance);
 
         // Act & Assert
         Action act = () => factory.Create();
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*Unknown*");
+        act.Should().Throw<VaultConfigurationException>()
+            .Which.ErrorCode.Should().Be("Vault:UnknownAuthMethod");
     }
 }

@@ -248,3 +248,12 @@ Granit.Diagnostics
 | Souveraineté OVHcloud | Pas de dépendance US Cloud Act — packages Microsoft officiels uniquement |
 | Résilience K8s | Liveness sans dépendances externes — jamais de restart en cascade |
 | Anti-DDoS interne | Cache 10 s — 1 req/10 s par pod au lieu de ~16 req/s sans cache |
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | Module feuille (consommé par les applications) |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

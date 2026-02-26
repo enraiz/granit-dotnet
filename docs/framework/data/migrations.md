@@ -238,3 +238,18 @@ et dans l'IDE via quatre règles Roslyn :
 Ces règles s'activent automatiquement quand `Granit.Persistence.Migrations` est
 référencé (opt-in). Voir la [documentation complète des analyseurs](../diagnostics/analyzers.md)
 pour le détail de chaque règle, les exemples et la suppression des diagnostics.
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Persistence`, `Granit.Timing`, `Granit.Wolverine` |
+| **Utilisé par** | Module feuille (aucun autre module n'en dépend) |
+
+> **Couplage à surveiller (#285)** : la dépendance sur `Granit.Wolverine` couple le
+> framework de migrations à un bus de messages spécifique. `RunMigrationBatchHandler`
+> et `MigrationStartupService` utilisent directement `IMessageBus` et le pattern
+> handler Wolverine pour l'orchestration des batches. Piste : extraire une abstraction
+> `IMigrationBatchDispatcher` avec implémentation Wolverine dans un package séparé.
+>
+> Voir le [graphe de dépendances complet](../dependencies.md).

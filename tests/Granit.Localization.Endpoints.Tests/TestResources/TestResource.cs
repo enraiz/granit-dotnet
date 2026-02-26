@@ -1,4 +1,4 @@
-using Granit.Localization.Attributes;
+using Granit.Core.Localization;
 
 namespace Granit.Localization.Endpoints.Tests.TestResources;
 

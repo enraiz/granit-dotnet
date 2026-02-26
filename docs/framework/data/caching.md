@@ -360,3 +360,13 @@ src/
   le module chargé (utile pour les environnements sans Redis)
 - Le L1 HybridCache est en mémoire locale du pod : pas de données sensibles
   exposées sur le réseau lors des accès L1
+
+## Dépendances Granit
+
+| Package | Dépend de | Utilisé par |
+|---------|-----------|-------------|
+| `Granit.Caching` | `Granit.Core` | `Authorization`, `Settings`, `Idempotency`, `Features`, `Caching.StackExchangeRedis`, `Caching.Hybrid` |
+| `Granit.Caching.StackExchangeRedis` | `Caching` | `Caching.Hybrid` |
+| `Granit.Caching.Hybrid` | `Caching`, `Caching.StackExchangeRedis` | Module feuille (opt-in applicatif) |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

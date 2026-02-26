@@ -144,3 +144,13 @@ public sealed class OrderCreatedHandler
 - La propagation `X-User-Id` garantit la traçabilité des opérations asynchrones dans l'audit trail
 - La chaîne de connexion doit pointer sur une base de données **en Europe (OVHcloud FR)**,
   jamais sur un service US (Cloud Act)
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Security` |
+| **Utilisé par** | `Granit.BackgroundJobs`, `Granit.Webhooks`, `Granit.Wolverine.Postgresql`, `Granit.Persistence.Migrations` |
+| **Package PostgreSQL** | `Granit.Wolverine.Postgresql` → ajoute `Granit.Persistence` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

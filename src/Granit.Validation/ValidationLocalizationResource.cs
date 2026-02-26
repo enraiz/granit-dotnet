@@ -1,5 +1,5 @@
+using Granit.Core.Localization;
 using Granit.Localization;
-using Granit.Localization.Attributes;
 
 namespace Granit.Validation;
 

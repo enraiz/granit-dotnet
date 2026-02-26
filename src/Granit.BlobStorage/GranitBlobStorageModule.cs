@@ -1,6 +1,4 @@
 using Granit.Core.Modularity;
-using Granit.Localization;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.BlobStorage;
 
@@ -12,20 +10,10 @@ namespace Granit.BlobStorage;
 /// <see cref="IBlobKeyStrategy"/>, and <see cref="IBlobValidator"/> abstractions.
 /// Register a concrete provider (e.g. <c>Granit.BlobStorage.S3</c>) and a
 /// persistence adapter (e.g. <c>Granit.BlobStorage.EntityFrameworkCore</c>) alongside this module.
+/// <para>
+/// Localization resources (<c>Localization/BlobStorage/{culture}.json</c>) are embedded in this
+/// assembly and auto-discovered by <c>GranitLocalizationModule</c> via
+/// <see cref="BlobStorageLocalizationResource"/>.
+/// </para>
 /// </remarks>
-[DependsOn(typeof(GranitLocalizationModule))]
-public sealed class GranitBlobStorageModule : GranitModule
-{
-    /// <inheritdoc/>
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.Configure<GranitLocalizationOptions>(options =>
-        {
-            options.Resources
-                .Add<BlobStorageLocalizationResource>("fr")
-                .AddJson(
-                    typeof(BlobStorageLocalizationResource).Assembly,
-                    "Granit.BlobStorage.Localization.BlobStorage");
-        });
-    }
-}
+public sealed class GranitBlobStorageModule : GranitModule;

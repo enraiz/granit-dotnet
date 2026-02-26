@@ -1,10 +1,4 @@
-// ---------------------------------------------------------------------------
-// InheritResourceAttribute.cs
-// Declares that a localization resource inherits translations
-// from one or more parent resources (ABP-style inheritance).
-// ---------------------------------------------------------------------------
-
-namespace Granit.Localization.Attributes;
+namespace Granit.Core.Localization;
 
 /// <summary>
 /// Declares that this resource inherits translations from the specified parent resources.

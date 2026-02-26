@@ -295,3 +295,13 @@ Le ou les rôles configurés dans `AdminRoles` bypasse le `PermissionChecker`
 (vérification directe via `ICurrentUserService.IsInRole`). Ces rôles ne peuvent
 **pas** être révoqués via `IPermissionManager.SetAsync` — ils sont définis dans
 la configuration et déployés hors du périmètre applicatif (Keycloak, Vault, etc.).
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Security`, `Granit.Caching` |
+| **Utilisé par** | `Granit.Authorization.EntityFrameworkCore`, `Granit.BackgroundJobs.Endpoints`, `Granit.Localization.Endpoints` |
+| **Package EF Core** | `Granit.Authorization.EntityFrameworkCore` → ajoute `Granit.Persistence` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

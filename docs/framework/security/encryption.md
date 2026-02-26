@@ -116,3 +116,12 @@ src/Granit.Encryption/
 Les paramètres déclarés avec `IsEncrypted = true` utilisent automatiquement
 `IStringEncryptionService` à la couche `ISettingStore` (chiffrement au repos).
 Le cache stocke le **plaintext** — seule la persistance en base chiffre/déchiffre.
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | `Granit.Settings`, `Granit.Vault` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

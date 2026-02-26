@@ -172,9 +172,23 @@ des raisons RGPD/HDS. Tenter de les utiliser sans contexte tenant lève une exce
 
 ## Dépendances
 
+### Packages NuGet
+
 | Package | Rôle |
 | --- | --- |
 | `Microsoft.Extensions.DependencyInjection.Abstractions` | `IServiceCollection` |
 | `Microsoft.Extensions.Hosting.Abstractions` | `IHostApplicationBuilder`, `IHost` |
 | `Microsoft.Extensions.Options` | `IOptions<T>` |
 | `Microsoft.AspNetCore.App` (FrameworkReference) | `IApplicationBuilder`, `WebApplication` |
+
+### Dépendances Granit
+
+`Granit.Core` est le **package racine** du framework — il ne dépend d'aucun autre
+module Granit. Tous les modules Granit en dépendent directement ou transitivement.
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | Aucun module Granit |
+| **Utilisé par (direct)** | `Timing`, `Guids`, `Security`, `ExceptionHandling`, `Validation`, `Caching`, `Encryption`, `Diagnostics`, `Observability`, `MultiTenancy`, `Persistence`, `Authorization`, `Wolverine`, `Localization`, `Features`, `BackgroundJobs`, `BlobStorage`, `Settings`, `Webhooks`, `Idempotency`, `ApiVersioning`, `Vault` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

@@ -17,8 +17,8 @@
       "StackExchange.Redis": {
         "type": "Direct",
         "requested": "[2.*, )",
-        "resolved": "2.11.3",
-        "contentHash": "/Uxwsyue5f4bXRRmV/apNNTWkrvVYQZnhYiPJJaUJpBuiAsyGxo4mGoXE4QFnzivV9vvH1cc5DjjnsLi69nd2Q==",
+        "resolved": "2.11.8",
+        "contentHash": "25UL0tkhQo3ATT+DAu9OyaPhyWRvJIYcID/iNM8gNWqapJCX4dB/Q2RBBHjv6rQ1utp92pUoxgtZdX25ZNLC6Q==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
           "Pipelines.Sockets.Unofficial": "2.2.8",
@@ -70,6 +70,7 @@
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Caching.Hybrid": "[10.*, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
           "Microsoft.Extensions.Configuration.Binder": "[10.*, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
@@ -87,6 +88,18 @@
         "contentHash": "5dtXBvI8t3z8pF4tB38JYgi/enCL/DwSXxpqShgFz3SHJ7IzqFIMs6Gu5ik8sNZzcO9qQs3xIDpB3vDamkYG+Q==",
         "dependencies": {
           "Microsoft.Extensions.Primitives": "10.0.3"
+        }
+      },
+      "Microsoft.Extensions.Caching.Hybrid": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.3.0",
+        "contentHash": "M64quRgc0tSGs8aTj7XNr0sm4nsoqNuAaDDUohC2UGEPyMt3jhW4dHcCUUk/UBYfj+XPWDeycbDIUsdIO5mShw==",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.3",
+          "Microsoft.Extensions.Caching.Memory": "10.0.3",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
+          "Microsoft.Extensions.Options": "10.0.3"
         }
       },
       "Microsoft.Extensions.Caching.Memory": {

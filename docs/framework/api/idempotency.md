@@ -224,3 +224,12 @@ partagé entre tous les threads, ce qui est son mode d'utilisation normal.
   conformité HDS sur les corps de réponse contenant des données de santé.
 - Le middleware n'est **jamais déclenché** sur les endpoints sans `[Idempotent]`
   (vérification via `IIdempotencyMetadata` dans les endpoint metadata).
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Caching`, `Granit.Security` |
+| **Utilisé par** | Module feuille (consommé par les applications) |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

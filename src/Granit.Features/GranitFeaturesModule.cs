@@ -1,4 +1,4 @@
-using Granit.Caching.Hybrid;
+using Granit.Caching;
 using Granit.Core.Modularity;
 using Granit.Localization;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +12,7 @@ namespace Granit.Features;
 /// Provides plan-based feature activation with multi-level resolution:
 /// Tenant override → Plan value → Default (code).
 /// <para>
-/// Values are cached via <c>IHybridCache</c> (L1 in-process + L2 Redis)
+/// Values are cached via <c>HybridCache</c> (L1 in-process, L2 Redis if configured)
 /// with per-tenant invalidation via <see cref="Events.FeatureValueChangedEvent"/>.
 /// </para>
 /// <para>
@@ -26,7 +26,7 @@ namespace Granit.Features;
 /// falls through Plan → Default with no DI error.
 /// </para>
 /// </remarks>
-[DependsOn(typeof(GranitCachingHybridModule))]
+[DependsOn(typeof(GranitCachingModule))]
 [DependsOn(typeof(GranitLocalizationModule))]
 public sealed class GranitFeaturesModule : GranitModule
 {

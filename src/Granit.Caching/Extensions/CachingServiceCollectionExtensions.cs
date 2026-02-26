@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +58,19 @@ public static class CachingServiceCollectionExtensions
 
         services.TryAddSingleton(typeof(ICacheService<>), typeof(DistributedCacheService<>));
         services.TryAddSingleton(typeof(ICacheService<,>), typeof(TypedKeyCacheServiceAdapter<,>));
+
+        // HybridCache memory-only par défaut (L1 uniquement, pas de L2)
+        // GranitCachingHybridModule reconfigure les options pour ajouter L2 Redis + LocalCacheExpiration
+        CachingOptions cachingOpts = new();
+        configuration?.Bind(cachingOpts);
+
+        services.AddHybridCache(hybrid =>
+        {
+            hybrid.DefaultEntryOptions = new HybridCacheEntryOptions
+            {
+                Expiration = cachingOpts.DefaultAbsoluteExpirationRelativeToNow,
+            };
+        });
 
         return services;
     }

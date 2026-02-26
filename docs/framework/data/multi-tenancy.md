@@ -337,6 +337,19 @@ factory.WithWebHostBuilder(builder =>
 5. **Isolation en parallèle** : chaque tâche `Task.Run(...)` hérite du contexte
    tenant de son parent, mais les modifications ultérieures sont indépendantes
 
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par (soft dependency)** | `Persistence`, `Settings`, `Wolverine`, `Authorization`, `Idempotency`, `BackgroundJobs`, `Webhooks` — via `ICurrentTenant` de `Granit.Core.MultiTenancy` |
+
+> `ICurrentTenant` vit dans `Granit.Core.MultiTenancy`. Les modules ci-dessus consomment
+> l'interface sans déclarer `[DependsOn(GranitMultiTenancyModule)]`. Seuls `BlobStorage`
+> et ses sous-packages ont une **dépendance forte** (isolation tenant obligatoire RGPD/HDS).
+>
+> Voir le [graphe de dépendances complet](../dependencies.md).
+
 ## Voir aussi
 
 - [Isolation Tenant-per-Database](isolation-tenant-per-database.md)

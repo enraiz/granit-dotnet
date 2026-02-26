@@ -59,6 +59,7 @@
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Caching.Hybrid": "[10.*, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
           "Microsoft.Extensions.Configuration.Binder": "[10.*, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
@@ -153,8 +154,8 @@
       "StackExchange.Redis": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.11.3",
-        "contentHash": "/Uxwsyue5f4bXRRmV/apNNTWkrvVYQZnhYiPJJaUJpBuiAsyGxo4mGoXE4QFnzivV9vvH1cc5DjjnsLi69nd2Q==",
+        "resolved": "2.11.8",
+        "contentHash": "25UL0tkhQo3ATT+DAu9OyaPhyWRvJIYcID/iNM8gNWqapJCX4dB/Q2RBBHjv6rQ1utp92pUoxgtZdX25ZNLC6Q==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
           "Pipelines.Sockets.Unofficial": "2.2.8",

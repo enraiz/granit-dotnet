@@ -25,7 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
     <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
-    <ProjectReference Include="..\Granit.Localization\Granit.Localization.csproj" />
     <!-- Optional at runtime: ICurrentTenant resolved via constructor injection (NullTenantContext when multi-tenancy is not installed) -->
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
   </ItemGroup>

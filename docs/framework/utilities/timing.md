@@ -454,7 +454,18 @@ entity.CreatedAt.Should().Be(fixedNow);
 
 ## Dépendances
 
+### Packages NuGet
+
 | Package | Rôle |
 | --- | --- |
 | `Microsoft.Extensions.Options` | `IOptions<ClockOptions>` |
 | `Microsoft.Extensions.DependencyInjection.Abstractions` | Registration DI |
+
+### Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | `Granit.Persistence`, `Granit.BackgroundJobs`, `Granit.BlobStorage`, `Granit.BlobStorage.S3`, `Granit.Persistence.Migrations` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

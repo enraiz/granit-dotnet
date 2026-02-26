@@ -107,3 +107,9 @@ Briques utilitaires transverses.
 | [guids.md](utilities/guids.md) | IGuidGenerator, GUID séquentiels pour index clustered |
 | [validation/index.md](utilities/validation/index.md) | Validation FluentValidation : identifiants légaux BE/FR, TVA UE, paiements, contacts |
 | [localization/index.md](utilities/localization/index.md) | Localisation, ressources multilingues, endpoint HTTP SPA |
+
+## Transversal
+
+| Document | Description |
+| --- | --- |
+| [dependencies.md](dependencies.md) | Graphe de dépendances inter-modules (Mermaid) |

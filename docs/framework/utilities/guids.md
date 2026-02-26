@@ -352,7 +352,18 @@ guidGenerator.Create().Returns(fixedId);
 
 ## Dépendances
 
+### Packages NuGet
+
 | Package | Rôle |
 | --- | --- |
 | `Microsoft.Extensions.Options` | `IOptions<GuidGeneratorOptions>` |
 | `Microsoft.Extensions.DependencyInjection.Abstractions` | Registration DI |
+
+### Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core` |
+| **Utilisé par** | `Granit.Persistence`, `Granit.BlobStorage` |
+
+> Voir le [graphe de dépendances complet](../dependencies.md).

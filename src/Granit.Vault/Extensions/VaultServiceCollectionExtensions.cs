@@ -1,5 +1,3 @@
-using Granit.Localization;
-using Granit.Localization.Extensions;
 using Granit.Vault.HealthChecks;
 using Granit.Vault.Options;
 using Granit.Vault.Services;
@@ -23,17 +21,6 @@ public static class VaultServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddGranitLocalization();
-        services.Configure<GranitLocalizationOptions>(options =>
-        {
-            options.Resources
-                .Add<VaultLocalizationResource>(defaultCulture: "fr")
-                .AddJson(
-                    typeof(VaultLocalizationResource).Assembly,
-                    "Granit.Vault.Localization.Vault")
-                .AddBaseTypes(typeof(GranitLocalizationResource));
-        });
-
         services.Configure<VaultOptions>(configuration.GetSection(VaultOptions.SectionName));
 
         services.AddSingleton<VaultClientFactory>();

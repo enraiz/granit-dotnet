@@ -271,3 +271,18 @@ src/
 | `FeatureLimitExceededException` | `IFeatureLimitGuard.GuardAsync()` — quota dépassé |
 | `FeatureNotFoundException` | `IFeatureDefinitionStore.GetRequired()` — feature inconnue |
 | `FeatureValueValidationException` | Valeur incompatible avec les contraintes du `ValueType` |
+
+## Dépendances Granit
+
+| Direction | Modules |
+|-----------|---------|
+| **Dépend de** | `Granit.Core`, `Granit.Caching`, `Granit.Localization` |
+| **Utilisé par** | `Granit.Features.EntityFrameworkCore` |
+
+> `Features` dépend de `Granit.Caching` (abstraction) et non de
+> `Granit.Caching.Hybrid` (implémentation L1+L2). `HybridCache` est
+> enregistré en mémoire seule par `GranitCachingModule` ;
+> `GranitCachingHybridModule` reconfigure L2 Redis si nécessaire.
+> L'application reste libre de choisir son fournisseur de cache.
+>
+> Voir le [graphe de dépendances complet](../dependencies.md).

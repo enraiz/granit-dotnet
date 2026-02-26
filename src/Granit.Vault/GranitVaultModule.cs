@@ -1,6 +1,5 @@
 using Granit.Core.Modularity;
 using Granit.Encryption;
-using Granit.Localization;
 using Granit.Vault.Extensions;
 using Granit.Vault.Providers;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,11 @@ namespace Granit.Vault;
 /// Skip l'enregistrement en Development (pas de Vault en local).
 /// Enregistre <see cref="VaultStringEncryptionProvider"/> si Vault est actif.
 /// </summary>
-[DependsOn(typeof(GranitLocalizationModule))]
+/// <remarks>
+/// Localization resources (<c>Localization/Vault/{culture}.json</c>) are embedded in this
+/// assembly and auto-discovered by <c>GranitLocalizationModule</c> via
+/// <see cref="VaultLocalizationResource"/>.
+/// </remarks>
 [DependsOn(typeof(GranitEncryptionModule))]
 public sealed class GranitVaultModule : GranitModule
 {
