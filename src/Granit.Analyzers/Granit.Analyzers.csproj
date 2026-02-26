@@ -4,7 +4,7 @@
     <PackageId>Granit.Analyzers</PackageId>
     <!-- Analyzers must target netstandard2.0 to be compatible with all SDK versions -->
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Roslyn analyzers enforcing the Granit Expand &amp; Contract zero-downtime migration pattern.</Description>
+    <Description>Roslyn analyzers enforcing Granit conventions: zero-downtime migrations, security best practices, and Entity Framework Core usage rules.</Description>
     <IsPackable>true</IsPackable>
     <!-- Analyzer packages: DLL goes in analyzers/, not in lib/ -->
     <DevelopmentDependency>true</DevelopmentDependency>

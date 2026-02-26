@@ -69,6 +69,24 @@ internal static class AnalyzerTestHelpers
         """;
 
     /// <summary>
+    /// Minimal EF Core <c>DbContext</c> stub with <c>SaveChanges()</c> and
+    /// <c>SaveChangesAsync()</c> — used by GR-EF001 tests.
+    /// </summary>
+    internal const string DbContextStub = """
+        namespace Microsoft.EntityFrameworkCore
+        {
+            public abstract class DbContext
+            {
+                public int SaveChanges() => 0;
+                public int SaveChanges(bool acceptAllChangesOnSuccess) => 0;
+                public System.Threading.Tasks.Task<int> SaveChangesAsync(
+                    System.Threading.CancellationToken cancellationToken = default)
+                    => System.Threading.Tasks.Task.FromResult(0);
+            }
+        }
+        """;
+
+    /// <summary>
     /// Runs <typeparamref name="TAnalyzer"/> against the given <paramref name="source"/> code,
     /// compiled together with the EF Core stub and optionally the <c>MigrationCycleAttribute</c> stub.
     /// </summary>
@@ -94,6 +112,41 @@ internal static class AnalyzerTestHelpers
         if (includeMigrationCycleAttribute)
         {
             treeBuilder.Add(CSharpSyntaxTree.ParseText(MigrationCycleAttributeStub, cancellationToken: ct));
+        }
+
+        ImmutableArray<MetadataReference> references = GetNetCoreReferences();
+
+        CSharpCompilation compilation = CSharpCompilation.Create(
+            assemblyName: "TestAssembly",
+            syntaxTrees: treeBuilder.ToImmutable(),
+            references: references,
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(
+            ImmutableArray.Create<DiagnosticAnalyzer>(new TAnalyzer()));
+
+        return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(ct);
+    }
+
+    /// <summary>
+    /// Runs <typeparamref name="TAnalyzer"/> against the given <paramref name="source"/> code
+    /// with optional additional source stubs (no EF Core migration stubs included by default).
+    /// </summary>
+    /// <param name="source">The C# source snippet to analyze.</param>
+    /// <param name="additionalSources">Extra source stubs to include in the compilation.</param>
+    /// <param name="ct">Cancellation token.</param>
+    internal static async Task<ImmutableArray<Diagnostic>> RunAnalyzerAsync<TAnalyzer>(
+        string source,
+        string[] additionalSources,
+        CancellationToken ct = default)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        ImmutableArray<SyntaxTree>.Builder treeBuilder = ImmutableArray.CreateBuilder<SyntaxTree>();
+        treeBuilder.Add(CSharpSyntaxTree.ParseText(source, cancellationToken: ct));
+
+        foreach (string additional in additionalSources)
+        {
+            treeBuilder.Add(CSharpSyntaxTree.ParseText(additional, cancellationToken: ct));
         }
 
         ImmutableArray<MetadataReference> references = GetNetCoreReferences();
