@@ -155,6 +155,59 @@ Pour supprimer globalement dans un projet, ajouter dans le `.editorconfig` :
 dotnet_diagnostic.GRSEC001.severity = none
 ```
 
+## Corrections automatiques (CodeFix)
+
+Le package `Granit.Analyzers` embarque des CodeFixProviders qui proposent des
+corrections automatiques dans l'IDE (Visual Studio, Rider, VS Code) pour
+certaines règles.
+
+| Règle | CodeFix | Description |
+| ----- | ------- | ----------- |
+| GRSEC001 | Remplacer par injection `IClock` | Remplace l'expression, ajoute champ + constructeur + `using Granit.Timing` |
+| GRSEC002 | Remplacer par injection `IGuidGenerator` | Remplace l'expression, ajoute champ + constructeur + `using Granit.Guids` |
+| GRSEC003 | — | Pas de correction automatique (les secrets ne se corrigent pas automatiquement) |
+| GREF001 | Remplacer par `SaveChangesAsync()` | Ajoute `await`, transforme la méthode en `async`, ajoute `using System.Threading.Tasks` |
+
+### Exemple — GRSEC001
+
+Avant (diagnostic) :
+
+```csharp
+public class MyService
+{
+    public MyService() { }
+    public void DoWork()
+    {
+        DateTimeOffset now = DateTime.Now; // GRSEC001
+    }
+}
+```
+
+Après application du CodeFix :
+
+```csharp
+public class MyService
+{
+    private readonly IClock _clock;
+    public MyService(IClock clock)
+    {
+        _clock = clock;
+    }
+    public void DoWork()
+    {
+        DateTimeOffset now = _clock.Now;
+    }
+}
+```
+
+### Contagion Async (GREF001)
+
+Le CodeFix pour GREF001 transforme la signature de la méthode englobante
+(`void` → `async Task`, `int` → `async Task<int>`). Cette modification **casse
+les appelants** de la méthode, qui devront à leur tour ajouter `await`. C'est
+un comportement standard pour un CodeFix local — l'IDE propose ensuite les
+corrections en cascade.
+
 ## Conformité
 
 | Exigence | Mécanisme |

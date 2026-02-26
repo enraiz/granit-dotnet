@@ -9,26 +9,26 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 
 ### Migrations
 
-| Rule | Severity | Description |
-| ---- | -------- | ----------- |
-| GRMIGA001 | Error | DropColumn requires a Contract-phase annotation |
-| GRMIGA002 | Error | RenameColumn is not zero-downtime safe |
-| GRMIGA003 | Warning | AddColumn NOT NULL without a default value risks a table lock |
-| GRMIGA004 | Warning | AlterColumn with a type change requires a Contract-phase annotation |
+| Rule | Severity | CodeFix | Description |
+| ---- | -------- | ------- | ----------- |
+| GRMIGA001 | Error | — | DropColumn requires a Contract-phase annotation |
+| GRMIGA002 | Error | — | RenameColumn is not zero-downtime safe |
+| GRMIGA003 | Warning | — | AddColumn NOT NULL without a default value risks a table lock |
+| GRMIGA004 | Warning | — | AlterColumn with a type change requires a Contract-phase annotation |
 
 ### Security
 
-| Rule | Severity | Description |
-| ---- | -------- | ----------- |
-| GRSEC001 | Warning | Avoid direct DateTime/DateTimeOffset clock access — use IClock |
-| GRSEC002 | Warning | Avoid Guid.NewGuid() — use IGuidGenerator |
-| GRSEC003 | Error | Potential hardcoded secret detected |
+| Rule | Severity | CodeFix | Description |
+| ---- | -------- | ------- | ----------- |
+| GRSEC001 | Warning | Yes | Avoid direct DateTime/DateTimeOffset clock access — use IClock |
+| GRSEC002 | Warning | Yes | Avoid Guid.NewGuid() — use IGuidGenerator |
+| GRSEC003 | Error | — | Potential hardcoded secret detected |
 
 ### Entity Framework
 
-| Rule | Severity | Description |
-| ---- | -------- | ----------- |
-| GREF001 | Warning | Use SaveChangesAsync() instead of SaveChanges() |
+| Rule | Severity | CodeFix | Description |
+| ---- | -------- | ------- | ----------- |
+| GREF001 | Warning | Yes | Use SaveChangesAsync() instead of SaveChanges() |
 
 ## Installation
 
