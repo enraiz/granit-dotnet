@@ -227,6 +227,83 @@ localizer["PatientNotFound", Arg.Any<object[]>()]
     .Returns(new LocalizedString("PatientNotFound", "Patient introuvable."));
 ```
 
+## Clés type-safe (source generator)
+
+Le package `Granit.Localization.SourceGenerator` génère automatiquement des constantes
+C# à partir des fichiers JSON de localisation, éliminant les chaînes magiques.
+
+### Installation
+
+```bash
+dotnet add package Granit.Localization.SourceGenerator
+```
+
+### Configuration
+
+Déclarer les fichiers JSON comme `AdditionalFiles` dans le `.csproj` du projet
+consommateur :
+
+```xml
+<ItemGroup>
+  <AdditionalFiles Include="Localization/**/*.json" />
+</ItemGroup>
+```
+
+### Code généré
+
+À partir du JSON suivant :
+
+```json
+{
+  "culture": "fr",
+  "texts": {
+    "Granit:EntityNotFound": "L'entité est introuvable.",
+    "Granit:Validation.Required": "Ce champ est obligatoire.",
+    "Granit:Validation.MaxLength": "Maximum {0} caractères."
+  }
+}
+```
+
+Le source generator produit :
+
+```csharp
+public static class LocalizationKeys
+{
+    public static class Granit
+    {
+        public const string EntityNotFound = "Granit:EntityNotFound";
+
+        public static class Validation
+        {
+            public const string Required = "Granit:Validation.Required";
+            public const string MaxLength = "Granit:Validation.MaxLength";
+        }
+    }
+}
+```
+
+### Utilisation
+
+```csharp
+// Avant — chaîne magique
+string message = localizer["Granit:EntityNotFound"];
+
+// Après — constante type-safe avec autocomplétion
+string message = localizer[LocalizationKeys.Granit.EntityNotFound];
+```
+
+### Règles de génération
+
+| Convention JSON | Résultat C# |
+| --- | --- |
+| Séparateur `:` (ex. `Granit:Key`) | Classe imbriquée + constante |
+| Séparateur `.` (ex. `Validation.Required`) | Classes imbriquées |
+| Objets JSON imbriqués | Aplatis avec `.` comme séparateur |
+| Caractères invalides (`-`, espaces) | Remplacés par `_` |
+| Identifiant commençant par un chiffre | Préfixé par `_` |
+
+Le namespace de la classe générée correspond au `RootNamespace` du projet consommateur.
+
 ## Bonnes pratiques
 
 1. **Un marker par module** — créer une classe marker par package/module pour isoler
@@ -252,3 +329,4 @@ localizer["PatientNotFound", Arg.Any<object[]>()]
 | `Microsoft.Extensions.Options` | `IOptions<GranitLocalizationOptions>` |
 | `SmartFormat` | Moteur de formatage avec pluralisation CLDR (remplace `string.Format`) |
 | `Granit.Core` | Système de modules (`GranitModule`, `[DependsOn]`) |
+| `Granit.Localization.SourceGenerator` | Source generator Roslyn pour constantes type-safe |
