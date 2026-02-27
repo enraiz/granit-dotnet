@@ -1,17 +1,16 @@
 # Templating et génération documentaire — Granit.Templating
 
 Moteur de rendu de templates et génération de documents (PDF, Excel) pour les applications
-Digital Dynamics. La source est toujours du HTML produit par le moteur Scriban ; les formats
-binaires sont créés par des renderers dédiés.
+Digital Dynamics.
 
 | Package | Rôle |
 | --- | --- |
 | `Granit.Templating` | Socle générique : interfaces, pipeline, enrichisseurs |
 | `Granit.Templating.Scriban` | Moteur Scriban 6 sandboxé + contextes globaux (`now.*`, `context.*`) |
-| `Granit.Templating.EntityFrameworkCore` | `IDocumentTemplateStore` EF Core — cycle de vie Draft/Published/Deprecated |
+| `Granit.Templating.EntityFrameworkCore` | `IDocumentTemplateStore` EF Core — cycle de vie Draft/Published/Deprecated + **cache hybride** |
 | `Granit.DocumentGeneration` | Façade `IDocumentGenerator`, `IDocumentRenderer`, `DocumentResult` |
 | `Granit.DocumentGeneration.Pdf` | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête *(à venir)* |
-| `Granit.DocumentGeneration.Excel` | `ClosedXmlTemplateEngine` — génération de tableurs *.xlsx* *(à venir)* |
+| `Granit.DocumentGeneration.Excel` | `ClosedXmlTemplateEngine` — génération de tableurs *.xlsx* natifs |
 
 ## Pipeline complet
 
@@ -19,10 +18,15 @@ binaires sont créés par des renderers dédiés.
 TData (brut)
   → ITemplateDataEnricher<TData>[]   (enrichissement ordonné, immutable)
   → ITemplateResolver[]              (chaîne par Priority, fallback culture)
-  → ITemplateEngine (Scriban)        (rendu HTML sandboxé)
-  → IDocumentRenderer                (optionnel — HTML → PDF/Excel)
+  → ITemplateEngine (sélectionné par MIME type)
+        ├── ScribanTemplateEngine  → TextRenderedContent (HTML)
+        │     └── IDocumentRenderer (optionnel — HTML → PDF)
+        └── ClosedXmlTemplateEngine → BinaryRenderedContent (XLSX direct)
   → DocumentResult
 ```
+
+La sélection du moteur est automatique : chaque `ITemplateEngine` déclare les MIME types
+qu'il peut rendre via `CanRender(descriptor)`. Le premier moteur compatible est utilisé.
 
 ## Concepts clés
 
@@ -35,7 +39,7 @@ public abstract class TextTemplateType<TData> : TemplateType<TData> where TData 
     public abstract string Name { get; }
 }
 
-// Template documentaire — source HTML, sortie binaire
+// Template documentaire — source HTML ou XLSX, sortie binaire
 public abstract class DocumentTemplateType<TData> : TextTemplateType<TData> where TData : notnull
 {
     public virtual DocumentFormat DefaultFormat => DocumentFormat.Pdf;
@@ -54,6 +58,13 @@ public sealed class InvoiceTemplateType : DocumentTemplateType<InvoiceData>
 {
     public override string Name => "Billing.Invoice";
     // DefaultFormat = Pdf par défaut
+}
+
+// Template Excel natif — le contenu est un XLSX en base64 dans le store
+public sealed class ExcelInvoiceTemplateType : DocumentTemplateType<InvoiceData>
+{
+    public override string Name => "Billing.Invoice.Excel";
+    public override DocumentFormat DefaultFormat => DocumentFormat.Excel;
 }
 ```
 
@@ -125,6 +136,26 @@ Variables globales disponibles sans configuration :
 > (`EnableRelaxedMemberAccess = false`). Aucun accès I/O, réseau ou réflexion .NET
 > n'est possible depuis un template.
 
+### Moteur Excel (ClosedXML)
+
+`ClosedXmlTemplateEngine` génère des fichiers XLSX directement à partir d'un template
+stocké en base64 dans le store (`MimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"`).
+
+Les cellules de type texte peuvent contenir des placeholders `{{model.propriété}}` :
+
+```text
+Cellule A1 : "Facture {{model.invoice_number}}"
+Cellule B1 : "Client : {{model.customer_name}}"
+Cellule C1 : "Adresse : {{model.address.city}}"
+```
+
+Les propriétés sont exprimées en snake\_case avec notation pointée pour les objets imbriqués.
+Le remplacement est effectué sur toutes les feuilles du classeur.
+
+> **Remarque :** contrairement au moteur Scriban, le moteur Excel ne supporte pas les boucles
+> ni les conditions — il effectue une substitution de chaînes simple. Pour des tableaux
+> dynamiques, utilisez un renderer HTML→Excel avec Scriban comme source.
+
 ### Cycle de vie des templates (IDocumentTemplateStore)
 
 ```text
@@ -140,21 +171,37 @@ Draft → Published → Deprecated
 Seuls les brouillons (`Draft`) peuvent être supprimés physiquement. Les révisions dépréciées
 sont conservées sans limite de durée (obligation HDS, article L. 1111-8 CSP — 3 ans minimum).
 
+### Cache hybride (HybridCache)
+
+`EfDocumentTemplateStore` met en cache les templates publiés via `HybridCache` (.NET 10) :
+
+- **L1** : in-process `MemoryCache` — accès sub-milliseconde
+- **L2** : cache distribué (Redis) si configuré dans l'application hôte
+
+Le cache est invalidé automatiquement (`RemoveAsync`) après chaque `PublishAsync` et
+`UnpublishAsync`. La clé de cache suit le schéma `granit:tmpl:{name}|{culture}`.
+
+`AddGranitTemplatingEntityFrameworkCore()` appelle `AddHybridCache()` — aucune configuration
+supplémentaire n'est requise pour le L1. Pour activer le L2 Redis, configurer
+`AddHybridCache().AddStackExchangeRedisCache(...)` dans l'application hôte après l'appel.
+
 ## Installation
 
 ### 1 — Modules
 
 ```csharp
-// Avec moteur Scriban et store EF Core (configuration complète recommandée)
+// Avec moteur Scriban, store EF Core et génération Excel
 [DependsOn(
     typeof(GranitTemplatingScribanModule),
     typeof(GranitTemplatingEntityFrameworkCoreModule),
-    typeof(GranitDocumentGenerationModule))]
+    typeof(GranitDocumentGenerationModule),
+    typeof(GranitDocumentGenerationExcelModule))]
 public sealed class MyAppModule : GranitModule { }
 ```
 
 > `GranitTemplatingScribanModule` dépend déjà de `GranitTemplatingModule`.
 > `GranitDocumentGenerationModule` dépend déjà de `GranitTemplatingModule`.
+> `GranitDocumentGenerationExcelModule` dépend déjà de `GranitTemplatingModule`.
 
 ### 2 — Enregistrement des services
 
@@ -162,7 +209,10 @@ public sealed class MyAppModule : GranitModule { }
 // Moteur Scriban (ITemplateEngine + contextes globaux now.* et context.*)
 builder.Services.AddGranitTemplatingWithScriban();
 
-// Store EF Core (IDocumentTemplateStore + StoreTemplateResolver, Priority = 100)
+// Moteur Excel ClosedXML (ITemplateEngine, additive — les deux moteurs coexistent)
+builder.Services.AddGranitDocumentGenerationExcel();
+
+// Store EF Core (IDocumentTemplateStore + StoreTemplateResolver + HybridCache L1)
 builder.AddGranitTemplatingEntityFrameworkCore(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
@@ -177,9 +227,6 @@ builder.Services.AddTemplateGlobalContext<MyCustomContext>();
 
 // Façade de génération documentaire
 builder.Services.AddGranitDocumentGeneration();
-
-// Renderer PDF (nécessite Granit.DocumentGeneration.Pdf — à venir)
-builder.Services.AddDocumentRenderer<PuppeteerSharpRenderer>();
 ```
 
 ### 3 — Ressources embarquées
@@ -231,7 +278,7 @@ public sealed class WelcomeEmailService(ITextTemplateRenderer renderer)
 }
 ```
 
-### Génération d'un document (PDF)
+### Génération d'un document PDF (HTML → PDF)
 
 ```csharp
 public sealed class InvoiceService(IDocumentGenerator generator)
@@ -241,6 +288,24 @@ public sealed class InvoiceService(IDocumentGenerator generator)
     {
         return await generator.GenerateAsync(
             new InvoiceTemplateType(), data, ct: ct);
+    }
+}
+```
+
+### Génération d'un tableur Excel natif
+
+Le template est un fichier *.xlsx* stocké en base64 dans le store avec le MIME type Excel.
+Le moteur `ClosedXmlTemplateEngine` est sélectionné automatiquement.
+
+```csharp
+public sealed class ExcelReportService(IDocumentGenerator generator)
+{
+    public async Task<DocumentResult> GenerateReportAsync(
+        ReportData data, CancellationToken ct)
+    {
+        // Le MIME type du template détermine automatiquement le moteur (ClosedXML)
+        return await generator.GenerateAsync(
+            new ExcelReportTemplateType(), data, ct: ct);
     }
 }
 ```
@@ -263,12 +328,12 @@ public sealed class TemplateAdminService(IDocumentTemplateStore store)
     public Task SaveDraftAsync(TemplateKey key, string html, CancellationToken ct)
         => store.SaveDraftAsync(key, html, "text/html", "admin@digitaldynamics.be", ct);
 
-    // Publier le brouillon courant
+    // Publier le brouillon courant (invalide le cache HybridCache)
     public Task PublishAsync(TemplateKey key, CancellationToken ct)
         => store.PublishAsync(key, "admin@digitaldynamics.be", ct);
 
     // Consulter l'historique complet (audit HDS)
-    public Task<IReadOnlyList<TemplateDescriptor>> GetHistoryAsync(
+    public Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
         TemplateKey key, CancellationToken ct)
         => store.GetHistoryAsync(key, ct);
 }
@@ -281,6 +346,7 @@ public sealed class TemplateAdminService(IDocumentTemplateStore store)
 | `TemplateNotFoundException` | Aucun resolver n'a trouvé le template pour la clé et la culture demandées |
 | `TemplateParseException` | Le source du template contient des erreurs de syntaxe Scriban |
 | `DocumentRendererNotFoundException` | Aucun `IDocumentRenderer` enregistré pour le `DocumentFormat` demandé |
+| `InvalidOperationException` | Aucun `ITemplateEngine` ne peut rendre le MIME type du template résolu |
 
 ## Architecture interne
 
@@ -290,16 +356,25 @@ ITextTemplateRenderer (TextTemplateRenderer — internal, scoped)
   ├── IEnumerable<ITemplateResolver>               (ordonnés par Priority décroissante)
   │     ├── EmbeddedTemplateResolver  (Priority = -100)
   │     └── StoreTemplateResolver     (Priority = 100, via Granit.Templating.EntityFrameworkCore)
-  ├── ITemplateEngine (ScribanTemplateEngine — singleton)
+  ├── IEnumerable<ITemplateEngine>                 (sélection par CanRender — MIME type)
+  │     ├── ScribanTemplateEngine    (singleton, via Granit.Templating.Scriban)
+  │     └── ClosedXmlTemplateEngine  (singleton, via Granit.DocumentGeneration.Excel)
   └── IEnumerable<ITemplateGlobalContext>          (singletons)
         ├── NowGlobalContext              → now.*
         └── ExecutionContextGlobalContext → context.*
 
+IDocumentTemplateStore (EfDocumentTemplateStore — internal, scoped)
+  ├── IDbContextFactory<TemplatingDbContext>
+  └── HybridCache                                  (L1 MemoryCache + L2 Redis optionnel)
+
 IDocumentGenerator (DocumentGenerator — internal, scoped)
-  ├── ITextTemplateRenderer        (rendu HTML)
+  ├── ITextTemplateRenderer        (rendu via pipeline ci-dessus)
   └── IEnumerable<IDocumentRenderer>
-        ├── PuppeteerSharpRenderer (singleton, via Granit.DocumentGeneration.Pdf — à venir)
-        └── ClosedXmlRenderer      (singleton, via Granit.DocumentGeneration.Excel — à venir)
+        └── PuppeteerSharpRenderer (singleton, via Granit.DocumentGeneration.Pdf — à venir)
+
+Flux selon le type de moteur :
+  Scriban (text/html) → TextRenderedContent → IDocumentRenderer → DocumentResult
+  ClosedXML (xlsx)    → BinaryRenderedContent ─────────────────→ DocumentResult
 ```
 
 ## Roadmap
@@ -310,14 +385,14 @@ IDocumentGenerator (DocumentGenerator — internal, scoped)
 | #328 | ✅ Terminé | Types de template fortement typés (`TextTemplateType<TData>`, `DocumentTemplateType<TData>`) |
 | #329 | ✅ Terminé | Rendu Scriban 6 sandboxé — scalaires, collections, conditions, snake_case |
 | #331 | ✅ Terminé | Store EF Core — cycle de vie Draft/Published/Deprecated + historique audit HDS |
+| #332 | ✅ Terminé | Cache hybride des templates résolus avec invalidation sur publication |
 | #333 | ✅ Terminé | Traçabilité HDS — `RevisionId` propagé du store jusqu'au `DocumentResult` |
+| #334 | ✅ Terminé | `Granit.DocumentGeneration.Excel` — tableurs *.xlsx* via ClosedXML |
 | #335 | ✅ Terminé | Documentation complète |
 | #336 | ✅ Terminé | Variables globales Scriban : `NowGlobalContext` et `ExecutionContextGlobalContext` |
 | #338 | ✅ Terminé | Façade `IDocumentGenerator` et pipeline d'orchestration binaire |
 | #339 | ✅ Terminé | Pipeline d'enrichissement `ITemplateDataEnricher<TData>` |
 | #330 | 🔜 Planifié | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête |
-| #332 | 🔜 Planifié | Cache hybride des templates résolus avec invalidation sur publication |
-| #334 | 🔜 Planifié | `Granit.DocumentGeneration.Excel` — tableurs *.xlsx* via ClosedXML |
 | #340 | ⏸ Différé | PDF/A-3b — Factur-X (loi e-facture sept. 2026, licence iText7 en attente) |
 
 ## Conformité HDS / RGPD
@@ -325,6 +400,8 @@ IDocumentGenerator (DocumentGenerator — internal, scoped)
 - **Piste d'audit** : `TemplateRevision.RevisionId` est propagé dans `RenderedContent.RevisionId`,
   permettant de tracer quelle version du template a produit chaque document.
 - **Immutabilité** : les révisions `Deprecated` ne sont jamais supprimées physiquement.
+- **Cache invalidé à la publication** : le cache hybride est vidé immédiatement après
+  `PublishAsync` et `UnpublishAsync` — aucune fenêtre de stale read.
 - **Données personnelles** : ne jamais exposer de PII dans les `ITemplateGlobalContext`.
   Les données sensibles (nom du patient, numéro de SS) transitent exclusivement via `TData`.
 - **Sandbox Scriban** : un template compromis ne peut pas accéder au système de fichiers,
@@ -336,9 +413,9 @@ IDocumentGenerator (DocumentGenerator — internal, scoped)
 | --- | --- |
 | `Granit.Templating` | `Granit.Core`, `Granit.Timing` |
 | `Granit.Templating.Scriban` | `Granit.Templating`, `Granit.Timing`, `Scriban 6.*` |
-| `Granit.Templating.EntityFrameworkCore` | `Granit.Templating`, EF Core 10 |
+| `Granit.Templating.EntityFrameworkCore` | `Granit.Templating`, EF Core 10, `Microsoft.Extensions.Caching.Hybrid` |
 | `Granit.DocumentGeneration` | `Granit.Templating` |
 | `Granit.DocumentGeneration.Pdf` | `Granit.DocumentGeneration`, `PuppeteerSharp` |
-| `Granit.DocumentGeneration.Excel` | `Granit.DocumentGeneration`, `ClosedXML` |
+| `Granit.DocumentGeneration.Excel` | `Granit.Templating`, `ClosedXML 0.104.*` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).
