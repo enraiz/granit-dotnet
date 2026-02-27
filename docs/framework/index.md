@@ -81,6 +81,14 @@ Planification et exécution des tâches de fond récurrentes.
 | --- | --- |
 | [background-jobs.md](scheduling/background-jobs.md) | Jobs récurrents cron via Outbox Wolverine, `IBackgroundJobManager`, anti-doublon |
 
+## Templating
+
+Rendu de templates et génération documentaire (PDF, Excel).
+
+| Document | Description |
+| --- | --- |
+| [templating/index.md](templating/index.md) | Pipeline Scriban, `IDocumentGenerator`, enrichisseurs, cycle de vie Draft/Published/Deprecated |
+
 ## Storage
 
 Stockage d'objets souverain, Direct-to-Cloud, conforme HDS et RGPD.

@@ -131,6 +131,25 @@ flowchart BT
     VAULT["Granit.Vault"] --> CORE
     VAULT --> ENCR
 
+    %% Couche Templating
+    TMPL["Granit.Templating"] --> CORE
+    TMPL --> TIMING
+
+    TMPL_SCR["Granit.Templating\n.Scriban"] --> TMPL
+    TMPL_SCR --> TIMING
+
+    TMPL_EF["Granit.Templating\n.EntityFrameworkCore"] --> TMPL
+
+    DOCGEN["Granit.DocumentGeneration"] --> TMPL
+
+    DOCGEN_PDF["Granit.DocumentGeneration\n.Pdf"] --> DOCGEN
+
+    style TMPL fill:#16a085,color:#fff
+    style TMPL_SCR fill:#16a085,color:#fff
+    style TMPL_EF fill:#16a085,color:#fff
+    style DOCGEN fill:#16a085,color:#fff
+    style DOCGEN_PDF fill:#16a085,color:#fff
+
     %% Analyzers (pas de dépendance runtime)
     ANLZ["Granit.Analyzers"]
     ANLZ_CF["Granit.Analyzers\n.CodeFixes"]
@@ -148,6 +167,7 @@ flowchart BT
 | Rouge | Persistence — couche transversale critique |
 | Violet | Wolverine — messaging et Outbox |
 | Orange | BlobStorage — stockage objet |
+| Vert sarcelle | Templating — rendu et génération documentaire |
 | Gris | Analyzers — pas de dépendance runtime |
 
 ## Propriétés du graphe
