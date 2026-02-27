@@ -47,23 +47,15 @@ public sealed class AlterColumnWithoutContractAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            // Opt-in: only activate when Granit.Persistence.Migrations is referenced.
-            INamedTypeSymbol? cycleAttrSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Granit.Persistence.Migrations.MigrationCycleAttribute");
-            if (cycleAttrSymbol is null)
-            {
-                return;
-            }
-
-            INamedTypeSymbol? migrationSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Migrations.Migration");
-            if (migrationSymbol is null)
+            (INamedTypeSymbol CycleAttr, INamedTypeSymbol Migration)? symbols =
+                MigrationAnalyzerHelpers.ResolveGranitMigrationSymbols(compilationContext.Compilation);
+            if (symbols is null)
             {
                 return;
             }
 
             compilationContext.RegisterSyntaxNodeAction(
-                nodeContext => AnalyzeInvocation(nodeContext, migrationSymbol, cycleAttrSymbol),
+                nodeContext => AnalyzeInvocation(nodeContext, symbols.Value.Migration, symbols.Value.CycleAttr),
                 SyntaxKind.InvocationExpression);
         });
     }
@@ -73,56 +65,30 @@ public sealed class AlterColumnWithoutContractAnalyzer : DiagnosticAnalyzer
         INamedTypeSymbol migrationBase,
         INamedTypeSymbol cycleAttrType)
     {
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "AlterColumn");
+        if (result is null)
+        {
+            return;
+        }
+
         InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
 
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return;
-        }
-
-        if (memberAccess.Name.Identifier.Text != "AlterColumn")
-        {
-            return;
-        }
-
-        ISymbol? symbol = context.SemanticModel.GetSymbolInfo(invocation).Symbol;
-        if (symbol is not IMethodSymbol methodSymbol)
-        {
-            return;
-        }
-
-        if (methodSymbol.ContainingType.ToDisplayString()
-            != "Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder")
-        {
-            return;
-        }
-
-        INamedTypeSymbol? migrationClass =
-            MigrationAnalyzerHelpers.GetContainingClass(invocation, context.SemanticModel);
-        if (migrationClass is null)
-        {
-            return;
-        }
-
-        if (!MigrationAnalyzerHelpers.InheritsFromMigration(migrationClass, migrationBase))
-        {
-            return;
-        }
-
         // Find the oldClrType argument — if absent, this is a constraint-only change.
-        ArgumentSyntax? oldClrTypeArg = FindNamedArgument(invocation.ArgumentList, "oldClrType");
+        ArgumentSyntax? oldClrTypeArg =
+            MigrationAnalyzerHelpers.FindNamedArgument(invocation.ArgumentList, "oldClrType");
         if (oldClrTypeArg is null)
         {
             return;
         }
 
         // Compare oldClrType with the generic type argument T of AlterColumn<T>.
-        if (methodSymbol.TypeArguments.Length == 0)
+        if (result.Value.Method.TypeArguments.Length == 0)
         {
             return;
         }
 
-        ITypeSymbol targetType = methodSymbol.TypeArguments[0];
+        ITypeSymbol targetType = result.Value.Method.TypeArguments[0];
 
         // oldClrType must be typeof(SomeType) to be statically comparable.
         if (oldClrTypeArg.Expression is not TypeOfExpressionSyntax typeofExpr)
@@ -143,25 +109,12 @@ public sealed class AlterColumnWithoutContractAnalyzer : DiagnosticAnalyzer
         }
 
         // Type changed — require Contract annotation.
-        if (MigrationAnalyzerHelpers.HasContractAnnotation(migrationClass, cycleAttrType))
+        if (MigrationAnalyzerHelpers.HasContractAnnotation(result.Value.MigrationClass, cycleAttrType))
         {
             return;
         }
 
         context.ReportDiagnostic(
-            Diagnostic.Create(Rule, invocation.GetLocation(), migrationClass.Name));
-    }
-
-    private static ArgumentSyntax? FindNamedArgument(ArgumentListSyntax argList, string name)
-    {
-        foreach (ArgumentSyntax arg in argList.Arguments)
-        {
-            if (arg.NameColon?.Name.Identifier.Text == name)
-            {
-                return arg;
-            }
-        }
-
-        return null;
+            Diagnostic.Create(Rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
     }
 }

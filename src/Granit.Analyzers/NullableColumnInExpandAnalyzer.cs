@@ -51,23 +51,15 @@ public sealed class NullableColumnInExpandAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            // Opt-in: only activate when Granit.Persistence.Migrations is referenced.
-            INamedTypeSymbol? cycleAttrSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Granit.Persistence.Migrations.MigrationCycleAttribute");
-            if (cycleAttrSymbol is null)
-            {
-                return;
-            }
-
-            INamedTypeSymbol? migrationSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Migrations.Migration");
-            if (migrationSymbol is null)
+            (INamedTypeSymbol CycleAttr, INamedTypeSymbol Migration)? symbols =
+                MigrationAnalyzerHelpers.ResolveGranitMigrationSymbols(compilationContext.Compilation);
+            if (symbols is null)
             {
                 return;
             }
 
             compilationContext.RegisterSyntaxNodeAction(
-                nodeContext => AnalyzeInvocation(nodeContext, migrationSymbol),
+                nodeContext => AnalyzeInvocation(nodeContext, symbols.Value.Migration),
                 SyntaxKind.InvocationExpression);
         });
     }
@@ -76,42 +68,14 @@ public sealed class NullableColumnInExpandAnalyzer : DiagnosticAnalyzer
         SyntaxNodeAnalysisContext context,
         INamedTypeSymbol migrationBase)
     {
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "AddColumn");
+        if (result is null)
+        {
+            return;
+        }
+
         InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
-
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return;
-        }
-
-        if (memberAccess.Name.Identifier.Text != "AddColumn")
-        {
-            return;
-        }
-
-        ISymbol? symbol = context.SemanticModel.GetSymbolInfo(invocation).Symbol;
-        if (symbol is not IMethodSymbol methodSymbol)
-        {
-            return;
-        }
-
-        if (methodSymbol.ContainingType.ToDisplayString()
-            != "Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder")
-        {
-            return;
-        }
-
-        INamedTypeSymbol? migrationClass =
-            MigrationAnalyzerHelpers.GetContainingClass(invocation, context.SemanticModel);
-        if (migrationClass is null)
-        {
-            return;
-        }
-
-        if (!MigrationAnalyzerHelpers.InheritsFromMigration(migrationClass, migrationBase))
-        {
-            return;
-        }
-
         ArgumentListSyntax argList = invocation.ArgumentList;
 
         // Safe: nullable: true
@@ -128,6 +92,6 @@ public sealed class NullableColumnInExpandAnalyzer : DiagnosticAnalyzer
         }
 
         context.ReportDiagnostic(
-            Diagnostic.Create(Rule, invocation.GetLocation(), migrationClass.Name));
+            Diagnostic.Create(Rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
     }
 }

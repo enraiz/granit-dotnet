@@ -42,23 +42,15 @@ public sealed class DropColumnWithoutContractAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            // Opt-in: only activate when Granit.Persistence.Migrations is referenced.
-            INamedTypeSymbol? cycleAttrSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Granit.Persistence.Migrations.MigrationCycleAttribute");
-            if (cycleAttrSymbol is null)
-            {
-                return;
-            }
-
-            INamedTypeSymbol? migrationSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Migrations.Migration");
-            if (migrationSymbol is null)
+            (INamedTypeSymbol CycleAttr, INamedTypeSymbol Migration)? symbols =
+                MigrationAnalyzerHelpers.ResolveGranitMigrationSymbols(compilationContext.Compilation);
+            if (symbols is null)
             {
                 return;
             }
 
             compilationContext.RegisterSyntaxNodeAction(
-                nodeContext => AnalyzeInvocation(nodeContext, migrationSymbol, cycleAttrSymbol),
+                nodeContext => AnalyzeInvocation(nodeContext, symbols.Value.Migration, symbols.Value.CycleAttr),
                 SyntaxKind.InvocationExpression);
         });
     }
@@ -68,48 +60,20 @@ public sealed class DropColumnWithoutContractAnalyzer : DiagnosticAnalyzer
         INamedTypeSymbol migrationBase,
         INamedTypeSymbol cycleAttrType)
     {
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "DropColumn");
+        if (result is null)
+        {
+            return;
+        }
+
+        if (MigrationAnalyzerHelpers.HasContractAnnotation(result.Value.MigrationClass, cycleAttrType))
+        {
+            return;
+        }
+
         InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
-
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return;
-        }
-
-        if (memberAccess.Name.Identifier.Text != "DropColumn")
-        {
-            return;
-        }
-
-        ISymbol? symbol = context.SemanticModel.GetSymbolInfo(invocation).Symbol;
-        if (symbol is not IMethodSymbol methodSymbol)
-        {
-            return;
-        }
-
-        if (methodSymbol.ContainingType.ToDisplayString()
-            != "Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder")
-        {
-            return;
-        }
-
-        INamedTypeSymbol? migrationClass =
-            MigrationAnalyzerHelpers.GetContainingClass(invocation, context.SemanticModel);
-        if (migrationClass is null)
-        {
-            return;
-        }
-
-        if (!MigrationAnalyzerHelpers.InheritsFromMigration(migrationClass, migrationBase))
-        {
-            return;
-        }
-
-        if (MigrationAnalyzerHelpers.HasContractAnnotation(migrationClass, cycleAttrType))
-        {
-            return;
-        }
-
         context.ReportDiagnostic(
-            Diagnostic.Create(Rule, invocation.GetLocation(), migrationClass.Name));
+            Diagnostic.Create(Rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
     }
 }

@@ -48,9 +48,8 @@ public sealed class RenameColumnForbiddenAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            // Activate whenever EF Core migrations are referenced (no Granit package required).
-            INamedTypeSymbol? migrationSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Migrations.Migration");
+            INamedTypeSymbol? migrationSymbol =
+                MigrationAnalyzerHelpers.ResolveEfCoreMigrationSymbol(compilationContext.Compilation);
             if (migrationSymbol is null)
             {
                 return;
@@ -66,42 +65,14 @@ public sealed class RenameColumnForbiddenAnalyzer : DiagnosticAnalyzer
         SyntaxNodeAnalysisContext context,
         INamedTypeSymbol migrationBase)
     {
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "RenameColumn");
+        if (result is null)
+        {
+            return;
+        }
+
         InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
-
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return;
-        }
-
-        if (memberAccess.Name.Identifier.Text != "RenameColumn")
-        {
-            return;
-        }
-
-        ISymbol? symbol = context.SemanticModel.GetSymbolInfo(invocation).Symbol;
-        if (symbol is not IMethodSymbol methodSymbol)
-        {
-            return;
-        }
-
-        if (methodSymbol.ContainingType.ToDisplayString()
-            != "Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder")
-        {
-            return;
-        }
-
-        INamedTypeSymbol? migrationClass =
-            MigrationAnalyzerHelpers.GetContainingClass(invocation, context.SemanticModel);
-        if (migrationClass is null)
-        {
-            return;
-        }
-
-        if (!MigrationAnalyzerHelpers.InheritsFromMigration(migrationClass, migrationBase))
-        {
-            return;
-        }
-
         context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
     }
 }
