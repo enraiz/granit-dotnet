@@ -21,10 +21,18 @@ public static class ObservabilityServiceCollectionExtensions
     public static IHostApplicationBuilder AddGranitObservability(
         this IHostApplicationBuilder builder)
     {
-        IConfigurationSection section = builder.Configuration.GetSection(ObservabilityOptions.SectionName);
-        builder.Services.Configure<ObservabilityOptions>(section);
+        builder.Services
+            .AddOptions<ObservabilityOptions>()
+            .BindConfiguration(ObservabilityOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        ObservabilityOptions options = section.Get<ObservabilityOptions>() ?? new ObservabilityOptions();
+        // Read options directly from IConfiguration: the DI container is not yet
+        // built at this point, so IOptions<> is not resolvable inside Serilog/OTel configuration.
+        ObservabilityOptions options = new();
+        builder.Configuration
+            .GetSection(ObservabilityOptions.SectionName)
+            .Bind(options);
 
         ConfigureSerilog(builder, options);
         ConfigureOpenTelemetry(builder, options);

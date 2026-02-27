@@ -1,7 +1,7 @@
 using Granit.Caching;
 using Microsoft.Extensions.Caching.Hybrid;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Caching.Hybrid.Extensions;
 
@@ -20,35 +20,32 @@ public static class HybridCachingServiceCollectionExtensions
     /// grâce aux attributs <c>[DependsOn]</c>).
     /// </remarks>
     /// <param name="services">Collection de services.</param>
-    /// <param name="configuration">Configuration racine (non la section "Cache").</param>
     /// <returns>La collection de services pour le chaînage.</returns>
     public static IServiceCollection AddGranitCachingHybrid(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        HybridCachingOptions hybridOpts = configuration
-            .GetSection(HybridCachingOptions.SectionName)
-            .Get<HybridCachingOptions>() ?? new HybridCachingOptions();
-
-        services.Configure<HybridCachingOptions>(
-            configuration.GetSection(HybridCachingOptions.SectionName));
-
-        CachingOptions cachingOpts = configuration
-            .GetSection(CachingOptions.SectionName)
-            .Get<CachingOptions>() ?? new CachingOptions();
+        services
+            .AddOptions<HybridCachingOptions>()
+            .BindConfiguration(HybridCachingOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         // Reconfigure les options HybridCache enregistrées par GranitCachingModule
-        // pour ajouter LocalCacheExpiration (L1 courte) en mode multi-pods
-        services.Configure<HybridCacheOptions>(hybridCache =>
-        {
-            hybridCache.DefaultEntryOptions = new HybridCacheEntryOptions
-            {
-                // L2 (Redis) : expiration longue selon la config globale
-                Expiration = cachingOpts.DefaultAbsoluteExpirationRelativeToNow,
-                // L1 (mémoire locale) : expiration courte pour limiter la staleness inter-pods
-                LocalCacheExpiration = hybridOpts.LocalCacheExpiration,
-            };
-        });
+        // pour ajouter LocalCacheExpiration (L1 courte) en mode multi-pods.
+        // Deferred configuration: reads CachingOptions and HybridCachingOptions at resolution time.
+        services
+            .AddOptions<HybridCacheOptions>()
+            .Configure<IOptions<CachingOptions>, IOptions<HybridCachingOptions>>(
+                (hybridCache, cachingOpts, hybridOpts) =>
+                {
+                    hybridCache.DefaultEntryOptions = new HybridCacheEntryOptions
+                    {
+                        // L2 (Redis) : expiration longue selon la config globale
+                        Expiration = cachingOpts.Value.DefaultAbsoluteExpirationRelativeToNow,
+                        // L1 (mémoire locale) : expiration courte pour limiter la staleness inter-pods
+                        LocalCacheExpiration = hybridOpts.Value.LocalCacheExpiration,
+                    };
+                });
 
         // Surcharge ICacheService<T> avec HybridCacheService<T>
         // AddSingleton (pas TryAdd) pour remplacer l'enregistrement Memory de AddGranitCaching

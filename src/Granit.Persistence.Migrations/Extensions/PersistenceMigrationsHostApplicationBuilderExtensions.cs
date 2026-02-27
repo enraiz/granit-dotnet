@@ -83,8 +83,11 @@ public static class PersistenceMigrationsHostApplicationBuilderExtensions
         builder.Services.AddHostedService<MigrationStartupService>();
 
         // Options — bound from the "GranitMigrations" configuration section.
-        builder.Services.Configure<MigrationStartupOptions>(
-            builder.Configuration.GetSection(MigrationStartupOptions.SectionName));
+        builder.Services
+            .AddOptions<MigrationStartupOptions>()
+            .BindConfiguration(MigrationStartupOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         return builder;
     }

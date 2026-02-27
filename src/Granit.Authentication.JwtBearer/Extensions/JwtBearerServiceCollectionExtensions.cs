@@ -2,8 +2,8 @@ using Granit.Authentication.JwtBearer.Authentication;
 using Granit.Authentication.JwtBearer.Options;
 using Granit.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Granit.Authentication.JwtBearer.Extensions;
@@ -18,18 +18,24 @@ public static class JwtBearerServiceCollectionExtensions
     /// Reads the <c>"Authentication"</c> section from configuration.
     /// </summary>
     public static IServiceCollection AddGranitJwtBearer(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        IConfigurationSection section = configuration.GetSection(JwtBearerAuthOptions.SectionName);
-        services.Configure<JwtBearerAuthOptions>(section);
-
-        JwtBearerAuthOptions options = section.Get<JwtBearerAuthOptions>() ?? new JwtBearerAuthOptions();
+        services
+            .AddOptions<JwtBearerAuthOptions>()
+            .BindConfiguration(JwtBearerAuthOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services
-            .AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(jwt =>
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer();
+
+        // Deferred configuration: JwtBearerOptions reads JwtBearerAuthOptions at resolution time.
+        services
+            .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<JwtBearerAuthOptions>>((jwt, granitOpts) =>
             {
+                JwtBearerAuthOptions options = granitOpts.Value;
                 jwt.Authority = options.Authority;
                 jwt.Audience = options.Audience;
                 jwt.RequireHttpsMetadata = options.RequireHttpsMetadata;

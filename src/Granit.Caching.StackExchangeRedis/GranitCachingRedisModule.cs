@@ -1,5 +1,6 @@
 using Granit.Caching.StackExchangeRedis.Extensions;
 using Granit.Core.Modularity;
+using Microsoft.Extensions.Configuration;
 
 namespace Granit.Caching.StackExchangeRedis;
 
@@ -28,6 +29,17 @@ namespace Granit.Caching.StackExchangeRedis;
 public sealed class GranitCachingRedisModule : GranitModule
 {
     /// <inheritdoc/>
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitCachingRedis(context.Configuration);
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        RedisCachingOptions redisOpts = context.Configuration
+            .GetSection(RedisCachingOptions.SectionName)
+            .Get<RedisCachingOptions>() ?? new RedisCachingOptions();
+
+        if (!redisOpts.IsEnabled)
+        {
+            return;
+        }
+
+        context.Services.AddGranitCachingRedis();
+    }
 }

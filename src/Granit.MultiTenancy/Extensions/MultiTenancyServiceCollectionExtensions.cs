@@ -1,7 +1,6 @@
 using Granit.MultiTenancy.Middleware;
 using Granit.MultiTenancy.Pipeline;
 using Granit.MultiTenancy.Resolvers;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -15,13 +14,14 @@ public static class MultiTenancyServiceCollectionExtensions
     /// <summary>
     /// Adds MultiTenancy services: ICurrentTenant, resolvers, pipeline, and middleware.
     /// </summary>
-    /// <param name="services">DI container.</param>
-    /// <param name="configuration">Configuration section "MultiTenancy".</param>
     public static IServiceCollection AddGranitMultiTenancy(
-        this IServiceCollection services,
-        IConfigurationSection configuration)
+        this IServiceCollection services)
     {
-        services.Configure<MultiTenancyOptions>(configuration);
+        services
+            .AddOptions<MultiTenancyOptions>()
+            .BindConfiguration(MultiTenancyOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         // Replace the NullTenantContext registered by AddGranit<T>() with the real implementation.
         services.Replace(ServiceDescriptor.Singleton<ICurrentTenant, CurrentTenant>());

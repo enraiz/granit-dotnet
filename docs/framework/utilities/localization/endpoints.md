@@ -25,7 +25,7 @@ app.MapGranitLocalization();
 Sans le système de modules :
 
 ```csharp
-builder.Services.AddGranitLocalization(options => { /* ... */ });
+builder.Services.AddGranitLocalization();
 
 var app = builder.Build();
 app.MapGranitLocalization();

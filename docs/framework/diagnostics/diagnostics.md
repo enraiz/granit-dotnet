@@ -52,6 +52,18 @@ builder.Services.AddGranitDiagnostics();
 app.MapGranitHealthChecks();
 ```
 
+La configuration se fait via `appsettings.json` :
+
+```json
+{
+  "Granit": {
+    "Diagnostics": {
+      "DefaultCacheDuration": "00:00:10"
+    }
+  }
+}
+```
+
 ### Personnalisation des chemins
 
 ```csharp
@@ -85,13 +97,17 @@ Le décorateur `CachedHealthCheck` met les résultats en cache avec un `Semaphor
 (double-check locking) : si le cache expire simultanément pour plusieurs threads, un
 seul exécute le check pendant que les autres attendent son résultat.
 
-Durée de cache configurable via `DiagnosticsOptions` (défaut : **10 secondes**) :
+Durée de cache configurable via `DiagnosticsOptions` (défaut : **10 secondes**) dans
+`appsettings.json` :
 
-```csharp
-builder.Services.AddGranitDiagnostics(options =>
+```json
 {
-    options.DefaultCacheDuration = TimeSpan.FromSeconds(10);
-});
+  "Granit": {
+    "Diagnostics": {
+      "DefaultCacheDuration": "00:00:10"
+    }
+  }
+}
 ```
 
 Le décorateur est appliqué automatiquement à tous les checks enregistrés via les

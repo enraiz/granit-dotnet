@@ -2,17 +2,16 @@
 // Tests - RedisCachingServiceCollectionExtensions
 // =============================================================================
 // Vérifie que AddGranitCachingRedis :
-//   - Remplace IDistributedCache par RedisCache quand IsEnabled = true
-//   - Ne modifie pas les services quand IsEnabled = false
+//   - Enregistre toujours RedisCache comme IDistributedCache
 //   - Enregistre AesCacheValueEncryptor si EncryptValues = true
 //   - Conserve NullCacheValueEncryptor si EncryptValues = false
+//   - Configure correctement les options Redis et StackExchange
 // =============================================================================
 
 using FluentAssertions;
 using Granit.Caching.StackExchangeRedis.Extensions;
 using Granit.Caching.StackExchangeRedis.HealthChecks;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,50 +25,26 @@ namespace Granit.Caching.StackExchangeRedis.Tests;
 
 public sealed class RedisCachingServiceCollectionExtensionsTests
 {
-    private static IConfiguration BuildConfiguration(Dictionary<string, string?> values)
-    {
-        return new ConfigurationBuilder()
+    private static IConfiguration BuildConfiguration(Dictionary<string, string?> values) =>
+        new ConfigurationBuilder()
             .AddInMemoryCollection(values)
             .Build();
-    }
 
     [Fact]
-    public void AddGranitCachingRedis_IsEnabledFalse_DoesNotReplaceDistributedCache()
+    public void AddGranitCachingRedis_AlwaysRegistersRedisCache()
     {
         // Arrange
         IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
         {
-            ["Cache:Redis:IsEnabled"] = "false",
-        });
-
-        ServiceCollection services = new();
-        services.AddDistributedMemoryCache(); // Memory par défaut
-
-        // Act
-        services.AddGranitCachingRedis(configuration);
-
-        // Assert — le MemoryDistributedCache doit rester
-        ServiceDescriptor? descriptor = services.FirstOrDefault(
-            d => d.ServiceType == typeof(IDistributedCache));
-        descriptor.Should().NotBeNull();
-        descriptor!.ImplementationType.Should().NotBe<RedisCache>();
-    }
-
-    [Fact]
-    public void AddGranitCachingRedis_IsEnabledTrue_RegistersRedisCache()
-    {
-        // Arrange
-        IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
-        {
-            ["Cache:Redis:IsEnabled"] = "true",
             ["Cache:Redis:Configuration"] = "localhost:6379",
             ["Cache:Redis:InstanceName"] = "test:",
         });
 
         ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(configuration);
 
         // Act
-        services.AddGranitCachingRedis(configuration);
+        services.AddGranitCachingRedis();
 
         // Assert — RedisCache doit être enregistré pour IDistributedCache
         ServiceDescriptor? redisDescriptor = services.FirstOrDefault(
@@ -80,47 +55,64 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitCachingRedis_EncryptValues_True_RegistersAesEncryptor()
     {
-        // Arrange
+        // Arrange — a valid 256-bit (32-byte) AES key encoded in base64
+        string testAesKey = Convert.ToBase64String(new byte[32]);
+
         IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
         {
-            ["Cache:Redis:IsEnabled"] = "true",
             ["Cache:Redis:Configuration"] = "localhost:6379",
             ["Cache:EncryptValues"] = "true",
+            ["Cache:Encryption:Key"] = testAesKey,
         });
 
         ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(configuration);
+
+        // Register CachingOptions and CacheEncryptionOptions (normally done by AddGranitCaching)
+        services
+            .AddOptions<CachingOptions>()
+            .BindConfiguration(CachingOptions.SectionName)
+            .ValidateDataAnnotations();
+        services
+            .AddOptions<CacheEncryptionOptions>()
+            .BindConfiguration(CacheEncryptionOptions.SectionName)
+            .ValidateDataAnnotations();
 
         // Act
-        services.AddGranitCachingRedis(configuration);
+        services.AddGranitCachingRedis();
 
-        // Assert
-        ServiceDescriptor? encryptorDescriptor = services.FirstOrDefault(
-            d => d.ServiceType == typeof(ICacheValueEncryptor));
-        encryptorDescriptor.Should().NotBeNull();
-        encryptorDescriptor!.ImplementationType.Should().Be<AesCacheValueEncryptor>();
+        // Assert — factory resolves to AesCacheValueEncryptor at runtime
+        using ServiceProvider sp = services.BuildServiceProvider();
+        ICacheValueEncryptor encryptor = sp.GetRequiredService<ICacheValueEncryptor>();
+        encryptor.Should().BeOfType<AesCacheValueEncryptor>();
     }
 
     [Fact]
-    public void AddGranitCachingRedis_EncryptValues_False_DoesNotRegisterAesEncryptor()
+    public void AddGranitCachingRedis_EncryptValues_False_RegistersNullEncryptor()
     {
         // Arrange
         IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
         {
-            ["Cache:Redis:IsEnabled"] = "true",
             ["Cache:Redis:Configuration"] = "localhost:6379",
             ["Cache:EncryptValues"] = "false",
         });
 
         ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(configuration);
+
+        // Register CachingOptions (normally done by AddGranitCaching)
+        services
+            .AddOptions<CachingOptions>()
+            .BindConfiguration(CachingOptions.SectionName)
+            .ValidateDataAnnotations();
 
         // Act
-        services.AddGranitCachingRedis(configuration);
+        services.AddGranitCachingRedis();
 
-        // Assert — AesCacheValueEncryptor ne doit PAS être enregistré
-        ServiceDescriptor? aesDescriptor = services.FirstOrDefault(
-            d => d.ServiceType == typeof(ICacheValueEncryptor)
-                 && d.ImplementationType == typeof(AesCacheValueEncryptor));
-        aesDescriptor.Should().BeNull();
+        // Assert — factory resolves to NullCacheValueEncryptor at runtime
+        using ServiceProvider sp = services.BuildServiceProvider();
+        ICacheValueEncryptor encryptor = sp.GetRequiredService<ICacheValueEncryptor>();
+        encryptor.Should().BeOfType<NullCacheValueEncryptor>();
     }
 
     [Fact]
@@ -129,13 +121,13 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Arrange
         IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
         {
-            ["Cache:Redis:IsEnabled"] = "true",
             ["Cache:Redis:Configuration"] = "redis-service:6379",
             ["Cache:Redis:InstanceName"] = "guava:",
         });
 
         ServiceCollection services = new();
-        services.AddGranitCachingRedis(configuration);
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddGranitCachingRedis();
         ServiceProvider sp = services.BuildServiceProvider();
 
         // Act
@@ -147,18 +139,18 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitCachingRedis_IsEnabledTrue_AppliesRedisConfigurationToStackExchangeOptions()
+    public void AddGranitCachingRedis_AppliesRedisConfigurationToStackExchangeOptions()
     {
-        // Arrange — vérifie que le lambda AddStackExchangeRedisCache est bien exécuté
+        // Arrange
         IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
         {
-            ["Cache:Redis:IsEnabled"] = "true",
             ["Cache:Redis:Configuration"] = "redis-service:6379",
             ["Cache:Redis:InstanceName"] = "myapp:",
         });
 
         ServiceCollection services = new();
-        services.AddGranitCachingRedis(configuration);
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddGranitCachingRedis();
         ServiceProvider sp = services.BuildServiceProvider();
 
         // Act — résoudre IOptions<RedisCacheOptions> force l'exécution du lambda de configuration

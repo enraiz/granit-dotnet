@@ -107,8 +107,11 @@ public sealed class MyAppModule : GranitModule { ... }
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddGranitJwtBearer(builder.Configuration);
+builder.Services.AddGranitJwtBearer();
 ```
+
+> La configuration est résolue automatiquement depuis `IConfiguration` enregistré
+> dans le conteneur DI, via `BindConfiguration("Authentication")`.
 
 ### JwtBearerAuthOptions
 
@@ -186,8 +189,8 @@ public sealed class MyAppModule : GranitModule { ... }
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddGranitJwtBearer(builder.Configuration);
-builder.Services.AddGranitKeycloak(builder.Configuration);
+builder.Services.AddGranitJwtBearer();
+builder.Services.AddGranitKeycloak();
 ```
 
 ### KeycloakOptions
@@ -289,7 +292,7 @@ Créer `Granit.Authentication.Auth0` en dépendant uniquement de
 public sealed class GranitAuthenticationAuth0Module : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitAuth0(context.Configuration);
+        context.Services.AddGranitAuth0();
 }
 ```
 

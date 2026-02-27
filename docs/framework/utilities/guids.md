@@ -66,13 +66,16 @@ builder.Services.AddGranitGuids();
 ```
 
 Par défaut, le générateur utilise `SequentialGuidType.SequentialAsString` (optimisé
-pour PostgreSQL). Pour changer le type :
+pour PostgreSQL). Pour changer le type, configurer `appsettings.json` :
 
-```csharp
-builder.Services.AddGranitGuids(options =>
+```json
 {
-    options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd; // SQL Server
-});
+  "Granit": {
+    "Guids": {
+      "DefaultSequentialGuidType": "SequentialAtEnd"
+    }
+  }
+}
 ```
 
 > Le package `Granit.Persistence` configure automatiquement le type

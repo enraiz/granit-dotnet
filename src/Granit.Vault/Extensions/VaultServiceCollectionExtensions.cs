@@ -1,7 +1,6 @@
 using Granit.Vault.HealthChecks;
 using Granit.Vault.Options;
 using Granit.Vault.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using VaultSharp;
@@ -18,10 +17,13 @@ public static class VaultServiceCollectionExtensions
     /// and the Transit encryption service.
     /// </summary>
     public static IServiceCollection AddGranitVault(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        services.Configure<VaultOptions>(configuration.GetSection(VaultOptions.SectionName));
+        services
+            .AddOptions<VaultOptions>()
+            .BindConfiguration(VaultOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddSingleton<VaultClientFactory>();
         services.AddSingleton<IVaultClient>(sp => sp.GetRequiredService<VaultClientFactory>().Create());

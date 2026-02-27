@@ -3,7 +3,6 @@ using Granit.Authorization.Authorization;
 using Granit.Authorization.Options;
 using Granit.Authorization.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -17,11 +16,13 @@ public static class AuthorizationServiceCollectionExtensions
     /// the dynamic policy provider, and the caching-aware permission checker.
     /// </summary>
     public static IServiceCollection AddGranitAuthorization(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        services.Configure<GranitAuthorizationOptions>(
-            configuration.GetSection(GranitAuthorizationOptions.SectionName));
+        services
+            .AddOptions<GranitAuthorizationOptions>()
+            .BindConfiguration(GranitAuthorizationOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddSingleton<IPermissionDefinitionManager, PermissionDefinitionManager>();
 

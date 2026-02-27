@@ -58,18 +58,15 @@ app.Run();
 | `TenantHeaderName` | `string` | `"X-Tenant-Id"` | Nom du header tenant dans la documentation |
 | `AuthorizationPolicy` | `string?` | `null` | Policy d'autorisation sur les endpoints doc (voir ci-dessous) |
 
-### Configuration programmatique
-
-Quand les versions ou les métadonnées doivent être définies en code :
+### Enregistrement direct (sans modules)
 
 ```csharp
-builder.Services.AddGranitApiDocumentation(opts =>
-{
-    opts.Title = "Guava API";
-    opts.MajorVersions = [1, 2];
-    opts.ContactEmail = "api@digitaldynamics.be";
-});
+builder.AddGranitApiDocumentation();
 ```
+
+La méthode est une extension sur `IHostApplicationBuilder`. Les options sont lues
+depuis la section `ApiDocumentation` de la configuration
+(voir [appsettings.json ci-dessus](#configuration)).
 
 ## Endpoints générés
 

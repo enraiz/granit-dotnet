@@ -12,5 +12,5 @@ public sealed class GranitApiVersioningModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitApiVersioning(context.Configuration);
+        context.Services.AddGranitApiVersioning();
 }

@@ -43,12 +43,13 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddGranitKeycloak_RegistersKeycloakOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
-        services.AddGranitJwtBearer(config);
+        services.AddSingleton<IConfiguration>(config);
+        services.AddGranitJwtBearer();
 
         // Act
-        services.AddGranitKeycloak(config);
+        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -63,12 +64,13 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddGranitKeycloak_PostConfiguresJwtBearer_WithKeycloakValues()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
-        services.AddGranitJwtBearer(config);
+        services.AddSingleton<IConfiguration>(config);
+        services.AddGranitJwtBearer();
 
         // Act
-        services.AddGranitKeycloak(config);
+        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -85,7 +87,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddGranitKeycloak_WithCustomAudience_UsesAudienceOverClientId()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
@@ -95,10 +97,11 @@ public sealed class KeycloakServiceCollectionExtensionsTests
                 ["Keycloak:RequireHttpsMetadata"] = "false"
             })
             .Build();
-        services.AddGranitJwtBearer(config);
+        services.AddSingleton<IConfiguration>(config);
+        services.AddGranitJwtBearer();
 
         // Act
-        services.AddGranitKeycloak(config);
+        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -113,15 +116,16 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddGranitKeycloak_RegistersClaimsTransformation()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
-        services.AddGranitJwtBearer(config);
+        services.AddSingleton<IConfiguration>(config);
+        services.AddGranitJwtBearer();
 
         // Act
-        services.AddGranitKeycloak(config);
+        services.AddGranitKeycloak();
 
         // Assert
-        var descriptors = services
+        List<ServiceDescriptor> descriptors = services
             .Where(d => d.ServiceType == typeof(IClaimsTransformation))
             .ToList();
 
@@ -132,12 +136,13 @@ public sealed class KeycloakServiceCollectionExtensionsTests
     public void AddGranitKeycloak_RegistersAdminPolicy()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration(adminRole: "superadmin");
-        services.AddGranitJwtBearer(config);
+        services.AddSingleton<IConfiguration>(config);
+        services.AddGranitJwtBearer();
 
         // Act
-        services.AddGranitKeycloak(config);
+        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 

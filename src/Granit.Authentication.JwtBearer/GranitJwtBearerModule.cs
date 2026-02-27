@@ -13,5 +13,5 @@ public sealed class GranitJwtBearerModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitJwtBearer(context.Configuration);
+        context.Services.AddGranitJwtBearer();
 }

@@ -17,5 +17,5 @@ public sealed class GranitAuthorizationModule : GranitModule
 {
     /// <inheritdoc />
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitAuthorization(context.Configuration);
+        context.Services.AddGranitAuthorization();
 }

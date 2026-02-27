@@ -39,7 +39,7 @@ Pour un enregistrement direct :
 // Vault n'est activé qu'en production (credentials dynamiques, Transit)
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddGranitVault(builder.Configuration);
+    builder.Services.AddGranitVault();
 }
 ```
 

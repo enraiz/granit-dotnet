@@ -39,11 +39,11 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddGranitVault_RegistersVaultOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
-        IConfiguration config = CreateVaultConfiguration();
+        ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(CreateVaultConfiguration());
 
         // Act
-        services.AddGranitVault(config);
+        services.AddGranitVault();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -58,12 +58,12 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddGranitVault_RegistersVaultClient()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         services.AddLogging();
-        IConfiguration config = CreateVaultConfiguration();
+        services.AddSingleton<IConfiguration>(CreateVaultConfiguration());
 
         // Act
-        services.AddGranitVault(config);
+        services.AddGranitVault();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -76,11 +76,11 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddGranitVault_RegistersDatabaseCredentialProvider()
     {
         // Arrange
-        var services = new ServiceCollection();
-        IConfiguration config = CreateVaultConfiguration();
+        ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(CreateVaultConfiguration());
 
         // Act
-        services.AddGranitVault(config);
+        services.AddGranitVault();
 
         // Assert
         ServiceDescriptor? descriptor = services.FirstOrDefault(
@@ -94,11 +94,11 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddGranitVault_RegistersHostedService()
     {
         // Arrange
-        var services = new ServiceCollection();
-        IConfiguration config = CreateVaultConfiguration();
+        ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(CreateVaultConfiguration());
 
         // Act
-        services.AddGranitVault(config);
+        services.AddGranitVault();
 
         // Assert
         ServiceDescriptor? descriptor = services.FirstOrDefault(
@@ -111,11 +111,11 @@ public sealed class VaultServiceCollectionExtensionsTests
     public void AddGranitVault_RegistersTransitEncryptionService()
     {
         // Arrange
-        var services = new ServiceCollection();
-        IConfiguration config = CreateVaultConfiguration();
+        ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(CreateVaultConfiguration());
 
         // Act
-        services.AddGranitVault(config);
+        services.AddGranitVault();
 
         // Assert
         ServiceDescriptor? descriptor = services.FirstOrDefault(

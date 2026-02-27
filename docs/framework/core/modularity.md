@@ -11,11 +11,11 @@ L'objectif : **un seul appel** dans `Program.cs` remplace tous les `AddGranit*()
 ```csharp
 // Avant (6 appels manuels, ordre à respecter)
 builder.AddGranitObservability();
-builder.Services.AddGranitSecurity(builder.Configuration);
+builder.Services.AddGranitSecurity();
 builder.Services.AddGranitTiming();
 builder.Services.AddGranitGuids();
 builder.Services.AddGranitPersistence();
-builder.Services.AddGranitVault(builder.Configuration);
+builder.Services.AddGranitVault();
 
 // Après (single entry point, async recommandé)
 await builder.AddGranitAsync<GuavaHostModule>();
@@ -128,7 +128,7 @@ public sealed class GranitSecurityModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddGranitSecurity(context.Configuration);
+        context.Services.AddGranitSecurity();
     }
 }
 

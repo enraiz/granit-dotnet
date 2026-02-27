@@ -17,17 +17,15 @@ namespace Granit.Authorization.Tests;
 
 public sealed class AuthorizationServiceCollectionExtensionsTests
 {
-    private static IConfiguration EmptyConfiguration =>
-        new ConfigurationBuilder().Build();
-
     [Fact]
     public void AddGranitAuthorization_RegistersPermissionDefinitionManager()
     {
         // Arrange
         ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
 
         // Act
-        services.AddGranitAuthorization(EmptyConfiguration);
+        services.AddGranitAuthorization();
 
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -40,9 +38,10 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
 
         // Act
-        services.AddGranitAuthorization(EmptyConfiguration);
+        services.AddGranitAuthorization();
 
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -57,7 +56,7 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         ServiceCollection services = new();
 
         // Act
-        services.AddGranitAuthorization(EmptyConfiguration);
+        services.AddGranitAuthorization();
 
         // Assert — descriptor registered (transitive dependencies not required here)
         services.Should().Contain(sd => sd.ServiceType == typeof(IPermissionChecker));
@@ -70,7 +69,7 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         ServiceCollection services = new();
 
         // Act
-        services.AddGranitAuthorization(EmptyConfiguration);
+        services.AddGranitAuthorization();
 
         // Assert — descriptor registered
         services.Should().Contain(sd => sd.ServiceType == typeof(IAuthorizationHandler));
@@ -83,7 +82,7 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         ServiceCollection services = new();
 
         // Act
-        IServiceCollection returned = services.AddGranitAuthorization(EmptyConfiguration);
+        IServiceCollection returned = services.AddGranitAuthorization();
 
         // Assert
         returned.Should().BeSameAs(services);

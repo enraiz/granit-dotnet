@@ -11,6 +11,7 @@ using Granit.ApiDocumentation.Extensions;
 using Granit.ApiDocumentation.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
@@ -27,11 +28,12 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         // Arrange
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.Environment.EnvironmentName = Environments.Production;
-        builder.Services.AddGranitApiDocumentation(opts =>
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.MajorVersions = [1];
-            opts.EnableInProduction = false;
+            ["ApiDocumentation:MajorVersions:0"] = "1",
+            ["ApiDocumentation:EnableInProduction"] = "false",
         });
+        builder.AddGranitApiDocumentation();
         WebApplication app = builder.Build();
 
         // Act
@@ -49,11 +51,12 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         // Arrange
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.Environment.EnvironmentName = Environments.Development;
-        builder.Services.AddGranitApiDocumentation(opts =>
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.Title = "Test API";
-            opts.MajorVersions = [1];
+            ["ApiDocumentation:Title"] = "Test API",
+            ["ApiDocumentation:MajorVersions:0"] = "1",
         });
+        builder.AddGranitApiDocumentation();
         WebApplication app = builder.Build();
 
         // Act
@@ -71,12 +74,14 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         // Arrange
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.Environment.EnvironmentName = Environments.Production;
-        builder.Services.AddGranitApiDocumentation(opts =>
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.Title = "Prod API";
-            opts.MajorVersions = [1, 2];
-            opts.EnableInProduction = true;
+            ["ApiDocumentation:Title"] = "Prod API",
+            ["ApiDocumentation:MajorVersions:0"] = "1",
+            ["ApiDocumentation:MajorVersions:1"] = "2",
+            ["ApiDocumentation:EnableInProduction"] = "true",
         });
+        builder.AddGranitApiDocumentation();
         WebApplication app = builder.Build();
 
         // Act
@@ -94,11 +99,11 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         // Arrange
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.Environment.EnvironmentName = Environments.Development;
-        builder.Services.AddGranitApiDocumentation(opts =>
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.MajorVersions = [1];
-            opts.AuthorizationPolicy = null;
+            ["ApiDocumentation:MajorVersions:0"] = "1",
         });
+        builder.AddGranitApiDocumentation();
         WebApplication app = builder.Build();
 
         // Act
@@ -116,11 +121,12 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         // Arrange
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.Environment.EnvironmentName = Environments.Development;
-        builder.Services.AddGranitApiDocumentation(opts =>
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.MajorVersions = [1];
-            opts.AuthorizationPolicy = "";
+            ["ApiDocumentation:MajorVersions:0"] = "1",
+            ["ApiDocumentation:AuthorizationPolicy"] = "",
         });
+        builder.AddGranitApiDocumentation();
         WebApplication app = builder.Build();
 
         // Act
@@ -140,11 +146,12 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         builder.Environment.EnvironmentName = Environments.Development;
         builder.Services.AddAuthorizationBuilder()
             .AddPolicy("InternalDeveloper", p => p.RequireAuthenticatedUser());
-        builder.Services.AddGranitApiDocumentation(opts =>
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.MajorVersions = [1];
-            opts.AuthorizationPolicy = "InternalDeveloper";
+            ["ApiDocumentation:MajorVersions:0"] = "1",
+            ["ApiDocumentation:AuthorizationPolicy"] = "InternalDeveloper",
         });
+        builder.AddGranitApiDocumentation();
         WebApplication app = builder.Build();
 
         // Act

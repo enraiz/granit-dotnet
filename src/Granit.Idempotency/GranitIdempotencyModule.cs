@@ -1,6 +1,5 @@
 using Granit.Core.Modularity;
 using Granit.Idempotency.Extensions;
-using Granit.Idempotency.Models;
 
 namespace Granit.Idempotency;
 
@@ -13,6 +12,5 @@ public sealed class GranitIdempotencyModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitIdempotency(
-            context.Configuration.GetSection(IdempotencyOptions.SectionName));
+        context.Services.AddGranitIdempotency();
 }

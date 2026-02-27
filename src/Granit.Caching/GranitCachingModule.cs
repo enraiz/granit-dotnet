@@ -21,6 +21,5 @@ public sealed class GranitCachingModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitCaching(
-            context.Configuration.GetSection(CachingOptions.SectionName));
+        context.Services.AddGranitCaching();
 }
