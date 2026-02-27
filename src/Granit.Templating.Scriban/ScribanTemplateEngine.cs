@@ -59,17 +59,17 @@ internal sealed class ScribanTemplateEngine : ITemplateEngine
         IReadOnlyList<ITemplateGlobalContext> globalContexts,
         CancellationToken ct) where TData : notnull
     {
-        ScriptObject globals = new();
+        ScriptObject globals = [];
 
         // Expose TData as "model" with snake_case property names (PascalCase → snake_case)
-        ScriptObject model = new();
+        ScriptObject model = [];
         model.Import(data, renamer: StandardMemberRenamer.Default);
         globals.SetValue("model", model, readOnly: true);
 
         // Inject each global context under its ContextName
         foreach (ITemplateGlobalContext globalContext in globalContexts)
         {
-            ScriptObject contextObj = new();
+            ScriptObject contextObj = [];
             contextObj.Import(globalContext.Resolve(), renamer: StandardMemberRenamer.Default);
             globals.SetValue(globalContext.ContextName, contextObj, readOnly: true);
         }

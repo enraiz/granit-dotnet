@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using Granit.Security;
+using JasperFx.Core;
 using Granit.Timing;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;

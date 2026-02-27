@@ -82,16 +82,7 @@ internal sealed class EmbeddedTemplateResolver(IReadOnlyList<Assembly> assemblie
         };
     }
 
-    private static string? FindResource(Assembly assembly, string resourceName)
-    {
-        string[] names = assembly.GetManifestResourceNames();
-        foreach (string name in names)
-        {
-            if (string.Equals(name, resourceName, StringComparison.Ordinal))
-            {
-                return name;
-            }
-        }
-        return null;
-    }
+    private static string? FindResource(Assembly assembly, string resourceName) =>
+        assembly.GetManifestResourceNames()
+            .FirstOrDefault(name => string.Equals(name, resourceName, StringComparison.Ordinal));
 }
