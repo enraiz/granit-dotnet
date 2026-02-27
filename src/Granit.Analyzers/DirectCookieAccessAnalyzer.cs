@@ -97,21 +97,7 @@ public sealed class DirectCookieAccessAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation(), methodName));
     }
 
-    private static bool ImplementsOrEquals(INamedTypeSymbol type, INamedTypeSymbol interfaceType)
-    {
-        if (SymbolEqualityComparer.Default.Equals(type, interfaceType))
-        {
-            return true;
-        }
-
-        foreach (INamedTypeSymbol iface in type.AllInterfaces)
-        {
-            if (SymbolEqualityComparer.Default.Equals(iface, interfaceType))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    private static bool ImplementsOrEquals(INamedTypeSymbol type, INamedTypeSymbol interfaceType) =>
+        SymbolEqualityComparer.Default.Equals(type, interfaceType)
+        || type.AllInterfaces.Any(iface => SymbolEqualityComparer.Default.Equals(iface, interfaceType));
 }

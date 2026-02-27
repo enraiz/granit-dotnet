@@ -25,8 +25,8 @@ export const CookieConsentContext =
 
 interface CookieConsentProviderProps {
   /** The CMP implementation (Axeptio, Cookiebot, native, etc.). */
-  provider: ICookieConsentProvider;
-  children: ReactNode;
+  readonly provider: ICookieConsentProvider;
+  readonly children: ReactNode;
 }
 
 /**

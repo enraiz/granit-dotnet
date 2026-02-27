@@ -97,10 +97,8 @@ public sealed class CookieRegistryTests
     }
 
     [Fact]
-    public void IsRegistered_ReturnsFalseForUnknown()
-    {
+    public void IsRegistered_ReturnsFalseForUnknown() =>
         _sut.IsRegistered("unknown").Should().BeFalse();
-    }
 
     [Fact]
     public void GetAll_ReturnsAllRegistered()
