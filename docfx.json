@@ -9,7 +9,8 @@
             "**/bin/**",
             "**/Granit.Analyzers/**",
             "**/Granit.Analyzers.CodeFixes/**",
-            "**/Granit.Localization.SourceGenerator/**"
+            "**/Granit.Localization.SourceGenerator/**",
+            "**/Granit.Localization.Endpoints/**"
           ]
         }
       ],
