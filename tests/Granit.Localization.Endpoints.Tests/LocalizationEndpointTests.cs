@@ -175,6 +175,40 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         response.Headers.Vary.Should().Contain("Accept-Language");
     }
 
+    [Fact]
+    public async Task MapGranitLocalization_WithCustomRoutePrefix_RespondsOnCustomRoute()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+        builder.Services.AddGranitLocalization(opts => opts.Resources.Add<TestResource>("fr"));
+
+        WebApplication app = builder.Build();
+        app.MapGranitLocalization(opts => opts.RoutePrefix = "api/v1/granit/localization");
+        await app.StartAsync(TestContext.Current.CancellationToken);
+        HttpClient client = app.GetTestClient();
+
+        try
+        {
+            // Default route must not be registered
+            HttpResponseMessage notFound = await client.GetAsync(
+                "/api/granit/localization",
+                TestContext.Current.CancellationToken);
+            notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            // Custom route must respond
+            HttpResponseMessage ok = await client.GetAsync(
+                "/api/v1/granit/localization",
+                TestContext.Current.CancellationToken);
+            ok.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+        finally
+        {
+            client.Dispose();
+            await app.DisposeAsync();
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         _client.Dispose();
