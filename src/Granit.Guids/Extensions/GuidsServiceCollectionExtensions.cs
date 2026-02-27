@@ -1,4 +1,5 @@
 using Granit.Guids;
+using Granit.Timing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -16,6 +17,9 @@ public static class GuidsServiceCollectionExtensions
         this IServiceCollection services,
         Action<GuidGeneratorOptions>? configure = null)
     {
+        // IClock is required by SequentialGuidGenerator; TryAdd is idempotent
+        services.AddGranitTiming();
+
         // Singleton because SequentialGuidGenerator is thread-safe
         // (static RandomNumberGenerator, injected IOptions)
         services.TryAddSingleton<IGuidGenerator, SequentialGuidGenerator>();

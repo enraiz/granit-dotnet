@@ -1,4 +1,5 @@
 using Granit.Caching;
+using Granit.Timing.Extensions;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -24,6 +25,9 @@ public static class HybridCachingServiceCollectionExtensions
     public static IServiceCollection AddGranitCachingHybrid(
         this IServiceCollection services)
     {
+        // IClock is required by HybridCacheService; TryAdd is idempotent
+        services.AddGranitTiming();
+
         services
             .AddOptions<HybridCachingOptions>()
             .BindConfiguration(HybridCachingOptions.SectionName)
