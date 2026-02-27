@@ -36,6 +36,7 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
+        builder.Services.AddHybridCache();
         builder.Services.AddDbContextFactory<TemplatingDbContext>(configure);
         builder.Services.AddScoped<IDocumentTemplateStore, EfDocumentTemplateStore>();
         builder.Services.AddScoped<ITemplateResolver, StoreTemplateResolver>();

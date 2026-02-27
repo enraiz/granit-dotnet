@@ -25,10 +25,18 @@ internal sealed class DocumentGenerator(
     {
         DocumentFormat format = targetFormat ?? templateType.DefaultFormat;
 
-        // 1. Render HTML via the shared text pipeline (enrichers + resolver + engine)
-        RenderedTextResult textResult = await _textRenderer.RenderAsync(templateType, data, ct);
+        // 1. Render via the shared text pipeline (enrichers + resolver + engine).
+        //    Binary engines (e.g. ClosedXML for Excel) return BinaryRenderedContent directly.
+        RenderedContent content = await _textRenderer.RenderDocumentAsync(templateType, data, format, ct);
 
-        // 2. Find a document renderer that supports the target format
+        // 2a. Binary engine result: return directly, no IDocumentRenderer step needed.
+        if (content is BinaryRenderedContent binary)
+        {
+            return new DocumentResult(binary.Bytes, binary.Format);
+        }
+
+        // 2b. Text engine result: find a renderer that converts HTML → target format.
+        TextRenderedContent text = (TextRenderedContent)content;
         IDocumentRenderer? renderer = _documentRenderers.FirstOrDefault(r => r.CanRender(format));
 
         if (renderer is null)
@@ -36,7 +44,7 @@ internal sealed class DocumentGenerator(
             throw new DocumentRendererNotFoundException(format);
         }
 
-        // 3. Convert HTML → binary document
-        return await renderer.RenderAsync(textResult.Html, format, ct);
+        // 3. Convert HTML → binary document.
+        return await renderer.RenderAsync(text.Html, format, ct);
     }
 }

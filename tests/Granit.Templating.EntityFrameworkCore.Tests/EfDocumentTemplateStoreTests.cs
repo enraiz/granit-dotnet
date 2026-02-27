@@ -4,6 +4,8 @@ using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Granit.Templating.EntityFrameworkCore.Tests;
@@ -26,8 +28,15 @@ public sealed class EfDocumentTemplateStoreTests
             Task.FromResult(CreateDbContext());
     }
 
+    private static HybridCache CreateHybridCache()
+    {
+        ServiceCollection services = new();
+        services.AddHybridCache();
+        return services.BuildServiceProvider().GetRequiredService<HybridCache>();
+    }
+
     private static EfDocumentTemplateStore CreateStore(string dbName) =>
-        new(new InMemoryContextFactory(dbName));
+        new(new InMemoryContextFactory(dbName), CreateHybridCache());
 
     private static string NewDb() => Guid.NewGuid().ToString();
 
@@ -108,6 +117,61 @@ public sealed class EfDocumentTemplateStoreTests
         frResult.Should().NotBeNull();
         frResult!.Content.Should().Be("<p>Français</p>");
         neutralResult.Should().BeNull("culture-neutral key is distinct from fr-BE");
+    }
+
+    [Fact]
+    public async Task TryGetPublishedAsync_AfterPublish_CacheIsInvalidated()
+    {
+        string db = NewDb();
+        EfDocumentTemplateStore store = CreateStore(db);
+        TemplateKey key = new("Cache.Publish");
+
+        // Publish v1 and read (populates cache)
+        await store.SaveDraftAsync(key, "<p>v1</p>", "text/html", "alice",
+            TestContext.Current.CancellationToken);
+        await store.PublishAsync(key, "bob",
+            TestContext.Current.CancellationToken);
+        TemplateDescriptor? v1 = await store.TryGetPublishedAsync(key,
+            TestContext.Current.CancellationToken);
+        v1!.Content.Should().Be("<p>v1</p>");
+
+        // Publish v2 — must invalidate the cache entry for v1
+        await store.SaveDraftAsync(key, "<p>v2</p>", "text/html", "carol",
+            TestContext.Current.CancellationToken);
+        await store.PublishAsync(key, "dave",
+            TestContext.Current.CancellationToken);
+
+        TemplateDescriptor? v2 = await store.TryGetPublishedAsync(key,
+            TestContext.Current.CancellationToken);
+
+        v2!.Content.Should().Be("<p>v2</p>", "cache must be invalidated after publish");
+    }
+
+    [Fact]
+    public async Task TryGetPublishedAsync_AfterUnpublish_CacheIsInvalidated()
+    {
+        string db = NewDb();
+        EfDocumentTemplateStore store = CreateStore(db);
+        TemplateKey key = new("Cache.Unpublish");
+
+        await store.SaveDraftAsync(key, "<p>v1</p>", "text/html", "alice",
+            TestContext.Current.CancellationToken);
+        await store.PublishAsync(key, "bob",
+            TestContext.Current.CancellationToken);
+
+        // Read to populate cache
+        TemplateDescriptor? cached = await store.TryGetPublishedAsync(key,
+            TestContext.Current.CancellationToken);
+        cached.Should().NotBeNull();
+
+        // Unpublish — must invalidate the cache entry
+        await store.UnpublishAsync(key, "carol",
+            TestContext.Current.CancellationToken);
+
+        TemplateDescriptor? result = await store.TryGetPublishedAsync(key,
+            TestContext.Current.CancellationToken);
+
+        result.Should().BeNull("cache must be invalidated after unpublish");
     }
 
     // -------------------------------------------------------------------------

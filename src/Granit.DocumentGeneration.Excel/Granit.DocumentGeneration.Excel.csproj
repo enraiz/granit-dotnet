@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.DocumentGeneration.Excel</PackageId>
+    <Description>Excel document generation for Granit via ClosedXML. Provides ClosedXmlTemplateEngine, which fills XLSX templates with a data model and returns binary output — no HTML intermediate step required.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.DocumentGeneration.Excel.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Templating\Granit.Templating.csproj" />
+  </ItemGroup>
+
+</Project>

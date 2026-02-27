@@ -15,25 +15,51 @@ namespace Granit.Templating.Internal;
 /// </summary>
 internal sealed class TextTemplateRenderer(
     IEnumerable<ITemplateResolver> resolvers,
-    ITemplateEngine engine,
+    IEnumerable<ITemplateEngine> engines,
     IEnumerable<ITemplateGlobalContext> globalContexts,
     IServiceProvider serviceProvider) : ITextTemplateRenderer
 {
     private readonly IOrderedEnumerable<ITemplateResolver> _resolvers =
         resolvers.OrderByDescending(r => r.Priority);
 
+    private readonly IReadOnlyList<ITemplateEngine> _engines = engines.ToList();
+
     private readonly IReadOnlyList<ITemplateGlobalContext> _globalContexts =
         globalContexts.ToList();
 
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-
-    private readonly ITemplateEngine _engine = engine;
 
     /// <inheritdoc/>
     public async Task<RenderedTextResult> RenderAsync<TData>(
         TextTemplateType<TData> templateType,
         TData data,
         CancellationToken ct = default) where TData : notnull
+    {
+        RenderedContent rendered = await RenderCoreAsync(templateType, data, DocumentFormat.Html, ct);
+
+        if (rendered is not TextRenderedContent text)
+        {
+            throw new InvalidOperationException(
+                $"ITemplateEngine returned {rendered.GetType().Name} for a text template. " +
+                "Ensure the registered ITemplateEngine supports 'text/html' templates.");
+        }
+
+        return new RenderedTextResult(text.Html);
+    }
+
+    /// <inheritdoc/>
+    public Task<RenderedContent> RenderDocumentAsync<TData>(
+        TextTemplateType<TData> templateType,
+        TData data,
+        DocumentFormat targetFormat,
+        CancellationToken ct = default) where TData : notnull =>
+        RenderCoreAsync(templateType, data, targetFormat, ct);
+
+    private async Task<RenderedContent> RenderCoreAsync<TData>(
+        TextTemplateType<TData> templateType,
+        TData data,
+        DocumentFormat targetFormat,
+        CancellationToken ct) where TData : notnull
     {
         // 1. Enrich data (ordered, immutable)
         TData enrichedData = await EnrichAsync(data, ct);
@@ -44,18 +70,17 @@ internal sealed class TextTemplateRenderer(
             await ResolveAsync(templateType.Name, culture, ct)
             ?? throw new TemplateNotFoundException(templateType.Name, culture);
 
-        // 3. Render
-        RenderedContent rendered = await _engine.RenderAsync(
-            descriptor, enrichedData, DocumentFormat.Html, _globalContexts, ct);
+        // 3. Select engine by MIME type and render
+        ITemplateEngine? engine = _engines.FirstOrDefault(e => e.CanRender(descriptor));
 
-        if (rendered is not TextRenderedContent text)
+        if (engine is null)
         {
             throw new InvalidOperationException(
-                $"ITemplateEngine returned {rendered.GetType().Name} for a text template. " +
-                "Ensure the registered ITemplateEngine supports 'text/html' templates.");
+                $"No ITemplateEngine can render MIME type '{descriptor.MimeType}'. " +
+                "Register a compatible engine (e.g. AddGranitTemplatingWithScriban or AddGranitDocumentGenerationExcel).");
         }
 
-        return new RenderedTextResult(text.Html);
+        return await engine.RenderAsync(descriptor, enrichedData, targetFormat, _globalContexts, ct);
     }
 
     private async Task<TData> EnrichAsync<TData>(TData data, CancellationToken ct)

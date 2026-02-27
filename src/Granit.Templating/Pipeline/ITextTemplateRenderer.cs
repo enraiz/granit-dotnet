@@ -47,4 +47,22 @@ public interface ITextTemplateRenderer
         TextTemplateType<TData> templateType,
         TData data,
         CancellationToken ct = default) where TData : notnull;
+
+    /// <summary>
+    /// Renders the template, returning a <see cref="RenderedContent"/> that may be text or binary.
+    /// </summary>
+    /// <remarks>
+    /// Used by <c>IDocumentGenerator</c> to support binary engines (e.g. ClosedXML for Excel)
+    /// that produce <see cref="BinaryRenderedContent"/> directly, bypassing the HTML→binary step.
+    /// </remarks>
+    /// <typeparam name="TData">Type of the data model. Must be non-null.</typeparam>
+    /// <param name="templateType">Strongly-typed template declaration.</param>
+    /// <param name="data">Data model to merge into the template.</param>
+    /// <param name="targetFormat">The intended output format.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<RenderedContent> RenderDocumentAsync<TData>(
+        TextTemplateType<TData> templateType,
+        TData data,
+        DocumentFormat targetFormat,
+        CancellationToken ct = default) where TData : notnull;
 }
