@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Templating.Scriban</PackageId>
+    <Description>Implémentation Scriban du moteur de templating Granit. Fournit ScribanTemplateEngine (sandboxé, multi-tenant safe), NowGlobalContext ({{ now.date }}, …) et ExecutionContextGlobalContext ({{ context.culture }}, …).</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Templating.Scriban.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Scriban" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Templating\Granit.Templating.csproj" />
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
+    <!-- Optional at runtime: ICurrentTenant resolved via GetService -->
+  </ItemGroup>
+
+</Project>

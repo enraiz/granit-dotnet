@@ -3,26 +3,62 @@
 # =============================================================================
 # Ce fichier centralise toutes les versions utilisées dans ce projet.
 # Format : CLE=VERSION (parsable par bash : source VERSIONS)
+# Les versions exactes (floating) sont gérées dans Directory.Packages.props.
 # =============================================================================
 
 # --- Runtime ---
 DOTNET_VERSION=10.0
 CSHARP_VERSION=14
 
-# --- Packages principaux ---
-EFCORE_VERSION=10.0.3
-VAULTSHARP_VERSION=1.17.5.1
-SERILOG_VERSION=10
-OPENTELEMETRY_VERSION=1.15
+# --- ASP.NET Core & Extensions ---
+ASPNETCORE_VERSION=10
 ASP_VERSIONING_VERSION=10.0.0-preview.1
-MICROSOFT_OPENAPI_VERSION=3.3.1
-SCALAR_VERSION=2.12.46
+
+# --- Entity Framework Core ---
+EFCORE_VERSION=10
+
+# --- Vault ---
+VAULTSHARP_VERSION=1.17
+
+# --- Observabilité ---
+SERILOG_ASPNETCORE_VERSION=10
+SERILOG_SINKS_OPENTELEMETRY_VERSION=4
+OPENTELEMETRY_VERSION=1.15
+
+# --- API & Documentation ---
+SCALAR_VERSION=2
+
+# --- Templating ---
+SCRIBAN_VERSION=5
+SMARTFORMAT_VERSION=3
+
+# --- Messaging ---
+WOLVERINE_VERSION=5
+
+# --- Validation ---
+FLUENTVALIDATION_VERSION=12
+
+# --- Planification ---
+CRONOS_VERSION=0.8
+
+# --- Cache ---
+STACKEXCHANGE_REDIS_VERSION=2
+
+# --- Blob Storage ---
+AWSSDK_S3_VERSION=3
+
+# --- Roslyn Analyzers ---
+ROSLYN_VERSION=5
 
 # --- Tests ---
 MICROSOFT_NET_TEST_SDK_VERSION=18
 XUNIT_VERSION=3
 FLUENTASSERTIONS_VERSION=8
 NSUBSTITUTE_VERSION=5
+BOGUS_VERSION=35
+TESTCONTAINERS_POSTGRESQL_VERSION=4
+COVERLET_VERSION=8
+JUNIT_XML_LOGGER_VERSION=7
 
 # --- Sécurité ---
 TRIVY_VERSION=latest
@@ -30,12 +66,17 @@ TRIVY_VERSION=latest
 # =============================================================================
 # LIENS DE RELEASES
 # =============================================================================
-# .NET          : https://dotnet.microsoft.com/en-us/download
-# EF Core       : https://github.com/dotnet/efcore/releases
-# VaultSharp    : https://github.com/rajanadar/VaultSharp/releases
-# Serilog       : https://github.com/serilog/serilog-aspnetcore/releases
-# OpenTelemetry : https://github.com/open-telemetry/opentelemetry-dotnet/releases
-# Asp.Versioning: https://github.com/dotnet/aspnet-api-versioning/releases
-# Microsoft.OpenApi: https://github.com/microsoft/OpenAPI.NET/releases
-# Scalar        : https://github.com/scalar/scalar/releases
+# .NET              : https://dotnet.microsoft.com/en-us/download
+# EF Core           : https://github.com/dotnet/efcore/releases
+# VaultSharp        : https://github.com/rajanadar/VaultSharp/releases
+# Serilog           : https://github.com/serilog/serilog-aspnetcore/releases
+# OpenTelemetry     : https://github.com/open-telemetry/opentelemetry-dotnet/releases
+# Asp.Versioning    : https://github.com/dotnet/aspnet-api-versioning/releases
+# Scalar            : https://github.com/scalar/scalar/releases
+# Scriban           : https://github.com/scriban/scriban/releases
+# SmartFormat       : https://github.com/axuno/SmartFormat/releases
+# Wolverine         : https://github.com/JasperFx/wolverine/releases
+# FluentValidation  : https://github.com/FluentValidation/FluentValidation/releases
+# Cronos            : https://github.com/HangfireIO/Cronos/releases
+# StackExchange.Redis: https://github.com/StackExchange/StackExchange.Redis/releases
 # =============================================================================

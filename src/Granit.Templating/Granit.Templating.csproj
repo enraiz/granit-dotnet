@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Templating</PackageId>
+    <Description>Socle de templating générique pour Granit. Pipeline résolution → rendu Scriban → texte/HTML. Sans dépendance tierce : moteur et renderer concrets fournis séparément (Granit.Templating.Scriban, Granit.DocumentGeneration.*).</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Templating.Tests" />
+    <InternalsVisibleTo Include="Granit.Templating.Scriban" />
+    <InternalsVisibleTo Include="Granit.Templating.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.DocumentGeneration" />
+    <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal types in tests -->
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
+    <!-- Optional at runtime: ICurrentTenant resolved via GetService — no GranitMultiTenancyModule required -->
+  </ItemGroup>
+
+</Project>
