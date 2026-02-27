@@ -30,6 +30,26 @@ Plan value   (200)
 Default      (300)   ← valeur déclarée dans le code
 ```
 
+```mermaid
+flowchart TD
+    REQ["GetValueAsync(featureName)"] --> CACHE{"HybridCache\nL1 + L2 ?"}
+
+    CACHE -->|hit| RES["Valeur en cache"]
+    CACHE -->|miss| T{"TenantValueProvider\n(Order = 100)"}
+
+    T -->|override trouvé| STORE["Stocke L1 + L2"]
+    T -->|null| P{"PlanValueProvider\n(Order = 200)"}
+
+    P -->|valeur plan| STORE
+    P -->|null| D["DefaultValueProvider\n(Order = 300)\nValeur du code"]
+
+    D --> STORE
+    STORE --> RES
+
+    style CACHE fill:#4a9eff,color:#fff
+    style RES fill:#2d5a27,color:#fff
+```
+
 La résolution s'arrête dès qu'un niveau retourne une valeur non nulle.
 Le résultat est mis en cache par `IHybridCache` (L1 in-process + L2 Redis)
 et invalidé via `FeatureValueChangedEvent` (Wolverine).

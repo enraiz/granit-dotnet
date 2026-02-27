@@ -25,6 +25,24 @@ Arguments de ligne de commande
 User Secrets (développement local uniquement)
 ```
 
+```mermaid
+flowchart TD
+    A["appsettings.json"] -->|surcharge| B["appsettings.{Env}.json"]
+    B -->|surcharge| C["Variables d'environnement"]
+    C -->|surcharge| D["Arguments CLI"]
+    D -->|surcharge| E["User Secrets\n(dev uniquement)"]
+    E --> F["IConfiguration\n(agrégée)"]
+
+    F --> G["BindConfiguration(SectionName)"]
+    G --> H["IOptions&lt;T&gt;\n(validé au démarrage)"]
+
+    V["HashiCorp Vault\n(secrets dynamiques)"] -->|injection runtime| F
+
+    style V fill:#e67e22,color:#fff
+    style F fill:#2d5a27,color:#fff
+    style H fill:#4a9eff,color:#fff
+```
+
 > **Secrets en production** : les secrets (mots de passe, tokens, clés API) ne sont
 > **jamais** dans les fichiers de configuration. Ils sont injectés via HashiCorp Vault
 > (voir [vault.md](../security/vault.md)) ou via des variables d'environnement sécurisées dans

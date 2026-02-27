@@ -380,6 +380,37 @@ app.Run();
 
 ## Architecture interne
 
+### Cycle de vie du chargement
+
+```mermaid
+sequenceDiagram
+    participant P as Program.cs
+    participant GA as GranitApplication
+    participant ML as ModuleLoader
+    participant A as Module A
+    participant B as Module B (depends on A)
+
+    P->>GA: AddGranitAsync&lt;B&gt;()
+    GA->>ML: LoadModules&lt;B&gt;()
+    ML->>ML: Récursion via [DependsOn]
+    ML->>ML: Déduplication par Type
+    ML->>ML: TopologicalSort (Kahn)
+    ML-->>GA: [A, B]
+
+    GA->>A: ConfigureServicesAsync(context)
+    A-->>GA: Services enregistrés
+    GA->>B: ConfigureServicesAsync(context)
+    B-->>GA: Services enregistrés
+
+    Note over P,B: Phase 1 terminée — Build()
+
+    P->>GA: UseGranitAsync()
+    GA->>A: OnApplicationInitializationAsync(context)
+    GA->>B: OnApplicationInitializationAsync(context)
+
+    Note over P,B: Phase 2 terminée — Run()
+```
+
 ### Algorithme de chargement
 
 Le `ModuleLoader` utilise l'algorithme de Kahn pour le tri topologique :
