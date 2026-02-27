@@ -6,12 +6,41 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Granit.Analyzers.CodeFixes.Helpers;
 
 /// <summary>
-/// Shared helper for GRSEC001 and GRSEC002 CodeFix providers.
-/// Handles field injection, constructor parameter addition, and using directive management.
+/// Shared helper for GRSEC001, GRSEC002, and GRSEC004 CodeFix providers.
+/// Handles field injection, constructor parameter addition, using directive management,
+/// and static context detection.
 /// All methods operate on immutable syntax trees — callers must track nodes via <see cref="SyntaxAnnotation"/>.
 /// </summary>
 internal static class DependencyInjectionHelper
 {
+    /// <summary>
+    /// Returns <c>true</c> when <paramref name="node"/> is inside a <c>static</c> method or property,
+    /// meaning constructor-based DI cannot be applied.
+    /// </summary>
+    internal static bool IsInStaticContext(SyntaxNode node)
+    {
+        foreach (SyntaxNode ancestor in node.Ancestors())
+        {
+            if (ancestor is MethodDeclarationSyntax method)
+            {
+                return method.Modifiers.Any(SyntaxKind.StaticKeyword);
+            }
+
+            if (ancestor is PropertyDeclarationSyntax property)
+            {
+                return property.Modifiers.Any(SyntaxKind.StaticKeyword);
+            }
+
+            if (ancestor is ClassDeclarationSyntax)
+            {
+                break;
+            }
+        }
+
+        return false;
+    }
+
+
     /// <summary>
     /// Ensures a <c>private readonly</c> field exists in the class. Returns the modified class if added.
     /// </summary>

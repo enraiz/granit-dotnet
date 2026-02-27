@@ -4,7 +4,7 @@
       "src": [
         {
           "files": ["src/**/*.csproj"],
-          "exclude": ["**/obj/**", "**/bin/**"]
+          "exclude": ["**/obj/**", "**/bin/**", "**/Granit.Analyzers/**", "**/Granit.Analyzers.CodeFixes/**"]
         }
       ],
       "dest": "api",
