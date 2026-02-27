@@ -1,6 +1,4 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -15,12 +13,12 @@ namespace Granit.Analyzers;
 /// compiled project (i.e., when <c>MigrationCycleAttribute</c> is found in the compilation).
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class DropColumnWithoutContractAnalyzer : DiagnosticAnalyzer
+public sealed class DropColumnWithoutContractAnalyzer : GranitMigrationAnalyzerBase
 {
     /// <summary>Diagnostic identifier.</summary>
     public const string DiagnosticId = "GRMIGA001";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor _rule = new(
         DiagnosticId,
         title: "DropColumn requires a Contract-phase annotation",
         messageFormat: "Migration '{0}' calls DropColumn but is not annotated with [MigrationCycle(MigrationPhase.Contract, ...)]",
@@ -31,31 +29,10 @@ public sealed class DropColumnWithoutContractAnalyzer : DiagnosticAnalyzer
             + "Annotate the migration class with [MigrationCycle(MigrationPhase.Contract, \"cycle-id\")].");
 
     /// <inheritdoc/>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+    protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    public override void Initialize(AnalysisContext context)
-    {
-        context.EnableConcurrentExecution();
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
-        context.RegisterCompilationStartAction(compilationContext =>
-        {
-            (INamedTypeSymbol CycleAttr, INamedTypeSymbol Migration)? symbols =
-                MigrationAnalyzerHelpers.ResolveGranitMigrationSymbols(compilationContext.Compilation);
-            if (symbols is null)
-            {
-                return;
-            }
-
-            compilationContext.RegisterSyntaxNodeAction(
-                nodeContext => AnalyzeInvocation(nodeContext, symbols.Value.Migration, symbols.Value.CycleAttr),
-                SyntaxKind.InvocationExpression);
-        });
-    }
-
-    private static void AnalyzeInvocation(
+    protected override void AnalyzeNode(
         SyntaxNodeAnalysisContext context,
         INamedTypeSymbol migrationBase,
         INamedTypeSymbol cycleAttrType)
@@ -74,6 +51,6 @@ public sealed class DropColumnWithoutContractAnalyzer : DiagnosticAnalyzer
 
         InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
         context.ReportDiagnostic(
-            Diagnostic.Create(Rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
+            Diagnostic.Create(_rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
     }
 }

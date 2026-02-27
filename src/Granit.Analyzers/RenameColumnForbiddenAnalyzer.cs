@@ -1,6 +1,4 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -20,12 +18,12 @@ namespace Granit.Analyzers;
 /// </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class RenameColumnForbiddenAnalyzer : DiagnosticAnalyzer
+public sealed class RenameColumnForbiddenAnalyzer : EfCoreMigrationAnalyzerBase
 {
     /// <summary>Diagnostic identifier.</summary>
     public const string DiagnosticId = "GRMIGA002";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor _rule = new(
         DiagnosticId,
         title: "RenameColumn is not zero-downtime safe",
         messageFormat: "RenameColumn is forbidden in the Expand & Contract pattern. "
@@ -37,31 +35,10 @@ public sealed class RenameColumnForbiddenAnalyzer : DiagnosticAnalyzer
             + "Use AddColumn (Expand phase) + data migration + DropColumn (Contract phase) instead.");
 
     /// <inheritdoc/>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+    protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    public override void Initialize(AnalysisContext context)
-    {
-        context.EnableConcurrentExecution();
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
-        context.RegisterCompilationStartAction(compilationContext =>
-        {
-            INamedTypeSymbol? migrationSymbol =
-                MigrationAnalyzerHelpers.ResolveEfCoreMigrationSymbol(compilationContext.Compilation);
-            if (migrationSymbol is null)
-            {
-                return;
-            }
-
-            compilationContext.RegisterSyntaxNodeAction(
-                nodeContext => AnalyzeInvocation(nodeContext, migrationSymbol),
-                SyntaxKind.InvocationExpression);
-        });
-    }
-
-    private static void AnalyzeInvocation(
+    protected override void AnalyzeNode(
         SyntaxNodeAnalysisContext context,
         INamedTypeSymbol migrationBase)
     {
@@ -73,6 +50,6 @@ public sealed class RenameColumnForbiddenAnalyzer : DiagnosticAnalyzer
         }
 
         InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
-        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
+        context.ReportDiagnostic(Diagnostic.Create(_rule, invocation.GetLocation()));
     }
 }
