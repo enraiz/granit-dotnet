@@ -1,8 +1,9 @@
 namespace Granit.Persistence.Migrations.Messages;
 
 /// <summary>
-/// Wolverine message that triggers the execution of a single data migration batch.
-/// Cascaded by <c>RunMigrationBatchHandler</c> until all rows have been processed.
+/// Command that triggers the execution of a single data migration batch.
+/// Cascaded by <see cref="Internal.MigrationBatchWorker"/> (Channel) or a Wolverine handler
+/// until all rows have been processed.
 /// </summary>
 /// <param name="CycleId">Identifier of the migration cycle to execute.</param>
 /// <param name="TenantId">

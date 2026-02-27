@@ -17,4 +17,11 @@ public sealed class MigrationStartupOptions
     /// Defaults to <c>500</c>.
     /// </summary>
     public int DefaultBatchSize { get; set; } = 500;
+
+    /// <summary>
+    /// Maximum duration for a single migration batch before timeout.
+    /// Prevents infinite hangs when a batch delegate never returns.
+    /// Defaults to <c>5 minutes</c>.
+    /// </summary>
+    public TimeSpan BatchExecutionTimeout { get; set; } = TimeSpan.FromMinutes(5);
 }

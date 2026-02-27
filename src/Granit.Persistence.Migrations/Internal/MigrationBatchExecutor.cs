@@ -7,32 +7,27 @@ using Microsoft.Extensions.Logging;
 namespace Granit.Persistence.Migrations.Internal;
 
 /// <summary>
-/// Wolverine handler that executes one batch of the <see cref="MigrationPhase.Migrate"/> phase.
-/// Cascades a new <see cref="RunMigrationBatchCommand"/> while rows remain to be processed,
-/// or returns an empty array when migration is complete.
+/// Executes a single migration batch and returns the next command (cascade), or <c>null</c> when complete.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Cascade pattern: returning <c>object[]</c> from a Wolverine handler emits zero or more
-/// follow-up messages into the durable Outbox. An empty array stops the cascade.
-/// </para>
-/// <para>
-/// <see cref="MigrationProgressDbContext"/> is committed independently from the tenant
-/// <see cref="DbContext"/>: progress tracking is best-effort and must not block the migration.
-/// </para>
+/// Extracted from the Wolverine handler to be transport-agnostic. This class contains no
+/// dependency on Wolverine — it can be consumed by a <see cref="MigrationBatchWorker"/>
+/// (Channel-based) or by a Wolverine handler in <c>Granit.Persistence.Migrations.Wolverine</c>.
 /// </remarks>
-internal sealed class RunMigrationBatchHandler(
+internal sealed class MigrationBatchExecutor(
     IMigrationCycleRegistry registry,
     IServiceProvider serviceProvider,
     MigrationProgressDbContext progressContext,
     ITenantDbIsolator isolator,
     IClock clock,
-    ILogger<RunMigrationBatchHandler> logger)
+    ILogger<MigrationBatchExecutor> logger)
 {
     /// <summary>
-    /// Processes one batch and cascades the next command, or returns empty when done.
+    /// Processes one batch and returns the next command, or <c>null</c> when the cycle is complete.
     /// </summary>
-    public async Task<object[]> HandleAsync(RunMigrationBatchCommand command, CancellationToken ct)
+    public async Task<RunMigrationBatchCommand?> ExecuteBatchAsync(
+        RunMigrationBatchCommand command,
+        CancellationToken ct)
     {
         MigrationCycleRegistration? registration = registry.Find(command.CycleId);
         if (registration is null)
@@ -40,7 +35,7 @@ internal sealed class RunMigrationBatchHandler(
             logger.LogWarning(
                 "Migration cycle '{CycleId}' not found in registry. Message discarded.",
                 command.CycleId);
-            return [];
+            return null;
         }
 
         DbContext tenantContext =
@@ -60,7 +55,7 @@ internal sealed class RunMigrationBatchHandler(
             logger.LogInformation(
                 "Migration cycle '{CycleId}' already completed for tenant {TenantId}. Message discarded.",
                 command.CycleId, tenantId);
-            return [];
+            return null;
         }
 
         MigrationBatchContext batchContext = new(command.Cursor, command.BatchSize, command.TenantId);
@@ -81,7 +76,7 @@ internal sealed class RunMigrationBatchHandler(
             progress.Error = ex.Message.Length > 4000 ? ex.Message[..4000] : ex.Message;
             await SaveProgressAsync(progress, command.CycleId, tenantId, ct);
 
-            throw; // Re-throw so Wolverine applies its retry / DLQ policy.
+            throw;
         }
 
         progress.ProcessedRows += result.ProcessedCount;
@@ -106,8 +101,8 @@ internal sealed class RunMigrationBatchHandler(
         await SaveProgressAsync(progress, command.CycleId, tenantId, ct);
 
         return result.NextCursor is null
-            ? []
-            : [new RunMigrationBatchCommand(command.CycleId, command.TenantId, result.NextCursor, command.BatchSize)];
+            ? null
+            : new RunMigrationBatchCommand(command.CycleId, command.TenantId, result.NextCursor, command.BatchSize);
     }
 
     private async Task<MigrationProgress> FindOrCreateProgressAsync(

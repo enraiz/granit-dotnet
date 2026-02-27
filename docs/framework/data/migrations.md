@@ -27,13 +27,17 @@ Phase 3 — Contract : suppression de l'ancienne colonne
 ```
 
 Les phases 1 et 3 correspondent à des migrations EF Core normales annotées avec
-`[MigrationCycle]`. La phase 2 est orchestrée par Wolverine via
+`[MigrationCycle]`. La phase 2 est orchestrée par `IMigrationBatchDispatcher` via
 `RunMigrationBatchCommand`.
 
 ## Installation
 
 ```bash
+# Core — dispatch via Channel<T> intégré (sans Wolverine)
 dotnet add package Granit.Persistence.Migrations
+
+# Optionnel — dispatch via Outbox Wolverine (durable, at-least-once)
+dotnet add package Granit.Persistence.Migrations.Wolverine
 ```
 
 ## Configuration
@@ -41,8 +45,12 @@ dotnet add package Granit.Persistence.Migrations
 ### Avec le système de modules
 
 ```csharp
-// Program.cs
+// Program.cs — dispatch Channel (défaut)
 [DependsOn(typeof(GranitPersistenceMigrationsModule))]
+public sealed class MyAppModule : GranitModule { }
+
+// Program.cs — dispatch Wolverine Outbox (durable)
+[DependsOn(typeof(GranitPersistenceMigrationsWolverineModule))]
 public sealed class MyAppModule : GranitModule { }
 ```
 
@@ -63,6 +71,8 @@ builder.AddGranitPersistenceMigrations(opts => opts.UseNpgsql(connectionString))
 > - `IMigrationCycleRegistry` — registre singleton des cycles
 > - `ITenantDbIsolator` — no-op par défaut (shared DB et DB-per-tenant)
 > - `ITenantEnumerator` — no-op par défaut (retourne un flux vide)
+> - `IMigrationBatchDispatcher` — dispatch des commandes (Channel par défaut)
+> - `MigrationBatchWorker` — `BackgroundService` consommant le channel
 > - `MigrationStartupService` — service hébergé de reprise au démarrage
 > - `MigrationStartupOptions` — options liées depuis la section `GranitMigrations`
 
@@ -105,18 +115,19 @@ registry
 
 ## Déclenchement de la migration
 
-La migration est déclenchée en envoyant un `RunMigrationBatchCommand` via Wolverine :
+La migration est déclenchée en envoyant un `RunMigrationBatchCommand` via
+`IMigrationBatchDispatcher` :
 
 ```csharp
-await bus.SendAsync(new RunMigrationBatchCommand(
+await dispatcher.DispatchAsync(new RunMigrationBatchCommand(
     CycleId:   "patient-fullname-v2",
     TenantId:  Guid.Empty,          // Guid.Empty pour les apps mono-tenant
     Cursor:    null,                 // null pour démarrer depuis le début
     BatchSize: 500));
 ```
 
-Le handler `RunMigrationBatchHandler` cascade automatiquement le message suivant
-tant que `NextCursor != null`.
+Le `MigrationBatchWorker` (Channel) ou le `RunMigrationBatchHandler` (Wolverine)
+cascade automatiquement le batch suivant tant que `NextCursor != null`.
 
 ## Reprise au démarrage
 
@@ -139,10 +150,16 @@ Les exceptions sont capturées et logguées ; le démarrage de l'application n'e
 // appsettings.json
 {
   "GranitMigrations": {
-    "DefaultBatchSize": 500
+    "DefaultBatchSize": 500,
+    "BatchExecutionTimeout": "00:05:00"
   }
 }
 ```
+
+| Propriété | Type | Défaut | Description |
+| --------- | ---- | ------ | ----------- |
+| `DefaultBatchSize` | `int` | `500` | Nombre de lignes par batch |
+| `BatchExecutionTimeout` | `TimeSpan` | `5 min` | Timeout de sécurité par batch (prévient les hangs infinis) |
 
 ## Multi-tenant
 
@@ -212,14 +229,27 @@ La table `granit_migration_progress` contient une ligne par cycle et par tenant.
 > indépendamment de la transaction de données tenant et ne bloquent jamais
 > le traitement du batch en cas d'échec.
 
+## Arrêt gracieux (Graceful Shutdown)
+
+Le `MigrationBatchWorker` gère l'arrêt propre via **deux niveaux de CancellationToken** :
+
+1. **`stoppingToken`** (BackgroundService) : annulé lors d'un SIGTERM Kubernetes.
+   Arrête la lecture du channel (pas de nouveau batch accepté).
+2. **`BatchExecutionTimeout`** : CTS interne par batch (défaut : 5 min).
+   Protège contre les hangs infinis.
+
+Le batch **en cours d'exécution n'est jamais interrompu** : il termine son
+`SaveChangesAsync()` et sauvegarde la progression avant que le worker ne s'arrête.
+Au prochain démarrage, `MigrationStartupService` reprend depuis le `LastCursor`.
+
 ## Garanties et contraintes
 
 - **Idempotence obligatoire** : le délégué doit tolérer une réexécution sur des
   lignes déjà migrées (pattern `WHERE new_column IS NULL`).
-- **Durabilité** : la cascade Wolverine est persistée dans l'Outbox ; une panne
-  redémarre le batch suivant au `LastCursor`.
-- **Pas de Polly** : la résilience est assurée par la politique de retry Wolverine
-  (`OnAnyException().RetryWithCooldown(...)`).
+- **Durabilité (Channel)** : la progression est persistée après chaque batch ;
+  une panne redémarre au `LastCursor` au prochain démarrage.
+- **Durabilité (Wolverine)** : la cascade est persistée dans l'Outbox PostgreSQL ;
+  une panne redémarre le batch suivant automatiquement (at-least-once).
 - **Pas de `COUNT(*)`** : `TotalRows` n'est jamais calculé automatiquement
   (risque de lock sur les grandes tables HDS). Setter manuellement si nécessaire.
 
@@ -241,15 +271,18 @@ pour le détail de chaque règle, les exemples et la suppression des diagnostics
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core`, `Granit.Persistence`, `Granit.Timing`, `Granit.Wolverine` |
-| **Utilisé par** | Module feuille (aucun autre module n'en dépend) |
+### `Granit.Persistence.Migrations` (core)
 
-> **Couplage à surveiller (#285)** : la dépendance sur `Granit.Wolverine` couple le
-> framework de migrations à un bus de messages spécifique. `RunMigrationBatchHandler`
-> et `MigrationStartupService` utilisent directement `IMessageBus` et le pattern
-> handler Wolverine pour l'orchestration des batches. Piste : extraire une abstraction
-> `IMigrationBatchDispatcher` avec implémentation Wolverine dans un package séparé.
->
+| Direction       | Modules                                              |
+| --------------- | ---------------------------------------------------- |
+| **Dépend de**   | `Granit.Core`, `Granit.Persistence`, `Granit.Timing` |
+| **Utilisé par** | `Granit.Persistence.Migrations.Wolverine`            |
+
+### `Granit.Persistence.Migrations.Wolverine` (optionnel)
+
+| Direction       | Modules                                             |
+| --------------- | --------------------------------------------------- |
+| **Dépend de**   | `Granit.Persistence.Migrations`, `Granit.Wolverine` |
+| **Utilisé par** | Module feuille                                      |
+
 > Voir le [graphe de dépendances complet](../dependencies.md).
