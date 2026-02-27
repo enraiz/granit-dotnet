@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
     <ProjectReference Include="..\Granit.Webhooks\Granit.Webhooks.csproj" />
   </ItemGroup>
 

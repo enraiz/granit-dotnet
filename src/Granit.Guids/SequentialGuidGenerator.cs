@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Granit.Timing;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Guids;
@@ -7,11 +8,12 @@ namespace Granit.Guids;
 /// Implementation of <see cref="IGuidGenerator"/> that generates sequential GUIDs
 /// optimized for clustered indexes.
 /// </summary>
-public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> options) : IGuidGenerator
+public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> options, IClock clock) : IGuidGenerator
 {
     private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
     private readonly GuidGeneratorOptions _options = options.Value;
+    private readonly IClock _clock = clock;
 
     /// <inheritdoc />
     public Guid Create() => Create(_options.GetDefaultSequentialGuidType());
@@ -28,7 +30,7 @@ public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> optio
         Rng.GetBytes(randomBytes);
 
         // Timestamp in milliseconds since DateTime.MinValue
-        long timestamp = DateTime.UtcNow.Ticks / 10000L;
+        long timestamp = _clock.Now.UtcTicks / 10000L;
 
         // Convert the timestamp to a byte array (8 bytes)
         byte[] timestampBytes = BitConverter.GetBytes(timestamp);

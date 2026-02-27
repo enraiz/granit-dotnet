@@ -131,7 +131,7 @@ cryptographiquement sûrs.
 ### Algorithme
 
 1. **10 octets aléatoires** via `RandomNumberGenerator` (cryptographiquement sûr)
-2. **Timestamp** : `DateTime.UtcNow.Ticks / 10000` (millisecondes depuis l'an 0001)
+2. **Timestamp** : `IClock.Now.UtcTicks / 10000` (millisecondes depuis l'an 0001)
 3. **6 octets de timestamp** extraits (48 bits, couvrant ~8 900 ans)
 4. **Assemblage** selon le `SequentialGuidType` :
 
@@ -365,8 +365,8 @@ guidGenerator.Create().Returns(fixedId);
 ### Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core` |
+| --- | --- |
+| **Dépend de** | `Granit.Core`, `Granit.Timing` |
 | **Utilisé par** | `Granit.Persistence`, `Granit.BlobStorage` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

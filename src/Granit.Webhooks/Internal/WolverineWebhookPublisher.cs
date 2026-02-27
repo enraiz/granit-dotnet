@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Granit.Core.MultiTenancy;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Messages;
 using Wolverine;
@@ -14,7 +15,7 @@ namespace Granit.Webhooks.Internal;
 /// <see cref="WebhookTrigger"/> into the Wolverine Outbox. The ambient
 /// <see cref="ICurrentTenant"/> is captured when available (<c>IsAvailable = true</c>).
 /// </remarks>
-internal sealed class WolverineWebhookPublisher(IMessageBus bus, ICurrentTenant currentTenant) : IWebhookPublisher
+internal sealed class WolverineWebhookPublisher(IMessageBus bus, ICurrentTenant currentTenant, IClock clock) : IWebhookPublisher
 {
     public async ValueTask PublishAsync<TPayload>(
         string eventType,
@@ -28,6 +29,7 @@ internal sealed class WolverineWebhookPublisher(IMessageBus bus, ICurrentTenant 
             EventType = eventType,
             Payload = serializedPayload,
             TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
+            OccurredAt = clock.Now,
         };
 
         await bus.PublishAsync(trigger);

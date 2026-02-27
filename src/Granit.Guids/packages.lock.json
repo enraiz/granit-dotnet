@@ -25,6 +25,14 @@
       },
       "granit.core": {
         "type": "Project"
+      },
+      "granit.timing": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Options": "[10.*, )"
+        }
       }
     }
   }

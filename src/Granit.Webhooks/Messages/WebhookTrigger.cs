@@ -47,5 +47,5 @@ public sealed record WebhookTrigger
     public Guid? TenantId { get; init; }
 
     /// <summary>UTC timestamp when the event occurred.</summary>
-    public DateTimeOffset OccurredAt { get; init; } = DateTimeOffset.UtcNow;
+    public required DateTimeOffset OccurredAt { get; init; }
 }

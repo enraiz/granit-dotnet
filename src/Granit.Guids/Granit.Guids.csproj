@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
   </ItemGroup>
 
 </Project>

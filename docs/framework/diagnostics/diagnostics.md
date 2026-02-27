@@ -268,8 +268,8 @@ Granit.Diagnostics
 ## Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core` |
+| --- | --- |
+| **Dépend de** | `Granit.Core`, `Granit.Timing` |
 | **Utilisé par** | Module feuille (consommé par les applications) |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

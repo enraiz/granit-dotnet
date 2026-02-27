@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Granit.BlobStorage.Internal;
+using Granit.Timing;
 using Microsoft.Extensions.Options;
 
 namespace Granit.BlobStorage.S3.Internal;
@@ -15,8 +16,9 @@ namespace Granit.BlobStorage.S3.Internal;
 internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
 {
     private readonly AmazonS3Client _s3;
+    private readonly IClock _clock;
 
-    public S3BlobClient(IOptions<S3BlobOptions> options)
+    public S3BlobClient(IOptions<S3BlobOptions> options, IClock clock)
     {
         S3BlobOptions opts = options.Value;
 
@@ -32,6 +34,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
 
         Amazon.Runtime.BasicAWSCredentials credentials = new(opts.AccessKey, opts.SecretKey);
         _s3 = new AmazonS3Client(credentials, config);
+        _clock = clock;
     }
 
     // ── IBlobPresignedUrlGenerator ────────────────────────────────────────────
@@ -50,7 +53,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
             BucketName = bucket,
             Key = objectKey,
             Verb = HttpVerb.PUT,
-            Expires = DateTime.UtcNow.Add(expiry),
+            Expires = _clock.Now.UtcDateTime.Add(expiry),
             ContentType = request.ContentType,
         };
 
@@ -77,7 +80,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
             BlobId: blobId,
             UploadUrl: new Uri(uploadUrl),
             HttpMethod: "PUT",
-            ExpiresAt: DateTimeOffset.UtcNow.Add(expiry),
+            ExpiresAt: _clock.Now.Add(expiry),
             RequiredHeaders: requiredHeaders);
 
         return Task.FromResult(ticket);
@@ -96,7 +99,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
             BucketName = bucket,
             Key = objectKey,
             Verb = HttpVerb.GET,
-            Expires = DateTime.UtcNow.Add(expiry),
+            Expires = _clock.Now.UtcDateTime.Add(expiry),
         };
 
         if (!string.IsNullOrEmpty(options?.DownloadFileName))
@@ -109,7 +112,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
 
         PresignedDownloadUrl result = new(
             Url: new Uri(downloadUrl),
-            ExpiresAt: DateTimeOffset.UtcNow.Add(expiry));
+            ExpiresAt: _clock.Now.Add(expiry));
 
         return Task.FromResult(result);
     }

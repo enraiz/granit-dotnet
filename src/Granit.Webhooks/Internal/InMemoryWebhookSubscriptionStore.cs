@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 
@@ -8,8 +9,9 @@ namespace Granit.Webhooks.Internal;
 /// Thread-safe in-memory implementation of <see cref="IWebhookSubscriptionStore"/>.
 /// Suitable for development and unit tests. Does not persist across application restarts.
 /// </summary>
-internal sealed class InMemoryWebhookSubscriptionStore : IWebhookSubscriptionStore
+internal sealed class InMemoryWebhookSubscriptionStore(IClock clock) : IWebhookSubscriptionStore
 {
+    private readonly IClock _clock = clock;
     private readonly ConcurrentDictionary<Guid, WebhookSubscription> _subscriptions = new();
 
     public Task<IReadOnlyList<WebhookSubscription>> GetActiveSubscriptionsAsync(
@@ -58,7 +60,7 @@ internal sealed class InMemoryWebhookSubscriptionStore : IWebhookSubscriptionSto
         {
             subscription.Status = WebhookSubscriptionStatus.Suspended;
             subscription.DeactivationReason = reason;
-            subscription.SuspendedAt = DateTimeOffset.UtcNow;
+            subscription.SuspendedAt = _clock.Now;
             subscription.SuspendedBy = "system";
         }
 

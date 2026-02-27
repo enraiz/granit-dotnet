@@ -364,9 +364,9 @@ src/
 ## Dépendances Granit
 
 | Package | Dépend de | Utilisé par |
-|---------|-----------|-------------|
+| --- | --- | --- |
 | `Granit.Caching` | `Granit.Core` | `Authorization`, `Settings`, `Idempotency`, `Features`, `Caching.StackExchangeRedis`, `Caching.Hybrid` |
 | `Granit.Caching.StackExchangeRedis` | `Caching` | `Caching.Hybrid` |
-| `Granit.Caching.Hybrid` | `Caching`, `Caching.StackExchangeRedis` | Module feuille (opt-in applicatif) |
+| `Granit.Caching.Hybrid` | `Caching`, `Caching.StackExchangeRedis`, `Timing` | Module feuille (opt-in applicatif) |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

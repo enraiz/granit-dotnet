@@ -1,3 +1,4 @@
+using Granit.Timing;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Granit.Diagnostics.Caching;
@@ -15,6 +16,7 @@ public sealed class CachedHealthCheck : IHealthCheck, IDisposable
 {
     private readonly IHealthCheck _inner;
     private readonly TimeSpan _cacheDuration;
+    private readonly IClock _clock;
     private readonly SemaphoreSlim _lock = new(1, 1);
     private HealthCheckResult? _cached;
     private DateTimeOffset _expiresAt = DateTimeOffset.MinValue;
@@ -24,10 +26,12 @@ public sealed class CachedHealthCheck : IHealthCheck, IDisposable
     /// </summary>
     /// <param name="inner">The health check whose result is cached.</param>
     /// <param name="cacheDuration">How long to cache the result.</param>
-    public CachedHealthCheck(IHealthCheck inner, TimeSpan cacheDuration)
+    /// <param name="clock">UTC clock used to evaluate cache expiration.</param>
+    public CachedHealthCheck(IHealthCheck inner, TimeSpan cacheDuration, IClock clock)
     {
         _inner = inner;
         _cacheDuration = cacheDuration;
+        _clock = clock;
     }
 
     /// <inheritdoc/>
@@ -36,7 +40,7 @@ public sealed class CachedHealthCheck : IHealthCheck, IDisposable
         CancellationToken cancellationToken = default)
     {
         // Fast path — no lock acquisition if cache is warm
-        DateTimeOffset now = DateTimeOffset.UtcNow;
+        DateTimeOffset now = _clock.Now;
         if (_cached.HasValue && now < _expiresAt)
         {
             return _cached.Value;
@@ -46,7 +50,7 @@ public sealed class CachedHealthCheck : IHealthCheck, IDisposable
         try
         {
             // Double-check after acquiring the lock: another thread may have populated the cache
-            now = DateTimeOffset.UtcNow;
+            now = _clock.Now;
             if (_cached.HasValue && now < _expiresAt)
             {
                 return _cached.Value;

@@ -1,3 +1,4 @@
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Messages;
@@ -12,7 +13,7 @@ namespace Granit.Webhooks.EntityFrameworkCore;
 /// HDS compliance: <see cref="WebhookDeliveryAttempt"/> records are INSERT-only.
 /// This store never updates or deletes them.
 /// </remarks>
-internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext> contextFactory)
+internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext> contextFactory, IClock clock)
     : IWebhookDeliveryStore
 {
     public async Task RecordSuccessAsync(
@@ -34,7 +35,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
             TargetUrl = command.TargetUrl,
             HttpStatusCode = httpStatusCode,
             PayloadHash = payloadHash,
-            OccurredAt = DateTimeOffset.UtcNow,
+            OccurredAt = clock.Now,
             DurationMs = durationMs,
             IsSuccess = true,
         });
@@ -44,7 +45,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
 
         if (subscription is not null)
         {
-            subscription.LastSuccessAt = DateTimeOffset.UtcNow;
+            subscription.LastSuccessAt = clock.Now;
             subscription.ConsecutiveFailureCount = 0;
         }
 
@@ -70,7 +71,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
             TargetUrl = command.TargetUrl,
             HttpStatusCode = httpStatusCode,
             PayloadHash = string.Empty,
-            OccurredAt = DateTimeOffset.UtcNow,
+            OccurredAt = clock.Now,
             DurationMs = durationMs,
             ErrorMessage = errorMessage.Length > 2000 ? errorMessage[..2000] : errorMessage,
             IsSuccess = false,
@@ -104,7 +105,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
 
         subscription.Status = WebhookSubscriptionStatus.Suspended;
         subscription.DeactivationReason = reason;
-        subscription.SuspendedAt = DateTimeOffset.UtcNow;
+        subscription.SuspendedAt = clock.Now;
         subscription.SuspendedBy = "system";
 
         await context.SaveChangesAsync(cancellationToken);

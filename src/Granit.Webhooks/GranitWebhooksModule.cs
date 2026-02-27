@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Timing;
 using Granit.Webhooks.Extensions;
 using Granit.Wolverine;
 
@@ -16,6 +17,7 @@ namespace Granit.Webhooks;
 /// the HDS-compliant audit trail.
 /// </para>
 /// </remarks>
+[DependsOn(typeof(GranitTimingModule))]
 [DependsOn(typeof(GranitWolverineModule))]
 public sealed class GranitWebhooksModule : GranitModule
 {

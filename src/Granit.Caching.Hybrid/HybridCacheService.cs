@@ -1,4 +1,5 @@
 using Granit.Caching;
+using Granit.Timing;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -41,15 +42,18 @@ namespace Granit.Caching.Hybrid;
 /// <param name="hybridCache">Cache hybride L1+L2 fourni par le runtime .NET 9.</param>
 /// <param name="options">Options globales du cache.</param>
 /// <param name="logger">Logger structuré.</param>
+/// <param name="clock">Horloge UTC pour le calcul des expirations absolues.</param>
 public partial class HybridCacheService<TCacheItem>(
     HybridCache hybridCache,
     IOptions<CachingOptions> options,
-    ILogger<HybridCacheService<TCacheItem>> logger) : ICacheService<TCacheItem>
+    ILogger<HybridCacheService<TCacheItem>> logger,
+    IClock clock) : ICacheService<TCacheItem>
     where TCacheItem : class
 {
     private readonly HybridCache _hybridCache = hybridCache;
     private readonly IOptions<CachingOptions> _options = options;
     private readonly ILogger<HybridCacheService<TCacheItem>> _logger = logger;
+    private readonly IClock _clock = clock;
     private readonly string _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
 
     /// <inheritdoc/>
@@ -155,12 +159,12 @@ public partial class HybridCacheService<TCacheItem>(
     private string BuildKey(string userKey) =>
         $"{_options.Value.KeyPrefix}:{_cacheName}:{userKey}";
 
-    private static HybridCacheEntryOptions BuildHybridOptions(DistributedCacheEntryOptions distributed) =>
+    private HybridCacheEntryOptions BuildHybridOptions(DistributedCacheEntryOptions distributed) =>
         new()
         {
             Expiration = distributed.AbsoluteExpirationRelativeToNow
                 ?? (distributed.AbsoluteExpiration.HasValue
-                    ? distributed.AbsoluteExpiration.Value - DateTimeOffset.UtcNow
+                    ? distributed.AbsoluteExpiration.Value - _clock.Now
                     : null),
             LocalCacheExpiration = distributed.SlidingExpiration,
         };
