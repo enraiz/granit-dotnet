@@ -38,9 +38,6 @@
       "_appFooter": "Digital Dynamics — Documentation Granit",
       "_enableSearch": true,
       "_appLogoPath": "docs/images/granit-icon.svg"
-    },
-    "markdownEngineProperties": {
-      "alerts": "GFM"
     }
   }
 }
