@@ -7,7 +7,7 @@ public sealed class ClockOptions
 {
     /// <summary>
     /// Default timezone when none is specified by the user
-    /// via <see cref="Abstractions.Timing.ICurrentTimezoneProvider"/>.
+    /// via <see cref="ICurrentTimezoneProvider"/>.
     /// <c>null</c> = no conversion (dates remain in UTC).
     /// Example: <c>"Europe/Brussels"</c>, <c>"America/New_York"</c>
     /// </summary>

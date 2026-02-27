@@ -87,6 +87,55 @@ internal static class AnalyzerTestHelpers
         """;
 
     /// <summary>
+    /// Minimal ASP.NET Core stubs for <c>IResponseCookies</c>, <c>HttpResponse</c>,
+    /// <c>HttpContext</c>, and <c>CookieOptions</c> — used by GRSEC004 tests.
+    /// </summary>
+    internal const string ResponseCookiesStub = """
+        namespace Microsoft.AspNetCore.Http
+        {
+            public class CookieOptions { }
+
+            public interface IResponseCookies
+            {
+                void Append(string key, string value);
+                void Append(string key, string value, CookieOptions options);
+                void Delete(string key);
+                void Delete(string key, CookieOptions options);
+            }
+
+            public abstract class HttpResponse
+            {
+                public abstract IResponseCookies Cookies { get; }
+            }
+
+            public abstract class HttpContext
+            {
+                public abstract HttpResponse Response { get; }
+            }
+        }
+        """;
+
+    /// <summary>
+    /// Minimal stub for <c>Granit.Cookies.IGranitCookieManager</c> — used to activate
+    /// the opt-in GRSEC004 analyzer.
+    /// </summary>
+    internal const string GranitCookieManagerStub = """
+        namespace Granit.Cookies
+        {
+            public interface IGranitCookieManager
+            {
+                System.Threading.Tasks.Task SetCookieAsync(
+                    Microsoft.AspNetCore.Http.HttpContext httpContext,
+                    string cookieName,
+                    string value);
+                void DeleteCookie(
+                    Microsoft.AspNetCore.Http.HttpContext httpContext,
+                    string cookieName);
+            }
+        }
+        """;
+
+    /// <summary>
     /// Runs <typeparamref name="TAnalyzer"/> against the given <paramref name="source"/> code,
     /// compiled together with the EF Core stub and optionally the <c>MigrationCycleAttribute</c> stub.
     /// </summary>
