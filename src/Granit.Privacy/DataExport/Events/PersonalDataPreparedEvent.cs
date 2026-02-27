@@ -1,4 +1,5 @@
 using Granit.Core.Events;
+using Wolverine.Persistence.Sagas;
 
 namespace Granit.Privacy.DataExport.Events;
 
@@ -8,7 +9,7 @@ namespace Granit.Privacy.DataExport.Events;
 /// raw data is never included in the event payload (HDS compliance).
 /// </summary>
 public sealed record PersonalDataPreparedEvent(
-    Guid RequestId,
+    [property: SagaIdentity] Guid RequestId,
     string ProviderName,
     string BlobReferenceId,
     string ContentType) : IIntegrationEvent;
