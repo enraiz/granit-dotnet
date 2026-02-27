@@ -105,8 +105,8 @@
       },
       "JasperFx.Events": {
         "type": "Transitive",
-        "resolved": "1.21.1",
-        "contentHash": "CQs/+m+nslBCzGv8RTxg552mpDllXssf8rL9lrjlr5rxFha3KW41eZqv0+6RFXmEIbMtjsHpBKFGceGt1E9Exg==",
+        "resolved": "1.22.0",
+        "contentHash": "QD01W8GFqHcMLYpqF4G5adkEHFexCntWSIWejvccVxmw8TTMmGf+EH8EoQI8EitdCc0XZ/ocGog2TQTRkqxG4A==",
         "dependencies": {
           "JasperFx": "1.20.0"
         }
@@ -668,7 +668,7 @@
       "granit.backgroundjobs": {
         "type": "Project",
         "dependencies": {
-          "Cronos": "[0.8.*, )",
+          "Cronos": "[0.11.*, )",
           "Granit.Core": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
@@ -726,9 +726,9 @@
       },
       "Cronos": {
         "type": "CentralTransitive",
-        "requested": "[0.8.*, )",
-        "resolved": "0.8.4",
-        "contentHash": "sTyvTH8hh5YWivinRGzL5QrfKKt59I/Hh+4m8j6vmtJdSOWA4I3B+AS9iJk3RdQqZ+i4E+0PlhYuY9iaxDLTcQ=="
+        "requested": "[0.11.*, )",
+        "resolved": "0.11.1",
+        "contentHash": "5Ug+giPQITSAdTp/METAsofRSSUi3I5p7t4dlcXnzUgUzwZb4HkOBcYfpHuPwAHrnKJjmyW8amVzLD6mfLpaBg=="
       },
       "FluentValidation": {
         "type": "CentralTransitive",
@@ -861,11 +861,11 @@
       "WolverineFx": {
         "type": "CentralTransitive",
         "requested": "[5.*, )",
-        "resolved": "5.16.3",
-        "contentHash": "EQ/Fsj3vflX9vZn40qQLq4WLDbxSfuQGGfQkuFisCkISzdC06AKcjm8GYbSXgeS3UCi/OO2MpCD5iDt3FUr0Sw==",
+        "resolved": "5.16.4",
+        "contentHash": "IDEDhimluawCxCn5Oo4I/+QEkRWdB0rlKRLMCkUE5Hule3weQTLA8uIAhkij4Gjb7Pxp4ZaIT2HXEN9n2slgBw==",
         "dependencies": {
           "JasperFx": "1.20.0",
-          "JasperFx.Events": "1.21.1",
+          "JasperFx.Events": "1.22.0",
           "JasperFx.RuntimeCompiler": "4.4.0",
           "Microsoft.Extensions.Caching.Memory": "10.0.0",
           "Microsoft.Extensions.Configuration": "10.0.0",
@@ -882,11 +882,11 @@
       "WolverineFx.FluentValidation": {
         "type": "CentralTransitive",
         "requested": "[5.*, )",
-        "resolved": "5.16.3",
-        "contentHash": "h4kPyrQpD/EjG/WC433jwCNL7g4t6SgyuOFJf7VpvEirB8FRtV/ehfdaNUmjwIuMX4CS4ZV/VROzsJeiU8slmw==",
+        "resolved": "5.16.4",
+        "contentHash": "AaJydbHbMyhHhiNEjJbFd1UN+QWudIEqw5Ov7cyiCB7uAdfn+FOEvbb7eb4kvxv2mK6T6if/EMuMtQUg5okO5w==",
         "dependencies": {
           "FluentValidation": "12.0.0",
-          "WolverineFx": "5.16.3"
+          "WolverineFx": "5.16.4"
         }
       }
     }

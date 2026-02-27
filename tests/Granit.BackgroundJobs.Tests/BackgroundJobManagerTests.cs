@@ -1,9 +1,9 @@
 using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using Granit.Core.Exceptions;
-using JasperFx.Core;
 using Granit.Security;
 using Granit.Timing;
+using JasperFx.Core;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;

@@ -12,7 +12,7 @@
     <PackageVersion Include="SmartFormat" Version="3.*" />
   </ItemGroup>
   <ItemGroup Label="Templating">
-    <PackageVersion Include="Scriban" Version="5.*" />
+    <PackageVersion Include="Scriban" Version="6.*" />
   </ItemGroup>
   <ItemGroup Label="ASP.NET Core">
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.*" />

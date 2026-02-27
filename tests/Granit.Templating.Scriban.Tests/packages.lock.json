@@ -223,7 +223,7 @@
         "dependencies": {
           "Granit.Templating": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
-          "Scriban": "[5.*, )"
+          "Scriban": "[6.*, )"
         }
       },
       "granit.timing": {
@@ -252,9 +252,9 @@
       },
       "Scriban": {
         "type": "CentralTransitive",
-        "requested": "[5.*, )",
-        "resolved": "5.12.1",
-        "contentHash": "zezB4VyYSALWvveki0IAdqxrx2r0wHqwQqP5LldFSHZ3U12YZCvt1nwJb6TZVLkerHZLP2FJIkemubLfOihdBQ=="
+        "requested": "[6.*, )",
+        "resolved": "6.5.3",
+        "contentHash": "0WuO/muuPnxn6OKR3cJeTJD/AiACsCz+lOh5k5bfZdZFPKVQ/4TIWd1VSJdiFbr7iyHBLbHpsF0WVWqu67KlUw=="
       }
     }
   }
