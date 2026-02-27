@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Granit.Caching;
+using Granit.Timing;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ public sealed class HybridCacheServiceTests
 
     private sealed class TrackingHybridCache : HybridCache
     {
-        private readonly Dictionary<string, object?> _store = new();
+        private readonly Dictionary<string, object?> _store = [];
         public List<string> GetKeys { get; } = [];
         public List<string> SetKeys { get; } = [];
         public List<string> RemovedKeys { get; } = [];
@@ -76,10 +77,13 @@ public sealed class HybridCacheServiceTests
     {
         cache ??= new TrackingHybridCache();
         CachingOptions options = new() { KeyPrefix = keyPrefix };
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(_ => DateTimeOffset.UtcNow);
         return new HybridCacheService<TestCacheItem>(
             cache,
             Options.Create(options),
-            NullLogger<HybridCacheService<TestCacheItem>>.Instance);
+            NullLogger<HybridCacheService<TestCacheItem>>.Instance,
+            clock);
     }
 
     // -------------------------------------------------------------------------
