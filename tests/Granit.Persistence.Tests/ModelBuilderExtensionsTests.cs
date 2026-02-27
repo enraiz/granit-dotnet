@@ -284,6 +284,141 @@ public sealed class ModelBuilderExtensionsTests
     }
 
     // -------------------------------------------------------------------------
+    // IProcessingRestrictable filter
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task ApplyGranitConventions_FiltersProcessingRestrictedEntities()
+    {
+        // Arrange
+        await using TestDbContextWithProcessingRestrictable context = CreateContextWithProcessingRestrictable();
+        await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+        context.RestrictableEntities.Add(new TestProcessingRestrictableEntity { Name = "Normal", IsProcessingRestricted = false });
+        context.RestrictableEntities.Add(new TestProcessingRestrictableEntity
+        {
+            Name = "Restricted",
+            IsProcessingRestricted = true,
+            ProcessingRestrictedAt = new DateTimeOffset(2026, 1, 15, 10, 0, 0, TimeSpan.Zero),
+            ProcessingRestrictedBy = "dpo",
+        });
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        List<TestProcessingRestrictableEntity> results = await context.RestrictableEntities.ToListAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        results.Should().HaveCount(1);
+        results[0].Name.Should().Be("Normal");
+    }
+
+    [Fact]
+    public async Task ApplyGranitConventions_ProcessingRestrictable_IgnoreQueryFilters_ReturnsAll()
+    {
+        // Arrange
+        await using TestDbContextWithProcessingRestrictable context = CreateContextWithProcessingRestrictable();
+        await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+        context.RestrictableEntities.Add(new TestProcessingRestrictableEntity { Name = "Normal", IsProcessingRestricted = false });
+        context.RestrictableEntities.Add(new TestProcessingRestrictableEntity { Name = "Restricted", IsProcessingRestricted = true });
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        List<TestProcessingRestrictableEntity> results = await context.RestrictableEntities
+            .IgnoreQueryFilters()
+            .ToListAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        results.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void ApplyGranitConventions_ProcessingRestrictable_DataFilter_Bypass_EvaluatesDynamically()
+    {
+        SharedDataFilter.SetEnabled<IProcessingRestrictable>(true);
+
+        using TestDbContextWithProcessingRestrictableDataFilter context = CreateContextWithProcessingRestrictableDataFilter();
+        LambdaExpression? filter = context.Model
+            .FindEntityType(typeof(TestProcessingRestrictableWithFilter))
+            ?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
+        filter.Should().NotBeNull();
+
+        Func<TestProcessingRestrictableWithFilter, bool> compiled =
+            (Func<TestProcessingRestrictableWithFilter, bool>)filter!.Compile();
+
+        // Filter active — restricted entity excluded
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).Should().BeFalse("restricted must be filtered");
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = false }).Should().BeTrue("non-restricted must pass");
+
+        // Bypass — all entities pass
+        SharedDataFilter.SetEnabled<IProcessingRestrictable>(false);
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).Should().BeTrue("restricted must pass when filter disabled");
+
+        // Restore
+        SharedDataFilter.SetEnabled<IProcessingRestrictable>(true);
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).Should().BeFalse("filter must be restored");
+    }
+
+    [Fact]
+    public void ApplyGranitConventions_CombinedSoftDeleteAndProcessingRestrictable_HasSingleQueryFilter()
+    {
+        using TestDbContextWithCombinedSdPr context = CreateContextWithCombinedSdPr();
+
+        IEntityType? entityType = context.Model.FindEntityType(typeof(TestCombinedSdPrEntity));
+
+        entityType.Should().NotBeNull();
+        entityType!.GetDeclaredQueryFilters().Should().HaveCount(1,
+            "exactly one HasQueryFilter must be registered for ISoftDeletable + IProcessingRestrictable");
+    }
+
+    [Fact]
+    public void ApplyGranitConventions_CombinedSoftDeleteAndProcessingRestrictable_BothFiltersActive()
+    {
+        SharedDataFilter.SetEnabled<ISoftDeletable>(true);
+        SharedDataFilter.SetEnabled<IProcessingRestrictable>(true);
+
+        using TestDbContextWithCombinedSdPr context = CreateContextWithCombinedSdPr();
+        LambdaExpression? filter = context.Model
+            .FindEntityType(typeof(TestCombinedSdPrEntity))
+            ?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
+        Func<TestCombinedSdPrEntity, bool> compiled = (Func<TestCombinedSdPrEntity, bool>)filter!.Compile();
+
+        // Not deleted, not restricted — passes
+        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = false }).Should().BeTrue();
+
+        // Deleted — excluded by soft delete
+        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = false }).Should().BeFalse("deleted must be filtered");
+
+        // Restricted — excluded by processing restriction
+        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = true }).Should().BeFalse("restricted must be filtered");
+
+        // Both — excluded
+        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = true }).Should().BeFalse("both must be filtered");
+    }
+
+    [Fact]
+    public void ApplyGranitConventions_CombinedSoftDeleteAndProcessingRestrictable_IndependentBypass()
+    {
+        SharedDataFilter.SetEnabled<ISoftDeletable>(true);
+        SharedDataFilter.SetEnabled<IProcessingRestrictable>(false); // processing restriction bypassed
+
+        using TestDbContextWithCombinedSdPr context = CreateContextWithCombinedSdPr();
+        LambdaExpression? filter = context.Model
+            .FindEntityType(typeof(TestCombinedSdPrEntity))
+            ?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
+        Func<TestCombinedSdPrEntity, bool> compiled = (Func<TestCombinedSdPrEntity, bool>)filter!.Compile();
+
+        // Processing restriction bypassed — restricted entity from non-deleted passes
+        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = true }).Should().BeTrue("restriction bypassed");
+
+        // Soft delete still active — deleted entity filtered
+        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = false }).Should().BeFalse("soft delete still active");
+
+        // Reset
+        SharedDataFilter.SetEnabled<IProcessingRestrictable>(true);
+    }
+
+    // -------------------------------------------------------------------------
     // Bug fix: entities combining multiple filter interfaces
     // -------------------------------------------------------------------------
 
@@ -428,6 +563,36 @@ public sealed class ModelBuilderExtensionsTests
                 .Options;
 
         return new TestDbContextWithDataFilter(options, SharedDataFilter);
+    }
+
+    private static TestDbContextWithProcessingRestrictable CreateContextWithProcessingRestrictable()
+    {
+        DbContextOptions<TestDbContextWithProcessingRestrictable> options =
+            new DbContextOptionsBuilder<TestDbContextWithProcessingRestrictable>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+        return new TestDbContextWithProcessingRestrictable(options);
+    }
+
+    private static TestDbContextWithProcessingRestrictableDataFilter CreateContextWithProcessingRestrictableDataFilter()
+    {
+        DbContextOptions<TestDbContextWithProcessingRestrictableDataFilter> options =
+            new DbContextOptionsBuilder<TestDbContextWithProcessingRestrictableDataFilter>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+        return new TestDbContextWithProcessingRestrictableDataFilter(options, SharedDataFilter);
+    }
+
+    private static TestDbContextWithCombinedSdPr CreateContextWithCombinedSdPr()
+    {
+        DbContextOptions<TestDbContextWithCombinedSdPr> options =
+            new DbContextOptionsBuilder<TestDbContextWithCombinedSdPr>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+        return new TestDbContextWithCombinedSdPr(options, SharedDataFilter);
     }
 
     // Always uses SharedTenant and SharedDataFilter — same reason as above.
@@ -596,6 +761,66 @@ internal sealed class TestDbContextWithCombined(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyGranitConventions(_currentTenant, _dataFilter);
+}
+
+internal sealed class TestProcessingRestrictableEntity : IProcessingRestrictable
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public bool IsProcessingRestricted { get; set; }
+    public DateTimeOffset? ProcessingRestrictedAt { get; set; }
+    public string? ProcessingRestrictedBy { get; set; }
+}
+
+internal sealed class TestProcessingRestrictableWithFilter : IProcessingRestrictable
+{
+    public int Id { get; set; }
+    public bool IsProcessingRestricted { get; set; }
+    public DateTimeOffset? ProcessingRestrictedAt { get; set; }
+    public string? ProcessingRestrictedBy { get; set; }
+}
+
+internal sealed class TestCombinedSdPrEntity : ISoftDeletable, IProcessingRestrictable
+{
+    public int Id { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+    public string? DeletedBy { get; set; }
+    public bool IsProcessingRestricted { get; set; }
+    public DateTimeOffset? ProcessingRestrictedAt { get; set; }
+    public string? ProcessingRestrictedBy { get; set; }
+}
+
+internal sealed class TestDbContextWithProcessingRestrictable(DbContextOptions<TestDbContextWithProcessingRestrictable> options) : DbContext(options)
+{
+    public DbSet<TestProcessingRestrictableEntity> RestrictableEntities => Set<TestProcessingRestrictableEntity>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+        modelBuilder.ApplyGranitConventions();
+}
+
+internal sealed class TestDbContextWithProcessingRestrictableDataFilter(
+    DbContextOptions<TestDbContextWithProcessingRestrictableDataFilter> options,
+    IDataFilter dataFilter) : DbContext(options)
+{
+    private readonly IDataFilter _dataFilter = dataFilter;
+
+    public DbSet<TestProcessingRestrictableWithFilter> RestrictableEntities => Set<TestProcessingRestrictableWithFilter>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+        modelBuilder.ApplyGranitConventions(dataFilter: _dataFilter);
+}
+
+internal sealed class TestDbContextWithCombinedSdPr(
+    DbContextOptions<TestDbContextWithCombinedSdPr> options,
+    IDataFilter dataFilter) : DbContext(options)
+{
+    private readonly IDataFilter _dataFilter = dataFilter;
+
+    public DbSet<TestCombinedSdPrEntity> CombinedSdPrEntities => Set<TestCombinedSdPrEntity>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+        modelBuilder.ApplyGranitConventions(dataFilter: _dataFilter);
 }
 
 #endregion
