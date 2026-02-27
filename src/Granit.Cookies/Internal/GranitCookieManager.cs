@@ -30,7 +30,7 @@ internal sealed class GranitCookieManager(
         CookieOptions options = new()
         {
             Expires = clock.Now.AddDays(definition.RetentionDays),
-            HttpOnly = definition.IsHttpOnly,
+            HttpOnly = definition.IsHttpOnly, // NOSONAR S3330 - intentional: HttpOnly is configurable per cookie (analytics cookies like _ga require JS access)
             Secure = true,
             SameSite = SameSiteMode.Lax
         };
