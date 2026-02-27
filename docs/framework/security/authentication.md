@@ -26,6 +26,33 @@ Granit.Authentication.Auth0       ← [DependsOn(JwtBearer)]
 
 ---
 
+### Flux d'une requête authentifiée
+
+```mermaid
+sequenceDiagram
+    participant C as Client HTTP
+    participant MW as Middleware Pipeline
+    participant JWT as JWT Bearer Handler
+    participant KC as KeycloakClaimsTransformation
+    participant AZ as Authorization
+    participant CU as ICurrentUserService
+    participant H as Handler / Endpoint
+    participant AI as AuditedEntityInterceptor
+
+    C->>MW: Requête HTTP (Bearer token)
+    MW->>JWT: Validate (issuer, audience, signature, lifetime)
+    JWT->>KC: TransformAsync(principal)
+    KC-->>JWT: ClaimsPrincipal + rôles Keycloak
+    JWT-->>MW: HttpContext.User = principal
+    MW->>AZ: Évaluation des policies
+    AZ->>H: Autorisé — exécution du handler
+    H->>AI: SaveChangesAsync()
+    AI->>CU: UserId, UserName
+    Note over AI: CreatedBy / ModifiedBy = UserId
+    AI-->>H: Entité sauvegardée
+    H-->>C: HTTP 200 OK
+```
+
 ## Granit.Security
 
 Package d'abstractions pures. Ne contient aucune dépendance sur ASP.NET Core.
@@ -107,8 +134,11 @@ public sealed class MyAppModule : GranitModule { ... }
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddGranitJwtBearer(builder.Configuration);
+builder.Services.AddGranitJwtBearer();
 ```
+
+> La configuration est résolue automatiquement depuis `IConfiguration` enregistré
+> dans le conteneur DI, via `BindConfiguration("Authentication")`.
 
 ### JwtBearerAuthOptions
 
@@ -186,8 +216,8 @@ public sealed class MyAppModule : GranitModule { ... }
 Enregistrement direct :
 
 ```csharp
-builder.Services.AddGranitJwtBearer(builder.Configuration);
-builder.Services.AddGranitKeycloak(builder.Configuration);
+builder.Services.AddGranitJwtBearer();
+builder.Services.AddGranitKeycloak();
 ```
 
 ### KeycloakOptions
@@ -289,7 +319,7 @@ Créer `Granit.Authentication.Auth0` en dépendant uniquement de
 public sealed class GranitAuthenticationAuth0Module : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitAuth0(context.Configuration);
+        context.Services.AddGranitAuth0();
 }
 ```
 

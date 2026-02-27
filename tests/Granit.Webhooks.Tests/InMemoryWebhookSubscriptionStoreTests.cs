@@ -6,15 +6,24 @@
 // =============================================================================
 
 using FluentAssertions;
+using Granit.Timing;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Internal;
+using NSubstitute;
 using Xunit;
 
 namespace Granit.Webhooks.Tests;
 
 public sealed class InMemoryWebhookSubscriptionStoreTests
 {
-    private readonly InMemoryWebhookSubscriptionStore _store = new();
+    private readonly InMemoryWebhookSubscriptionStore _store;
+
+    public InMemoryWebhookSubscriptionStoreTests()
+    {
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(_ => DateTimeOffset.UtcNow);
+        _store = new InMemoryWebhookSubscriptionStore(clock);
+    }
 
     [Fact]
     public async Task GetActiveSubscriptionsAsync_ReturnsOnlyActiveMatchingSubscriptions()

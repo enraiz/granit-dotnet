@@ -35,6 +35,7 @@ stages:
   - quality
   - gitlab-security
   - analysis
+  - docs
   - pack
   - publish
 
@@ -180,6 +181,29 @@ audit:nuget:
     when: always
     paths:
       - vulnerability-report.txt
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
+  allow_failure: true
+
+# ---------------------------------------------------------------------------
+# DOCS (DocFX — référence API C#)
+# ---------------------------------------------------------------------------
+
+docfx:
+  extends: .dotnet
+  stage: docs
+  script:
+    - dotnet tool install -g docfx
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet restore
+    - docfx metadata docfx.json
+    - docfx build docfx.json
+  artifacts:
+    paths:
+      - _site/
     expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"

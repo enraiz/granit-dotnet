@@ -3,7 +3,6 @@ using Granit.Core.Modularity;
 using Granit.Encryption;
 using Granit.Security;
 using Granit.Settings.Extensions;
-using Granit.Settings.Options;
 
 namespace Granit.Settings;
 
@@ -17,6 +16,5 @@ public sealed class GranitSettingsModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitSettings(
-            context.Configuration.GetSection(SettingsOptions.SectionName));
+        context.Services.AddGranitSettings();
 }

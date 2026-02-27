@@ -107,6 +107,72 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
         result.Should().BeSameAs(builder);
     }
 
+    [Fact]
+    public void AddGranitObservability_TracingDisabled_DoesNotRegisterOtlpTraceExporter()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+        builder.Configuration["Observability:EnableTracing"] = "false";
+        builder.Configuration["Observability:OtlpEndpoint"] = "http://localhost:4317";
+
+        builder.AddGranitObservability();
+
+        // Should not throw — tracing is skipped gracefully
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+        sp.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitObservability_MetricsDisabled_DoesNotRegisterOtlpMetricExporter()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+        builder.Configuration["Observability:EnableMetrics"] = "false";
+        builder.Configuration["Observability:OtlpEndpoint"] = "http://localhost:4317";
+
+        builder.AddGranitObservability();
+
+        // Should not throw — metrics is skipped gracefully
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+        sp.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitObservability_AllDisabled_StillRegistersOptions()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+        builder.Configuration["Observability:EnableTracing"] = "false";
+        builder.Configuration["Observability:EnableMetrics"] = "false";
+        builder.Configuration["Observability:ServiceName"] = "disabled-service";
+
+        builder.AddGranitObservability();
+
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+        ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
+        options.ServiceName.Should().Be("disabled-service");
+        options.EnableTracing.Should().BeFalse();
+        options.EnableMetrics.Should().BeFalse();
+    }
+
+    [Fact]
+    public void AddGranitObservability_CustomServiceProperties_BindsCorrectly()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+        builder.Configuration["Observability:ServiceName"] = "guava-api";
+        builder.Configuration["Observability:ServiceVersion"] = "2.0.0";
+        builder.Configuration["Observability:ServiceNamespace"] = "digital-dynamics";
+        builder.Configuration["Observability:Environment"] = "staging";
+        builder.Configuration["Observability:OtlpEndpoint"] = "http://otel:4317";
+
+        builder.AddGranitObservability();
+
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+        ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
+        options.ServiceName.Should().Be("guava-api");
+        options.ServiceVersion.Should().Be("2.0.0");
+        options.ServiceNamespace.Should().Be("digital-dynamics");
+        options.Environment.Should().Be("staging");
+        options.OtlpEndpoint.Should().Be("http://otel:4317");
+    }
+
     /// <summary>
     /// Verifies the OTEL tracing filter: paths under /health/* must be excluded,
     /// while /healthcare/... and regular paths must be included.

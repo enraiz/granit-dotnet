@@ -3,6 +3,7 @@ using Granit.ApiDocumentation.Options;
 using Granit.ApiDocumentation.Transformers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 
 namespace Granit.ApiDocumentation.Extensions;
@@ -17,11 +18,21 @@ public static class ApiDocumentationServiceCollectionExtensions
     /// Each integer in <c>ApiDocumentation:MajorVersions</c> generates one distinct OpenAPI document.
     /// Call <c>app.UseGranitApiDocumentation()</c> in <c>Program.cs</c> to expose the Scalar UI.
     /// </summary>
-    public static IServiceCollection AddGranitApiDocumentation(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    /// <remarks>
+    /// Uses <see cref="IHostApplicationBuilder"/> because OpenAPI document endpoints must be
+    /// registered at startup (one per major version), which requires reading configuration before
+    /// the DI container is built.
+    /// </remarks>
+    public static IHostApplicationBuilder AddGranitApiDocumentation(
+        this IHostApplicationBuilder builder)
     {
-        IConfigurationSection section = configuration.GetSection(ApiDocumentationOptions.SectionName);
+        builder.Services
+            .AddOptions<ApiDocumentationOptions>()
+            .BindConfiguration(ApiDocumentationOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        IConfigurationSection section = builder.Configuration.GetSection(ApiDocumentationOptions.SectionName);
 
         // The .NET configuration binder appends to existing IList values instead of replacing them.
         // Clearing MajorVersions before Bind prevents duplicates when config mirrors the default value.
@@ -33,35 +44,12 @@ public static class ApiDocumentationServiceCollectionExtensions
             options.MajorVersions.Add(1);
         }
 
-        services.Configure<ApiDocumentationOptions>(opts =>
-        {
-            opts.MajorVersions.Clear();
-            section.Bind(opts);
-            if (opts.MajorVersions.Count == 0)
-            {
-                opts.MajorVersions.Add(1);
-            }
-        });
+        RegisterDocuments(builder.Services, options);
 
-        return RegisterDocuments(services, options);
+        return builder;
     }
 
-    /// <summary>
-    /// Adds OpenAPI document generation with programmatic configuration.
-    /// Use when the version list or API metadata must be set in code rather than appsettings.
-    /// Call <c>app.UseGranitApiDocumentation()</c> in <c>Program.cs</c> to expose the Scalar UI.
-    /// </summary>
-    public static IServiceCollection AddGranitApiDocumentation(
-        this IServiceCollection services,
-        Action<ApiDocumentationOptions> configure)
-    {
-        ApiDocumentationOptions options = new();
-        configure(options);
-        services.Configure(configure);
-        return RegisterDocuments(services, options);
-    }
-
-    private static IServiceCollection RegisterDocuments(
+    private static void RegisterDocuments(
         IServiceCollection services,
         ApiDocumentationOptions options)
     {
@@ -98,7 +86,5 @@ public static class ApiDocumentationServiceCollectionExtensions
                 openApiOptions.AddOperationTransformer<ProblemDetailsResponseOperationTransformer>();
             });
         }
-
-        return services;
     }
 }

@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Diagnostics.Extensions;
+using Granit.Timing;
 
 namespace Granit.Diagnostics;
 
@@ -8,6 +9,7 @@ namespace Granit.Diagnostics;
 /// Registers <c>AddGranitDiagnostics()</c>; call <c>app.MapGranitHealthChecks()</c>
 /// in <c>Program.cs</c> to expose the endpoints.
 /// </summary>
+[DependsOn(typeof(GranitTimingModule))]
 public sealed class GranitDiagnosticsModule : GranitModule
 {
     /// <inheritdoc/>

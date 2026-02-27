@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Granit.ApiVersioning.Options;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Granit.ApiVersioning.Extensions;
 
@@ -16,30 +16,34 @@ public static class ApiVersioningServiceCollectionExtensions
     /// Fallback reader: <c>?api-version=1.0</c> (visible in access logs).
     /// </summary>
     public static IServiceCollection AddGranitApiVersioning(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        GranitApiVersioningOptions granitOptions = configuration
-            .GetSection(GranitApiVersioningOptions.SectionName)
-            .Get<GranitApiVersioningOptions>() ?? new GranitApiVersioningOptions();
+        services
+            .AddOptions<GranitApiVersioningOptions>()
+            .BindConfiguration(GranitApiVersioningOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        services.Configure<GranitApiVersioningOptions>(
-            configuration.GetSection(GranitApiVersioningOptions.SectionName));
+        services.AddApiVersioning()
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
 
-        services.AddApiVersioning(options =>
-        {
-            options.DefaultApiVersion = new ApiVersion(granitOptions.DefaultMajorVersion);
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.ReportApiVersions = granitOptions.ReportApiVersions;
-            options.ApiVersionReader = ApiVersionReader.Combine(
-                new UrlSegmentApiVersionReader(),
-                new QueryStringApiVersionReader("api-version"));
-        })
-        .AddApiExplorer(options =>
-        {
-            options.GroupNameFormat = "'v'VVV";
-            options.SubstituteApiVersionInUrl = true;
-        });
+        // Deferred configuration: ApiVersioningOptions reads GranitApiVersioningOptions at resolution time.
+        services
+            .AddOptions<ApiVersioningOptions>()
+            .Configure<IOptions<GranitApiVersioningOptions>>((options, granitOpts) =>
+            {
+                GranitApiVersioningOptions granit = granitOpts.Value;
+                options.DefaultApiVersion = new ApiVersion(granit.DefaultMajorVersion);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = granit.ReportApiVersions;
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new UrlSegmentApiVersionReader(),
+                    new QueryStringApiVersionReader("api-version"));
+            });
 
         return services;
     }

@@ -75,11 +75,9 @@ Strategy permet de changer cette décision sans modifier le code applicatif.
 ## Exemple d'usage
 
 ```csharp
-// La stratégie est choisie à la configuration
-services.AddGranitPersistence(options =>
-{
-    options.IsolationStrategy = TenantIsolationStrategy.SchemaPerTenant;
-});
+// La stratégie est choisie via appsettings.json (section "Persistence")
+// { "Persistence": { "IsolationStrategy": "SchemaPerTenant" } }
+services.AddGranitPersistence();
 
 // Le code applicatif est identique quelle que soit la stratégie
 public sealed class PatientService(AppDbContext db)

@@ -25,9 +25,10 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Arrange
         ServiceCollection services = new();
         IConfiguration configuration = new ConfigurationBuilder().Build();
+        services.AddSingleton<IConfiguration>(configuration);
 
         // Act
-        services.AddGranitApiVersioning(configuration);
+        services.AddGranitApiVersioning();
 
         // Assert — IApiVersionReader, IApiVersionSelector, etc. should be registered
         ServiceDescriptor? descriptor = services.FirstOrDefault(
@@ -47,9 +48,10 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
                 ["ApiVersioning:ReportApiVersions"] = "false",
             })
             .Build();
+        services.AddSingleton<IConfiguration>(configuration);
 
         // Act
-        services.AddGranitApiVersioning(configuration);
+        services.AddGranitApiVersioning();
 
         // Assert — options are bound from configuration
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -64,9 +66,10 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Arrange
         ServiceCollection services = new();
         IConfiguration configuration = new ConfigurationBuilder().Build();
+        services.AddSingleton<IConfiguration>(configuration);
 
         // Act
-        services.AddGranitApiVersioning(configuration);
+        services.AddGranitApiVersioning();
 
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -81,9 +84,10 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Arrange
         ServiceCollection services = new();
         IConfiguration configuration = new ConfigurationBuilder().Build();
+        services.AddSingleton<IConfiguration>(configuration);
 
         // Act
-        IServiceCollection returned = services.AddGranitApiVersioning(configuration);
+        IServiceCollection returned = services.AddGranitApiVersioning();
 
         // Assert
         returned.Should().BeSameAs(services);
@@ -95,7 +99,8 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Arrange
         ServiceCollection services = new();
         IConfiguration configuration = new ConfigurationBuilder().Build();
-        services.AddGranitApiVersioning(configuration);
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddGranitApiVersioning();
 
         // Act — resolving IOptions triggers the AddApiVersioning lambda
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -119,7 +124,8 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
                 ["ApiVersioning:ReportApiVersions"] = "false",
             })
             .Build();
-        services.AddGranitApiVersioning(configuration);
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddGranitApiVersioning();
 
         // Act
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -136,7 +142,8 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Arrange
         ServiceCollection services = new();
         IConfiguration configuration = new ConfigurationBuilder().Build();
-        services.AddGranitApiVersioning(configuration);
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddGranitApiVersioning();
 
         // Act — resolving IOptions triggers the AddApiExplorer lambda
         using ServiceProvider sp = services.BuildServiceProvider();

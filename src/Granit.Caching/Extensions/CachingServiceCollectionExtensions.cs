@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -28,12 +27,22 @@ public static class CachingServiceCollectionExtensions
     /// et configurez <c>Cache:Encryption:Key</c>.
     /// </remarks>
     /// <param name="services">Collection de services.</param>
-    /// <param name="configuration">Section de configuration <c>"Cache"</c>. Optionnel.</param>
     /// <returns>La collection de services pour le chaînage.</returns>
     public static IServiceCollection AddGranitCaching(
-        this IServiceCollection services,
-        IConfigurationSection? configuration = null)
+        this IServiceCollection services)
     {
+        services
+            .AddOptions<CachingOptions>()
+            .BindConfiguration(CachingOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services
+            .AddOptions<CacheEncryptionOptions>()
+            .BindConfiguration(CacheEncryptionOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         // Fournisseur Memory par défaut (remplacé par les modules Redis/Hybrid si chargés après)
         services.AddDistributedMemoryCache();
 
@@ -49,28 +58,21 @@ public static class CachingServiceCollectionExtensions
         // Chiffreur no-op par défaut (remplacé par AesCacheValueEncryptor si EncryptValues=true)
         services.TryAddSingleton<ICacheValueEncryptor, NullCacheValueEncryptor>();
 
-        if (configuration is not null)
-        {
-            services.Configure<CachingOptions>(configuration);
-            // "Cache:Encryption" → sous-section "Encryption" de la section "Cache"
-            services.Configure<CacheEncryptionOptions>(configuration.GetSection("Encryption"));
-        }
-
         services.TryAddSingleton(typeof(ICacheService<>), typeof(DistributedCacheService<>));
         services.TryAddSingleton(typeof(ICacheService<,>), typeof(TypedKeyCacheServiceAdapter<,>));
 
         // HybridCache memory-only par défaut (L1 uniquement, pas de L2)
         // GranitCachingHybridModule reconfigure les options pour ajouter L2 Redis + LocalCacheExpiration
-        CachingOptions cachingOpts = new();
-        configuration?.Bind(cachingOpts);
-
-        services.AddHybridCache(hybrid =>
-        {
-            hybrid.DefaultEntryOptions = new HybridCacheEntryOptions
+        services.AddHybridCache();
+        services
+            .AddOptions<HybridCacheOptions>()
+            .Configure<IOptions<CachingOptions>>((hybrid, cachingOpts) =>
             {
-                Expiration = cachingOpts.DefaultAbsoluteExpirationRelativeToNow,
-            };
-        });
+                hybrid.DefaultEntryOptions = new HybridCacheEntryOptions
+                {
+                    Expiration = cachingOpts.Value.DefaultAbsoluteExpirationRelativeToNow,
+                };
+            });
 
         return services;
     }

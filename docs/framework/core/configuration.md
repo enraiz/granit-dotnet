@@ -25,6 +25,24 @@ Arguments de ligne de commande
 User Secrets (développement local uniquement)
 ```
 
+```mermaid
+flowchart TD
+    A["appsettings.json"] -->|surcharge| B["appsettings.{Env}.json"]
+    B -->|surcharge| C["Variables d'environnement"]
+    C -->|surcharge| D["Arguments CLI"]
+    D -->|surcharge| E["User Secrets\n(dev uniquement)"]
+    E --> F["IConfiguration\n(agrégée)"]
+
+    F --> G["BindConfiguration(SectionName)"]
+    G --> H["IOptions&lt;T&gt;\n(validé au démarrage)"]
+
+    V["HashiCorp Vault\n(secrets dynamiques)"] -->|injection runtime| F
+
+    style V fill:#e67e22,color:#fff
+    style F fill:#2d5a27,color:#fff
+    style H fill:#4a9eff,color:#fff
+```
+
 > **Secrets en production** : les secrets (mots de passe, tokens, clés API) ne sont
 > **jamais** dans les fichiers de configuration. Ils sont injectés via HashiCorp Vault
 > (voir [vault.md](../security/vault.md)) ou via des variables d'environnement sécurisées dans
@@ -59,12 +77,16 @@ public sealed class KeycloakOptions
 
 ### Enregistrer les options
 
-Les méthodes d'extension Granit lient automatiquement les options à la configuration :
+Les méthodes d'extension Granit lient automatiquement les options à la configuration
+via `BindConfiguration`. La configuration est résolue depuis le conteneur DI
+(`IConfiguration` enregistré par le host) — aucun paramètre n'est requis :
 
 ```csharp
 // Dans JwtBearerServiceCollectionExtensions.cs
-services.Configure<JwtBearerAuthOptions>(
-    configuration.GetSection(JwtBearerAuthOptions.SectionName));
+services.AddOptions<JwtBearerAuthOptions>()
+    .BindConfiguration(JwtBearerAuthOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 ```
 
 ### Consommer les options dans un service
@@ -92,14 +114,14 @@ public class GuavaHostModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        var configuration = context.Configuration;
-
         // Lecture d'une valeur brute
-        var connectionString = configuration.GetConnectionString("Default");
+        var connectionString = context.Configuration.GetConnectionString("Default");
 
-        // Binding d'une section vers une classe d'options
-        context.Services.Configure<MyModuleOptions>(
-            configuration.GetSection(MyModuleOptions.SectionName));
+        // Binding d'une section vers une classe d'options (pattern standard)
+        context.Services.AddOptions<MyModuleOptions>()
+            .BindConfiguration(MyModuleOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
     }
 }
 ```
@@ -163,7 +185,7 @@ appsettings.json
 ```csharp
 builder.AddGranit<GuavaHostModule>();
 // ou directement :
-builder.Services.AddGranitJwtBearer(builder.Configuration);
+builder.Services.AddGranitJwtBearer();
 ```
 
 ### Granit.Authentication.Keycloak
@@ -180,7 +202,7 @@ builder.Services.AddGranitJwtBearer(builder.Configuration);
 ```
 
 ```csharp
-builder.Services.AddGranitKeycloak(builder.Configuration);
+builder.Services.AddGranitKeycloak();
 ```
 
 ### Granit.Vault
@@ -199,7 +221,7 @@ builder.Services.AddGranitKeycloak(builder.Configuration);
 ```
 
 ```csharp
-builder.Services.AddGranitVault(builder.Configuration);
+builder.Services.AddGranitVault();
 ```
 
 > **En développement local**, `AuthMethod` peut être `"Token"` avec `"Token": "root-token-dev"`.
@@ -207,15 +229,19 @@ builder.Services.AddGranitVault(builder.Configuration);
 
 ### Granit.Timing
 
-`ClockOptions` est configuré via le callback de la méthode d'extension (pas via `appsettings.json`)
-car il n'a qu'une seule option, rarement modifiée par environnement :
+```json
+{
+  "Clock": {
+    "DefaultTimezone": "Europe/Brussels"
+  }
+}
+```
 
 ```csharp
-builder.Services.AddGranitTiming(options =>
-{
-    options.DefaultTimezone = "Europe/Brussels"; // null = UTC (défaut)
-});
+builder.Services.AddGranitTiming();
 ```
+
+> Si `DefaultTimezone` n'est pas spécifié, UTC est utilisé par défaut.
 
 ### Granit.Observability
 
@@ -233,7 +259,7 @@ builder.Services.AddGranitTiming(options =>
 ```
 
 ```csharp
-builder.AddGranitObservability(builder.Configuration);
+builder.AddGranitObservability();
 ```
 
 ## Surcharge par environnement
@@ -302,19 +328,19 @@ via `ServiceConfigurationContext.Configuration`.
 
 ## Validation des options au démarrage
 
-Pour détecter les erreurs de configuration tôt (fail-fast), ajouter la validation
-avec `ValidateOnStart()` :
+Les packages Granit activent `ValidateDataAnnotations()` et `ValidateOnStart()` par défaut
+pour détecter les erreurs de configuration tôt (fail-fast). Chaque méthode `AddGranit*()`
+utilise le pattern standard :
 
 ```csharp
-builder.Services
-    .AddOptions<KeycloakOptions>()
+services.AddOptions<KeycloakOptions>()
     .BindConfiguration(KeycloakOptions.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 ```
 
-Les packages Granit n'activent pas `ValidateOnStart()` par défaut pour laisser
-le choix à l'application hôte, mais la validation est recommandée en production.
+Si une option annotée avec `[Required]`, `[Url]`, `[Range]`, etc. est invalide ou manquante,
+l'application lève une exception au démarrage plutôt qu'à l'exécution.
 
 ## Secrets via HashiCorp Vault
 
@@ -325,7 +351,7 @@ les fichiers de configuration. Elles sont injectées depuis Vault via le package
 ```csharp
 // Les credentials PostgreSQL sont obtenus dynamiquement depuis Vault
 // et injectés dans le DbContext via IVaultCredentialLeaseManager
-builder.Services.AddGranitVault(builder.Configuration);
+builder.Services.AddGranitVault();
 ```
 
 Voir [vault.md](../security/vault.md) pour le détail de l'intégration Vault.

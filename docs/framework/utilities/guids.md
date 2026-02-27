@@ -66,13 +66,16 @@ builder.Services.AddGranitGuids();
 ```
 
 Par défaut, le générateur utilise `SequentialGuidType.SequentialAsString` (optimisé
-pour PostgreSQL). Pour changer le type :
+pour PostgreSQL). Pour changer le type, configurer `appsettings.json` :
 
-```csharp
-builder.Services.AddGranitGuids(options =>
+```json
 {
-    options.DefaultSequentialGuidType = SequentialGuidType.SequentialAtEnd; // SQL Server
-});
+  "Granit": {
+    "Guids": {
+      "DefaultSequentialGuidType": "SequentialAtEnd"
+    }
+  }
+}
 ```
 
 > Le package `Granit.Persistence` configure automatiquement le type
@@ -128,7 +131,7 @@ cryptographiquement sûrs.
 ### Algorithme
 
 1. **10 octets aléatoires** via `RandomNumberGenerator` (cryptographiquement sûr)
-2. **Timestamp** : `DateTime.UtcNow.Ticks / 10000` (millisecondes depuis l'an 0001)
+2. **Timestamp** : `IClock.Now.UtcTicks / 10000` (millisecondes depuis l'an 0001)
 3. **6 octets de timestamp** extraits (48 bits, couvrant ~8 900 ans)
 4. **Assemblage** selon le `SequentialGuidType` :
 
@@ -362,8 +365,8 @@ guidGenerator.Create().Returns(fixedId);
 ### Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core` |
+| --- | --- |
+| **Dépend de** | `Granit.Core`, `Granit.Timing` |
 | **Utilisé par** | `Granit.Persistence`, `Granit.BlobStorage` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

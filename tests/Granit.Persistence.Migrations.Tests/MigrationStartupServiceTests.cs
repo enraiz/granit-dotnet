@@ -14,8 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
-using NSubstitute.Core;
-using Wolverine;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -54,24 +52,6 @@ public sealed class MigrationStartupServiceTests
     }
 
     /// <summary>
-    /// Creates a mocked <see cref="IServiceScopeFactory"/> whose scope resolves the given bus.
-    /// Avoids a real DI container to eliminate any resolution ambiguity.
-    /// </summary>
-    private static IServiceScopeFactory MockScopeFactory(IMessageBus bus)
-    {
-        IServiceProvider serviceProvider = Substitute.For<IServiceProvider>();
-        serviceProvider.GetService(typeof(IMessageBus)).Returns(bus);
-
-        IServiceScope scope = Substitute.For<IServiceScope>();
-        scope.ServiceProvider.Returns(serviceProvider);
-
-        IServiceScopeFactory scopeFactory = Substitute.For<IServiceScopeFactory>();
-        scopeFactory.CreateScope().Returns(scope);
-
-        return scopeFactory;
-    }
-
-    /// <summary>
     /// Returns an <see cref="IAsyncEnumerable{T}"/> that yields the given tenant identifiers.
     /// </summary>
     private static async IAsyncEnumerable<Guid> ToAsyncEnumerable(params Guid[] tenantIds)
@@ -85,23 +65,37 @@ public sealed class MigrationStartupServiceTests
     }
 
     /// <summary>
-    /// Collects all <see cref="RunMigrationBatchCommand"/> instances sent to the bus.
+    /// Collects all <see cref="RunMigrationBatchCommand"/> instances dispatched via the dispatcher.
     /// </summary>
-    private static List<RunMigrationBatchCommand> GetSentCommands(IMessageBus bus) =>
-        bus.ReceivedCalls()
-           .Select((ICall c) => c.GetArguments()[0])
-           .OfType<RunMigrationBatchCommand>()
+    private static List<RunMigrationBatchCommand> GetDispatchedCommands(IMigrationBatchDispatcher dispatcher) =>
+        dispatcher.ReceivedCalls()
+           .Where(c => c.GetMethodInfo().Name == nameof(IMigrationBatchDispatcher.DispatchAsync))
+           .SelectMany(c =>
+           {
+               object? arg = c.GetArguments()[0];
+               if (arg is IEnumerable<RunMigrationBatchCommand> commands)
+               {
+                   return commands;
+               }
+
+               if (arg is RunMigrationBatchCommand single)
+               {
+                   return [single];
+               }
+
+               return [];
+           })
            .ToList();
 
     private static MigrationStartupService BuildService(
         IDbContextFactory<MigrationProgressDbContext> factory,
         ITenantEnumerator tenantEnumerator,
-        IMessageBus bus,
+        IMigrationBatchDispatcher dispatcher,
         int defaultBatchSize = 200) =>
         new(
             factory,
             tenantEnumerator,
-            MockScopeFactory(bus),
+            dispatcher,
             Options.Create(new MigrationStartupOptions { DefaultBatchSize = defaultBatchSize }),
             NullLogger<MigrationStartupService>.Instance);
 
@@ -110,18 +104,18 @@ public sealed class MigrationStartupServiceTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task StartAsync_NoPendingCycles_DoesNotCallBus()
+    public async Task StartAsync_NoPendingCycles_DoesNotDispatch()
     {
-        IMessageBus bus = Substitute.For<IMessageBus>();
+        IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();
         enumerator.GetActiveTenantIdsAsync(Arg.Any<CancellationToken>())
             .Returns(ToAsyncEnumerable());
 
-        MigrationStartupService sut = BuildService(CreateFactory(), enumerator, bus);
+        MigrationStartupService sut = BuildService(CreateFactory(), enumerator, dispatcher);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        bus.ReceivedCalls().Should().BeEmpty();
+        dispatcher.ReceivedCalls().Should().BeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -129,9 +123,9 @@ public sealed class MigrationStartupServiceTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task StartAsync_OnlyCompletedAndFailedRows_DoesNotCallBus()
+    public async Task StartAsync_OnlyCompletedAndFailedRows_DoesNotDispatch()
     {
-        IMessageBus bus = Substitute.For<IMessageBus>();
+        IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();
         enumerator.GetActiveTenantIdsAsync(Arg.Any<CancellationToken>())
             .Returns(ToAsyncEnumerable());
@@ -142,11 +136,11 @@ public sealed class MigrationStartupServiceTests
             new() { Id = Guid.NewGuid(), CycleId = "err",  Status = MigrationStatus.Failed    },
         ];
 
-        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, bus);
+        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, dispatcher);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        bus.ReceivedCalls().Should().BeEmpty();
+        dispatcher.ReceivedCalls().Should().BeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -156,7 +150,7 @@ public sealed class MigrationStartupServiceTests
     [Fact]
     public async Task StartAsync_PendingRow_DispatchesOneCommand()
     {
-        IMessageBus bus = Substitute.For<IMessageBus>();
+        IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();
         enumerator.GetActiveTenantIdsAsync(Arg.Any<CancellationToken>())
             .Returns(ToAsyncEnumerable());
@@ -166,11 +160,11 @@ public sealed class MigrationStartupServiceTests
             new() { Id = Guid.NewGuid(), CycleId = "cycle-a", Status = MigrationStatus.Pending, TenantId = null },
         ];
 
-        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, bus, defaultBatchSize: 100);
+        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, dispatcher, defaultBatchSize: 100);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        List<RunMigrationBatchCommand> commands = GetSentCommands(bus);
+        List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
         commands.Should().ContainSingle();
         commands[0].CycleId.Should().Be("cycle-a");
         commands[0].BatchSize.Should().Be(100);
@@ -183,7 +177,7 @@ public sealed class MigrationStartupServiceTests
     [Fact]
     public async Task StartAsync_InProgressRowWithCursor_UsesCursorInCommand()
     {
-        IMessageBus bus = Substitute.For<IMessageBus>();
+        IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();
         enumerator.GetActiveTenantIdsAsync(Arg.Any<CancellationToken>())
             .Returns(ToAsyncEnumerable());
@@ -200,11 +194,11 @@ public sealed class MigrationStartupServiceTests
             },
         ];
 
-        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, bus);
+        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, dispatcher);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        List<RunMigrationBatchCommand> commands = GetSentCommands(bus);
+        List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
         commands.Should().ContainSingle();
         commands[0].CycleId.Should().Be("cycle-resume");
         commands[0].Cursor.Should().Be("{\"lastId\":\"abc\"}");
@@ -217,7 +211,7 @@ public sealed class MigrationStartupServiceTests
     [Fact]
     public async Task StartAsync_NullTenantId_MapsToGuidEmpty()
     {
-        IMessageBus bus = Substitute.For<IMessageBus>();
+        IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();
         enumerator.GetActiveTenantIdsAsync(Arg.Any<CancellationToken>())
             .Returns(ToAsyncEnumerable());
@@ -227,11 +221,11 @@ public sealed class MigrationStartupServiceTests
             new() { Id = Guid.NewGuid(), CycleId = "single-tenant", Status = MigrationStatus.Pending, TenantId = null },
         ];
 
-        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, bus);
+        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, dispatcher);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        List<RunMigrationBatchCommand> commands = GetSentCommands(bus);
+        List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
         commands.Should().ContainSingle();
         commands[0].TenantId.Should().Be(Guid.Empty);
     }
@@ -246,7 +240,7 @@ public sealed class MigrationStartupServiceTests
         Guid tenantA = Guid.NewGuid();
         Guid tenantB = Guid.NewGuid();
 
-        IMessageBus bus = Substitute.For<IMessageBus>();
+        IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();
         enumerator.GetActiveTenantIdsAsync(Arg.Any<CancellationToken>())
             .Returns(ToAsyncEnumerable(tenantA, tenantB));
@@ -263,11 +257,11 @@ public sealed class MigrationStartupServiceTests
             },
         ];
 
-        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, bus);
+        MigrationStartupService sut = BuildService(CreateFactory(rows), enumerator, dispatcher);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        List<RunMigrationBatchCommand> commands = GetSentCommands(bus);
+        List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
 
         // Two commands — one per tenant.
         commands.Should().HaveCount(2);
@@ -294,10 +288,10 @@ public sealed class MigrationStartupServiceTests
             Substitute.For<IDbContextFactory<MigrationProgressDbContext>>();
         factory.CreateDbContext().Returns(_ => throw new InvalidOperationException("db unavailable"));
 
-        IMessageBus bus = Substitute.For<IMessageBus>();
+        IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();
 
-        MigrationStartupService sut = BuildService(factory, enumerator, bus);
+        MigrationStartupService sut = BuildService(factory, enumerator, dispatcher);
 
         Func<Task> act = () => sut.StartAsync(TestContext.Current.CancellationToken);
 

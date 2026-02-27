@@ -1,8 +1,8 @@
 // =============================================================================
-// Tests — RunMigrationBatchHandler
+// Tests — MigrationBatchExecutor
 // =============================================================================
 // Verifies the cascade logic, progress lifecycle, and error handling of the
-// Wolverine handler without requiring a real database or message bus.
+// transport-agnostic batch executor without requiring a real database.
 // MigrationProgressDbContext uses the EF Core InMemory provider.
 // =============================================================================
 
@@ -18,13 +18,13 @@ using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
 
-public sealed class RunMigrationBatchHandlerTests : IDisposable
+public sealed class MigrationBatchExecutorTests : IDisposable
 {
     private readonly MigrationProgressDbContext _progressContext;
     private readonly ITenantDbIsolator _isolator;
     private readonly IClock _clock;
 
-    public RunMigrationBatchHandlerTests()
+    public MigrationBatchExecutorTests()
     {
         DbContextOptions<MigrationProgressDbContext> options =
             new DbContextOptionsBuilder<MigrationProgressDbContext>()
@@ -57,7 +57,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
         return services.BuildServiceProvider();
     }
 
-    private RunMigrationBatchHandler BuildHandler(
+    private MigrationBatchExecutor BuildExecutor(
         IMigrationCycleRegistry registry,
         IServiceProvider serviceProvider) =>
         new(
@@ -66,24 +66,24 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
             _progressContext,
             _isolator,
             _clock,
-            NullLogger<RunMigrationBatchHandler>.Instance);
+            NullLogger<MigrationBatchExecutor>.Instance);
 
     // -------------------------------------------------------------------------
     // Unknown cycle
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_UnknownCycle_ReturnsEmptyArray()
+    public async Task ExecuteBatchAsync_UnknownCycle_ReturnsNull()
     {
         IMigrationCycleRegistry registry = Substitute.For<IMigrationCycleRegistry>();
         registry.Find(Arg.Any<string>()).Returns((MigrationCycleRegistration?)null);
-        RunMigrationBatchHandler handler = BuildHandler(registry, new ServiceCollection().BuildServiceProvider());
+        MigrationBatchExecutor executor = BuildExecutor(registry, new ServiceCollection().BuildServiceProvider());
 
-        object[] result = await handler.HandleAsync(
+        RunMigrationBatchCommand? result = await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand("missing", Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.Should().BeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -91,14 +91,14 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_AlreadyCompleted_ReturnsEmptyArray()
+    public async Task ExecuteBatchAsync_AlreadyCompleted_ReturnsNull()
     {
         string cycleId = "completed-cycle";
         StubDbContext stubContext = CreateStubContext();
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => Task.FromResult(new MigrationBatchResult(10, null)));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
         _progressContext.MigrationProgresses.Add(new MigrationProgress
         {
@@ -110,11 +110,11 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
         });
         await _progressContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        object[] result = await handler.HandleAsync(
+        RunMigrationBatchCommand? result = await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.Should().BeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -122,7 +122,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_LastBatch_ReturnsEmptyArrayAndMarksCompleted()
+    public async Task ExecuteBatchAsync_LastBatch_ReturnsNullAndMarksCompleted()
     {
         string cycleId = "last-batch";
         StubDbContext stubContext = CreateStubContext();
@@ -132,13 +132,13 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => Task.FromResult(new MigrationBatchResult(42, null)));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        object[] result = await handler.HandleAsync(
+        RunMigrationBatchCommand? result = await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.Should().BeNull();
 
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
@@ -153,25 +153,24 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_MidBatch_ReturnsCascadeCommand()
+    public async Task ExecuteBatchAsync_MidBatch_ReturnsNextCommand()
     {
         string cycleId = "mid-batch";
         StubDbContext stubContext = CreateStubContext();
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => Task.FromResult(new MigrationBatchResult(100, "{\"lastId\":999}")));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        object[] result = await handler.HandleAsync(
+        RunMigrationBatchCommand? result = await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(1);
-        RunMigrationBatchCommand cascade = result[0].Should().BeOfType<RunMigrationBatchCommand>().Subject;
-        cascade.CycleId.Should().Be(cycleId);
-        cascade.Cursor.Should().Be("{\"lastId\":999}");
-        cascade.BatchSize.Should().Be(100);
-        cascade.TenantId.Should().Be(Guid.Empty);
+        result.Should().NotBeNull();
+        result!.CycleId.Should().Be(cycleId);
+        result.Cursor.Should().Be("{\"lastId\":999}");
+        result.BatchSize.Should().Be(100);
+        result.TenantId.Should().Be(Guid.Empty);
     }
 
     // -------------------------------------------------------------------------
@@ -179,7 +178,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_AccumulatesProcessedRows_AcrossBatches()
+    public async Task ExecuteBatchAsync_AccumulatesProcessedRows_AcrossBatches()
     {
         string cycleId = "accumulate";
         StubDbContext stubContext = CreateStubContext();
@@ -193,17 +192,17 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
                 string? next = callCount == 1 ? "cursor-2" : null;
                 return Task.FromResult(new MigrationBatchResult(50, next));
             });
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        object[] result1 = await handler.HandleAsync(
+        RunMigrationBatchCommand? result1 = await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
-        result1.Should().HaveCount(1);
+        result1.Should().NotBeNull();
 
-        object[] result2 = await handler.HandleAsync(
-            (RunMigrationBatchCommand)result1[0],
+        RunMigrationBatchCommand? result2 = await executor.ExecuteBatchAsync(
+            result1!,
             TestContext.Current.CancellationToken);
-        result2.Should().BeEmpty();
+        result2.Should().BeNull();
 
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
@@ -216,7 +215,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_NonEmptyTenantId_CallsIsolator()
+    public async Task ExecuteBatchAsync_NonEmptyTenantId_CallsIsolator()
     {
         string cycleId = "tenant-isolation";
         Guid tenantId = Guid.NewGuid();
@@ -224,9 +223,9 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => Task.FromResult(new MigrationBatchResult(0, null)));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        await handler.HandleAsync(
+        await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, tenantId, null, 100),
             TestContext.Current.CancellationToken);
 
@@ -235,16 +234,16 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task HandleAsync_EmptyTenantId_DoesNotCallIsolator()
+    public async Task ExecuteBatchAsync_EmptyTenantId_DoesNotCallIsolator()
     {
         string cycleId = "no-tenant";
         StubDbContext stubContext = CreateStubContext();
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => Task.FromResult(new MigrationBatchResult(0, null)));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        await handler.HandleAsync(
+        await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
@@ -257,16 +256,16 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_EmptyTenantId_StoresNullTenantIdInProgress()
+    public async Task ExecuteBatchAsync_EmptyTenantId_StoresNullTenantIdInProgress()
     {
         string cycleId = "null-tenant";
         StubDbContext stubContext = CreateStubContext();
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => Task.FromResult(new MigrationBatchResult(0, null)));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        await handler.HandleAsync(
+        await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
@@ -281,16 +280,16 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_BatchThrows_MarksFailedAndRethrows()
+    public async Task ExecuteBatchAsync_BatchThrows_MarksFailedAndRethrows()
     {
         string cycleId = "failing-batch";
         StubDbContext stubContext = CreateStubContext();
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => throw new InvalidOperationException("boom"));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        Func<Task> act = () => handler.HandleAsync(
+        Func<Task> act = () => executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
@@ -304,7 +303,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task HandleAsync_BatchThrowsOperationCanceled_PropagatesWithoutMarkingFailed()
+    public async Task ExecuteBatchAsync_BatchThrowsOperationCanceled_PropagatesWithoutMarkingFailed()
     {
         string cycleId = "cancel-batch";
         StubDbContext stubContext = CreateStubContext();
@@ -318,16 +317,15 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
                 ct.ThrowIfCancellationRequested();
                 return Task.FromResult(new MigrationBatchResult(0, null));
             });
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
-        Func<Task> act = () => handler.HandleAsync(
+        Func<Task> act = () => executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             cts.Token);
 
         await act.Should().ThrowAsync<OperationCanceledException>();
 
         // Progress should NOT be marked as Failed for cancellation.
-        // Use a fresh CTS since the original one is cancelled.
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
         progress.Should().BeNull();
@@ -338,7 +336,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task HandleAsync_LongErrorMessage_TruncatesTo4000Chars()
+    public async Task ExecuteBatchAsync_LongErrorMessage_TruncatesTo4000Chars()
     {
         string cycleId = "long-error";
         StubDbContext stubContext = CreateStubContext();
@@ -346,11 +344,11 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
             (_, _, _) => throw new InvalidOperationException(longMessage));
-        RunMigrationBatchHandler handler = BuildHandler(registry, ProviderWith(stubContext));
+        MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));
 
         try
         {
-            await handler.HandleAsync(
+            await executor.ExecuteBatchAsync(
                 new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
                 TestContext.Current.CancellationToken);
         }

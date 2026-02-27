@@ -60,13 +60,16 @@ Pour les projets qui n'utilisent pas le système de modules :
 builder.Services.AddGranitTiming();
 ```
 
-Avec options :
+La configuration se fait via `appsettings.json` :
 
-```csharp
-builder.Services.AddGranitTiming(options =>
+```json
 {
-    options.DefaultTimezone = "Europe/Brussels";
-});
+  "Granit": {
+    "Timing": {
+      "DefaultTimezone": "Europe/Brussels"
+    }
+  }
+}
 ```
 
 ## IClock

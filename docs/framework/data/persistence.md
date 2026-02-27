@@ -26,8 +26,8 @@ important :
 ```csharp
 builder.Services.AddGranitTiming();      // IClock (requis par les intercepteurs)
 builder.Services.AddGranitGuids();       // IGuidGenerator (requis par AuditedEntityInterceptor)
-builder.Services.AddGranitSecurity(builder.Configuration); // ICurrentUserService
-builder.Services.AddGranitMultiTenancy(builder.Configuration); // ICurrentTenant (requis par AuditedEntityInterceptor)
+builder.Services.AddGranitSecurity(); // ICurrentUserService
+builder.Services.AddGranitMultiTenancy(); // ICurrentTenant (requis par AuditedEntityInterceptor)
 builder.Services.AddGranitPersistence();
 ```
 

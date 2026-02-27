@@ -140,6 +140,7 @@ public sealed class WebhookFanoutHandlerTests
         EventType = "test.event",
         Payload = JsonSerializer.SerializeToElement(new { key = "value" }),
         TenantId = tenantId,
+        OccurredAt = DateTimeOffset.UtcNow,
     };
 
     private static WebhookSubscription BuildSubscription() => new()

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Granit.Diagnostics.Caching;
+using Granit.Timing;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NSubstitute;
 using Xunit;
@@ -8,6 +9,14 @@ namespace Granit.Diagnostics.Tests;
 
 public sealed class CachedHealthCheckTests
 {
+    private readonly IClock _clock;
+
+    public CachedHealthCheckTests()
+    {
+        _clock = Substitute.For<IClock>();
+        _clock.Now.Returns(_ => DateTimeOffset.UtcNow);
+    }
+
     [Fact]
     public async Task CheckHealthAsync_ReturnsInnerResult_WhenCacheIsEmpty()
     {
@@ -15,7 +24,7 @@ public sealed class CachedHealthCheckTests
         inner.CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>())
             .Returns(HealthCheckResult.Healthy());
 
-        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(10));
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(10), _clock);
         HealthCheckContext context = BuildContext();
 
         HealthCheckResult result = await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
@@ -31,7 +40,7 @@ public sealed class CachedHealthCheckTests
         inner.CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>())
             .Returns(HealthCheckResult.Healthy());
 
-        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30));
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30), _clock);
         HealthCheckContext context = BuildContext();
 
         await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
@@ -54,7 +63,7 @@ public sealed class CachedHealthCheckTests
                 return HealthCheckResult.Healthy();
             });
 
-        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30));
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30), _clock);
         HealthCheckContext context = BuildContext();
 
         // 10 concurrent callers — only 1 should hit the inner check
@@ -75,7 +84,7 @@ public sealed class CachedHealthCheckTests
             .Returns(HealthCheckResult.Healthy());
 
         // Very short TTL so it expires immediately
-        CachedHealthCheck sut = new(inner, TimeSpan.FromMilliseconds(1));
+        CachedHealthCheck sut = new(inner, TimeSpan.FromMilliseconds(1), _clock);
         HealthCheckContext context = BuildContext();
 
         await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
@@ -92,7 +101,7 @@ public sealed class CachedHealthCheckTests
         inner.CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>())
             .Returns(HealthCheckResult.Degraded("slow dependency"));
 
-        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30));
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30), _clock);
         HealthCheckContext context = BuildContext();
 
         await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
@@ -107,7 +116,7 @@ public sealed class CachedHealthCheckTests
     {
         // Arrange
         IHealthCheck inner = Substitute.For<IHealthCheck>();
-        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(10));
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(10), _clock);
 
         // Act & Assert — Dispose must not throw; SemaphoreSlim is released
         Action act = sut.Dispose;
@@ -136,7 +145,7 @@ public sealed class CachedHealthCheckTests
                 return HealthCheckResult.Healthy("populated");
             });
 
-        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30));
+        CachedHealthCheck sut = new(inner, TimeSpan.FromSeconds(30), _clock);
         HealthCheckContext context = BuildContext();
 
         // First caller takes the lock and waits

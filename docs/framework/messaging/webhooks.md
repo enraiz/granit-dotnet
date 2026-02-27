@@ -292,8 +292,8 @@ Cela garantit que le module fonctionne avec ou sans `GranitMultiTenancyModule` i
 ## Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core`, `Granit.Wolverine` |
+| --- | --- |
+| **Dépend de** | `Granit.Core`, `Granit.Timing`, `Granit.Wolverine` |
 | **Utilisé par** | `Granit.Webhooks.EntityFrameworkCore` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

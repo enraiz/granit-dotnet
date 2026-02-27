@@ -49,7 +49,9 @@ flowchart BT
     PERS --> EXC
 
     PERS_MIG["Granit.Persistence\n.Migrations"] --> PERS
-    PERS_MIG --> WOL
+
+    PERS_MIG_WOL["Granit.Persistence\n.Migrations.Wolverine"] --> PERS_MIG
+    PERS_MIG_WOL --> WOL
 
     style PERS fill:#ff6b6b,color:#fff
 
@@ -163,4 +165,6 @@ flowchart BT
    `ICurrentTenant` de `Granit.Core.MultiTenancy`
 4. **Les packages `*.Endpoints` dépendent de `Granit.Authorization`** pour la protection des routes
 5. **Wolverine est le seul bus de messages** — tous les modules asynchrones passent par lui
-6. **`Persistence.Migrations → Wolverine`** — couplage à évaluer (#285)
+6. **`Persistence.Migrations` est découplé de Wolverine** — le dispatch est abstrait par
+   `IMigrationBatchDispatcher` (Channel par défaut, Wolverine en option via
+   `Granit.Persistence.Migrations.Wolverine`)

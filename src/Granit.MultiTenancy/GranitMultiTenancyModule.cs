@@ -12,6 +12,5 @@ public sealed class GranitMultiTenancyModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitMultiTenancy(
-            context.Configuration.GetSection(MultiTenancyOptions.SectionName));
+        context.Services.AddGranitMultiTenancy();
 }

@@ -101,6 +101,11 @@ Serilog · OpenTelemetry · WolverineFx
 | Section | Description |
 | --- | --- |
 | [Framework](framework/index.md) | Architecture, modules, sécurité, données, diagnostics, API, messaging, stockage |
+| [Guide](guide/index.md) | Tutoriels pas-à-pas, démarrage rapide |
+| [Cookbook](cookbook/index.md) | Recettes pratiques cross-modules |
+| [Déploiement](deployment/index.md) | Observabilité, Vault, Kubernetes, checklist production |
+| [Référence API](api/index.md) | Documentation C# générée par DocFX |
+| [Patterns](patterns/index.md) | 39 design patterns identifiés dans Granit |
 | [Tests](testing/index.md) | Conventions, mocking, assertions, intégration EF Core, conformité HDS/RGPD |
 
 ## Démarrage rapide

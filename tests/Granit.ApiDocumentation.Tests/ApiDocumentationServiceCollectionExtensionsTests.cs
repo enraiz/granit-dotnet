@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using NSubstitute;
@@ -26,61 +27,60 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
     public void AddGranitApiDocumentation_WithConfiguration_RegistersOptions()
     {
         // Arrange
-        ServiceCollection services = new();
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["ApiDocumentation:Title"] = "Guava API",
-                ["ApiDocumentation:MajorVersions:0"] = "1",
-                ["ApiDocumentation:EnableInProduction"] = "false",
-            })
-            .Build();
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["ApiDocumentation:Title"] = "Guava API",
+            ["ApiDocumentation:MajorVersions:0"] = "2",
+            ["ApiDocumentation:EnableInProduction"] = "false",
+        });
 
         // Act
-        services.AddGranitApiDocumentation(configuration);
+        builder.AddGranitApiDocumentation();
 
         // Assert — options are bound from configuration
-        using ServiceProvider sp = services.BuildServiceProvider();
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
         options.Title.Should().Be("Guava API");
-        options.MajorVersions.Should().ContainSingle().Which.Should().Be(1);
+        options.MajorVersions.Should().Contain(2);
         options.EnableInProduction.Should().BeFalse();
     }
 
     [Fact]
-    public void AddGranitApiDocumentation_WithLambda_RegistersOptions()
+    public void AddGranitApiDocumentation_WithConfiguredValues_RegistersOptions()
     {
         // Arrange
-        ServiceCollection services = new();
-
-        // Act
-        services.AddGranitApiDocumentation(opts =>
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.Title = "Test API";
-            opts.MajorVersions = [1, 2];
+            ["ApiDocumentation:Title"] = "Test API",
+            ["ApiDocumentation:MajorVersions:0"] = "2",
+            ["ApiDocumentation:MajorVersions:1"] = "3",
         });
 
+        // Act
+        builder.AddGranitApiDocumentation();
+
         // Assert
-        using ServiceProvider sp = services.BuildServiceProvider();
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
         options.Title.Should().Be("Test API");
-        options.MajorVersions.Should().HaveCount(2).And.Contain([1, 2]);
+        options.MajorVersions.Should().Contain(2).And.Contain(3);
     }
 
     [Fact]
     public void AddGranitApiDocumentation_WithDefaultConfig_UsesDefaultOptions()
     {
         // Arrange
-        ServiceCollection services = new();
-        IConfiguration configuration = new ConfigurationBuilder().Build();
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
 
         // Act
-        services.AddGranitApiDocumentation(configuration);
+        builder.AddGranitApiDocumentation();
 
         // Assert
-        using ServiceProvider sp = services.BuildServiceProvider();
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
         options.Title.Should().Be("API");
@@ -88,36 +88,38 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitApiDocumentation_ReturnsServices_ForChaining()
+    public void AddGranitApiDocumentation_ReturnsBuilder_ForChaining()
     {
         // Arrange
-        ServiceCollection services = new();
-        IConfiguration configuration = new ConfigurationBuilder().Build();
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
 
         // Act
-        IServiceCollection returned = services.AddGranitApiDocumentation(configuration);
+        IHostApplicationBuilder returned = builder.AddGranitApiDocumentation();
 
         // Assert
-        returned.Should().BeSameAs(services);
+        returned.Should().BeSameAs(builder);
     }
 
     [Fact]
     public void AddGranitApiDocumentation_WithMultipleVersions_RegistersMultipleOpenApiDocuments()
     {
         // Arrange
-        ServiceCollection services = new();
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["ApiDocumentation:Title"] = "Multi-version API",
+            ["ApiDocumentation:MajorVersions:0"] = "1",
+            ["ApiDocumentation:MajorVersions:1"] = "2",
+            ["ApiDocumentation:MajorVersions:2"] = "3",
+        });
 
         // Act
-        services.AddGranitApiDocumentation(opts =>
-        {
-            opts.Title = "Multi-version API";
-            opts.MajorVersions = [1, 2, 3];
-        });
+        builder.AddGranitApiDocumentation();
 
         // Assert — one AddOpenApi registration per version → each is named "v1", "v2", "v3"
         // AddOpenApi registers IConfigureOptions<OpenApiOptions> keyed by document name.
         // We verify services are registered (not zero), which indicates documents were added.
-        services.Should().NotBeEmpty("versions [1, 2, 3] must register OpenAPI services");
+        builder.Services.Should().NotBeEmpty("versions [1, 2, 3] must register OpenAPI services");
     }
 
     // --- OpenApiOptions : déclenchement du callback AddOpenApi et du transformer inline ---
@@ -126,16 +128,17 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
     public async Task AddGranitApiDocumentation_DocumentTransformer_SetsInfoWithoutContact()
     {
         // Arrange
-        ServiceCollection services = new();
-        services.AddGranitApiDocumentation(opts =>
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.Title = "My API";
-            opts.Description = "My description";
-            opts.MajorVersions = [1];
-            opts.ContactEmail = null;
+            ["ApiDocumentation:Title"] = "My API",
+            ["ApiDocumentation:Description"] = "My description",
+            ["ApiDocumentation:MajorVersions:0"] = "1",
         });
 
-        using ServiceProvider sp = services.BuildServiceProvider();
+        builder.AddGranitApiDocumentation();
+
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
 
         // IOptionsMonitor.Get("v1") triggers the outer openApiOptions => lambda,
         // which registers the document transformers on the OpenApiOptions instance.
@@ -161,16 +164,17 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
     public async Task AddGranitApiDocumentation_DocumentTransformer_SetsInfoWithContact()
     {
         // Arrange
-        ServiceCollection services = new();
-        services.AddGranitApiDocumentation(opts =>
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            opts.Title = "Guava API";
-            opts.Description = null;
-            opts.ContactEmail = "api@example.com";
-            opts.MajorVersions = [2];
+            ["ApiDocumentation:Title"] = "Guava API",
+            ["ApiDocumentation:ContactEmail"] = "api@example.com",
+            ["ApiDocumentation:MajorVersions:0"] = "2",
         });
 
-        using ServiceProvider sp = services.BuildServiceProvider();
+        builder.AddGranitApiDocumentation();
+
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
         IOptionsMonitor<OpenApiOptions> monitor = sp.GetRequiredService<IOptionsMonitor<OpenApiOptions>>();
         OpenApiOptions openApiOpts = monitor.Get("v2");
 

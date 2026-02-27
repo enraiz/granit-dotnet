@@ -11,11 +11,11 @@ L'objectif : **un seul appel** dans `Program.cs` remplace tous les `AddGranit*()
 ```csharp
 // Avant (6 appels manuels, ordre à respecter)
 builder.AddGranitObservability();
-builder.Services.AddGranitSecurity(builder.Configuration);
+builder.Services.AddGranitSecurity();
 builder.Services.AddGranitTiming();
 builder.Services.AddGranitGuids();
 builder.Services.AddGranitPersistence();
-builder.Services.AddGranitVault(builder.Configuration);
+builder.Services.AddGranitVault();
 
 // Après (single entry point, async recommandé)
 await builder.AddGranitAsync<GuavaHostModule>();
@@ -128,7 +128,7 @@ public sealed class GranitSecurityModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddGranitSecurity(context.Configuration);
+        context.Services.AddGranitSecurity();
     }
 }
 
@@ -379,6 +379,37 @@ app.Run();
 ```
 
 ## Architecture interne
+
+### Cycle de vie du chargement
+
+```mermaid
+sequenceDiagram
+    participant P as Program.cs
+    participant GA as GranitApplication
+    participant ML as ModuleLoader
+    participant A as Module A
+    participant B as Module B (depends on A)
+
+    P->>GA: AddGranitAsync&lt;B&gt;()
+    GA->>ML: LoadModules&lt;B&gt;()
+    ML->>ML: Récursion via [DependsOn]
+    ML->>ML: Déduplication par Type
+    ML->>ML: TopologicalSort (Kahn)
+    ML-->>GA: [A, B]
+
+    GA->>A: ConfigureServicesAsync(context)
+    A-->>GA: Services enregistrés
+    GA->>B: ConfigureServicesAsync(context)
+    B-->>GA: Services enregistrés
+
+    Note over P,B: Phase 1 terminée — Build()
+
+    P->>GA: UseGranitAsync()
+    GA->>A: OnApplicationInitializationAsync(context)
+    GA->>B: OnApplicationInitializationAsync(context)
+
+    Note over P,B: Phase 2 terminée — Run()
+```
 
 ### Algorithme de chargement
 

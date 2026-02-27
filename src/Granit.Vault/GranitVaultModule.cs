@@ -27,7 +27,7 @@ public sealed class GranitVaultModule : GranitModule
             return;
         }
 
-        context.Services.AddGranitVault(context.Configuration);
+        context.Services.AddGranitVault();
 
         context.Services.AddSingleton<IStringEncryptionProvider, VaultStringEncryptionProvider>();
     }

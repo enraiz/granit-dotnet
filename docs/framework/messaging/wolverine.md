@@ -105,6 +105,38 @@ Lors de l'émission d'un message, trois headers sont injectés automatiquement d
   → TenantContextBehavior.After()     — dispose le scope
 ```
 
+```mermaid
+sequenceDiagram
+    participant API as Endpoint HTTP
+    participant OCM as OutgoingContextMiddleware
+    participant WOL as Wolverine Bus
+    participant OB as Outbox PostgreSQL
+    participant TX as Transaction EF Core
+    participant TCB as TenantContextBehavior
+    participant UCB as UserContextBehavior
+    participant TrCB as TraceContextBehavior
+    participant H as Handler Background
+
+    API->>OCM: PublishAsync(event)
+    OCM->>OCM: Injecte X-Tenant-Id, X-User-Id, traceparent
+    OCM->>WOL: Envelope avec headers
+    WOL->>OB: INSERT INTO outbox (même transaction)
+    WOL->>TX: COMMIT
+    Note over OB,TX: Atomique — at-least-once delivery
+
+    OB->>TCB: Dispatch message
+    TCB->>TCB: Restaure ICurrentTenant (AsyncLocal)
+    TCB->>UCB: next()
+    UCB->>UCB: Restaure ICurrentUserService (AsyncLocal)
+    UCB->>TrCB: next()
+    TrCB->>TrCB: Démarre Activity bridge (trace-id)
+    TrCB->>H: Exécute handler
+    H-->>TrCB: Résultat
+    TrCB-->>UCB: Dispose activity
+    UCB-->>TCB: Dispose scope
+    TCB-->>OB: Terminé
+```
+
 La propagation du `traceparent` permet de corréler visuellement une requête HTTP et tous
 ses traitements Wolverine asynchrones dans Grafana/Tempo sous un même `trace-id`.
 

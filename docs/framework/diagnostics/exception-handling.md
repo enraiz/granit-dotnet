@@ -47,15 +47,27 @@ public sealed class AppModule : GranitModule { }
 ### Enregistrement direct
 
 ```csharp
-builder.Services.AddGranitExceptionHandling(opts =>
-{
-    // true en Development uniquement — jamais en production (règle HDS)
-    opts.ExposeInternalErrorDetails = builder.Environment.IsDevelopment();
-});
+builder.Services.AddGranitExceptionHandling();
 
 var app = builder.Build();
 app.UseGranitExceptionHandling(); // Premier middleware obligatoire
 ```
+
+La configuration se fait via `appsettings.json` :
+
+```json
+{
+  "Granit": {
+    "ExceptionHandling": {
+      "ExposeInternalErrorDetails": false
+    }
+  }
+}
+```
+
+> `ExposeInternalErrorDetails` doit être `true` uniquement en développement — jamais en
+> production (règle HDS). Utiliser la surcharge par environnement
+> (`appsettings.Development.json`) pour activer cette option localement.
 
 ## Exceptions disponibles
 

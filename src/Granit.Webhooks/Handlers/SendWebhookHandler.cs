@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Exceptions;
 using Granit.Webhooks.Internal;
@@ -40,7 +41,8 @@ public sealed class SendWebhookHandler(
     IHttpClientFactory httpClientFactory,
     IWebhookDeliveryStore deliveryStore,
     IWebhookSecretProtector secretProtector,
-    ILogger<SendWebhookHandler> logger)
+    ILogger<SendWebhookHandler> logger,
+    IClock clock)
 {
     /// <summary>
     /// Executes the HTTP POST delivery. Throws <see cref="WebhookDeliveryException"/> on
@@ -50,7 +52,7 @@ public sealed class SendWebhookHandler(
     {
         string bodyJson = JsonSerializer.Serialize(command.Envelope);
         string payloadHash = WebhookSignatureService.ComputePayloadHash(bodyJson);
-        DateTimeOffset sentAt = DateTimeOffset.UtcNow;
+        DateTimeOffset sentAt = clock.Now;
 
         string plainSecret = await secretProtector.UnprotectAsync(command.SigningSecret, cancellationToken);
         string signature = WebhookSignatureService.Compute(plainSecret, sentAt, bodyJson);
@@ -78,6 +80,7 @@ public sealed class SendWebhookHandler(
             stopwatch.Stop();
             string timeoutMessage = $"Timeout delivering to {command.TargetUrl}";
             logger.LogWarning(
+                ex,
                 "Webhook delivery timeout for subscription {SubscriptionId} delivery {DeliveryId}",
                 command.SubscriptionId, command.DeliveryId);
 

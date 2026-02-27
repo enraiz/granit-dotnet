@@ -1,6 +1,5 @@
 using Granit.Caching;
 using Granit.Caching.StackExchangeRedis.HealthChecks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -19,48 +18,42 @@ public static class RedisCachingServiceCollectionExtensions
     /// <c>CachingOptions.EncryptValues = true</c>.
     /// </summary>
     /// <remarks>
-    /// Si <see cref="RedisCachingOptions.IsEnabled"/> est <c>false</c>, cette méthode est sans effet
-    /// et le fournisseur Memory enregistré par <c>AddGranitCaching()</c> reste actif.
+    /// The <c>IsEnabled</c> check is handled by the module (<c>GranitCachingRedisModule</c>).
+    /// Calling this method always registers the Redis provider.
     /// </remarks>
     /// <param name="services">Collection de services.</param>
-    /// <param name="configuration">Configuration racine (non la section "Cache").</param>
     /// <returns>La collection de services pour le chaînage.</returns>
     public static IServiceCollection AddGranitCachingRedis(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        RedisCachingOptions redisOpts = configuration
-            .GetSection(RedisCachingOptions.SectionName)
-            .Get<RedisCachingOptions>() ?? new RedisCachingOptions();
-
-        if (!redisOpts.IsEnabled)
-        {
-            return services;
-        }
-
-        services.Configure<RedisCachingOptions>(
-            configuration.GetSection(RedisCachingOptions.SectionName));
+        services
+            .AddOptions<RedisCachingOptions>()
+            .BindConfiguration(RedisCachingOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         // Remplace IDistributedCache (MemoryDistributedCache → RedisCache)
-        services.AddStackExchangeRedisCache(redis =>
+        // Deferred configuration: reads RedisCachingOptions at resolution time.
+        services.AddStackExchangeRedisCache(_ => { });
+        services
+            .AddOptions<Microsoft.Extensions.Caching.StackExchangeRedis.RedisCacheOptions>()
+            .Configure<IOptions<RedisCachingOptions>>((redis, granitOpts) =>
+            {
+                redis.Configuration = granitOpts.Value.Configuration;
+                redis.InstanceName = granitOpts.Value.InstanceName;
+            });
+
+        // Conditional AES-256 encryption: factory resolves at runtime based on CachingOptions.EncryptValues.
+        services.AddSingleton<ICacheValueEncryptor>(sp =>
         {
-            redis.Configuration = redisOpts.Configuration;
-            redis.InstanceName = redisOpts.InstanceName;
+            CachingOptions cachingOpts = sp.GetRequiredService<IOptions<CachingOptions>>().Value;
+            if (cachingOpts.EncryptValues)
+            {
+                return ActivatorUtilities.CreateInstance<AesCacheValueEncryptor>(sp);
+            }
+
+            return new NullCacheValueEncryptor();
         });
-
-        // Active le chiffrement AES-256 si demandé globalement
-        CachingOptions cachingOpts = configuration
-            .GetSection(CachingOptions.SectionName)
-            .Get<CachingOptions>() ?? new CachingOptions();
-
-        if (cachingOpts.EncryptValues)
-        {
-            services.Configure<CacheEncryptionOptions>(
-                configuration.GetSection(CacheEncryptionOptions.SectionName));
-
-            // Remplace NullCacheValueEncryptor par AesCacheValueEncryptor
-            services.AddSingleton<ICacheValueEncryptor, AesCacheValueEncryptor>();
-        }
 
         return services;
     }

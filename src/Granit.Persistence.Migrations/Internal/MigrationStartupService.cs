@@ -1,10 +1,8 @@
 using Granit.Persistence.Migrations.Messages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Wolverine;
 
 namespace Granit.Persistence.Migrations.Internal;
 
@@ -15,7 +13,7 @@ namespace Granit.Persistence.Migrations.Internal;
 /// <para>
 /// On startup, queries all <see cref="MigrationProgress"/> rows with status
 /// <see cref="MigrationStatus.Pending"/> or <see cref="MigrationStatus.InProgress"/>
-/// and dispatches one <see cref="RunMigrationBatchCommand"/> per cycle per tenant via Wolverine.
+/// and dispatches one <see cref="RunMigrationBatchCommand"/> per cycle per tenant via <see cref="IMigrationBatchDispatcher"/>.
 /// </para>
 /// <para>
 /// If <see cref="ITenantEnumerator"/> yields tenant identifiers (Tenant-per-Schema or
@@ -31,16 +29,16 @@ namespace Granit.Persistence.Migrations.Internal;
 internal sealed partial class MigrationStartupService(
     IDbContextFactory<MigrationProgressDbContext> progressFactory,
     ITenantEnumerator tenantEnumerator,
-    IServiceScopeFactory scopeFactory,
+    IMigrationBatchDispatcher dispatcher,
     IOptions<MigrationStartupOptions> options,
     ILogger<MigrationStartupService> logger) : IHostedService
 {
     /// <inheritdoc/>
-    public async Task StartAsync(CancellationToken ct)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
-            await ResumeAsync(ct);
+            await ResumeAsync(cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -49,7 +47,7 @@ internal sealed partial class MigrationStartupService(
     }
 
     /// <inheritdoc/>
-    public Task StopAsync(CancellationToken ct) => Task.CompletedTask;
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     private async Task ResumeAsync(CancellationToken ct)
     {
@@ -74,13 +72,7 @@ internal sealed partial class MigrationStartupService(
         int batchSize = options.Value.DefaultBatchSize;
         List<RunMigrationBatchCommand> commands = BuildCommands(pending, tenantIds, batchSize);
 
-        await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-        IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-
-        foreach (RunMigrationBatchCommand command in commands)
-        {
-            await bus.SendAsync(command);
-        }
+        await dispatcher.DispatchAsync(commands, ct);
 
         LogCommandsDispatched(commands.Count);
     }

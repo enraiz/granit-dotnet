@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Privacy</PackageId>
+    <Description>Abstractions PIMS reutilisables pour les droits des utilisateurs (RGPD, HDS).
+    Data Subject Export via Wolverine Saga (scatter-gather), Data Subject Deletion via events,
+    Legal Agreements versioning, IDataProviderRegistry.
+    Conforme HDS/RGPD.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Privacy.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+  </ItemGroup>
+
+</Project>

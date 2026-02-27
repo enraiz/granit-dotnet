@@ -11,6 +11,5 @@ public sealed class GranitEncryptionModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitEncryption(
-            context.Configuration.GetSection(StringEncryptionOptions.SectionName));
+        context.Services.AddGranitEncryption();
 }

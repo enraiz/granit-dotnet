@@ -61,18 +61,18 @@ public sealed class KeycloakOptions
 
 ### Binding depuis la configuration (recommandé)
 
-La méthode d'extension Granit lie automatiquement la section de configuration
-via `BindConfiguration` :
+Toutes les méthodes `AddGranit*()` sont **sans paramètre**. La configuration est résolue
+automatiquement depuis le conteneur DI (`IConfiguration` enregistré par le host).
+Chaque méthode utilise le pattern standard `BindConfiguration` + validation :
 
 ```csharp
 // Dans JwtBearerServiceCollectionExtensions.cs
-public static IServiceCollection AddGranitJwtBearer(
-    this IServiceCollection services,
-    IConfiguration configuration)
+public static IServiceCollection AddGranitJwtBearer(this IServiceCollection services)
 {
-    services
-        .AddOptions<JwtBearerAuthOptions>()
-        .BindConfiguration(JwtBearerAuthOptions.SectionName);
+    services.AddOptions<JwtBearerAuthOptions>()
+        .BindConfiguration(JwtBearerAuthOptions.SectionName)
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
     // ...
     return services;
@@ -91,34 +91,23 @@ L'application hôte fournit uniquement la configuration dans `appsettings.json` 
 }
 ```
 
-### Binding via callback (sans appsettings.json)
+### Binding via appsettings.json (tous les modules)
 
-Pour les options rarement modifiées par environnement, Granit expose un callback
-dans la méthode d'extension :
+Toutes les options Granit sont désormais configurées via `appsettings.json`, y compris
+celles qui étaient auparavant passées par callback. Cela uniformise la configuration
+et permet la surcharge par environnement :
 
-```csharp
-// Dans TimingServiceCollectionExtensions.cs
-public static IServiceCollection AddGranitTiming(
-    this IServiceCollection services,
-    Action<ClockOptions>? configure = null)
+```json
 {
-    services.Configure<ClockOptions>(options =>
-    {
-        configure?.Invoke(options);
-    });
-
-    // ...
-    return services;
+  "Clock": {
+    "DefaultTimezone": "Europe/Brussels"
+  }
 }
 ```
 
-Usage dans `Program.cs` :
-
 ```csharp
-builder.Services.AddGranitTiming(options =>
-{
-    options.DefaultTimezone = "Europe/Brussels";
-});
+// Sans paramètre — les options sont liées via BindConfiguration
+builder.Services.AddGranitTiming();
 ```
 
 ### Binding mixte : callback + configuration
@@ -162,21 +151,18 @@ public class KeycloakClaimsTransformation : IClaimsTransformation
 ### Dans un module Granit
 
 Pendant la phase `ConfigureServices`, les options ne sont pas encore disponibles via
-`IOptions<T>` (le conteneur DI n'est pas encore construit). Pour lire la configuration
-à ce stade, utiliser `IConfiguration` directement depuis le `ServiceConfigurationContext` :
+`IOptions<T>` (le conteneur DI n'est pas encore construit). Les méthodes `AddGranit*()`
+étant sans paramètre, elles utilisent `BindConfiguration` qui résout `IConfiguration`
+depuis le conteneur au moment de la construction des options :
 
 ```csharp
 public class GranitAuthenticationKeycloakModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        var configuration = context.Configuration;
-
-        // Lecture directe (DI non disponible ici)
-        var keycloakSection = configuration.GetSection(KeycloakOptions.SectionName);
-
-        context.Services.AddGranitJwtBearer(configuration);
-        context.Services.AddGranitKeycloak(configuration);
+        // Appels sans paramètre — BindConfiguration résout IConfiguration depuis le DI
+        context.Services.AddGranitJwtBearer();
+        context.Services.AddGranitKeycloak();
     }
 }
 ```
@@ -234,9 +220,9 @@ Ce mécanisme permet à `Granit.Authentication.Keycloak` de reconfigurer le JWT 
 sans que l'application hôte ait à gérer l'ordre d'initialisation manuellement.
 
 ```text
-Configure<JwtBearerOptions>      (via AddGranitJwtBearer — section "Authentication")
+Configure<JwtBearerOptions>       (via AddGranitJwtBearer() — section "Authentication")
          ↓
-PostConfigureAll<JwtBearerOptions> (via AddGranitKeycloak — écrase avec Keycloak)
+PostConfigureAll<JwtBearerOptions> (via AddGranitKeycloak() — écrase avec Keycloak)
 ```
 
 ## Référence des options Granit
@@ -247,8 +233,8 @@ PostConfigureAll<JwtBearerOptions> (via AddGranitKeycloak — écrase avec Keycl
 | `KeycloakOptions` | `Granit.Authentication.Keycloak` | `"Keycloak"` | `BindConfiguration` |
 | `VaultOptions` | `Granit.Vault` | `"Vault"` | `BindConfiguration` |
 | `ObservabilityOptions` | `Granit.Observability` | `"Observability"` | `BindConfiguration` |
-| `ClockOptions` | `Granit.Timing` | — | Callback `Action<T>` |
-| `GuidGeneratorOptions` | `Granit.Guids` | — | Callback `Action<T>` |
+| `ClockOptions` | `Granit.Timing` | `"Clock"` | `BindConfiguration` |
+| `GuidGeneratorOptions` | `Granit.Guids` | `"GuidGenerator"` | `BindConfiguration` |
 
 ## Créer des options pour un nouveau module
 
@@ -272,13 +258,12 @@ public sealed class MyModuleOptions
 ### 2. Lier dans la méthode d'extension
 
 ```csharp
-public static IServiceCollection AddGranitMyModule(
-    this IServiceCollection services,
-    IConfiguration configuration)
+public static IServiceCollection AddGranitMyModule(this IServiceCollection services)
 {
-    services
-        .AddOptions<MyModuleOptions>()
-        .BindConfiguration(MyModuleOptions.SectionName);
+    services.AddOptions<MyModuleOptions>()
+        .BindConfiguration(MyModuleOptions.SectionName)
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
     services.AddScoped<IMyService, MyService>();
 
@@ -344,15 +329,14 @@ public sealed class MyModuleOptions
 ```
 
 ```csharp
-services
-    .AddOptions<MyModuleOptions>()
+services.AddOptions<MyModuleOptions>()
     .BindConfiguration(MyModuleOptions.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();   // Exception au démarrage si invalide
 ```
 
-Les packages Granit n'activent pas `ValidateOnStart()` par défaut — ce choix
-appartient à l'application hôte.
+Tous les packages Granit activent `ValidateDataAnnotations()` et `ValidateOnStart()` par
+défaut. Les options annotées sont validées au démarrage de l'application (fail-fast).
 
 ## Bonnes pratiques
 

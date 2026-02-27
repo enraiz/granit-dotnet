@@ -169,7 +169,8 @@ public string GetExpiredMessage()
 public void GivenFrenchCulture_WhenLocalizing_ThenReturnsFrenchTranslation()
 {
     ServiceCollection services = new();
-    services.AddGranitLocalization(options =>
+    services.AddGranitLocalization();
+    services.Configure<GranitLocalizationOptions>(options =>
     {
         options.Resources
             .Add<MyAppResource>(defaultCulture: "fr")

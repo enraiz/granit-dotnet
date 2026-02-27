@@ -1,6 +1,4 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -22,12 +20,12 @@ namespace Granit.Analyzers;
 /// Opt-in: only activates when <c>Granit.Persistence.Migrations</c> is referenced.
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class NullableColumnInExpandAnalyzer : DiagnosticAnalyzer
+public sealed class NullableColumnInExpandAnalyzer : GranitMigrationAnalyzerBase
 {
     /// <summary>Diagnostic identifier.</summary>
     public const string DiagnosticId = "GRMIGA003";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor _rule = new(
         DiagnosticId,
         title: "AddColumn NOT NULL without a default value risks a table lock",
         messageFormat: "Migration '{0}' adds a NOT NULL column without a defaultValue or defaultValueSql. "
@@ -40,79 +38,22 @@ public sealed class NullableColumnInExpandAnalyzer : DiagnosticAnalyzer
             + "backfill data, then add the NOT NULL constraint in the Contract phase.");
 
     /// <inheritdoc/>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+    protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    public override void Initialize(AnalysisContext context)
-    {
-        context.EnableConcurrentExecution();
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
-        context.RegisterCompilationStartAction(compilationContext =>
-        {
-            // Opt-in: only activate when Granit.Persistence.Migrations is referenced.
-            INamedTypeSymbol? cycleAttrSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Granit.Persistence.Migrations.MigrationCycleAttribute");
-            if (cycleAttrSymbol is null)
-            {
-                return;
-            }
-
-            INamedTypeSymbol? migrationSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Migrations.Migration");
-            if (migrationSymbol is null)
-            {
-                return;
-            }
-
-            compilationContext.RegisterSyntaxNodeAction(
-                nodeContext => AnalyzeInvocation(nodeContext, migrationSymbol),
-                SyntaxKind.InvocationExpression);
-        });
-    }
-
-    private static void AnalyzeInvocation(
+    protected override void AnalyzeNode(
         SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol migrationBase)
+        INamedTypeSymbol migrationBase,
+        INamedTypeSymbol cycleAttrType)
     {
-        InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
-
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "AddColumn");
+        if (result is null)
         {
             return;
         }
 
-        if (memberAccess.Name.Identifier.Text != "AddColumn")
-        {
-            return;
-        }
-
-        ISymbol? symbol = context.SemanticModel.GetSymbolInfo(invocation).Symbol;
-        if (symbol is not IMethodSymbol methodSymbol)
-        {
-            return;
-        }
-
-        if (methodSymbol.ContainingType.ToDisplayString()
-            != "Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder")
-        {
-            return;
-        }
-
-        INamedTypeSymbol? migrationClass =
-            MigrationAnalyzerHelpers.GetContainingClass(invocation, context.SemanticModel);
-        if (migrationClass is null)
-        {
-            return;
-        }
-
-        if (!MigrationAnalyzerHelpers.InheritsFromMigration(migrationClass, migrationBase))
-        {
-            return;
-        }
-
-        ArgumentListSyntax argList = invocation.ArgumentList;
+        ArgumentListSyntax argList = ((InvocationExpressionSyntax)context.Node).ArgumentList;
 
         // Safe: nullable: true
         if (MigrationAnalyzerHelpers.HasNamedArgumentWithTrueValue(argList, "nullable", context.SemanticModel))
@@ -128,6 +69,6 @@ public sealed class NullableColumnInExpandAnalyzer : DiagnosticAnalyzer
         }
 
         context.ReportDiagnostic(
-            Diagnostic.Create(Rule, invocation.GetLocation(), migrationClass.Name));
+            Diagnostic.Create(_rule, context.Node.GetLocation(), result.Value.MigrationClass.Name));
     }
 }

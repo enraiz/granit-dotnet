@@ -8,6 +8,7 @@
 using System.Net;
 using System.Text.Json;
 using FluentAssertions;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Exceptions;
 using Granit.Webhooks.Handlers;
@@ -25,6 +26,14 @@ public sealed class SendWebhookHandlerTests
 
     // Use the real no-op protector to avoid CA2012 when mocking ValueTask-returning methods.
     private readonly IWebhookSecretProtector _secretProtector = new NoOpWebhookSecretProtector();
+
+    private readonly IClock _clock;
+
+    public SendWebhookHandlerTests()
+    {
+        _clock = Substitute.For<IClock>();
+        _clock.Now.Returns(_ => DateTimeOffset.UtcNow);
+    }
 
     // -------------------------------------------------------------------------
     // Success
@@ -160,7 +169,7 @@ public sealed class SendWebhookHandlerTests
         HttpClient httpClient = new(new StaticResponseHandler(statusCode));
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        return new SendWebhookHandler(factory, _deliveryStore, _secretProtector, NullLogger<SendWebhookHandler>.Instance);
+        return new SendWebhookHandler(factory, _deliveryStore, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 
     private SendWebhookHandler BuildHandlerWithTimeout()
@@ -168,7 +177,7 @@ public sealed class SendWebhookHandlerTests
         HttpClient httpClient = new(new TimeoutHandler());
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        return new SendWebhookHandler(factory, _deliveryStore, _secretProtector, NullLogger<SendWebhookHandler>.Instance);
+        return new SendWebhookHandler(factory, _deliveryStore, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 
     private static SendWebhookCommand BuildCommand() => new()

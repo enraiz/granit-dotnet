@@ -2,8 +2,9 @@ using Granit.Authentication.Keycloak.Authentication;
 using Granit.Authentication.Keycloak.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Authentication.Keycloak.Extensions;
 
@@ -17,31 +18,41 @@ public static class KeycloakServiceCollectionExtensions
     /// enregistre <see cref="KeycloakClaimsTransformation"/> et la policy <c>"Admin"</c>.
     /// </summary>
     public static IServiceCollection AddGranitKeycloak(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        IConfigurationSection section = configuration.GetSection(KeycloakOptions.SectionName);
-        services.Configure<KeycloakOptions>(section);
-
-        KeycloakOptions options = section.Get<KeycloakOptions>() ?? new KeycloakOptions();
+        services
+            .AddOptions<KeycloakOptions>()
+            .BindConfiguration(KeycloakOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         // PostConfigure s'exécute après AddGranitJwtBearer (GranitJwtBearerModule),
         // permettant de surcharger Authority, Audience et NameClaimType pour Keycloak.
-        services.PostConfigureAll<JwtBearerOptions>(jwt =>
-        {
-            string audience = options.Audience ?? options.ClientId;
-            jwt.Authority = options.Authority;
-            jwt.Audience = audience;
-            jwt.RequireHttpsMetadata = options.RequireHttpsMetadata;
-            jwt.TokenValidationParameters.NameClaimType = "preferred_username";
-            jwt.TokenValidationParameters.ValidIssuer = options.Authority;
-            jwt.TokenValidationParameters.ValidAudience = audience;
-        });
+        // Deferred configuration: reads KeycloakOptions at resolution time.
+        services
+            .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .PostConfigure<IOptions<KeycloakOptions>>((jwt, keycloakOpts) =>
+            {
+                KeycloakOptions options = keycloakOpts.Value;
+                string audience = options.Audience ?? options.ClientId;
+                jwt.Authority = options.Authority;
+                jwt.Audience = audience;
+                jwt.RequireHttpsMetadata = options.RequireHttpsMetadata;
+                jwt.TokenValidationParameters.NameClaimType = "preferred_username";
+                jwt.TokenValidationParameters.ValidIssuer = options.Authority;
+                jwt.TokenValidationParameters.ValidAudience = audience;
+            });
 
         services.AddTransient<IClaimsTransformation, KeycloakClaimsTransformation>();
 
-        services.AddAuthorizationBuilder()
-            .AddPolicy("Admin", policy => policy.RequireRole(options.AdminRole));
+        // Deferred Admin policy: reads AdminRole from KeycloakOptions at resolution time.
+        services
+            .AddOptions<AuthorizationOptions>()
+            .Configure<IOptions<KeycloakOptions>>((authOpts, keycloakOpts) =>
+            {
+                authOpts.AddPolicy("Admin",
+                    policy => policy.RequireRole(keycloakOpts.Value.AdminRole));
+            });
 
         return services;
     }

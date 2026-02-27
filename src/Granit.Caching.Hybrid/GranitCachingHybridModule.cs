@@ -1,6 +1,7 @@
 using Granit.Caching.Hybrid.Extensions;
 using Granit.Caching.StackExchangeRedis;
 using Granit.Core.Modularity;
+using Granit.Timing;
 
 namespace Granit.Caching.Hybrid;
 
@@ -34,9 +35,10 @@ namespace Granit.Caching.Hybrid;
 /// </para>
 /// </remarks>
 [DependsOn(typeof(GranitCachingRedisModule))]
+[DependsOn(typeof(GranitTimingModule))]
 public sealed class GranitCachingHybridModule : GranitModule
 {
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitCachingHybrid(context.Configuration);
+        context.Services.AddGranitCachingHybrid();
 }

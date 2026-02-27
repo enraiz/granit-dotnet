@@ -1,8 +1,9 @@
+using System.Threading.Channels;
 using Granit.Core.Modularity;
 using Granit.Persistence;
 using Granit.Persistence.Migrations.Internal;
+using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
-using Granit.Wolverine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -13,8 +14,13 @@ namespace Granit.Persistence.Migrations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Registers provider-independent services: <see cref="IMigrationCycleRegistry"/> and
-/// the default <see cref="ITenantDbIsolator"/> (no-op).
+/// Registers provider-independent services: <see cref="IMigrationCycleRegistry"/>,
+/// the default <see cref="ITenantDbIsolator"/> (no-op), and the Channel-based
+/// <see cref="IMigrationBatchDispatcher"/> with its <see cref="MigrationBatchWorker"/>.
+/// </para>
+/// <para>
+/// Install <c>Granit.Persistence.Migrations.Wolverine</c> to replace the Channel-based
+/// dispatcher with an Outbox-backed <c>IMessageBus</c> implementation.
 /// </para>
 /// <para>
 /// <see cref="MigrationProgressDbContext"/> requires a provider-specific connection string
@@ -25,8 +31,7 @@ namespace Granit.Persistence.Migrations;
 /// </remarks>
 [DependsOn(
     typeof(GranitPersistenceModule),
-    typeof(GranitTimingModule),
-    typeof(GranitWolverineModule))]
+    typeof(GranitTimingModule))]
 public sealed class GranitPersistenceMigrationsModule : GranitModule
 {
     /// <inheritdoc/>
@@ -35,5 +40,11 @@ public sealed class GranitPersistenceMigrationsModule : GranitModule
         context.Services.TryAddSingleton<IMigrationCycleRegistry, MigrationCycleRegistry>();
         context.Services.TryAddSingleton<ITenantDbIsolator, NullTenantDbIsolator>();
         context.Services.TryAddSingleton<ITenantEnumerator, NullTenantEnumerator>();
+
+        // Channel-based dispatch (default). Replaced by Granit.Persistence.Migrations.Wolverine if installed.
+        context.Services.TryAddSingleton(Channel.CreateUnbounded<RunMigrationBatchCommand>());
+        context.Services.TryAddSingleton<IMigrationBatchDispatcher, ChannelBatchDispatcher>();
+        context.Services.AddScoped<MigrationBatchExecutor>();
+        context.Services.AddHostedService<MigrationBatchWorker>();
     }
 }

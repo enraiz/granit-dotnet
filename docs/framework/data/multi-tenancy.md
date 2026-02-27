@@ -32,6 +32,38 @@ ICurrentTenant.Change(id, name)  ←─ AsyncLocal, scope = durée de la requêt
 Handlers, Services, Intercepteurs EF Core (lisent ICurrentTenant)
 ```
 
+```mermaid
+sequenceDiagram
+    participant C as Client HTTP
+    participant TRM as TenantResolutionMiddleware
+    participant TRP as TenantResolverPipeline
+    participant HR as HeaderTenantResolver (100)
+    participant JR as JwtClaimTenantResolver (200)
+    participant CT as ICurrentTenant (AsyncLocal)
+    participant H as Handler / Service
+
+    C->>TRM: Requête HTTP
+    TRM->>TRP: Resolve(HttpContext)
+    TRP->>HR: ResolveAsync(context)
+    alt Header X-Tenant-Id présent
+        HR-->>TRP: TenantInfo(id, name)
+    else Header absent
+        HR-->>TRP: null
+        TRP->>JR: ResolveAsync(context)
+        alt Claim tenant_id présent
+            JR-->>TRP: TenantInfo(id, name)
+        else Claim absent
+            JR-->>TRP: null
+        end
+    end
+
+    TRP-->>TRM: TenantInfo ou null
+    TRM->>CT: Change(id, name) — scope AsyncLocal
+    TRM->>H: next(context)
+    H-->>TRM: Réponse
+    TRM->>CT: Dispose scope (restaure contexte précédent)
+```
+
 **Stratégie first-wins** : le premier résolveur qui retourne un tenant non-nul
 l'emporte. L'en-tête HTTP est prioritaire sur le claim JWT.
 

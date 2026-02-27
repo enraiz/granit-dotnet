@@ -40,7 +40,13 @@ public sealed class MyAppModule : GranitModule
 Pour les projets qui n'utilisent pas le système de modules :
 
 ```csharp
-builder.Services.AddGranitLocalization(options =>
+builder.Services.AddGranitLocalization();
+```
+
+La configuration des ressources se fait dans le module ou via `IConfigureOptions<GranitLocalizationOptions>` :
+
+```csharp
+services.Configure<GranitLocalizationOptions>(options =>
 {
     options.Resources
         .Add<MyAppResource>(defaultCulture: "fr")

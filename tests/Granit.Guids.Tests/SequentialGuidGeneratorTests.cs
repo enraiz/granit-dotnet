@@ -9,6 +9,7 @@
 // =============================================================================
 
 using FluentAssertions;
+using Granit.Timing;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Xunit;
@@ -25,7 +26,9 @@ public sealed class SequentialGuidGeneratorTests
         {
             DefaultSequentialGuidType = guidType
         });
-        return new SequentialGuidGenerator(options);
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(_ => DateTimeOffset.UtcNow);
+        return new SequentialGuidGenerator(options, clock);
     }
 
     [Fact]

@@ -40,11 +40,12 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddGranitJwtBearer_RegistersJwtBearerAuthOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
+        services.AddSingleton<IConfiguration>(config);
 
         // Act
-        services.AddGranitJwtBearer(config);
+        services.AddGranitJwtBearer();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -60,11 +61,12 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddGranitJwtBearer_RegistersJwtBearerAuthentication()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
+        services.AddSingleton<IConfiguration>(config);
 
         // Act
-        services.AddGranitJwtBearer(config);
+        services.AddGranitJwtBearer();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -85,11 +87,12 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddGranitJwtBearer_RegistersOnlyAuthenticatedPolicy()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
+        services.AddSingleton<IConfiguration>(config);
 
         // Act
-        services.AddGranitJwtBearer(config);
+        services.AddGranitJwtBearer();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -105,11 +108,12 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddGranitJwtBearer_RegistersCurrentUserService()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
+        services.AddSingleton<IConfiguration>(config);
 
         // Act
-        services.AddGranitJwtBearer(config);
+        services.AddGranitJwtBearer();
 
         // Assert
         ServiceDescriptor? descriptor = services.FirstOrDefault(
@@ -124,11 +128,12 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddGranitJwtBearer_RegistersHttpContextAccessor()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         IConfiguration config = CreateConfiguration();
+        services.AddSingleton<IConfiguration>(config);
 
         // Act
-        services.AddGranitJwtBearer(config);
+        services.AddGranitJwtBearer();
 
         // Assert
         ServiceDescriptor? descriptor = services.FirstOrDefault(
@@ -141,8 +146,8 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
     public void AddGranitJwtBearer_WithCustomNameClaimType_UsesConfiguredNameClaimType()
     {
         // Arrange
-        var services = new ServiceCollection();
-        IConfigurationRoot config = new ConfigurationBuilder()
+        ServiceCollection services = new();
+        IConfiguration config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Authentication:Authority"] = "https://auth.test.com/realms/test",
@@ -150,9 +155,10 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
                 ["Authentication:NameClaimType"] = "email"
             })
             .Build();
+        services.AddSingleton<IConfiguration>(config);
 
         // Act
-        services.AddGranitJwtBearer(config);
+        services.AddGranitJwtBearer();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 

@@ -1,6 +1,4 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -15,12 +13,12 @@ namespace Granit.Analyzers;
 /// compiled project (i.e., when <c>MigrationCycleAttribute</c> is found in the compilation).
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class DropColumnWithoutContractAnalyzer : DiagnosticAnalyzer
+public sealed class DropColumnWithoutContractAnalyzer : GranitMigrationAnalyzerBase
 {
     /// <summary>Diagnostic identifier.</summary>
     public const string DiagnosticId = "GRMIGA001";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor _rule = new(
         DiagnosticId,
         title: "DropColumn requires a Contract-phase annotation",
         messageFormat: "Migration '{0}' calls DropColumn but is not annotated with [MigrationCycle(MigrationPhase.Contract, ...)]",
@@ -31,85 +29,28 @@ public sealed class DropColumnWithoutContractAnalyzer : DiagnosticAnalyzer
             + "Annotate the migration class with [MigrationCycle(MigrationPhase.Contract, \"cycle-id\")].");
 
     /// <inheritdoc/>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+    protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    public override void Initialize(AnalysisContext context)
-    {
-        context.EnableConcurrentExecution();
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
-        context.RegisterCompilationStartAction(compilationContext =>
-        {
-            // Opt-in: only activate when Granit.Persistence.Migrations is referenced.
-            INamedTypeSymbol? cycleAttrSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Granit.Persistence.Migrations.MigrationCycleAttribute");
-            if (cycleAttrSymbol is null)
-            {
-                return;
-            }
-
-            INamedTypeSymbol? migrationSymbol = compilationContext.Compilation
-                .GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Migrations.Migration");
-            if (migrationSymbol is null)
-            {
-                return;
-            }
-
-            compilationContext.RegisterSyntaxNodeAction(
-                nodeContext => AnalyzeInvocation(nodeContext, migrationSymbol, cycleAttrSymbol),
-                SyntaxKind.InvocationExpression);
-        });
-    }
-
-    private static void AnalyzeInvocation(
+    protected override void AnalyzeNode(
         SyntaxNodeAnalysisContext context,
         INamedTypeSymbol migrationBase,
         INamedTypeSymbol cycleAttrType)
     {
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "DropColumn");
+        if (result is null)
+        {
+            return;
+        }
+
+        if (MigrationAnalyzerHelpers.HasContractAnnotation(result.Value.MigrationClass, cycleAttrType))
+        {
+            return;
+        }
+
         InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
-
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return;
-        }
-
-        if (memberAccess.Name.Identifier.Text != "DropColumn")
-        {
-            return;
-        }
-
-        ISymbol? symbol = context.SemanticModel.GetSymbolInfo(invocation).Symbol;
-        if (symbol is not IMethodSymbol methodSymbol)
-        {
-            return;
-        }
-
-        if (methodSymbol.ContainingType.ToDisplayString()
-            != "Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder")
-        {
-            return;
-        }
-
-        INamedTypeSymbol? migrationClass =
-            MigrationAnalyzerHelpers.GetContainingClass(invocation, context.SemanticModel);
-        if (migrationClass is null)
-        {
-            return;
-        }
-
-        if (!MigrationAnalyzerHelpers.InheritsFromMigration(migrationClass, migrationBase))
-        {
-            return;
-        }
-
-        if (MigrationAnalyzerHelpers.HasContractAnnotation(migrationClass, cycleAttrType))
-        {
-            return;
-        }
-
         context.ReportDiagnostic(
-            Diagnostic.Create(Rule, invocation.GetLocation(), migrationClass.Name));
+            Diagnostic.Create(_rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
     }
 }
