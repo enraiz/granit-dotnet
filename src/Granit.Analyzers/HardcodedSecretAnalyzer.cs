@@ -134,7 +134,7 @@ public sealed class HardcodedSecretAnalyzer : DiagnosticAnalyzer
                 return variableDecl.Identifier.Text;
             }
 
-            // Case 2: public string Password { get; } = "literal";
+            // Case 2: property declaration initializer
             if (equalsClause.Parent is PropertyDeclarationSyntax propertyDecl)
             {
                 return propertyDecl.Identifier.Text;
@@ -153,7 +153,7 @@ public sealed class HardcodedSecretAnalyzer : DiagnosticAnalyzer
             return argument.NameColon.Name.Identifier.Text;
         }
 
-        // Case 5: simple assignment — password = "literal";
+        // Case 5: simple assignment expression
         if (parent is AssignmentExpressionSyntax assignment
             && assignment.Left is IdentifierNameSyntax identifierName)
         {

@@ -78,6 +78,7 @@ public sealed class SendWebhookHandler(
             stopwatch.Stop();
             string timeoutMessage = $"Timeout delivering to {command.TargetUrl}";
             logger.LogWarning(
+                ex,
                 "Webhook delivery timeout for subscription {SubscriptionId} delivery {DeliveryId}",
                 command.SubscriptionId, command.DeliveryId);
 

@@ -32,7 +32,7 @@ internal sealed class ProblemDetailsResponseOperationTransformer : IOpenApiOpera
         bool hasRouteParameter = operation.Parameters?
             .Any(p => p.In == ParameterLocation.Path) ?? false;
 
-        operation.Responses ??= new OpenApiResponses();
+        operation.Responses ??= new();
 
         // Remove phantom 404 from Wolverine on endpoints without route parameters.
         if (!hasRouteParameter && operation.Responses.ContainsKey("404"))

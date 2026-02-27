@@ -26,7 +26,7 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
     {
         // Arrange
         ProblemDetailsResponseOperationTransformer transformer = new();
-        OpenApiOperation operation = new() { Responses = new OpenApiResponses() };
+        OpenApiOperation operation = new() { Responses = new() };
         OpenApiOperationTransformerContext context = BuildContext(new AuthorizeAttribute());
 
         // Act
@@ -48,7 +48,7 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         ProblemDetailsResponseOperationTransformer transformer = new();
         OpenApiOperation operation = new()
         {
-            Responses = new OpenApiResponses(),
+            Responses = new(),
             RequestBody = new OpenApiRequestBody(),
         };
         OpenApiOperationTransformerContext context = BuildContext(new AuthorizeAttribute());
@@ -146,7 +146,7 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
     {
         // Arrange
         ProblemDetailsResponseOperationTransformer transformer = new();
-        OpenApiOperation operation = new() { Responses = new OpenApiResponses() };
+        OpenApiOperation operation = new() { Responses = new() };
         OpenApiOperationTransformerContext context = BuildContext(
             new AuthorizeAttribute(), new AllowAnonymousAttribute());
 

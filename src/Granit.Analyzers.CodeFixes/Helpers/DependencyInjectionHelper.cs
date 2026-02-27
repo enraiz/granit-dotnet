@@ -30,7 +30,7 @@ internal static class DependencyInjectionHelper
             return classDecl;
         }
 
-        // Build: private readonly TypeName _fieldName;
+        // Create the field declaration node
         FieldDeclarationSyntax field = SyntaxFactory.FieldDeclaration(
             SyntaxFactory.VariableDeclaration(
                 SyntaxFactory.ParseTypeName(typeName),
@@ -74,7 +74,7 @@ internal static class DependencyInjectionHelper
             .OfType<ConstructorDeclarationSyntax>()
             .FirstOrDefault();
 
-        // Build the assignment statement: _field = paramName;
+        // Create the assignment statement node
         StatementSyntax assignment = SyntaxFactory.ExpressionStatement(
             SyntaxFactory.AssignmentExpression(
                 SyntaxKind.SimpleAssignmentExpression,

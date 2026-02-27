@@ -87,7 +87,7 @@ public sealed class LocalizationKeysGenerator : IIncrementalGenerator
                 return ImmutableArray<string>.Empty;
             }
 
-            List<string> keys = new List<string>();
+            List<string> keys = [];
             FlattenKeys(textsElement, "", keys);
             return keys.ToImmutableArray();
         }
@@ -130,16 +130,13 @@ public sealed class LocalizationKeysGenerator : IIncrementalGenerator
     {
         // Merge all keys (dedup, preserve order)
         HashSet<string> seen = new HashSet<string>(StringComparer.Ordinal);
-        List<string> allKeys = new List<string>();
+        List<string> allKeys = [];
 
         foreach (ImmutableArray<string> keys in allKeyCollections)
         {
-            foreach (string key in keys)
+            foreach (string key in keys.Where(seen.Add))
             {
-                if (seen.Add(key))
-                {
-                    allKeys.Add(key);
-                }
+                allKeys.Add(key);
             }
         }
 
@@ -186,7 +183,7 @@ public sealed class LocalizationKeysGenerator : IIncrementalGenerator
         // Split on ":" first (Granit convention: "ResourceName:KeyPath")
         string[] colonParts = key.Split(new[] { ':' }, 2);
 
-        List<string> segments = new List<string>();
+        List<string> segments = [];
 
         if (colonParts.Length == 2)
         {
@@ -217,17 +214,9 @@ public sealed class LocalizationKeysGenerator : IIncrementalGenerator
             {
                 // Intermediate segment — it becomes a nested class
                 string identifier = SanitizeIdentifier(segment);
-                KeyNode? child = null;
-                foreach (KeyNode c in current.Children)
-                {
-                    if (c.Name == identifier)
-                    {
-                        child = c;
-                        break;
-                    }
-                }
+                KeyNode? child = current.Children.FirstOrDefault(c => c.Name == identifier);
 
-                if (child == null)
+                if (child is null)
                 {
                     child = new KeyNode(identifier);
                     current.Children.Add(child);
@@ -330,8 +319,8 @@ public sealed class LocalizationKeysGenerator : IIncrementalGenerator
         }
 
         public string Name { get; }
-        public List<KeyNode> Children { get; } = new List<KeyNode>();
-        public List<KeyConstant> Constants { get; } = new List<KeyConstant>();
+        public List<KeyNode> Children { get; } = [];
+        public List<KeyConstant> Constants { get; } = [];
     }
 
     /// <summary>

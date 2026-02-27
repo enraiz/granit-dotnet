@@ -34,11 +34,11 @@ internal sealed partial class MigrationStartupService(
     ILogger<MigrationStartupService> logger) : IHostedService
 {
     /// <inheritdoc/>
-    public async Task StartAsync(CancellationToken ct)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
-            await ResumeAsync(ct);
+            await ResumeAsync(cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -47,7 +47,7 @@ internal sealed partial class MigrationStartupService(
     }
 
     /// <inheritdoc/>
-    public Task StopAsync(CancellationToken ct) => Task.CompletedTask;
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     private async Task ResumeAsync(CancellationToken ct)
     {

@@ -246,7 +246,7 @@ public sealed class LocalizationKeysGeneratorTests
 
         LocalizationKeysGenerator generator = new();
 
-        List<AdditionalText> additionalTexts = new();
+        List<AdditionalText> additionalTexts = [];
         for (int i = 0; i < jsonContents.Length; i++)
         {
             additionalTexts.Add(new InMemoryAdditionalText("Localization/file" + i + ".json", jsonContents[i]));

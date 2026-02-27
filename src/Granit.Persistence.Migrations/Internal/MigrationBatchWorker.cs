@@ -13,7 +13,7 @@ namespace Granit.Persistence.Migrations.Internal;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Graceful shutdown</b>: when Kubernetes sends SIGTERM, <paramref name="stoppingToken"/>
+/// <b>Graceful shutdown</b>: when Kubernetes sends SIGTERM, <c>stoppingToken</c>
 /// is cancelled. The worker finishes the <b>current batch</b> before exiting the cascade
 /// loop — it never interrupts a batch mid-execution, preventing partial migrations that
 /// would leave the database in an inconsistent state.

@@ -67,14 +67,9 @@ internal sealed class MigrationBatchExecutor(
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            logger.LogError(
-                ex,
-                "Migration batch failed for cycle '{CycleId}', tenant {TenantId}, cursor '{Cursor}'.",
-                command.CycleId, tenantId, command.Cursor);
-
             progress.Status = MigrationStatus.Failed;
             progress.Error = ex.Message.Length > 4000 ? ex.Message[..4000] : ex.Message;
-            await SaveProgressAsync(progress, command.CycleId, tenantId, ct);
+            await SaveProgressAsync(command.CycleId, tenantId, ct);
 
             throw;
         }
@@ -98,7 +93,7 @@ internal sealed class MigrationBatchExecutor(
                 command.CycleId, tenantId, result.ProcessedCount, result.NextCursor);
         }
 
-        await SaveProgressAsync(progress, command.CycleId, tenantId, ct);
+        await SaveProgressAsync(command.CycleId, tenantId, ct);
 
         return result.NextCursor is null
             ? null
@@ -133,7 +128,6 @@ internal sealed class MigrationBatchExecutor(
     }
 
     private async Task SaveProgressAsync(
-        MigrationProgress progress,
         string cycleId,
         Guid? tenantId,
         CancellationToken ct)
