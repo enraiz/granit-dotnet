@@ -47,12 +47,17 @@ public static class LocalizationEndpointRouteBuilderExtensions
     /// </para>
     /// </remarks>
     /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="configure">Optional delegate to customize <see cref="LocalizationEndpointsOptions"/>.</param>
     /// <returns>The endpoint route builder for chaining.</returns>
     public static IEndpointRouteBuilder MapGranitLocalization(
-        this IEndpointRouteBuilder endpoints)
+        this IEndpointRouteBuilder endpoints,
+        Action<LocalizationEndpointsOptions>? configure = null)
     {
+        LocalizationEndpointsOptions options = new();
+        configure?.Invoke(options);
+
         endpoints
-            .MapGet("/api/granit/localization", HandleGetLocalizationAsync)
+            .MapGet(options.RoutePrefix, HandleGetLocalizationAsync)
             .AllowAnonymous()
             .WithName("GetGranitLocalization")
             .WithTags("Granit")
@@ -80,12 +85,17 @@ public static class LocalizationEndpointRouteBuilderExtensions
     /// </para>
     /// </remarks>
     /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="configure">Optional delegate to customize <see cref="LocalizationEndpointsOptions"/>.</param>
     /// <returns>The route group builder for further chaining.</returns>
     public static RouteGroupBuilder MapGranitLocalizationOverrides(
-        this IEndpointRouteBuilder endpoints)
+        this IEndpointRouteBuilder endpoints,
+        Action<LocalizationEndpointsOptions>? configure = null)
     {
+        LocalizationEndpointsOptions options = new();
+        configure?.Invoke(options);
+
         RouteGroupBuilder group = endpoints
-            .MapGroup("/api/granit/localization/overrides")
+            .MapGroup($"{options.RoutePrefix}/overrides")
             .RequireAuthorization(LocalizationOverridesPermissions.Manage)
             .WithTags("Granit");
 

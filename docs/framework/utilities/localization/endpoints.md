@@ -31,7 +31,27 @@ var app = builder.Build();
 app.MapGranitLocalization();
 ```
 
+## Personnalisation du préfixe de route
+
+Le préfixe de route est configurable via `LocalizationEndpointsOptions`. Cela permet
+à chaque application de choisir son schéma de versioning d'URL :
+
+```csharp
+// Ajouter un segment de version
+app.MapGranitLocalization(opts => opts.RoutePrefix = "api/v1/granit/localization");
+app.MapGranitLocalizationOverrides(opts => opts.RoutePrefix = "api/v1/granit/localization");
+```
+
+Le préfixe par défaut est `api/granit/localization`. Les deux méthodes acceptent
+la même option indépendamment, ce qui permet de versionner l'un sans l'autre.
+
 ## Endpoint
+
+```text
+GET /{RoutePrefix}?cultureName={culture}
+```
+
+Par défaut :
 
 ```text
 GET /api/granit/localization?cultureName={culture}
