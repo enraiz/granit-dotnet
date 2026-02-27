@@ -29,10 +29,8 @@ public sealed class LegalDocumentRegistryTests
     }
 
     [Fact]
-    public void GetDefinition_UnknownDocument_ReturnsNull()
-    {
+    public void GetDefinition_UnknownDocument_ReturnsNull() =>
         _sut.GetDefinition("unknown").Should().BeNull();
-    }
 
     [Fact]
     public void GetDefinition_IsCaseInsensitive()

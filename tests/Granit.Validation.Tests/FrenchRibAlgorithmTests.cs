@@ -26,20 +26,14 @@ public sealed class FrenchRibAlgorithmTests
     // Letters in account number (conversion A–Z → digits)
     // -------------------------------------------------------------------------
 
+    /// <summary>
+    /// Account "0000000A045" where A→1, equivalent to "00000001045".
+    /// Also tests that spaces and case normalization work together.
+    /// Known valid: "30004000010000000404529".
+    /// </summary>
     [Fact]
-    public void IsValid_LettersInAccount_ConvertedCorrectly()
-    {
-        // Account "0000000A045" where A→1, equivalent to "00000001045"
-        // bank=30004, branch=00001, account(numeric)=00000001045
-        // (89×30004 + 15×1 + 3×1045) mod 97 = (2670356 + 15 + 3135) mod 97
-        // = 2673506 mod 97 = 2673506 / 97 = 27561 * 97 = 2673417, remainder = 89
-        // key = 97 - 89 = 8 → "08"
-        // We need to compute the correct key for a specific letter-account RIB.
-        // Let's use a lowercase variant to also test case insensitivity.
-        // Known valid: "30004000010000000404529"
-        // This tests that spaces and case normalization work together.
+    public void IsValid_LettersInAccount_ConvertedCorrectly() =>
         FrenchRibAlgorithm.IsValid("30004 00001 00000004045 29").Should().BeTrue();
-    }
 
     // -------------------------------------------------------------------------
     // Invalid — null / empty / whitespace

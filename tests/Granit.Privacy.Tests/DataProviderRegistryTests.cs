@@ -75,8 +75,6 @@ public sealed class DataProviderRegistryTests
     }
 
     [Fact]
-    public void Count_Empty_ReturnsZero()
-    {
+    public void Count_Empty_ReturnsZero() =>
         _sut.Count.Should().Be(0);
-    }
 }
