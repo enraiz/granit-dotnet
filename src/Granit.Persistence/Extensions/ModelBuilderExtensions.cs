@@ -18,6 +18,7 @@ public static class ModelBuilderExtensions
     /// <list type="bullet">
     ///   <item><see cref="ISoftDeletable"/> → WHERE IsDeleted = false</item>
     ///   <item><see cref="IActive"/> → WHERE IsActive = true</item>
+    ///   <item><see cref="IProcessingRestrictable"/> → WHERE IsProcessingRestricted = false</item>
     ///   <item>
     ///     <see cref="IMultiTenant"/> → WHERE TenantId = currentTenant.Id
     ///     (only when <paramref name="currentTenant"/> is provided)
@@ -55,10 +56,11 @@ public static class ModelBuilderExtensions
         {
             bool hasSoftDelete = typeof(ISoftDeletable).IsAssignableFrom(clrType);
             bool hasActive = typeof(IActive).IsAssignableFrom(clrType);
+            bool hasProcessingRestriction = typeof(IProcessingRestrictable).IsAssignableFrom(clrType);
             bool hasMultiTenant = typeof(IMultiTenant).IsAssignableFrom(clrType)
                 && currentTenant is not null;
 
-            if (!hasSoftDelete && !hasActive && !hasMultiTenant)
+            if (!hasSoftDelete && !hasActive && !hasProcessingRestriction && !hasMultiTenant)
             {
                 continue;
             }
@@ -105,6 +107,17 @@ public static class ModelBuilderExtensions
             conditions.Add(Expression.OrElse(bypass, isActive));
         }
 
+        if (typeof(IProcessingRestrictable).IsAssignableFrom(typeof(TEntity)))
+        {
+            // bypass = !proxy.ProcessingRestrictableEnabled
+            // real   = !e.IsProcessingRestricted
+            Expression bypass = Expression.Not(
+                Expression.Property(Expression.Constant(proxy), nameof(FilterProxy.ProcessingRestrictableEnabled)));
+            Expression notRestricted = Expression.Not(
+                Expression.Property(param, nameof(IProcessingRestrictable.IsProcessingRestricted)));
+            conditions.Add(Expression.OrElse(bypass, notRestricted));
+        }
+
         if (typeof(IMultiTenant).IsAssignableFrom(typeof(TEntity)) && currentTenant is not null)
         {
             // bypass = !proxy.MultiTenantEnabled
@@ -136,6 +149,7 @@ public static class ModelBuilderExtensions
 
         public bool SoftDeleteEnabled => _dataFilter?.IsEnabled<ISoftDeletable>() ?? true;
         public bool ActiveEnabled => _dataFilter?.IsEnabled<IActive>() ?? true;
+        public bool ProcessingRestrictableEnabled => _dataFilter?.IsEnabled<IProcessingRestrictable>() ?? true;
         public bool MultiTenantEnabled => _dataFilter?.IsEnabled<IMultiTenant>() ?? true;
     }
 }
