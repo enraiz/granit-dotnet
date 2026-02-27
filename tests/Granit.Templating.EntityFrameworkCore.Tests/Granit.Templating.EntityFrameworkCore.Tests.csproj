@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <!-- EF1001: expected when accessing internal DbContext via InternalsVisibleTo -->
+    <NoWarn>$(NoWarn);EF1001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,19 +13,12 @@
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="NSubstitute" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Templates/Billing.Invoice.html"
-        LogicalName="Granit.Templating.Tests.Templates.Billing.Invoice.html" />
-    <EmbeddedResource Include="Templates/Billing.Invoice.fr.html"
-        LogicalName="Granit.Templating.Tests.Templates.Billing.Invoice.fr.html"
-        WithCulture="false" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.Templating\Granit.Templating.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Templating.EntityFrameworkCore\Granit.Templating.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

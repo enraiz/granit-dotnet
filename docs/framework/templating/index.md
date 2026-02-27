@@ -6,11 +6,12 @@ binaires sont créés par des renderers dédiés.
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.Templating` | Socle générique : interfaces, pipeline, enrichisseurs, store |
-| `Granit.Templating.Scriban` | Moteur Scriban sandboxé + contextes globaux (`now.*`, `context.*`) |
+| `Granit.Templating` | Socle générique : interfaces, pipeline, enrichisseurs |
+| `Granit.Templating.Scriban` | Moteur Scriban 6 sandboxé + contextes globaux (`now.*`, `context.*`) |
 | `Granit.Templating.EntityFrameworkCore` | `IDocumentTemplateStore` EF Core — cycle de vie Draft/Published/Deprecated |
 | `Granit.DocumentGeneration` | Façade `IDocumentGenerator`, `IDocumentRenderer`, `DocumentResult` |
-| `Granit.DocumentGeneration.Pdf` | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête |
+| `Granit.DocumentGeneration.Pdf` | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête *(à venir)* |
+| `Granit.DocumentGeneration.Excel` | `ClosedXmlTemplateEngine` — génération de tableurs *.xlsx* *(à venir)* |
 
 ## Pipeline complet
 
@@ -68,6 +69,11 @@ Résolution de "Billing.Invoice" avec culture "fr-BE" :
   3. Si non trouvé → TemplateNotFoundException
 ```
 
+| Resolver | Priorité | Source |
+| --- | --- | --- |
+| `StoreTemplateResolver` | 100 | `IDocumentTemplateStore` (EF Core) — templates publiés |
+| `EmbeddedTemplateResolver` | -100 | Ressources embarquées dans l'assembly — fallback code |
+
 ### Enrichissement des données
 
 `ITemplateDataEnricher<TData>` permet d'enrichir le modèle avant le rendu (ex. : génération
@@ -110,10 +116,10 @@ Variables globales disponibles sans configuration :
 | `{{ now.month }}` | Mois | `02` |
 | `{{ now.day }}` | Jour | `27` |
 | `{{ now.time }}` | Heure | `14:35` |
-| `{{ context.culture }}` | Culture courante | `fr-BE` |
+| `{{ context.culture }}` | Culture courante (BCP 47) | `fr-BE` |
 | `{{ context.culture_name }}` | Nom de la culture | `français (Belgique)` |
-| `{{ context.tenant_id }}` | ID du tenant courant | `3fa85f64-…` |
-| `{{ context.tenant_name }}` | Nom du tenant | `Hôpital Saint-Luc` |
+| `{{ context.tenant_id }}` | ID du tenant courant | `3fa85f64-…` ou vide |
+| `{{ context.tenant_name }}` | Nom du tenant | `Hôpital Saint-Luc` ou vide |
 
 > **Sécurité :** les templates s'exécutent dans un `TemplateContext` sandboxé
 > (`EnableRelaxedMemberAccess = false`). Aucun accès I/O, réseau ou réflexion .NET
@@ -131,17 +137,18 @@ Draft → Published → Deprecated
 | `Published` | Version active ; une seule par clé à un instant donné |
 | `Deprecated` | Conservé pour la piste d'audit HDS — **jamais supprimé physiquement** |
 
-Seuls les brouillons (`Draft`) peuvent être supprimés. Les révisions dépréciées sont
-conservées 3 ans (obligation HDS article L. 1111-8 CSP).
+Seuls les brouillons (`Draft`) peuvent être supprimés physiquement. Les révisions dépréciées
+sont conservées sans limite de durée (obligation HDS, article L. 1111-8 CSP — 3 ans minimum).
 
 ## Installation
 
-### 1 — Module
+### 1 — Modules
 
 ```csharp
-// Avec moteur Scriban (recommandé)
+// Avec moteur Scriban et store EF Core (configuration complète recommandée)
 [DependsOn(
     typeof(GranitTemplatingScribanModule),
+    typeof(GranitTemplatingEntityFrameworkCoreModule),
     typeof(GranitDocumentGenerationModule))]
 public sealed class MyAppModule : GranitModule { }
 ```
@@ -152,16 +159,26 @@ public sealed class MyAppModule : GranitModule { }
 ### 2 — Enregistrement des services
 
 ```csharp
-// Templates embarqués dans l'assembly (résolution fallback)
+// Moteur Scriban (ITemplateEngine + contextes globaux now.* et context.*)
+builder.Services.AddGranitTemplatingWithScriban();
+
+// Store EF Core (IDocumentTemplateStore + StoreTemplateResolver, Priority = 100)
+builder.AddGranitTemplatingEntityFrameworkCore(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+// Templates embarqués dans l'assembly (résolution fallback, Priority = -100)
 builder.Services.AddEmbeddedTemplates(typeof(MyAppModule).Assembly);
 
-// Enrichisseur de données
+// Enrichisseur de données (optionnel)
 builder.Services.AddTemplateDataEnricher<InvoiceData, QrCodeEnricher>();
 
 // Contexte global personnalisé (optionnel)
 builder.Services.AddTemplateGlobalContext<MyCustomContext>();
 
-// Renderer PDF (nécessite Granit.DocumentGeneration.Pdf)
+// Façade de génération documentaire
+builder.Services.AddGranitDocumentGeneration();
+
+// Renderer PDF (nécessite Granit.DocumentGeneration.Pdf — à venir)
 builder.Services.AddDocumentRenderer<PuppeteerSharpRenderer>();
 ```
 
@@ -171,16 +188,30 @@ Convention de nommage pour les templates embarqués dans l'assembly :
 
 ```text
 {AssemblyName}.Templates.{TemplateName}.html        (neutre)
-{AssemblyName}.Templates.{TemplateName}.fr-BE.html  (spécifique culture)
+{AssemblyName}.Templates.{TemplateName}.fr.html     (spécifique culture)
 ```
 
-Marquer le fichier comme ressource embarquée dans le `.csproj` :
+Marquer les fichiers comme ressources embarquées dans le `.csproj` :
 
 ```xml
 <ItemGroup>
-  <EmbeddedResource Include="Templates\*.html" />
+  <!-- Fichier neutre -->
+  <EmbeddedResource Include="Templates/Billing.Invoice.html"
+      LogicalName="$(RootNamespace).Templates.Billing.Invoice.html" />
+
+  <!-- Fichier spécifique à une culture -->
+  <!-- WithCulture="false" empêche MSBuild de le placer dans une assembly satellite -->
+  <EmbeddedResource Include="Templates/Billing.Invoice.fr.html"
+      LogicalName="$(RootNamespace).Templates.Billing.Invoice.fr.html"
+      WithCulture="false" />
 </ItemGroup>
 ```
+
+> **Important :** tout fichier dont le nom contient un code de culture reconnu
+> (ex. `.fr.html`, `.fr-BE.html`) est automatiquement placé par MSBuild dans une
+> assembly satellite (`fr/MyApp.resources.dll`) et devient **invisible** à
+> `GetManifestResourceStream`. Les attributs `LogicalName` + `WithCulture="false"`
+> sont obligatoires pour les templates culture-spécifiques embarqués.
 
 ## Utilisation
 
@@ -223,6 +254,26 @@ DocumentResult excel = await generator.GenerateAsync(
     ct: ct);
 ```
 
+### Administration des templates (store EF Core)
+
+```csharp
+public sealed class TemplateAdminService(IDocumentTemplateStore store)
+{
+    // Créer ou mettre à jour un brouillon
+    public Task SaveDraftAsync(TemplateKey key, string html, CancellationToken ct)
+        => store.SaveDraftAsync(key, html, "text/html", "admin@digitaldynamics.be", ct);
+
+    // Publier le brouillon courant
+    public Task PublishAsync(TemplateKey key, CancellationToken ct)
+        => store.PublishAsync(key, "admin@digitaldynamics.be", ct);
+
+    // Consulter l'historique complet (audit HDS)
+    public Task<IReadOnlyList<TemplateDescriptor>> GetHistoryAsync(
+        TemplateKey key, CancellationToken ct)
+        => store.GetHistoryAsync(key, ct);
+}
+```
+
 ## Exceptions
 
 | Classe | Déclencheur |
@@ -234,42 +285,46 @@ DocumentResult excel = await generator.GenerateAsync(
 ## Architecture interne
 
 ```text
-ITextTemplateRenderer (TextTemplateRenderer — interne, scoped)
+ITextTemplateRenderer (TextTemplateRenderer — internal, scoped)
   ├── IEnumerable<ITemplateDataEnricher<TData>>   (résolution via IServiceProvider)
-  ├── IEnumerable<ITemplateResolver>               (ordonnés par Priority)
-  │     ├── EmbeddedTemplateResolver (Priority = -100)
-  │     └── StoreTemplateResolver    (Priority = 100, via EntityFrameworkCore)
+  ├── IEnumerable<ITemplateResolver>               (ordonnés par Priority décroissante)
+  │     ├── EmbeddedTemplateResolver  (Priority = -100)
+  │     └── StoreTemplateResolver     (Priority = 100, via Granit.Templating.EntityFrameworkCore)
   ├── ITemplateEngine (ScribanTemplateEngine — singleton)
   └── IEnumerable<ITemplateGlobalContext>          (singletons)
-        ├── NowGlobalContext            → now.*
+        ├── NowGlobalContext              → now.*
         └── ExecutionContextGlobalContext → context.*
 
-IDocumentGenerator (DocumentGenerator — interne, scoped)
+IDocumentGenerator (DocumentGenerator — internal, scoped)
   ├── ITextTemplateRenderer        (rendu HTML)
   └── IEnumerable<IDocumentRenderer>
-        └── PuppeteerSharpRenderer (singleton, via Granit.DocumentGeneration.Pdf)
+        ├── PuppeteerSharpRenderer (singleton, via Granit.DocumentGeneration.Pdf — à venir)
+        └── ClosedXmlRenderer      (singleton, via Granit.DocumentGeneration.Excel — à venir)
 ```
 
 ## Roadmap
 
 | Story | Statut | Description |
 | --- | --- | --- |
-| #327 | ✅ Terminé | `TemplateType<TData>` et `TextTemplateType<TData>` — typage fort |
-| #328 | ✅ Terminé | `ITemplateResolver` — chaîne de résolution par priorité |
-| #329 | ✅ Terminé | `ScribanTemplateEngine` — rendu sandboxé, contextes globaux |
-| #333 | ✅ Terminé | `ITemplateDataEnricher<TData>` — pipeline d'enrichissement immutable |
-| #334 | ✅ Terminé | `EmbeddedTemplateResolver` — résolution depuis les ressources embarquées |
-| #335 | ✅ Terminé | `IDocumentGenerator` et `IDocumentRenderer` — génération documentaire |
-| #331 | 🔜 Planifié | `IDocumentTemplateStore` EF Core — Draft/Published/Deprecated |
-| #330 | 🔜 Planifié | `PuppeteerSharpRenderer` — HTML → PDF |
-| #336 | 🔜 Planifié | `Granit.DocumentGeneration.Excel` — ClosedXML |
+| #327 | ✅ Terminé | Interfaces du pipeline (`ITextTemplateRenderer`, `ITemplateEngine`, `ITemplateResolver`) |
+| #328 | ✅ Terminé | Types de template fortement typés (`TextTemplateType<TData>`, `DocumentTemplateType<TData>`) |
+| #329 | ✅ Terminé | Rendu Scriban 6 sandboxé — scalaires, collections, conditions, snake_case |
+| #331 | ✅ Terminé | Store EF Core — cycle de vie Draft/Published/Deprecated + historique audit HDS |
+| #333 | ✅ Terminé | Traçabilité HDS — `RevisionId` propagé du store jusqu'au `DocumentResult` |
+| #335 | ✅ Terminé | Documentation complète |
+| #336 | ✅ Terminé | Variables globales Scriban : `NowGlobalContext` et `ExecutionContextGlobalContext` |
+| #338 | ✅ Terminé | Façade `IDocumentGenerator` et pipeline d'orchestration binaire |
+| #339 | ✅ Terminé | Pipeline d'enrichissement `ITemplateDataEnricher<TData>` |
+| #330 | 🔜 Planifié | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête |
+| #332 | 🔜 Planifié | Cache hybride des templates résolus avec invalidation sur publication |
+| #334 | 🔜 Planifié | `Granit.DocumentGeneration.Excel` — tableurs *.xlsx* via ClosedXML |
 | #340 | ⏸ Différé | PDF/A-3b — Factur-X (loi e-facture sept. 2026, licence iText7 en attente) |
 
 ## Conformité HDS / RGPD
 
 - **Piste d'audit** : `TemplateRevision.RevisionId` est propagé dans `RenderedContent.RevisionId`,
   permettant de tracer quelle version du template a produit chaque document.
-- **Immutabilité** : les révisions `Deprecated` ne sont jamais supprimées (3 ans HDS).
+- **Immutabilité** : les révisions `Deprecated` ne sont jamais supprimées physiquement.
 - **Données personnelles** : ne jamais exposer de PII dans les `ITemplateGlobalContext`.
   Les données sensibles (nom du patient, numéro de SS) transitent exclusivement via `TData`.
 - **Sandbox Scriban** : un template compromis ne peut pas accéder au système de fichiers,
@@ -280,9 +335,10 @@ IDocumentGenerator (DocumentGenerator — interne, scoped)
 | Package | Dépend de |
 | --- | --- |
 | `Granit.Templating` | `Granit.Core`, `Granit.Timing` |
-| `Granit.Templating.Scriban` | `Granit.Templating`, `Granit.Timing`, `Scriban 5.*` |
-| `Granit.Templating.EntityFrameworkCore` | `Granit.Templating` |
+| `Granit.Templating.Scriban` | `Granit.Templating`, `Granit.Timing`, `Scriban 6.*` |
+| `Granit.Templating.EntityFrameworkCore` | `Granit.Templating`, EF Core 10 |
 | `Granit.DocumentGeneration` | `Granit.Templating` |
 | `Granit.DocumentGeneration.Pdf` | `Granit.DocumentGeneration`, `PuppeteerSharp` |
+| `Granit.DocumentGeneration.Excel` | `Granit.DocumentGeneration`, `ClosedXML` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

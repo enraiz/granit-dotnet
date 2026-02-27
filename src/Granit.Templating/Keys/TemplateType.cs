@@ -28,6 +28,11 @@ public abstract class TemplateType<TData> where TData : notnull
     public abstract string Name { get; }
 
     /// <summary>
+    /// The CLR type of the data model associated with this template.
+    /// </summary>
+    public Type DataType => typeof(TData);
+
+    /// <summary>
     /// Assembly that contains the embedded template resources for this type.
     /// Defaults to the assembly that declares the concrete subclass.
     /// </summary>

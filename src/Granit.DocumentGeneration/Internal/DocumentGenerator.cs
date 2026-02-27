@@ -29,15 +29,7 @@ internal sealed class DocumentGenerator(
         RenderedTextResult textResult = await _textRenderer.RenderAsync(templateType, data, ct);
 
         // 2. Find a document renderer that supports the target format
-        IDocumentRenderer? renderer = null;
-        foreach (IDocumentRenderer candidate in _documentRenderers)
-        {
-            if (candidate.CanRender(format))
-            {
-                renderer = candidate;
-                break;
-            }
-        }
+        IDocumentRenderer? renderer = _documentRenderers.FirstOrDefault(r => r.CanRender(format));
 
         if (renderer is null)
         {

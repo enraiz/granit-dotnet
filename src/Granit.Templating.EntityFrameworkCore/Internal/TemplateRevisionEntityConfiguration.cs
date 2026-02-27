@@ -1,0 +1,68 @@
+using Granit.Templating.Store;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Granit.Templating.EntityFrameworkCore.Internal;
+
+/// <summary>
+/// EF Core Fluent API configuration for <see cref="TemplateRevisionEntity"/>.
+/// Table: <c>granit_template_revisions</c>.
+/// </summary>
+internal sealed class TemplateRevisionEntityConfiguration
+    : IEntityTypeConfiguration<TemplateRevisionEntity>
+{
+    /// <inheritdoc/>
+    public void Configure(EntityTypeBuilder<TemplateRevisionEntity> builder)
+    {
+        builder.ToTable("granit_template_revisions");
+
+        builder.HasKey(e => e.RevisionId);
+
+        builder.Property(e => e.TemplateName)
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(e => e.Culture)
+            .HasMaxLength(10);
+
+        // Content is unbounded — stored as TEXT in PostgreSQL, nvarchar(max) in SQL Server
+        builder.Property(e => e.Content)
+            .IsRequired();
+
+        builder.Property(e => e.MimeType)
+            .HasMaxLength(127)
+            .IsRequired();
+
+        // Store enum as string for readability and resilience to member reordering.
+        builder.Property(e => e.Status)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        builder.Property(e => e.CreatedAt)
+            .IsRequired();
+
+        builder.Property(e => e.CreatedBy)
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(e => e.PublishedAt);
+
+        builder.Property(e => e.PublishedBy)
+            .HasMaxLength(200);
+
+        // HDS: deprecation metadata retained for 3-year audit trail.
+        builder.Property(e => e.DeprecatedAt);
+
+        builder.Property(e => e.DeprecatedBy)
+            .HasMaxLength(200);
+
+        // Composite index for lifecycle queries: find draft/published by (name, culture, status)
+        builder.HasIndex(e => new { e.TemplateName, e.Culture, e.Status })
+            .HasDatabaseName("ix_granit_template_revisions_name_culture_status");
+
+        // Index for history queries: all revisions for a given key
+        builder.HasIndex(e => new { e.TemplateName, e.Culture })
+            .HasDatabaseName("ix_granit_template_revisions_name_culture");
+    }
+}
