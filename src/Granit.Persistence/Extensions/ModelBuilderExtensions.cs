@@ -14,14 +14,14 @@ namespace Granit.Persistence.Extensions;
 public static class ModelBuilderExtensions
 {
     /// <summary>
-    /// Applies Granit global query filters to all entity types in the model:
+    /// Applies Granit conventions to all entity types in the model:
     /// <list type="bullet">
-    ///   <item><see cref="ISoftDeletable"/> → WHERE IsDeleted = false</item>
-    ///   <item><see cref="IActive"/> → WHERE IsActive = true</item>
-    ///   <item><see cref="IProcessingRestrictable"/> → WHERE IsProcessingRestricted = false</item>
-    ///   <item>
-    ///     <see cref="IMultiTenant"/> → WHERE TenantId = currentTenant.Id
-    ///     (only when <paramref name="currentTenant"/> is provided)
+    ///   <item><b>Query filters</b>:
+    ///     <see cref="ISoftDeletable"/>, <see cref="IActive"/>,
+    ///     <see cref="IProcessingRestrictable"/>, <see cref="IMultiTenant"/>
+    ///   </item>
+    ///   <item><b>Translation conventions</b>:
+    ///     <see cref="ITranslation{TParent}"/> → FK, cascade delete, unique index (ParentId, Culture)
     ///   </item>
     /// </list>
     /// Entities implementing multiple filter interfaces receive a single combined
@@ -71,7 +71,56 @@ public static class ModelBuilderExtensions
                 .Invoke(null, [modelBuilder, currentTenant, proxy]);
         }
 
+        // --- Translation conventions ---
+        // Detects ITranslation<TParent> implementations and configures:
+        //   - FK from Translation.ParentId → Parent.Id with cascade delete
+        //   - Unique index on (ParentId, Culture)
+        //   - Culture max length (20, BCP 47)
+        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes().ToList())
+        {
+            Type? translationInterface = entityType.ClrType
+                .GetInterfaces()
+                .FirstOrDefault(i => i.IsGenericType
+                    && i.GetGenericTypeDefinition() == typeof(ITranslation<>));
+
+            if (translationInterface is null)
+            {
+                continue;
+            }
+
+            Type parentType = translationInterface.GetGenericArguments()[0];
+
+            typeof(ModelBuilderExtensions)
+                .GetMethod(nameof(ConfigureTranslation), BindingFlags.Static | BindingFlags.NonPublic)! // NOSONAR S3011 - intentional: generic EF Core convention pattern requires reflection
+                .MakeGenericMethod(entityType.ClrType, parentType)
+                .Invoke(null, [modelBuilder]);
+        }
+
         return modelBuilder;
+    }
+
+    // Configures a translation entity type: FK, cascade delete, unique index, Culture max length.
+    private static void ConfigureTranslation<TTranslation, TParent>(ModelBuilder modelBuilder)
+        where TTranslation : class, ITranslation<TParent>
+        where TParent : Entity
+    {
+        Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<TTranslation> builder =
+            modelBuilder.Entity<TTranslation>();
+
+        // Culture column: max 20 chars (BCP 47 — same as LocalizationOverride)
+        builder.Property(t => t.Culture)
+            .HasMaxLength(20)
+            .IsRequired();
+
+        // FK: Translation.ParentId → Parent.Id, cascade delete (HDS/RGPD compliance)
+        builder.HasOne(t => t.Parent)
+            .WithMany()
+            .HasForeignKey(t => t.ParentId)
+            .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Cascade);
+
+        // Unique index: one translation per (parent, culture)
+        builder.HasIndex(t => new { t.ParentId, t.Culture })
+            .IsUnique();
     }
 
     // Builds and registers a single combined HasQueryFilter for TEntity.

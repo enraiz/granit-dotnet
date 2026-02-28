@@ -29,6 +29,7 @@ Modélisation, accès, isolation et performance de la donnée.
 | [data-filtering.md](data/data-filtering.md) | IDataFilter, bypass des query filters globaux |
 | [caching.md](data/caching.md) | Cache distribué, invalidation, chiffrement des valeurs |
 | [multi-tenancy.md](data/multi-tenancy.md) | Isolation par tenant, résolution, filtrage automatique |
+| [translations.md](data/translations.md) | Entités traduisibles, résolution multilingue, conventions EF Core |
 
 ## Security
 

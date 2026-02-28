@@ -198,6 +198,53 @@ Le query filter `IActive` est activé automatiquement par `ApplyGranitConvention
 (voir [persistence.md](persistence.md#query-filter-iactive)). Il peut être désactivé
 ponctuellement via `IDataFilter` (voir [data-filtering.md](data-filtering.md)).
 
+## ITranslatable / ITranslation
+
+Interfaces pour les entités dont les propriétés textuelles sont stockées en plusieurs
+langues via une **table de traduction par entité**.
+
+```csharp
+public interface ITranslatable<TTranslation>
+{
+    ICollection<TTranslation> Translations { get; }
+}
+
+public interface ITranslation
+{
+    Guid ParentId { get; set; }
+    string Culture { get; set; }  // BCP 47
+}
+```
+
+Deux classes de base sont fournies :
+
+| Classe | Hérite de | Usage |
+| --- | --- | --- |
+| `Translation<TParent>` | `Entity` | Traduction sans audit |
+| `AuditedTranslation<TParent>` | `AuditedEntity` | Traduction avec audit HDS |
+
+Exemple :
+
+```csharp
+using Granit.Core.Domain;
+
+public sealed class Document : AuditedEntity, ITranslatable<DocumentTranslation>
+{
+    public string InternalCode { get; set; } = string.Empty;
+    public ICollection<DocumentTranslation> Translations { get; set; } = [];
+}
+
+public sealed class DocumentTranslation : AuditedTranslation<Document>
+{
+    public string Title { get; set; } = string.Empty;
+}
+```
+
+La configuration EF Core (FK, cascade delete, index unique) est appliquée
+automatiquement par `ApplyGranitConventions()`.
+
+Voir [translations.md](translations.md) pour la documentation complète.
+
 ## AuditLogEntry
 
 Classe scellée représentant une entrée de l'audit trail HDS. Enregistre qui a fait
@@ -232,6 +279,11 @@ Granit.Core
     ├── ISoftDeletable.cs           (suppression logique RGPD)
     ├── IMultiTenant.cs             (isolation par tenant, TenantId auto-injecté)
     ├── IActive.cs                  (filtre actif/inactif, WHERE IsActive = true)
+    ├── ITranslatable.cs            (entité parente traduisible)
+    ├── ITranslation.cs             (interface de traduction, Culture BCP 47)
+    ├── Translation.cs              (classe de base traduction, hérite Entity)
+    ├── AuditedTranslation.cs       (classe de base traduction HDS, hérite AuditedEntity)
+    ├── TranslatableExtensions.cs   (résolution in-memory, fallback / strict)
     └── AuditLogEntry.cs            (entrée d'audit trail)
 ```
 
