@@ -3,11 +3,11 @@
 // =============================================================================
 
 using System.Security.Claims;
-using FluentAssertions;
 using Granit.MultiTenancy;
 using Granit.MultiTenancy.Resolvers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.MultiTenancy.Tests;
@@ -35,7 +35,7 @@ public sealed class JwtClaimTenantResolverTests
     public void Order_Is_200()
     {
         JwtClaimTenantResolver resolver = CreateResolver();
-        resolver.Order.Should().Be(200);
+        resolver.Order.ShouldBe(200);
     }
 
     [Fact]
@@ -47,8 +47,8 @@ public sealed class JwtClaimTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(tenantId);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(tenantId);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public sealed class JwtClaimTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class JwtClaimTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public sealed class JwtClaimTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -93,8 +93,8 @@ public sealed class JwtClaimTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(tenantId);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(tenantId);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public sealed class JwtClaimTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -119,6 +119,6 @@ public sealed class JwtClaimTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 }

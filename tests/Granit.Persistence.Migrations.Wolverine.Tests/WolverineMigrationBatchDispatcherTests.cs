@@ -5,10 +5,10 @@
 // scoped service and sends each command via SendAsync.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.Migrations.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 

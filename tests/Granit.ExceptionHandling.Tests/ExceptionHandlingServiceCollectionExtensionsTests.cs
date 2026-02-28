@@ -8,13 +8,13 @@
 //   - ExceptionHandlingOptions is configurable
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ExceptionHandling;
 using Granit.ExceptionHandling.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ExceptionHandling.Tests;
@@ -34,7 +34,7 @@ public sealed class ExceptionHandlingServiceCollectionExtensionsTests
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
-        sp.GetService<IProblemDetailsService>().Should().NotBeNull();
+        sp.GetService<IProblemDetailsService>().ShouldNotBeNull();
     }
 
     [Fact]
@@ -46,8 +46,9 @@ public sealed class ExceptionHandlingServiceCollectionExtensionsTests
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
-        sp.GetService<IExceptionHandler>().Should().NotBeNull()
-            .And.BeOfType<GranitExceptionHandler>();
+        IExceptionHandler? handler = sp.GetService<IExceptionHandler>();
+        handler.ShouldNotBeNull();
+        handler.ShouldBeOfType<GranitExceptionHandler>();
     }
 
     [Fact]
@@ -60,7 +61,7 @@ public sealed class ExceptionHandlingServiceCollectionExtensionsTests
         using ServiceProvider sp = services.BuildServiceProvider();
 
         IExceptionStatusCodeMapper mapper = sp.GetRequiredService<IExceptionStatusCodeMapper>();
-        mapper.Should().BeOfType<DefaultExceptionStatusCodeMapper>();
+        mapper.ShouldBeOfType<DefaultExceptionStatusCodeMapper>();
     }
 
     // -------------------------------------------------------------------------
@@ -77,8 +78,7 @@ public sealed class ExceptionHandlingServiceCollectionExtensionsTests
         using ServiceProvider sp = services.BuildServiceProvider();
 
         ExceptionHandlingOptions opts = sp.GetRequiredService<IOptions<ExceptionHandlingOptions>>().Value;
-        opts.ExposeInternalErrorDetails.Should().BeFalse(
-            "internal error details must never be exposed by default (HDS production rule)");
+        opts.ExposeInternalErrorDetails.ShouldBeFalse("internal error details must never be exposed by default (HDS production rule)");
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public sealed class ExceptionHandlingServiceCollectionExtensionsTests
         using ServiceProvider sp = services.BuildServiceProvider();
 
         ExceptionHandlingOptions opts = sp.GetRequiredService<IOptions<ExceptionHandlingOptions>>().Value;
-        opts.ExposeInternalErrorDetails.Should().BeTrue();
+        opts.ExposeInternalErrorDetails.ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public sealed class ExceptionHandlingServiceCollectionExtensionsTests
 
         System.Collections.Generic.IEnumerable<IExceptionStatusCodeMapper> mappers =
             sp.GetServices<IExceptionStatusCodeMapper>();
-        mappers.Should().HaveCount(2);
+        mappers.Count().ShouldBe(2);
     }
 
     private sealed class CustomPriorityMapper : IExceptionStatusCodeMapper

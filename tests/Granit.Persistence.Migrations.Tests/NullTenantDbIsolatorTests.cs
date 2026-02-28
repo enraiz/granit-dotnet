@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -16,7 +16,7 @@ public sealed class NullTenantDbIsolatorTests
 
         Func<Task> act = () => isolator.IsolateAsync(context, Guid.NewGuid(), CancellationToken.None);
 
-        await act.Should().NotThrowAsync();
-        context.ReceivedCalls().Should().BeEmpty();
+        await Should.NotThrowAsync(act);
+        context.ReceivedCalls().ShouldBeEmpty();
     }
 }

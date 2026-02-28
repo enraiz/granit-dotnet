@@ -8,7 +8,6 @@
 //   - No registration when ExceptionHandling is not configured
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ExceptionHandling;
 using Granit.ExceptionHandling.Extensions;
 using Granit.Persistence.ExceptionHandling;
@@ -16,6 +15,7 @@ using Granit.Persistence.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -33,7 +33,7 @@ public sealed class EfCoreExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new DbUpdateConcurrencyException());
 
-        result.Should().Be(StatusCodes.Status409Conflict);
+        result.ShouldBe(StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class EfCoreExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new InvalidOperationException("unrelated"));
 
-        result.Should().BeNull("EfCoreMapper must delegate unknown exceptions to the next mapper");
+        result.ShouldBeNull("EfCoreMapper must delegate unknown exceptions to the next mapper");
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class EfCoreExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new ArgumentException("unrelated"));
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -75,7 +75,7 @@ public sealed class EfCoreExceptionStatusCodeMapperTests
         System.Collections.Generic.IEnumerable<IExceptionStatusCodeMapper> mappers =
             sp.GetServices<IExceptionStatusCodeMapper>();
 
-        mappers.Should().Contain(m => m is EfCoreExceptionStatusCodeMapper,
+        mappers.ShouldContain(m => m is EfCoreExceptionStatusCodeMapper,
             "EfCoreExceptionStatusCodeMapper must be registered when ExceptionHandling is active");
     }
 
@@ -93,7 +93,7 @@ public sealed class EfCoreExceptionStatusCodeMapperTests
         System.Collections.Generic.IEnumerable<IExceptionStatusCodeMapper> mappers =
             sp.GetServices<IExceptionStatusCodeMapper>();
 
-        mappers.Should().NotContain(m => m is EfCoreExceptionStatusCodeMapper,
+        mappers.ShouldNotContain(m => m is EfCoreExceptionStatusCodeMapper,
             "EfCoreExceptionStatusCodeMapper must not be registered without ExceptionHandling");
     }
 }

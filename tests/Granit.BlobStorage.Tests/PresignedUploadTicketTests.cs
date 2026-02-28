@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.Tests;
@@ -18,11 +18,11 @@ public sealed class PresignedUploadTicketTests
 
         PresignedUploadTicket ticket = new(blobId, uploadUrl, "PUT", expiresAt, headers);
 
-        ticket.BlobId.Should().Be(blobId);
-        ticket.UploadUrl.Should().Be(uploadUrl);
-        ticket.HttpMethod.Should().Be("PUT");
-        ticket.ExpiresAt.Should().Be(expiresAt);
-        ticket.RequiredHeaders.Should().ContainKey("Content-Type");
+        ticket.BlobId.ShouldBe(blobId);
+        ticket.UploadUrl.ShouldBe(uploadUrl);
+        ticket.HttpMethod.ShouldBe("PUT");
+        ticket.ExpiresAt.ShouldBe(expiresAt);
+        ticket.RequiredHeaders.ShouldContainKey("Content-Type");
     }
 
     [Fact]
@@ -36,6 +36,6 @@ public sealed class PresignedUploadTicketTests
         PresignedUploadTicket a = new(blobId, url, "PUT", expiry, headers);
         PresignedUploadTicket b = new(blobId, url, "PUT", expiry, headers);
 
-        a.Should().Be(b);
+        a.ShouldBe(b);
     }
 }

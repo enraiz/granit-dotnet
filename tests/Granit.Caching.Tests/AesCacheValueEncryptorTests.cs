@@ -8,8 +8,8 @@
 // =============================================================================
 
 using System.Security.Cryptography;
-using FluentAssertions;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -41,7 +41,7 @@ public sealed class AesCacheValueEncryptorTests
         byte[] decrypted = encryptor.Decrypt(ciphertext);
 
         // Assert
-        decrypted.Should().BeEquivalentTo(plaintext);
+        decrypted.ShouldBe(plaintext);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class AesCacheValueEncryptorTests
         byte[] cipher2 = encryptor.Encrypt(plaintext);
 
         // Assert
-        cipher1.Should().NotBeEquivalentTo(cipher2, "l'IV aléatoire doit produire des ciphertexts distincts");
+        cipher1.ShouldNotBe(cipher2, "l'IV aléatoire doit produire des ciphertexts distincts");
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class AesCacheValueEncryptorTests
         byte[] ciphertext = encryptor.Encrypt(plaintext);
 
         // Assert — le ciphertext doit être plus long que l'IV seul (16 octets)
-        ciphertext.Length.Should().BeGreaterThan(16);
+        ciphertext.Length.ShouldBeGreaterThan(16);
     }
 
     [Fact]
@@ -85,8 +85,7 @@ public sealed class AesCacheValueEncryptorTests
         Action act = () => _ = new AesCacheValueEncryptor(Options.Create(opts));
 
         // Assert
-        act.Should().Throw<ArgumentException>()
-            .WithMessage("*256*");
+        Should.Throw<ArgumentException>(act).Message.ShouldContain("256");
     }
 
     [Fact]
@@ -99,7 +98,7 @@ public sealed class AesCacheValueEncryptorTests
         Action act = () => _ = new AesCacheValueEncryptor(Options.Create(opts));
 
         // Assert
-        act.Should().Throw<InvalidOperationException>();
+        Should.Throw<InvalidOperationException>(act);
     }
 
     [Fact]
@@ -114,7 +113,7 @@ public sealed class AesCacheValueEncryptorTests
         byte[] decrypted = encryptor.Decrypt(ciphertext);
 
         // Assert
-        decrypted.Should().BeEmpty();
+        decrypted.ShouldBeEmpty();
     }
 
     [Fact]
@@ -128,7 +127,6 @@ public sealed class AesCacheValueEncryptorTests
         Action act = () => encryptor.Decrypt(tooShort);
 
         // Assert
-        act.Should().Throw<ArgumentException>()
-            .WithMessage("*16*");
+        Should.Throw<ArgumentException>(act).Message.ShouldContain("16");
     }
 }

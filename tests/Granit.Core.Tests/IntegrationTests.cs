@@ -7,11 +7,11 @@
 //   - UseGranit() appelle OnApplicationInitialization
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Extensions;
 using Granit.Core.Modularity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests;
@@ -76,10 +76,10 @@ public sealed class IntegrationTests
 
         // Assert
         var granitApp = app.Services.GetService<GranitApplication>();
-        granitApp.Should().NotBeNull();
+        granitApp.ShouldNotBeNull();
 
         var secondResolve = app.Services.GetService<GranitApplication>();
-        secondResolve.Should().BeSameAs(granitApp);
+        secondResolve.ShouldBeSameAs(granitApp);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public sealed class IntegrationTests
 
         // Assert - TestLeafModule enregistre ITestService
         var service = app.Services.GetService<ITestService>();
-        service.Should().NotBeNull();
+        service.ShouldNotBeNull();
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public sealed class IntegrationTests
         app.UseGranit();
 
         // Assert
-        _initializationCalled.Should().BeTrue();
+        _initializationCalled.ShouldBeTrue();
     }
 
     [Fact]
@@ -124,9 +124,8 @@ public sealed class IntegrationTests
 
         // Assert
         var granitApp = app.Services.GetRequiredService<GranitApplication>();
-        granitApp.GetModuleTypes().Should().ContainInOrder(
-            typeof(TestLeafModule),
-            typeof(TestRootModule));
+        granitApp.GetModuleTypes().ShouldBe(new[] { typeof(TestLeafModule),
+            typeof(TestRootModule) });
     }
 
     // --- Tests async ---
@@ -143,10 +142,10 @@ public sealed class IntegrationTests
 
         // Assert
         var granitApp = app.Services.GetService<GranitApplication>();
-        granitApp.Should().NotBeNull();
+        granitApp.ShouldNotBeNull();
 
         var secondResolve = app.Services.GetService<GranitApplication>();
-        secondResolve.Should().BeSameAs(granitApp);
+        secondResolve.ShouldBeSameAs(granitApp);
     }
 
     [Fact]
@@ -161,7 +160,7 @@ public sealed class IntegrationTests
 
         // Assert - AsyncTestLeafModule enregistre ITestService via ConfigureServicesAsync
         var service = app.Services.GetService<ITestService>();
-        service.Should().NotBeNull();
+        service.ShouldNotBeNull();
     }
 
     [Fact]
@@ -176,7 +175,7 @@ public sealed class IntegrationTests
         await app.UseGranitAsync();
 
         // Assert
-        _asyncInitializationCalled.Should().BeTrue();
+        _asyncInitializationCalled.ShouldBeTrue();
     }
 
     [Fact]
@@ -191,8 +190,7 @@ public sealed class IntegrationTests
 
         // Assert
         var granitApp = app.Services.GetRequiredService<GranitApplication>();
-        granitApp.GetModuleTypes().Should().ContainInOrder(
-            typeof(AsyncTestLeafModule),
-            typeof(AsyncTestRootModule));
+        granitApp.GetModuleTypes().ShouldBe(new[] { typeof(AsyncTestLeafModule),
+            typeof(AsyncTestRootModule) });
     }
 }

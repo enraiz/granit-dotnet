@@ -7,12 +7,12 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.WhatsApp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.WhatsApp.Tests;
@@ -93,8 +93,8 @@ public sealed class WhatsAppNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.Language.Should().Be("en");
+        captured.ShouldNotBeNull();
+        captured!.Language.ShouldBe("en");
     }
 
     [Fact]
@@ -112,8 +112,8 @@ public sealed class WhatsAppNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.Language.Should().Be("de");
+        captured.ShouldNotBeNull();
+        captured!.Language.ShouldBe("de");
     }
 
     [Fact]
@@ -131,13 +131,13 @@ public sealed class WhatsAppNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.Language.Should().Be("fr");
+        captured.ShouldNotBeNull();
+        captured!.Language.ShouldBe("fr");
     }
 
     [Fact]
     public void Name_ReturnsWhatsApp() =>
-        _channel.Name.Should().Be(NotificationChannels.WhatsApp);
+        _channel.Name.ShouldBe(NotificationChannels.WhatsApp);
 
     // -------------------------------------------------------------------------
     // Helpers

@@ -5,8 +5,8 @@
 // et qu'il n'est pas héritable (sealed) ni répétable (AllowMultiple = false).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiDocumentation.Attributes;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -23,8 +23,8 @@ public sealed class InternalApiAttributeTests
             .FirstOrDefault();
 
         // Assert
-        usage.Should().NotBeNull();
-        usage!.ValidOn.Should().HaveFlag(AttributeTargets.Class);
+        usage.ShouldNotBeNull();
+        usage!.ValidOn.HasFlag(AttributeTargets.Class).ShouldBeTrue();
     }
 
     [Fact]
@@ -37,8 +37,8 @@ public sealed class InternalApiAttributeTests
             .FirstOrDefault();
 
         // Assert
-        usage.Should().NotBeNull();
-        usage!.ValidOn.Should().HaveFlag(AttributeTargets.Method);
+        usage.ShouldNotBeNull();
+        usage!.ValidOn.HasFlag(AttributeTargets.Method).ShouldBeTrue();
     }
 
     [Fact]
@@ -51,11 +51,11 @@ public sealed class InternalApiAttributeTests
             .FirstOrDefault();
 
         // Assert
-        usage.Should().NotBeNull();
-        usage!.AllowMultiple.Should().BeFalse();
+        usage.ShouldNotBeNull();
+        usage!.AllowMultiple.ShouldBeFalse();
     }
 
     [Fact]
     public void InternalApiAttribute_IsAttribute() =>
-        typeof(InternalApiAttribute).Should().BeAssignableTo<Attribute>();
+        typeof(InternalApiAttribute).IsAssignableTo(typeof(Attribute)).ShouldBeTrue();
 }

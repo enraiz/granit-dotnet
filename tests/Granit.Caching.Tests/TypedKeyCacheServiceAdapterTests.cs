@@ -7,11 +7,11 @@
 // pour éviter d'exposer des types internes aux générateurs de proxy NSubstitute.
 // =============================================================================
 
-using FluentAssertions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -52,8 +52,8 @@ public sealed class TypedKeyCacheServiceAdapterTests
             await stringSvc.GetAsync(id.ToString(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(id);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(id);
     }
 
     [Fact]
@@ -75,8 +75,8 @@ public sealed class TypedKeyCacheServiceAdapterTests
             await typedSvc.GetAsync(id, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().NotBeNull();
-        result!.Name.Should().Be("Bob");
+        result.ShouldNotBeNull();
+        result!.Name.ShouldBe("Bob");
     }
 
     [Fact]
@@ -103,8 +103,8 @@ public sealed class TypedKeyCacheServiceAdapterTests
             TestContext.Current.CancellationToken);
 
         // Assert
-        result.Id.Should().Be(id);
-        callCount.Should().Be(1);
+        result.Id.ShouldBe(id);
+        callCount.ShouldBe(1);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
             await typedSvc.GetAsync(id, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -147,8 +147,8 @@ public sealed class TypedKeyCacheServiceAdapterTests
             await typedSvc.GetAsync("string-key", TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().NotBeNull();
-        result!.Name.Should().Be("Eve");
+        result.ShouldNotBeNull();
+        result!.Name.ShouldBe("Eve");
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
             TestContext.Current.CancellationToken);
 
         // Assert
-        result.Id.Should().Be(expected.Id);
+        result.Id.ShouldBe(expected.Id);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
             await typedSvc.GetAsync("string-key-3", TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
             await typedSvc.GetAsync("remove-key", TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -223,6 +223,6 @@ public sealed class TypedKeyCacheServiceAdapterTests
         Func<Task> act = () => typedSvc.RefreshAsync("refresh-key", TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 }

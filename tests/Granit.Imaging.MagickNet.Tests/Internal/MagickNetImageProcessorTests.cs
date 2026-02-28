@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Imaging.MagickNet.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Imaging.MagickNet.Tests.Internal;
@@ -30,9 +30,9 @@ public sealed class MagickNetImageProcessorTests
         IImagePipeline pipeline = _processor.Load(stream);
 
         // Assert
-        pipeline.SourceFormat.Should().Be(ImageFormat.Png);
-        pipeline.SourceSize.Width.Should().Be(100);
-        pipeline.SourceSize.Height.Should().Be(100);
+        pipeline.SourceFormat.ShouldBe(ImageFormat.Png);
+        pipeline.SourceSize.Width.ShouldBe(100);
+        pipeline.SourceSize.Height.ShouldBe(100);
     }
 
     [Fact]
@@ -45,12 +45,12 @@ public sealed class MagickNetImageProcessorTests
         IImagePipeline pipeline = _processor.Load(bytes);
 
         // Assert
-        pipeline.SourceFormat.Should().Be(ImageFormat.Png);
-        pipeline.SourceSize.Should().Be(new ImageSize(100, 100));
+        pipeline.SourceFormat.ShouldBe(ImageFormat.Png);
+        pipeline.SourceSize.ShouldBe(new ImageSize(100, 100));
     }
 
     [Fact]
-    public void Load_FromStream_PipelineIsDisposable()
+    public async Task Load_FromStream_PipelineIsDisposable()
     {
         // Arrange
         using Stream stream = GetTestImageStream();
@@ -60,6 +60,6 @@ public sealed class MagickNetImageProcessorTests
 
         // Assert
         Func<Task> act = () => pipeline.DisposeAsync().AsTask();
-        act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 }

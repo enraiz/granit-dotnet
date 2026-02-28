@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Definitions;
 using Xunit;
 
@@ -17,8 +17,8 @@ public sealed class FeatureDefinitionContextTests
 
         FeatureGroupDefinition group = context.AddGroup("Guava");
 
-        group.Name.Should().Be("Guava");
-        group.DisplayName.Should().BeNull();
+        group.Name.ShouldBe("Guava");
+        group.DisplayName.ShouldBeNull();
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public sealed class FeatureDefinitionContextTests
 
         FeatureGroupDefinition group = context.AddGroup("Guava", "Guava Features");
 
-        group.DisplayName.Should().Be("Guava Features");
+        group.DisplayName.ShouldBe("Guava Features");
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public sealed class FeatureDefinitionContextTests
         FeatureGroupDefinition group1 = context.AddGroup("Guava");
         FeatureGroupDefinition group2 = context.AddGroup("Billing");
 
-        group1.Should().NotBeSameAs(group2);
+        group1.ShouldNotBeSameAs(group2);
     }
 
     // -------------------------------------------------------------------------
@@ -53,7 +53,7 @@ public sealed class FeatureDefinitionContextTests
 
         IEnumerable<FeatureDefinition> definitions = context.GetAllDefinitions();
 
-        definitions.Should().BeEmpty();
+        definitions.ShouldBeEmpty();
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class FeatureDefinitionContextTests
 
         IEnumerable<FeatureDefinition> definitions = context.GetAllDefinitions();
 
-        definitions.Should().BeEmpty();
+        definitions.ShouldBeEmpty();
     }
 
     [Fact]
@@ -80,8 +80,7 @@ public sealed class FeatureDefinitionContextTests
 
         List<FeatureDefinition> definitions = context.GetAllDefinitions().ToList();
 
-        definitions.Should().HaveCount(3);
-        definitions.Select(d => d.Name).Should().Contain(
-            ["Guava.Video", "Guava.MaxPatients", "Billing.Invoices"]);
+        definitions.Count.ShouldBe(3);
+        definitions.Select(d => d.Name).ShouldContain(["Guava.Video", "Guava.MaxPatients", "Billing.Invoices"]);
     }
 }

@@ -5,11 +5,11 @@
 // (TenantId = null); deactivation.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Timing;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Internal;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Webhooks.Tests;
@@ -36,7 +36,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
         IReadOnlyList<WebhookSubscription> result =
             await _store.GetActiveSubscriptionsAsync("test.event", tenantId, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(1);
+        result.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
         IReadOnlyList<WebhookSubscription> result =
             await _store.GetActiveSubscriptionsAsync("test.event", tenantId, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
+        result.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
         IReadOnlyList<WebhookSubscription> result =
             await _store.GetActiveSubscriptionsAsync("test.event", tenantB, TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
         IReadOnlyList<WebhookSubscription> result =
             await _store.GetActiveSubscriptionsAsync("unknown.event", Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -82,8 +82,8 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
 
         WebhookSubscription? found = await _store.FindByIdAsync(sub.Id, TestContext.Current.CancellationToken);
 
-        found.Should().NotBeNull();
-        found!.Id.Should().Be(sub.Id);
+        found.ShouldNotBeNull();
+        found!.Id.ShouldBe(sub.Id);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
     {
         WebhookSubscription? found = await _store.FindByIdAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        found.Should().BeNull();
+        found.ShouldBeNull();
     }
 
     [Fact]
@@ -103,8 +103,8 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
         await _store.DeactivateAsync(sub.Id, "test reason", TestContext.Current.CancellationToken);
 
         WebhookSubscription? updated = await _store.FindByIdAsync(sub.Id, TestContext.Current.CancellationToken);
-        updated!.Status.Should().Be(WebhookSubscriptionStatus.Deactivated);
-        updated.DeactivationReason.Should().Be("test reason");
+        updated!.Status.ShouldBe(WebhookSubscriptionStatus.Deactivated);
+        updated.DeactivationReason.ShouldBe("test reason");
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
     {
         Func<Task> act = () => _store.DeactivateAsync(Guid.NewGuid(), "reason", TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // -------------------------------------------------------------------------

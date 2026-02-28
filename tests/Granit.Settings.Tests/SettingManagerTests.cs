@@ -5,7 +5,6 @@
 // les portées Global, Tenant et User.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Caching;
 using Granit.Settings.Definitions;
 using Granit.Settings.Providers;
@@ -13,6 +12,7 @@ using Granit.Settings.Services;
 using Granit.Settings.Stores;
 using Granit.Settings.Values;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -57,8 +57,8 @@ public sealed class SettingManagerTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
-        stored.Should().NotBeNull();
-        stored!.Value.Should().Be("light");
+        stored.ShouldNotBeNull();
+        stored!.Value.ShouldBe("light");
     }
 
     [Fact]
@@ -81,8 +81,7 @@ public sealed class SettingManagerTests
 
         Func<Task> act = () => manager.SetGlobalAsync("Unknown.Setting", "value");
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*Unknown.Setting*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("Unknown.Setting");
     }
 
     // -------------------------------------------------------------------------
@@ -100,8 +99,8 @@ public sealed class SettingManagerTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "T", tenantId.ToString(), TestContext.Current.CancellationToken);
-        stored.Should().NotBeNull();
-        stored!.Value.Should().Be("blue");
+        stored.ShouldNotBeNull();
+        stored!.Value.ShouldBe("blue");
     }
 
     [Fact]
@@ -132,8 +131,8 @@ public sealed class SettingManagerTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "U", "user-42", TestContext.Current.CancellationToken);
-        stored.Should().NotBeNull();
-        stored!.Value.Should().Be("red");
+        stored.ShouldNotBeNull();
+        stored!.Value.ShouldBe("red");
     }
 
     [Fact]
@@ -143,7 +142,7 @@ public sealed class SettingManagerTests
 
         Func<Task> act = () => manager.SetForUserAsync("", "App.Theme", "value");
 
-        await act.Should().ThrowAsync<ArgumentException>();
+        await Should.ThrowAsync<ArgumentException>(act);
     }
 
     // -------------------------------------------------------------------------
@@ -163,7 +162,7 @@ public sealed class SettingManagerTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
-        stored.Should().BeNull("la suppression doit retirer l'entrée du store");
+        stored.ShouldBeNull("la suppression doit retirer l'entrée du store");
 
         await cache.Received(1).RemoveAsync(
             Arg.Is<string>(k => k.Contains('G') && k.Contains("App.Theme")),

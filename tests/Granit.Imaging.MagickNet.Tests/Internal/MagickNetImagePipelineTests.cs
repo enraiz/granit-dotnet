@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Imaging.MagickNet.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Imaging.MagickNet.Tests.Internal;
@@ -26,8 +26,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert — should fit within 50x80, preserving 1:1 aspect ratio → 50x50
-        result.Width.Should().Be(50);
-        result.Height.Should().Be(50);
+        result.Width.ShouldBe(50);
+        result.Height.ShouldBe(50);
     }
 
     [Fact]
@@ -42,8 +42,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert — exact dimensions
-        result.Width.Should().Be(60);
-        result.Height.Should().Be(40);
+        result.Width.ShouldBe(60);
+        result.Height.ShouldBe(40);
     }
 
     [Fact]
@@ -58,8 +58,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert — exact dimensions (padded with transparent pixels)
-        result.Width.Should().Be(150);
-        result.Height.Should().Be(200);
+        result.Width.ShouldBe(150);
+        result.Height.ShouldBe(200);
     }
 
     [Fact]
@@ -74,8 +74,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert — exact dimensions (distorted)
-        result.Width.Should().Be(60);
-        result.Height.Should().Be(30);
+        result.Width.ShouldBe(60);
+        result.Height.ShouldBe(30);
     }
 
     [Fact]
@@ -90,8 +90,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert — covers both dimensions (1:1 aspect → 80x80)
-        result.Width.Should().BeGreaterThanOrEqualTo(50);
-        result.Height.Should().BeGreaterThanOrEqualTo(80);
+        result.Width.ShouldBeGreaterThanOrEqualTo(50);
+        result.Height.ShouldBeGreaterThanOrEqualTo(80);
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        result.Width.Should().Be(50);
-        result.Height.Should().Be(30);
+        result.Width.ShouldBe(50);
+        result.Height.ShouldBe(30);
     }
 
     [Fact]
@@ -122,8 +122,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        result.Format.Should().Be(ImageFormat.Jpeg);
-        result.Content.Length.Should().BeGreaterThan(0);
+        result.Format.ShouldBe(ImageFormat.Jpeg);
+        result.Content.Length.ShouldBeGreaterThan(0);
     }
 
     [Fact]
@@ -138,8 +138,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        result.Format.Should().Be(ImageFormat.WebP);
-        result.Content.Length.Should().BeGreaterThan(0);
+        result.Format.ShouldBe(ImageFormat.WebP);
+        result.Content.Length.ShouldBeGreaterThan(0);
     }
 
     [Fact]
@@ -161,7 +161,7 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert — lower quality should produce smaller file
-        lowResult.Content.Length.Should().BeLessThan(highResult.Content.Length);
+        lowResult.Content.Length.ShouldBeLessThan(highResult.Content.Length);
     }
 
     [Fact]
@@ -176,8 +176,8 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert — result should be valid and not empty
-        result.Content.Length.Should().BeGreaterThan(0);
-        result.Format.Should().Be(ImageFormat.Png);
+        result.Content.Length.ShouldBeGreaterThan(0);
+        result.Format.ShouldBe(ImageFormat.Png);
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public sealed class MagickNetImagePipelineTests
         await pipeline.SaveToStreamAsync(output, TestContext.Current.CancellationToken);
 
         // Assert
-        output.Length.Should().BeGreaterThan(0);
+        output.Length.ShouldBeGreaterThan(0);
     }
 
     [Fact]
@@ -209,10 +209,10 @@ public sealed class MagickNetImagePipelineTests
             .ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        result.Width.Should().Be(50);
-        result.Height.Should().Be(50);
-        result.Format.Should().Be(ImageFormat.WebP);
-        result.Content.Length.Should().BeGreaterThan(0);
+        result.Width.ShouldBe(50);
+        result.Height.ShouldBe(50);
+        result.Format.ShouldBe(ImageFormat.WebP);
+        result.Content.Length.ShouldBeGreaterThan(0);
     }
 
     [Fact]
@@ -225,7 +225,7 @@ public sealed class MagickNetImagePipelineTests
         ImageResult result = await pipeline.ToResultAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        result.Format.Should().Be(ImageFormat.Png);
+        result.Format.ShouldBe(ImageFormat.Png);
     }
 
     [Fact]
@@ -239,11 +239,11 @@ public sealed class MagickNetImagePipelineTests
 
         // Assert — calling ToResultAsync after dispose should throw
         Func<Task> act = () => pipeline.ToResultAsync(TestContext.Current.CancellationToken);
-        await act.Should().ThrowAsync<ObjectDisposedException>();
+        await Should.ThrowAsync<ObjectDisposedException>(act);
     }
 
     [Fact]
-    public void ToResultAsync_ThrowsOnCancelledToken()
+    public async Task ToResultAsync_ThrowsOnCancelledToken()
     {
         // Arrange
         using CancellationTokenSource cts = new();
@@ -252,6 +252,6 @@ public sealed class MagickNetImagePipelineTests
 
         // Act & Assert
         Func<Task> act = () => pipeline.ToResultAsync(cts.Token);
-        act.Should().ThrowExactlyAsync<OperationCanceledException>();
+        await Should.ThrowAsync<OperationCanceledException>(act);
     }
 }

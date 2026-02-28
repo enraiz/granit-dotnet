@@ -4,8 +4,8 @@
 // Vérifie que les propriétés de l'entrée d'audit HDS fonctionnent correctement.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests;
@@ -34,15 +34,15 @@ public sealed class AuditLogEntryTests
         };
 
         // Assert
-        entry.Id.Should().Be(id);
-        entry.Timestamp.Should().Be(timestamp);
-        entry.UserId.Should().Be("user-123");
-        entry.Operation.Should().Be("Create");
-        entry.EntityType.Should().Be("Patient");
-        entry.EntityId.Should().Be("entity-456");
-        entry.Changes.Should().Be("""{"Name": "Updated"}""");
-        entry.IpAddress.Should().Be("192.168.1.1");
-        entry.UserAgent.Should().Be("Mozilla/5.0");
+        entry.Id.ShouldBe(id);
+        entry.Timestamp.ShouldBe(timestamp);
+        entry.UserId.ShouldBe("user-123");
+        entry.Operation.ShouldBe("Create");
+        entry.EntityType.ShouldBe("Patient");
+        entry.EntityId.ShouldBe("entity-456");
+        entry.Changes.ShouldBe("""{"Name": "Updated"}""");
+        entry.IpAddress.ShouldBe("192.168.1.1");
+        entry.UserAgent.ShouldBe("Mozilla/5.0");
     }
 
     [Fact]
@@ -52,14 +52,14 @@ public sealed class AuditLogEntryTests
         AuditLogEntry entry = new();
 
         // Assert
-        entry.Id.Should().Be(Guid.Empty);
-        entry.Timestamp.Should().Be(default);
-        entry.UserId.Should().BeEmpty();
-        entry.Operation.Should().BeEmpty();
-        entry.EntityType.Should().BeEmpty();
-        entry.EntityId.Should().BeEmpty();
-        entry.Changes.Should().BeNull();
-        entry.IpAddress.Should().BeNull();
-        entry.UserAgent.Should().BeNull();
+        entry.Id.ShouldBe(Guid.Empty);
+        entry.Timestamp.ShouldBe(default);
+        entry.UserId.ShouldBeEmpty();
+        entry.Operation.ShouldBeEmpty();
+        entry.EntityType.ShouldBeEmpty();
+        entry.EntityId.ShouldBeEmpty();
+        entry.Changes.ShouldBeNull();
+        entry.IpAddress.ShouldBeNull();
+        entry.UserAgent.ShouldBeNull();
     }
 }

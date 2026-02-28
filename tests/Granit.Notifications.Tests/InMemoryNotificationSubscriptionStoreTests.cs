@@ -5,9 +5,9 @@
 // listing, entity follow/unfollow, follower queries, tenant isolation.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
@@ -28,7 +28,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribers =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: null, TestContext.Current.CancellationToken);
 
-        subscribers.Should().ContainSingle().Which.Should().Be("user-1");
+        subscribers.ShouldHaveSingleItem().ShouldBe("user-1");
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribers =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: null, TestContext.Current.CancellationToken);
 
-        subscribers.Should().ContainSingle("subscribing twice should not create duplicates");
+        subscribers.ShouldHaveSingleItem().ShouldBe("user-1");
     }
 
     // -------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribers =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: null, TestContext.Current.CancellationToken);
 
-        subscribers.Should().BeEmpty();
+        subscribers.ShouldBeEmpty();
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         Func<Task> act = () => _store.UnsubscribeAsync(
             "user-1", "order.created", tenantId: null, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // -------------------------------------------------------------------------
@@ -82,9 +82,9 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribers =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: null, TestContext.Current.CancellationToken);
 
-        subscribers.Should().HaveCount(2);
-        subscribers.Should().Contain("user-1");
-        subscribers.Should().Contain("user-2");
+        subscribers.Count.ShouldBe(2);
+        subscribers.ShouldContain("user-1");
+        subscribers.ShouldContain("user-2");
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribers =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: null, TestContext.Current.CancellationToken);
 
-        subscribers.Should().ContainSingle().Which.Should().Be("user-1");
+        subscribers.ShouldHaveSingleItem().ShouldBe("user-1");
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribers =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: null, TestContext.Current.CancellationToken);
 
-        subscribers.Should().BeEmpty();
+        subscribers.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -122,8 +122,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<NotificationSubscription> subscriptions =
             await _store.GetUserSubscriptionsAsync("user-1", tenantId: null, TestContext.Current.CancellationToken);
 
-        subscriptions.Should().HaveCount(2);
-        subscriptions.Should().OnlyContain(s => s.UserId == "user-1");
+        subscriptions.Count.ShouldBe(2);
+        subscriptions.ShouldAllBe(s => s.UserId == "user-1");
     }
 
     // -------------------------------------------------------------------------
@@ -138,7 +138,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> followers =
             await _store.GetEntityFollowerIdsAsync("Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        followers.Should().ContainSingle().Which.Should().Be("user-1");
+        followers.ShouldHaveSingleItem().ShouldBe("user-1");
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> followers =
             await _store.GetEntityFollowerIdsAsync("Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        followers.Should().ContainSingle("following twice should not create duplicates");
+        followers.ShouldHaveSingleItem().ShouldBe("user-1");
     }
 
     // -------------------------------------------------------------------------
@@ -166,7 +166,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> followers =
             await _store.GetEntityFollowerIdsAsync("Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        followers.Should().BeEmpty();
+        followers.ShouldBeEmpty();
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         Func<Task> act = () => _store.UnfollowEntityAsync(
             "user-1", "Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // -------------------------------------------------------------------------
@@ -192,9 +192,9 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> followers =
             await _store.GetEntityFollowerIdsAsync("Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        followers.Should().HaveCount(2);
-        followers.Should().Contain("user-1");
-        followers.Should().Contain("user-2");
+        followers.Count.ShouldBe(2);
+        followers.ShouldContain("user-1");
+        followers.ShouldContain("user-2");
     }
 
     // -------------------------------------------------------------------------
@@ -210,9 +210,10 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<NotificationSubscription> followers =
             await _store.GetEntityFollowersAsync("Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        followers.Should().HaveCount(2);
-        followers.Should().OnlyContain(s => s.EntityType == "Order" && s.EntityId == "order-42");
-        followers.Select(f => f.UserId).Should().Contain("user-1").And.Contain("user-2");
+        followers.Count.ShouldBe(2);
+        followers.ShouldAllBe(s => s.EntityType == "Order" && s.EntityId == "order-42");
+        followers.Select(f => f.UserId).ShouldContain("user-1");
+        followers.Select(f => f.UserId).ShouldContain("user-2");
     }
 
     // -------------------------------------------------------------------------
@@ -227,7 +228,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         bool isFollowing = await _store.IsFollowingEntityAsync(
             "user-1", "Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        isFollowing.Should().BeTrue();
+        isFollowing.ShouldBeTrue();
     }
 
     [Fact]
@@ -236,7 +237,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         bool isFollowing = await _store.IsFollowingEntityAsync(
             "user-1", "Order", "order-42", tenantId: null, TestContext.Current.CancellationToken);
 
-        isFollowing.Should().BeFalse();
+        isFollowing.ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------
@@ -257,8 +258,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribersB =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: tenantB, TestContext.Current.CancellationToken);
 
-        subscribersA.Should().ContainSingle().Which.Should().Be("user-1");
-        subscribersB.Should().ContainSingle().Which.Should().Be("user-2");
+        subscribersA.ShouldHaveSingleItem().ShouldBe("user-1");
+        subscribersB.ShouldHaveSingleItem().ShouldBe("user-2");
     }
 
     [Fact]
@@ -275,8 +276,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> followersB =
             await _store.GetEntityFollowerIdsAsync("Order", "order-42", tenantId: tenantB, TestContext.Current.CancellationToken);
 
-        followersA.Should().ContainSingle().Which.Should().Be("user-1");
-        followersB.Should().ContainSingle().Which.Should().Be("user-2");
+        followersA.ShouldHaveSingleItem().ShouldBe("user-1");
+        followersB.ShouldHaveSingleItem().ShouldBe("user-2");
     }
 
     [Fact]
@@ -293,8 +294,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<NotificationSubscription> subsB =
             await _store.GetUserSubscriptionsAsync("user-1", tenantId: tenantB, TestContext.Current.CancellationToken);
 
-        subsA.Should().ContainSingle();
-        subsB.Should().ContainSingle();
+        subsA.ShouldHaveSingleItem();
+        subsB.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -313,7 +314,7 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
         IReadOnlyList<string> subscribersB =
             await _store.GetSubscriberIdsAsync("order.created", tenantId: tenantB, TestContext.Current.CancellationToken);
 
-        subscribersA.Should().BeEmpty("subscription was removed for tenant A");
-        subscribersB.Should().ContainSingle("subscription for tenant B should not be affected");
+        subscribersA.ShouldBeEmpty("subscription was removed for tenant A");
+        subscribersB.ShouldContain("user-1", "subscription for tenant B should not be affected");
     }
 }

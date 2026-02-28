@@ -5,13 +5,13 @@
 // et le chiffrement AES opt-in via CacheEncryptedAttribute.
 // =============================================================================
 
-using FluentAssertions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -65,7 +65,7 @@ public sealed class DistributedCacheServiceTests
         UserCacheItem? result = await sut.GetAsync("user-1", TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -82,9 +82,9 @@ public sealed class DistributedCacheServiceTests
         UserCacheItem? result = await sut.GetAsync("alice", TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(expected.Id);
-        result.Name.Should().Be(expected.Name);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(expected.Id);
+        result.Name.ShouldBe(expected.Name);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public sealed class DistributedCacheServiceTests
         UserCacheItem? result = await sut.GetAsync("user-to-remove", TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -131,8 +131,8 @@ public sealed class DistributedCacheServiceTests
             TestContext.Current.CancellationToken);
 
         // Assert
-        result.Id.Should().Be(expected.Id);
-        callCount.Should().Be(1);
+        result.Id.ShouldBe(expected.Id);
+        callCount.ShouldBe(1);
     }
 
     [Fact]
@@ -159,8 +159,8 @@ public sealed class DistributedCacheServiceTests
             TestContext.Current.CancellationToken);
 
         // Assert
-        result.Id.Should().Be(existing.Id);
-        callCount.Should().Be(0);
+        result.Id.ShouldBe(existing.Id);
+        callCount.ShouldBe(0);
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public sealed class DistributedCacheServiceTests
         _ = await sut.GetAsync("user-42", TestContext.Current.CancellationToken);
 
         // Assert
-        capturedKey.Should().Be("myapp:User:user-42");
+        capturedKey.ShouldBe("myapp:User:user-42");
     }
 
     // Types de test

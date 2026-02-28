@@ -7,11 +7,11 @@
 //   - Gère correctement les grants à portée globale (TenantId null)
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authorization.EntityFrameworkCore.DbContext;
 using Granit.Authorization.EntityFrameworkCore.Entities;
 using Granit.Authorization.EntityFrameworkCore.Stores;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.EntityFrameworkCore.Tests;
@@ -33,7 +33,7 @@ public sealed class EfCorePermissionGrantStoreTests
         bool result = await store.IsGrantedAsync("accountant", "Invoices.Delete", TenantA, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public sealed class EfCorePermissionGrantStoreTests
         bool result = await store.IsGrantedAsync("reader", "Invoices.Delete", TenantA, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public sealed class EfCorePermissionGrantStoreTests
         bool result = await store.IsGrantedAsync("accountant", "Invoices.Read", TenantA, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class EfCorePermissionGrantStoreTests
         bool result = await store.IsGrantedAsync("accountant", "Invoices.Delete", TenantB, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public sealed class EfCorePermissionGrantStoreTests
         bool result = await store.IsGrantedAsync("admin", "System.Configure", tenantId: null, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public sealed class EfCorePermissionGrantStoreTests
         bool result = await store.IsGrantedAsync("admin", "System.Configure", TenantA, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     // --- Helpers ---

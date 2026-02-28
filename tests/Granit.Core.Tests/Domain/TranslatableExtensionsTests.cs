@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Core.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Domain;
@@ -36,27 +36,27 @@ public sealed class TranslatableExtensionsTests
 
     [Fact]
     public void Translation_InheritsFromEntity() =>
-        new TestTranslation().Should().BeAssignableTo<Entity>();
+        new TestTranslation().ShouldBeAssignableTo<Entity>();
 
     [Fact]
     public void Translation_ImplementsITranslation() =>
-        new TestTranslation().Should().BeAssignableTo<ITranslation>();
+        new TestTranslation().ShouldBeAssignableTo<ITranslation>();
 
     [Fact]
     public void Translation_ImplementsITranslationOfParent() =>
-        new TestTranslation().Should().BeAssignableTo<ITranslation<TestParent>>();
+        new TestTranslation().ShouldBeAssignableTo<ITranslation<TestParent>>();
 
     [Fact]
     public void AuditedTranslation_InheritsFromAuditedEntity() =>
-        new TestAuditedTranslation().Should().BeAssignableTo<AuditedEntity>();
+        new TestAuditedTranslation().ShouldBeAssignableTo<AuditedEntity>();
 
     [Fact]
     public void AuditedTranslation_ImplementsITranslation() =>
-        new TestAuditedTranslation().Should().BeAssignableTo<ITranslation>();
+        new TestAuditedTranslation().ShouldBeAssignableTo<ITranslation>();
 
     [Fact]
     public void AuditedTranslation_ImplementsITranslationOfParent() =>
-        new TestAuditedTranslation().Should().BeAssignableTo<ITranslation<TestAuditedParent>>();
+        new TestAuditedTranslation().ShouldBeAssignableTo<ITranslation<TestAuditedParent>>();
 
     // -------------------------------------------------------------------------
     // Default values
@@ -67,10 +67,10 @@ public sealed class TranslatableExtensionsTests
     {
         TestTranslation translation = new();
 
-        translation.Id.Should().Be(Guid.Empty);
-        translation.ParentId.Should().Be(Guid.Empty);
-        translation.Culture.Should().BeEmpty();
-        translation.Parent.Should().BeNull();
+        translation.Id.ShouldBe(Guid.Empty);
+        translation.ParentId.ShouldBe(Guid.Empty);
+        translation.Culture.ShouldBeEmpty();
+        translation.Parent.ShouldBeNull();
     }
 
     [Fact]
@@ -78,13 +78,13 @@ public sealed class TranslatableExtensionsTests
     {
         TestAuditedTranslation translation = new();
 
-        translation.Id.Should().Be(Guid.Empty);
-        translation.ParentId.Should().Be(Guid.Empty);
-        translation.Culture.Should().BeEmpty();
-        translation.CreatedAt.Should().Be(default);
-        translation.CreatedBy.Should().BeEmpty();
-        translation.ModifiedAt.Should().BeNull();
-        translation.ModifiedBy.Should().BeNull();
+        translation.Id.ShouldBe(Guid.Empty);
+        translation.ParentId.ShouldBe(Guid.Empty);
+        translation.Culture.ShouldBeEmpty();
+        translation.CreatedAt.ShouldBe(default);
+        translation.CreatedBy.ShouldBeEmpty();
+        translation.ModifiedAt.ShouldBeNull();
+        translation.ModifiedBy.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -98,8 +98,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("fr");
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().Be("fr");
+        result.ShouldNotBeNull();
+        result!.Culture.ShouldBe("fr");
     }
 
     [Fact]
@@ -109,8 +109,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("FR-BE");
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().Be("fr-BE");
+        result.ShouldNotBeNull();
+        result!.Culture.ShouldBe("fr-BE");
     }
 
     // -------------------------------------------------------------------------
@@ -125,8 +125,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("fr-BE");
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().Be("fr");
+        result.ShouldNotBeNull();
+        result!.Culture.ShouldBe("fr");
     }
 
     // -------------------------------------------------------------------------
@@ -141,8 +141,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("de");
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().Be("en");
+        result.ShouldNotBeNull();
+        result!.Culture.ShouldBe("en");
     }
 
     [Fact]
@@ -152,8 +152,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("de", defaultCulture: "fr");
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().Be("fr");
+        result.ShouldNotBeNull();
+        result!.Culture.ShouldBe("fr");
     }
 
     // -------------------------------------------------------------------------
@@ -168,8 +168,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("de");
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().BeOneOf("fr", "nl");
+        result.ShouldNotBeNull();
+        new[] { "fr", "nl" }.ShouldContain(result!.Culture);
     }
 
     // -------------------------------------------------------------------------
@@ -183,7 +183,7 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("fr");
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -197,8 +197,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("fr", useFallback: false);
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().Be("fr");
+        result.ShouldNotBeNull();
+        result!.Culture.ShouldBe("fr");
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("de", useFallback: false);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("fr-BE", useFallback: false);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("fr", useFallback: false);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -243,8 +243,8 @@ public sealed class TranslatableExtensionsTests
 
         TestTranslation? result = entity.GetTranslation("en");
 
-        result.Should().NotBeNull();
-        result!.Culture.Should().Be("en");
+        result.ShouldNotBeNull();
+        result!.Culture.ShouldBe("en");
     }
 
     // -------------------------------------------------------------------------

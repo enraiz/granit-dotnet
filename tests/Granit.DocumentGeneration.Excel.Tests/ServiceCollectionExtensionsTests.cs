@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Templating.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Excel.Tests;
@@ -17,7 +17,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitDocumentGenerationExcel();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITemplateEngine) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -31,6 +31,6 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitDocumentGenerationExcel();
 
         services.Count(d => d.ServiceType == typeof(ITemplateEngine))
-                .Should().Be(2, "each call must add an independent registration");
+                .ShouldBe(2, "each call must add an independent registration");
     }
 }

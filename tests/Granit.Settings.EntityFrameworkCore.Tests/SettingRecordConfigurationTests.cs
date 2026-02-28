@@ -4,11 +4,11 @@
 // Verifies table mapping, column constraints, and unique index definition.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.EntityFrameworkCore.Extensions;
 using Granit.Settings.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.EntityFrameworkCore.Tests;
@@ -43,7 +43,7 @@ public sealed class SettingRecordConfigurationTests
         IModel model = BuildModel();
         IEntityType entity = model.FindEntityType(typeof(SettingRecord))!;
 
-        entity.GetTableName().Should().Be("core_setting_records");
+        entity.GetTableName().ShouldBe("core_setting_records");
     }
 
     [Fact]
@@ -57,8 +57,7 @@ public sealed class SettingRecordConfigurationTests
                 i.Properties.Select(p => p.Name)
                     .SequenceEqual(["Name", "ProviderName", "ProviderKey"]));
 
-        uniqueIndex.Should().NotBeNull(
-            "a unique index on (Name, ProviderName, ProviderKey) is required to prevent duplicate records");
+        uniqueIndex.ShouldNotBeNull("a unique index on (Name, ProviderName, ProviderKey) is required to prevent duplicate records");
     }
 
     [Fact]
@@ -68,7 +67,7 @@ public sealed class SettingRecordConfigurationTests
         IEntityType entity = model.FindEntityType(typeof(SettingRecord))!;
 
         IKey pk = entity.FindPrimaryKey()!;
-        pk.Properties.Should().ContainSingle(p => p.Name == "Id");
+        pk.Properties.ShouldContain(p => p.Name == "Id");
     }
 
     [Fact]
@@ -78,7 +77,7 @@ public sealed class SettingRecordConfigurationTests
         IEntityType entity = model.FindEntityType(typeof(SettingRecord))!;
 
         IProperty name = entity.FindProperty(nameof(SettingRecord.Name))!;
-        name.GetMaxLength().Should().Be(256);
+        name.GetMaxLength().ShouldBe(256);
     }
 
     [Fact]
@@ -88,7 +87,7 @@ public sealed class SettingRecordConfigurationTests
         IEntityType entity = model.FindEntityType(typeof(SettingRecord))!;
 
         IProperty providerName = entity.FindProperty(nameof(SettingRecord.ProviderName))!;
-        providerName.GetMaxLength().Should().Be(4);
+        providerName.GetMaxLength().ShouldBe(4);
     }
 
     [Fact]
@@ -98,7 +97,7 @@ public sealed class SettingRecordConfigurationTests
         IEntityType entity = model.FindEntityType(typeof(SettingRecord))!;
 
         IProperty providerKey = entity.FindProperty(nameof(SettingRecord.ProviderKey))!;
-        providerKey.IsNullable.Should().BeTrue();
+        providerKey.IsNullable.ShouldBeTrue();
     }
 
     [Fact]
@@ -108,6 +107,6 @@ public sealed class SettingRecordConfigurationTests
         IEntityType entity = model.FindEntityType(typeof(SettingRecord))!;
 
         IProperty value = entity.FindProperty(nameof(SettingRecord.Value))!;
-        value.IsNullable.Should().BeTrue();
+        value.IsNullable.ShouldBeTrue();
     }
 }

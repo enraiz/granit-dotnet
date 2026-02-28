@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.Idempotency.Abstractions;
 using Granit.Idempotency.Extensions;
 using Granit.Idempotency.Internal;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IO;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Idempotency.Tests;
@@ -31,7 +31,7 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
 
         services.AddGranitIdempotency(config.GetSection("Idempotency"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IConfigureOptions<IdempotencyOptions>));
     }
 
@@ -46,7 +46,7 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
 
         services.AddGranitIdempotency(opts => opts.HeaderName = "X-Custom");
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IConfigureOptions<IdempotencyOptions>));
     }
 
@@ -57,7 +57,7 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
 
         services.AddGranitIdempotency();
 
-        services.Should().NotBeEmpty();
+        services.ShouldNotBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -70,7 +70,7 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitIdempotency();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IValidateOptions<IdempotencyOptions>) &&
             d.ImplementationType == typeof(IdempotencyOptionsValidator) &&
             d.Lifetime == ServiceLifetime.Singleton);
@@ -82,7 +82,7 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitIdempotency();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IIdempotencyStore) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -93,7 +93,7 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitIdempotency();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(RecyclableMemoryStreamManager) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -104,7 +104,7 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitIdempotency();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IdempotencyMiddleware) &&
             d.Lifetime == ServiceLifetime.Transient);
     }
@@ -117,6 +117,6 @@ public sealed class IdempotencyServiceCollectionExtensionsTests
         services.AddGranitIdempotency();
 
         services.Count(d => d.ServiceType == typeof(RecyclableMemoryStreamManager))
-                .Should().Be(1, "TryAddSingleton should not add a duplicate");
+                .ShouldBe(1, "TryAddSingleton should not add a duplicate");
     }
 }

@@ -4,11 +4,11 @@
 // Vérifie que le module enregistre les services Timing via ConfigureServices.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Timing.Tests;
@@ -33,12 +33,12 @@ public sealed class GranitTimingModuleTests
 
         // Assert
         IClock? clock = sp.GetService<IClock>();
-        clock.Should().NotBeNull();
+        clock.ShouldNotBeNull();
 
         ICurrentTimezoneProvider? tzProvider = sp.GetService<ICurrentTimezoneProvider>();
-        tzProvider.Should().NotBeNull();
+        tzProvider.ShouldNotBeNull();
 
         TimeProvider? timeProvider = sp.GetService<TimeProvider>();
-        timeProvider.Should().NotBeNull();
+        timeProvider.ShouldNotBeNull();
     }
 }

@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.Caching;
 using Granit.Timing;
 using Microsoft.Extensions.Caching.Distributed;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Hybrid.Tests;
@@ -97,7 +97,7 @@ public sealed class HybridCacheServiceTests
 
         TestCacheItem? result = await service.GetAsync("missing", TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -108,8 +108,7 @@ public sealed class HybridCacheServiceTests
 
         await service.GetAsync("user-1", TestContext.Current.CancellationToken);
 
-        cache.GetKeys.Should().ContainSingle()
-             .Which.Should().Be("app:Test:user-1");
+        cache.GetKeys.ShouldHaveSingleItem().ShouldBe("app:Test:user-1");
     }
 
     // -------------------------------------------------------------------------
@@ -131,8 +130,8 @@ public sealed class HybridCacheServiceTests
             },
             ct: TestContext.Current.CancellationToken);
 
-        factoryCalled.Should().BeTrue();
-        result.Value.Should().Be("created");
+        factoryCalled.ShouldBeTrue();
+        result.Value.ShouldBe("created");
     }
 
     [Fact]
@@ -156,8 +155,8 @@ public sealed class HybridCacheServiceTests
             ct: TestContext.Current.CancellationToken);
 
         // Factory should NOT be called on cache hit
-        factoryCallCount.Should().Be(0);
-        result.Value.Should().Be("first");
+        factoryCallCount.ShouldBe(0);
+        result.Value.ShouldBe("first");
     }
 
     [Fact]
@@ -175,7 +174,7 @@ public sealed class HybridCacheServiceTests
             options,
             TestContext.Current.CancellationToken);
 
-        cache.GetKeys.Should().ContainSingle();
+        cache.GetKeys.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -193,7 +192,7 @@ public sealed class HybridCacheServiceTests
             options,
             TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     [Fact]
@@ -211,7 +210,7 @@ public sealed class HybridCacheServiceTests
             options,
             TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -227,8 +226,7 @@ public sealed class HybridCacheServiceTests
         await service.SetAsync("key", new TestCacheItem { Value = "stored" },
             ct: TestContext.Current.CancellationToken);
 
-        cache.SetKeys.Should().ContainSingle()
-             .Which.Should().Contain("key");
+        cache.SetKeys.ShouldHaveSingleItem().ShouldContain("key");
     }
 
     [Fact]
@@ -244,7 +242,7 @@ public sealed class HybridCacheServiceTests
         await service.SetAsync("key", new TestCacheItem { Value = "v" }, options,
             TestContext.Current.CancellationToken);
 
-        cache.SetKeys.Should().ContainSingle();
+        cache.SetKeys.ShouldHaveSingleItem();
     }
 
     // -------------------------------------------------------------------------
@@ -259,8 +257,7 @@ public sealed class HybridCacheServiceTests
 
         await service.RemoveAsync("key", TestContext.Current.CancellationToken);
 
-        cache.RemovedKeys.Should().ContainSingle()
-             .Which.Should().Contain("key");
+        cache.RemovedKeys.ShouldHaveSingleItem().ShouldContain("key");
     }
 
     // -------------------------------------------------------------------------
@@ -274,7 +271,7 @@ public sealed class HybridCacheServiceTests
 
         Func<Task> act = () => service.RefreshAsync("key", TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // -------------------------------------------------------------------------
@@ -289,7 +286,6 @@ public sealed class HybridCacheServiceTests
 
         await service.RemoveAsync("patient-42", TestContext.Current.CancellationToken);
 
-        cache.RemovedKeys.Should().ContainSingle()
-             .Which.Should().Be("myapp:Test:patient-42");
+        cache.RemovedKeys.ShouldHaveSingleItem().ShouldBe("myapp:Test:patient-42");
     }
 }

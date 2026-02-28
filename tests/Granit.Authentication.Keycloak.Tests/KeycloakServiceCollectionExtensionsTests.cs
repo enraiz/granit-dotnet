@@ -8,7 +8,6 @@
 //   - "Admin" policy
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authentication.JwtBearer.Extensions;
 using Granit.Authentication.Keycloak.Authentication;
 using Granit.Authentication.Keycloak.Extensions;
@@ -19,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authentication.Keycloak.Tests;
@@ -55,9 +55,9 @@ public sealed class KeycloakServiceCollectionExtensionsTests
 
         // Assert
         KeycloakOptions options = sp.GetRequiredService<IOptions<KeycloakOptions>>().Value;
-        options.Authority.Should().Be("https://keycloak.test/realms/test");
-        options.ClientId.Should().Be("test-client");
-        options.RequireHttpsMetadata.Should().BeFalse();
+        options.Authority.ShouldBe("https://keycloak.test/realms/test");
+        options.ClientId.ShouldBe("test-client");
+        options.RequireHttpsMetadata.ShouldBeFalse();
     }
 
     [Fact]
@@ -78,9 +78,9 @@ public sealed class KeycloakServiceCollectionExtensionsTests
         JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
             .Get(JwtBearerDefaults.AuthenticationScheme);
 
-        jwtOptions.Authority.Should().Be("https://keycloak.test/realms/test");
-        jwtOptions.Audience.Should().Be("test-client", "ClientId is used as Audience by default");
-        jwtOptions.TokenValidationParameters.NameClaimType.Should().Be("preferred_username");
+        jwtOptions.Authority.ShouldBe("https://keycloak.test/realms/test");
+        jwtOptions.Audience.ShouldBe("test-client", "ClientId is used as Audience by default");
+        jwtOptions.TokenValidationParameters.NameClaimType.ShouldBe("preferred_username");
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
         JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
             .Get(JwtBearerDefaults.AuthenticationScheme);
 
-        jwtOptions.Audience.Should().Be("custom-audience");
+        jwtOptions.Audience.ShouldBe("custom-audience");
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
             .Where(d => d.ServiceType == typeof(IClaimsTransformation))
             .ToList();
 
-        descriptors.Should().Contain(d => d.ImplementationType == typeof(KeycloakClaimsTransformation));
+        descriptors.ShouldContain(d => d.ImplementationType == typeof(KeycloakClaimsTransformation));
     }
 
     [Fact]
@@ -148,9 +148,8 @@ public sealed class KeycloakServiceCollectionExtensionsTests
 
         // Assert
         AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
-        authOptions.GetPolicy("Admin").Should().NotBeNull();
-        authOptions.GetPolicy("Authenticated").Should().NotBeNull("inherited from Granit.Authentication.JwtBearer");
-        authOptions.GetPolicy("FhirAccess").Should().BeNull(
-            "FhirAccess is application-specific, not part of Granit.Authentication.Keycloak");
+        authOptions.GetPolicy("Admin").ShouldNotBeNull();
+        authOptions.GetPolicy("Authenticated").ShouldNotBeNull("inherited from Granit.Authentication.JwtBearer");
+        authOptions.GetPolicy("FhirAccess").ShouldBeNull("FhirAccess is application-specific, not part of Granit.Authentication.Keycloak");
     }
 }

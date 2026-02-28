@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Analyzers.Tests;
@@ -32,7 +32,7 @@ public sealed class DropColumnWithoutContractAnalyzerTests
                 includeMigrationCycleAttribute: true,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DropColumnWithoutContractAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DropColumnWithoutContractAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class DropColumnWithoutContractAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DropColumnWithoutContractAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class DropColumnWithoutContractAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DropColumnWithoutContractAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -113,6 +113,6 @@ public sealed class DropColumnWithoutContractAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DropColumnWithoutContractAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 }

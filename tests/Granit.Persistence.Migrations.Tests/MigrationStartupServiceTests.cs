@@ -6,7 +6,6 @@
 // MigrationProgressDbContext uses the EF Core InMemory provider.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -115,7 +115,7 @@ public sealed class MigrationStartupServiceTests
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        dispatcher.ReceivedCalls().Should().BeEmpty();
+        dispatcher.ReceivedCalls().ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -140,7 +140,7 @@ public sealed class MigrationStartupServiceTests
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
-        dispatcher.ReceivedCalls().Should().BeEmpty();
+        dispatcher.ReceivedCalls().ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -165,9 +165,9 @@ public sealed class MigrationStartupServiceTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
-        commands.Should().ContainSingle();
-        commands[0].CycleId.Should().Be("cycle-a");
-        commands[0].BatchSize.Should().Be(100);
+        commands.ShouldHaveSingleItem();
+        commands[0].CycleId.ShouldBe("cycle-a");
+        commands[0].BatchSize.ShouldBe(100);
     }
 
     // -------------------------------------------------------------------------
@@ -199,9 +199,9 @@ public sealed class MigrationStartupServiceTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
-        commands.Should().ContainSingle();
-        commands[0].CycleId.Should().Be("cycle-resume");
-        commands[0].Cursor.Should().Be("{\"lastId\":\"abc\"}");
+        commands.ShouldHaveSingleItem();
+        commands[0].CycleId.ShouldBe("cycle-resume");
+        commands[0].Cursor.ShouldBe("{\"lastId\":\"abc\"}");
     }
 
     // -------------------------------------------------------------------------
@@ -226,8 +226,8 @@ public sealed class MigrationStartupServiceTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
-        commands.Should().ContainSingle();
-        commands[0].TenantId.Should().Be(Guid.Empty);
+        commands.ShouldHaveSingleItem();
+        commands[0].TenantId.ShouldBe(Guid.Empty);
     }
 
     // -------------------------------------------------------------------------
@@ -264,17 +264,17 @@ public sealed class MigrationStartupServiceTests
         List<RunMigrationBatchCommand> commands = GetDispatchedCommands(dispatcher);
 
         // Two commands — one per tenant.
-        commands.Should().HaveCount(2);
+        commands.Count.ShouldBe(2);
 
         // Tenant A reuses its stored cursor.
         RunMigrationBatchCommand commandA = commands.Single(c => c.TenantId == tenantA);
-        commandA.CycleId.Should().Be("schema-cycle");
-        commandA.Cursor.Should().Be("cursor-a");
+        commandA.CycleId.ShouldBe("schema-cycle");
+        commandA.Cursor.ShouldBe("cursor-a");
 
         // Tenant B has no stored row → null cursor (start from beginning).
         RunMigrationBatchCommand commandB = commands.Single(c => c.TenantId == tenantB);
-        commandB.CycleId.Should().Be("schema-cycle");
-        commandB.Cursor.Should().BeNull();
+        commandB.CycleId.ShouldBe("schema-cycle");
+        commandB.Cursor.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -295,6 +295,6 @@ public sealed class MigrationStartupServiceTests
 
         Func<Task> act = () => sut.StartAsync(TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 }

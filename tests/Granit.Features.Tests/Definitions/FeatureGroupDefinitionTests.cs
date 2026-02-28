@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.ValueTypes;
 using Xunit;
@@ -33,10 +33,10 @@ public sealed class FeatureGroupDefinitionTests
         FeatureGroupDefinition group = MakeGroup();
         group.AddToggle("Guava.VideoConsultation");
 
-        FeatureDefinition feature = group.Features.Should().ContainSingle().Which;
-        feature.Name.Should().Be("Guava.VideoConsultation");
-        feature.DefaultValue.Should().Be("false");
-        feature.ValueType.Should().Be(FeatureValueType.Toggle);
+        FeatureDefinition feature = group.Features.ShouldHaveSingleItem().Which;
+        feature.Name.ShouldBe("Guava.VideoConsultation");
+        feature.DefaultValue.ShouldBe("false");
+        feature.ValueType.ShouldBe(FeatureValueType.Toggle);
     }
 
     [Fact]
@@ -46,8 +46,8 @@ public sealed class FeatureGroupDefinitionTests
         group.AddToggle("Guava.VideoConsultation", defaultValue: true, displayName: "Video");
 
         FeatureDefinition feature = group.Features.Single();
-        feature.DefaultValue.Should().Be("true");
-        feature.DisplayName.Should().Be("Video");
+        feature.DefaultValue.ShouldBe("true");
+        feature.DisplayName.ShouldBe("Video");
     }
 
     [Fact]
@@ -57,11 +57,11 @@ public sealed class FeatureGroupDefinitionTests
         group.AddNumeric("Guava.MaxPatients", defaultValue: 200, min: 0, max: 10000);
 
         FeatureDefinition feature = group.Features.Single();
-        feature.DefaultValue.Should().Be("200");
-        feature.ValueType.Should().Be(FeatureValueType.Numeric);
-        feature.NumericConstraint.Should().NotBeNull();
-        feature.NumericConstraint!.Min.Should().Be(0);
-        feature.NumericConstraint.Max.Should().Be(10000);
+        feature.DefaultValue.ShouldBe("200");
+        feature.ValueType.ShouldBe(FeatureValueType.Numeric);
+        feature.NumericConstraint.ShouldNotBeNull();
+        feature.NumericConstraint!.Min.ShouldBe(0);
+        feature.NumericConstraint.Max.ShouldBe(10000);
     }
 
     [Fact]
@@ -75,11 +75,11 @@ public sealed class FeatureGroupDefinitionTests
             displayName: "Storage");
 
         FeatureDefinition feature = group.Features.Single();
-        feature.DefaultValue.Should().Be("standard");
-        feature.ValueType.Should().Be(FeatureValueType.Selection);
-        feature.DisplayName.Should().Be("Storage");
-        feature.SelectionValues.Should().NotBeNull();
-        feature.SelectionValues!.AllowedValues.Should().BeEquivalentTo(["standard", "premium"]);
+        feature.DefaultValue.ShouldBe("standard");
+        feature.ValueType.ShouldBe(FeatureValueType.Selection);
+        feature.DisplayName.ShouldBe("Storage");
+        feature.SelectionValues.ShouldNotBeNull();
+        feature.SelectionValues!.AllowedValues.ShouldBe(["standard", "premium"]);
     }
 
     [Fact]
@@ -91,8 +91,8 @@ public sealed class FeatureGroupDefinitionTests
             .AddToggle("Guava.FeatureA")
             .AddToggle("Guava.FeatureB");
 
-        returned.Should().BeSameAs(group);
-        group.Features.Should().HaveCount(2);
+        returned.ShouldBeSameAs(group);
+        group.Features.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public sealed class FeatureGroupDefinitionTests
     {
         FeatureGroupDefinition group = MakeGroup("Guava", "Guava Platform");
 
-        group.Name.Should().Be("Guava");
-        group.DisplayName.Should().Be("Guava Platform");
+        group.Name.ShouldBe("Guava");
+        group.DisplayName.ShouldBe("Guava Platform");
     }
 }

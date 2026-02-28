@@ -5,12 +5,12 @@
 // Aucune connexion PostgreSQL réelle n'est requise.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.MultiTenancy;
@@ -64,7 +64,7 @@ public sealed class TenantPerSchemaDbContextFactoryTests
         await using StubSchemaDbContext ctx =
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
-        ctx.Should().NotBeNull();
+        ctx.ShouldNotBeNull();
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class TenantPerSchemaDbContextFactoryTests
 
         using StubSchemaDbContext ctx = factory.CreateDbContext();
 
-        ctx.Should().NotBeNull();
+        ctx.ShouldNotBeNull();
     }
 
     // -----------------------------------------------------------------------
@@ -91,9 +91,7 @@ public sealed class TenantPerSchemaDbContextFactoryTests
         Func<Task> act = async () =>
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("*No active tenant context*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("No active tenant context");
     }
 
     [Fact]
@@ -104,8 +102,6 @@ public sealed class TenantPerSchemaDbContextFactoryTests
 
         Action act = () => factory.CreateDbContext();
 
-        act.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("*No active tenant context*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("No active tenant context");
     }
 }

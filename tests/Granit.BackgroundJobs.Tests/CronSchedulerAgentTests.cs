@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using Granit.Timing;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 
@@ -197,8 +197,7 @@ public sealed class CronSchedulerAgentTests
         Action act = () =>
             CronSchedulerAgent.CreateMessage("Unknown.Type, UnknownAssembly", "test-job");
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*Cannot resolve message type*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("Cannot resolve message type");
     }
 
     // =========================================================================
@@ -212,6 +211,6 @@ public sealed class CronSchedulerAgentTests
             ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
                 .StopAsync(TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 }

@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Templating.Scriban.GlobalContexts;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Scriban.Tests.GlobalContexts;
@@ -30,7 +30,7 @@ public sealed class ExecutionContextGlobalContextTests
     public void ContextName_Is_context()
     {
         ExecutionContextGlobalContext sut = CreateSut(BuildSp());
-        sut.ContextName.Should().Be("context");
+        sut.ContextName.ShouldBe("context");
     }
 
     // -------------------------------------------------------------------------
@@ -49,9 +49,9 @@ public sealed class ExecutionContextGlobalContextTests
         string tenantId = (string)type.GetProperty("tenant_id")!.GetValue(resolved)!;
         string tenantName = (string)type.GetProperty("tenant_name")!.GetValue(resolved)!;
 
-        culture.Should().NotBeNull("culture must always be set (invariant culture has Name = \"\")");
-        tenantId.Should().BeEmpty();
-        tenantName.Should().BeEmpty();
+        culture.ShouldNotBeNull("culture must always be set (invariant culture has Name = \"\")");
+        tenantId.ShouldBeEmpty();
+        tenantName.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -72,8 +72,8 @@ public sealed class ExecutionContextGlobalContextTests
         string tenantId = (string)type.GetProperty("tenant_id")!.GetValue(resolved)!;
         string tenantName = (string)type.GetProperty("tenant_name")!.GetValue(resolved)!;
 
-        tenantId.Should().BeEmpty();
-        tenantName.Should().BeEmpty();
+        tenantId.ShouldBeEmpty();
+        tenantName.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -97,8 +97,8 @@ public sealed class ExecutionContextGlobalContextTests
         string tenantId = (string)type.GetProperty("tenant_id")!.GetValue(resolved)!;
         string tenantName = (string)type.GetProperty("tenant_name")!.GetValue(resolved)!;
 
-        tenantId.Should().Be(id.ToString());
-        tenantName.Should().Be("Hôpital Saint-Luc");
+        tenantId.ShouldBe(id.ToString());
+        tenantName.ShouldBe("Hôpital Saint-Luc");
     }
 
     // -------------------------------------------------------------------------
@@ -118,7 +118,7 @@ public sealed class ExecutionContextGlobalContextTests
         dynamic resolved = sut.Resolve();
         string tenantId = (string)resolved.GetType().GetProperty("tenant_id")!.GetValue(resolved)!;
 
-        tenantId.Should().BeEmpty();
+        tenantId.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -138,6 +138,6 @@ public sealed class ExecutionContextGlobalContextTests
         dynamic resolved = sut.Resolve();
         string tenantName = (string)resolved.GetType().GetProperty("tenant_name")!.GetValue(resolved)!;
 
-        tenantName.Should().BeEmpty();
+        tenantName.ShouldBeEmpty();
     }
 }

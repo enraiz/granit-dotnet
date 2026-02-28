@@ -2,8 +2,8 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Analyzers.Tests;
@@ -27,7 +27,7 @@ public sealed class HardcodedSecretAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<HardcodedSecretAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class HardcodedSecretAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<HardcodedSecretAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class HardcodedSecretAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<HardcodedSecretAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public sealed class HardcodedSecretAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<HardcodedSecretAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public sealed class HardcodedSecretAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<HardcodedSecretAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public sealed class HardcodedSecretAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public sealed class HardcodedSecretAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public sealed class HardcodedSecretAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public sealed class HardcodedSecretAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -203,6 +203,6 @@ public sealed class HardcodedSecretAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == HardcodedSecretAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 }

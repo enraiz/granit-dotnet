@@ -7,8 +7,8 @@
 //   - Implements IHasValidationErrors and IUserFriendlyException
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Exceptions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Exceptions;
@@ -32,7 +32,7 @@ public sealed class ValidationExceptionTests
         IReadOnlyDictionary<string, string[]> errors = BuildErrors();
         ValidationException exception = new(errors);
 
-        exception.ValidationErrors.Should().BeSameAs(errors);
+        exception.ValidationErrors.ShouldBeSameAs(errors);
     }
 
     [Fact]
@@ -40,8 +40,7 @@ public sealed class ValidationExceptionTests
     {
         ValidationException exception = new(BuildErrors());
 
-        exception.ValidationErrors["Email"].Should().ContainSingle()
-            .Which.Should().Be("The Email field is required.");
+        exception.ValidationErrors["Email"].ShouldHaveSingleItem().ShouldBe("The Email field is required.");
     }
 
     [Fact]
@@ -49,8 +48,9 @@ public sealed class ValidationExceptionTests
     {
         ValidationException exception = new(BuildErrors());
 
-        exception.ValidationErrors.Should().HaveCount(2);
-        exception.ValidationErrors.Keys.Should().Contain(["Email", "Name"]);
+        exception.ValidationErrors.Count.ShouldBe(2);
+        exception.ValidationErrors.Keys.ShouldContain("Email");
+        exception.ValidationErrors.Keys.ShouldContain("Name");
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class ValidationExceptionTests
     {
         ValidationException exception = new(BuildErrors());
 
-        exception.Message.Should().Be("One or more validation errors occurred.");
+        exception.Message.ShouldBe("One or more validation errors occurred.");
     }
 
     // -------------------------------------------------------------------------
@@ -70,7 +70,7 @@ public sealed class ValidationExceptionTests
     {
         ValidationException exception = new(BuildErrors());
 
-        exception.Should().BeAssignableTo<IHasValidationErrors>();
+        exception.ShouldBeAssignableTo<IHasValidationErrors>();
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class ValidationExceptionTests
     {
         ValidationException exception = new(BuildErrors());
 
-        exception.Should().BeAssignableTo<IUserFriendlyException>();
+        exception.ShouldBeAssignableTo<IUserFriendlyException>();
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public sealed class ValidationExceptionTests
     {
         ValidationException exception = new(BuildErrors());
 
-        exception.Should().BeAssignableTo<Exception>();
+        exception.ShouldBeAssignableTo<Exception>();
     }
 
     // -------------------------------------------------------------------------
@@ -99,6 +99,6 @@ public sealed class ValidationExceptionTests
         IReadOnlyDictionary<string, string[]> empty = new Dictionary<string, string[]>();
         ValidationException exception = new(empty);
 
-        exception.ValidationErrors.Should().BeEmpty();
+        exception.ValidationErrors.ShouldBeEmpty();
     }
 }

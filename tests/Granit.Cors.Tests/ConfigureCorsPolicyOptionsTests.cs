@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Cors.Internal;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Cors.Tests;
@@ -21,10 +21,10 @@ public sealed class ConfigureCorsPolicyOptionsTests
         sut.Configure(corsOptions);
 
         CorsPolicy? policy = corsOptions.GetPolicy(corsOptions.DefaultPolicyName);
-        policy.Should().NotBeNull();
-        policy!.Origins.Should().Contain("https://app.example.com");
-        policy.Origins.Should().Contain("https://admin.example.com");
-        policy.AllowAnyOrigin.Should().BeFalse();
+        policy.ShouldNotBeNull();
+        policy!.Origins.ShouldContain("https://app.example.com");
+        policy.Origins.ShouldContain("https://admin.example.com");
+        policy.AllowAnyOrigin.ShouldBeFalse();
     }
 
     [Fact]
@@ -37,8 +37,8 @@ public sealed class ConfigureCorsPolicyOptionsTests
         sut.Configure(corsOptions);
 
         CorsPolicy? policy = corsOptions.GetPolicy(corsOptions.DefaultPolicyName);
-        policy.Should().NotBeNull();
-        policy!.AllowAnyOrigin.Should().BeTrue();
+        policy.ShouldNotBeNull();
+        policy!.AllowAnyOrigin.ShouldBeTrue();
     }
 
     [Fact]
@@ -54,9 +54,9 @@ public sealed class ConfigureCorsPolicyOptionsTests
         sut.Configure(corsOptions);
 
         CorsPolicy? policy = corsOptions.GetPolicy(corsOptions.DefaultPolicyName);
-        policy.Should().NotBeNull();
-        policy!.AllowAnyHeader.Should().BeTrue();
-        policy.AllowAnyMethod.Should().BeTrue();
+        policy.ShouldNotBeNull();
+        policy!.AllowAnyHeader.ShouldBeTrue();
+        policy.AllowAnyMethod.ShouldBeTrue();
     }
 
     [Fact]
@@ -73,8 +73,8 @@ public sealed class ConfigureCorsPolicyOptionsTests
         sut.Configure(corsOptions);
 
         CorsPolicy? policy = corsOptions.GetPolicy(corsOptions.DefaultPolicyName);
-        policy.Should().NotBeNull();
-        policy!.SupportsCredentials.Should().BeTrue();
+        policy.ShouldNotBeNull();
+        policy!.SupportsCredentials.ShouldBeTrue();
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public sealed class ConfigureCorsPolicyOptionsTests
         sut.Configure(corsOptions);
 
         CorsPolicy? policy = corsOptions.GetPolicy(corsOptions.DefaultPolicyName);
-        policy.Should().NotBeNull();
-        policy!.SupportsCredentials.Should().BeFalse();
+        policy.ShouldNotBeNull();
+        policy!.SupportsCredentials.ShouldBeFalse();
     }
 }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.Store;
 using Granit.Features.ValueProviders;
@@ -51,11 +51,11 @@ public sealed class TenantFeatureValueProviderTests
 
     [Fact]
     public void Name_Is_Tenant() =>
-        BuildProvider().Name.Should().Be("Tenant");
+        BuildProvider().Name.ShouldBe("Tenant");
 
     [Fact]
     public void Order_Is_100() =>
-        BuildProvider().Order.Should().Be(100);
+        BuildProvider().Order.ShouldBe(100);
 
     // -------------------------------------------------------------------------
     // GetOrNullAsync — ICurrentTenant not registered (optional multi-tenancy)
@@ -69,7 +69,7 @@ public sealed class TenantFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("ICurrentTenant is not registered in the service provider");
+        result.ShouldBeNull("ICurrentTenant is not registered in the service provider");
     }
 
     // -------------------------------------------------------------------------
@@ -84,7 +84,7 @@ public sealed class TenantFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("no tenant is active (IsAvailable = false)");
+        result.ShouldBeNull("no tenant is active (IsAvailable = false)");
     }
 
     // -------------------------------------------------------------------------
@@ -102,7 +102,7 @@ public sealed class TenantFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("no override stored for this tenant");
+        result.ShouldBeNull("no override stored for this tenant");
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public sealed class TenantFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().Be("true");
+        result.ShouldBe("true");
     }
 
     [Fact]
@@ -140,6 +140,6 @@ public sealed class TenantFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("the active tenant (B) has no stored override");
+        result.ShouldBeNull("the active tenant (B) has no stored override");
     }
 }

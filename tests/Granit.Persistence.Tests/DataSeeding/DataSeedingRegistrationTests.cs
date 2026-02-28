@@ -7,11 +7,11 @@
 //   - N'enregistre PAS de IDataSeedContributor (responsabilité des modules)
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.DataSeeding;
 using Granit.Persistence.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.DataSeeding;
@@ -29,9 +29,9 @@ public sealed class DataSeedingRegistrationTests
 
         // Assert
         ServiceDescriptor? descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IDataSeeder));
-        descriptor.Should().NotBeNull();
-        descriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
-        descriptor.ImplementationType.Should().Be<DataSeeder>();
+        descriptor.ShouldNotBeNull();
+        descriptor!.Lifetime.ShouldBe(ServiceLifetime.Singleton);
+        descriptor.ImplementationType.ShouldBe(typeof(DataSeeder));
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public sealed class DataSeedingRegistrationTests
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(IHostedService)
                  && d.ImplementationType == typeof(DataSeedingHostedService));
-        descriptor.Should().NotBeNull();
+        descriptor.ShouldNotBeNull();
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class DataSeedingRegistrationTests
 
         // Assert
         services.Where(d => d.ServiceType == typeof(IDataSeedContributor))
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -74,6 +74,6 @@ public sealed class DataSeedingRegistrationTests
         IServiceCollection result = services.AddGranitDataSeeding();
 
         // Assert
-        result.Should().BeSameAs(services);
+        result.ShouldBeSameAs(services);
     }
 }

@@ -6,13 +6,13 @@
 // followers (Odoo-style auto-tracking).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Notifications.Abstractions;
 using Granit.Timing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.EntityFrameworkCore.Tests;
@@ -132,7 +132,7 @@ public sealed class EntityTrackingInterceptorTests : IDisposable
 
         // Load and save without modifying — no notification expected
         TrackedOrder? loaded = await db.Orders.FindAsync([order.Id], TestContext.Current.CancellationToken);
-        loaded.Should().NotBeNull();
+        loaded.ShouldNotBeNull();
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await _publisher.DidNotReceive().PublishToEntityFollowersAsync(

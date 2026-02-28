@@ -5,9 +5,9 @@
 // Error codes follow the convention Granit:Validation:* (WithMessage = WithErrorCode).
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -30,7 +30,7 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(niss));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -47,9 +47,9 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(niss));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBelgianNiss");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianNiss");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianNiss");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianNiss");
     }
 
     // =========================================================================
@@ -66,7 +66,7 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(rpps));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -83,8 +83,8 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(rpps));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchRpps");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchRpps");
     }
 
     // =========================================================================
@@ -103,7 +103,7 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(phone));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -121,8 +121,8 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(phone));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidE164Phone");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidE164Phone");
     }
 
     // =========================================================================
@@ -139,7 +139,7 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(adeli));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -155,8 +155,8 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(adeli));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchAdeli");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchAdeli");
     }
 
     // =========================================================================
@@ -176,7 +176,7 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(iban));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -193,8 +193,8 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(iban));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidIban");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidIban");
     }
 
     // =========================================================================
@@ -210,7 +210,7 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(finess));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -227,8 +227,8 @@ public sealed class IdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(finess));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchFiness");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchFiness");
     }
 
     // -------------------------------------------------------------------------

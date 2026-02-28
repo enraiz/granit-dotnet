@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.BlobStorage.EntityFrameworkCore.Internal;
 using Granit.Core.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.EntityFrameworkCore.Tests;
@@ -66,7 +66,7 @@ public sealed class EfBlobDescriptorStoreTests
         BlobDescriptor? result = await store.FindAsync(
             Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // =========================================================================
@@ -85,11 +85,11 @@ public sealed class EfBlobDescriptorStoreTests
 
         BlobDescriptor? retrieved = await store.FindAsync(
             blobId, TestContext.Current.CancellationToken);
-        retrieved.Should().NotBeNull();
-        retrieved!.Id.Should().Be(blobId);
-        retrieved.Status.Should().Be(BlobStatus.Pending);
-        retrieved.OriginalFileName.Should().Be("prescription.pdf");
-        retrieved.DeclaredContentType.Should().Be("application/pdf");
+        retrieved.ShouldNotBeNull();
+        retrieved!.Id.ShouldBe(blobId);
+        retrieved.Status.ShouldBe(BlobStatus.Pending);
+        retrieved.OriginalFileName.ShouldBe("prescription.pdf");
+        retrieved.DeclaredContentType.ShouldBe("application/pdf");
     }
 
     [Fact]
@@ -111,12 +111,12 @@ public sealed class EfBlobDescriptorStoreTests
 
         BlobDescriptor? retrieved = await store.FindAsync(
             blobId, TestContext.Current.CancellationToken);
-        retrieved!.TenantId.Should().Be(TenantId.ToString());
-        retrieved.ContainerName.Should().Be("medical-images");
-        retrieved.ObjectKey.Should().Be($"{TenantId}/medical-images/2026/02/{blobId}");
-        retrieved.OriginalFileName.Should().Be("scan.dcm");
-        retrieved.DeclaredContentType.Should().Be("application/dicom");
-        retrieved.CreatedAt.Should().Be(createdAt);
+        retrieved!.TenantId.ShouldBe(TenantId.ToString());
+        retrieved.ContainerName.ShouldBe("medical-images");
+        retrieved.ObjectKey.ShouldBe($"{TenantId}/medical-images/2026/02/{blobId}");
+        retrieved.OriginalFileName.ShouldBe("scan.dcm");
+        retrieved.DeclaredContentType.ShouldBe("application/dicom");
+        retrieved.CreatedAt.ShouldBe(createdAt);
     }
 
     // =========================================================================
@@ -138,7 +138,7 @@ public sealed class EfBlobDescriptorStoreTests
 
         BlobDescriptor? updated = await store.FindAsync(
             blobId, TestContext.Current.CancellationToken);
-        updated!.Status.Should().Be(BlobStatus.Uploading);
+        updated!.Status.ShouldBe(BlobStatus.Uploading);
     }
 
     [Fact]
@@ -162,10 +162,10 @@ public sealed class EfBlobDescriptorStoreTests
 
         BlobDescriptor? valid = await store.FindAsync(
             blobId, TestContext.Current.CancellationToken);
-        valid!.Status.Should().Be(BlobStatus.Valid);
-        valid.VerifiedContentType.Should().Be("application/pdf");
-        valid.SizeBytes.Should().Be(204_800L);
-        valid.ValidatedAt.Should().Be(validatedAt);
+        valid!.Status.ShouldBe(BlobStatus.Valid);
+        valid.VerifiedContentType.ShouldBe("application/pdf");
+        valid.SizeBytes.ShouldBe(204_800L);
+        valid.ValidatedAt.ShouldBe(validatedAt);
     }
 
     [Fact]
@@ -188,8 +188,8 @@ public sealed class EfBlobDescriptorStoreTests
 
         BlobDescriptor? rejected = await store.FindAsync(
             blobId, TestContext.Current.CancellationToken);
-        rejected!.Status.Should().Be(BlobStatus.Rejected);
-        rejected.RejectionReason.Should().Be("Invalid magic bytes: expected PDF signature.");
+        rejected!.Status.ShouldBe(BlobStatus.Rejected);
+        rejected.RejectionReason.ShouldBe("Invalid magic bytes: expected PDF signature.");
     }
 
     [Fact]
@@ -216,10 +216,10 @@ public sealed class EfBlobDescriptorStoreTests
 
         // RGPD / HDS: the audit row must remain in the database after deletion.
         BlobDescriptor? deleted = await store.FindAsync(blobId, TestContext.Current.CancellationToken);
-        deleted.Should().NotBeNull("HDS requires the audit record to be retained for 3 years");
-        deleted!.Status.Should().Be(BlobStatus.Deleted);
-        deleted.DeletedAt.Should().Be(deletedAt);
-        deleted.DeletionReason.Should().Be("RGPD Art. 17 erasure request");
+        deleted.ShouldNotBeNull("HDS requires the audit record to be retained for 3 years");
+        deleted!.Status.ShouldBe(BlobStatus.Deleted);
+        deleted.DeletedAt.ShouldBe(deletedAt);
+        deleted.DeletionReason.ShouldBe("RGPD Art. 17 erasure request");
     }
 
     // =========================================================================
@@ -242,7 +242,7 @@ public sealed class EfBlobDescriptorStoreTests
         BlobDescriptor? result = await storeTenant.FindAsync(
             blobId, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("cross-tenant access must be blocked at the store level");
+        result.ShouldBeNull("cross-tenant access must be blocked at the store level");
     }
 
     // =========================================================================
@@ -261,6 +261,6 @@ public sealed class EfBlobDescriptorStoreTests
         BlobDescriptor? result = await store.FindAsync(
             Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("no blob exists with TenantId = string.Empty");
+        result.ShouldBeNull("no blob exists with TenantId = string.Empty");
     }
 }

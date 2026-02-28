@@ -1,9 +1,9 @@
-using FluentAssertions;
 using Granit.Privacy.DataExport;
 using Granit.Privacy.Extensions;
 using Granit.Privacy.LegalAgreements;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Privacy.Tests;
@@ -23,9 +23,9 @@ public sealed class PrivacyServiceCollectionExtensionsTests
 
         ServiceProvider provider = services.BuildServiceProvider();
 
-        provider.GetService<IDataProviderRegistry>().Should().NotBeNull();
-        provider.GetService<ILegalDocumentRegistry>().Should().NotBeNull();
-        provider.GetService<ILegalAgreementChecker>().Should().NotBeNull();
+        provider.GetService<IDataProviderRegistry>().ShouldNotBeNull();
+        provider.GetService<ILegalDocumentRegistry>().ShouldNotBeNull();
+        provider.GetService<ILegalAgreementChecker>().ShouldNotBeNull();
     }
 
     [Fact]
@@ -41,10 +41,10 @@ public sealed class PrivacyServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
         IDataProviderRegistry? registry = provider.GetService<IDataProviderRegistry>();
 
-        registry.Should().NotBeNull();
-        registry!.Count.Should().Be(2);
-        registry.GetAll().Should().Contain("patients");
-        registry.GetAll().Should().Contain("billing");
+        registry.ShouldNotBeNull();
+        registry!.Count.ShouldBe(2);
+        registry.GetAll().ShouldContain("patients");
+        registry.GetAll().ShouldContain("billing");
     }
 
     [Fact]
@@ -60,9 +60,9 @@ public sealed class PrivacyServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
         ILegalDocumentRegistry? registry = provider.GetService<ILegalDocumentRegistry>();
 
-        registry.Should().NotBeNull();
-        registry!.GetAll().Should().HaveCount(2);
-        registry.GetDefinition("privacy-policy")!.CurrentVersion.Should().Be("2.0.0");
+        registry.ShouldNotBeNull();
+        registry!.GetAll().Count.ShouldBe(2);
+        registry.GetDefinition("privacy-policy")!.CurrentVersion.ShouldBe("2.0.0");
     }
 
     [Fact]
@@ -72,6 +72,6 @@ public sealed class PrivacyServiceCollectionExtensionsTests
 
         Action act = () => services.AddGranitPrivacy(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(act);
     }
 }

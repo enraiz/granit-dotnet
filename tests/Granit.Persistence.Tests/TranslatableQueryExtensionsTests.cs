@@ -5,10 +5,10 @@
 // produce correct results via EF Core InMemory.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Domain;
 using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -28,8 +28,8 @@ public sealed class TranslatableQueryExtensionsTests
             .IncludeTranslations<TestQueryDocument, TestQueryDocTranslation>()
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(2);
-        results.SelectMany(d => d.Translations).Should().HaveCount(4,
+        results.Count.ShouldBe(2);
+        results.SelectMany(d => d.Translations).Count().ShouldBe(4,
             "all translations for all documents must be loaded");
     }
 
@@ -42,10 +42,10 @@ public sealed class TranslatableQueryExtensionsTests
             .IncludeTranslations<TestQueryDocument, TestQueryDocTranslation>("fr")
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(2);
+        results.Count.ShouldBe(2);
         List<TestQueryDocTranslation> allTranslations = results.SelectMany(d => d.Translations).ToList();
-        allTranslations.Should().HaveCount(2, "only FR translations must be loaded");
-        allTranslations.Should().OnlyContain(t => t.Culture == "fr");
+        allTranslations.Count.ShouldBe(2, "only FR translations must be loaded");
+        allTranslations.ShouldAllBe(t => t.Culture == "fr");
     }
 
     // -------------------------------------------------------------------------
@@ -63,8 +63,8 @@ public sealed class TranslatableQueryExtensionsTests
                 "fr", t => t.Title.Contains("Rapport"))
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(1);
-        results[0].InternalCode.Should().Be("DOC-001");
+        results.Count.ShouldBe(1);
+        results[0].InternalCode.ShouldBe("DOC-001");
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class TranslatableQueryExtensionsTests
                 "de", t => t.Title.Contains("Rapport"))
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        results.Should().BeEmpty("no translation in German exists");
+        results.ShouldBeEmpty("no translation in German exists");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public sealed class TranslatableQueryExtensionsTests
                 "fr", t => t.Title.Contains("inexistant"))
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        results.Should().BeEmpty();
+        results.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -108,10 +108,10 @@ public sealed class TranslatableQueryExtensionsTests
                 "fr", t => t.Title)
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(2);
+        results.Count.ShouldBe(2);
         // "Guide" comes before "Rapport" alphabetically
-        results[0].InternalCode.Should().Be("DOC-002");
-        results[1].InternalCode.Should().Be("DOC-001");
+        results[0].InternalCode.ShouldBe("DOC-002");
+        results[1].InternalCode.ShouldBe("DOC-001");
     }
 
     // -------------------------------------------------------------------------

@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Endpoints.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Endpoints.Tests;
@@ -21,7 +21,7 @@ public sealed class MapBackgroundJobsEndpointsTests
         RouteGroupBuilder group = app.MapBackgroundJobsEndpoints();
 
         // Assert
-        group.Should().NotBeNull();
+        group.ShouldNotBeNull();
     }
 
     [Fact]
@@ -37,6 +37,6 @@ public sealed class MapBackgroundJobsEndpointsTests
             opts => opts.RoutePrefix = "admin/jobs");
 
         // Assert
-        group.Should().NotBeNull();
+        group.ShouldNotBeNull();
     }
 }

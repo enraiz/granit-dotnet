@@ -5,7 +5,6 @@
 // and the sentinel pattern (Value=null → provider returns null).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Caching;
 using Granit.Settings.Definitions;
 using Granit.Settings.Options;
@@ -15,6 +14,7 @@ using Granit.Settings.Values;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -42,11 +42,11 @@ public sealed class GlobalSettingValueProviderTests
 
     [Fact]
     public void Name_Is_G() =>
-        Create().provider.Name.Should().Be("G");
+        Create().provider.Name.ShouldBe("G");
 
     [Fact]
     public void Order_Is_300() =>
-        Create().provider.Order.Should().Be(300);
+        Create().provider.Order.ShouldBe(300);
 
     [Fact]
     public async Task GetOrNullAsync_StoreHasValue_Returns_SettingValue()
@@ -57,10 +57,10 @@ public sealed class GlobalSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Value.Should().Be("dark");
-        result.ProviderName.Should().Be("G");
-        result.ProviderKey.Should().BeNull();
+        result.ShouldNotBeNull();
+        result!.Value.ShouldBe("dark");
+        result.ProviderName.ShouldBe("G");
+        result.ProviderKey.ShouldBeNull();
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class GlobalSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("sentinel with Value=null must be filtered out");
+        result.ShouldBeNull("sentinel with Value=null must be filtered out");
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public sealed class GlobalSettingValueProviderTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
-        stored!.Value.Should().Be("light");
+        stored!.Value.ShouldBe("light");
 
         await cache.Received(1).RemoveAsync(
             Arg.Is<string>(k => k.Contains('G') && k.Contains("App.Theme")),
@@ -102,7 +102,7 @@ public sealed class GlobalSettingValueProviderTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
-        stored.Should().BeNull("ClearAsync must delete the store entry");
+        stored.ShouldBeNull("ClearAsync must delete the store entry");
 
         await cache.Received(1).RemoveAsync(
             Arg.Is<string>(k => k.Contains('G') && k.Contains("App.Theme")),

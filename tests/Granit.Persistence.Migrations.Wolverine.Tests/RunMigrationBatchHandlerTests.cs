@@ -6,7 +6,6 @@
 // Uses real MigrationBatchExecutor with mocked dependencies.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
@@ -14,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Wolverine.Tests;
@@ -77,7 +77,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -92,10 +92,10 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(1);
-        RunMigrationBatchCommand cascade = result[0].Should().BeOfType<RunMigrationBatchCommand>().Subject;
-        cascade.CycleId.Should().Be(cycleId);
-        cascade.Cursor.Should().Be("cursor-next");
+        result.Length.ShouldBe(1);
+        RunMigrationBatchCommand cascade = result[0].ShouldBeOfType<RunMigrationBatchCommand>();
+        cascade.CycleId.ShouldBe(cycleId);
+        cascade.Cursor.ShouldBe("cursor-next");
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
             new RunMigrationBatchCommand("missing", Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     private sealed class StubDbContext(DbContextOptions<StubDbContext> options) : DbContext(options);

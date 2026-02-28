@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.MultiTenancy;
@@ -8,24 +8,24 @@ public sealed class NullTenantContextTests
 {
     [Fact]
     public void IsAvailable_IsFalse() =>
-        NullTenantContext.Instance.IsAvailable.Should().BeFalse();
+        NullTenantContext.Instance.IsAvailable.ShouldBeFalse();
 
     [Fact]
     public void Id_IsNull() =>
-        NullTenantContext.Instance.Id.Should().BeNull();
+        NullTenantContext.Instance.Id.ShouldBeNull();
 
     [Fact]
     public void Name_IsNull() =>
-        NullTenantContext.Instance.Name.Should().BeNull();
+        NullTenantContext.Instance.Name.ShouldBeNull();
 
     [Fact]
     public void Change_ReturnsDisposable_WithoutEffect()
     {
         using IDisposable scope = NullTenantContext.Instance.Change(Guid.NewGuid(), "tenant-a");
 
-        scope.Should().NotBeNull();
-        NullTenantContext.Instance.Id.Should().BeNull("Change is a no-op");
-        NullTenantContext.Instance.IsAvailable.Should().BeFalse();
+        scope.ShouldNotBeNull();
+        NullTenantContext.Instance.Id.ShouldBeNull("Change is a no-op");
+        NullTenantContext.Instance.IsAvailable.ShouldBeFalse();
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public sealed class NullTenantContextTests
     {
         using IDisposable scope = NullTenantContext.Instance.Change(null);
 
-        scope.Should().NotBeNull();
+        scope.ShouldNotBeNull();
     }
 
     [Fact]
@@ -42,10 +42,10 @@ public sealed class NullTenantContextTests
         NullTenantContext a = NullTenantContext.Instance;
         NullTenantContext b = NullTenantContext.Instance;
 
-        a.Should().BeSameAs(b);
+        a.ShouldBeSameAs(b);
     }
 
     [Fact]
     public void ImplementsICurrentTenant() =>
-        NullTenantContext.Instance.Should().BeAssignableTo<ICurrentTenant>();
+        NullTenantContext.Instance.ShouldBeAssignableTo<ICurrentTenant>();
 }

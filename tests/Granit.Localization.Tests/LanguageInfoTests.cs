@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Tests;
@@ -10,10 +10,10 @@ public sealed class LanguageInfoTests
     {
         LanguageInfo lang = new("fr", "Français", "fr");
 
-        lang.CultureName.Should().Be("fr");
-        lang.DisplayName.Should().Be("Français");
-        lang.FlagIcon.Should().Be("fr");
-        lang.IsDefault.Should().BeFalse();
+        lang.CultureName.ShouldBe("fr");
+        lang.DisplayName.ShouldBe("Français");
+        lang.FlagIcon.ShouldBe("fr");
+        lang.IsDefault.ShouldBeFalse();
     }
 
     [Fact]
@@ -21,10 +21,10 @@ public sealed class LanguageInfoTests
     {
         LanguageInfo lang = new("en", "English");
 
-        lang.CultureName.Should().Be("en");
-        lang.DisplayName.Should().Be("English");
-        lang.FlagIcon.Should().BeNull();
-        lang.IsDefault.Should().BeFalse();
+        lang.CultureName.ShouldBe("en");
+        lang.DisplayName.ShouldBe("English");
+        lang.FlagIcon.ShouldBeNull();
+        lang.IsDefault.ShouldBeFalse();
     }
 
     [Fact]
@@ -32,10 +32,10 @@ public sealed class LanguageInfoTests
     {
         LanguageInfo lang = new("fr-CA", "Français (Canada)", "ca");
 
-        lang.CultureName.Should().Be("fr-CA");
-        lang.DisplayName.Should().Be("Français (Canada)");
-        lang.FlagIcon.Should().Be("ca");
-        lang.IsDefault.Should().BeFalse();
+        lang.CultureName.ShouldBe("fr-CA");
+        lang.DisplayName.ShouldBe("Français (Canada)");
+        lang.FlagIcon.ShouldBe("ca");
+        lang.IsDefault.ShouldBeFalse();
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class LanguageInfoTests
     {
         LanguageInfo lang = new("en", "English", "gb", isDefault: true);
 
-        lang.IsDefault.Should().BeTrue();
+        lang.IsDefault.ShouldBeTrue();
     }
 
     [Fact]
@@ -51,9 +51,9 @@ public sealed class LanguageInfoTests
     {
         LanguageInfo lang = new("en", "English", "gb", isDefault: true);
 
-        lang.CultureName.Should().Be("en");
-        lang.DisplayName.Should().Be("English");
-        lang.FlagIcon.Should().Be("gb");
-        lang.IsDefault.Should().BeTrue();
+        lang.CultureName.ShouldBe("en");
+        lang.DisplayName.ShouldBe("English");
+        lang.FlagIcon.ShouldBe("gb");
+        lang.IsDefault.ShouldBeTrue();
     }
 }

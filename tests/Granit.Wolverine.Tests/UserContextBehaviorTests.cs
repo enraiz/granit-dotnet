@@ -5,11 +5,11 @@
 // in incoming Wolverine envelopes, and that the scope is disposed on After().
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Wolverine.Behaviors;
 using Granit.Wolverine.Internal;
 using Granit.Wolverine.Middleware;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 
@@ -87,6 +87,6 @@ public sealed class UserContextBehaviorTests
 
         Action act = behavior.After;
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 }

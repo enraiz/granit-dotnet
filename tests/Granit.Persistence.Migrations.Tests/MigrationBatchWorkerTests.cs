@@ -6,7 +6,6 @@
 // =============================================================================
 
 using System.Threading.Channels;
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
@@ -16,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -109,9 +109,9 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         // Assert
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, ct);
-        progress.Should().NotBeNull();
-        progress!.Status.Should().Be(MigrationStatus.Completed);
-        progress.ProcessedRows.Should().Be(10);
+        progress.ShouldNotBeNull();
+        progress!.Status.ShouldBe(MigrationStatus.Completed);
+        progress.ProcessedRows.ShouldBe(10);
     }
 
     // -------------------------------------------------------------------------
@@ -144,10 +144,10 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         // Assert
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, ct);
-        progress.Should().NotBeNull();
-        progress!.Status.Should().Be(MigrationStatus.Completed);
-        progress.ProcessedRows.Should().Be(100);
-        callCount.Should().Be(2);
+        progress.ShouldNotBeNull();
+        progress!.Status.ShouldBe(MigrationStatus.Completed);
+        progress.ProcessedRows.ShouldBe(100);
+        callCount.ShouldBe(2);
     }
 
     // -------------------------------------------------------------------------
@@ -178,7 +178,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         await worker.StopAsync(ct);
 
         // Assert
-        worker.ExecuteTask!.IsCompleted.Should().BeTrue();
+        worker.ExecuteTask!.IsCompleted.ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -216,7 +216,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         await worker.StopAsync(ct);
 
         // Assert
-        callCount.Should().Be(1);
+        callCount.ShouldBe(1);
     }
 
     // -------------------------------------------------------------------------
@@ -242,7 +242,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         await worker.ExecuteTask!;
 
         // Assert
-        worker.ExecuteTask.IsCompletedSuccessfully.Should().BeTrue();
+        worker.ExecuteTask.IsCompletedSuccessfully.ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -273,7 +273,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         await worker.ExecuteTask!;
 
         // Assert
-        worker.ExecuteTask.IsCompletedSuccessfully.Should().BeTrue();
+        worker.ExecuteTask.IsCompletedSuccessfully.ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------

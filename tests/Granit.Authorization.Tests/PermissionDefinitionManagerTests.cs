@@ -7,9 +7,9 @@
 //   - Détecte les permissions existantes et inconnues
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Services;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.Tests;
@@ -26,9 +26,9 @@ public sealed class PermissionDefinitionManagerTests
         PermissionDefinitionManager manager = new(providers);
 
         // Assert
-        manager.Exists("Invoices.Read").Should().BeTrue();
-        manager.Exists("Invoices.Create").Should().BeTrue();
-        manager.Exists("Invoices.Delete").Should().BeTrue();
+        manager.Exists("Invoices.Read").ShouldBeTrue();
+        manager.Exists("Invoices.Create").ShouldBeTrue();
+        manager.Exists("Invoices.Delete").ShouldBeTrue();
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public sealed class PermissionDefinitionManagerTests
         PermissionDefinitionManager manager = new(providers);
 
         // Assert — les permissions des deux providers sont disponibles
-        manager.Exists("Administration.Users.Read").Should().BeTrue();
-        manager.Exists("Administration.Reports.Export").Should().BeTrue();
+        manager.Exists("Administration.Users.Read").ShouldBeTrue();
+        manager.Exists("Administration.Reports.Export").ShouldBeTrue();
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class PermissionDefinitionManagerTests
         PermissionDefinitionManager manager = new([new InvoicesPermissionProvider()]);
 
         // Act & Assert
-        manager.Exists("Unknown.Permission").Should().BeFalse();
+        manager.Exists("Unknown.Permission").ShouldBeFalse();
     }
 
     [Fact]
@@ -74,9 +74,9 @@ public sealed class PermissionDefinitionManagerTests
         IReadOnlyList<PermissionDefinition> all = manager.GetAll();
 
         // Assert
-        all.Should().Contain(p => p.Name == "Invoices.Read");
-        all.Should().Contain(p => p.Name == "Invoices.Delete");
-        all.Should().Contain(p => p.Name == "Administration.Users.Read");
+        all.ShouldContain(p => p.Name == "Invoices.Read");
+        all.ShouldContain(p => p.Name == "Invoices.Delete");
+        all.ShouldContain(p => p.Name == "Administration.Users.Read");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public sealed class PermissionDefinitionManagerTests
         IReadOnlyList<PermissionGroup> groups = manager.GetGroups();
 
         // Assert
-        groups.Should().ContainSingle(g => g.Name == "Invoices");
+        groups.ShouldContain(g => g.Name == "Invoices");
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public sealed class PermissionDefinitionManagerTests
         PermissionDefinitionManager manager = new(providers);
 
         // Assert — le groupe "Administration" n'est présent qu'une fois
-        manager.GetGroups().Where(g => g.Name == "Administration").Should().HaveCount(1);
+        manager.GetGroups().Where(g => g.Name == "Administration").Count().ShouldBe(1);
     }
 
     // --- Test doubles ---

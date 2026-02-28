@@ -1,9 +1,9 @@
-using FluentAssertions;
 using Granit.Core.Extensions;
 using Granit.Core.Modularity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Extensions;
@@ -44,8 +44,8 @@ public sealed class GranitApplicationExtensionsTests
         using IHost host = hostBuilder.Build();
         IHost result = host.UseGranit();
 
-        result.Should().BeSameAs(host);
-        CallOrder.Should().Contain("sync-init");
+        result.ShouldBeSameAs(host);
+        CallOrder.ShouldContain("sync-init");
     }
 
     // -------------------------------------------------------------------------
@@ -63,7 +63,7 @@ public sealed class GranitApplicationExtensionsTests
         using IHost host = hostBuilder.Build();
         IHost result = await host.UseGranitAsync();
 
-        result.Should().BeSameAs(host);
-        CallOrder.Should().Contain("async-init");
+        result.ShouldBeSameAs(host);
+        CallOrder.ShouldContain("async-init");
     }
 }

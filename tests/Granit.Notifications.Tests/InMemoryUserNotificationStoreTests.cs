@@ -6,9 +6,9 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
@@ -25,8 +25,8 @@ public sealed class InMemoryUserNotificationStoreTests
         await _store.InsertAsync(notification, TestContext.Current.CancellationToken);
         UserNotification? retrieved = await _store.GetAsync(notification.Id, TestContext.Current.CancellationToken);
 
-        retrieved.Should().NotBeNull();
-        retrieved!.Id.Should().Be(notification.Id);
+        retrieved.ShouldNotBeNull();
+        retrieved!.Id.ShouldBe(notification.Id);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public sealed class InMemoryUserNotificationStoreTests
         IReadOnlyList<UserNotification> results =
             await _store.GetListAsync("user-1", tenantId: null, skipCount: 0, maxResultCount: 2, TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(2);
-        results[0].CreatedAt.Should().BeOnOrAfter(results[1].CreatedAt,
+        results.Count.ShouldBe(2);
+        results[0].CreatedAt.ShouldBeGreaterThanOrEqualTo(results[1].CreatedAt,
             "results should be sorted by date descending (newest first)");
     }
 
@@ -63,7 +63,7 @@ public sealed class InMemoryUserNotificationStoreTests
 
         int count = await _store.GetUnreadCountAsync("user-1", tenantId: null, TestContext.Current.CancellationToken);
 
-        count.Should().Be(2);
+        count.ShouldBe(2);
     }
 
     [Fact]
@@ -76,8 +76,8 @@ public sealed class InMemoryUserNotificationStoreTests
         await _store.MarkAsReadAsync(notification.Id, readAt, TestContext.Current.CancellationToken);
 
         UserNotification? updated = await _store.GetAsync(notification.Id, TestContext.Current.CancellationToken);
-        updated!.State.Should().Be(UserNotificationState.Read);
-        updated.ReadAt.Should().Be(readAt);
+        updated!.State.ShouldBe(UserNotificationState.Read);
+        updated.ReadAt.ShouldBe(readAt);
     }
 
     [Fact]
@@ -98,9 +98,9 @@ public sealed class InMemoryUserNotificationStoreTests
         UserNotification? updated2 = await _store.GetAsync(unread2.Id, TestContext.Current.CancellationToken);
         UserNotification? otherUserNotif = await _store.GetAsync(otherUser.Id, TestContext.Current.CancellationToken);
 
-        updated1!.State.Should().Be(UserNotificationState.Read);
-        updated2!.State.Should().Be(UserNotificationState.Read);
-        otherUserNotif!.State.Should().Be(UserNotificationState.Unread,
+        updated1!.State.ShouldBe(UserNotificationState.Read);
+        updated2!.State.ShouldBe(UserNotificationState.Read);
+        otherUserNotif!.State.ShouldBe(UserNotificationState.Unread,
             "other user's notifications should not be affected");
     }
 
@@ -118,8 +118,8 @@ public sealed class InMemoryUserNotificationStoreTests
         IReadOnlyList<UserNotification> results =
             await _store.GetByEntityAsync("Invoice", "inv-42", tenantId: null, skipCount: 0, maxResultCount: 10, TestContext.Current.CancellationToken);
 
-        results.Should().ContainSingle();
-        results[0].Id.Should().Be(matching.Id);
+        results.ShouldHaveSingleItem();
+        results[0].Id.ShouldBe(matching.Id);
     }
 
     // -------------------------------------------------------------------------

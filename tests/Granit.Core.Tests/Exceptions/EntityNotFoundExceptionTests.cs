@@ -8,8 +8,8 @@
 //   - Does NOT implement IHasErrorCode (by design — entity names must not leak as error keys)
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Exceptions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Exceptions;
@@ -27,7 +27,7 @@ public sealed class EntityNotFoundExceptionTests
     {
         EntityNotFoundException exception = new(typeof(Appointment), Guid.NewGuid());
 
-        exception.EntityType.Should().Be<Appointment>();
+        exception.EntityType.ShouldBe(typeof(Appointment));
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class EntityNotFoundExceptionTests
         var id = Guid.NewGuid();
         EntityNotFoundException exception = new(typeof(Appointment), id);
 
-        exception.EntityId.Should().Be(id);
+        exception.EntityId.ShouldBe(id);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class EntityNotFoundExceptionTests
     {
         EntityNotFoundException exception = new(typeof(Appointment), 42);
 
-        exception.Message.Should().Contain("Appointment");
+        exception.Message.ShouldContain("Appointment");
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class EntityNotFoundExceptionTests
         var id = Guid.NewGuid();
         EntityNotFoundException exception = new(typeof(Appointment), id);
 
-        exception.Message.Should().Contain(id.ToString());
+        exception.Message.ShouldContain(id.ToString());
     }
 
     // -------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public sealed class EntityNotFoundExceptionTests
     {
         EntityNotFoundException exception = new(typeof(Appointment), 1);
 
-        exception.Should().BeAssignableTo<IUserFriendlyException>();
+        exception.ShouldBeAssignableTo<IUserFriendlyException>();
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public sealed class EntityNotFoundExceptionTests
         EntityNotFoundException exception = new(typeof(Appointment), 1);
 
         // By design: entity type names must not be used as localizable error code keys.
-        exception.Should().NotBeAssignableTo<IHasErrorCode>();
+        exception.ShouldNotBeAssignableTo<IHasErrorCode>();
     }
 
     [Fact]
@@ -82,6 +82,6 @@ public sealed class EntityNotFoundExceptionTests
     {
         EntityNotFoundException exception = new(typeof(Appointment), 1);
 
-        exception.Should().BeAssignableTo<Exception>();
+        exception.ShouldBeAssignableTo<Exception>();
     }
 }

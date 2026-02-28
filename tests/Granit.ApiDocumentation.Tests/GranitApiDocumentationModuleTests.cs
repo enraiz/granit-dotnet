@@ -4,12 +4,12 @@
 // Vérifie que ConfigureServices enregistre les services de documentation OpenAPI.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiDocumentation.Options;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -35,7 +35,7 @@ public sealed class GranitApiDocumentationModuleTests
             builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
-        options.Should().NotBeNull();
-        options.MajorVersions.Should().ContainSingle().Which.Should().Be(1, "default version is 1");
+        options.ShouldNotBeNull();
+        options.MajorVersions.ShouldHaveSingleItem().ShouldBe(1, "default version is 1");
     }
 }

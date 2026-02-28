@@ -8,13 +8,13 @@
 // =============================================================================
 
 using System.Data.Common;
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.MultiTenancy;
@@ -91,7 +91,7 @@ public sealed class TenantSchemaConnectionInterceptorTests
 
         await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), ct);
 
-        cmd.CommandText.Should().Be("SET search_path TO \"tenant_a\", public");
+        cmd.CommandText.ShouldBe("SET search_path TO \"tenant_a\", public");
         await cmd.Received(1).ExecuteNonQueryAsync(ct);
     }
 
@@ -121,7 +121,7 @@ public sealed class TenantSchemaConnectionInterceptorTests
         // ne peut pas sauter la seconde exécution même si la connexion est "déjà ouverte".
         await cmd.Received(2).ExecuteNonQueryAsync(ct);
         // Le search_path final correspond au tenant B.
-        cmd.CommandText.Should().Be("SET search_path TO \"tenant_b\", public");
+        cmd.CommandText.ShouldBe("SET search_path TO \"tenant_b\", public");
     }
 
     // -----------------------------------------------------------------------
@@ -157,7 +157,7 @@ public sealed class TenantSchemaConnectionInterceptorTests
         TenantSchemaConnectionInterceptor interceptor = new(MakeTenant(TenantA), provider);
         interceptor.ConnectionOpened(conn, MakeEventData());
 
-        cmd.CommandText.Should().StartWith("SET search_path TO \"tenant_");
+        cmd.CommandText.ShouldStartWith("SET search_path TO \"tenant_");
         cmd.Received(1).ExecuteNonQuery();
     }
 
@@ -195,8 +195,7 @@ public sealed class TenantSchemaConnectionInterceptorTests
 
         Func<Task> act = () => interceptor.ConnectionOpenedAsync(conn, MakeEventData(), ct);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*not a valid PostgreSQL identifier*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("not a valid PostgreSQL identifier");
     }
 
     [Theory]
@@ -215,7 +214,6 @@ public sealed class TenantSchemaConnectionInterceptorTests
 
         Action act = () => interceptor.ConnectionOpened(conn, MakeEventData());
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*not a valid PostgreSQL identifier*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("not a valid PostgreSQL identifier");
     }
 }

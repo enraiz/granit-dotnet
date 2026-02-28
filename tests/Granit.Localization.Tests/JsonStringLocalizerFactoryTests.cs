@@ -1,10 +1,10 @@
 using System.Globalization;
-using FluentAssertions;
 using Granit.Localization.Json;
 using Granit.Localization.Tests.TestResources;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Tests;
@@ -53,7 +53,7 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
         IStringLocalizer localizer = factory.Create(typeof(TestResource));
 
         // Assert
-        localizer["Test:Hello"].Value.Should().Be("Bonjour");
+        localizer["Test:Hello"].Value.ShouldBe("Bonjour");
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
         IStringLocalizer localizer2 = factory.Create(typeof(TestResource));
 
         // Assert
-        localizer1.Should().BeSameAs(localizer2);
+        localizer1.ShouldBeSameAs(localizer2);
     }
 
     [Fact]
@@ -81,8 +81,8 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
         IStringLocalizer localizer = factory.Create(typeof(UnregisteredResource));
 
         // Assert
-        localizer["Any:Key"].ResourceNotFound.Should().BeTrue();
-        localizer["Any:Key"].Value.Should().Be("Any:Key");
+        localizer["Any:Key"].ResourceNotFound.ShouldBeTrue();
+        localizer["Any:Key"].Value.ShouldBe("Any:Key");
     }
 
     [Fact]
@@ -101,8 +101,8 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
         IStringLocalizer localizer = factory.Create(typeof(ChildTestResource));
 
         // Assert — la clé du parent est accessible via héritage
-        localizer["Parent:SharedKey"].Value.Should().Be("Valeur partagée du parent");
-        localizer["Parent:SharedKey"].ResourceNotFound.Should().BeFalse();
+        localizer["Parent:SharedKey"].Value.ShouldBe("Valeur partagée du parent");
+        localizer["Parent:SharedKey"].ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -120,8 +120,8 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
         IStringLocalizer localizer = factory.Create(typeof(ChildTestResource));
 
         // Assert
-        localizer["Parent:OnlyInParent"].Value.Should().Be("Seulement dans le parent");
-        localizer["Parent:OnlyInParent"].ResourceNotFound.Should().BeFalse();
+        localizer["Parent:OnlyInParent"].Value.ShouldBe("Seulement dans le parent");
+        localizer["Parent:OnlyInParent"].ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -137,8 +137,8 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
         IStringLocalizer localizer = factory.Create("Test", "any.location");
 
         // Assert
-        localizer["Test:Hello"].Value.Should().Be("Bonjour");
-        localizer["Test:Hello"].ResourceNotFound.Should().BeFalse();
+        localizer["Test:Hello"].Value.ShouldBe("Bonjour");
+        localizer["Test:Hello"].ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -151,6 +151,6 @@ public sealed class JsonStringLocalizerFactoryTests : IDisposable
         IStringLocalizer localizer = factory.Create("NonExistent.Type", "NonExistent.Assembly");
 
         // Assert
-        localizer["Any:Key"].ResourceNotFound.Should().BeTrue();
+        localizer["Any:Key"].ResourceNotFound.ShouldBeTrue();
     }
 }

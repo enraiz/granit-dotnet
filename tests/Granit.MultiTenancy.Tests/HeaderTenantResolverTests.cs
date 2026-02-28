@@ -2,11 +2,11 @@
 // HeaderTenantResolverTests - Unit tests for the HTTP header tenant resolver
 // =============================================================================
 
-using FluentAssertions;
 using Granit.MultiTenancy;
 using Granit.MultiTenancy.Resolvers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.MultiTenancy.Tests;
@@ -33,7 +33,7 @@ public sealed class HeaderTenantResolverTests
     public void Order_Is_100()
     {
         HeaderTenantResolver resolver = CreateResolver();
-        resolver.Order.Should().Be(100);
+        resolver.Order.ShouldBe(100);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public sealed class HeaderTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(tenantId);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(tenantId);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public sealed class HeaderTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public sealed class HeaderTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public sealed class HeaderTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -91,8 +91,8 @@ public sealed class HeaderTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(tenantId);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(tenantId);
     }
 
     [Fact]
@@ -103,6 +103,6 @@ public sealed class HeaderTenantResolverTests
 
         TenantInfo? result = await resolver.ResolveAsync(context, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 }

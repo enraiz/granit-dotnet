@@ -5,10 +5,10 @@
 // and returns null when no default is set.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.Definitions;
 using Granit.Settings.Providers;
 using Granit.Settings.Values;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -19,11 +19,11 @@ public sealed class DefaultValueSettingValueProviderTests
 
     [Fact]
     public void Name_Is_D() =>
-        CreateProvider().Name.Should().Be("D");
+        CreateProvider().Name.ShouldBe("D");
 
     [Fact]
     public void Order_Is_500() =>
-        CreateProvider().Order.Should().Be(500);
+        CreateProvider().Order.ShouldBe(500);
 
     [Fact]
     public async Task GetOrNullAsync_WithDefaultValue_Returns_SettingValue()
@@ -33,11 +33,11 @@ public sealed class DefaultValueSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Name.Should().Be("App.Theme");
-        result.ProviderName.Should().Be("D");
-        result.ProviderKey.Should().BeNull();
-        result.Value.Should().Be("dark");
+        result.ShouldNotBeNull();
+        result!.Name.ShouldBe("App.Theme");
+        result.ProviderName.ShouldBe("D");
+        result.ProviderKey.ShouldBeNull();
+        result.Value.ShouldBe("dark");
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public sealed class DefaultValueSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -59,10 +59,10 @@ public sealed class DefaultValueSettingValueProviderTests
 
         Func<Task> act = () => provider.SetAsync(def, "light", TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         // The DefaultValue is immutable — verify nothing changed
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
-        result!.Value.Should().Be("dark", "SetAsync is a no-op for the Default provider");
+        result!.Value.ShouldBe("dark", "SetAsync is a no-op for the Default provider");
     }
 
     [Fact]
@@ -73,6 +73,6 @@ public sealed class DefaultValueSettingValueProviderTests
 
         Func<Task> act = () => provider.ClearAsync(def, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 }

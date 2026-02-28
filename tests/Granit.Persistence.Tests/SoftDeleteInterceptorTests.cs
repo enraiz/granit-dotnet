@@ -8,7 +8,6 @@
 // SaveChangesAsync is called directly. IClock is mocked for exact assertions.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Domain;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
@@ -17,6 +16,7 @@ using Granit.Security;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -59,13 +59,13 @@ public sealed class SoftDeleteInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert — the entity is soft-deleted (not physically removed)
-        entity.IsDeleted.Should().BeTrue();
-        entity.DeletedAt.Should().Be(FixedNow);
-        entity.DeletedBy.Should().Be("user-test-123");
+        entity.IsDeleted.ShouldBeTrue();
+        entity.DeletedAt.ShouldBe(FixedNow);
+        entity.DeletedBy.ShouldBe("user-test-123");
 
         // Verify the entity still exists in the database (not physically deleted)
         int count = await context.Entities.IgnoreQueryFilters().CountAsync(TestContext.Current.CancellationToken);
-        count.Should().Be(1);
+        count.ShouldBe(1);
     }
 
     [Fact]
@@ -90,8 +90,8 @@ public sealed class SoftDeleteInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert — no soft delete
-        entity.IsDeleted.Should().BeFalse();
-        entity.DeletedAt.Should().BeNull();
+        entity.IsDeleted.ShouldBeFalse();
+        entity.DeletedAt.ShouldBeNull();
     }
 
     private TestDbContext CreateContext()

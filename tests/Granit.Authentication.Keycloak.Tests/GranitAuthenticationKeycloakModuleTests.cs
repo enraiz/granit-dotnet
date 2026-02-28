@@ -7,7 +7,6 @@
 //   - "Admin" policy registered
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authentication.JwtBearer;
 using Granit.Authentication.Keycloak.Authentication;
 using Granit.Core.Modularity;
@@ -17,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authentication.Keycloak.Tests;
@@ -42,7 +42,7 @@ public sealed class GranitAuthenticationKeycloakModuleTests
 
         // Assert
         ICurrentUserService? userService = sp.GetService<ICurrentUserService>();
-        userService.Should().NotBeNull("inherited from GranitJwtBearerModule");
+        userService.ShouldNotBeNull("inherited from GranitJwtBearerModule");
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class GranitAuthenticationKeycloakModuleTests
             .Where(d => d.ServiceType == typeof(IClaimsTransformation))
             .ToList();
 
-        descriptors.Should().Contain(d => d.ImplementationType == typeof(KeycloakClaimsTransformation));
+        descriptors.ShouldContain(d => d.ImplementationType == typeof(KeycloakClaimsTransformation));
     }
 
     [Fact]
@@ -86,6 +86,6 @@ public sealed class GranitAuthenticationKeycloakModuleTests
 
         // Assert
         AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
-        authOptions.GetPolicy("Admin").Should().NotBeNull();
+        authOptions.GetPolicy("Admin").ShouldNotBeNull();
     }
 }

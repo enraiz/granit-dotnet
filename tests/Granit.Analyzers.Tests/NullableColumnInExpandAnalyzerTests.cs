@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Analyzers.Tests;
@@ -32,7 +32,7 @@ public sealed class NullableColumnInExpandAnalyzerTests
                 includeMigrationCycleAttribute: true,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public sealed class NullableColumnInExpandAnalyzerTests
                 includeMigrationCycleAttribute: true,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public sealed class NullableColumnInExpandAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public sealed class NullableColumnInExpandAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public sealed class NullableColumnInExpandAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -167,6 +167,6 @@ public sealed class NullableColumnInExpandAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == NullableColumnInExpandAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 }

@@ -7,12 +7,12 @@
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using FluentAssertions;
 using Granit.ApiVersioning.Extensions;
 using Granit.ApiVersioning.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiVersioning.Tests;
@@ -33,7 +33,7 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Assert — IApiVersionReader, IApiVersionSelector, etc. should be registered
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType.Name.Contains("ApiVersion", StringComparison.OrdinalIgnoreCase));
-        descriptor.Should().NotBeNull("AddApiVersioning must register versioning services");
+        descriptor.ShouldNotBeNull("AddApiVersioning must register versioning services");
     }
 
     [Fact]
@@ -56,8 +56,8 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Assert — options are bound from configuration
         using ServiceProvider sp = services.BuildServiceProvider();
         GranitApiVersioningOptions options = sp.GetRequiredService<IOptions<GranitApiVersioningOptions>>().Value;
-        options.DefaultMajorVersion.Should().Be(2);
-        options.ReportApiVersions.Should().BeFalse();
+        options.DefaultMajorVersion.ShouldBe(2);
+        options.ReportApiVersions.ShouldBeFalse();
     }
 
     [Fact]
@@ -74,8 +74,8 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();
         GranitApiVersioningOptions options = sp.GetRequiredService<IOptions<GranitApiVersioningOptions>>().Value;
-        options.DefaultMajorVersion.Should().Be(1);
-        options.ReportApiVersions.Should().BeTrue();
+        options.DefaultMajorVersion.ShouldBe(1);
+        options.ReportApiVersions.ShouldBeTrue();
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         IServiceCollection returned = services.AddGranitApiVersioning();
 
         // Assert
-        returned.Should().BeSameAs(services);
+        returned.ShouldBeSameAs(services);
     }
 
     [Fact]
@@ -107,9 +107,9 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         ApiVersioningOptions options = sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
 
         // Assert
-        options.DefaultApiVersion.Should().Be(new ApiVersion(1));
-        options.AssumeDefaultVersionWhenUnspecified.Should().BeTrue();
-        options.ReportApiVersions.Should().BeTrue();
+        options.DefaultApiVersion.ShouldBe(new ApiVersion(1));
+        options.AssumeDefaultVersionWhenUnspecified.ShouldBeTrue();
+        options.ReportApiVersions.ShouldBeTrue();
     }
 
     [Fact]
@@ -132,8 +132,8 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         ApiVersioningOptions options = sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
 
         // Assert
-        options.DefaultApiVersion.Should().Be(new ApiVersion(3));
-        options.ReportApiVersions.Should().BeFalse();
+        options.DefaultApiVersion.ShouldBe(new ApiVersion(3));
+        options.ReportApiVersions.ShouldBeFalse();
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public sealed class ApiVersioningServiceCollectionExtensionsTests
         ApiExplorerOptions options = sp.GetRequiredService<IOptions<ApiExplorerOptions>>().Value;
 
         // Assert
-        options.GroupNameFormat.Should().Be("'v'VVV");
-        options.SubstituteApiVersionInUrl.Should().BeTrue();
+        options.GroupNameFormat.ShouldBe("'v'VVV");
+        options.SubstituteApiVersionInUrl.ShouldBeTrue();
     }
 }

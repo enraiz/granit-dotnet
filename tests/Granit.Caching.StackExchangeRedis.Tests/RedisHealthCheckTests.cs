@@ -7,11 +7,11 @@
 //   - Exception → Unhealthy avec message sanitisé (type uniquement)
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Caching.StackExchangeRedis.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using StackExchange.Redis;
 using Xunit;
 
@@ -37,8 +37,8 @@ public sealed class RedisHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(HealthStatus.Healthy);
-        result.Description.Should().Contain("10");
+        result.Status.ShouldBe(HealthStatus.Healthy);
+        result.Description!.ShouldContain("10");
     }
 
     [Fact]
@@ -56,9 +56,9 @@ public sealed class RedisHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(HealthStatus.Degraded);
-        result.Description.Should().Contain("100");
-        result.Description.Should().Contain("threshold");
+        result.Status.ShouldBe(HealthStatus.Degraded);
+        result.Description!.ShouldContain("100");
+        result.Description!.ShouldContain("threshold");
     }
 
     [Fact]
@@ -76,9 +76,9 @@ public sealed class RedisHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(HealthStatus.Degraded);
-        result.Description.Should().Contain("250");
-        result.Description.Should().Contain("100");
+        result.Status.ShouldBe(HealthStatus.Degraded);
+        result.Description!.ShouldContain("250");
+        result.Description!.ShouldContain("100");
     }
 
     [Fact]
@@ -98,10 +98,10 @@ public sealed class RedisHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(HealthStatus.Unhealthy);
-        result.Description.Should().Be("Redis unreachable: RedisConnectionException");
+        result.Status.ShouldBe(HealthStatus.Unhealthy);
+        result.Description.ShouldBe("Redis unreachable: RedisConnectionException");
         // Connection string and credentials must not appear
-        result.Description.Should().NotContain("password");
-        result.Description.Should().NotContain("redis:6379");
+        result.Description!.ShouldNotContain("password");
+        result.Description!.ShouldNotContain("redis:6379");
     }
 }

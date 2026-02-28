@@ -5,10 +5,10 @@
 // et que les dépendances de modules sont respectées.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.StackExchangeRedis.Tests;
@@ -33,7 +33,7 @@ public sealed class GranitCachingRedisModuleTests
         Action act = () => redisModule.ConfigureServices(context);
 
         // Assert
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -59,6 +59,6 @@ public sealed class GranitCachingRedisModuleTests
             d => d.ServiceType.IsGenericType
                  && d.ServiceType.GetGenericTypeDefinition() == typeof(Microsoft.Extensions.Options.IConfigureOptions<>)
                  && d.ServiceType.GetGenericArguments()[0] == typeof(RedisCachingOptions));
-        optsDescriptor.Should().NotBeNull();
+        optsDescriptor.ShouldNotBeNull();
     }
 }

@@ -1,8 +1,8 @@
 using System.Reflection;
-using FluentAssertions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Resolvers;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Tests.Resolvers;
@@ -24,14 +24,14 @@ public sealed class EmbeddedTemplateResolverTests
         TemplateDescriptor? result = await sut.TryResolveAsync(
             key, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
     public void Priority_IsNegative_SoStoreResolversAlwaysWin()
     {
         EmbeddedTemplateResolver sut = new([TestAssembly]);
-        sut.Priority.Should().BeNegative();
+        sut.Priority.ShouldBeLessThan(0);
     }
 
     [Fact]
@@ -43,10 +43,10 @@ public sealed class EmbeddedTemplateResolverTests
         TemplateDescriptor? result = await sut.TryResolveAsync(
             key, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Content.Should().Contain("Invoice neutral");
-        result.MimeType.Should().Be("text/html");
-        result.RevisionId.Should().BeNull("embedded templates have no persisted revision");
+        result.ShouldNotBeNull();
+        result!.Content.ShouldContain("Invoice neutral");
+        result.MimeType.ShouldBe("text/html");
+        result.RevisionId.ShouldBeNull("embedded templates have no persisted revision");
     }
 
     [Fact]
@@ -58,8 +58,8 @@ public sealed class EmbeddedTemplateResolverTests
         TemplateDescriptor? result = await sut.TryResolveAsync(
             key, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Content.Should().Contain("Facture fr");
+        result.ShouldNotBeNull();
+        result!.Content.ShouldContain("Facture fr");
     }
 
     [Fact]
@@ -72,8 +72,8 @@ public sealed class EmbeddedTemplateResolverTests
         TemplateDescriptor? result = await sut.TryResolveAsync(
             key, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull("must fall back to neutral resource");
-        result!.Content.Should().Contain("Invoice neutral");
+        result.ShouldNotBeNull("must fall back to neutral resource");
+        result!.Content.ShouldContain("Invoice neutral");
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public sealed class EmbeddedTemplateResolverTests
         TemplateDescriptor? result = await sut.TryResolveAsync(
             key, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull("second assembly must be searched when first has no match");
-        result!.Content.Should().Contain("Invoice neutral");
+        result.ShouldNotBeNull("second assembly must be searched when first has no match");
+        result!.Content.ShouldContain("Invoice neutral");
     }
 }

@@ -7,7 +7,7 @@
 //   - Provides a static instance
 // =============================================================================
 
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Guids.Tests;
@@ -24,7 +24,7 @@ public sealed class SimpleGuidGeneratorTests
         Guid guid = generator.Create();
 
         // Assert
-        guid.Should().NotBe(Guid.Empty);
+        guid.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -38,11 +38,11 @@ public sealed class SimpleGuidGeneratorTests
         Guid guid2 = generator.Create();
 
         // Assert
-        guid1.Should().NotBe(guid2);
+        guid1.ShouldNotBe(guid2);
     }
 
     [Fact]
-    public void Instance_IsNotNull() => SimpleGuidGenerator.Instance.Should().NotBeNull();
+    public void Instance_IsNotNull() => SimpleGuidGenerator.Instance.ShouldNotBeNull();
 
     [Fact]
     public void Instance_CreateReturnsNonEmptyGuid()
@@ -51,6 +51,6 @@ public sealed class SimpleGuidGeneratorTests
         Guid guid = SimpleGuidGenerator.Instance.Create();
 
         // Assert
-        guid.Should().NotBe(Guid.Empty);
+        guid.ShouldNotBe(Guid.Empty);
     }
 }

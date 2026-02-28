@@ -1,5 +1,4 @@
 using System.Net;
-using FluentAssertions;
 using Granit.Diagnostics.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Diagnostics.Tests;
@@ -22,7 +22,7 @@ public sealed class DiagnosticsEndpointTests
 
         HttpResponseMessage response = await client.GetAsync("/health/live", TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public sealed class DiagnosticsEndpointTests
 
         HttpResponseMessage response = await client.GetAsync("/health/ready", TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+        response.StatusCode.ShouldBe(HttpStatusCode.ServiceUnavailable);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class DiagnosticsEndpointTests
 
         HttpResponseMessage response = await client.GetAsync("/health/ready", TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class DiagnosticsEndpointTests
 
         HttpResponseMessage response = await client.GetAsync("/health/ready", TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public sealed class DiagnosticsEndpointTests
 
         HttpResponseMessage response = await client.GetAsync("/health/live", TestContext.Current.CancellationToken);
 
-        response.Content.Headers.ContentType?.MediaType.Should().Be("application/json");
+        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/json");
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public sealed class DiagnosticsEndpointTests
 
         HttpResponseMessage response = await client.GetAsync("/health/startup", TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+        response.StatusCode.ShouldBe(HttpStatusCode.ServiceUnavailable);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public sealed class DiagnosticsEndpointTests
 
         HttpResponseMessage response = await client.GetAsync("/health/startup", TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -111,9 +111,9 @@ public sealed class DiagnosticsEndpointTests
         HttpResponseMessage ready = await client.GetAsync("/health/ready", TestContext.Current.CancellationToken);
         HttpResponseMessage startup = await client.GetAsync("/health/startup", TestContext.Current.CancellationToken);
 
-        live.StatusCode.Should().Be(HttpStatusCode.OK);
-        ready.StatusCode.Should().Be(HttpStatusCode.OK);
-        startup.StatusCode.Should().Be(HttpStatusCode.OK);
+        live.StatusCode.ShouldBe(HttpStatusCode.OK);
+        ready.StatusCode.ShouldBe(HttpStatusCode.OK);
+        startup.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public sealed class DiagnosticsEndpointTests
         HttpResponseMessage response = await client.GetAsync("/alive", TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     private static HttpClient BuildTestClient(HealthStatus dependencyStatus)

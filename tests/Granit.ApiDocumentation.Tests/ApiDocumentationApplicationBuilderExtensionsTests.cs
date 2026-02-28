@@ -6,7 +6,6 @@
 // sinon.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiDocumentation.Extensions;
 using Granit.ApiDocumentation.Options;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -40,7 +40,7 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         WebApplication result = app.UseGranitApiDocumentation();
 
         // Assert
-        result.Should().BeSameAs(app);
+        result.ShouldBeSameAs(app);
     }
 
     // --- Development → maps routes, returns app ---
@@ -63,7 +63,7 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         WebApplication result = app.UseGranitApiDocumentation();
 
         // Assert
-        result.Should().BeSameAs(app);
+        result.ShouldBeSameAs(app);
     }
 
     // --- Production + EnableInProduction=true → maps routes, returns app ---
@@ -88,7 +88,7 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         WebApplication result = app.UseGranitApiDocumentation();
 
         // Assert
-        result.Should().BeSameAs(app);
+        result.ShouldBeSameAs(app);
     }
 
     // --- AuthorizationPolicy = null → no explicit policy applied ---
@@ -110,7 +110,7 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         WebApplication result = app.UseGranitApiDocumentation();
 
         // Assert
-        result.Should().BeSameAs(app);
+        result.ShouldBeSameAs(app);
     }
 
     // --- AuthorizationPolicy = "" → AllowAnonymous applied ---
@@ -133,7 +133,7 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         WebApplication result = app.UseGranitApiDocumentation();
 
         // Assert
-        result.Should().BeSameAs(app);
+        result.ShouldBeSameAs(app);
     }
 
     // --- AuthorizationPolicy = "InternalDeveloper" → RequireAuthorization applied ---
@@ -158,6 +158,6 @@ public sealed class ApiDocumentationApplicationBuilderExtensionsTests
         WebApplication result = app.UseGranitApiDocumentation();
 
         // Assert
-        result.Should().BeSameAs(app);
+        result.ShouldBeSameAs(app);
     }
 }

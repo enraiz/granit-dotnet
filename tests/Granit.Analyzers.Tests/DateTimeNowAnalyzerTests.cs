@@ -2,8 +2,8 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Analyzers.Tests;
@@ -26,7 +26,7 @@ public sealed class DateTimeNowAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<DateTimeNowAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public sealed class DateTimeNowAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<DateTimeNowAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class DateTimeNowAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<DateTimeNowAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public sealed class DateTimeNowAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<DateTimeNowAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public sealed class DateTimeNowAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DateTimeNowAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public sealed class DateTimeNowAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DateTimeNowAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public sealed class DateTimeNowAnalyzerTests
             await AnalyzerTestHelpers.RunAnalyzerAsync<DateTimeNowAnalyzer>(
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DateTimeNowAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -176,6 +176,6 @@ public sealed class DateTimeNowAnalyzerTests
                 source, Array.Empty<string>(), TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DateTimeNowAnalyzer.DiagnosticId)
-            .Should().HaveCount(2);
+            .Count().ShouldBe(2);
     }
 }

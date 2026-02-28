@@ -5,8 +5,8 @@
 // auditable de base (trail HDS : créé/modifié).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests;
@@ -20,11 +20,11 @@ public sealed class AuditableEntityTests
         ConcreteAuditableEntity entity = new();
 
         // Assert
-        entity.Id.Should().Be(Guid.Empty);
-        entity.CreatedAt.Should().Be(default);
-        entity.CreatedBy.Should().BeEmpty("default is string.Empty");
-        entity.ModifiedAt.Should().BeNull();
-        entity.ModifiedBy.Should().BeNull();
+        entity.Id.ShouldBe(Guid.Empty);
+        entity.CreatedAt.ShouldBe(default);
+        entity.CreatedBy.ShouldBeEmpty("default is string.Empty");
+        entity.ModifiedAt.ShouldBeNull();
+        entity.ModifiedBy.ShouldBeNull();
     }
 
     [Fact]
@@ -46,11 +46,11 @@ public sealed class AuditableEntityTests
         };
 
         // Assert
-        entity.Id.Should().Be(id);
-        entity.CreatedAt.Should().Be(now);
-        entity.CreatedBy.Should().Be("user-123");
-        entity.ModifiedAt.Should().Be(modified);
-        entity.ModifiedBy.Should().Be("user-456");
+        entity.Id.ShouldBe(id);
+        entity.CreatedAt.ShouldBe(now);
+        entity.CreatedBy.ShouldBe("user-123");
+        entity.ModifiedAt.ShouldBe(modified);
+        entity.ModifiedBy.ShouldBe("user-456");
     }
 
     /// <summary>Concrete subclass required to instantiate the abstract base.</summary>

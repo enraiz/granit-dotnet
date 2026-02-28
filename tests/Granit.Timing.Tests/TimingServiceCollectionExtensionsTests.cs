@@ -4,9 +4,9 @@
 // Vérifie que AddGranitTiming enregistre les services attendus.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Timing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Timing.Tests;
@@ -26,8 +26,8 @@ public sealed class TimingServiceCollectionExtensionsTests
 
         // Assert
         IClock? clock = sp.GetService<IClock>();
-        clock.Should().NotBeNull();
-        clock.Should().BeOfType<Clock>();
+        clock.ShouldNotBeNull();
+        clock.ShouldBeOfType<Clock>();
     }
 
     [Fact]
@@ -43,8 +43,8 @@ public sealed class TimingServiceCollectionExtensionsTests
 
         // Assert
         ICurrentTimezoneProvider? provider = sp.GetService<ICurrentTimezoneProvider>();
-        provider.Should().NotBeNull();
-        provider.Should().BeOfType<CurrentTimezoneProvider>();
+        provider.ShouldNotBeNull();
+        provider.ShouldBeOfType<CurrentTimezoneProvider>();
     }
 
     [Fact]
@@ -60,8 +60,8 @@ public sealed class TimingServiceCollectionExtensionsTests
 
         // Assert
         TimeProvider? timeProvider = sp.GetService<TimeProvider>();
-        timeProvider.Should().NotBeNull();
-        timeProvider.Should().BeSameAs(TimeProvider.System);
+        timeProvider.ShouldNotBeNull();
+        timeProvider.ShouldBeSameAs(TimeProvider.System);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public sealed class TimingServiceCollectionExtensionsTests
 
         // Assert
         IClock resolved = sp.GetRequiredService<IClock>();
-        resolved.Should().BeSameAs(customClock);
+        resolved.ShouldBeSameAs(customClock);
     }
 
     [Fact]
@@ -98,6 +98,6 @@ public sealed class TimingServiceCollectionExtensionsTests
 
         // Assert
         ClockOptions options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ClockOptions>>().Value;
-        options.DefaultTimezone.Should().Be("America/New_York");
+        options.DefaultTimezone.ShouldBe("America/New_York");
     }
 }

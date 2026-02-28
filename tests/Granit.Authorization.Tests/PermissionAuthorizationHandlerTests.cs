@@ -6,11 +6,11 @@
 // =============================================================================
 
 using System.Security.Claims;
-using FluentAssertions;
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.Tests;
@@ -35,7 +35,7 @@ public sealed class PermissionAuthorizationHandlerTests
         await handler.HandleAsync(context);
 
         // Assert
-        context.HasSucceeded.Should().BeTrue();
+        context.HasSucceeded.ShouldBeTrue();
     }
 
     [Fact]
@@ -56,6 +56,6 @@ public sealed class PermissionAuthorizationHandlerTests
         await handler.HandleAsync(context);
 
         // Assert
-        context.HasSucceeded.Should().BeFalse();
+        context.HasSucceeded.ShouldBeFalse();
     }
 }

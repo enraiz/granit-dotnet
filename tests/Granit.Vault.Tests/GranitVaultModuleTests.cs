@@ -6,11 +6,11 @@
 //   - Enregistre les services Vault en environnement Production
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Vault.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Vault.Tests;
@@ -35,7 +35,7 @@ public sealed class GranitVaultModuleTests
 
         // Assert — aucun service Vault ne doit être enregistré
         ITransitEncryptionService? transitService = sp.GetService<ITransitEncryptionService>();
-        transitService.Should().BeNull();
+        transitService.ShouldBeNull();
     }
 
     [Fact]
@@ -57,6 +57,6 @@ public sealed class GranitVaultModuleTests
         // Assert — les services Vault doivent être enregistrés
         ServiceDescriptor? vaultDescriptor = builder.Services.FirstOrDefault(
             d => d.ServiceType == typeof(VaultClientFactory));
-        vaultDescriptor.Should().NotBeNull();
+        vaultDescriptor.ShouldNotBeNull();
     }
 }

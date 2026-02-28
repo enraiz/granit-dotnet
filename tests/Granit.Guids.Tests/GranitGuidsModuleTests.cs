@@ -4,10 +4,10 @@
 // Vérifie que le module enregistre les services Guids via ConfigureServices.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Guids.Tests;
@@ -32,7 +32,7 @@ public sealed class GranitGuidsModuleTests
 
         // Assert
         IGuidGenerator? generator = sp.GetService<IGuidGenerator>();
-        generator.Should().NotBeNull();
-        generator.Should().BeOfType<SequentialGuidGenerator>();
+        generator.ShouldNotBeNull();
+        generator.ShouldBeOfType<SequentialGuidGenerator>();
     }
 }

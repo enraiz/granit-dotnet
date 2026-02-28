@@ -6,9 +6,9 @@
 // error codes for the GranitExceptionHandler localization pipeline.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.BlobStorage.Exceptions;
 using Granit.Core.Exceptions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.Tests;
@@ -27,8 +27,8 @@ public sealed class BlobStorageExceptionTests
 
         BlobNotFoundException exception = new(blobId, containerName);
 
-        exception.BlobId.Should().Be(blobId);
-        exception.ContainerName.Should().Be(containerName);
+        exception.BlobId.ShouldBe(blobId);
+        exception.ContainerName.ShouldBe(containerName);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class BlobStorageExceptionTests
     {
         BlobNotFoundException exception = new(Guid.NewGuid(), "avatars");
 
-        exception.ErrorCode.Should().Be("BlobStorage:NotFound");
+        exception.ErrorCode.ShouldBe("BlobStorage:NotFound");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class BlobStorageExceptionTests
     {
         BlobNotFoundException exception = new(Guid.NewGuid(), "avatars");
 
-        exception.Should().BeAssignableTo<NotFoundException>();
+        exception.ShouldBeAssignableTo<NotFoundException>();
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class BlobStorageExceptionTests
     {
         BlobNotFoundException exception = new(Guid.NewGuid(), "avatars");
 
-        exception.Should().BeAssignableTo<IHasErrorCode>();
+        exception.ShouldBeAssignableTo<IHasErrorCode>();
     }
 
     // -------------------------------------------------------------------------
@@ -67,8 +67,8 @@ public sealed class BlobStorageExceptionTests
 
         BlobNotValidException exception = new(blobId, currentStatus);
 
-        exception.BlobId.Should().Be(blobId);
-        exception.CurrentStatus.Should().Be(currentStatus);
+        exception.BlobId.ShouldBe(blobId);
+        exception.CurrentStatus.ShouldBe(currentStatus);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public sealed class BlobStorageExceptionTests
     {
         BlobNotValidException exception = new(Guid.NewGuid(), BlobStatus.Rejected);
 
-        exception.ErrorCode.Should().Be("BlobStorage:NotValid");
+        exception.ErrorCode.ShouldBe("BlobStorage:NotValid");
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public sealed class BlobStorageExceptionTests
     {
         BlobNotValidException exception = new(Guid.NewGuid(), BlobStatus.Deleted);
 
-        exception.Should().BeAssignableTo<IHasErrorCode>();
+        exception.ShouldBeAssignableTo<IHasErrorCode>();
     }
 
     [Fact]
@@ -93,6 +93,6 @@ public sealed class BlobStorageExceptionTests
         // BlobNotValidException maps to 400, not 404; it must not extend NotFoundException.
         BlobNotValidException exception = new(Guid.NewGuid(), BlobStatus.Pending);
 
-        exception.Should().NotBeAssignableTo<NotFoundException>();
+        exception.ShouldNotBeAssignableTo<NotFoundException>();
     }
 }

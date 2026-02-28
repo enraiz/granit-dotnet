@@ -4,9 +4,9 @@
 // BelgianInami: 11 digits (formatted XXXXXX/XXX-XX), check = 97 − (first 9 mod 97)
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -32,7 +32,7 @@ public sealed class ProfessionalRegistryValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(inami));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -48,9 +48,9 @@ public sealed class ProfessionalRegistryValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(inami));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBelgianInami");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianInami");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianInami");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianInami");
     }
 
     // -------------------------------------------------------------------------

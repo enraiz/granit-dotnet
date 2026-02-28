@@ -7,12 +7,12 @@
 //   - Configure LocalCacheExpiration depuis la configuration
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Caching;
 using Granit.Caching.StackExchangeRedis;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Hybrid.Tests;
@@ -46,8 +46,7 @@ public sealed class GranitCachingHybridModuleTests
 
         // Assert — ICacheService<T> doit être HybridCacheService<T>, pas DistributedCacheService<T>
         ICacheService<TestCacheItem> service = sp.GetRequiredService<ICacheService<TestCacheItem>>();
-        service.Should().BeOfType<HybridCacheService<TestCacheItem>>(
-            "HybridCacheService doit surcharger DistributedCacheService après AddGranitCachingHybrid");
+        service.ShouldBeOfType<HybridCacheService<TestCacheItem>>("HybridCacheService doit surcharger DistributedCacheService après AddGranitCachingHybrid");
     }
 
     [Fact]
@@ -58,7 +57,7 @@ public sealed class GranitCachingHybridModuleTests
 
         // Assert
         HybridCachingOptions opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<HybridCachingOptions>>().Value;
-        opts.LocalCacheExpiration.Should().Be(TimeSpan.FromSeconds(30));
+        opts.LocalCacheExpiration.ShouldBe(TimeSpan.FromSeconds(30));
     }
 
     [Fact]
@@ -74,7 +73,7 @@ public sealed class GranitCachingHybridModuleTests
         HybridCachingOptions opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<HybridCachingOptions>>().Value;
 
         // Assert
-        opts.LocalCacheExpiration.Should().Be(TimeSpan.FromSeconds(45));
+        opts.LocalCacheExpiration.ShouldBe(TimeSpan.FromSeconds(45));
     }
 
     // Type de test

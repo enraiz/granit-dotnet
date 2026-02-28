@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.BlobStorage;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.Tests;
@@ -31,19 +31,19 @@ public sealed class BlobDescriptorTests
             request: new BlobUploadRequest("radio.jpg", "image/jpeg", 10_000_000L),
             createdAt: Now);
 
-        descriptor.Id.Should().Be(id);
-        descriptor.TenantId.Should().Be("tenant-abc");
-        descriptor.ContainerName.Should().Be("medical-images");
-        descriptor.Status.Should().Be(BlobStatus.Pending);
-        descriptor.OriginalFileName.Should().Be("radio.jpg");
-        descriptor.DeclaredContentType.Should().Be("image/jpeg");
-        descriptor.CreatedAt.Should().Be(Now);
-        descriptor.VerifiedContentType.Should().BeNull();
-        descriptor.SizeBytes.Should().BeNull();
-        descriptor.ValidatedAt.Should().BeNull();
-        descriptor.DeletedAt.Should().BeNull();
-        descriptor.RejectionReason.Should().BeNull();
-        descriptor.DeletionReason.Should().BeNull();
+        descriptor.Id.ShouldBe(id);
+        descriptor.TenantId.ShouldBe("tenant-abc");
+        descriptor.ContainerName.ShouldBe("medical-images");
+        descriptor.Status.ShouldBe(BlobStatus.Pending);
+        descriptor.OriginalFileName.ShouldBe("radio.jpg");
+        descriptor.DeclaredContentType.ShouldBe("image/jpeg");
+        descriptor.CreatedAt.ShouldBe(Now);
+        descriptor.VerifiedContentType.ShouldBeNull();
+        descriptor.SizeBytes.ShouldBeNull();
+        descriptor.ValidatedAt.ShouldBeNull();
+        descriptor.DeletedAt.ShouldBeNull();
+        descriptor.RejectionReason.ShouldBeNull();
+        descriptor.DeletionReason.ShouldBeNull();
     }
 
     // ── Pending → Uploading ──────────────────────────────────────────────────
@@ -55,7 +55,7 @@ public sealed class BlobDescriptorTests
 
         descriptor.MarkAsUploading();
 
-        descriptor.Status.Should().Be(BlobStatus.Uploading);
+        descriptor.Status.ShouldBe(BlobStatus.Uploading);
     }
 
     [Theory]
@@ -69,8 +69,7 @@ public sealed class BlobDescriptorTests
 
         Action act = () => descriptor.MarkAsUploading();
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage($"*{illegalStatus}*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain($"{illegalStatus}");
     }
 
     // ── Uploading → Valid ────────────────────────────────────────────────────
@@ -84,10 +83,10 @@ public sealed class BlobDescriptorTests
 
         descriptor.MarkAsValid("image/jpeg", 512_000, validatedAt);
 
-        descriptor.Status.Should().Be(BlobStatus.Valid);
-        descriptor.VerifiedContentType.Should().Be("image/jpeg");
-        descriptor.SizeBytes.Should().Be(512_000);
-        descriptor.ValidatedAt.Should().Be(validatedAt);
+        descriptor.Status.ShouldBe(BlobStatus.Valid);
+        descriptor.VerifiedContentType.ShouldBe("image/jpeg");
+        descriptor.SizeBytes.ShouldBe(512_000);
+        descriptor.ValidatedAt.ShouldBe(validatedAt);
     }
 
     [Theory]
@@ -101,8 +100,7 @@ public sealed class BlobDescriptorTests
 
         Action act = () => descriptor.MarkAsValid("image/jpeg", 512_000, Now);
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage($"*{illegalStatus}*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain($"{illegalStatus}");
     }
 
     // ── Uploading → Rejected ─────────────────────────────────────────────────
@@ -115,8 +113,8 @@ public sealed class BlobDescriptorTests
 
         descriptor.MarkAsRejected("MIME mismatch: declared image/jpeg but magic bytes are MZ (executable).");
 
-        descriptor.Status.Should().Be(BlobStatus.Rejected);
-        descriptor.RejectionReason.Should().Contain("MZ");
+        descriptor.Status.ShouldBe(BlobStatus.Rejected);
+        descriptor.RejectionReason!.ShouldContain("MZ");
     }
 
     [Theory]
@@ -130,8 +128,7 @@ public sealed class BlobDescriptorTests
 
         Action act = () => descriptor.MarkAsRejected("some reason");
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage($"*{illegalStatus}*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain($"{illegalStatus}");
     }
 
     // ── Valid → Deleted (Crypto-Shredding) ───────────────────────────────────
@@ -146,14 +143,14 @@ public sealed class BlobDescriptorTests
 
         descriptor.MarkAsDeleted(deletedAt, "RGPD Art. 17 erasure request");
 
-        descriptor.Status.Should().Be(BlobStatus.Deleted);
-        descriptor.DeletedAt.Should().Be(deletedAt);
-        descriptor.DeletionReason.Should().Be("RGPD Art. 17 erasure request");
+        descriptor.Status.ShouldBe(BlobStatus.Deleted);
+        descriptor.DeletedAt.ShouldBe(deletedAt);
+        descriptor.DeletionReason.ShouldBe("RGPD Art. 17 erasure request");
         // Audit fields must be preserved — the DB record is never removed.
-        descriptor.Id.Should().NotBeEmpty();
-        descriptor.TenantId.Should().Be("tenant-abc");
-        descriptor.OriginalFileName.Should().Be("radio.jpg");
-        descriptor.ValidatedAt.Should().NotBeNull();
+        descriptor.Id.ShouldNotBe(Guid.Empty);
+        descriptor.TenantId.ShouldBe("tenant-abc");
+        descriptor.OriginalFileName.ShouldBe("radio.jpg");
+        descriptor.ValidatedAt.ShouldNotBeNull();
     }
 
     [Fact]
@@ -165,8 +162,8 @@ public sealed class BlobDescriptorTests
 
         descriptor.MarkAsDeleted(Now.AddDays(1));
 
-        descriptor.Status.Should().Be(BlobStatus.Deleted);
-        descriptor.DeletionReason.Should().BeNull();
+        descriptor.Status.ShouldBe(BlobStatus.Deleted);
+        descriptor.DeletionReason.ShouldBeNull();
     }
 
     [Theory]
@@ -180,8 +177,7 @@ public sealed class BlobDescriptorTests
 
         Action act = () => descriptor.MarkAsDeleted(Now);
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage($"*{illegalStatus}*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain($"{illegalStatus}");
     }
 
     // ── Helper ────────────────────────────────────────────────────────────────

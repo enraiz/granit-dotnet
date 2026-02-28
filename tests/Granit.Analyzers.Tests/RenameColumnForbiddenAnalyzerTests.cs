@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Analyzers.Tests;
@@ -32,7 +32,7 @@ public sealed class RenameColumnForbiddenAnalyzerTests
                 includeMigrationCycleAttribute: true,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == RenameColumnForbiddenAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == RenameColumnForbiddenAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class RenameColumnForbiddenAnalyzerTests
                 includeMigrationCycleAttribute: false,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == RenameColumnForbiddenAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == RenameColumnForbiddenAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public sealed class RenameColumnForbiddenAnalyzerTests
                 includeMigrationCycleAttribute: true,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == RenameColumnForbiddenAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == RenameColumnForbiddenAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -111,6 +111,6 @@ public sealed class RenameColumnForbiddenAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == RenameColumnForbiddenAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 }

@@ -5,9 +5,9 @@
 // Bcp47LanguageTag: lang(2–3) + optional script(4) + optional region(2), BCP 47 subset
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -31,7 +31,7 @@ public sealed class LocaleValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -47,9 +47,9 @@ public sealed class LocaleValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidIso3166Alpha2");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidIso3166Alpha2");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidIso3166Alpha2");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidIso3166Alpha2");
     }
 
     // =========================================================================
@@ -73,7 +73,7 @@ public sealed class LocaleValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(tag));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -91,9 +91,9 @@ public sealed class LocaleValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(tag));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBcp47LanguageTag");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBcp47LanguageTag");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBcp47LanguageTag");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBcp47LanguageTag");
     }
 
     // -------------------------------------------------------------------------

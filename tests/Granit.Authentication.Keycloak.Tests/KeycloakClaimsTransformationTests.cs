@@ -6,8 +6,8 @@
 // =============================================================================
 
 using System.Security.Claims;
-using FluentAssertions;
 using Granit.Authentication.Keycloak.Authentication;
+using Shouldly;
 using Xunit;
 using KeycloakOptions = Granit.Authentication.Keycloak.Options.KeycloakOptions;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
@@ -42,9 +42,9 @@ public sealed class KeycloakClaimsTransformationTests
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
 
         // Assert
-        result.IsInRole("admin").Should().BeTrue();
-        result.IsInRole("practitioner").Should().BeTrue();
-        result.FindAll(ClaimTypes.Role).Should().HaveCount(2);
+        result.IsInRole("admin").ShouldBeTrue();
+        result.IsInRole("practitioner").ShouldBeTrue();
+        result.FindAll(ClaimTypes.Role).Count().ShouldBe(2);
     }
 
     [Fact]
@@ -64,8 +64,8 @@ public sealed class KeycloakClaimsTransformationTests
         ClaimsPrincipal result = await CreateSut(roleClaimsSource: "resource_access").TransformAsync(principal);
 
         // Assert
-        result.IsInRole("admin").Should().BeTrue();
-        result.FindAll(ClaimTypes.Role).Should().HaveCount(1);
+        result.IsInRole("admin").ShouldBeTrue();
+        result.FindAll(ClaimTypes.Role).Count().ShouldBe(1);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public sealed class KeycloakClaimsTransformationTests
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
 
         // Assert
-        result.FindAll(ClaimTypes.Role).Should().BeEmpty();
+        result.FindAll(ClaimTypes.Role).ShouldBeEmpty();
     }
 
     [Fact]
@@ -95,8 +95,8 @@ public sealed class KeycloakClaimsTransformationTests
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
 
         // Assert
-        result.Identity!.IsAuthenticated.Should().BeFalse();
-        result.FindAll(ClaimTypes.Role).Should().BeEmpty();
+        result.Identity!.IsAuthenticated.ShouldBeFalse();
+        result.FindAll(ClaimTypes.Role).ShouldBeEmpty();
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public sealed class KeycloakClaimsTransformationTests
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
 
         // Assert
-        result.FindAll(ClaimTypes.Role).Should().BeEmpty();
+        result.FindAll(ClaimTypes.Role).ShouldBeEmpty();
     }
 
     [Fact]
@@ -137,6 +137,6 @@ public sealed class KeycloakClaimsTransformationTests
         ClaimsPrincipal result = await CreateSut().TransformAsync(principal);
 
         // Assert
-        result.FindAll(ClaimTypes.Role).Should().HaveCount(1);
+        result.FindAll(ClaimTypes.Role).Count().ShouldBe(1);
     }
 }

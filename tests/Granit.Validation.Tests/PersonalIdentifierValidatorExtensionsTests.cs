@@ -5,9 +5,9 @@
 // BelgianEid: 12 digits, mod-97 on first 10 digits
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -34,7 +34,7 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(nir));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -51,9 +51,9 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(nir));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchNir");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchNir");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchNir");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchNir");
     }
 
     // =========================================================================
@@ -74,7 +74,7 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(eid));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -90,9 +90,9 @@ public sealed class PersonalIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(eid));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBelgianEid");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianEid");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianEid");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianEid");
     }
 
     // -------------------------------------------------------------------------

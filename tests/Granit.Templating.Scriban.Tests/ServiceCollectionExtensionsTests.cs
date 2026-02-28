@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Templating.GlobalContext;
 using Granit.Templating.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Scriban.Tests;
@@ -18,7 +18,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitTemplatingWithScriban();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITemplateEngine) &&
             d.ImplementationType == typeof(ScribanTemplateEngine) &&
             d.Lifetime == ServiceLifetime.Singleton);
@@ -30,7 +30,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitTemplatingWithScriban();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITextTemplateRenderer) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -43,7 +43,7 @@ public sealed class ServiceCollectionExtensionsTests
 
         // NowGlobalContext + ExecutionContextGlobalContext
         services.Count(d => d.ServiceType == typeof(ITemplateGlobalContext))
-                .Should().Be(2, "NowGlobalContext and ExecutionContextGlobalContext must be registered");
+                .ShouldBe(2, "NowGlobalContext and ExecutionContextGlobalContext must be registered");
     }
 
     [Fact]
@@ -54,6 +54,6 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitTemplatingWithScriban();           // TryAdd must not replace
 
         services.Count(d => d.ServiceType == typeof(ITemplateEngine))
-                .Should().Be(1, "TryAddSingleton must not add a duplicate");
+                .ShouldBe(1, "TryAddSingleton must not add a duplicate");
     }
 }

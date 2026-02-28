@@ -8,7 +8,6 @@
 //   - Configure correctement les options Redis et StackExchange
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Caching.StackExchangeRedis.Extensions;
 using Granit.Caching.StackExchangeRedis.HealthChecks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -18,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using StackExchange.Redis;
 using Xunit;
 
@@ -49,7 +49,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Assert — RedisCache doit être enregistré pour IDistributedCache
         ServiceDescriptor? redisDescriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(IDistributedCache));
-        redisDescriptor.Should().NotBeNull("Redis doit être enregistré comme IDistributedCache");
+        redisDescriptor.ShouldNotBeNull("Redis doit être enregistré comme IDistributedCache");
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Assert — factory resolves to AesCacheValueEncryptor at runtime
         using ServiceProvider sp = services.BuildServiceProvider();
         ICacheValueEncryptor encryptor = sp.GetRequiredService<ICacheValueEncryptor>();
-        encryptor.Should().BeOfType<AesCacheValueEncryptor>();
+        encryptor.ShouldBeOfType<AesCacheValueEncryptor>();
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Assert — factory resolves to NullCacheValueEncryptor at runtime
         using ServiceProvider sp = services.BuildServiceProvider();
         ICacheValueEncryptor encryptor = sp.GetRequiredService<ICacheValueEncryptor>();
-        encryptor.Should().BeOfType<NullCacheValueEncryptor>();
+        encryptor.ShouldBeOfType<NullCacheValueEncryptor>();
     }
 
     [Fact]
@@ -134,8 +134,8 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         RedisCachingOptions opts = sp.GetRequiredService<IOptions<RedisCachingOptions>>().Value;
 
         // Assert
-        opts.Configuration.Should().Be("redis-service:6379");
-        opts.InstanceName.Should().Be("guava:");
+        opts.Configuration.ShouldBe("redis-service:6379");
+        opts.InstanceName.ShouldBe("guava:");
     }
 
     [Fact]
@@ -157,8 +157,8 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         RedisCacheOptions redisOpts = sp.GetRequiredService<IOptions<RedisCacheOptions>>().Value;
 
         // Assert
-        redisOpts.Configuration.Should().Be("redis-service:6379");
-        redisOpts.InstanceName.Should().Be("myapp:");
+        redisOpts.Configuration.ShouldBe("redis-service:6379");
+        redisOpts.InstanceName.ShouldBe("myapp:");
     }
 
     [Fact]
@@ -176,8 +176,8 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Assert — IConnectionMultiplexer must have been registered
         ServiceDescriptor? multiplexerDescriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(IConnectionMultiplexer));
-        multiplexerDescriptor.Should().NotBeNull();
-        multiplexerDescriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        multiplexerDescriptor.ShouldNotBeNull();
+        multiplexerDescriptor!.Lifetime.ShouldBe(ServiceLifetime.Singleton);
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Assert — only one IConnectionMultiplexer registration
         IEnumerable<ServiceDescriptor> multiplexerDescriptors = services.Where(
             d => d.ServiceType == typeof(IConnectionMultiplexer));
-        multiplexerDescriptors.Should().HaveCount(1);
+        multiplexerDescriptors.Count().ShouldBe(1);
     }
 
     [Fact]
@@ -214,7 +214,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         using ServiceProvider sp = services.BuildServiceProvider();
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "redis");
-        registration.Should().NotBeNull();
-        registration!.Tags.Should().Contain("readiness");
+        registration.ShouldNotBeNull();
+        registration!.Tags.ShouldContain("readiness");
     }
 }

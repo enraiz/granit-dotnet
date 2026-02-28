@@ -5,12 +5,12 @@
 // ce qui enregistre les services HealthChecks dans le conteneur DI.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Diagnostics.Tests;
@@ -34,6 +34,6 @@ public sealed class GranitDiagnosticsModuleTests
         // Assert — AddGranitDiagnostics calls AddHealthChecks which registers HealthCheckServiceOptions
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         HealthCheckServiceOptions options = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
-        options.Should().NotBeNull();
+        options.ShouldNotBeNull();
     }
 }

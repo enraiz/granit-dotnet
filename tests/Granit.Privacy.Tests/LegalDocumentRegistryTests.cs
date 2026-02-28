@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Privacy.LegalAgreements;
 using Granit.Privacy.LegalAgreements.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Privacy.Tests;
@@ -14,7 +14,7 @@ public sealed class LegalDocumentRegistryTests
     {
         _sut.Register(new LegalDocumentDefinition("privacy-policy", "1.0.0", "Privacy Policy"));
 
-        _sut.GetDefinition("privacy-policy").Should().NotBeNull();
+        _sut.GetDefinition("privacy-policy").ShouldNotBeNull();
     }
 
     [Fact]
@@ -24,20 +24,19 @@ public sealed class LegalDocumentRegistryTests
 
         Action act = () => _sut.Register(new LegalDocumentDefinition("privacy-policy", "2.0.0", "Privacy Policy v2"));
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*already registered*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("already registered");
     }
 
     [Fact]
     public void GetDefinition_UnknownDocument_ReturnsNull() =>
-        _sut.GetDefinition("unknown").Should().BeNull();
+        _sut.GetDefinition("unknown").ShouldBeNull();
 
     [Fact]
     public void GetDefinition_IsCaseInsensitive()
     {
         _sut.Register(new LegalDocumentDefinition("Privacy-Policy", "1.0.0", "Privacy Policy"));
 
-        _sut.GetDefinition("privacy-policy").Should().NotBeNull();
+        _sut.GetDefinition("privacy-policy").ShouldNotBeNull();
     }
 
     [Fact]
@@ -46,6 +45,6 @@ public sealed class LegalDocumentRegistryTests
         _sut.Register(new LegalDocumentDefinition("privacy-policy", "1.0.0", "Privacy Policy"));
         _sut.Register(new LegalDocumentDefinition("terms", "1.0.0", "Terms of Service"));
 
-        _sut.GetAll().Should().HaveCount(2);
+        _sut.GetAll().Count.ShouldBe(2);
     }
 }

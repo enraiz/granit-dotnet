@@ -7,7 +7,6 @@
 
 using System.Net;
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Exceptions;
@@ -16,6 +15,7 @@ using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Webhooks.Tests;
@@ -58,7 +58,7 @@ public sealed class SendWebhookHandlerTests
 
         Func<Task> act = () => handler.HandleAsync(BuildCommand(), TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // -------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public sealed class SendWebhookHandlerTests
 
         Func<Task> act = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await _deliveryStore.Received(1).RecordFailureAsync(
             command, (int)statusCode, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _deliveryStore.DidNotReceive().SuspendSubscriptionAsync(
@@ -115,7 +115,7 @@ public sealed class SendWebhookHandlerTests
 
         Func<Task> act = () => handler.HandleAsync(BuildCommand(), TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<WebhookDeliveryException>();
+        await Should.ThrowAsync<WebhookDeliveryException>(act);
     }
 
     [Fact]
@@ -143,8 +143,7 @@ public sealed class SendWebhookHandlerTests
 
         Func<Task> act = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<WebhookDeliveryException>()
-            .WithMessage("*Timeout*");
+        (await Should.ThrowAsync<WebhookDeliveryException>(act)).Message.ShouldContain("Timeout");
     }
 
     [Fact]

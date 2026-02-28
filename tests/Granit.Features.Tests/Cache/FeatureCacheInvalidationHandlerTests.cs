@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Cache;
 using Granit.Features.Events;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -53,8 +53,7 @@ public sealed class FeatureCacheInvalidationHandlerTests
             @event, cache, TestContext.Current.CancellationToken);
 
         string expectedKey = FeatureCacheKey.Build(tenantId, "App.VideoConsultation");
-        cache.RemovedKeys.Should().ContainSingle()
-             .Which.Should().Be(expectedKey);
+        cache.RemovedKeys.ShouldHaveSingleItem().ShouldBe(expectedKey);
     }
 
     [Fact]
@@ -67,7 +66,6 @@ public sealed class FeatureCacheInvalidationHandlerTests
             @event, cache, TestContext.Current.CancellationToken);
 
         string expectedKey = FeatureCacheKey.Build(null, "App.Feature");
-        cache.RemovedKeys.Should().ContainSingle()
-             .Which.Should().Be(expectedKey);
+        cache.RemovedKeys.ShouldHaveSingleItem().ShouldBe(expectedKey);
     }
 }

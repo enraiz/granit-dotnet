@@ -5,11 +5,11 @@
 // other exception types return null (pass-through in chain of responsibility).
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Granit.Validation.Internal;
 using Microsoft.AspNetCore.Http;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -26,7 +26,7 @@ public sealed class FluentValidationExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new ValidationException([failure]));
 
-        result.Should().Be(StatusCodes.Status422UnprocessableEntity);
+        result.ShouldBe(StatusCodes.Status422UnprocessableEntity);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class FluentValidationExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new InvalidOperationException("Something failed"));
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public sealed class FluentValidationExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new ArgumentException("Bad argument"));
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -56,6 +56,6 @@ public sealed class FluentValidationExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new NotSupportedException("Not supported"));
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 }

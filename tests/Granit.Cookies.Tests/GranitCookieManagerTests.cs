@@ -1,9 +1,9 @@
-using FluentAssertions;
 using Granit.Cookies.Exceptions;
 using Granit.Cookies.Internal;
 using Granit.Timing;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Cookies.Tests;
@@ -34,7 +34,7 @@ public sealed class GranitCookieManagerTests
         await _sut.SetCookieAsync(httpContext, "analytics_id", "abc123");
 
         string? setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        setCookieHeader.Should().Contain("analytics_id=abc123");
+        setCookieHeader.ShouldContain("analytics_id=abc123");
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public sealed class GranitCookieManagerTests
         await _sut.SetCookieAsync(httpContext, "session_id", "sess_xyz");
 
         string? setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        setCookieHeader.Should().Contain("session_id=sess_xyz");
+        setCookieHeader.ShouldContain("session_id=sess_xyz");
         await _consentResolver.DidNotReceive().ResolveAsync(Arg.Any<HttpContext>(), Arg.Any<CookieCategory>());
     }
 
@@ -62,7 +62,7 @@ public sealed class GranitCookieManagerTests
         await _sut.SetCookieAsync(httpContext, "marketing_id", "mkt_123");
 
         string? setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        setCookieHeader.Should().BeNullOrEmpty();
+        setCookieHeader.ShouldBeNullOrEmpty();
     }
 
     [Fact]
@@ -72,8 +72,8 @@ public sealed class GranitCookieManagerTests
 
         Func<Task> act = () => _sut.SetCookieAsync(httpContext, "unknown_cookie", "value");
 
-        await act.Should().ThrowAsync<UnregisteredCookieException>()
-            .Where(e => e.CookieName == "unknown_cookie");
+        UnregisteredCookieException ex = await Should.ThrowAsync<UnregisteredCookieException>(act);
+        ex.CookieName.ShouldBe("unknown_cookie");
     }
 
     [Fact]
@@ -87,10 +87,10 @@ public sealed class GranitCookieManagerTests
         await _sut.SetCookieAsync(httpContext, "pref_cookie", "value");
 
         string? setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        setCookieHeader.Should().Contain("pref_cookie=value");
-        setCookieHeader.Should().Contain("expires=");
-        setCookieHeader.Should().Contain("secure");
-        setCookieHeader.Should().Contain("httponly");
+        setCookieHeader.ShouldContain("pref_cookie=value");
+        setCookieHeader.ShouldContain("expires=");
+        setCookieHeader.ShouldContain("secure");
+        setCookieHeader.ShouldContain("httponly");
     }
 
     [Fact]
@@ -103,8 +103,8 @@ public sealed class GranitCookieManagerTests
         await _sut.SetCookieAsync(httpContext, "session_id", "val");
 
         string? setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        setCookieHeader.Should().Contain("secure");
-        setCookieHeader.Should().Contain("samesite=lax");
+        setCookieHeader.ShouldContain("secure");
+        setCookieHeader.ShouldContain("samesite=lax");
     }
 
     [Fact]
@@ -118,9 +118,9 @@ public sealed class GranitCookieManagerTests
         await _sut.RevokeCategoryAsync(httpContext, CookieCategory.Analytics);
 
         string? setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        setCookieHeader.Should().Contain("analytics_1");
-        setCookieHeader.Should().Contain("analytics_2");
-        setCookieHeader.Should().NotContain("session");
+        setCookieHeader.ShouldContain("analytics_1");
+        setCookieHeader.ShouldContain("analytics_2");
+        setCookieHeader.ShouldNotContain("session");
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public sealed class GranitCookieManagerTests
         _sut.DeleteCookie(httpContext, "my_cookie");
 
         string? setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        setCookieHeader.Should().Contain("my_cookie");
+        setCookieHeader.ShouldContain("my_cookie");
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public sealed class GranitCookieManagerTests
 
         Action act = () => _sut.DeleteCookie(httpContext, "unknown_cookie");
 
-        act.Should().Throw<UnregisteredCookieException>()
-            .Where(e => e.CookieName == "unknown_cookie");
+        UnregisteredCookieException ex = Should.Throw<UnregisteredCookieException>(act);
+        ex.CookieName.ShouldBe("unknown_cookie");
     }
 }

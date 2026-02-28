@@ -7,7 +7,7 @@
 //   - Type sans suffixe CacheItem → nom intact
 // =============================================================================
 
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -21,7 +21,7 @@ public sealed class CacheNameProviderTests
         string name = CacheNameProvider.GetCacheName(typeof(UserCacheItem));
 
         // Assert
-        name.Should().Be("User");
+        name.ShouldBe("User");
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public sealed class CacheNameProviderTests
         string name = CacheNameProvider.GetCacheName(typeof(CustomNamedItem));
 
         // Assert
-        name.Should().Be("MyCustomCache");
+        name.ShouldBe("MyCustomCache");
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public sealed class CacheNameProviderTests
         string name = CacheNameProvider.GetCacheName(typeof(ProductDto));
 
         // Assert
-        name.Should().Be("ProductDto");
+        name.ShouldBe("ProductDto");
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class CacheNameProviderTests
         string name2 = CacheNameProvider.GetCacheName(typeof(UserCacheItem));
 
         // Assert — résultat mis en cache interne, doit être identique
-        name1.Should().Be(name2);
+        name1.ShouldBe(name2);
     }
 
     // Types de test internes

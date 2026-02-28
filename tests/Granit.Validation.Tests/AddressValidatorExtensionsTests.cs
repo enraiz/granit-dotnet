@@ -6,9 +6,9 @@
 // FrenchInseeCode:   5 chars, dept (01–99 | 2A/2B | 971–976) + commune
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -33,7 +33,7 @@ public sealed class AddressValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -50,9 +50,9 @@ public sealed class AddressValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchPostalCode");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchPostalCode");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchPostalCode");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchPostalCode");
     }
 
     // =========================================================================
@@ -71,7 +71,7 @@ public sealed class AddressValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -88,9 +88,9 @@ public sealed class AddressValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBelgianPostalCode");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianPostalCode");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianPostalCode");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianPostalCode");
     }
 
     // =========================================================================
@@ -111,7 +111,7 @@ public sealed class AddressValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -129,9 +129,9 @@ public sealed class AddressValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchInseeCode");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchInseeCode");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchInseeCode");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchInseeCode");
     }
 
     // -------------------------------------------------------------------------

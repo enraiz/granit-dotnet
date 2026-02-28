@@ -5,9 +5,9 @@
 // et le comportement par défaut (SharedDatabase) en l'absence de configuration.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.MultiTenancy;
@@ -31,7 +31,7 @@ public sealed class ConfigurationTenantIsolationStrategyProviderTests
         TenantIsolationStrategy strategy = await provider.GetStrategyAsync(
             null, TestContext.Current.CancellationToken);
 
-        strategy.Should().Be(TenantIsolationStrategy.SharedDatabase);
+        strategy.ShouldBe(TenantIsolationStrategy.SharedDatabase);
     }
 
     // -----------------------------------------------------------------------
@@ -50,7 +50,7 @@ public sealed class ConfigurationTenantIsolationStrategyProviderTests
         TenantIsolationStrategy strategy = await provider.GetStrategyAsync(
             Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        strategy.Should().Be(configured);
+        strategy.ShouldBe(configured);
     }
 
     // -----------------------------------------------------------------------
@@ -68,6 +68,6 @@ public sealed class ConfigurationTenantIsolationStrategyProviderTests
         TenantIsolationStrategy strategy = await provider.GetStrategyAsync(
             null, TestContext.Current.CancellationToken);
 
-        strategy.Should().Be(configured);
+        strategy.ShouldBe(configured);
     }
 }

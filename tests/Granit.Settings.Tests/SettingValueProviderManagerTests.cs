@@ -5,9 +5,9 @@
 // and that GetOrNull returns the correct provider or null.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.Providers;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -31,7 +31,7 @@ public sealed class SettingValueProviderManagerTests
 
         SettingValueProviderManager manager = new([global, user, defaultP]);
 
-        manager.Providers.Select(p => p.Name).Should().ContainInOrder("U", "G", "D");
+        manager.Providers.Select(p => p.Name).ShouldBe(new[] { "U", "G", "D" });
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class SettingValueProviderManagerTests
 
         ISettingValueProvider? found = manager.GetOrNull("G");
 
-        found.Should().BeSameAs(global);
+        found.ShouldBeSameAs(global);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class SettingValueProviderManagerTests
 
         ISettingValueProvider? found = manager.GetOrNull("X");
 
-        found.Should().BeNull();
+        found.ShouldBeNull();
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class SettingValueProviderManagerTests
     {
         SettingValueProviderManager manager = new([]);
 
-        manager.Providers.Should().BeEmpty();
+        manager.Providers.ShouldBeEmpty();
     }
 
     [Fact]
@@ -80,6 +80,6 @@ public sealed class SettingValueProviderManagerTests
 
         SettingValueProviderManager manager = new(providers);
 
-        manager.Providers.Select(p => p.Name).Should().ContainInOrder("U", "T", "G", "C", "D");
+        manager.Providers.Select(p => p.Name).ShouldBe(new[] { "U", "T", "G", "C", "D" });
     }
 }

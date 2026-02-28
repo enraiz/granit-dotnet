@@ -9,13 +9,13 @@
 //   - Propage OperationCanceledException sans l'attraper
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.DataSeeding;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.DataSeeding;
@@ -37,7 +37,7 @@ public sealed class DataSeederTests
         Func<Task> act = () => seeder.SeedAsync(context, TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -134,9 +134,9 @@ public sealed class DataSeederTests
         await seeder.SeedAsync(context, TestContext.Current.CancellationToken);
 
         // Assert
-        capturedContext.Should().NotBeNull();
-        capturedContext!.TenantId.Should().Be(tenantId);
-        capturedContext["AdminEmail"].Should().Be("admin@test.com");
+        capturedContext.ShouldNotBeNull();
+        capturedContext!.TenantId.ShouldBe(tenantId);
+        capturedContext["AdminEmail"].ShouldBe("admin@test.com");
     }
 
     [Fact]
@@ -158,6 +158,6 @@ public sealed class DataSeederTests
         Func<Task> act = () => seeder.SeedAsync(context, TestContext.Current.CancellationToken);
 
         // Assert — OperationCanceledException is NOT caught
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        await Should.ThrowAsync<OperationCanceledException>(act);
     }
 }

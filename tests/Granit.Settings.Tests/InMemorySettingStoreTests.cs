@@ -4,9 +4,9 @@
 // Verifies CRUD operations and key isolation by (providerName, providerKey).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.Stores;
 using Granit.Settings.Values;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -23,7 +23,7 @@ public sealed class InMemorySettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -35,10 +35,10 @@ public sealed class InMemorySettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Value.Should().Be("dark");
-        result.ProviderName.Should().Be("G");
-        result.ProviderKey.Should().BeNull();
+        result.ShouldNotBeNull();
+        result!.Value.ShouldBe("dark");
+        result.ProviderName.ShouldBe("G");
+        result.ProviderKey.ShouldBeNull();
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class InMemorySettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result!.Value.Should().Be("light");
+        result!.Value.ShouldBe("light");
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class InMemorySettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class InMemorySettingStoreTests
         Func<Task> act = () => store.DeleteAsync(
             "Unknown", "G", null, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public sealed class InMemorySettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "U", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("provider name is part of the key");
+        result.ShouldBeNull("provider name is part of the key");
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public sealed class InMemorySettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "T", "tenant-2", TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("provider key is part of the key");
+        result.ShouldBeNull("provider key is part of the key");
     }
 
     [Fact]
@@ -121,8 +121,9 @@ public sealed class InMemorySettingStoreTests
         IReadOnlyList<SettingValue> results = await store.GetListAsync(
             "G", null, TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(2);
-        results.Select(v => v.Name).Should().Contain(["App.Theme", "App.Language"]);
+        results.Count.ShouldBe(2);
+        results.Select(v => v.Name).ShouldContain("App.Theme");
+        results.Select(v => v.Name).ShouldContain("App.Language");
     }
 
     [Fact]
@@ -133,6 +134,6 @@ public sealed class InMemorySettingStoreTests
         IReadOnlyList<SettingValue> results = await store.GetListAsync(
             "G", null, TestContext.Current.CancellationToken);
 
-        results.Should().BeEmpty();
+        results.ShouldBeEmpty();
     }
 }

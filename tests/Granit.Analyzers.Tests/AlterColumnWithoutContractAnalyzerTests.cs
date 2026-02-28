@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Analyzers.Tests;
@@ -32,7 +32,7 @@ public sealed class AlterColumnWithoutContractAnalyzerTests
                 includeMigrationCycleAttribute: true,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == AlterColumnWithoutContractAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == AlterColumnWithoutContractAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class AlterColumnWithoutContractAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == AlterColumnWithoutContractAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class AlterColumnWithoutContractAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == AlterColumnWithoutContractAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public sealed class AlterColumnWithoutContractAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == AlterColumnWithoutContractAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -144,6 +144,6 @@ public sealed class AlterColumnWithoutContractAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == AlterColumnWithoutContractAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 }

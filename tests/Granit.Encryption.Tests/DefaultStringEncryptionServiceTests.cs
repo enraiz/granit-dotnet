@@ -2,11 +2,11 @@
 // DefaultStringEncryptionServiceTests - Tests du service principal
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Encryption;
 using Granit.Encryption.Services;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Encryption.Tests;
@@ -29,7 +29,7 @@ public sealed class DefaultStringEncryptionServiceTests
 
         string result = service.Encrypt("hello");
 
-        result.Should().Be("chiffré");
+        result.ShouldBe("chiffré");
         provider.Received(1).Encrypt("hello");
     }
 
@@ -46,7 +46,7 @@ public sealed class DefaultStringEncryptionServiceTests
 
         string? result = service.Decrypt("chiffré");
 
-        result.Should().Be("hello");
+        result.ShouldBe("hello");
         provider.Received(1).Decrypt("chiffré");
     }
 
@@ -60,8 +60,7 @@ public sealed class DefaultStringEncryptionServiceTests
             [aesProvider],
             OptionsFor("Vault"));
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*Vault*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("Vault");
     }
 
     [Fact]

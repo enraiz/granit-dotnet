@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 
@@ -192,7 +192,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
             sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
 
         // Assert — must not throw, no next execution recorded
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await _store.DidNotReceive()
             .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
                 Arg.Any<CancellationToken>());

@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.BlobStorage.S3;
 using Granit.BlobStorage.S3.Internal;
 using Granit.Core.MultiTenancy;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.S3.Tests;
@@ -42,7 +42,7 @@ public sealed class PrefixBlobKeyStrategyTests
         string key = _sut.BuildObjectKey("medical-images", blobId);
 
         // Assert
-        key.Should().Be($"{TenantId}/medical-images/2026/02/{blobId}");
+        key.ShouldBe($"{TenantId}/medical-images/2026/02/{blobId}");
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class PrefixBlobKeyStrategyTests
         string key = _sut.BuildObjectKey("prescriptions", blobId);
 
         // Assert — month 3 → "03"
-        key.Should().Contain("/2026/03/");
+        key.ShouldContain("/2026/03/");
     }
 
     [Fact]
@@ -75,9 +75,9 @@ public sealed class PrefixBlobKeyStrategyTests
         string keyB = strategyB.BuildObjectKey("medical-images", blobId);
 
         // Assert — same blobId, different tenants → different keys
-        keyA.Should().NotBe(keyB);
-        keyA.Should().StartWith(TenantId.ToString());
-        keyB.Should().StartWith(tenantB.ToString());
+        keyA.ShouldNotBe(keyB);
+        keyA.ShouldStartWith(TenantId.ToString());
+        keyB.ShouldStartWith(tenantB.ToString());
     }
 
     [Fact]
@@ -92,9 +92,9 @@ public sealed class PrefixBlobKeyStrategyTests
         string key = _sut.BuildObjectKey("docs", blobId);
 
         // Assert — single-tenant format: {containerName}/{yyyy}/{MM}/{blobId}
-        key.Should().StartWith("docs/");
-        key.Should().EndWith(blobId.ToString());
-        key.Should().NotContain(TenantId.ToString());
+        key.ShouldStartWith("docs/");
+        key.ShouldEndWith(blobId.ToString());
+        key.ShouldNotContain(TenantId.ToString());
     }
 
     // ── ResolveBucketName ─────────────────────────────────────────────────────
@@ -106,16 +106,16 @@ public sealed class PrefixBlobKeyStrategyTests
         string bucket = _sut.ResolveBucketName("medical-images");
 
         // Assert
-        bucket.Should().Be("granit-blobs");
+        bucket.ShouldBe("granit-blobs");
     }
 
     [Fact]
     public void ResolveBucketName_ShouldReturnSameBucketRegardlessOfContainer()
     {
         // Act + Assert
-        _sut.ResolveBucketName("medical-images").Should().Be("granit-blobs");
-        _sut.ResolveBucketName("prescriptions").Should().Be("granit-blobs");
-        _sut.ResolveBucketName("avatars").Should().Be("granit-blobs");
+        _sut.ResolveBucketName("medical-images").ShouldBe("granit-blobs");
+        _sut.ResolveBucketName("prescriptions").ShouldBe("granit-blobs");
+        _sut.ResolveBucketName("avatars").ShouldBe("granit-blobs");
     }
 
     // ── TryExtractTenantId ────────────────────────────────────────────────────
@@ -130,8 +130,8 @@ public sealed class PrefixBlobKeyStrategyTests
         bool result = _sut.TryExtractTenantId(objectKey, out string? tenantId);
 
         // Assert
-        result.Should().BeTrue();
-        tenantId.Should().Be(TenantId.ToString());
+        result.ShouldBeTrue();
+        tenantId.ShouldBe(TenantId.ToString());
     }
 
     [Fact]
@@ -145,8 +145,8 @@ public sealed class PrefixBlobKeyStrategyTests
         bool result = _sut.TryExtractTenantId(objectKey, out string? extractedTenantId);
 
         // Assert
-        result.Should().BeTrue();
-        extractedTenantId.Should().Be(TenantId.ToString());
+        result.ShouldBeTrue();
+        extractedTenantId.ShouldBe(TenantId.ToString());
     }
 
     [Theory]
@@ -158,8 +158,8 @@ public sealed class PrefixBlobKeyStrategyTests
         bool result = _sut.TryExtractTenantId(malformedKey, out string? tenantId);
 
         // Assert
-        result.Should().BeFalse();
-        tenantId.Should().BeNull();
+        result.ShouldBeFalse();
+        tenantId.ShouldBeNull();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

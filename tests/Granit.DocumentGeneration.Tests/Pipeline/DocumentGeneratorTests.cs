@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.DocumentGeneration.Exceptions;
 using Granit.DocumentGeneration.Internal;
 using Granit.DocumentGeneration.Pipeline;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Tests.Pipeline;
@@ -52,8 +52,8 @@ public sealed class DocumentGeneratorTests
             TemplateType, data, ct: TestContext.Current.CancellationToken);
 
         // Assert
-        result.Format.Should().Be(DocumentFormat.Pdf);
-        result.Content.ToArray().Should().Equal(PdfBytes);
+        result.Format.ShouldBe(DocumentFormat.Pdf);
+        result.Content.ToArray().ShouldBe(PdfBytes);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public sealed class DocumentGeneratorTests
             DocumentFormat.Pdf,
             Arg.Any<CancellationToken>());
 
-        result.Format.Should().Be(DocumentFormat.Pdf);
+        result.Format.ShouldBe(DocumentFormat.Pdf);
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public sealed class DocumentGeneratorTests
             ct: TestContext.Current.CancellationToken);
 
         // Assert
-        result.Format.Should().Be(DocumentFormat.Excel);
+        result.Format.ShouldBe(DocumentFormat.Excel);
     }
 
     [Fact]
@@ -155,8 +155,8 @@ public sealed class DocumentGeneratorTests
                 ct: TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<DocumentRendererNotFoundException>()
-            .Where(e => e.Format == DocumentFormat.Pdf);
+        DocumentRendererNotFoundException ex = await Should.ThrowAsync<DocumentRendererNotFoundException>(act);
+        ex.Format.ShouldBe(DocumentFormat.Pdf);
     }
 
     [Fact]
@@ -190,7 +190,7 @@ public sealed class DocumentGeneratorTests
             TemplateType, data, ct: TestContext.Current.CancellationToken);
 
         // Assert
-        capturedHtml.Should().Be(expectedHtml);
+        capturedHtml.ShouldBe(expectedHtml);
     }
 
     [Fact]
@@ -219,8 +219,8 @@ public sealed class DocumentGeneratorTests
             ct: TestContext.Current.CancellationToken);
 
         // Assert — binary content returned directly, no IDocumentRenderer invoked
-        result.Format.Should().Be(DocumentFormat.Excel);
-        result.Content.ToArray().Should().Equal(excelBytes);
+        result.Format.ShouldBe(DocumentFormat.Excel);
+        result.Content.ToArray().ShouldBe(excelBytes);
         await renderer.DidNotReceive().RenderAsync(
             Arg.Any<string>(),
             Arg.Any<DocumentFormat>(),

@@ -24,7 +24,7 @@ là où c'est le plus efficace à écrire et à maintenir.
 | Package | Rôle | Version |
 | --- | --- | --- |
 | [xUnit v3](https://xunit.net/) | Framework de tests | 3.* |
-| [FluentAssertions](https://fluentassertions.com/) | Assertions lisibles | 8.* |
+| [Shouldly](https://docs.shouldly.org/) | Assertions lisibles | 4.* |
 | [NSubstitute](https://nsubstitute.github.io/) | Mocking/stubbing | 5.* |
 | [Bogus](https://github.com/bchavez/Bogus) | Génération de données de test | 35.* |
 | [coverlet](https://github.com/coverlet-coverage/coverlet) | Couverture de code | 6.* |
@@ -126,7 +126,7 @@ Chaque projet de tests suit la même structure standardisée :
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="NSubstitute" />
-    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Shouldly" />
     <PackageReference Include="Bogus" />
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
@@ -155,7 +155,7 @@ Des packages spécifiques sont ajoutés selon les besoins :
 | --- | --- |
 | [Conventions](conventions.md) | Nommage, pattern AAA, classes scellées, headers descriptifs |
 | [Mocking](mocking.md) | NSubstitute : interfaces, IOptions, IHttpContextAccessor, stratégie |
-| [Assertions et temps](assertions.md) | FluentAssertions, FakeTimeProvider, déterminisme temporel |
+| [Assertions et temps](assertions.md) | Shouldly, FakeTimeProvider, déterminisme temporel |
 | [Tests d'intégration EF Core](integration.md) | DbContext in-memory, entités de test internes |
 | [Conformité HDS / RGPD](hds-rgpd.md) | Audit trail, soft delete, UTC |
 

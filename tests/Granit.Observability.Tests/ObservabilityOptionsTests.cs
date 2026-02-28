@@ -5,9 +5,9 @@
 // and that binding from configuration works correctly.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Observability.Options;
 using Microsoft.Extensions.Configuration;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Observability.Tests;
@@ -21,13 +21,13 @@ public sealed class ObservabilityOptionsTests
         var options = new ObservabilityOptions();
 
         // Assert
-        options.ServiceName.Should().Be("unknown-service");
-        options.ServiceVersion.Should().Be("0.0.0");
-        options.OtlpEndpoint.Should().Be("http://localhost:4317");
-        options.ServiceNamespace.Should().Be("guava-health");
-        options.Environment.Should().Be("development");
-        options.EnableTracing.Should().BeTrue();
-        options.EnableMetrics.Should().BeTrue();
+        options.ServiceName.ShouldBe("unknown-service");
+        options.ServiceVersion.ShouldBe("0.0.0");
+        options.OtlpEndpoint.ShouldBe("http://localhost:4317");
+        options.ServiceNamespace.ShouldBe("guava-health");
+        options.Environment.ShouldBe("development");
+        options.EnableTracing.ShouldBeTrue();
+        options.EnableMetrics.ShouldBeTrue();
     }
 
     [Fact]
@@ -51,15 +51,15 @@ public sealed class ObservabilityOptionsTests
             .Get<ObservabilityOptions>();
 
         // Assert
-        options.Should().NotBeNull();
-        options!.ServiceName.Should().Be("guava-backend");
-        options.ServiceVersion.Should().Be("1.0.0");
-        options.OtlpEndpoint.Should().Be("http://otel-collector:4317");
-        options.Environment.Should().Be("production");
-        options.EnableTracing.Should().BeTrue();
-        options.EnableMetrics.Should().BeFalse();
+        options.ShouldNotBeNull();
+        options!.ServiceName.ShouldBe("guava-backend");
+        options.ServiceVersion.ShouldBe("1.0.0");
+        options.OtlpEndpoint.ShouldBe("http://otel-collector:4317");
+        options.Environment.ShouldBe("production");
+        options.EnableTracing.ShouldBeTrue();
+        options.EnableMetrics.ShouldBeFalse();
     }
 
     [Fact]
-    public void SectionName_IsCorrect() => ObservabilityOptions.SectionName.Should().Be("Observability");
+    public void SectionName_IsCorrect() => ObservabilityOptions.SectionName.ShouldBe("Observability");
 }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Cache;
 using Xunit;
 
@@ -13,7 +13,7 @@ public sealed class FeatureCacheKeyTests
 
         string key = FeatureCacheKey.Build(tenantId, "App.Video");
 
-        key.Should().Be("features:t:11111111-1111-1111-1111-111111111111:App.Video");
+        key.ShouldBe("features:t:11111111-1111-1111-1111-111111111111:App.Video");
     }
 
     [Fact]
@@ -21,7 +21,7 @@ public sealed class FeatureCacheKeyTests
     {
         string key = FeatureCacheKey.Build(null, "App.Video");
 
-        key.Should().Be("features:g:App.Video");
+        key.ShouldBe("features:g:App.Video");
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public sealed class FeatureCacheKeyTests
         string keyA = FeatureCacheKey.Build(tenantA, "App.Feature");
         string keyB = FeatureCacheKey.Build(tenantB, "App.Feature");
 
-        keyA.Should().NotBe(keyB);
+        keyA.ShouldNotBe(keyB);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class FeatureCacheKeyTests
         string key1 = FeatureCacheKey.Build(tenantId, "App.Video");
         string key2 = FeatureCacheKey.Build(tenantId, "App.Export");
 
-        key1.Should().NotBe(key2);
+        key1.ShouldNotBe(key2);
     }
 
     [Fact]
@@ -53,6 +53,6 @@ public sealed class FeatureCacheKeyTests
         string key1 = FeatureCacheKey.Build(null, "App.Video");
         string key2 = FeatureCacheKey.Build(null, "App.Export");
 
-        key1.Should().NotBe(key2);
+        key1.ShouldNotBe(key2);
     }
 }

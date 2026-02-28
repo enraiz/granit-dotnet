@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using Granit.Security;
 using Granit.Timing;
@@ -6,6 +5,7 @@ using JasperFx.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.Core;
+using Shouldly;
 using Wolverine;
 using Wolverine.Persistence.Durability;
 using Wolverine.Persistence.Durability.DeadLetterManagement;
@@ -55,7 +55,7 @@ public sealed class BackgroundJobsIntegrationTests
         BackgroundJobDefinition? job = await store.FindAsync(
             "fake-daily-report", TestContext.Current.CancellationToken);
         DateTimeOffset expectedNext = new(2026, 3, 1, 8, 0, 0, TimeSpan.Zero);
-        job!.NextExecutionAt.Should().Be(expectedNext);
+        job!.NextExecutionAt.ShouldBe(expectedNext);
     }
 
     // =========================================================================
@@ -85,7 +85,7 @@ public sealed class BackgroundJobsIntegrationTests
         // Assert — NextExecutionAt not updated (still null after seed)
         BackgroundJobDefinition? job = await store.FindAsync(
             "fake-daily-report", TestContext.Current.CancellationToken);
-        job!.NextExecutionAt.Should().BeNull();
+        job!.NextExecutionAt.ShouldBeNull();
     }
 
     // =========================================================================
@@ -143,7 +143,7 @@ public sealed class BackgroundJobsIntegrationTests
         // Assert — TriggeredBy persisted in store
         BackgroundJobDefinition? job = await store.FindAsync(
             "fake-daily-report", TestContext.Current.CancellationToken);
-        job!.TriggeredBy.Should().Be("user-admin");
+        job!.TriggeredBy.ShouldBe("user-admin");
     }
 
     // =========================================================================
@@ -168,7 +168,7 @@ public sealed class BackgroundJobsIntegrationTests
         // Assert — exactly 2 jobs, no duplicates
         IReadOnlyList<BackgroundJobDefinition> jobs =
             await store.GetAllJobsAsync(TestContext.Current.CancellationToken);
-        jobs.Should().HaveCount(2);
-        jobs.Select(j => j.JobName).Should().BeEquivalentTo(["job-a", "job-b"]);
+        jobs.Count.ShouldBe(2);
+        jobs.Select(j => j.JobName).Order().ShouldBe(["job-a", "job-b"]);
     }
 }

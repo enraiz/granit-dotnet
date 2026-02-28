@@ -6,10 +6,10 @@
 // Pattern : double-check locking + SemaphoreSlim stocké dans IMemoryCache.
 // =============================================================================
 
-using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -57,8 +57,8 @@ public sealed class StampedeProtectionTests
         ProductCacheItem[] results = await Task.WhenAll(tasks);
 
         // Assert — factory appelée exactement 1 fois, tous les résultats identiques
-        factoryCallCount.Should().Be(1, "la factory ne doit être exécutée qu'une seule fois sous concurrence");
-        results.Should().AllSatisfy(r => r.Id.Should().Be(42));
+        factoryCallCount.ShouldBe(1, "la factory ne doit être exécutée qu'une seule fois sous concurrence");
+        results.ToList().ForEach(r => r.Id.ShouldBe(42));
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class StampedeProtectionTests
             sut.GetOrAddAsync("key-3", _ => { Interlocked.Increment(ref factoryCallCount); return Task.FromResult(new ProductCacheItem { Id = 3 }); }, null, ct));
 
         // Assert
-        factoryCallCount.Should().Be(3);
+        factoryCallCount.ShouldBe(3);
     }
 
     // Type de test

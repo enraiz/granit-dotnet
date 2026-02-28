@@ -6,9 +6,9 @@
 // =============================================================================
 
 using System.Threading.Channels;
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -31,8 +31,8 @@ public sealed class ChannelBatchDispatcherTests
 
         // Assert
         bool hasItem = _channel.Reader.TryRead(out RunMigrationBatchCommand? read);
-        hasItem.Should().BeTrue();
-        read.Should().Be(command);
+        hasItem.ShouldBeTrue();
+        read.ShouldBe(command);
     }
 
     [Fact]
@@ -57,8 +57,8 @@ public sealed class ChannelBatchDispatcherTests
             received.Add(item);
         }
 
-        received.Should().HaveCount(3);
-        received.Should().BeEquivalentTo(commands, options => options.WithStrictOrdering());
+        received.Count.ShouldBe(3);
+        received.ShouldBe(commands);
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public sealed class ChannelBatchDispatcherTests
 
         // Assert
         bool hasItem = _channel.Reader.TryRead(out _);
-        hasItem.Should().BeFalse();
+        hasItem.ShouldBeFalse();
     }
 
     [Fact]
@@ -87,6 +87,6 @@ public sealed class ChannelBatchDispatcherTests
 
         // Act & Assert
         Func<Task> act = () => dispatcher.DispatchAsync(command, cts.Token);
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        await Should.ThrowAsync<OperationCanceledException>(act);
     }
 }

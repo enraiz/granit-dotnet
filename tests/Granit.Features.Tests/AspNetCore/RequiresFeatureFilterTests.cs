@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.AspNetCore;
 using Granit.Features.Checker;
 using Granit.Features.Exceptions;
@@ -43,14 +43,14 @@ public sealed class RequiresFeatureFilterTests
         RequiresFeatureAttribute attribute = new("App.Feature");
         IFilterMetadata filter = attribute.CreateInstance(sp);
 
-        filter.Should().BeAssignableTo<IAsyncActionFilter>();
+        filter.ShouldBeAssignableTo<IAsyncActionFilter>();
     }
 
     [Fact]
     public void RequiresFeatureAttribute_IsReusable_IsFalse()
     {
         RequiresFeatureAttribute attribute = new("App.Feature");
-        attribute.IsReusable.Should().BeFalse();
+        attribute.IsReusable.ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------
@@ -75,7 +75,7 @@ public sealed class RequiresFeatureFilterTests
 
         await filter.OnActionExecutionAsync(context, next);
 
-        nextCalled.Should().BeTrue();
+        nextCalled.ShouldBeTrue();
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public sealed class RequiresFeatureFilterTests
 
         Func<Task> act = () => filter.OnActionExecutionAsync(context, next);
 
-        await act.Should().ThrowAsync<FeatureNotEnabledException>();
-        nextCalled.Should().BeFalse();
+        await Should.ThrowAsync<FeatureNotEnabledException>(act);
+        nextCalled.ShouldBeFalse();
     }
 }

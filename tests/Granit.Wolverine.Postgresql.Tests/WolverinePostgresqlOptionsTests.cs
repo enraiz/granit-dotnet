@@ -4,10 +4,10 @@
 // Verifies default values, section name constant, and all validation branches.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Wolverine.Postgresql;
 using Granit.Wolverine.Postgresql.Internal;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Wolverine.Persistence;
 using Xunit;
 
@@ -21,15 +21,15 @@ public sealed class WolverinePostgresqlOptionsTests
 
     [Fact]
     public void SectionName_IsWolverinePostgresql() =>
-        WolverinePostgresqlOptions.SectionName.Should().Be("WolverinePostgresql");
+        WolverinePostgresqlOptions.SectionName.ShouldBe("WolverinePostgresql");
 
     [Fact]
     public void DefaultTransportConnectionString_IsEmpty() =>
-        new WolverinePostgresqlOptions().TransportConnectionString.Should().BeEmpty();
+        new WolverinePostgresqlOptions().TransportConnectionString.ShouldBeEmpty();
 
     [Fact]
     public void DefaultTransactionMode_IsEager() =>
-        new WolverinePostgresqlOptions().TransactionMode.Should().Be(TransactionMiddlewareMode.Eager);
+        new WolverinePostgresqlOptions().TransactionMode.ShouldBe(TransactionMiddlewareMode.Eager);
 
     // -----------------------------------------------------------------------
     // WolverinePostgresqlOptionsValidator — happy path
@@ -46,7 +46,7 @@ public sealed class WolverinePostgresqlOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class WolverinePostgresqlOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     // -----------------------------------------------------------------------
@@ -76,8 +76,8 @@ public sealed class WolverinePostgresqlOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().ContainMatch("*TransportConnectionString*");
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(x => x.Contains("TransportConnectionString"));
     }
 
     [Fact]
@@ -88,8 +88,8 @@ public sealed class WolverinePostgresqlOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().ContainMatch("*TransportConnectionString*");
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(x => x.Contains("TransportConnectionString"));
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public sealed class WolverinePostgresqlOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().ContainMatch("*HDS*");
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(x => x.Contains("HDS"));
     }
 }

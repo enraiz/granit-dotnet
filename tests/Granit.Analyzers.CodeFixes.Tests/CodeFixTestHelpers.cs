@@ -3,13 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Formatting;
+using Shouldly;
 
 namespace Granit.Analyzers.CodeFixes.Tests;
 
@@ -57,7 +57,7 @@ internal static class CodeFixTestHelpers
             ImmutableArray.Create<DiagnosticAnalyzer>(analyzer));
 
         ImmutableArray<Diagnostic> diagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(ct);
-        diagnostics.Should().NotBeEmpty("the analyzer should report at least one diagnostic");
+        diagnostics.ShouldNotBeEmpty("the analyzer should report at least one diagnostic");
 
         // 3. Apply the first CodeFix action on the first diagnostic
         Diagnostic diagnostic = diagnostics
@@ -93,18 +93,18 @@ internal static class CodeFixTestHelpers
             ct);
 
         await codeFix.RegisterCodeFixesAsync(context);
-        codeAction.Should().NotBeNull("the CodeFix provider should register an action");
+        codeAction.ShouldNotBeNull("the CodeFix provider should register an action");
 
         ImmutableArray<CodeActionOperation> operations = await codeAction!.GetOperationsAsync(ct);
         ApplyChangesOperation? applyChanges = operations.OfType<ApplyChangesOperation>().FirstOrDefault();
-        applyChanges.Should().NotBeNull("the CodeFix action should produce an ApplyChangesOperation");
+        applyChanges.ShouldNotBeNull("the CodeFix action should produce an ApplyChangesOperation");
 
         // 4. Get the changed document and format it
         Document changedDocument = applyChanges!.ChangedSolution.GetDocument(document.Id)!;
         Document formattedDocument = await Formatter.FormatAsync(changedDocument, cancellationToken: ct);
         string actualText = (await formattedDocument.GetTextAsync(ct)).ToString();
 
-        // 5. Compare — use Assert.Equal to avoid FormatException with curly braces in FluentAssertions
+        // 5. Compare — use Assert.Equal to avoid FormatException with curly braces in Shouldly
         Xunit.Assert.Equal(expected, actualText);
     }
 
@@ -140,7 +140,7 @@ internal static class CodeFixTestHelpers
             ImmutableArray.Create<DiagnosticAnalyzer>(analyzer));
 
         ImmutableArray<Diagnostic> diagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(ct);
-        diagnostics.Should().BeEmpty("no diagnostic should be reported");
+        diagnostics.ShouldBeEmpty("no diagnostic should be reported");
     }
 
     private static ImmutableArray<MetadataReference> GetNetCoreReferences()

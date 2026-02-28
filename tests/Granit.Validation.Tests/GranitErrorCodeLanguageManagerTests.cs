@@ -9,11 +9,11 @@
 // =============================================================================
 
 using System.Globalization;
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Granit.Validation.Extensions;
 using Granit.Validation.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -35,7 +35,7 @@ public sealed class GranitErrorCodeLanguageManagerTests
 
         string result = manager.GetString(key);
 
-        result.Should().Be(expected);
+        result.ShouldBe(expected);
     }
 
     [Fact]
@@ -47,7 +47,8 @@ public sealed class GranitErrorCodeLanguageManagerTests
         string dutch = manager.GetString("NotEmptyValidator", new CultureInfo("nl"));
         string english = manager.GetString("NotEmptyValidator", new CultureInfo("en"));
 
-        french.Should().Be(dutch).And.Be(english);
+        french.ShouldBe(dutch);
+        french.ShouldBe(english);
     }
 
     // -------------------------------------------------------------------------
@@ -59,7 +60,7 @@ public sealed class GranitErrorCodeLanguageManagerTests
     {
         GranitErrorCodeLanguageManager manager = new();
 
-        manager.Enabled.Should().BeTrue();
+        manager.Enabled.ShouldBeTrue();
     }
 
     [Fact]
@@ -67,7 +68,7 @@ public sealed class GranitErrorCodeLanguageManagerTests
     {
         GranitErrorCodeLanguageManager manager = new();
 
-        manager.Culture.Should().Be(CultureInfo.InvariantCulture);
+        manager.Culture.ShouldBe(CultureInfo.InvariantCulture);
     }
 
     // -------------------------------------------------------------------------
@@ -81,7 +82,7 @@ public sealed class GranitErrorCodeLanguageManagerTests
 
         services.AddGranitValidation();
 
-        ValidatorOptions.Global.LanguageManager.Should().BeOfType<GranitErrorCodeLanguageManager>();
+        ValidatorOptions.Global.LanguageManager.ShouldBeOfType<GranitErrorCodeLanguageManager>();
     }
 
     [Fact]
@@ -95,6 +96,6 @@ public sealed class GranitErrorCodeLanguageManagerTests
 
         ValidationResult result = validator.Validate(string.Empty);
 
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:NotEmptyValidator");
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:NotEmptyValidator");
     }
 }

@@ -9,9 +9,9 @@
 //   - AsyncLocal isolation between parallel tasks
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.DataFiltering;
 using Granit.Core.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.DataFiltering;
@@ -33,10 +33,10 @@ public sealed class DataFilterTests
     {
         DataFilter filter = Create();
 
-        filter.IsEnabled<ISoftDeletable>().Should().BeTrue();
-        filter.IsEnabled<IMultiTenant>().Should().BeTrue();
-        filter.IsEnabled<IActive>().Should().BeTrue();
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<ISoftDeletable>().ShouldBeTrue();
+        filter.IsEnabled<IMultiTenant>().ShouldBeTrue();
+        filter.IsEnabled<IActive>().ShouldBeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public sealed class DataFilterTests
 
         using IDisposable scope = filter.Disable<IFilterA>();
 
-        filter.IsEnabled<IFilterA>().Should().BeFalse();
+        filter.IsEnabled<IFilterA>().ShouldBeFalse();
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class DataFilterTests
         IDisposable scope = filter.Disable<IFilterA>();
         scope.Dispose();
 
-        filter.IsEnabled<IFilterA>().Should().BeTrue("scope disposed must restore enabled state");
+        filter.IsEnabled<IFilterA>().ShouldBeTrue("scope disposed must restore enabled state");
     }
 
     // -------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public sealed class DataFilterTests
         using IDisposable disableScope = filter.Disable<IFilterA>();
         using IDisposable enableScope = filter.Enable<IFilterA>();
 
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
     }
 
     [Fact]
@@ -87,10 +87,10 @@ public sealed class DataFilterTests
         using IDisposable disableScope = filter.Disable<IFilterA>();
 
         IDisposable enableScope = filter.Enable<IFilterA>();
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
 
         enableScope.Dispose();
-        filter.IsEnabled<IFilterA>().Should().BeFalse("re-disable state must be restored after enable scope disposed");
+        filter.IsEnabled<IFilterA>().ShouldBeFalse("re-disable state must be restored after enable scope disposed");
     }
 
     // -------------------------------------------------------------------------
@@ -103,23 +103,23 @@ public sealed class DataFilterTests
         DataFilter filter = Create();
 
         // Level 0: enabled (default)
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
 
         IDisposable disableScope = filter.Disable<IFilterA>();
         // Level 1: disabled
-        filter.IsEnabled<IFilterA>().Should().BeFalse();
+        filter.IsEnabled<IFilterA>().ShouldBeFalse();
 
         IDisposable reenableScope = filter.Enable<IFilterA>();
         // Level 2: re-enabled
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
 
         reenableScope.Dispose();
         // Back to level 1: disabled
-        filter.IsEnabled<IFilterA>().Should().BeFalse();
+        filter.IsEnabled<IFilterA>().ShouldBeFalse();
 
         disableScope.Dispose();
         // Back to level 0: enabled
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -135,7 +135,7 @@ public sealed class DataFilterTests
         scope.Dispose();
         scope.Dispose(); // must not throw or corrupt state
 
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -149,11 +149,11 @@ public sealed class DataFilterTests
 
         using IDisposable scope = filter.Disable<IFilterA>();
 
-        filter.IsEnabled<IFilterA>().Should().BeFalse();
-        filter.IsEnabled<IFilterB>().Should().BeTrue("IFilterB must be independent from IFilterA");
-        filter.IsEnabled<ISoftDeletable>().Should().BeTrue("ISoftDeletable must be independent");
-        filter.IsEnabled<IMultiTenant>().Should().BeTrue("IMultiTenant must be independent");
-        filter.IsEnabled<IActive>().Should().BeTrue("IActive must be independent");
+        filter.IsEnabled<IFilterA>().ShouldBeFalse();
+        filter.IsEnabled<IFilterB>().ShouldBeTrue("IFilterB must be independent from IFilterA");
+        filter.IsEnabled<ISoftDeletable>().ShouldBeTrue("ISoftDeletable must be independent");
+        filter.IsEnabled<IMultiTenant>().ShouldBeTrue("IMultiTenant must be independent");
+        filter.IsEnabled<IActive>().ShouldBeTrue("IActive must be independent");
     }
 
     [Fact]
@@ -164,8 +164,8 @@ public sealed class DataFilterTests
         using IDisposable scopeA = filter.Disable<IFilterA>();
         using IDisposable scopeB = filter.Disable<IFilterB>();
 
-        filter.IsEnabled<IFilterA>().Should().BeFalse();
-        filter.IsEnabled<IFilterB>().Should().BeFalse();
+        filter.IsEnabled<IFilterA>().ShouldBeFalse();
+        filter.IsEnabled<IFilterB>().ShouldBeFalse();
     }
 
     [Fact]
@@ -177,11 +177,11 @@ public sealed class DataFilterTests
         IDisposable scopeB = filter.Disable<IFilterB>();
 
         scopeB.Dispose();
-        filter.IsEnabled<IFilterA>().Should().BeFalse("IFilterA must still be disabled");
-        filter.IsEnabled<IFilterB>().Should().BeTrue("IFilterB must be restored");
+        filter.IsEnabled<IFilterA>().ShouldBeFalse("IFilterA must still be disabled");
+        filter.IsEnabled<IFilterB>().ShouldBeTrue("IFilterB must be restored");
 
         scopeA.Dispose();
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -197,20 +197,20 @@ public sealed class DataFilterTests
         {
             using IDisposable scope = filter.Disable<IFilterA>();
             await Task.Delay(20, TestContext.Current.CancellationToken);
-            filter.IsEnabled<IFilterA>().Should().BeFalse("task A must see its own disabled state");
+            filter.IsEnabled<IFilterA>().ShouldBeFalse("task A must see its own disabled state");
         }, TestContext.Current.CancellationToken);
 
         Task taskB = Task.Run(async () =>
         {
             await Task.Delay(5, TestContext.Current.CancellationToken);
             // Task B never disabled IFilterA — must see the default state.
-            filter.IsEnabled<IFilterA>().Should().BeTrue("task B must see the default enabled state");
+            filter.IsEnabled<IFilterA>().ShouldBeTrue("task B must see the default enabled state");
         }, TestContext.Current.CancellationToken);
 
         await Task.WhenAll(taskA, taskB);
 
         // Root flow state is untouched.
-        filter.IsEnabled<IFilterA>().Should().BeTrue();
+        filter.IsEnabled<IFilterA>().ShouldBeTrue();
     }
 
     [Fact]
@@ -225,16 +225,16 @@ public sealed class DataFilterTests
         await Task.Run(async () =>
         {
             // Child inherits parent's disabled state.
-            filter.IsEnabled<IFilterA>().Should().BeFalse("child inherits parent's snapshot");
+            filter.IsEnabled<IFilterA>().ShouldBeFalse("child inherits parent's snapshot");
 
             // Child re-enables — does not affect parent.
             using IDisposable childScope = filter.Enable<IFilterA>();
-            filter.IsEnabled<IFilterA>().Should().BeTrue("child re-enabled in its own flow");
+            filter.IsEnabled<IFilterA>().ShouldBeTrue("child re-enabled in its own flow");
 
             await Task.Delay(5, TestContext.Current.CancellationToken);
         }, TestContext.Current.CancellationToken);
 
         // Parent state is unaffected by the child's mutation.
-        filter.IsEnabled<IFilterA>().Should().BeFalse("parent state must be unchanged after child task");
+        filter.IsEnabled<IFilterA>().ShouldBeFalse("parent state must be unchanged after child task");
     }
 }

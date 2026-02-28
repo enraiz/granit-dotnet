@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Tests.Pipeline;
@@ -20,8 +20,8 @@ public sealed class RenderedContentTests
 
         BinaryRenderedContent result = new(memory, DocumentFormat.Pdf);
 
-        result.Bytes.ToArray().Should().Equal(bytes);
-        result.Format.Should().Be(DocumentFormat.Pdf);
+        result.Bytes.ToArray().ShouldBe(bytes);
+        result.Format.ShouldBe(DocumentFormat.Pdf);
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public sealed class RenderedContentTests
             RevisionId = id,
         };
 
-        result.RevisionId.Should().Be(id);
+        result.RevisionId.ShouldBe(id);
     }
 
     // -------------------------------------------------------------------------
@@ -49,7 +49,7 @@ public sealed class RenderedContentTests
             RevisionId = id,
         };
 
-        result.RevisionId.Should().Be(id);
+        result.RevisionId.ShouldBe(id);
     }
 
     // -------------------------------------------------------------------------
@@ -64,9 +64,9 @@ public sealed class RenderedContentTests
             PlainText: "Hello",
             Subject: "Test subject");
 
-        result.Html.Should().Be("<p>Hello</p>");
-        result.PlainText.Should().Be("Hello");
-        result.Subject.Should().Be("Test subject");
+        result.Html.ShouldBe("<p>Hello</p>");
+        result.PlainText.ShouldBe("Hello");
+        result.Subject.ShouldBe("Test subject");
     }
 
     [Fact]
@@ -74,9 +74,9 @@ public sealed class RenderedContentTests
     {
         RenderedTextResult result = new(Html: "<p>Body</p>");
 
-        result.Html.Should().Be("<p>Body</p>");
-        result.PlainText.Should().BeNull();
-        result.Subject.Should().BeNull();
+        result.Html.ShouldBe("<p>Body</p>");
+        result.PlainText.ShouldBeNull();
+        result.Subject.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -88,10 +88,10 @@ public sealed class RenderedContentTests
     {
         TemplateNotFoundException ex = new("Billing.Invoice", "fr-BE");
 
-        ex.TemplateName.Should().Be("Billing.Invoice");
-        ex.Culture.Should().Be("fr-BE");
-        ex.Message.Should().Contain("fr-BE");
-        ex.Message.Should().Contain("Billing.Invoice");
+        ex.TemplateName.ShouldBe("Billing.Invoice");
+        ex.Culture.ShouldBe("fr-BE");
+        ex.Message.ShouldContain("fr-BE");
+        ex.Message.ShouldContain("Billing.Invoice");
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public sealed class RenderedContentTests
     {
         TemplateNotFoundException ex = new("Billing.Invoice");
 
-        ex.Culture.Should().BeNull();
-        ex.Message.Should().Contain("Billing.Invoice");
+        ex.Culture.ShouldBeNull();
+        ex.Message.ShouldContain("Billing.Invoice");
     }
 }

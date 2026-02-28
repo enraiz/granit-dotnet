@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Privacy.LegalAgreements;
 using Granit.Privacy.LegalAgreements.Internal;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 using Xunit.v3;
 
@@ -28,7 +28,7 @@ public sealed class LegalAgreementCheckerTests
 
         bool result = await _sut.HasAcceptedLatestAsync(userId, "privacy-policy", TestContext.Current.CancellationToken);
 
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public sealed class LegalAgreementCheckerTests
 
         bool result = await _sut.HasAcceptedLatestAsync(userId, "privacy-policy", TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class LegalAgreementCheckerTests
 
         bool result = await _sut.HasAcceptedLatestAsync(userId, "privacy-policy", TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class LegalAgreementCheckerTests
 
         bool result = await _sut.HasAcceptedLatestAsync(userId, "unknown-doc", TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public sealed class LegalAgreementCheckerTests
 
         IReadOnlyList<LegalAgreementBase> result = await _sut.GetUserAgreementsAsync(userId, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(3);
+        result.Count.ShouldBe(3);
     }
 
     private static TestLegalAgreement CreateAgreement(Guid userId, string documentId, string version) =>

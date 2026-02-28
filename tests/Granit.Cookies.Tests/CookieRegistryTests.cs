@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Cookies.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Cookies.Tests;
@@ -20,7 +20,7 @@ public sealed class CookieRegistryTests
 
         _sut.Register(definition);
 
-        _sut.IsRegistered("test_cookie").Should().BeTrue();
+        _sut.IsRegistered("test_cookie").ShouldBeTrue();
     }
 
     [Fact]
@@ -31,8 +31,7 @@ public sealed class CookieRegistryTests
 
         Action act = () => _sut.Register(definition);
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*already registered*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("already registered");
     }
 
     [Fact]
@@ -43,7 +42,7 @@ public sealed class CookieRegistryTests
 
         CookieDefinition? result = _sut.GetDefinition("test_cookie");
 
-        result.Should().Be(definition);
+        result.ShouldBe(definition);
     }
 
     [Fact]
@@ -51,7 +50,7 @@ public sealed class CookieRegistryTests
     {
         CookieDefinition? result = _sut.GetDefinition("unknown");
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -62,7 +61,7 @@ public sealed class CookieRegistryTests
 
         CookieDefinition? result = _sut.GetDefinition("TEST_COOKIE");
 
-        result.Should().Be(definition);
+        result.ShouldBe(definition);
     }
 
     [Fact]
@@ -74,8 +73,8 @@ public sealed class CookieRegistryTests
 
         IReadOnlyList<CookieDefinition> result = _sut.GetByCategory(CookieCategory.Analytics);
 
-        result.Should().HaveCount(2);
-        result.Should().AllSatisfy(c => c.Category.Should().Be(CookieCategory.Analytics));
+        result.Count.ShouldBe(2);
+        result.ToList().ForEach(c => c.Category.ShouldBe(CookieCategory.Analytics));
     }
 
     [Fact]
@@ -85,7 +84,7 @@ public sealed class CookieRegistryTests
 
         IReadOnlyList<CookieDefinition> result = _sut.GetByCategory(CookieCategory.Marketing);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -93,12 +92,12 @@ public sealed class CookieRegistryTests
     {
         _sut.Register(CreateDefinition());
 
-        _sut.IsRegistered("test_cookie").Should().BeTrue();
+        _sut.IsRegistered("test_cookie").ShouldBeTrue();
     }
 
     [Fact]
     public void IsRegistered_ReturnsFalseForUnknown() =>
-        _sut.IsRegistered("unknown").Should().BeFalse();
+        _sut.IsRegistered("unknown").ShouldBeFalse();
 
     [Fact]
     public void GetAll_ReturnsAllRegistered()
@@ -109,7 +108,7 @@ public sealed class CookieRegistryTests
 
         IReadOnlyList<CookieDefinition> result = _sut.GetAll();
 
-        result.Should().HaveCount(3);
+        result.Count.ShouldBe(3);
     }
 
     [Fact]
@@ -117,6 +116,6 @@ public sealed class CookieRegistryTests
     {
         Action act = () => _sut.Register(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(act);
     }
 }

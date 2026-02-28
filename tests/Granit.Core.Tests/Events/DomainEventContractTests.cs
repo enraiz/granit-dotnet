@@ -6,8 +6,8 @@
 // =============================================================================
 
 using System.Reflection;
-using FluentAssertions;
 using Granit.Core.Events;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Events;
@@ -17,19 +17,19 @@ public sealed class DomainEventContractTests
     [Fact]
     public void IDomainEvent_HasNoMembers() =>
         typeof(IDomainEvent).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-            .Should().BeEmpty("IDomainEvent must be a pure marker interface");
+            .ShouldBeEmpty("IDomainEvent must be a pure marker interface");
 
     [Fact]
     public void IIntegrationEvent_HasNoMembers() =>
         typeof(IIntegrationEvent).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-            .Should().BeEmpty("IIntegrationEvent must be a pure marker interface");
+            .ShouldBeEmpty("IIntegrationEvent must be a pure marker interface");
 
     [Fact]
     public void IDomainEvent_CanBeImplementedByRecord()
     {
         ConcreteDomainEvent evt = new(Guid.NewGuid());
 
-        evt.Should().BeAssignableTo<IDomainEvent>();
+        evt.ShouldBeAssignableTo<IDomainEvent>();
     }
 
     [Fact]
@@ -37,14 +37,14 @@ public sealed class DomainEventContractTests
     {
         ConcreteIntegrationEvent evt = new(Guid.NewGuid(), "bed-42");
 
-        evt.Should().BeAssignableTo<IIntegrationEvent>();
+        evt.ShouldBeAssignableTo<IIntegrationEvent>();
     }
 
     [Fact]
     public void IDomainEvent_AndIIntegrationEvent_AreInCorrectNamespace()
     {
-        typeof(IDomainEvent).Namespace.Should().Be("Granit.Core.Events");
-        typeof(IIntegrationEvent).Namespace.Should().Be("Granit.Core.Events");
+        typeof(IDomainEvent).Namespace.ShouldBe("Granit.Core.Events");
+        typeof(IIntegrationEvent).Namespace.ShouldBe("Granit.Core.Events");
     }
 
     // --- Test fixtures ---

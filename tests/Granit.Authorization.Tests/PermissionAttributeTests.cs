@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Authorization.Attributes;
 using Microsoft.AspNetCore.Authorization;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.Tests;
@@ -12,7 +12,7 @@ public sealed class PermissionAttributeTests
     {
         PermissionAttribute attr = new("Invoices.Delete");
 
-        attr.Policy.Should().Be("Invoices.Delete");
+        attr.Policy.ShouldBe("Invoices.Delete");
     }
 
     [Fact]
@@ -20,7 +20,7 @@ public sealed class PermissionAttributeTests
     {
         PermissionAttribute attr = new("Invoices.Read");
 
-        attr.Should().BeAssignableTo<AuthorizeAttribute>();
+        attr.ShouldBeAssignableTo<AuthorizeAttribute>();
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public sealed class PermissionAttributeTests
             .Cast<AttributeUsageAttribute>()
             .FirstOrDefault();
 
-        usage.Should().NotBeNull();
-        usage!.AllowMultiple.Should().BeTrue();
+        usage.ShouldNotBeNull();
+        usage!.AllowMultiple.ShouldBeTrue();
     }
 }

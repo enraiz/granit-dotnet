@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Store;
 using Xunit;
 
@@ -14,7 +14,7 @@ public sealed class InMemoryFeatureStoreTests
         string? result = await store.GetOrNullAsync("App.Feature", tenantId: null,
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public sealed class InMemoryFeatureStoreTests
         string? result = await store.GetOrNullAsync("App.Feature", tenantId: null,
             TestContext.Current.CancellationToken);
 
-        result.Should().Be("true");
+        result.ShouldBe("true");
     }
 
     [Fact]
@@ -42,8 +42,8 @@ public sealed class InMemoryFeatureStoreTests
         string? tenantResult = await store.GetOrNullAsync("App.Feature", tenantId,
             TestContext.Current.CancellationToken);
 
-        globalResult.Should().BeNull("global scope has no value");
-        tenantResult.Should().Be("true");
+        globalResult.ShouldBeNull("global scope has no value");
+        tenantResult.ShouldBe("true");
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class InMemoryFeatureStoreTests
 
         string? result = await store.GetOrNullAsync("App.Feature", tenantId: null,
             TestContext.Current.CancellationToken);
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -73,6 +73,6 @@ public sealed class InMemoryFeatureStoreTests
         string? result = await store.GetOrNullAsync("App.Feature", tenantId: null,
             TestContext.Current.CancellationToken);
 
-        result.Should().Be("true");
+        result.ShouldBe("true");
     }
 }

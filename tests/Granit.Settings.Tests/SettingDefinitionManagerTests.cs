@@ -2,8 +2,8 @@
 // SettingDefinitionManagerTests - Tests unitaires du registre de définitions
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.Definitions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -26,7 +26,7 @@ public sealed class SettingDefinitionManagerTests
     {
         SettingDefinitionManager manager = new([]);
 
-        manager.GetAll().Should().BeEmpty();
+        manager.GetAll().ShouldBeEmpty();
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public sealed class SettingDefinitionManagerTests
 
         SettingDefinition result = manager.Get("App.Theme");
 
-        result.Should().BeSameAs(def);
+        result.ShouldBeSameAs(def);
     }
 
     [Fact]
@@ -47,8 +47,7 @@ public sealed class SettingDefinitionManagerTests
 
         Action act = () => manager.Get("Unknown.Setting");
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*Unknown.Setting*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("Unknown.Setting");
     }
 
     [Fact]
@@ -58,7 +57,7 @@ public sealed class SettingDefinitionManagerTests
 
         SettingDefinition? result = manager.GetOrNull("Unknown.Setting");
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -70,9 +69,9 @@ public sealed class SettingDefinitionManagerTests
 
         IReadOnlyCollection<SettingDefinition> all = manager.GetAll();
 
-        all.Should().HaveCount(2);
-        all.Should().Contain(def1);
-        all.Should().Contain(def2);
+        all.Count.ShouldBe(2);
+        all.ShouldContain(def1);
+        all.ShouldContain(def2);
     }
 
     [Fact]
@@ -85,7 +84,7 @@ public sealed class SettingDefinitionManagerTests
 
         SettingDefinitionManager manager = new([providerA, providerB]);
 
-        manager.Get("App.Theme").DefaultValue.Should().Be("light", "le second provider écrase le premier");
+        manager.Get("App.Theme").DefaultValue.ShouldBe("light", "le second provider écrase le premier");
     }
 
     [Fact]
@@ -104,7 +103,7 @@ public sealed class SettingDefinitionManagerTests
             })
         ]);
 
-        capturedFromContext.Should().BeSameAs(added,
+        capturedFromContext.ShouldBeSameAs(added,
             "GetOrNull doit retrouver la définition ajoutée dans le même contexte");
     }
 

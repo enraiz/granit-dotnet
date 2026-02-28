@@ -7,11 +7,11 @@
 //   - Handles modules without overrides (no-op OK)
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests;
@@ -92,7 +92,7 @@ public sealed class GranitApplicationTests
         app.ConfigureServices(context);
 
         // Assert - A must be called before B
-        CallOrder.Should().ContainInOrder("ConfigureServices:A", "ConfigureServices:B");
+        CallOrder.ShouldBe(new[] { "ConfigureServices:A", "ConfigureServices:B" });
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public sealed class GranitApplicationTests
         app.InitializeApplication(context);
 
         // Assert - A must be called before B
-        CallOrder.Should().ContainInOrder("Initialize:A", "Initialize:B");
+        CallOrder.ShouldBe(new[] { "Initialize:A", "Initialize:B" });
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public sealed class GranitApplicationTests
         var act = () => app.ConfigureServices(context);
 
         // Assert
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -139,9 +139,9 @@ public sealed class GranitApplicationTests
 
         var types = app.GetModuleTypes();
 
-        types.Should().HaveCount(2);
-        types[0].Should().Be<TrackingModuleA>();
-        types[1].Should().Be<TrackingModuleB>();
+        types.Count.ShouldBe(2);
+        types[0].ShouldBe(typeof(TrackingModuleA));
+        types[1].ShouldBe(typeof(TrackingModuleB));
     }
 
     // --- Async tests ---
@@ -162,7 +162,7 @@ public sealed class GranitApplicationTests
         await app.ConfigureServicesAsync(context);
 
         // Assert - A must be called before B
-        CallOrder.Should().ContainInOrder("ConfigureServicesAsync:A", "ConfigureServicesAsync:B");
+        CallOrder.ShouldBe(new[] { "ConfigureServicesAsync:A", "ConfigureServicesAsync:B" });
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public sealed class GranitApplicationTests
         await app.InitializeApplicationAsync(context);
 
         // Assert - A must be called before B
-        CallOrder.Should().ContainInOrder("InitializeAsync:A", "InitializeAsync:B");
+        CallOrder.ShouldBe(new[] { "InitializeAsync:A", "InitializeAsync:B" });
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public sealed class GranitApplicationTests
         await app.ConfigureServicesAsync(context);
 
         // Assert - Sync overrides are called via the async path
-        CallOrder.Should().ContainInOrder("ConfigureServices:A", "ConfigureServices:B");
+        CallOrder.ShouldBe(new[] { "ConfigureServices:A", "ConfigureServices:B" });
     }
 
     [Fact]
@@ -217,6 +217,6 @@ public sealed class GranitApplicationTests
         var act = () => app.ConfigureServicesAsync(context);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 }

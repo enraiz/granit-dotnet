@@ -4,9 +4,9 @@
 // Email: RFC-compliant via FluentValidation .EmailAddress()
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -29,7 +29,7 @@ public sealed class ContactValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(email));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -46,9 +46,9 @@ public sealed class ContactValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(email));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidEmail");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidEmail");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidEmail");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidEmail");
     }
 
     // -------------------------------------------------------------------------

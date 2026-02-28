@@ -9,11 +9,11 @@
 // metadata (InMemory does not enforce unique indexes at runtime).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Domain;
 using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -31,12 +31,12 @@ public sealed class TranslationConventionTests
 
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestDocTranslation));
 
-        entityType.Should().NotBeNull();
+        entityType.ShouldNotBeNull();
 
         IForeignKey? fk = entityType!.GetForeignKeys().FirstOrDefault();
-        fk.Should().NotBeNull("a FK to the parent entity must be configured");
-        fk!.PrincipalEntityType.ClrType.Should().Be<TestDocument>();
-        fk.Properties.Should().ContainSingle(p => p.Name == nameof(ITranslation.ParentId));
+        fk.ShouldNotBeNull("a FK to the parent entity must be configured");
+        fk!.PrincipalEntityType.ClrType.ShouldBe(typeof(TestDocument));
+        fk.Properties.ShouldContain(p => p.Name == nameof(ITranslation.ParentId));
     }
 
     [Fact]
@@ -47,8 +47,8 @@ public sealed class TranslationConventionTests
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestDocTranslation));
         IForeignKey? fk = entityType!.GetForeignKeys().FirstOrDefault();
 
-        fk.Should().NotBeNull();
-        fk!.DeleteBehavior.Should().Be(DeleteBehavior.Cascade);
+        fk.ShouldNotBeNull();
+        fk!.DeleteBehavior.ShouldBe(DeleteBehavior.Cascade);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public sealed class TranslationConventionTests
                 && i.Properties.Any(p => p.Name == nameof(ITranslation.ParentId))
                 && i.Properties.Any(p => p.Name == nameof(ITranslation.Culture)));
 
-        uniqueIndex.Should().NotBeNull("a unique index on (ParentId, Culture) must exist");
+        uniqueIndex.ShouldNotBeNull("a unique index on (ParentId, Culture) must exist");
     }
 
     [Fact]
@@ -74,8 +74,8 @@ public sealed class TranslationConventionTests
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestDocTranslation));
         IProperty? cultureProperty = entityType!.FindProperty(nameof(ITranslation.Culture));
 
-        cultureProperty.Should().NotBeNull();
-        cultureProperty!.GetMaxLength().Should().Be(20);
+        cultureProperty.ShouldNotBeNull();
+        cultureProperty!.GetMaxLength().ShouldBe(20);
     }
 
     // -------------------------------------------------------------------------
@@ -89,18 +89,18 @@ public sealed class TranslationConventionTests
 
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestAuditedDocTranslation));
 
-        entityType.Should().NotBeNull();
+        entityType.ShouldNotBeNull();
 
         IForeignKey? fk = entityType!.GetForeignKeys().FirstOrDefault();
-        fk.Should().NotBeNull("FK must be configured for AuditedTranslation<T>");
-        fk!.DeleteBehavior.Should().Be(DeleteBehavior.Cascade);
+        fk.ShouldNotBeNull("FK must be configured for AuditedTranslation<T>");
+        fk!.DeleteBehavior.ShouldBe(DeleteBehavior.Cascade);
 
         IIndex? uniqueIndex = entityType.GetIndexes()
             .FirstOrDefault(i => i.IsUnique
                 && i.Properties.Any(p => p.Name == nameof(ITranslation.ParentId))
                 && i.Properties.Any(p => p.Name == nameof(ITranslation.Culture)));
 
-        uniqueIndex.Should().NotBeNull("unique index on (ParentId, Culture) must exist for AuditedTranslation");
+        uniqueIndex.ShouldNotBeNull("unique index on (ParentId, Culture) must exist for AuditedTranslation");
     }
 
     // -------------------------------------------------------------------------
@@ -114,8 +114,8 @@ public sealed class TranslationConventionTests
 
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestDocument));
 
-        entityType.Should().NotBeNull();
-        entityType!.GetIndexes().Should().BeEmpty("parent entity should not get translation indexes");
+        entityType.ShouldNotBeNull();
+        entityType!.GetIndexes().ShouldBeEmpty("parent entity should not get translation indexes");
     }
 
     // -------------------------------------------------------------------------
@@ -154,7 +154,7 @@ public sealed class TranslationConventionTests
         // Assert
         List<TestDocTranslation> remainingTranslations = await context.Set<TestDocTranslation>()
             .ToListAsync(TestContext.Current.CancellationToken);
-        remainingTranslations.Should().BeEmpty("translations must be cascade-deleted with parent");
+        remainingTranslations.ShouldBeEmpty("translations must be cascade-deleted with parent");
     }
 
     // -------------------------------------------------------------------------

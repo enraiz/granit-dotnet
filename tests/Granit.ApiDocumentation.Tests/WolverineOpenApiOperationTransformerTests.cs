@@ -7,7 +7,6 @@
 //   - réponse 200 fantôme avec IResult supprimée
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiDocumentation.Transformers;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +16,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OpenApi;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -37,7 +37,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.OperationId.Should().Be("RequestDataExport");
+        operation.OperationId.ShouldBe("RequestDataExport");
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.OperationId.Should().Be("RequestDataExport");
+        operation.OperationId.ShouldBe("RequestDataExport");
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.OperationId.Should().Be("POST_api_v1_gdpr_export");
+        operation.OperationId.ShouldBe("POST_api_v1_gdpr_export");
     }
 
     // --- description ---
@@ -85,7 +85,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Description.Should().BeNull();
+        operation.Description.ShouldBeNull();
     }
 
     [Theory]
@@ -104,7 +104,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Description.Should().BeNull();
+        operation.Description.ShouldBeNull();
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Description.Should().Be("Returns the current user profile.");
+        operation.Description.ShouldBe("Returns the current user profile.");
     }
 
     // --- phantom 200 ---
@@ -147,8 +147,8 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().NotContainKey("200");
-        operation.Responses.Should().ContainKey("202");
+        operation.Responses.ShouldNotContainKey("200");
+        operation.Responses.ShouldContainKey("202");
     }
 
     [Fact]
@@ -173,8 +173,8 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().NotContainKey("200");
-        operation.Responses.Should().ContainKey("204");
+        operation.Responses.ShouldNotContainKey("200");
+        operation.Responses.ShouldContainKey("204");
     }
 
     [Fact]
@@ -207,7 +207,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().ContainKey("200");
+        operation.Responses.ShouldContainKey("200");
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public sealed class WolverineOpenApiOperationTransformerTests
             operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // --- Helpers ---

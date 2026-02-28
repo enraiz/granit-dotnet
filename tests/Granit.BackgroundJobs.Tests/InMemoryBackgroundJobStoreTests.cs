@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
@@ -31,10 +31,10 @@ public sealed class InMemoryBackgroundJobStoreTests
         BackgroundJobDefinition? job = await _sut.FindAsync("daily-report", ct);
 
         // Assert
-        job.Should().NotBeNull();
-        job!.JobName.Should().Be("daily-report");
-        job.CronExpression.Should().Be("0 8 * * *");
-        job.IsEnabled.Should().BeTrue();
+        job.ShouldNotBeNull();
+        job!.JobName.ShouldBe("daily-report");
+        job.CronExpression.ShouldBe("0 8 * * *");
+        job.IsEnabled.ShouldBeTrue();
     }
 
     [Fact]
@@ -52,8 +52,8 @@ public sealed class InMemoryBackgroundJobStoreTests
         BackgroundJobDefinition? job = await _sut.FindAsync("daily-report", ct);
 
         // Assert — cron updated, pause state preserved
-        job!.CronExpression.Should().Be("0 9 * * *");
-        job.IsEnabled.Should().BeFalse();
+        job!.CronExpression.ShouldBe("0 9 * * *");
+        job.IsEnabled.ShouldBeFalse();
     }
 
     // =========================================================================
@@ -68,7 +68,7 @@ public sealed class InMemoryBackgroundJobStoreTests
             await _sut.FindAsync("does-not-exist", TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public sealed class InMemoryBackgroundJobStoreTests
         IReadOnlyList<BackgroundJobDefinition> jobs = await _sut.GetAllJobsAsync(ct);
 
         // Assert
-        jobs.Should().HaveCount(2);
+        jobs.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -97,8 +97,8 @@ public sealed class InMemoryBackgroundJobStoreTests
         IReadOnlyList<BackgroundJobDefinition> enabled = await _sut.GetEnabledJobsAsync(ct);
 
         // Assert
-        enabled.Should().HaveCount(1);
-        enabled.Single().JobName.Should().Be("job-b");
+        enabled.Count.ShouldBe(1);
+        enabled.Single().JobName.ShouldBe("job-b");
     }
 
     // =========================================================================
@@ -118,10 +118,10 @@ public sealed class InMemoryBackgroundJobStoreTests
         BackgroundJobDefinition? job = await _sut.FindAsync("test-job", ct);
 
         // Assert
-        job!.LastExecutedAt.Should().Be(_now);
-        job.LastErrorMessage.Should().BeNull();
-        job.ConsecutiveFailureCount.Should().Be(0);
-        job.TriggeredBy.Should().BeNull();
+        job!.LastExecutedAt.ShouldBe(_now);
+        job.LastErrorMessage.ShouldBeNull();
+        job.ConsecutiveFailureCount.ShouldBe(0);
+        job.TriggeredBy.ShouldBeNull();
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public sealed class InMemoryBackgroundJobStoreTests
         BackgroundJobDefinition? job = await _sut.FindAsync("test-job", ct);
 
         // Assert
-        job!.NextExecutionAt.Should().Be(nextRun);
+        job!.NextExecutionAt.ShouldBe(nextRun);
     }
 
     [Fact]
@@ -153,8 +153,8 @@ public sealed class InMemoryBackgroundJobStoreTests
         BackgroundJobDefinition? job = await _sut.FindAsync("test-job", ct);
 
         // Assert
-        job!.ConsecutiveFailureCount.Should().Be(2);
-        job.LastErrorMessage.Should().Be("timeout again");
+        job!.ConsecutiveFailureCount.ShouldBe(2);
+        job.LastErrorMessage.ShouldBe("timeout again");
     }
 
     // =========================================================================
@@ -171,12 +171,12 @@ public sealed class InMemoryBackgroundJobStoreTests
         // Act — pause, assert immediately (store returns same object reference)
         await _sut.SetEnabledAsync("test-job", false, ct);
         BackgroundJobDefinition? paused = await _sut.FindAsync("test-job", ct);
-        paused!.IsEnabled.Should().BeFalse();
+        paused!.IsEnabled.ShouldBeFalse();
 
         // Act — resume, assert
         await _sut.SetEnabledAsync("test-job", true, ct);
         BackgroundJobDefinition? resumed = await _sut.FindAsync("test-job", ct);
-        resumed!.IsEnabled.Should().BeTrue();
+        resumed!.IsEnabled.ShouldBeTrue();
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public sealed class InMemoryBackgroundJobStoreTests
         BackgroundJobDefinition? job = await _sut.FindAsync("test-job", ct);
 
         // Assert
-        job!.TriggeredBy.Should().Be("user-123");
+        job!.TriggeredBy.ShouldBe("user-123");
     }
 
     [Fact]
@@ -202,6 +202,6 @@ public sealed class InMemoryBackgroundJobStoreTests
             "ghost-job", _now, TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 }

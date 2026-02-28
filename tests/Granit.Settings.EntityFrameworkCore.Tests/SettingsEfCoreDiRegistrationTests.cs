@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.Settings.EntityFrameworkCore.Extensions;
 using Granit.Settings.EntityFrameworkCore.Internal;
 using Granit.Settings.Values;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.EntityFrameworkCore.Tests;
@@ -31,7 +31,7 @@ public sealed class SettingsEfCoreDiRegistrationTests
 
         builder.AddGranitSettingsEfCore<TestSettingsDbContext>();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(ISettingStore) &&
             d.Lifetime == ServiceLifetime.Singleton,
             "EfCoreSettingStore must be registered as Singleton");
@@ -44,6 +44,6 @@ public sealed class SettingsEfCoreDiRegistrationTests
 
         IHostApplicationBuilder result = builder.AddGranitSettingsEfCore<TestSettingsDbContext>();
 
-        result.Should().BeSameAs(builder);
+        result.ShouldBeSameAs(builder);
     }
 }

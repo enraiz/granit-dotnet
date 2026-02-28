@@ -1,10 +1,10 @@
 using System.Globalization;
-using FluentAssertions;
 using Granit.Localization.Json;
 using Granit.Localization.Tests.TestResources;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Tests;
@@ -45,8 +45,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Test:Hello"];
 
         // Assert
-        result.Value.Should().Be("Bonjour");
-        result.ResourceNotFound.Should().BeFalse();
+        result.Value.ShouldBe("Bonjour");
+        result.ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -60,8 +60,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Test:Hello"];
 
         // Assert
-        result.Value.Should().Be("Hello");
-        result.ResourceNotFound.Should().BeFalse();
+        result.Value.ShouldBe("Hello");
+        result.ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -75,8 +75,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Test:Hello"];
 
         // Assert
-        result.Value.Should().Be("Bonjour");
-        result.ResourceNotFound.Should().BeFalse();
+        result.Value.ShouldBe("Bonjour");
+        result.ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -90,8 +90,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Test:Hello"];
 
         // Assert
-        result.Value.Should().Be("Bonjour");
-        result.ResourceNotFound.Should().BeFalse();
+        result.Value.ShouldBe("Bonjour");
+        result.ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -105,8 +105,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["NonExistent:Key"];
 
         // Assert
-        result.Value.Should().Be("NonExistent:Key");
-        result.ResourceNotFound.Should().BeTrue();
+        result.Value.ShouldBe("NonExistent:Key");
+        result.ResourceNotFound.ShouldBeTrue();
     }
 
     [Fact]
@@ -120,8 +120,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Test:Welcome", "Jean", 5];
 
         // Assert
-        result.Value.Should().Be("Bienvenue Jean, vous avez 5 messages");
-        result.ResourceNotFound.Should().BeFalse();
+        result.Value.ShouldBe("Bienvenue Jean, vous avez 5 messages");
+        result.ResourceNotFound.ShouldBeFalse();
     }
 
     [Fact]
@@ -135,8 +135,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Missing", "arg"];
 
         // Assert
-        result.Value.Should().Be("Missing");
-        result.ResourceNotFound.Should().BeTrue();
+        result.Value.ShouldBe("Missing");
+        result.ResourceNotFound.ShouldBeTrue();
     }
 
     [Fact]
@@ -150,11 +150,11 @@ public sealed class JsonStringLocalizerTests : IDisposable
         var all = localizer.GetAllStrings(includeParentCultures: false).ToList();
 
         // Assert
-        all.Should().HaveCount(4);
-        all.Select(s => s.Name).Should().Contain("Test:Hello");
-        all.Select(s => s.Name).Should().Contain("Test:Welcome");
-        all.Select(s => s.Name).Should().Contain("Test:Goodbye");
-        all.Select(s => s.Name).Should().Contain("Test:Files:Count");
+        all.Count.ShouldBe(4);
+        all.Select(s => s.Name).ShouldContain("Test:Hello");
+        all.Select(s => s.Name).ShouldContain("Test:Welcome");
+        all.Select(s => s.Name).ShouldContain("Test:Goodbye");
+        all.Select(s => s.Name).ShouldContain("Test:Files:Count");
     }
 
     [Theory]
@@ -173,8 +173,8 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Test:Files:Count", count];
 
         // Assert
-        result.Value.Should().Be(expected);
-        result.ResourceNotFound.Should().BeFalse();
+        result.Value.ShouldBe(expected);
+        result.ResourceNotFound.ShouldBeFalse();
     }
 
     [Theory]
@@ -193,7 +193,7 @@ public sealed class JsonStringLocalizerTests : IDisposable
         LocalizedString result = localizer["Test:Files:Count", count];
 
         // Assert
-        result.Value.Should().Be(expected);
-        result.ResourceNotFound.Should().BeFalse();
+        result.Value.ShouldBe(expected);
+        result.ResourceNotFound.ShouldBeFalse();
     }
 }

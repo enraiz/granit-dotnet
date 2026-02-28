@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
@@ -19,7 +19,7 @@ public sealed class BackgroundJobsOptionsValidatorTests
         ValidateOptionsResult result = _sut.Validate(null, options);
 
         // Assert
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class BackgroundJobsOptionsValidatorTests
         ValidateOptionsResult result = _sut.Validate(null, options);
 
         // Assert
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     [Theory]
@@ -55,7 +55,7 @@ public sealed class BackgroundJobsOptionsValidatorTests
         ValidateOptionsResult result = _sut.Validate(null, options);
 
         // Assert
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain(nameof(BackgroundJobsOptions.ConnectionString));
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain(nameof(BackgroundJobsOptions.ConnectionString));
     }
 }

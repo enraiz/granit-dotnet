@@ -2,7 +2,6 @@
 // TenantResolutionMiddlewareTests - Unit tests for the tenant resolution middleware
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.MultiTenancy;
 using Granit.MultiTenancy.Middleware;
@@ -11,6 +10,7 @@ using Granit.MultiTenancy.Resolvers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.MultiTenancy.Tests;
@@ -49,7 +49,7 @@ public sealed class TenantResolutionMiddlewareTests
 
         await middleware.InvokeAsync(context, _ => { nextCalled = true; return Task.CompletedTask; });
 
-        nextCalled.Should().BeTrue();
+        nextCalled.ShouldBeTrue();
         currentTenant.DidNotReceive().Change(Arg.Any<Guid?>(), Arg.Any<string?>());
     }
 
@@ -68,7 +68,7 @@ public sealed class TenantResolutionMiddlewareTests
 
         await middleware.InvokeAsync(context, _ => { nextCalled = true; return Task.CompletedTask; });
 
-        nextCalled.Should().BeTrue();
+        nextCalled.ShouldBeTrue();
         currentTenant.Received(1).Change(tenantId, "Acme");
     }
 
@@ -99,7 +99,7 @@ public sealed class TenantResolutionMiddlewareTests
 
         await middleware.InvokeAsync(context, _ => { nextCalled = true; return Task.CompletedTask; });
 
-        nextCalled.Should().BeTrue();
+        nextCalled.ShouldBeTrue();
         currentTenant.DidNotReceive().Change(Arg.Any<Guid?>(), Arg.Any<string?>());
     }
 
@@ -114,6 +114,6 @@ public sealed class TenantResolutionMiddlewareTests
 
         await middleware.InvokeAsync(context, _ => { nextCalled = true; return Task.CompletedTask; });
 
-        nextCalled.Should().BeTrue();
+        nextCalled.ShouldBeTrue();
     }
 }

@@ -5,11 +5,11 @@
 // and that Set/Clear are no-ops.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.Definitions;
 using Granit.Settings.Providers;
 using Granit.Settings.Values;
 using Microsoft.Extensions.Configuration;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -27,11 +27,11 @@ public sealed class ConfigurationSettingValueProviderTests
 
     [Fact]
     public void Name_Is_C() =>
-        CreateProvider([]).Name.Should().Be("C");
+        CreateProvider([]).Name.ShouldBe("C");
 
     [Fact]
     public void Order_Is_400() =>
-        CreateProvider([]).Order.Should().Be(400);
+        CreateProvider([]).Order.ShouldBe(400);
 
     [Fact]
     public async Task GetOrNullAsync_KeyExists_Returns_SettingValue()
@@ -42,10 +42,10 @@ public sealed class ConfigurationSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Value.Should().Be("dark");
-        result.ProviderName.Should().Be("C");
-        result.ProviderKey.Should().BeNull();
+        result.ShouldNotBeNull();
+        result!.Value.ShouldBe("dark");
+        result.ProviderName.ShouldBe("C");
+        result.ProviderKey.ShouldBeNull();
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class ConfigurationSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class ConfigurationSettingValueProviderTests
 
         // IConfiguration is read-only — value must remain unchanged
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
-        result!.Value.Should().Be("dark", "SetAsync is a no-op for the Configuration provider");
+        result!.Value.ShouldBe("dark", "SetAsync is a no-op for the Configuration provider");
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public sealed class ConfigurationSettingValueProviderTests
 
         Func<Task> act = () => provider.ClearAsync(def, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -94,6 +94,6 @@ public sealed class ConfigurationSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result!.Value.Should().Be("true");
+        result!.Value.ShouldBe("true");
     }
 }

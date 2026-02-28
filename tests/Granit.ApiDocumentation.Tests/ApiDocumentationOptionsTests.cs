@@ -4,8 +4,8 @@
 // Vérifie les valeurs par défaut et la constante SectionName.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiDocumentation.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -14,15 +14,14 @@ public sealed class ApiDocumentationOptionsTests
 {
     [Fact]
     public void SectionName_IsApiDocumentation() =>
-        ApiDocumentationOptions.SectionName.Should().Be("ApiDocumentation");
+        ApiDocumentationOptions.SectionName.ShouldBe("ApiDocumentation");
 
     [Fact]
     public void MajorVersions_DefaultsToListWithOne()
     {
         ApiDocumentationOptions options = new();
 
-        options.MajorVersions.Should().ContainSingle()
-            .Which.Should().Be(1);
+        options.MajorVersions.ShouldHaveSingleItem().ShouldBe(1);
     }
 
     [Fact]
@@ -30,7 +29,7 @@ public sealed class ApiDocumentationOptionsTests
     {
         ApiDocumentationOptions options = new();
 
-        options.Title.Should().Be("API");
+        options.Title.ShouldBe("API");
     }
 
     [Fact]
@@ -38,7 +37,7 @@ public sealed class ApiDocumentationOptionsTests
     {
         ApiDocumentationOptions options = new();
 
-        options.Description.Should().BeNull();
+        options.Description.ShouldBeNull();
     }
 
     [Fact]
@@ -46,7 +45,7 @@ public sealed class ApiDocumentationOptionsTests
     {
         ApiDocumentationOptions options = new();
 
-        options.ContactEmail.Should().BeNull();
+        options.ContactEmail.ShouldBeNull();
     }
 
     [Fact]
@@ -54,6 +53,6 @@ public sealed class ApiDocumentationOptionsTests
     {
         ApiDocumentationOptions options = new();
 
-        options.EnableInProduction.Should().BeFalse();
+        options.EnableInProduction.ShouldBeFalse();
     }
 }

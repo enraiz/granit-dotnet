@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Checker;
 using Granit.Features.Exceptions;
 using Granit.Features.Wolverine;
@@ -50,7 +50,7 @@ public sealed class RequiresFeatureMiddlewareTests
             checker,
             TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await checker.Received(1)
                      .RequireEnabledAsync("App.VideoConsultation", Arg.Any<CancellationToken>());
     }
@@ -67,8 +67,7 @@ public sealed class RequiresFeatureMiddlewareTests
             checker,
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<FeatureNotEnabledException>()
-                 .WithMessage("*App.VideoConsultation*");
+        (await Should.ThrowAsync<FeatureNotEnabledException>(act)).Message.ShouldContain("App.VideoConsultation");
     }
 
     [Fact]
@@ -83,7 +82,7 @@ public sealed class RequiresFeatureMiddlewareTests
             checker,
             TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await checker.Received(1)
                      .RequireEnabledAsync("App.VideoConsultation", Arg.Any<CancellationToken>());
         await checker.Received(1)
@@ -104,7 +103,7 @@ public sealed class RequiresFeatureMiddlewareTests
             checker,
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<FeatureNotEnabledException>();
+        await Should.ThrowAsync<FeatureNotEnabledException>(act);
         await checker.DidNotReceive()
                      .RequireEnabledAsync("App.ExportPdf", Arg.Any<CancellationToken>());
     }

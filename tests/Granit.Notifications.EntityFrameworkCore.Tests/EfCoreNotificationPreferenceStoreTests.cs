@@ -5,8 +5,8 @@
 // channel enabled check with default-true fallback.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Notifications.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.EntityFrameworkCore.Tests;
@@ -39,8 +39,8 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
 
         IReadOnlyList<NotificationPreference> result = await _store.GetListAsync(userId, tenantId, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
-        result.Should().OnlyContain(p => p.UserId == userId && p.TenantId == tenantId);
+        result.Count.ShouldBe(2);
+        result.ShouldAllBe(p => p.UserId == userId && p.TenantId == tenantId);
     }
 
     [Fact]
@@ -53,9 +53,9 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
         await _store.SetAsync(preference, TestContext.Current.CancellationToken);
 
         NotificationPreference? result = await _store.GetAsync(userId, preference.NotificationTypeName, preference.ChannelName, tenantId, TestContext.Current.CancellationToken);
-        result.Should().NotBeNull();
-        result!.IsEnabled.Should().BeFalse();
-        result.UserId.Should().Be(userId);
+        result.ShouldNotBeNull();
+        result!.IsEnabled.ShouldBeFalse();
+        result.UserId.ShouldBe(userId);
     }
 
     [Fact]
@@ -77,8 +77,8 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
         await _store.SetAsync(updated, TestContext.Current.CancellationToken);
 
         NotificationPreference? result = await _store.GetAsync(userId, typeName, channelName, tenantId, TestContext.Current.CancellationToken);
-        result.Should().NotBeNull();
-        result!.IsEnabled.Should().BeFalse();
+        result.ShouldNotBeNull();
+        result!.IsEnabled.ShouldBeFalse();
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
     {
         bool result = await _store.IsChannelEnabledAsync("nonexistent-user", "some.type", "push", Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        result.Should().BeTrue("no preference stored means channel is enabled by default");
+        result.ShouldBeTrue("no preference stored means channel is enabled by default");
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
 
         bool result = await _store.IsChannelEnabledAsync(userId, typeName, channelName, tenantId, TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------

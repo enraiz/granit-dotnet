@@ -6,8 +6,8 @@
 // Granit.Authentication.JwtBearer (GranitJwtBearerModule).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Security.Tests;
@@ -15,5 +15,5 @@ namespace Granit.Security.Tests;
 public sealed class GranitSecurityModuleTests
 {
     [Fact]
-    public void GranitSecurityModule_IsGranitModule() => typeof(GranitSecurityModule).Should().BeAssignableTo<GranitModule>();
+    public void GranitSecurityModule_IsGranitModule() => typeof(GranitSecurityModule).IsAssignableTo(typeof(GranitModule)).ShouldBeTrue();
 }

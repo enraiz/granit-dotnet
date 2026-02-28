@@ -7,11 +7,11 @@
 //   - StopAsync complète sans effet de bord
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.DataSeeding;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.DataSeeding;
@@ -49,7 +49,7 @@ public sealed class DataSeedingHostedServiceTests
         Func<Task> act = () => service.StartAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class DataSeedingHostedServiceTests
         Func<Task> act = () => service.StopAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await _seeder.DidNotReceive().SeedAsync(Arg.Any<DataSeedContext>(), Arg.Any<CancellationToken>());
     }
 }

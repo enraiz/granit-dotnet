@@ -5,7 +5,6 @@
 // OpenAPI en fonction de EnableTenantHeader et [AllowAnonymousTenant].
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiDocumentation.Options;
 using Granit.ApiDocumentation.Transformers;
 using Granit.Core.MultiTenancy;
@@ -15,6 +14,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -35,7 +35,7 @@ public sealed class TenantHeaderOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Parameters.Should().BeNullOrEmpty();
+        (operation.Parameters ?? []).ShouldBeEmpty();
     }
 
     // --- EnableTenantHeader = true, no [AllowAnonymousTenant] → header added ---
@@ -52,10 +52,9 @@ public sealed class TenantHeaderOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Parameters.Should().ContainSingle()
-            .Which.Name.Should().Be("X-Tenant-Id");
-        operation.Parameters![0].In.Should().Be(ParameterLocation.Header);
-        operation.Parameters[0].Required.Should().BeTrue();
+        operation.Parameters.ShouldHaveSingleItem().Name.ShouldBe("X-Tenant-Id");
+        operation.Parameters![0].In.ShouldBe(ParameterLocation.Header);
+        operation.Parameters[0].Required.ShouldBeTrue();
     }
 
     // --- EnableTenantHeader = true, with [AllowAnonymousTenant] → no header ---
@@ -72,7 +71,7 @@ public sealed class TenantHeaderOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Parameters.Should().BeNullOrEmpty();
+        (operation.Parameters ?? []).ShouldBeEmpty();
     }
 
     // --- Custom header name ---
@@ -91,8 +90,7 @@ public sealed class TenantHeaderOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Parameters.Should().ContainSingle()
-            .Which.Name.Should().Be("X-Organization-Id");
+        operation.Parameters.ShouldHaveSingleItem().Name.ShouldBe("X-Organization-Id");
     }
 
     // --- Helpers ---

@@ -10,7 +10,6 @@
 
 using System.Net;
 using System.Net.Http.Headers;
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Idempotency.Abstractions;
 using Granit.Idempotency.Attributes;
@@ -25,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IO;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Idempotency.Tests;
@@ -143,10 +143,10 @@ public sealed class IdempotencyMiddlewareTests
             HttpResponseMessage response = await client.SendAsync(BuildRequest(), TestContext.Current.CancellationToken);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-            response.Headers.Should().ContainKey("Retry-After");
+            response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+            response.Headers.Contains("Retry-After").ShouldBeTrue();
             string body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-            body.Should().Contain("In Progress");
+            body.ShouldContain("In Progress");
         }
         finally
         {
@@ -186,9 +186,9 @@ public sealed class IdempotencyMiddlewareTests
             HttpResponseMessage response = await client.SendAsync(BuildRequest(), TestContext.Current.CancellationToken);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+            response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
             string body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-            body.Should().Contain("Conflict");
+            body.ShouldContain("Conflict");
         }
         finally
         {
@@ -237,11 +237,11 @@ public sealed class IdempotencyMiddlewareTests
             HttpResponseMessage response = await client.SendAsync(BuildRequest(), TestContext.Current.CancellationToken);
 
             // Assert — middleware wrote 503 and released the lock
-            response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+            response.StatusCode.ShouldBe(HttpStatusCode.ServiceUnavailable);
             await store.Received(1).DeleteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
 
             string body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-            body.Should().Contain("Timeout");
+            body.ShouldContain("Timeout");
         }
         finally
         {
@@ -290,21 +290,21 @@ public sealed class IdempotencyMiddlewareTests
         {
             // Act — first request (executes handler, stores completed entry)
             HttpResponseMessage first = await client.SendAsync(BuildRequest(), TestContext.Current.CancellationToken);
-            first.StatusCode.Should().Be(HttpStatusCode.Created);
+            first.StatusCode.ShouldBe(HttpStatusCode.Created);
 
             // capturedCompleted is now set by the SetCompletedAsync callback;
             // second request's GetAsync will return it.
-            capturedCompleted.Should().NotBeNull("SetCompletedAsync must have been called");
+            capturedCompleted.ShouldNotBeNull("SetCompletedAsync must have been called");
 
             // Act — second request (replay, no handler re-execution)
             HttpResponseMessage second = await client.SendAsync(BuildRequest(), TestContext.Current.CancellationToken);
 
             // Assert
-            second.StatusCode.Should().Be(HttpStatusCode.Created);
-            second.Headers.Should().ContainKey("X-Idempotency-Replayed");
-            second.Headers.GetValues("X-Idempotency-Replayed").Should().Contain("true");
+            second.StatusCode.ShouldBe(HttpStatusCode.Created);
+            second.Headers.Contains("X-Idempotency-Replayed").ShouldBeTrue();
+            second.Headers.GetValues("X-Idempotency-Replayed").ShouldContain("true");
 
-            handlerCallCount.Should().Be(1, "business logic must not be re-executed on replay");
+            handlerCallCount.ShouldBe(1, "business logic must not be re-executed on replay");
         }
         finally
         {

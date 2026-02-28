@@ -1,8 +1,8 @@
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Diagnostics.ResponseWriters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Diagnostics.Tests;
@@ -18,7 +18,7 @@ public sealed class GranitHealthCheckWriterTests
 
         await GranitHealthCheckWriter.WriteAsync(httpContext, report);
 
-        httpContext.Response.ContentType.Should().Be("application/json; charset=utf-8");
+        httpContext.Response.ContentType.ShouldBe("application/json; charset=utf-8");
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public sealed class GranitHealthCheckWriterTests
         await GranitHealthCheckWriter.WriteAsync(httpContext, report);
 
         JsonDocument json = ParseResponse(httpContext);
-        json.RootElement.GetProperty("status").GetString().Should().Be("Unhealthy");
+        json.RootElement.GetProperty("status").GetString().ShouldBe("Unhealthy");
     }
 
     [Fact]
@@ -51,14 +51,14 @@ public sealed class GranitHealthCheckWriterTests
 
         JsonDocument json = ParseResponse(httpContext);
         JsonElement checks = json.RootElement.GetProperty("checks");
-        checks.GetArrayLength().Should().Be(2);
+        checks.GetArrayLength().ShouldBe(2);
 
         JsonElement efcore = checks.EnumerateArray().First(e => e.GetProperty("name").GetString() == "efcore");
-        efcore.GetProperty("status").GetString().Should().Be("Healthy");
+        efcore.GetProperty("status").GetString().ShouldBe("Healthy");
 
         JsonElement vault = checks.EnumerateArray().First(e => e.GetProperty("name").GetString() == "vault");
-        vault.GetProperty("status").GetString().Should().Be("Degraded");
-        vault.GetProperty("description").GetString().Should().Be("Vault standby");
+        vault.GetProperty("status").GetString().ShouldBe("Degraded");
+        vault.GetProperty("description").GetString().ShouldBe("Vault standby");
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class GranitHealthCheckWriterTests
         await GranitHealthCheckWriter.WriteAsync(httpContext, report);
 
         JsonDocument json = ParseResponse(httpContext);
-        json.RootElement.GetProperty("checks").GetArrayLength().Should().Be(0);
+        json.RootElement.GetProperty("checks").GetArrayLength().ShouldBe(0);
     }
 
     private static HealthReport BuildReport(HealthStatus status) =>

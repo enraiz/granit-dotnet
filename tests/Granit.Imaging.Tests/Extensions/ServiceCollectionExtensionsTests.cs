@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Imaging.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Imaging.Tests.Extensions;
@@ -17,7 +17,7 @@ public sealed class ServiceCollectionExtensionsTests
         IServiceCollection result = services.AddGranitImaging();
 
         // Assert
-        result.Should().BeSameAs(services);
+        result.ShouldBeSameAs(services);
     }
 
     [Fact]
@@ -30,6 +30,6 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitImaging();
 
         // Assert — base package has no services, only interfaces
-        services.Should().BeEmpty();
+        services.ShouldBeEmpty();
     }
 }

@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.Templating.GlobalContext;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Scriban;
 using Granit.Templating.Scriban.Exceptions;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Scriban.Tests;
@@ -30,7 +30,7 @@ public sealed class ScribanTemplateEngineTests
             MimeType = mimeType,
         };
 
-        Sut.CanRender(descriptor).Should().BeTrue();
+        Sut.CanRender(descriptor).ShouldBeTrue();
     }
 
     [Theory]
@@ -44,7 +44,7 @@ public sealed class ScribanTemplateEngineTests
             MimeType = mimeType,
         };
 
-        Sut.CanRender(descriptor).Should().BeFalse();
+        Sut.CanRender(descriptor).ShouldBeFalse();
     }
 
     // ---- RenderAsync — happy path ----------------------------------------
@@ -64,8 +64,8 @@ public sealed class ScribanTemplateEngineTests
             descriptor, data, DocumentFormat.Html, [],
             TestContext.Current.CancellationToken);
 
-        result.Should().BeOfType<TextRenderedContent>()
-            .Which.Html.Should().Be("Hello Jean Dupont!");
+        result.ShouldBeOfType<TextRenderedContent>()
+            .Html.ShouldBe("Hello Jean Dupont!");
     }
 
     [Fact]
@@ -83,8 +83,8 @@ public sealed class ScribanTemplateEngineTests
             descriptor, data, DocumentFormat.Html, [],
             TestContext.Current.CancellationToken);
 
-        result.Should().BeOfType<TextRenderedContent>()
-            .Which.Html.Should().Be("30");
+        result.ShouldBeOfType<TextRenderedContent>()
+            .Html.ShouldBe("30");
     }
 
     [Fact]
@@ -105,8 +105,8 @@ public sealed class ScribanTemplateEngineTests
             [globalContext],
             TestContext.Current.CancellationToken);
 
-        result.Should().BeOfType<TextRenderedContent>()
-            .Which.Html.Should().Be("Culture: fr-BE");
+        result.ShouldBeOfType<TextRenderedContent>()
+            .Html.ShouldBe("Culture: fr-BE");
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public sealed class ScribanTemplateEngineTests
             descriptor, new PersonModel("A", "B"), DocumentFormat.Html, [],
             TestContext.Current.CancellationToken);
 
-        result.RevisionId.Should().Be(revisionId);
+        result.RevisionId.ShouldBe(revisionId);
     }
 
     [Fact]
@@ -140,8 +140,8 @@ public sealed class ScribanTemplateEngineTests
             descriptor, new PersonModel("Bob", "Martin"), DocumentFormat.Html, [],
             TestContext.Current.CancellationToken);
 
-        result.Should().BeOfType<TextRenderedContent>()
-            .Which.Html.Should().Be("Hello Bob");
+        result.ShouldBeOfType<TextRenderedContent>()
+            .Html.ShouldBe("Hello Bob");
     }
 
     // ---- RenderAsync — parse error ---------------------------------------
@@ -161,7 +161,7 @@ public sealed class ScribanTemplateEngineTests
                 descriptor, new PersonModel("X", "Y"), DocumentFormat.Html, [],
                 TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<TemplateParseException>()
-            .Where(e => e.Errors.Count > 0);
+        TemplateParseException ex = await Should.ThrowAsync<TemplateParseException>(act);
+        ex.Errors.Count.ShouldBeGreaterThan(0);
     }
 }

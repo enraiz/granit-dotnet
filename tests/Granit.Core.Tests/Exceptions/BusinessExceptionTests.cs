@@ -8,8 +8,8 @@
 //   - Implements IHasErrorCode and IUserFriendlyException
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Exceptions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Exceptions;
@@ -25,7 +25,7 @@ public sealed class BusinessExceptionTests
     {
         BusinessException exception = new("Vault:CredentialsFailed");
 
-        exception.ErrorCode.Should().Be("Vault:CredentialsFailed");
+        exception.ErrorCode.ShouldBe("Vault:CredentialsFailed");
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public sealed class BusinessExceptionTests
     {
         BusinessException exception = new("Vault:CredentialsFailed", "Connexion Vault échouée.");
 
-        exception.Message.Should().Be("Connexion Vault échouée.");
+        exception.Message.ShouldBe("Connexion Vault échouée.");
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public sealed class BusinessExceptionTests
     {
         BusinessException exception = new("Vault:CredentialsFailed");
 
-        exception.Message.Should().Be("Vault:CredentialsFailed");
+        exception.Message.ShouldBe("Vault:CredentialsFailed");
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class BusinessExceptionTests
         InvalidOperationException inner = new("inner");
         BusinessException exception = new("Vault:CredentialsFailed", "message", inner);
 
-        exception.InnerException.Should().BeSameAs(inner);
+        exception.InnerException.ShouldBeSameAs(inner);
     }
 
     // -------------------------------------------------------------------------
@@ -62,8 +62,8 @@ public sealed class BusinessExceptionTests
     {
         BusinessException exception = new("Vault:CredentialsFailed");
 
-        exception.Should().BeAssignableTo<IHasErrorCode>();
-        ((IHasErrorCode)exception).ErrorCode.Should().Be("Vault:CredentialsFailed");
+        exception.ShouldBeAssignableTo<IHasErrorCode>();
+        ((IHasErrorCode)exception).ErrorCode.ShouldBe("Vault:CredentialsFailed");
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class BusinessExceptionTests
     {
         BusinessException exception = new("Vault:CredentialsFailed");
 
-        exception.Should().BeAssignableTo<IUserFriendlyException>();
+        exception.ShouldBeAssignableTo<IUserFriendlyException>();
     }
 
     [Fact]
@@ -79,6 +79,6 @@ public sealed class BusinessExceptionTests
     {
         BusinessException exception = new("Vault:CredentialsFailed");
 
-        exception.Should().BeAssignableTo<Exception>();
+        exception.ShouldBeAssignableTo<Exception>();
     }
 }

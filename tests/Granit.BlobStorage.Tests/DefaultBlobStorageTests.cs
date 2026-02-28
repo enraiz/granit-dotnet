@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.BlobStorage.Exceptions;
 using Granit.BlobStorage.Internal;
 using Granit.Core.MultiTenancy;
@@ -6,6 +5,7 @@ using Granit.Guids;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.Tests;
@@ -72,7 +72,7 @@ public sealed class DefaultBlobStorageTests
         PresignedUploadTicket ticket = await _sut.InitiateUploadAsync("medical-images", request, TestContext.Current.CancellationToken);
 
         // Assert
-        ticket.Should().Be(expectedTicket);
+        ticket.ShouldBe(expectedTicket);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public sealed class DefaultBlobStorageTests
             await _sut.InitiateUploadAsync("docs", new BlobUploadRequest("f.pdf", "application/pdf", 1_000));
 
         // Assert — single-tenant apps must not be blocked
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await _store.Received(1).SaveAsync(
             Arg.Is<BlobDescriptor>(d => d.TenantId == string.Empty),
             Arg.Any<CancellationToken>());
@@ -177,7 +177,7 @@ public sealed class DefaultBlobStorageTests
         PresignedDownloadUrl result = await _sut.CreateDownloadUrlAsync("medical-images", blobId, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().Be(expectedUrl);
+        result.ShouldBe(expectedUrl);
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public sealed class DefaultBlobStorageTests
         Func<Task> act = async () => await _sut.CreateDownloadUrlAsync("medical-images", blobId);
 
         // Assert
-        await act.Should().ThrowAsync<BlobNotValidException>();
+        await Should.ThrowAsync<BlobNotValidException>(act);
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public sealed class DefaultBlobStorageTests
         Func<Task> act = async () => await _sut.CreateDownloadUrlAsync("medical-images", blobId);
 
         // Assert
-        await act.Should().ThrowAsync<BlobNotFoundException>();
+        await Should.ThrowAsync<BlobNotFoundException>(act);
     }
 
     // ── DeleteAsync ──────────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ public sealed class DefaultBlobStorageTests
         Func<Task> act = async () => await _sut.DeleteAsync("medical-images", blobId);
 
         // Assert
-        await act.Should().ThrowAsync<BlobNotFoundException>();
+        await Should.ThrowAsync<BlobNotFoundException>(act);
         await _storageClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -297,7 +297,7 @@ public sealed class DefaultBlobStorageTests
         BlobDescriptor? result = await _sut.GetDescriptorAsync("medical-images", blobId, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().Be(descriptor);
+        result.ShouldBe(descriptor);
     }
 
     [Fact]
@@ -310,7 +310,7 @@ public sealed class DefaultBlobStorageTests
         BlobDescriptor? result = await _sut.GetDescriptorAsync("medical-images", Guid.NewGuid(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

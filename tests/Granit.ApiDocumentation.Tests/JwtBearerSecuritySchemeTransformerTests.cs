@@ -6,7 +6,6 @@
 // =============================================================================
 
 using System.Net.Http;
-using FluentAssertions;
 using Granit.ApiDocumentation.Transformers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -37,7 +37,7 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        document.Components.Should().BeNull("no JWT Bearer scheme → no security scheme added");
+        document.Components.ShouldBeNull("no JWT Bearer scheme → no security scheme added");
     }
 
     // --- JWT Bearer scheme registered ---
@@ -55,12 +55,12 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        document.Components.Should().NotBeNull();
-        document.Components!.SecuritySchemes.Should().ContainKey("Bearer");
-        OpenApiSecurityScheme scheme = (OpenApiSecurityScheme)document.Components.SecuritySchemes["Bearer"];
-        scheme.Type.Should().Be(SecuritySchemeType.Http);
-        scheme.Scheme.Should().Be("bearer");
-        scheme.BearerFormat.Should().Be("JWT");
+        document.Components.ShouldNotBeNull();
+        document.Components!.SecuritySchemes!.ShouldContainKey("Bearer");
+        OpenApiSecurityScheme scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["Bearer"];
+        scheme.Type.ShouldBe(SecuritySchemeType.Http);
+        scheme.Scheme.ShouldBe("bearer");
+        scheme.BearerFormat.ShouldBe("JWT");
     }
 
     // --- Security requirement added to operations ---
@@ -93,7 +93,8 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Security.Should().NotBeNullOrEmpty("Bearer scheme adds a security requirement");
+        operation.Security.ShouldNotBeNull();
+        operation.Security!.ShouldNotBeEmpty();
     }
 
     // --- Paths with null operations do not throw ---
@@ -120,7 +121,7 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         Func<Task> act = () => transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // --- Helpers ---

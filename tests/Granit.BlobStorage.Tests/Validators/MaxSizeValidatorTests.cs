@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.BlobStorage.Validators;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.Tests.Validators;
@@ -31,7 +31,7 @@ public sealed class MaxSizeValidatorTests
         BlobValidationResult result = await validator.ValidateAsync(
             context, TestContext.Current.CancellationToken);
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class MaxSizeValidatorTests
         BlobValidationResult result = await validator.ValidateAsync(
             context, TestContext.Current.CancellationToken);
 
-        result.IsValid.Should().BeTrue("exact limit must be accepted");
+        result.IsValid.ShouldBeTrue("exact limit must be accepted");
     }
 
     [Fact]
@@ -55,9 +55,9 @@ public sealed class MaxSizeValidatorTests
         BlobValidationResult result = await validator.ValidateAsync(
             context, TestContext.Current.CancellationToken);
 
-        result.IsValid.Should().BeFalse();
-        result.FailureReason.Should().Contain("5,000,001");
-        result.FailureReason.Should().Contain("5,000,000");
+        result.IsValid.ShouldBeFalse();
+        result.FailureReason!.ShouldContain("5,000,001");
+        result.FailureReason!.ShouldContain("5,000,000");
     }
 
     [Fact]
@@ -84,10 +84,10 @@ public sealed class MaxSizeValidatorTests
 
         await validator.ValidateAsync(context, TestContext.Current.CancellationToken);
 
-        streamOpened.Should().BeFalse("MaxSizeValidator uses ActualSizeBytes from S3 HEAD, not the stream");
+        streamOpened.ShouldBeFalse("MaxSizeValidator uses ActualSizeBytes from S3 HEAD, not the stream");
     }
 
     [Fact]
     public void Order_Is20() =>
-        new MaxSizeValidator().Order.Should().Be(20);
+        new MaxSizeValidator().Order.ShouldBe(20);
 }

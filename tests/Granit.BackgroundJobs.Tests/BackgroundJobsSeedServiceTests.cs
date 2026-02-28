@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
@@ -36,7 +36,7 @@ public sealed class BackgroundJobsSeedServiceTests
         Func<Task> act = () => sut.StopAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await store.DidNotReceive().SeedJobsAsync(Arg.Any<IEnumerable<RecurringJobRegistration>>(),
             Arg.Any<CancellationToken>());
     }

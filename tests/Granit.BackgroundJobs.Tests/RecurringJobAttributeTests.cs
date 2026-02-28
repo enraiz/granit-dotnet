@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
@@ -12,8 +12,8 @@ public sealed class RecurringJobAttributeTests
         RecurringJobAttribute attr = new("0 * * * *", "hourly-cleanup");
 
         // Assert
-        attr.CronExpression.Should().Be("0 * * * *");
-        attr.Name.Should().Be("hourly-cleanup");
+        attr.CronExpression.ShouldBe("0 * * * *");
+        attr.Name.ShouldBe("hourly-cleanup");
     }
 
     [Theory]
@@ -25,7 +25,7 @@ public sealed class RecurringJobAttributeTests
         Action act = () => _ = new RecurringJobAttribute(cron, name);
 
         // Assert
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(act);
     }
 
     [Theory]
@@ -37,7 +37,7 @@ public sealed class RecurringJobAttributeTests
         Action act = () => _ = new RecurringJobAttribute(cron, name);
 
         // Assert
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(act);
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public sealed class RecurringJobAttributeTests
             .Cast<AttributeUsageAttribute>()
             .Single();
 
-        usage.AllowMultiple.Should().BeFalse();
-        usage.ValidOn.Should().HaveFlag(AttributeTargets.Class);
+        usage.AllowMultiple.ShouldBeFalse();
+        usage.ValidOn.HasFlag(AttributeTargets.Class).ShouldBeTrue();
     }
 }

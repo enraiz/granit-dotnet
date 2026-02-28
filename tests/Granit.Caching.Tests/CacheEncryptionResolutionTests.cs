@@ -7,7 +7,7 @@
 //   - Pas d'attribut → suit CachingOptions.EncryptValues
 // =============================================================================
 
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -24,7 +24,7 @@ public sealed class CacheEncryptionResolutionTests
         bool result = CacheEncryptionResolver.ShouldEncrypt(typeof(AlwaysEncryptedItem), options);
 
         // Assert
-        result.Should().BeTrue("l'attribut [CacheEncrypted] doit forcer le chiffrement");
+        result.ShouldBeTrue("l'attribut [CacheEncrypted] doit forcer le chiffrement");
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public sealed class CacheEncryptionResolutionTests
         bool result = CacheEncryptionResolver.ShouldEncrypt(typeof(NeverEncryptedItem), options);
 
         // Assert
-        result.Should().BeFalse("l'attribut [CacheEncrypted(false)] doit désactiver le chiffrement");
+        result.ShouldBeFalse("l'attribut [CacheEncrypted(false)] doit désactiver le chiffrement");
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class CacheEncryptionResolutionTests
         bool result = CacheEncryptionResolver.ShouldEncrypt(typeof(UnattributedItem), options);
 
         // Assert
-        result.Should().BeTrue("sans attribut, le flag global EncryptValues=true doit s'appliquer");
+        result.ShouldBeTrue("sans attribut, le flag global EncryptValues=true doit s'appliquer");
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public sealed class CacheEncryptionResolutionTests
         bool result = CacheEncryptionResolver.ShouldEncrypt(typeof(UnattributedItem), options);
 
         // Assert
-        result.Should().BeFalse("sans attribut, le flag global EncryptValues=false doit s'appliquer");
+        result.ShouldBeFalse("sans attribut, le flag global EncryptValues=false doit s'appliquer");
     }
 
     // Types de test

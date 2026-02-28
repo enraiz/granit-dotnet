@@ -9,13 +9,13 @@
 // un type internal depuis un assembly externe).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.MultiTenancy;
@@ -104,7 +104,7 @@ public sealed class IsolatedDbContextFactoryTests
 
         await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
 
-        factory.CallCount.Should().Be(1);
+        factory.CallCount.ShouldBe(1);
     }
 
     // -----------------------------------------------------------------------
@@ -125,7 +125,7 @@ public sealed class IsolatedDbContextFactoryTests
 
         await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
 
-        factory.CallCount.Should().Be(1);
+        factory.CallCount.ShouldBe(1);
     }
 
     // -----------------------------------------------------------------------
@@ -146,7 +146,7 @@ public sealed class IsolatedDbContextFactoryTests
 
         await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
 
-        factory.CallCount.Should().Be(1);
+        factory.CallCount.ShouldBe(1);
     }
 
     // -----------------------------------------------------------------------
@@ -186,8 +186,8 @@ public sealed class IsolatedDbContextFactoryTests
 
         await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
 
-        premiumFactory.CallCount.Should().Be(1);
-        standardFactory.CallCount.Should().Be(0);
+        premiumFactory.CallCount.ShouldBe(1);
+        standardFactory.CallCount.ShouldBe(0);
     }
 
     // -----------------------------------------------------------------------
@@ -206,8 +206,6 @@ public sealed class IsolatedDbContextFactoryTests
 
         Func<Task> act = async () => await facade.CreateDbContextAsync(ct);
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("*SchemaPerTenant*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("SchemaPerTenant");
     }
 }

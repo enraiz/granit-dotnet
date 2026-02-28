@@ -4,8 +4,8 @@
 // Vérifie les valeurs par défaut et la constante SectionName.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiVersioning.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiVersioning.Tests;
@@ -14,14 +14,14 @@ public sealed class GranitApiVersioningOptionsTests
 {
     [Fact]
     public void SectionName_IsApiVersioning() =>
-        GranitApiVersioningOptions.SectionName.Should().Be("ApiVersioning");
+        GranitApiVersioningOptions.SectionName.ShouldBe("ApiVersioning");
 
     [Fact]
     public void DefaultMajorVersion_DefaultsToOne()
     {
         GranitApiVersioningOptions options = new();
 
-        options.DefaultMajorVersion.Should().Be(1);
+        options.DefaultMajorVersion.ShouldBe(1);
     }
 
     [Fact]
@@ -29,6 +29,6 @@ public sealed class GranitApiVersioningOptionsTests
     {
         GranitApiVersioningOptions options = new();
 
-        options.ReportApiVersions.Should().BeTrue();
+        options.ReportApiVersions.ShouldBeTrue();
     }
 }
