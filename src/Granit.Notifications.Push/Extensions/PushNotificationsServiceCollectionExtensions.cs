@@ -1,0 +1,45 @@
+using Granit.Notifications.Abstractions;
+using Lib.Net.Http.WebPush;
+using Lib.Net.Http.WebPush.Authentication;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+namespace Granit.Notifications.Push.Extensions;
+
+/// <summary>Extension methods for Web Push notification channel registration.</summary>
+public static class PushNotificationsServiceCollectionExtensions
+{
+    /// <summary>Registers the W3C Web Push (VAPID) notification channel.</summary>
+    public static IServiceCollection AddGranitNotificationsPush(
+        this IServiceCollection services,
+        Action<PushChannelOptions>? configure = null)
+    {
+        services.AddOptions<PushChannelOptions>()
+            .BindConfiguration(PushChannelOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        if (configure is not null)
+        {
+            services.Configure(configure);
+        }
+
+        services.AddSingleton<IPushSubscriptionStore, InMemoryPushSubscriptionStore>();
+
+        services.AddSingleton(sp =>
+        {
+            PushChannelOptions opts = sp.GetRequiredService<IOptions<PushChannelOptions>>().Value;
+            PushServiceClient client = new();
+            client.DefaultAuthentication = new VapidAuthentication(
+                opts.VapidPublicKey, opts.VapidPrivateKey)
+            {
+                Subject = opts.VapidSubject,
+            };
+            return client;
+        });
+
+        services.AddSingleton<INotificationChannel, PushNotificationChannel>();
+
+        return services;
+    }
+}

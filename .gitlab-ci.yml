@@ -154,15 +154,18 @@ sonarqube:
     - export PATH="$PATH:$HOME/.dotnet/tools"
     - >
       dotnet sonarscanner begin
-      /k:"Granit"
-      /n:"Granit"
+      /k:"${CI_PROJECT_NAME}"
+      /n:"${CI_PROJECT_TITLE}"
       /v:"${CI_COMMIT_REF_NAME}"
       /d:sonar.host.url="${SONAR_HOST_URL}"
       /d:sonar.token="${SONAR_TOKEN}"
       /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
-      /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs"
       /d:sonar.exclusions=".nuget/**"
-      /d:sonar.qualitygate.wait=true
+      /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs"
+      /d:sonar.issue.ignore.multicriteria="e1"
+      /d:sonar.issue.ignore.multicriteria.e1.ruleKey="csharpsquid:S6608"
+      /d:sonar.issue.ignore.multicriteria.e1.resourceKey="**/*"
+      /d:sonar.qualitygate.wait="true"
     - dotnet build -c $CONFIGURATION
     - dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
   rules:
