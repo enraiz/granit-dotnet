@@ -333,7 +333,7 @@ thread-safe). Le lifetime Singleton évite les allocations inutiles.
 // Utiliser SimpleGuidGenerator dans les tests unitaires
 var guidGenerator = SimpleGuidGenerator.Instance;
 var id = guidGenerator.Create();
-id.Should().NotBe(Guid.Empty);
+id.ShouldNotBe(Guid.Empty);
 
 // Ou mocker IGuidGenerator pour des assertions exactes
 var guidGenerator = Substitute.For<IGuidGenerator>();

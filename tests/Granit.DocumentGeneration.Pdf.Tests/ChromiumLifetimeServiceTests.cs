@@ -1,9 +1,9 @@
-using FluentAssertions;
 using Granit.DocumentGeneration.Pdf.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using PuppeteerSharp;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Pdf.Tests;
@@ -17,8 +17,8 @@ public sealed class ChromiumLifetimeServiceTests
 
         Func<object> act = () => service.Browser;
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*Chromium browser is not available*");
+        var ex = Should.Throw<InvalidOperationException>(act);
+        ex.Message.ShouldContain("Chromium browser is not available");
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public sealed class ChromiumLifetimeServiceTests
     {
         ChromiumLifetimeService service = CreateService();
 
-        service.PageSemaphore.CurrentCount.Should().Be(4);
+        service.PageSemaphore.CurrentCount.ShouldBe(4);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public sealed class ChromiumLifetimeServiceTests
         PdfRenderOptions options = new() { MaxConcurrentPages = 8 };
         ChromiumLifetimeService service = CreateService(options);
 
-        service.PageSemaphore.CurrentCount.Should().Be(8);
+        service.PageSemaphore.CurrentCount.ShouldBe(8);
     }
 
     [Fact]
@@ -43,9 +43,7 @@ public sealed class ChromiumLifetimeServiceTests
     {
         ChromiumLifetimeService service = CreateService();
 
-        Func<Task> act = () => service.StopAsync(TestContext.Current.CancellationToken);
-
-        await act.Should().NotThrowAsync();
+        await service.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -68,7 +66,7 @@ public sealed class ChromiumLifetimeServiceTests
         await service.StopAsync(TestContext.Current.CancellationToken);
 
         Func<object> act = () => service.Browser;
-        act.Should().Throw<InvalidOperationException>();
+        Should.Throw<InvalidOperationException>(act);
     }
 
     [Fact]
@@ -76,9 +74,7 @@ public sealed class ChromiumLifetimeServiceTests
     {
         ChromiumLifetimeService service = CreateService();
 
-        Func<Task> act = async () => await service.DisposeAsync();
-
-        await act.Should().NotThrowAsync();
+        await service.DisposeAsync();
     }
 
     [Fact]
@@ -100,7 +96,7 @@ public sealed class ChromiumLifetimeServiceTests
         await service.DisposeAsync();
 
         Func<Task> act = () => service.PageSemaphore.WaitAsync();
-        await act.Should().ThrowAsync<ObjectDisposedException>();
+        await Should.ThrowAsync<ObjectDisposedException>(act);
     }
 
     private static ChromiumLifetimeService CreateService(PdfRenderOptions? options = null) =>

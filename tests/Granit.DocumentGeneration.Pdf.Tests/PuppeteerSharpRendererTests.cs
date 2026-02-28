@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.DocumentGeneration.Pdf.Internal;
 using Granit.DocumentGeneration.Pipeline;
 using Granit.Templating.Keys;
@@ -8,6 +7,7 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Pdf.Tests;
@@ -21,7 +21,7 @@ public sealed class PuppeteerSharpRendererTests
 
         bool result = renderer.CanRender(DocumentFormat.Pdf);
 
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -33,7 +33,7 @@ public sealed class PuppeteerSharpRendererTests
 
         bool result = renderer.CanRender(format);
 
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Theory]
@@ -52,24 +52,24 @@ public sealed class PuppeteerSharpRendererTests
     {
         PaperFormat result = PuppeteerSharpRenderer.ResolvePaperFormat(format);
 
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     [Fact]
     public void ResolvePaperFormat_A4_ReturnsA4() =>
-        PuppeteerSharpRenderer.ResolvePaperFormat("A4").Should().Be(PaperFormat.A4);
+        PuppeteerSharpRenderer.ResolvePaperFormat("A4").ShouldBe(PaperFormat.A4);
 
     [Fact]
     public void ResolvePaperFormat_Letter_ReturnsLetter() =>
-        PuppeteerSharpRenderer.ResolvePaperFormat("Letter").Should().Be(PaperFormat.Letter);
+        PuppeteerSharpRenderer.ResolvePaperFormat("Letter").ShouldBe(PaperFormat.Letter);
 
     [Fact]
     public void ResolvePaperFormat_CaseInsensitive() =>
-        PuppeteerSharpRenderer.ResolvePaperFormat("a4").Should().Be(PaperFormat.A4);
+        PuppeteerSharpRenderer.ResolvePaperFormat("a4").ShouldBe(PaperFormat.A4);
 
     [Fact]
     public void ResolvePaperFormat_Unknown_DefaultsToA4() =>
-        PuppeteerSharpRenderer.ResolvePaperFormat("B5").Should().Be(PaperFormat.A4);
+        PuppeteerSharpRenderer.ResolvePaperFormat("B5").ShouldBe(PaperFormat.A4);
 
     [Fact]
     public async Task RenderAsync_WhenBrowserNotStarted_ThrowsInvalidOperationException()
@@ -78,8 +78,8 @@ public sealed class PuppeteerSharpRendererTests
 
         Func<Task> act = () => renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*Chromium browser is not available*");
+        var ex = await Should.ThrowAsync<InvalidOperationException>(act);
+        ex.Message.ShouldContain("Chromium browser is not available");
     }
 
     [Fact]
@@ -103,8 +103,8 @@ public sealed class PuppeteerSharpRendererTests
 
         DocumentResult result = await renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
 
-        result.Format.Should().Be(DocumentFormat.Pdf);
-        result.Content.ToArray().Should().Equal(fakePdf);
+        result.Format.ShouldBe(DocumentFormat.Pdf);
+        result.Content.ToArray().ShouldBe(fakePdf);
     }
 
     [Fact]
@@ -190,11 +190,11 @@ public sealed class PuppeteerSharpRendererTests
 
         await renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
 
-        capturedOptions.Should().NotBeNull();
-        capturedOptions!.MarginOptions.Top.Should().Be("20mm");
-        capturedOptions.MarginOptions.Bottom.Should().Be("15mm");
-        capturedOptions.MarginOptions.Left.Should().Be("25mm");
-        capturedOptions.MarginOptions.Right.Should().Be("25mm");
+        capturedOptions.ShouldNotBeNull();
+        capturedOptions!.MarginOptions.Top.ShouldBe("20mm");
+        capturedOptions.MarginOptions.Bottom.ShouldBe("15mm");
+        capturedOptions.MarginOptions.Left.ShouldBe("25mm");
+        capturedOptions.MarginOptions.Right.ShouldBe("25mm");
     }
 
     [Fact]
@@ -277,10 +277,10 @@ public sealed class PuppeteerSharpRendererTests
 
         Func<Task> act = () => renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<PuppeteerException>();
+        await Should.ThrowAsync<PuppeteerException>(act);
 
         // Semaphore should be released — verify by checking current count
-        lifetime.PageSemaphore.CurrentCount.Should().Be(opts.MaxConcurrentPages);
+        lifetime.PageSemaphore.CurrentCount.ShouldBe(opts.MaxConcurrentPages);
     }
 
     private static PuppeteerSharpRenderer CreateRenderer()

@@ -1,7 +1,7 @@
 # Étape 8 — Tests
 
 Les tests font partie de la **Definition of Done** Granit. Chaque package a
-son projet de test. Nous utilisons xUnit v3, FluentAssertions, NSubstitute et Bogus.
+son projet de test. Nous utilisons xUnit v3, Shouldly, NSubstitute et Bogus.
 
 ## Créer le projet de test
 
@@ -11,7 +11,7 @@ cd tests/TaskManagement.Api.Tests
 
 dotnet new xunit
 dotnet add reference ../../src/TaskManagement.Api/TaskManagement.Api.csproj
-dotnet add package FluentAssertions
+dotnet add package Shouldly
 dotnet add package NSubstitute
 dotnet add package Microsoft.EntityFrameworkCore.InMemory
 ```
@@ -21,7 +21,7 @@ dotnet add package Microsoft.EntityFrameworkCore.InMemory
 Créer `TaskItemTests.cs` :
 
 ```csharp
-using FluentAssertions;
+using Shouldly;
 using TaskManagement.Api.Domain;
 
 namespace TaskManagement.Api.Tests;
@@ -33,15 +33,15 @@ public sealed class TaskItemTests
     {
         TaskItem task = new();
 
-        task.Id.Should().Be(Guid.Empty);
-        task.Title.Should().BeEmpty();
-        task.Description.Should().BeNull();
-        task.IsCompleted.Should().BeFalse();
-        task.DueDate.Should().BeNull();
-        task.CreatedAt.Should().Be(default);
-        task.CreatedBy.Should().BeEmpty();
-        task.ModifiedAt.Should().BeNull();
-        task.ModifiedBy.Should().BeNull();
+        task.Id.ShouldBe(Guid.Empty);
+        task.Title.ShouldBeEmpty();
+        task.Description.ShouldBeNull();
+        task.IsCompleted.ShouldBeFalse();
+        task.DueDate.ShouldBeNull();
+        task.CreatedAt.ShouldBe(default);
+        task.CreatedBy.ShouldBeEmpty();
+        task.ModifiedAt.ShouldBeNull();
+        task.ModifiedBy.ShouldBeNull();
     }
 
     [Fact]
@@ -55,8 +55,8 @@ public sealed class TaskItemTests
             CreatedBy = "test-user"
         };
 
-        task.CreatedAt.Should().Be(now);
-        task.CreatedBy.Should().Be("test-user");
+        task.CreatedAt.ShouldBe(now);
+        task.CreatedBy.ShouldBe("test-user");
     }
 }
 ```
@@ -66,7 +66,7 @@ public sealed class TaskItemTests
 Créer `TaskDbContextTests.cs` :
 
 ```csharp
-using FluentAssertions;
+using Shouldly;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.Api.Data;
 using TaskManagement.Api.Domain;
@@ -102,9 +102,9 @@ public sealed class TaskDbContextTests : IDisposable
 
         TaskItem? retrieved = await _db.Tasks.FindAsync(task.Id);
 
-        retrieved.Should().NotBeNull();
-        retrieved!.Title.Should().Be("Test task");
-        retrieved.CreatedBy.Should().Be("test-user");
+        retrieved.ShouldNotBeNull();
+        retrieved.Title.ShouldBe("Test task");
+        retrieved.CreatedBy.ShouldBe("test-user");
     }
 
     [Fact]
@@ -114,13 +114,13 @@ public sealed class TaskDbContextTests : IDisposable
         Microsoft.EntityFrameworkCore.Metadata.IEntityType? entityType =
             _db.Model.FindEntityType(typeof(TaskItem));
 
-        entityType.Should().NotBeNull();
+        entityType.ShouldNotBeNull();
 
         Microsoft.EntityFrameworkCore.Metadata.IProperty? titleProperty =
-            entityType!.FindProperty(nameof(TaskItem.Title));
+            entityType.FindProperty(nameof(TaskItem.Title));
 
-        titleProperty.Should().NotBeNull();
-        titleProperty!.GetMaxLength().Should().Be(200);
+        titleProperty.ShouldNotBeNull();
+        titleProperty.GetMaxLength().ShouldBe(200);
     }
 
     public void Dispose() => _db.Dispose();
@@ -132,7 +132,7 @@ public sealed class TaskDbContextTests : IDisposable
 Créer `TaskManagementModuleTests.cs` :
 
 ```csharp
-using FluentAssertions;
+using Shouldly;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -162,7 +162,7 @@ public sealed class TaskManagementModuleTests
         ServiceProvider sp = builder.Services.BuildServiceProvider();
         TaskDbContext? db = sp.GetService<TaskDbContext>();
 
-        db.Should().NotBeNull();
+        db.ShouldNotBeNull();
     }
 }
 ```
@@ -182,7 +182,7 @@ Tous les tests doivent passer avant de pousser du code.
 | Nommage | `MethodName_Scenario_ExpectedResult` ou `MethodName_ExpectedBehavior` |
 | Un assert par test | Chaque test vérifie un seul comportement |
 | Arrange-Act-Assert | Structure claire en trois phases |
-| FluentAssertions | `result.Should().Be(expected)` (pas `Assert.Equal`) |
+| Shouldly | `result.ShouldBe(expected)` (pas `Assert.Equal`) |
 | NSubstitute | `Substitute.For<IService>()` pour les mocks |
 | InMemoryDatabase | GUID unique par test pour l'isolation |
 
@@ -196,7 +196,7 @@ En 8 étapes, nous avons construit une API complète avec :
 - **Endpoints** : Minimal API avec le pattern `MapXxxEndpoints()`
 - **Sécurité** : JWT Keycloak + `ICurrentUserService`
 - **Observabilité** : Serilog + OpenTelemetry + OTLP
-- **Tests** : xUnit + FluentAssertions + NSubstitute
+- **Tests** : xUnit + Shouldly + NSubstitute
 
 ## Pour aller plus loin
 
