@@ -154,8 +154,8 @@ sonarqube:
     - export PATH="$PATH:$HOME/.dotnet/tools"
     - >
       dotnet sonarscanner begin
-      /k:"Granit-Dotnet"
-      /n:"Granit Dotnet"
+      /k:"${CI_PROJECT_NAME}"
+      /n:"${CI_PROJECT_TITLE}"
       /v:"${CI_COMMIT_REF_NAME}"
       /d:sonar.host.url="${SONAR_HOST_URL}"
       /d:sonar.token="${SONAR_TOKEN}"
