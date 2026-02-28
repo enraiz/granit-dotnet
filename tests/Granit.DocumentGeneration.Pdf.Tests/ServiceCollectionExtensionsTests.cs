@@ -1,9 +1,9 @@
-using FluentAssertions;
 using Granit.DocumentGeneration.Pipeline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Pdf.Tests;
@@ -19,7 +19,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
 
         IDocumentRenderer? renderer = provider.GetService<IDocumentRenderer>();
-        renderer.Should().NotBeNull();
+        renderer.ShouldNotBeNull();
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
 
         IEnumerable<IHostedService> hostedServices = provider.GetServices<IHostedService>();
-        hostedServices.Should().ContainSingle();
+        hostedServices.Count().ShouldBe(1);
     }
 
     [Fact]
@@ -43,8 +43,8 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
 
         IOptions<PdfRenderOptions>? options = provider.GetService<IOptions<PdfRenderOptions>>();
-        options.Should().NotBeNull();
-        options!.Value.PaperFormat.Should().Be("A4");
+        options.ShouldNotBeNull();
+        options!.Value.PaperFormat.ShouldBe("A4");
     }
 
     [Fact]
@@ -54,8 +54,8 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitDocumentGenerationPdf();
 
         ServiceDescriptor? descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IDocumentRenderer));
-        descriptor.Should().NotBeNull();
-        descriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        descriptor.ShouldNotBeNull();
+        descriptor!.Lifetime.ShouldBe(ServiceLifetime.Singleton);
     }
 
     private static ServiceCollection CreateServices()

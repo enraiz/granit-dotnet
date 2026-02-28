@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.DocumentGeneration.Pipeline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Pdf.Tests;
@@ -27,7 +27,7 @@ public sealed class GranitDocumentGenerationPdfModuleTests
 
         ServiceProvider provider = services.BuildServiceProvider();
         IDocumentRenderer? renderer = provider.GetService<IDocumentRenderer>();
-        renderer.Should().NotBeNull();
+        renderer.ShouldNotBeNull();
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public sealed class GranitDocumentGenerationPdfModuleTests
             .Cast<DependsOnAttribute>()
             .ToArray();
 
-        attributes.Should().ContainSingle();
-        attributes[0].DependedTypes.Should().Contain(typeof(GranitDocumentGenerationModule));
+        attributes.Length.ShouldBe(1);
+        attributes[0].DependedTypes.ShouldContain(typeof(GranitDocumentGenerationModule));
     }
 }

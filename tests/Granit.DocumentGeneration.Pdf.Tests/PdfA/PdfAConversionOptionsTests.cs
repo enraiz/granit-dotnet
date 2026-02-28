@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.DocumentGeneration.Pdf.PdfA;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Pdf.Tests.PdfA;
@@ -10,35 +10,35 @@ public sealed class PdfAConversionOptionsTests
     public void Defaults_ConformanceLevel_IsPdfA3b()
     {
         PdfAConversionOptions options = new();
-        options.ConformanceLevel.Should().Be(PdfAConformanceLevel.PdfA3b);
+        options.ConformanceLevel.ShouldBe(PdfAConformanceLevel.PdfA3b);
     }
 
     [Fact]
     public void Defaults_FacturXXmlContent_IsNull()
     {
         PdfAConversionOptions options = new();
-        options.FacturXXmlContent.Should().BeNull();
+        options.FacturXXmlContent.ShouldBeNull();
     }
 
     [Fact]
     public void Defaults_FacturXConformanceLevel_IsNull()
     {
         PdfAConversionOptions options = new();
-        options.FacturXConformanceLevel.Should().BeNull();
+        options.FacturXConformanceLevel.ShouldBeNull();
     }
 
     [Fact]
     public void Defaults_DocumentTitle_IsNull()
     {
         PdfAConversionOptions options = new();
-        options.DocumentTitle.Should().BeNull();
+        options.DocumentTitle.ShouldBeNull();
     }
 
     [Fact]
     public void Defaults_DocumentAuthor_IsNull()
     {
         PdfAConversionOptions options = new();
-        options.DocumentAuthor.Should().BeNull();
+        options.DocumentAuthor.ShouldBeNull();
     }
 
     [Fact]
@@ -53,16 +53,16 @@ public sealed class PdfAConversionOptionsTests
             DocumentAuthor = "Guava Health",
         };
 
-        options.FacturXXmlContent.Should().Be("<xml>invoice</xml>");
-        options.FacturXConformanceLevel.Should().Be("EN 16931");
-        options.DocumentTitle.Should().Be("Invoice 2026-001");
-        options.DocumentAuthor.Should().Be("Guava Health");
+        options.FacturXXmlContent.ShouldBe("<xml>invoice</xml>");
+        options.FacturXConformanceLevel.ShouldBe("EN 16931");
+        options.DocumentTitle.ShouldBe("Invoice 2026-001");
+        options.DocumentAuthor.ShouldBe("Guava Health");
     }
 
     [Fact]
     public void PdfAConformanceLevel_HasExpectedValues()
     {
-        ((int)PdfAConformanceLevel.PdfA3b).Should().Be(0);
-        ((int)PdfAConformanceLevel.PdfA2a).Should().Be(1);
+        ((int)PdfAConformanceLevel.PdfA3b).ShouldBe(0);
+        ((int)PdfAConformanceLevel.PdfA2a).ShouldBe(1);
     }
 }
