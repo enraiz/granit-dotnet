@@ -79,16 +79,35 @@ Pour `MajorVersions: [1, 2]`, les endpoints suivants sont créés :
 ## Compatibilité Wolverine HTTP
 
 Le module supporte nativement les endpoints Wolverine HTTP en plus des contrôleurs MVC.
-Tous les transformers (InternalApi, JWT Bearer, tenant header, réponses d'erreur)
-fonctionnent de manière identique sur les deux types d'endpoints.
+Tous les transformers (InternalApi, JWT Bearer, tenant header, réponses d'erreur,
+normalisation Wolverine) fonctionnent de manière identique sur les deux types d'endpoints.
 
 Wolverine expose ses endpoints via `IApiDescriptionProvider`, et les métadonnées
 (`[Authorize]`, `[AllowAnonymous]`, attributs personnalisés) sont propagées dans
 `EndpointMetadata`. Aucune configuration supplémentaire n'est nécessaire.
 
-> **Note** : Wolverine ajoute une réponse 404 fantôme sur tous les endpoints.
+### Normalisation des métadonnées Wolverine
+
+Le `WolverineOpenApiOperationTransformer` corrige automatiquement trois artefacts
+que Wolverine HTTP génère dans les métadonnées OpenAPI :
+
+| Artefact | Comportement Wolverine | Correction appliquée |
+| -------- | ---------------------- | -------------------- |
+| **operationId** | Auto-généré (`POST_api_v1_gdpr_export`) | Remplacé par le `Name` de l'attribut `[WolverinePost(..., Name = "RequestDataExport")]` via réflexion, ou par `EndpointNameMetadata` |
+| **description** | Copie de l'operationId auto-généré | Supprimée quand elle correspond au pattern `METHOD_path_segments` |
+| **réponse 200 fantôme** | Ajoutée avec un schéma `IResult` opaque, même si le endpoint déclare 202 ou 204 | Supprimée quand le endpoint déclare explicitement d'autres codes 2xx via `[ProducesResponseType]` |
+
+Le transformer lit le `Name` de l'attribut Wolverine par réflexion pour éviter
+une dépendance compile-time sur `Wolverine.Http`. Il distingue les
+`ProducesResponseTypeAttribute` (déclarés par le développeur) des
+`IProducesResponseTypeMetadata` (injectés automatiquement par Wolverine : 200 + 404).
+
+> **Note** : Wolverine ajoute aussi une réponse 404 fantôme sur tous les endpoints.
 > Le transformer RFC 7807 supprime automatiquement ces 404 sur les endpoints
 > sans paramètre de route.
+
+> **Voir aussi** : [http-responses.md](http-responses.md) pour les conventions
+> sur les codes de retour HTTP (quand utiliser 200, 202, 204, etc.).
 
 ## Attribut `[InternalApi]`
 
