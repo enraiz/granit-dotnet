@@ -13,6 +13,10 @@ namespace Granit.Persistence.Extensions;
 /// </summary>
 public static class ModelBuilderExtensions
 {
+    private static readonly MethodInfo SetEntityFilterMethod =
+        typeof(ModelBuilderExtensions)
+            .GetMethod(nameof(SetEntityFilter), BindingFlags.Static | BindingFlags.NonPublic)!;
+
     /// <summary>
     /// Applies Granit global query filters to all entity types in the model:
     /// <list type="bullet">
@@ -65,8 +69,7 @@ public static class ModelBuilderExtensions
                 continue;
             }
 
-            typeof(ModelBuilderExtensions)
-                .GetMethod(nameof(SetEntityFilter), BindingFlags.Static | BindingFlags.NonPublic)! // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection
+            SetEntityFilterMethod // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection
                 .MakeGenericMethod(clrType)
                 .Invoke(null, [modelBuilder, currentTenant, proxy]);
         }

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
@@ -36,6 +37,9 @@ internal sealed class EmbeddedTemplateResolver(IReadOnlyList<Assembly> assemblie
 {
     private readonly IReadOnlyList<Assembly> _assemblies = assemblies;
 
+    // Cache resource names per assembly to avoid repeated GetManifestResourceNames() allocations
+    private readonly ConcurrentDictionary<Assembly, HashSet<string>> _resourceNameCache = new();
+
     /// <inheritdoc/>
     public int Priority => -100;
 
@@ -55,7 +59,7 @@ internal sealed class EmbeddedTemplateResolver(IReadOnlyList<Assembly> assemblie
         return Task.FromResult<TemplateDescriptor?>(null);
     }
 
-    private static TemplateDescriptor? TryLoadFromAssembly(Assembly assembly, TemplateKey key)
+    private TemplateDescriptor? TryLoadFromAssembly(Assembly assembly, TemplateKey key)
     {
         string assemblyName = assembly.GetName().Name ?? string.Empty;
 
@@ -82,7 +86,12 @@ internal sealed class EmbeddedTemplateResolver(IReadOnlyList<Assembly> assemblie
         };
     }
 
-    private static string? FindResource(Assembly assembly, string resourceName) =>
-        assembly.GetManifestResourceNames()
-            .FirstOrDefault(name => string.Equals(name, resourceName, StringComparison.Ordinal));
+    private string? FindResource(Assembly assembly, string resourceName)
+    {
+        HashSet<string> names = _resourceNameCache.GetOrAdd(
+            assembly,
+            static a => new HashSet<string>(a.GetManifestResourceNames(), StringComparer.Ordinal));
+
+        return names.Contains(resourceName) ? resourceName : null;
+    }
 }

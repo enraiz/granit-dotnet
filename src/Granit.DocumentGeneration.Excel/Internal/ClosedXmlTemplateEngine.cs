@@ -110,6 +110,10 @@ internal sealed class ClosedXmlTemplateEngine : ITemplateEngine
     private static void ApplySubstitutions(
         XLWorkbook workbook, Dictionary<string, string> substitutions)
     {
+        // Pre-compute pattern strings once to avoid re-allocation per cell
+        List<(string Pattern, string Value)> patterns =
+            [.. substitutions.Select(s => ($"{{{{{s.Key}}}}}", s.Value))];
+
         foreach (IXLWorksheet worksheet in workbook.Worksheets)
         {
             foreach (IXLCell cell in worksheet.CellsUsed())
@@ -120,12 +124,9 @@ internal sealed class ClosedXmlTemplateEngine : ITemplateEngine
                 }
 
                 string value = cell.GetValue<string>();
-                foreach (KeyValuePair<string, string> sub in substitutions)
+                foreach ((string pattern, string replacement) in patterns)
                 {
-                    value = value.Replace(
-                        $"{{{{{sub.Key}}}}}",
-                        sub.Value,
-                        StringComparison.Ordinal);
+                    value = value.Replace(pattern, replacement, StringComparison.Ordinal);
                 }
 
                 cell.SetValue(value);

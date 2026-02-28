@@ -47,10 +47,13 @@ public sealed class KeycloakClaimsTransformation(IOptions<KeycloakOptions> optio
             return Task.FromResult(principal);
         }
 
+        // Collect existing roles in a HashSet to avoid O(n²) HasClaim scans
+        HashSet<string> existingRoles = [.. identity.FindAll(ClaimTypes.Role).Select(c => c.Value)];
+
         foreach (JsonElement role in rolesElement.EnumerateArray())
         {
             string? roleValue = role.GetString();
-            if (!string.IsNullOrEmpty(roleValue) && !identity.HasClaim(ClaimTypes.Role, roleValue))
+            if (!string.IsNullOrEmpty(roleValue) && existingRoles.Add(roleValue))
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, roleValue));
             }

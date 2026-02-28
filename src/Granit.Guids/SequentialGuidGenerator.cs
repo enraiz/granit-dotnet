@@ -10,8 +10,6 @@ namespace Granit.Guids;
 /// </summary>
 public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> options, IClock clock) : IGuidGenerator
 {
-    private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
-
     private readonly GuidGeneratorOptions _options = options.Value;
     private readonly IClock _clock = clock;
 
@@ -25,47 +23,48 @@ public sealed class SequentialGuidGenerator(IOptions<GuidGeneratorOptions> optio
     public Guid Create(SequentialGuidType guidType) // NOSONAR S2325
 #pragma warning restore CA1822
     {
-        // 10 cryptographically secure random bytes
-        byte[] randomBytes = new byte[10];
-        Rng.GetBytes(randomBytes);
+        // 10 cryptographically secure random bytes — stack-allocated to avoid GC pressure
+        Span<byte> randomBytes = stackalloc byte[10];
+        RandomNumberGenerator.Fill(randomBytes);
 
         // Timestamp in milliseconds since DateTime.MinValue
         long timestamp = _clock.Now.UtcTicks / 10000L;
 
-        // Convert the timestamp to a byte array (8 bytes)
-        byte[] timestampBytes = BitConverter.GetBytes(timestamp);
+        // Convert the timestamp to a byte span (8 bytes) — stack-allocated
+        Span<byte> timestampBytes = stackalloc byte[8];
+        BitConverter.TryWriteBytes(timestampBytes, timestamp);
 
         // Big-endian for correct sorting
         if (BitConverter.IsLittleEndian)
         {
-            Array.Reverse(timestampBytes);
+            timestampBytes.Reverse();
         }
 
-        byte[] guidBytes = new byte[16];
+        Span<byte> guidBytes = stackalloc byte[16];
 
         switch (guidType)
         {
             case SequentialGuidType.SequentialAsString:
             case SequentialGuidType.SequentialAsBinary:
                 // Timestamp at the front (6 bytes), then random (10 bytes)
-                Buffer.BlockCopy(timestampBytes, 2, guidBytes, 0, 6);
-                Buffer.BlockCopy(randomBytes, 0, guidBytes, 6, 10);
+                timestampBytes.Slice(2, 6).CopyTo(guidBytes);
+                randomBytes.CopyTo(guidBytes.Slice(6));
 
                 // Endianness correction for the string format
-                // Guid(byte[]) interprets Data1 and Data2 as little-endian
+                // Guid(ReadOnlySpan<byte>) interprets Data1 and Data2 as little-endian
                 if (guidType == SequentialGuidType.SequentialAsString
                     && BitConverter.IsLittleEndian)
                 {
-                    Array.Reverse(guidBytes, 0, 4); // Data1
-                    Array.Reverse(guidBytes, 4, 2); // Data2
+                    guidBytes.Slice(0, 4).Reverse(); // Data1
+                    guidBytes.Slice(4, 2).Reverse(); // Data2
                 }
 
                 break;
 
             case SequentialGuidType.SequentialAtEnd:
                 // Random at the front (10 bytes), then timestamp (6 bytes)
-                Buffer.BlockCopy(randomBytes, 0, guidBytes, 0, 10);
-                Buffer.BlockCopy(timestampBytes, 2, guidBytes, 10, 6);
+                randomBytes.CopyTo(guidBytes);
+                timestampBytes.Slice(2, 6).CopyTo(guidBytes.Slice(10));
                 break;
         }
 
