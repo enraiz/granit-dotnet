@@ -1,6 +1,6 @@
-using Shouldly;
 using Granit.Workflow.Definitions;
 using Granit.Workflow.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Workflow.Tests;

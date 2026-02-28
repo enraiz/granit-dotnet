@@ -1,7 +1,7 @@
-using Shouldly;
 using Granit.Security;
 using Granit.Workflow.Domain;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Workflow.Tests;

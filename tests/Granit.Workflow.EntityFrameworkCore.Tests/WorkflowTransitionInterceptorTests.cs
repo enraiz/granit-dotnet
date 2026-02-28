@@ -1,4 +1,3 @@
-using Shouldly;
 using Granit.Core.Domain;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
@@ -8,6 +7,7 @@ using Granit.Workflow.Domain;
 using Granit.Workflow.EntityFrameworkCore.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Workflow.EntityFrameworkCore.Tests;
