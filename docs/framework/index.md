@@ -40,6 +40,7 @@ Identité, droits d'accès et protection des secrets.
 | [authorization.md](security/authorization.md) | Policies RBAC, ICurrentUserService |
 | [encryption.md](security/encryption.md) | Chiffrement Transit via Vault |
 | [vault.md](security/vault.md) | VaultSharp, credentials dynamiques PostgreSQL, leases |
+| [cors.md](security/cors.md) | Configuration CORS standardisée, validation HDS au démarrage |
 
 ## Diagnostics
 
