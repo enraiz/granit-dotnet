@@ -1,0 +1,89 @@
+using Granit.Core.MultiTenancy;
+using Granit.Notifications.Abstractions;
+using Granit.Notifications.Messages;
+
+namespace Granit.Notifications.Handlers;
+
+/// <summary>
+/// Wolverine handler that fans out a <see cref="NotificationTrigger"/> into one
+/// <see cref="DeliverNotificationCommand"/> per recipient x channel.
+/// </summary>
+public sealed class NotificationFanoutHandler(
+    INotificationSubscriptionStore subscriptionStore,
+    INotificationPreferenceStore preferenceStore,
+    INotificationDefinitionStore definitionStore,
+    ICurrentTenant currentTenant)
+{
+    /// <summary>
+    /// Resolves recipients, loads preferences, filters channels, and produces delivery commands.
+    /// </summary>
+    public async Task<IEnumerable<DeliverNotificationCommand>> HandleAsync(
+        NotificationTrigger trigger,
+        CancellationToken cancellationToken)
+    {
+        Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : trigger.TenantId;
+        NotificationDefinition? definition = definitionStore.Get(trigger.NotificationTypeName);
+        IReadOnlyList<string> defaultChannels = definition?.DefaultChannels ?? [NotificationChannels.InApp];
+        bool allowOptOut = definition?.AllowUserOptOut ?? true;
+
+        // Resolve recipients: explicit list, or subscribers, or entity followers
+        IReadOnlyList<string> recipientUserIds = trigger.RecipientUserIds;
+
+        if (recipientUserIds.Count == 0 && trigger.RelatedEntity is not null)
+        {
+            recipientUserIds = await subscriptionStore.GetEntityFollowerIdsAsync(
+                trigger.RelatedEntity.EntityType,
+                trigger.RelatedEntity.EntityId,
+                tenantId,
+                cancellationToken);
+        }
+
+        if (recipientUserIds.Count == 0)
+        {
+            recipientUserIds = await subscriptionStore.GetSubscriberIdsAsync(
+                trigger.NotificationTypeName,
+                tenantId,
+                cancellationToken);
+        }
+
+        if (recipientUserIds.Count == 0)
+        {
+            return [];
+        }
+
+        List<DeliverNotificationCommand> commands = [];
+
+        foreach (string userId in recipientUserIds)
+        {
+            foreach (string channelName in defaultChannels)
+            {
+                if (allowOptOut)
+                {
+                    bool isEnabled = await preferenceStore.IsChannelEnabledAsync(
+                        userId, trigger.NotificationTypeName, channelName, tenantId, cancellationToken);
+                    if (!isEnabled)
+                    {
+                        continue;
+                    }
+                }
+
+                commands.Add(new DeliverNotificationCommand
+                {
+                    DeliveryId = Guid.NewGuid(),
+                    NotificationId = trigger.NotificationId,
+                    NotificationTypeName = trigger.NotificationTypeName,
+                    Severity = trigger.Severity,
+                    RecipientUserId = userId,
+                    ChannelName = channelName,
+                    Data = trigger.Data,
+                    RelatedEntity = trigger.RelatedEntity,
+                    TenantId = tenantId,
+                    OccurredAt = trigger.OccurredAt,
+                    Culture = trigger.Culture,
+                });
+            }
+        }
+
+        return commands;
+    }
+}

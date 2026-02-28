@@ -1,0 +1,46 @@
+using Granit.Notifications.Email;
+using Granit.Notifications.Sms;
+using Granit.Notifications.WhatsApp;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Granit.Notifications.Brevo.Extensions;
+
+/// <summary>Extension methods for Brevo notification provider registration.</summary>
+public static class BrevoNotificationsServiceCollectionExtensions
+{
+    /// <summary>
+    /// Registers the unified Brevo provider as Keyed Services for Email, SMS, and WhatsApp.
+    /// </summary>
+    public static IServiceCollection AddGranitNotificationsBrevo(
+        this IServiceCollection services,
+        Action<BrevoOptions>? configure = null)
+    {
+        services.AddOptions<BrevoOptions>()
+            .BindConfiguration(BrevoOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        if (configure is not null)
+        {
+            services.Configure(configure);
+        }
+
+        services.AddHttpClient("Brevo", (sp, client) =>
+        {
+            BrevoOptions opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<BrevoOptions>>().Value;
+            client.BaseAddress = new Uri(opts.BaseUrl.TrimEnd('/') + "/");
+            client.DefaultRequestHeaders.Add("api-key", opts.ApiKey);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+        });
+
+        services.AddSingleton<BrevoNotificationProvider>();
+        services.AddKeyedSingleton<IEmailSender>(
+            "Brevo", (sp, _) => sp.GetRequiredService<BrevoNotificationProvider>());
+        services.AddKeyedSingleton<ISmsSender>(
+            "Brevo", (sp, _) => sp.GetRequiredService<BrevoNotificationProvider>());
+        services.AddKeyedSingleton<IWhatsAppSender>(
+            "Brevo", (sp, _) => sp.GetRequiredService<BrevoNotificationProvider>());
+
+        return services;
+    }
+}

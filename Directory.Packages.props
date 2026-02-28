@@ -35,6 +35,7 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.*" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.*" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.*" />
   </ItemGroup>
   <ItemGroup Label="Background Jobs">
     <PackageVersion Include="Cronos" Version="0.11.*" />
@@ -57,6 +58,12 @@
   </ItemGroup>
   <ItemGroup Label="Vault">
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
+  </ItemGroup>
+  <ItemGroup Label="Notifications">
+    <PackageVersion Include="MailKit" Version="4.*" />
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.*" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.*" />
+    <PackageVersion Include="Lib.Net.Http.WebPush" Version="3.*" />
   </ItemGroup>
   <ItemGroup Label="Cache">
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.*" />
