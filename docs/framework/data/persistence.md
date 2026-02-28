@@ -271,26 +271,125 @@ int totalGlobal = await _context.Dossiers.CountAsync(ct);
 
 Pour la documentation complète de `IDataFilter`, voir [data-filtering.md](data-filtering.md).
 
+## Data Seeding
+
+`Granit.Persistence` fournit un mécanisme de peuplement de données initiales
+inspiré d'ABP Framework. Il permet à chaque module de contribuer ses données
+référentielles (types de documents, rôles par défaut, configurations) au
+démarrage de l'application.
+
+### Activation
+
+L'enregistrement est opt-in :
+
+```csharp
+builder.Services.AddGranitDataSeeding();
+```
+
+### IDataSeedContributor
+
+Chaque module implémente `IDataSeedContributor` pour contribuer ses données
+initiales. Les contributeurs doivent être **idempotents** (vérifier l'existence
+avant insertion) :
+
+```csharp
+public sealed class AuthDataSeedContributor(AuthDbContext dbContext) : IDataSeedContributor
+{
+    public async Task SeedAsync(DataSeedContext context, CancellationToken cancellationToken = default)
+    {
+        if (await dbContext.Roles.AnyAsync(cancellationToken))
+        {
+            return; // Déjà initialisé — idempotent
+        }
+
+        dbContext.Roles.Add(new Role { Name = "Admin" });
+        dbContext.Roles.Add(new Role { Name = "User" });
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+}
+```
+
+Enregistrer le contributeur dans le module :
+
+```csharp
+services.AddTransient<IDataSeedContributor, AuthDataSeedContributor>();
+```
+
+### DataSeedContext
+
+Le contexte passé à chaque contributeur contient :
+
+| Propriété | Type | Description |
+| --- | --- | --- |
+| `TenantId` | `Guid?` | Identifiant du tenant (`null` = contexte host-level) |
+| `Properties` | `Dictionary<string, object?>` | Données arbitraires pour les contributeurs |
+
+Accès via indexeur :
+
+```csharp
+DataSeedContext context = new(tenantId: myTenantId);
+context["AdminEmail"] = "admin@example.com";
+
+// Dans le contributeur :
+string? email = context["AdminEmail"] as string;
+```
+
+### Comportement au démarrage
+
+1. Le `DataSeedingHostedService` s'exécute au démarrage de l'application
+2. Il crée un `DataSeedContext` host-level (`TenantId = null`)
+3. Le `DataSeeder` crée un scope DI et résout tous les `IDataSeedContributor`
+4. Les contributeurs sont exécutés **séquentiellement**
+5. Si un contributeur échoue, l'erreur est loguée et les suivants continuent
+6. Les exceptions ne bloquent **jamais** le démarrage de l'application
+
+### Seeding multi-tenant
+
+Le hosted service effectue un seeding host-level. Pour seeder les données
+d'un tenant spécifique (ex : provisionnement), appeler `IDataSeeder`
+directement :
+
+```csharp
+IDataSeeder seeder = serviceProvider.GetRequiredService<IDataSeeder>();
+DataSeedContext context = new(tenantId: newTenantId);
+await seeder.SeedAsync(context, cancellationToken);
+```
+
 ## Architecture
 
 ```text
 Granit.Persistence
+├── DataSeeding/
+│   ├── IDataSeedContributor.cs             (interface publique — contributeur)
+│   ├── IDataSeeder.cs                      (interface publique — orchestrateur)
+│   ├── DataSeedContext.cs                   (contexte : TenantId + Properties)
+│   ├── DataSeeder.cs                       (interne : résolution DI + résilience)
+│   └── DataSeedingHostedService.cs         (interne : IHostedService au démarrage)
 ├── Interceptors/
-│   ├── AuditedEntityInterceptor.cs       (audit HDS : CreatedAt/By, ModifiedAt/By)
-│   └── SoftDeleteInterceptor.cs          (soft delete RGPD : IsDeleted, DeletedAt/By)
+│   ├── AuditedEntityInterceptor.cs         (audit HDS : CreatedAt/By, ModifiedAt/By)
+│   └── SoftDeleteInterceptor.cs            (soft delete RGPD : IsDeleted, DeletedAt/By)
 └── Extensions/
-    ├── ModelBuilderExtensions.cs          (ApplyGranitConventions : ISoftDeletable,
-    │                                       IActive, IMultiTenant, IDataFilter bypass)
-    └── PersistenceServiceCollectionExtensions.cs  (AddGranitPersistence)
+    ├── ModelBuilderExtensions.cs            (ApplyGranitConventions : ISoftDeletable,
+    │                                         IActive, IMultiTenant, IDataFilter bypass)
+    └── PersistenceServiceCollectionExtensions.cs  (AddGranitPersistence, AddGranitDataSeeding)
 ```
 
 ## Services enregistrés
+
+### AddGranitPersistence()
 
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `AuditedEntityInterceptor` | - | Scoped |
 | `SoftDeleteInterceptor` | - | Scoped |
 | `IDataFilter` | `DataFilter` | Singleton |
+
+### AddGranitDataSeeding() (opt-in)
+
+| Service | Implémentation | Lifetime |
+| --- | --- | --- |
+| `IDataSeeder` | `DataSeeder` | Singleton |
+| `IHostedService` | `DataSeedingHostedService` | - |
 
 ## Tests
 
