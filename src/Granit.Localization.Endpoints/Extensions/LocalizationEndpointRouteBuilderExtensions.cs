@@ -24,11 +24,11 @@ namespace Granit.Localization.Endpoints.Extensions;
 /// <summary>
 /// Extension methods for mapping Granit localization endpoints.
 /// </summary>
-public static class LocalizationEndpointRouteBuilderExtensions
+public static partial class LocalizationEndpointRouteBuilderExtensions
 {
     // BCP 47 language tag: 2-8 alpha primary subtag, optional hyphen-separated subtags (1-8 alphanumeric).
-    private static readonly Regex Bcp47Pattern =
-        new(@"^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$", RegexOptions.Compiled);
+    [GeneratedRegex(@"^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$")]
+    private static partial Regex Bcp47Pattern();
 
     // Column size constraints (must match LocalizationOverrideConfiguration).
     private const int MaxResourceNameLength = 200;
@@ -125,7 +125,7 @@ public static class LocalizationEndpointRouteBuilderExtensions
         IStringLocalizerFactory localizerFactory =
             context.RequestServices.GetRequiredService<IStringLocalizerFactory>();
 
-        if (!string.IsNullOrWhiteSpace(cultureName) && !Bcp47Pattern.IsMatch(cultureName))
+        if (!string.IsNullOrWhiteSpace(cultureName) && !Bcp47Pattern().IsMatch(cultureName))
         {
             return Results.Problem(
                 detail: $"Culture name '{cultureName}' is not supported.",
@@ -192,7 +192,7 @@ public static class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (!Bcp47Pattern.IsMatch(cultureName))
+        if (!Bcp47Pattern().IsMatch(cultureName))
         {
             return Results.Problem(
                 detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
@@ -230,7 +230,7 @@ public static class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (!Bcp47Pattern.IsMatch(cultureName))
+        if (!Bcp47Pattern().IsMatch(cultureName))
         {
             return Results.Problem(
                 detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
@@ -286,7 +286,7 @@ public static class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (!Bcp47Pattern.IsMatch(cultureName))
+        if (!Bcp47Pattern().IsMatch(cultureName))
         {
             return Results.Problem(
                 detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
@@ -314,13 +314,13 @@ public static class LocalizationEndpointRouteBuilderExtensions
     {
         Dictionary<string, IReadOnlyDictionary<string, string>> resources = new(StringComparer.Ordinal);
 
-        foreach (LocalizationResourceInfo resourceInfo in options.Resources.GetAll())
+        foreach (Type resourceType in options.Resources.GetAll().Select(resourceInfo => resourceInfo.ResourceType))
         {
-            string name = resourceInfo.ResourceType
+            string name = resourceType
                 .GetCustomAttribute<LocalizationResourceNameAttribute>()?.Name
-                ?? resourceInfo.ResourceType.Name;
+                ?? resourceType.Name;
 
-            IStringLocalizer localizer = localizerFactory.Create(resourceInfo.ResourceType);
+            IStringLocalizer localizer = localizerFactory.Create(resourceType);
 
             Dictionary<string, string> translations = localizer
                 .GetAllStrings(includeParentCultures: true)
