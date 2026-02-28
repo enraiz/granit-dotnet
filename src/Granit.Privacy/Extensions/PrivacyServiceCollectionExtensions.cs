@@ -47,7 +47,15 @@ public static class PrivacyServiceCollectionExtensions
 
         services.TryAddSingleton<IDataProviderRegistry>(dataProviderRegistry);
         services.TryAddSingleton<ILegalDocumentRegistry>(legalDocumentRegistry);
-        services.TryAddScoped<ILegalAgreementChecker, LegalAgreementChecker>();
+
+        // Only register the checker when a store implementation has been provided
+        // via UseLegalAgreementStore<T>(). Without a store the checker cannot work
+        // and would cause a DI validation failure at startup.
+        bool hasStore = services.Any(d => d.ServiceType == typeof(ILegalAgreementStore));
+        if (hasStore)
+        {
+            services.TryAddScoped<ILegalAgreementChecker, LegalAgreementChecker>();
+        }
 
         return services;
     }

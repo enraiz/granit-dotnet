@@ -30,7 +30,9 @@ public static class ApiDocumentationApplicationBuilderExtensions
             return app;
         }
 
-        foreach (int majorVersion in options.MajorVersions)
+        // Distinct() guards against the .NET configuration binder appending
+        // bound values to the default list (e.g. default [1] + config [1] → [1,1]).
+        foreach (int majorVersion in options.MajorVersions.Distinct())
         {
             IEndpointConventionBuilder openApiEndpoint =
                 app.MapOpenApi($"/openapi/v{majorVersion}.json");
