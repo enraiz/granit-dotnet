@@ -19,8 +19,8 @@ internal sealed class TextTemplateRenderer(
     IEnumerable<ITemplateGlobalContext> globalContexts,
     IServiceProvider serviceProvider) : ITextTemplateRenderer
 {
-    private readonly IOrderedEnumerable<ITemplateResolver> _resolvers =
-        resolvers.OrderByDescending(r => r.Priority);
+    private readonly IReadOnlyList<ITemplateResolver> _resolvers =
+        [.. resolvers.OrderByDescending(r => r.Priority)];
 
     private readonly IReadOnlyList<ITemplateEngine> _engines = engines.ToList();
 

@@ -37,10 +37,10 @@ public sealed partial class VaultCredentialLeaseManager(
     private readonly VaultOptions _options = options.Value;
     private readonly ILogger<VaultCredentialLeaseManager> _logger = logger;
 
-    private string _username = string.Empty;
-    private string _password = string.Empty;
-    private string _leaseId = string.Empty;
-    private int _leaseDurationSeconds;
+    private volatile string _username = string.Empty;
+    private volatile string _password = string.Empty;
+    private volatile string _leaseId = string.Empty;
+    private volatile int _leaseDurationSeconds;
 
     public string Username => _username;
     public string Password => _password;

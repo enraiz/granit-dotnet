@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Persistence.MultiTenancy;
@@ -10,9 +11,13 @@ internal sealed class DefaultTenantSchemaProvider(IOptions<TenantSchemaOptions> 
     : ITenantSchemaProvider
 {
     private readonly TenantSchemaOptions _options = options.Value;
+    private readonly ConcurrentDictionary<Guid, string> _schemaNameCache = new();
 
     /// <inheritdoc/>
-    public ValueTask<string> GetSchemaNameAsync(Guid tenantId, CancellationToken ct = default)
+    public ValueTask<string> GetSchemaNameAsync(Guid tenantId, CancellationToken ct = default) =>
+        ValueTask.FromResult(_schemaNameCache.GetOrAdd(tenantId, ComputeSchemaName));
+
+    private string ComputeSchemaName(Guid tenantId)
     {
         string suffix = _options.NamingConvention switch
         {
@@ -29,6 +34,6 @@ internal sealed class DefaultTenantSchemaProvider(IOptions<TenantSchemaOptions> 
                 $"Unknown naming convention: {_options.NamingConvention}"),
         };
 
-        return ValueTask.FromResult(_options.Prefix + suffix);
+        return _options.Prefix + suffix;
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Granit.Templating.GlobalContext;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
@@ -24,6 +25,9 @@ namespace Granit.Templating.Scriban;
 /// </remarks>
 internal sealed class ScribanTemplateEngine : ITemplateEngine
 {
+    // Parsed Template objects are immutable and thread-safe — cache to avoid re-parsing
+    private readonly ConcurrentDictionary<string, Template> _templateCache = new();
+
     /// <inheritdoc/>
     public bool CanRender(TemplateDescriptor descriptor) =>
         string.Equals(descriptor.MimeType, "text/html", StringComparison.OrdinalIgnoreCase)
@@ -37,11 +41,17 @@ internal sealed class ScribanTemplateEngine : ITemplateEngine
         IReadOnlyList<ITemplateGlobalContext> globalContexts,
         CancellationToken ct = default) where TData : notnull
     {
-        Template template = Template.Parse(descriptor.Content);
-        if (template.HasErrors)
+        string cacheKey = descriptor.RevisionId?.ToString() ?? descriptor.Content;
+        Template template = _templateCache.GetOrAdd(cacheKey, _ =>
         {
-            throw new TemplateParseException(template.Messages);
-        }
+            Template parsed = Template.Parse(descriptor.Content);
+            if (parsed.HasErrors)
+            {
+                throw new TemplateParseException(parsed.Messages);
+            }
+
+            return parsed;
+        });
 
         TemplateContext context = BuildContext(data, globalContexts, ct);
         string rendered = template.Render(context);

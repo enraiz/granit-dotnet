@@ -23,10 +23,16 @@ public sealed class CurrentUserService(IHttpContextAccessor httpContextAccessor)
 
     public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
 
-    public IReadOnlyList<string> GetRoles() => User?.FindAll(ClaimTypes.Role)
-        .Select(c => c.Value)
-        .ToList()
-        .AsReadOnly() ?? new List<string>().AsReadOnly();
+    public IReadOnlyList<string> GetRoles()
+    {
+        if (User is not { } user)
+        {
+            return Array.Empty<string>();
+        }
+
+        List<string> roles = [.. user.FindAll(ClaimTypes.Role).Select(c => c.Value)];
+        return roles.Count == 0 ? Array.Empty<string>() : roles;
+    }
 
     public bool IsInRole(string role) => User?.IsInRole(role) ?? false;
 }

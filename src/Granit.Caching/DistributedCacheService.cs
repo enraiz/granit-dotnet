@@ -44,6 +44,7 @@ public partial class DistributedCacheService<TCacheItem>(
     private readonly ILogger<DistributedCacheService<TCacheItem>> _logger = logger;
     private readonly string _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
     private readonly bool _shouldEncrypt = CacheEncryptionResolver.ShouldEncrypt(typeof(TCacheItem), options.Value);
+    private readonly string _keyPrefix = $"{options.Value.KeyPrefix}:{CacheNameProvider.GetCacheName(typeof(TCacheItem))}:";
 
     /// <inheritdoc/>
     public async Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default)
@@ -136,7 +137,7 @@ public partial class DistributedCacheService<TCacheItem>(
         _cache.RefreshAsync(BuildKey(key), ct);
 
     private string BuildKey(string userKey) =>
-        $"{_options.Value.KeyPrefix}:{_cacheName}:{userKey}";
+        string.Concat(_keyPrefix, userKey);
 
     private DistributedCacheEntryOptions BuildDefaultOptions()
     {
