@@ -150,7 +150,7 @@ public static class LocalizationEndpointRouteBuilderExtensions
         }
 
         List<LanguageInfoDto> languages = [.. options.Value.Languages
-            .Select(l => new LanguageInfoDto(l.CultureName, l.DisplayName, l.FlagIcon))];
+            .Select(l => new LanguageInfoDto(l.CultureName, l.DisplayName, l.FlagIcon, l.IsDefault))];
 
         context.Response.Headers.CacheControl = "public, max-age=3600";
         context.Response.Headers.Vary = "Accept-Language";

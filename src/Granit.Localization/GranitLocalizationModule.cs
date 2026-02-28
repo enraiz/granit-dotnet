@@ -23,6 +23,9 @@ public sealed class GranitLocalizationModule : GranitModule
                 .AddJson(
                     typeof(GranitLocalizationResource).Assembly,
                     "Granit.Localization.Localization.Granit");
+
+            options.Languages.Add(new LanguageInfo("fr", "Français", "fr"));
+            options.Languages.Add(new LanguageInfo("en", "English", "gb", isDefault: true));
         });
     }
 }
