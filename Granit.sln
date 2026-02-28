@@ -207,6 +207,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DocumentGeneration.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DocumentGeneration.Excel.Tests", "tests\Granit.DocumentGeneration.Excel.Tests\Granit.DocumentGeneration.Excel.Tests.csproj", "{F3D51536-EFFA-4D05-AD7E-FEC7596F305D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Localization.Endpoints", "src\Granit.Localization.Endpoints\Granit.Localization.Endpoints.csproj", "{F24A0D52-A01B-4E97-A359-D2298711F106}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Localization.Endpoints.Tests", "tests\Granit.Localization.Endpoints.Tests\Granit.Localization.Endpoints.Tests.csproj", "{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1417,6 +1421,30 @@ Global
 		{F3D51536-EFFA-4D05-AD7E-FEC7596F305D}.Release|x64.Build.0 = Release|Any CPU
 		{F3D51536-EFFA-4D05-AD7E-FEC7596F305D}.Release|x86.ActiveCfg = Release|Any CPU
 		{F3D51536-EFFA-4D05-AD7E-FEC7596F305D}.Release|x86.Build.0 = Release|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Debug|x64.Build.0 = Debug|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Debug|x86.Build.0 = Debug|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Release|x64.ActiveCfg = Release|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Release|x64.Build.0 = Release|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Release|x86.ActiveCfg = Release|Any CPU
+		{F24A0D52-A01B-4E97-A359-D2298711F106}.Release|x86.Build.0 = Release|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Debug|x64.Build.0 = Debug|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Debug|x86.Build.0 = Debug|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Release|x64.ActiveCfg = Release|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Release|x64.Build.0 = Release|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Release|x86.ActiveCfg = Release|Any CPU
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1522,5 +1550,7 @@ Global
 		{7733A1B6-B694-4D07-8E6B-DE75DC7B9926} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{4107C38F-0FFA-4ACC-89DC-313E7E8E61C9} = {A1B2C3D4-0001-0001-0001-000000000001}
 		{F3D51536-EFFA-4D05-AD7E-FEC7596F305D} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{F24A0D52-A01B-4E97-A359-D2298711F106} = {A1B2C3D4-0001-0001-0001-000000000001}
+		{AE4D4FB9-DED4-4111-9BE2-B27D3EF0758E} = {A1B2C3D4-0002-0002-0002-000000000002}
 	EndGlobalSection
 EndGlobal
