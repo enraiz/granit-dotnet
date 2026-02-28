@@ -91,6 +91,14 @@ Rendu de templates et génération documentaire (PDF, Excel).
 | --- | --- |
 | [templating/index.md](templating/index.md) | Pipeline Scriban, `IDocumentGenerator`, enrichisseurs, cycle de vie Draft/Published/Deprecated |
 
+## Imaging
+
+Manipulation d'images : redimensionnement, recadrage, compression, conversion et watermark.
+
+| Document | Description |
+| --- | --- |
+| [imaging/index.md](imaging/index.md) | API fluide `IImageProcessor` / `IImagePipeline`, Magick.NET, formats WebP/AVIF, strip EXIF (RGPD) |
+
 ## Storage
 
 Stockage d'objets souverain, Direct-to-Cloud, conforme HDS et RGPD.

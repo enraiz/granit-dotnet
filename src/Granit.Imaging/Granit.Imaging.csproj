@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Imaging</PackageId>
+    <Description>Couche d'abstraction pour la manipulation d'images : interfaces IImageProcessor et IImagePipeline (API fluide), enums (ImageFormat, ResizeMode), value types et ImageResult. Les implémentations concrètes (Magick.NET, etc.) vivent dans des packages séparés.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Imaging.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+  </ItemGroup>
+
+</Project>
