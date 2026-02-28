@@ -20,9 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
-    <!-- Soft dependency: ICurrentUserService (WorkflowManager uses UserId for audit).
-         NullCurrentUserService from Granit.Core is used when Security is not registered. -->
-    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
   </ItemGroup>
 
 </Project>

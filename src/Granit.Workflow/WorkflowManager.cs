@@ -1,5 +1,3 @@
-using Granit.Security;
-
 namespace Granit.Workflow;
 
 /// <summary>
@@ -9,13 +7,11 @@ namespace Granit.Workflow;
 /// <typeparam name="TState">Enum type representing the workflow states.</typeparam>
 public sealed class WorkflowManager<TState>(
     IWorkflowDefinition<TState> definition,
-    IWorkflowPermissionChecker permissionChecker,
-    ICurrentUserService currentUserService) : IWorkflowManager<TState>
+    IWorkflowPermissionChecker permissionChecker) : IWorkflowManager<TState>
     where TState : struct, Enum
 {
     private readonly IWorkflowDefinition<TState> _definition = definition;
     private readonly IWorkflowPermissionChecker _permissionChecker = permissionChecker;
-    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<WorkflowTransition<TState>>> GetAllowedTransitionsAsync(

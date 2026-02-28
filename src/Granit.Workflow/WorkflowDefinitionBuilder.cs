@@ -54,15 +54,18 @@ public sealed class WorkflowDefinitionBuilder<TState> where TState : struct, Enu
         }
 
         // Check for duplicate transitions (same From+To)
-        HashSet<(TState From, TState To)> seen = [];
-        foreach (WorkflowTransition<TState> transition in _transitions)
+        (TState From, TState To)? duplicate = _transitions
+            .GroupBy(t => (t.From, t.To))
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .Cast<(TState From, TState To)?>()
+            .FirstOrDefault();
+
+        if (duplicate is not null)
         {
-            if (!seen.Add((transition.From, transition.To)))
-            {
-                throw new InvalidOperationException(
-                    $"Duplicate transition: {transition.From} → {transition.To}. " +
-                    "Each From+To pair must be unique.");
-            }
+            throw new InvalidOperationException(
+                $"Duplicate transition: {duplicate.Value.From} → {duplicate.Value.To}. " +
+                "Each From+To pair must be unique.");
         }
 
         // Detect unreachable states (states with no incoming transition except initial state)
@@ -74,24 +77,21 @@ public sealed class WorkflowDefinitionBuilder<TState> where TState : struct, Enu
         }
 
         HashSet<TState> reachable = [_initialState.Value];
-        // BFS from initial state
+        // BFS from initial state using adjacency lookup
+        ILookup<TState, TState> adjacency = _transitions.ToLookup(t => t.From, t => t.To);
         Queue<TState> queue = new();
         queue.Enqueue(_initialState.Value);
 
         while (queue.Count > 0)
         {
             TState current = queue.Dequeue();
-            foreach (WorkflowTransition<TState> transition in _transitions)
+            foreach (TState target in adjacency[current].Where(reachable.Add))
             {
-                if (EqualityComparer<TState>.Default.Equals(transition.From, current)
-                    && reachable.Add(transition.To))
-                {
-                    queue.Enqueue(transition.To);
-                }
+                queue.Enqueue(target);
             }
         }
 
-        HashSet<TState> unreachable = new(allStates);
+        HashSet<TState> unreachable = [.. allStates];
         unreachable.ExceptWith(reachable);
 
         if (unreachable.Count > 0)

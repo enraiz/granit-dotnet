@@ -11,18 +11,12 @@ namespace Granit.Workflow.Tests;
 public sealed class PublicationWorkflowTests
 {
     [Fact]
-    public void Default_ShouldHaveCorrectInitialState()
-    {
-        // Assert
+    public void Default_ShouldHaveCorrectInitialState() =>
         PublicationWorkflow.Default.InitialState.ShouldBe(WorkflowLifecycleStatus.Draft);
-    }
 
     [Fact]
-    public void Default_ShouldHaveExpectedTransitions()
-    {
-        // Assert
+    public void Default_ShouldHaveExpectedTransitions() =>
         PublicationWorkflow.Default.Transitions.Count.ShouldBe(5);
-    }
 
     [Theory]
     [InlineData(WorkflowLifecycleStatus.Draft, 2)]           // PendingReview, Published

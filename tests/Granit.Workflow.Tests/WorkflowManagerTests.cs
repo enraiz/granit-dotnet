@@ -1,4 +1,3 @@
-using Granit.Security;
 using Granit.Workflow.Domain;
 using NSubstitute;
 using Shouldly;
@@ -27,7 +26,6 @@ public sealed class WorkflowManagerTests
                 .RequiresPermission("workflow.archive")));
 
     private readonly IWorkflowPermissionChecker _permissionChecker = Substitute.For<IWorkflowPermissionChecker>();
-    private readonly ICurrentUserService _currentUserService = Substitute.For<ICurrentUserService>();
 
     // ========================================================================
     // TransitionAsync — valid transitions
@@ -61,7 +59,7 @@ public sealed class WorkflowManagerTests
             WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
                 .InitialState(WorkflowLifecycleStatus.Draft)
                 .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published));
-        WorkflowManager<WorkflowLifecycleStatus> manager = new(openDefinition, _permissionChecker, _currentUserService);
+        WorkflowManager<WorkflowLifecycleStatus> manager = new(openDefinition, _permissionChecker);
 
         // Act
         TransitionResult<WorkflowLifecycleStatus> result = await manager.TransitionAsync(
@@ -235,5 +233,5 @@ public sealed class WorkflowManagerTests
     // ========================================================================
 
     private WorkflowManager<WorkflowLifecycleStatus> BuildManager() =>
-        new(Definition, _permissionChecker, _currentUserService);
+        new(Definition, _permissionChecker);
 }
