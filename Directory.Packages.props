@@ -52,6 +52,9 @@
   <ItemGroup Label="Blob Storage">
     <PackageVersion Include="AWSSDK.S3" Version="3.*" />
   </ItemGroup>
+  <ItemGroup Label="Imaging">
+    <PackageVersion Include="Magick.NET-Q8-AnyCPU" Version="14.*" />
+  </ItemGroup>
   <ItemGroup Label="Vault">
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
   </ItemGroup>

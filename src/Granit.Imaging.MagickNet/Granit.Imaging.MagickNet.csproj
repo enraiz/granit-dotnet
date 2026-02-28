@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Imaging.MagickNet</PackageId>
+    <Description>Implémentation Magick.NET du module Granit.Imaging. Fournit IImageProcessor et IImagePipeline avec support natif de JPEG, PNG, WebP, AVIF, GIF, BMP, TIFF. API fluide pour resize, crop, compress, watermark et strip EXIF.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Imaging.MagickNet.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Imaging\Granit.Imaging.csproj" />
+  </ItemGroup>
+
+</Project>

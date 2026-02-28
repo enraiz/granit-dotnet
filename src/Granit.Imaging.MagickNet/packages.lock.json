@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "Magick.NET-Q8-AnyCPU": {
+        "type": "Direct",
+        "requested": "[14.*, )",
+        "resolved": "14.10.3",
+        "contentHash": "gi7kRE4x4fBDBwgCFKM3KJbLRBoK332DdeaIu+xDE4syWRYG5oEU+iXqmHM1RihJH0N17F0qL44vZKs9V89bqw==",
+        "dependencies": {
+          "Magick.NET.Core": "14.10.3"
+        }
+      },
+      "Magick.NET.Core": {
+        "type": "Transitive",
+        "resolved": "14.10.3",
+        "contentHash": "Shb3KrAMFB49+j7nJ2uVbNBuGg+rEAoOpIDmR2A/sSbQ21l4vrPY8Py90chcndGcjzvhqZWk69SMmb8v5esOjA=="
+      },
+      "granit.core": {
+        "type": "Project"
+      },
+      "granit.imaging": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.0.3",
+        "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
+      }
+    }
+  }
+}
