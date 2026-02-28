@@ -1,8 +1,8 @@
 # Granit.Notifications
 
-Core notification module for Granit. Multi-channel notification system (InApp,
-Email, SMS, WhatsApp, Push, SignalR) with Odoo-style entity tracking, Wolverine
-fan-out, and HDS audit trail.
+Multi-channel notification engine for Granit. Provides `INotificationPublisher` for publishing
+notifications, Wolverine-based transactional fan-out, `INotificationChannel` for pluggable
+delivery channels, and Odoo-style entity tracking via `ITrackedEntity`.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

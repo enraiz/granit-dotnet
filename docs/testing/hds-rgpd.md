@@ -15,17 +15,17 @@ correctement remplis, conformément à l'exigence HDS de traçabilité sur 3 ans
 public async Task SaveChangesAsync_OnAdd_SetsCreatedFields()
 {
     // Arrange
-    await using var context = CreateContext();
-    var entity = new TestEntity { Name = "Test" };
+    await using TestDbContext context = CreateContext();
+    TestEntity entity = new() { Name = "Test" };
     context.TestEntities.Add(entity);
 
     // Act
     await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    entity.CreatedAt.Should().Be(FixedNow);
-    entity.CreatedBy.Should().Be("user-test-123");
-    entity.Id.Should().Be(FixedGuid);
+    entity.CreatedAt.ShouldBe(FixedNow);
+    entity.CreatedBy.ShouldBe("user-test-123");
+    entity.Id.ShouldBe(FixedGuid);
 }
 ```
 
@@ -39,8 +39,8 @@ convertie en suppression logique, avec capture de `DeletedAt` et `DeletedBy` :
 public async Task SaveChangesAsync_OnDelete_ConvertToSoftDelete()
 {
     // Arrange
-    await using var context = CreateContext();
-    var entity = new TestSoftDeletableEntity { /* ... */ };
+    await using TestDbContext context = CreateContext();
+    TestSoftDeletableEntity entity = new() { /* ... */ };
     context.Entities.Add(entity);
     await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -51,9 +51,9 @@ public async Task SaveChangesAsync_OnDelete_ConvertToSoftDelete()
     await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert — l'entité est soft-deleted (pas physiquement supprimée)
-    entity.IsDeleted.Should().BeTrue();
-    entity.DeletedAt.Should().Be(FixedNow);
-    entity.DeletedBy.Should().Be("user-test-123");
+    entity.IsDeleted.ShouldBeTrue();
+    entity.DeletedAt.ShouldBe(FixedNow);
+    entity.DeletedBy.ShouldBe("user-test-123");
 }
 ```
 
@@ -65,8 +65,8 @@ Les tests de `Clock` vérifient que l'horloge retourne toujours UTC (conformité
 [Fact]
 public void Now_IsAlwaysUtc()
 {
-    var now = _clock.Now;
-    now.Offset.Should().Be(TimeSpan.Zero,
+    DateTimeOffset now = _clock.Now;
+    now.Offset.ShouldBe(TimeSpan.Zero,
         "le Clock doit toujours retourner UTC (conformité HDS)");
 }
 ```

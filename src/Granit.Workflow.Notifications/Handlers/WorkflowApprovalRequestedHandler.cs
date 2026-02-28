@@ -1,5 +1,6 @@
 using Granit.Core.MultiTenancy;
 using Granit.Notifications;
+using Granit.Notifications.Abstractions;
 using Granit.Workflow.Events;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +22,7 @@ namespace Granit.Workflow.Notifications.Handlers;
 /// </list>
 /// <para>
 /// If no approvers are found, the handler logs a warning and returns without error.
-/// This follows the NestJS graceful degradation pattern.
+/// This follows the graceful degradation pattern.
 /// </para>
 /// </remarks>
 public sealed class WorkflowApprovalRequestedHandler(
@@ -30,8 +31,6 @@ public sealed class WorkflowApprovalRequestedHandler(
     ICurrentTenant currentTenant,
     ILogger<WorkflowApprovalRequestedHandler> logger)
 {
-    private const string NotificationTypeName = "workflow.approval_requested";
-
     /// <summary>
     /// Handles the <see cref="WorkflowApprovalRequested"/> event by notifying approvers.
     /// </summary>
@@ -51,20 +50,20 @@ public sealed class WorkflowApprovalRequestedHandler(
             return;
         }
 
-        string title = $"Approbation requise : {message.EntityType}";
-        string body = $"L'utilisateur **{message.RequestedBy}** demande l'approbation " +
-                       $"pour la transition vers **{message.TargetState}** " +
-                       $"de l'entité {message.EntityType} ({message.EntityId}).";
+        WorkflowApprovalNotificationData data = new(
+            message.EntityType,
+            message.EntityId,
+            message.RequestedBy,
+            message.TargetState,
+            message.RequiredPermission);
 
         EntityReference relatedEntity = new(message.EntityType, message.EntityId);
 
         await notificationPublisher.PublishAsync(
-            NotificationTypeName,
-            title,
-            body,
+            WorkflowApprovalNotificationType.Instance,
+            data,
             approverIds,
             relatedEntity,
-            NotificationSeverity.Warning,
             cancellationToken);
 
         logger.LogInformation(
