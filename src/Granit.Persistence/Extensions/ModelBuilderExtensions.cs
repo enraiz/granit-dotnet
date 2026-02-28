@@ -13,9 +13,9 @@ namespace Granit.Persistence.Extensions;
 /// </summary>
 public static class ModelBuilderExtensions
 {
-    private static readonly MethodInfo SetEntityFilterMethod = // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection on private generic method
+    private static readonly MethodInfo SetEntityFilterMethod =
         typeof(ModelBuilderExtensions)
-            .GetMethod(nameof(SetEntityFilter), BindingFlags.Static | BindingFlags.NonPublic)!;
+            .GetMethod(nameof(SetEntityFilter), BindingFlags.Static | BindingFlags.NonPublic)!; // NOSONAR S3011 - intentional: generic EF Core filter pattern requires reflection on private generic method
 
     /// <summary>
     /// Applies Granit conventions to all entity types in the model:
@@ -79,7 +79,7 @@ public static class ModelBuilderExtensions
         //   - FK from Translation.ParentId → Parent.Id with cascade delete
         //   - Unique index on (ParentId, Culture)
         //   - Culture max length (20, BCP 47)
-        foreach (Type clrType in modelBuilder.Model.GetEntityTypes().ToList().Select(entityType => entityType.ClrType))
+        foreach (Type clrType in modelBuilder.Model.GetEntityTypes().ToList().Select(entityType => entityType.ClrType)) // NOSONAR S3445 - ToList() required: ConfigureTranslation modifies the model (adds FK, index), enumerating a live collection would throw InvalidOperationException
         {
             Type? translationInterface = clrType
                 .GetInterfaces()

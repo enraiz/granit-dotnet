@@ -19,7 +19,7 @@ internal sealed class ConfigureCorsPolicyOptions(
         {
             if (granitOptions.AllowedOrigins.Contains("*"))
             {
-                policy.AllowAnyOrigin();
+                policy.AllowAnyOrigin(); // NOSONAR S5122 - intentional: wildcard origin is configuration-driven (GranitCorsOptions), only enabled when explicitly set by the application (typically dev/staging)
             }
             else
             {
