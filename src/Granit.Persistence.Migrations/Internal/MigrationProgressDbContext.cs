@@ -5,7 +5,7 @@ namespace Granit.Persistence.Migrations.Internal;
 /// <summary>
 /// System <see cref="DbContext"/> that tracks the progress of migration cycles.
 /// Uses its own connection, independent of any tenant schema switch.
-/// Table: <c>granit_migration_progress</c>.
+/// Table: <c>data_migration_progress</c>.
 /// </summary>
 internal sealed class MigrationProgressDbContext(DbContextOptions<MigrationProgressDbContext> options)
     : DbContext(options)

@@ -33,7 +33,7 @@ public sealed class GranitFeaturesDbContextTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public void Model_TableName_IsFeatureOverrides()
+    public void Model_TableName_IsSaasFeatureOverrides()
     {
         using GranitFeaturesDbContext ctx = CreateInMemory();
 
@@ -41,7 +41,7 @@ public sealed class GranitFeaturesDbContextTests
             .FindEntityType(typeof(TenantFeatureOverride))!
             .GetTableName();
 
-        tableName.Should().Be("feature_overrides");
+        tableName.Should().Be("saas_feature_overrides");
     }
 
     [Fact]

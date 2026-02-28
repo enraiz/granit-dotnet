@@ -3,7 +3,7 @@ using Granit.Core.Domain;
 namespace Granit.Settings.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// Persistent setting value record stored in the <c>granit_setting_records</c> table.
+/// Persistent setting value record stored in the <c>core_setting_records</c> table.
 /// </summary>
 /// <remarks>
 /// <para>

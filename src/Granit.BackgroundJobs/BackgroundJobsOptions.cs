@@ -10,7 +10,7 @@ namespace Granit.BackgroundJobs;
 /// <para>
 /// In <see cref="JobStoreMode.Durable"/> mode, <see cref="ConnectionString"/> must point
 /// to a SQL Server or PostgreSQL instance. The module creates and manages the
-/// <c>granit_background_jobs</c> table automatically.
+/// <c>scheduling_background_jobs</c> table automatically.
 /// </para>
 /// </remarks>
 public sealed class BackgroundJobsOptions

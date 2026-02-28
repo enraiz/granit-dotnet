@@ -6,7 +6,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="TemplateRevisionEntity"/>.
-/// Table: <c>granit_template_revisions</c>.
+/// Table: <c>templating_revisions</c>.
 /// </summary>
 internal sealed class TemplateRevisionEntityConfiguration
     : IEntityTypeConfiguration<TemplateRevisionEntity>
@@ -14,7 +14,7 @@ internal sealed class TemplateRevisionEntityConfiguration
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<TemplateRevisionEntity> builder)
     {
-        builder.ToTable("granit_template_revisions");
+        builder.ToTable("templating_revisions");
 
         builder.HasKey(e => e.RevisionId);
 
@@ -59,10 +59,10 @@ internal sealed class TemplateRevisionEntityConfiguration
 
         // Composite index for lifecycle queries: find draft/published by (name, culture, status)
         builder.HasIndex(e => new { e.TemplateName, e.Culture, e.Status })
-            .HasDatabaseName("ix_granit_template_revisions_name_culture_status");
+            .HasDatabaseName("ix_templating_revisions_name_culture_status");
 
         // Index for history queries: all revisions for a given key
         builder.HasIndex(e => new { e.TemplateName, e.Culture })
-            .HasDatabaseName("ix_granit_template_revisions_name_culture");
+            .HasDatabaseName("ix_templating_revisions_name_culture");
     }
 }

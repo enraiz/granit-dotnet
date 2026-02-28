@@ -1,5 +1,6 @@
 using Granit.Core.DataFiltering;
 using Granit.ExceptionHandling;
+using Granit.Persistence.DataSeeding;
 using Granit.Persistence.ExceptionHandling;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,29 @@ public static class PersistenceServiceCollectionExtensions
             services.AddSingleton<IExceptionStatusCodeMapper, EfCoreExceptionStatusCodeMapper>();
         }
 
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the Granit data seeding infrastructure:
+    /// <list type="bullet">
+    ///   <item><see cref="IDataSeeder"/> as a singleton (orchestrates contributors).</item>
+    ///   <item><see cref="DataSeedingHostedService"/> — hosted service that triggers seeding at startup.</item>
+    /// </list>
+    /// </summary>
+    /// <remarks>
+    /// <see cref="IDataSeedContributor"/> implementations must be registered separately
+    /// by each module, typically as transient:
+    /// <code>
+    /// services.AddTransient&lt;IDataSeedContributor, MyModuleSeedContributor&gt;();
+    /// </code>
+    /// </remarks>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddGranitDataSeeding(this IServiceCollection services)
+    {
+        services.AddSingleton<IDataSeeder, DataSeeder>();
+        services.AddHostedService<DataSeedingHostedService>();
         return services;
     }
 

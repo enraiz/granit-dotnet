@@ -15,13 +15,13 @@ public static class PermissionGrantModelBuilderExtensions
     {
         builder.Entity<PermissionGrant>(entity =>
         {
-            entity.ToTable("permission_grants");
+            entity.ToTable("security_permission_grants");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).HasMaxLength(256).IsRequired();
             entity.Property(e => e.RoleName).HasMaxLength(256).IsRequired();
             entity.HasIndex(e => new { e.TenantId, e.Name, e.RoleName })
                   .IsUnique()
-                  .HasDatabaseName("uq_permission_grants_tenant_name_role");
+                  .HasDatabaseName("uq_security_permission_grants_tenant_name_role");
         });
 
         return builder;

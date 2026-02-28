@@ -5,14 +5,14 @@ namespace Granit.Settings.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="SettingRecord"/>.
-/// Table: <c>granit_setting_records</c>.
+/// Table: <c>core_setting_records</c>.
 /// </summary>
 internal sealed class SettingRecordConfiguration : IEntityTypeConfiguration<SettingRecord>
 {
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<SettingRecord> builder)
     {
-        builder.ToTable("granit_setting_records");
+        builder.ToTable("core_setting_records");
 
         builder.HasKey(e => e.Id);
 
@@ -45,6 +45,6 @@ internal sealed class SettingRecordConfiguration : IEntityTypeConfiguration<Sett
         // Unique composite index: one record per (Name, ProviderName, ProviderKey)
         builder.HasIndex(e => new { e.Name, e.ProviderName, e.ProviderKey })
                .IsUnique()
-               .HasDatabaseName("uq_granit_setting_records_name_provider");
+               .HasDatabaseName("uq_core_setting_records_name_provider");
     }
 }

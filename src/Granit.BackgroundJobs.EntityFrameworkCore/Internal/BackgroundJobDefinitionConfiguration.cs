@@ -5,7 +5,7 @@ namespace Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="BackgroundJobDefinition"/>.
-/// Table: <c>granit_background_jobs</c>.
+/// Table: <c>scheduling_background_jobs</c>.
 /// </summary>
 internal sealed class BackgroundJobDefinitionConfiguration
     : IEntityTypeConfiguration<BackgroundJobDefinition>
@@ -13,7 +13,7 @@ internal sealed class BackgroundJobDefinitionConfiguration
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<BackgroundJobDefinition> builder)
     {
-        builder.ToTable("granit_background_jobs");
+        builder.ToTable("scheduling_background_jobs");
 
         builder.HasKey(e => e.Id);
 
@@ -49,6 +49,6 @@ internal sealed class BackgroundJobDefinitionConfiguration
 
         builder.HasIndex(e => e.JobName)
             .IsUnique()
-            .HasDatabaseName("uq_granit_background_jobs_name");
+            .HasDatabaseName("uq_scheduling_background_jobs_name");
     }
 }

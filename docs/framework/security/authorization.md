@@ -250,7 +250,7 @@ dotnet ef database update
 La table générée :
 
 ```sql
-CREATE TABLE permission_grants (
+CREATE TABLE security_permission_grants (
     id           uuid           NOT NULL PRIMARY KEY,
     name         varchar(256)   NOT NULL,
     role_name    varchar(256)   NOT NULL,
@@ -259,7 +259,7 @@ CREATE TABLE permission_grants (
     created_by   text           NOT NULL,
     modified_at  timestamptz    NULL,
     modified_by  text           NULL,
-    CONSTRAINT uq_permission_grants_tenant_name_role
+    CONSTRAINT uq_security_permission_grants_tenant_name_role
         UNIQUE (tenant_id, name, role_name)
 );
 ```

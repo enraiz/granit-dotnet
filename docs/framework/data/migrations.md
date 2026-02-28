@@ -67,7 +67,7 @@ builder.AddGranitPersistenceMigrations(opts => opts.UseNpgsql(connectionString))
 
 > La méthode `AddGranitPersistenceMigrations` enregistre :
 >
-> - `MigrationProgressDbContext` — suivi des cycles dans `granit_migration_progress`
+> - `MigrationProgressDbContext` — suivi des cycles dans `data_migration_progress`
 > - `IMigrationCycleRegistry` — registre singleton des cycles
 > - `ITenantDbIsolator` — no-op par défaut (shared DB et DB-per-tenant)
 > - `ITenantEnumerator` — no-op par défaut (retourne un flux vide)
@@ -132,7 +132,7 @@ cascade automatiquement le batch suivant tant que `NextCursor != null`.
 ## Reprise au démarrage
 
 `MigrationStartupService` est un service hébergé qui, au démarrage de l'application,
-interroge la table `granit_migration_progress` et publie un `RunMigrationBatchCommand`
+interroge la table `data_migration_progress` et publie un `RunMigrationBatchCommand`
 pour chaque cycle en statut `Pending` ou `InProgress`.
 
 Le comportement dépend de `ITenantEnumerator` :
@@ -211,7 +211,7 @@ public sealed class MyTenantEnumerator : ITenantEnumerator
 
 ## Suivi de progression
 
-La table `granit_migration_progress` contient une ligne par cycle et par tenant.
+La table `data_migration_progress` contient une ligne par cycle et par tenant.
 
 | Colonne | Description |
 | ------- | ----------- |

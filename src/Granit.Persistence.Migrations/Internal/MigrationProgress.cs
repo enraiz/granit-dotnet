@@ -2,7 +2,7 @@ namespace Granit.Persistence.Migrations.Internal;
 
 /// <summary>
 /// System entity that tracks the progress of a migration cycle's data backfill phase.
-/// Mapped to the <c>granit_migration_progress</c> table in the system schema.
+/// Mapped to the <c>data_migration_progress</c> table in the system schema.
 /// </summary>
 internal sealed class MigrationProgress
 {

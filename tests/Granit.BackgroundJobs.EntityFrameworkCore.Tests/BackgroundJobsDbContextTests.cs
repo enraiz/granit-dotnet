@@ -38,7 +38,7 @@ public sealed class BackgroundJobsDbContextTests
     // =========================================================================
 
     [Fact]
-    public void Model_TableName_IsGranitBackgroundJobs()
+    public void Model_TableName_IsSchedulingBackgroundJobs()
     {
         using BackgroundJobsDbContext ctx = CreateInMemory();
 
@@ -46,7 +46,7 @@ public sealed class BackgroundJobsDbContextTests
             .FindEntityType(typeof(BackgroundJobDefinition))!
             .GetTableName();
 
-        tableName.Should().Be("granit_background_jobs");
+        tableName.Should().Be("scheduling_background_jobs");
     }
 
     [Fact]

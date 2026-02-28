@@ -8,7 +8,7 @@ sont échangés entre le client, le serveur et OVHcloud Object Storage.
 | --- | --- |
 | `Granit.BlobStorage` | Core provider-agnostique : `IBlobStorage`, `BlobDescriptor`, pipeline de validation, `IBlobDescriptorStore` |
 | `Granit.BlobStorage.S3` | Adaptateur S3 : client AWS SDK, URL pré-signées, `S3BlobOptions` |
-| `Granit.BlobStorage.EntityFrameworkCore` | Persistance EF Core : `BlobStorageDbContext`, table `granit_blob_descriptors` |
+| `Granit.BlobStorage.EntityFrameworkCore` | Persistance EF Core : `BlobStorageDbContext`, table `storage_blob_descriptors` |
 
 ## Concepts clés
 
@@ -123,7 +123,7 @@ dotnet ef migrations add InitBlobStorage \
   --startup-project src/MyApp
 ```
 
-La migration crée la table `granit_blob_descriptors` avec un index unique sur `ObjectKey`
+La migration crée la table `storage_blob_descriptors` avec un index unique sur `ObjectKey`
 et un index composite sur `(TenantId, ContainerName)`.
 
 ## Utilisation
@@ -270,7 +270,7 @@ IBlobStorage (DefaultBlobStorage)
   ├── IBlobKeyStrategy (PrefixBlobKeyStrategy)
   │     └── {tenantId}/{containerName}/{yyyy}/{MM}/{blobId}
   ├── IBlobDescriptorStore (EfBlobDescriptorStore)
-  │     └── BlobStorageDbContext → table granit_blob_descriptors
+  │     └── BlobStorageDbContext → table storage_blob_descriptors
   ├── IBlobStorageClient (S3BlobClient)
   │     └── AmazonS3Client — URL pré-signées, Range GET, HEAD, DELETE (thread-safe, Singleton)
   └── IEnumerable<IBlobValidator> (pipeline ordonné)

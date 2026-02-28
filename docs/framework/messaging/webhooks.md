@@ -223,12 +223,12 @@ tenants. Un abonnement avec `TenantId = <guid>` est **spécifique** : il ne reç
 
 ```sql
 -- Index composite optimisé pour la résolution des abonnements actifs
-CREATE INDEX ON granit_webhook_subscriptions (event_type, tenant_id, status);
+CREATE INDEX ON webhook_subscriptions (event_type, tenant_id, status);
 ```
 
 ## Schéma de base de données
 
-### `granit_webhook_subscriptions`
+### `webhook_subscriptions`
 
 | Colonne | Type | Description |
 | --- | --- | --- |
@@ -247,7 +247,7 @@ CREATE INDEX ON granit_webhook_subscriptions (event_type, tenant_id, status);
 | `last_modified_at` | `timestamptz?` | Audit HDS — dernière modification |
 | `last_modified_by` | `varchar?` | Audit HDS — auteur modification |
 
-### `granit_webhook_delivery_attempts`
+### `webhook_delivery_attempts`
 
 Table **INSERT-only** (pas de soft delete, pas de cascade delete) — piste d'audit immuable.
 
