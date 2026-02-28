@@ -59,7 +59,7 @@ export function useWorkflowStatus(
   }, [baseUrl, entityType, entityId, fetchFn]);
 
   useEffect(() => {
-    void refetch();
+    refetch().catch(() => {});
   }, [refetch]);
 
   return { transitions, isLoading, error, refetch };

@@ -31,19 +31,19 @@ export interface TransitionHistoryDto {
 /** Props for the WorkflowStatusBar component. */
 export interface WorkflowStatusBarProps {
   /** Logical entity type name (e.g. "document"). */
-  entityType: string;
+  readonly entityType: string;
   /** Entity identifier. */
-  entityId: string;
+  readonly entityId: string;
   /** Current state of the entity. */
-  currentState: string;
+  readonly currentState: string;
   /** All possible states in order for the status bar display. */
-  states: string[];
+  readonly states: readonly string[];
   /** Available transitions for the current user. */
-  transitions: TransitionDto[];
+  readonly transitions: readonly TransitionDto[];
   /** Callback when the user triggers a transition. */
-  onTransition?: (targetState: string, comment?: string) => void;
+  readonly onTransition?: (targetState: string, comment?: string) => void;
   /** Whether a transition is currently in progress. */
-  isLoading?: boolean;
+  readonly isLoading?: boolean;
   /** Optional CSS class name. */
-  className?: string;
+  readonly className?: string;
 }
