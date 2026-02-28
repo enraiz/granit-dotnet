@@ -75,6 +75,7 @@ Messagerie asynchrone et outbox transactionnelle.
 | --- | --- |
 | [wolverine.md](messaging/wolverine.md) | WolverineFx, Outbox PostgreSQL, propagation de contexte HDS |
 | [webhooks.md](messaging/webhooks.md) | Webhooks sortants, fan-out Wolverine, HMAC-SHA256, audit trail HDS |
+| [notifications.md](messaging/notifications.md) | Notifications multi-canal (InApp, SignalR, Email, SMS, WhatsApp, Push), fan-out Wolverine, entity tracking Odoo-style |
 
 ## Scheduling
 
