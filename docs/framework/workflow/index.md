@@ -90,14 +90,24 @@ Draft → PendingReview → Published → Archived
                                 Published → Draft (nouvelle version)
 ```
 
-### Entités versionnées
+### Entités versionnées avec workflow
 
-`VersionedEntity` fournit une classe de base pour les entités avec versionnement :
+Le versionnement (`BusinessId`, `Version`) est découplé du workflow. Trois cas
+d'usage sont supportés :
 
-- `BusinessId` : identifiant métier stable entre versions
-- `Version` : numéro de version (monotone, 1-based)
-- `LifecycleStatus` : état dans le cycle de vie
-- `IsPublished` : synchronisé automatiquement par l'intercepteur
+1. **Versionnement pur** — `IVersioned` seul (voir [persistence.md](../data/persistence.md#versioninginterceptor))
+2. **Workflow pur** — `IWorkflowStateful` seul
+3. **Versionnement + Workflow** — `VersionedWorkflowEntity`
+
+`VersionedWorkflowEntity` est la classe de base pour le cas 3 (combo) :
+
+- `BusinessId` / `Version` : hérités de `IVersioned`, auto-assignés par `VersioningInterceptor`
+- `LifecycleStatus` : état dans le cycle de vie (`WorkflowLifecycleStatus`)
+- `IsPublished` : synchronisé automatiquement par le `WorkflowTransitionInterceptor`
+
+> **Note** : l'ancienne classe `VersionedEntity` est un alias obsolète
+> (`[Obsolete]`) pour `VersionedWorkflowEntity`. Le code existant continue
+> de fonctionner sans modification.
 
 ### Filtre `IPublishable`
 

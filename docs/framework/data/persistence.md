@@ -92,6 +92,65 @@ await db.SaveChangesAsync();
 // patient.Id == Guid généré automatiquement
 ```
 
+## VersioningInterceptor
+
+Intercepteur `SaveChanges` qui assigne automatiquement `BusinessId` et `Version`
+sur les entités implémentant `IVersioned` lors de l'insertion.
+
+### Comportement du VersioningInterceptor
+
+| État | Action |
+| --- | --- |
+| `EntityState.Added` | Assigne `BusinessId` (si `Guid.Empty`) et `Version` (max existant + 1) |
+| `EntityState.Modified` | Aucune action — les mises à jour sont en place |
+
+Le versionnement est **indépendant du workflow**. Trois cas d'usage :
+
+1. **Versionnement pur** (ex : Patient) — `IVersioned` seul
+2. **Workflow pur** (ex : Facture) — `IWorkflowStateful` seul
+3. **Versionnement + Workflow** (ex : Document) — `VersionedWorkflowEntity`
+
+### Interface IVersioned
+
+```csharp
+public interface IVersioned
+{
+    Guid BusinessId { get; set; }
+    int Version { get; set; }
+}
+```
+
+### Exemple de versionnement
+
+```csharp
+// Entité avec versionnement pur (pas de workflow)
+public sealed class FichePatient : AuditedEntity, IVersioned
+{
+    public Guid BusinessId { get; set; }
+    public int Version { get; set; }
+    public string Nom { get; set; } = string.Empty;
+}
+
+// Première version : BusinessId et Version assignés automatiquement
+db.Fiches.Add(new FichePatient { Nom = "Martin" });
+await db.SaveChangesAsync();
+// fiche.BusinessId == Guid généré automatiquement
+// fiche.Version == 1
+
+// Nouvelle version du même patient : même BusinessId
+db.Fiches.Add(new FichePatient
+{
+    BusinessId = fiche.BusinessId,
+    Nom = "Martin (mis à jour)",
+});
+await db.SaveChangesAsync();
+// nouvelleFiche.Version == 2
+```
+
+> **Création de version explicite** : le `VersioningInterceptor` ne transforme jamais
+> un `Modified` en `Added`. Créer une nouvelle version est toujours une opération
+> explicite (ajouter une nouvelle entité avec le même `BusinessId`).
+
 ## SoftDeleteInterceptor
 
 Intercepteur `SaveChanges` qui convertit les suppressions physiques en suppressions
@@ -367,6 +426,7 @@ Granit.Persistence
 │   └── DataSeedingHostedService.cs         (interne : IHostedService au démarrage)
 ├── Interceptors/
 │   ├── AuditedEntityInterceptor.cs         (audit HDS : CreatedAt/By, ModifiedAt/By)
+│   ├── VersioningInterceptor.cs            (versionnement : BusinessId, Version)
 │   └── SoftDeleteInterceptor.cs            (soft delete RGPD : IsDeleted, DeletedAt/By)
 └── Extensions/
     ├── ModelBuilderExtensions.cs            (ApplyGranitConventions : ISoftDeletable,
@@ -381,6 +441,7 @@ Granit.Persistence
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `AuditedEntityInterceptor` | - | Scoped |
+| `VersioningInterceptor` | - | Scoped |
 | `SoftDeleteInterceptor` | - | Scoped |
 | `IDataFilter` | `DataFilter` | Singleton |
 
@@ -423,6 +484,7 @@ AuditedEntityInterceptor interceptor = new(currentUser, clock, guidGenerator, cu
 | Exigence | Mécanisme |
 | --- | --- |
 | HDS - Audit trail | `AuditedEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
+| HDS - Versionnement | `VersioningInterceptor` (BusinessId, Version — traçabilité des révisions) |
 | HDS - Horodatage UTC | `IClock.Now` (jamais `DateTimeOffset.UtcNow`) |
 | RGPD - Droit à l'oubli | `SoftDeleteInterceptor` (suppression logique) |
 | RGPD - Minimisation | Query filters (entités supprimées et inactives exclues par défaut) |
@@ -441,10 +503,12 @@ d'isolation physique :
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core`, `Granit.Timing`, `Granit.Guids`, `Granit.Security`, `Granit.ExceptionHandling` |
-| **Utilisé par** | `Granit.Authorization.EntityFrameworkCore`, `Granit.Wolverine.Postgresql`, `Granit.Localization.EntityFrameworkCore`, `Granit.Features.EntityFrameworkCore`, `Granit.Settings.EntityFrameworkCore`, `Granit.Persistence.Migrations` |
+- **Dépend de** : `Granit.Core`, `Granit.Timing`, `Granit.Guids`, `Granit.Security`,
+  `Granit.ExceptionHandling`
+- **Utilisé par** : `Granit.Authorization.EntityFrameworkCore`,
+  `Granit.Wolverine.Postgresql`, `Granit.Localization.EntityFrameworkCore`,
+  `Granit.Features.EntityFrameworkCore`, `Granit.Settings.EntityFrameworkCore`,
+  `Granit.Persistence.Migrations`
 
 > **5 dépendances directes** — c'est le module avec le plus de dépendances dans le
 > framework. Ce couplage est justifié : `Timing` fournit `IClock` pour l'horodatage
