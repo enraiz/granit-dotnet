@@ -24,7 +24,8 @@ namespace Granit.Workflow.EntityFrameworkCore.Interceptors;
 /// </para>
 /// <para>
 /// Also synchronizes <see cref="IPublishable.IsPublished"/> for entities implementing
-/// <see cref="IVersionedEntity"/> (keeps IsPublished in sync with LifecycleStatus).
+/// both <see cref="IPublishable"/> and <see cref="IWorkflowStateful"/>
+/// (keeps IsPublished in sync with the workflow status).
 /// </para>
 /// <para>
 /// Registered as Scoped. Must be ordered after <c>AuditedEntityInterceptor</c> and
@@ -119,10 +120,18 @@ public sealed class WorkflowTransitionInterceptor(
         foreach (EntityEntry entry in context.ChangeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified))
         {
-            if (entry.Entity is IVersionedEntity versioned)
+            if (entry.Entity is not (IPublishable publishable and IWorkflowStateful))
             {
-                versioned.IsPublished = versioned.LifecycleStatus == WorkflowLifecycleStatus.Published;
+                continue;
             }
+
+            Type entityType = entry.Entity.GetType();
+            string statusPropertyName = GetStaticAbstract<string>(
+                entityType, nameof(IWorkflowStateful.StatusPropertyName));
+            object? statusValue = entry.Property(statusPropertyName).CurrentValue;
+
+            publishable.IsPublished = statusValue is WorkflowLifecycleStatus status
+                && status == WorkflowLifecycleStatus.Published;
         }
     }
 
