@@ -137,6 +137,7 @@ semgrep-sast:
 sonarqube:
   extends: .dotnet
   stage: analysis
+  timeout: 2h
   needs:
     - job: test
       artifacts: true
