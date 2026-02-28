@@ -1,0 +1,96 @@
+using Granit.DocumentGeneration.Pipeline;
+using Granit.Templating.Keys;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
+
+namespace Granit.DocumentGeneration.Pdf.Internal;
+
+/// <summary>
+/// <see cref="IDocumentRenderer"/> implementation that converts HTML to PDF
+/// using PuppeteerSharp (headless Chromium).
+/// </summary>
+internal sealed class PuppeteerSharpRenderer(
+    ChromiumLifetimeService chromiumLifetime,
+    IOptions<PdfRenderOptions> options,
+    ILogger<PuppeteerSharpRenderer> logger) : IDocumentRenderer
+{
+    /// <inheritdoc/>
+    public bool CanRender(DocumentFormat targetFormat) =>
+        targetFormat == DocumentFormat.Pdf;
+
+    /// <inheritdoc/>
+    public async Task<DocumentResult> RenderAsync(
+        string html,
+        DocumentFormat targetFormat,
+        CancellationToken ct = default)
+    {
+        PdfRenderOptions opts = options.Value;
+
+        await chromiumLifetime.PageSemaphore.WaitAsync(ct);
+        try
+        {
+            await using IPage page = await chromiumLifetime.Browser.NewPageAsync();
+
+            await page.SetContentAsync(html, new NavigationOptions
+            {
+                WaitUntil = [WaitUntilNavigation.Networkidle0],
+            });
+
+            PdfOptions pdfOptions = new()
+            {
+                Format = ResolvePaperFormat(opts.PaperFormat),
+                Landscape = opts.Landscape,
+                PrintBackground = opts.PrintBackground,
+                MarginOptions = new MarginOptions
+                {
+                    Top = opts.MarginTop,
+                    Bottom = opts.MarginBottom,
+                    Left = opts.MarginLeft,
+                    Right = opts.MarginRight,
+                },
+            };
+
+            if (opts.HeaderTemplate is not null || opts.FooterTemplate is not null)
+            {
+                pdfOptions.DisplayHeaderFooter = true;
+                pdfOptions.HeaderTemplate = opts.HeaderTemplate ?? "<span></span>";
+                pdfOptions.FooterTemplate = opts.FooterTemplate ?? "<span></span>";
+            }
+
+            byte[] pdfBytes = await page.PdfDataAsync(pdfOptions);
+
+            logger.LogDebug(
+                "PDF rendered successfully ({Size} bytes, format={Format})",
+                pdfBytes.Length,
+                opts.PaperFormat);
+
+            return new DocumentResult(pdfBytes, DocumentFormat.Pdf);
+        }
+        finally
+        {
+            chromiumLifetime.PageSemaphore.Release();
+        }
+    }
+
+    /// <summary>
+    /// Resolves a paper format string (e.g. "A4", "Letter") to a <see cref="PaperFormat"/>.
+    /// </summary>
+    internal static PaperFormat ResolvePaperFormat(string format) =>
+        format.ToUpperInvariant() switch
+        {
+            "A0" => PaperFormat.A0,
+            "A1" => PaperFormat.A1,
+            "A2" => PaperFormat.A2,
+            "A3" => PaperFormat.A3,
+            "A4" => PaperFormat.A4,
+            "A5" => PaperFormat.A5,
+            "A6" => PaperFormat.A6,
+            "LETTER" => PaperFormat.Letter,
+            "LEGAL" => PaperFormat.Legal,
+            "TABLOID" => PaperFormat.Tabloid,
+            "LEDGER" => PaperFormat.Ledger,
+            _ => PaperFormat.A4,
+        };
+}
