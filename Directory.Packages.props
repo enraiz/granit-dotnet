@@ -12,6 +12,7 @@
     <PackageVersion Include="SmartFormat" Version="3.*" />
   </ItemGroup>
   <ItemGroup Label="Templating">
+    <PackageVersion Include="ClosedXML" Version="0.104.*" />
     <PackageVersion Include="Scriban" Version="6.*" />
   </ItemGroup>
   <ItemGroup Label="ASP.NET Core">

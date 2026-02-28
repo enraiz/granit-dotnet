@@ -78,8 +78,8 @@ L'endpoint est **anonyme** — les chaînes de traduction sont des données publ
     }
   },
   "languages": [
-    { "cultureName": "fr", "displayName": "Français", "flagIcon": "fr" },
-    { "cultureName": "en", "displayName": "English",  "flagIcon": "gb" }
+    { "cultureName": "fr", "displayName": "Français", "flagIcon": "fr", "isDefault": true },
+    { "cultureName": "en", "displayName": "English",  "flagIcon": "gb", "isDefault": false }
   ]
 }
 ```

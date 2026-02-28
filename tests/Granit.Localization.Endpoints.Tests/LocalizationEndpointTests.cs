@@ -32,7 +32,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
                 .Add<TestResource>("fr")
                 .AddJson(typeof(LocalizationEndpointTests).Assembly, TestResourcePrefix);
 
-            options.Languages.Add(new LanguageInfo("fr", "Français", "fr"));
+            options.Languages.Add(new LanguageInfo("fr", "Français", "fr", isDefault: true));
             options.Languages.Add(new LanguageInfo("en", "English", "gb"));
         });
 
@@ -133,6 +133,27 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
 
         List<string> cultureCodes = [.. languages.EnumerateArray().Select(l => l.GetProperty("cultureName").GetString()!)];
         cultureCodes.Should().Contain("fr").And.Contain("en");
+    }
+
+    [Fact]
+    public async Task GetLocalization_ReturnsIsDefaultForDefaultLanguage()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync(
+            "/api/granit/localization?cultureName=fr",
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        JsonElement languages = doc.RootElement.GetProperty("languages");
+
+        JsonElement frenchLang = languages.EnumerateArray().First(l => l.GetProperty("cultureName").GetString() == "fr");
+        frenchLang.GetProperty("isDefault").GetBoolean().Should().BeTrue();
+
+        JsonElement englishLang = languages.EnumerateArray().First(l => l.GetProperty("cultureName").GetString() == "en");
+        englishLang.GetProperty("isDefault").GetBoolean().Should().BeFalse();
     }
 
     [Fact]

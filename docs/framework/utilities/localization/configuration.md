@@ -28,7 +28,7 @@ public sealed class MyAppModule : GranitModule
                 .AddBaseTypes(typeof(GranitLocalizationResource));
 
             options.DefaultResourceType = typeof(MyAppResource);
-            options.Languages.Add(new LanguageInfo("fr", "Français"));
+            options.Languages.Add(new LanguageInfo("fr", "Français", isDefault: true));
             options.Languages.Add(new LanguageInfo("en", "English"));
         });
     }
@@ -205,10 +205,17 @@ public sealed class LanguageInfo
     public string CultureName { get; }    // ex: "fr-BE"
     public string DisplayName { get; }    // ex: "Français (Belgique)"
     public string? FlagIcon { get; }      // ex: "🇧🇪" (optionnel)
+    public bool IsDefault { get; }        // langue par défaut pour le sélecteur UI
 }
 ```
 
 Utilisé pour peupler un sélecteur de langue en interface utilisateur.
+
+- `IsDefault` : indique la langue pré-sélectionnée dans le sélecteur. Si aucune
+  langue n'est marquée par défaut, le frontend utilise sa propre logique.
+- `GranitLocalizationModule` enregistre `fr` et `en` par défaut (avec `en`
+  comme langue par défaut). Les modules applicatifs peuvent les remplacer ou
+  les compléter via `Configure<GranitLocalizationOptions>`.
 
 ## Ressource Granit intégrée
 

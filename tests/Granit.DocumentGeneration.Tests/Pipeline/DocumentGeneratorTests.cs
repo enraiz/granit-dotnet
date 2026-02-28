@@ -30,11 +30,12 @@ public sealed class DocumentGeneratorTests
         InvoiceData data = new("Hôpital Saint-Luc", 1500m);
 
         ITextTemplateRenderer textRenderer = Substitute.For<ITextTemplateRenderer>();
-        textRenderer.RenderAsync(
+        textRenderer.RenderDocumentAsync(
                 Arg.Any<InvoiceTemplateType>(),
                 Arg.Any<InvoiceData>(),
+                Arg.Any<DocumentFormat>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new RenderedTextResult("<p>Invoice for Hôpital Saint-Luc</p>"));
+            .Returns(new TextRenderedContent("<p>Invoice for Hôpital Saint-Luc</p>", DocumentFormat.Pdf));
 
         IDocumentRenderer pdfRenderer = Substitute.For<IDocumentRenderer>();
         pdfRenderer.CanRender(DocumentFormat.Pdf).Returns(true);
@@ -62,11 +63,12 @@ public sealed class DocumentGeneratorTests
         InvoiceData data = new("Clinique", 200m);
 
         ITextTemplateRenderer textRenderer = Substitute.For<ITextTemplateRenderer>();
-        textRenderer.RenderAsync(
+        textRenderer.RenderDocumentAsync(
                 Arg.Any<InvoiceTemplateType>(),
                 Arg.Any<InvoiceData>(),
+                Arg.Any<DocumentFormat>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new RenderedTextResult("<p>ok</p>"));
+            .Returns(new TextRenderedContent("<p>ok</p>", DocumentFormat.Pdf));
 
         IDocumentRenderer pdfRenderer = Substitute.For<IDocumentRenderer>();
         pdfRenderer.CanRender(DocumentFormat.Pdf).Returns(true);
@@ -98,11 +100,12 @@ public sealed class DocumentGeneratorTests
         InvoiceData data = new("Test", 0m);
 
         ITextTemplateRenderer textRenderer = Substitute.For<ITextTemplateRenderer>();
-        textRenderer.RenderAsync(
+        textRenderer.RenderDocumentAsync(
                 Arg.Any<InvoiceTemplateType>(),
                 Arg.Any<InvoiceData>(),
+                Arg.Any<DocumentFormat>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new RenderedTextResult("<html/>"));
+            .Returns(new TextRenderedContent("<html/>", DocumentFormat.Excel));
 
         IDocumentRenderer excelRenderer = Substitute.For<IDocumentRenderer>();
         excelRenderer.CanRender(DocumentFormat.Excel).Returns(true);
@@ -131,11 +134,12 @@ public sealed class DocumentGeneratorTests
         InvoiceData data = new("X", 0m);
 
         ITextTemplateRenderer textRenderer = Substitute.For<ITextTemplateRenderer>();
-        textRenderer.RenderAsync(
+        textRenderer.RenderDocumentAsync(
                 Arg.Any<InvoiceTemplateType>(),
                 Arg.Any<InvoiceData>(),
+                Arg.Any<DocumentFormat>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new RenderedTextResult("<html/>"));
+            .Returns(new TextRenderedContent("<html/>", DocumentFormat.Pdf));
 
         IDocumentRenderer excelOnly = Substitute.For<IDocumentRenderer>();
         excelOnly.CanRender(DocumentFormat.Pdf).Returns(false);
@@ -164,11 +168,12 @@ public sealed class DocumentGeneratorTests
         string? capturedHtml = null;
 
         ITextTemplateRenderer textRenderer = Substitute.For<ITextTemplateRenderer>();
-        textRenderer.RenderAsync(
+        textRenderer.RenderDocumentAsync(
                 Arg.Any<InvoiceTemplateType>(),
                 Arg.Any<InvoiceData>(),
+                Arg.Any<DocumentFormat>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new RenderedTextResult(expectedHtml));
+            .Returns(new TextRenderedContent(expectedHtml, DocumentFormat.Pdf));
 
         IDocumentRenderer renderer = Substitute.For<IDocumentRenderer>();
         renderer.CanRender(DocumentFormat.Pdf).Returns(true);
@@ -186,5 +191,39 @@ public sealed class DocumentGeneratorTests
 
         // Assert
         capturedHtml.Should().Be(expectedHtml);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_BinaryEngineResult_ReturnedDirectlyWithoutRenderer()
+    {
+        // Arrange — binary engine (e.g. ClosedXML) returns BinaryRenderedContent directly
+        InvoiceData data = new("Dupont", 123m);
+        byte[] excelBytes = [0x50, 0x4B, 0x03, 0x04]; // PK (ZIP magic, XLSX)
+
+        ITextTemplateRenderer textRenderer = Substitute.For<ITextTemplateRenderer>();
+        textRenderer.RenderDocumentAsync(
+                Arg.Any<InvoiceTemplateType>(),
+                Arg.Any<InvoiceData>(),
+                Arg.Any<DocumentFormat>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new BinaryRenderedContent(excelBytes, DocumentFormat.Excel));
+
+        IDocumentRenderer renderer = Substitute.For<IDocumentRenderer>();
+
+        DocumentGenerator sut = new(textRenderer, [renderer]);
+
+        // Act
+        DocumentResult result = await sut.GenerateAsync(
+            TemplateType, data,
+            targetFormat: DocumentFormat.Excel,
+            ct: TestContext.Current.CancellationToken);
+
+        // Assert — binary content returned directly, no IDocumentRenderer invoked
+        result.Format.Should().Be(DocumentFormat.Excel);
+        result.Content.ToArray().Should().Equal(excelBytes);
+        await renderer.DidNotReceive().RenderAsync(
+            Arg.Any<string>(),
+            Arg.Any<DocumentFormat>(),
+            Arg.Any<CancellationToken>());
     }
 }

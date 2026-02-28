@@ -53,7 +53,7 @@ public sealed class TextTemplateRendererTests
         IServiceProvider sp = services.BuildServiceProvider();
 
         TextTemplateRenderer sut = new(
-            [resolver], engine, [], sp);
+            [resolver], [engine], [], sp);
 
         // Act
         RenderedTextResult result = await sut.RenderAsync(
@@ -78,7 +78,7 @@ public sealed class TextTemplateRendererTests
         IServiceProvider sp = services.BuildServiceProvider();
 
         TextTemplateRenderer sut = new(
-            [resolver], engine, [], sp);
+            [resolver], [engine], [], sp);
 
         // Act
         Func<Task> act = async () =>
@@ -103,6 +103,7 @@ public sealed class TextTemplateRendererTests
             .Returns(HtmlDescriptor);
 
         ITemplateEngine engine = Substitute.For<ITemplateEngine>();
+        engine.CanRender(Arg.Any<TemplateDescriptor>()).Returns(true);
         engine.RenderAsync(
                 Arg.Any<TemplateDescriptor>(),
                 Arg.Any<TextTestData>(),
@@ -135,7 +136,7 @@ public sealed class TextTemplateRendererTests
         IServiceProvider sp = services.BuildServiceProvider();
 
         TextTemplateRenderer sut = new(
-            [resolver], engine, [], sp);
+            [resolver], [engine], [], sp);
 
         // Act
         await sut.RenderAsync(
@@ -159,6 +160,7 @@ public sealed class TextTemplateRendererTests
             .Returns(HtmlDescriptor);
 
         ITemplateEngine engine = Substitute.For<ITemplateEngine>();
+        engine.CanRender(Arg.Any<TemplateDescriptor>()).Returns(true);
         engine.RenderAsync(
                 Arg.Any<TemplateDescriptor>(),
                 Arg.Do<TextTestData>(d => capturedData = d),
@@ -171,7 +173,7 @@ public sealed class TextTemplateRendererTests
         IServiceProvider sp = services.BuildServiceProvider();
 
         TextTemplateRenderer sut = new(
-            [resolver], engine, [], sp);
+            [resolver], [engine], [], sp);
 
         // Act
         await sut.RenderAsync(TemplateType, data, TestContext.Current.CancellationToken);
@@ -196,6 +198,7 @@ public sealed class TextTemplateRendererTests
             .Returns(HtmlDescriptor);
 
         ITemplateEngine engine = Substitute.For<ITemplateEngine>();
+        engine.CanRender(Arg.Any<TemplateDescriptor>()).Returns(true);
         engine.RenderAsync(
                 Arg.Any<TemplateDescriptor>(),
                 Arg.Any<TextTestData>(),
@@ -208,7 +211,7 @@ public sealed class TextTemplateRendererTests
         IServiceProvider sp = services.BuildServiceProvider();
 
         TextTemplateRenderer sut = new(
-            [resolver], engine, [], sp);
+            [resolver], [engine], [], sp);
 
         // Act
         RenderedTextResult result = await sut.RenderAsync(

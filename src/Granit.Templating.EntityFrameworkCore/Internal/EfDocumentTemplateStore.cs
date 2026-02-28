@@ -2,6 +2,7 @@ using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Granit.Templating.EntityFrameworkCore.Internal;
 
@@ -13,35 +14,41 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// Each operation creates and disposes its own <see cref="TemplatingDbContext"/>
 /// via <see cref="IDbContextFactory{TContext}"/>, making concurrent access safe.
 /// <para>
+/// <strong>HybridCache:</strong> <c>TryGetPublishedAsync</c> caches results in L1 (in-memory)
+/// and optional L2 (distributed). Cache entries are invalidated on <c>PublishAsync</c>
+/// and <c>UnpublishAsync</c> to prevent stale reads after lifecycle transitions.
+/// </para>
+/// <para>
 /// <strong>HDS compliance:</strong> only <c>Draft</c> revisions are physically deleted.
 /// <c>Published</c> → <c>Deprecated</c> transitions are always preserved for the 3-year audit trail.
 /// </para>
 /// </remarks>
 internal sealed class EfDocumentTemplateStore(
-    IDbContextFactory<TemplatingDbContext> contextFactory) : IDocumentTemplateStore
+    IDbContextFactory<TemplatingDbContext> contextFactory,
+    HybridCache cache) : IDocumentTemplateStore
 {
     /// <inheritdoc/>
     public async Task<TemplateDescriptor?> TryGetPublishedAsync(
         TemplateKey key, CancellationToken ct = default)
     {
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct);
-        TemplateRevisionEntity? entity = await ctx.TemplateRevisions
-            .Where(r => r.TemplateName == key.Name
-                        && r.Culture == key.Culture
-                        && r.Status == TemplateLifecycleStatus.Published)
-            .FirstOrDefaultAsync(ct);
+        TemplateCacheEntry entry = await cache.GetOrCreateAsync(
+            CacheKey(key),
+            async innerCt =>
+            {
+                await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(innerCt);
+                TemplateRevisionEntity? entity = await ctx.TemplateRevisions
+                    .Where(r => r.TemplateName == key.Name
+                                && r.Culture == key.Culture
+                                && r.Status == TemplateLifecycleStatus.Published)
+                    .FirstOrDefaultAsync(innerCt);
 
-        if (entity is null)
-        {
-            return null;
-        }
+                return entity is null
+                    ? TemplateCacheEntry.NotFound
+                    : TemplateCacheEntry.From(entity.Content, entity.MimeType, entity.RevisionId);
+            },
+            cancellationToken: ct);
 
-        return new TemplateDescriptor
-        {
-            Content = entity.Content,
-            MimeType = entity.MimeType,
-            RevisionId = entity.RevisionId,
-        };
+        return entry.ToDescriptor();
     }
 
     /// <inheritdoc/>
@@ -124,6 +131,7 @@ internal sealed class EfDocumentTemplateStore(
         draft.PublishedBy = publishedBy;
 
         await ctx.SaveChangesAsync(ct);
+        await cache.RemoveAsync(CacheKey(key), ct);
     }
 
     /// <inheritdoc/>
@@ -153,6 +161,7 @@ internal sealed class EfDocumentTemplateStore(
         }
 
         await ctx.SaveChangesAsync(ct);
+        await cache.RemoveAsync(CacheKey(key), ct);
     }
 
     /// <inheritdoc/>
@@ -200,4 +209,7 @@ internal sealed class EfDocumentTemplateStore(
             })
             .ToListAsync(ct);
     }
+
+    private static string CacheKey(TemplateKey key) =>
+        $"granit:tmpl:{key.Name}|{key.Culture ?? string.Empty}";
 }
