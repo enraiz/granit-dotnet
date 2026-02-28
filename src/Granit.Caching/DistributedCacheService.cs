@@ -42,7 +42,6 @@ public partial class DistributedCacheService<TCacheItem>(
     private readonly ICacheValueEncryptor _encryptor = encryptor;
     private readonly IOptions<CachingOptions> _options = options;
     private readonly ILogger<DistributedCacheService<TCacheItem>> _logger = logger;
-    private readonly string _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
     private readonly bool _shouldEncrypt = CacheEncryptionResolver.ShouldEncrypt(typeof(TCacheItem), options.Value);
     private readonly string _keyPrefix = $"{options.Value.KeyPrefix}:{CacheNameProvider.GetCacheName(typeof(TCacheItem))}:";
 
