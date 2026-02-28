@@ -18,6 +18,7 @@ public static class PersistenceServiceCollectionExtensions
     /// Adds Granit EF Core services:
     /// <list type="bullet">
     ///   <item>HDS audit interceptor (<see cref="AuditedEntityInterceptor"/>)</item>
+    ///   <item>Versioning interceptor (<see cref="VersioningInterceptor"/>)</item>
     ///   <item>GDPR soft delete interceptor (<see cref="SoftDeleteInterceptor"/>)</item>
     ///   <item>
     ///     Data filter service (<see cref="IDataFilter"/>) for runtime filter control.
@@ -34,6 +35,7 @@ public static class PersistenceServiceCollectionExtensions
     public static IServiceCollection AddGranitPersistence(this IServiceCollection services)
     {
         services.AddScoped<AuditedEntityInterceptor>();
+        services.AddScoped<VersioningInterceptor>();
         services.AddScoped<SoftDeleteInterceptor>();
         services.AddSingleton<IDataFilter, DataFilter>();
 

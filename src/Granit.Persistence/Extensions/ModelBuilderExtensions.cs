@@ -22,7 +22,8 @@ public static class ModelBuilderExtensions
     /// <list type="bullet">
     ///   <item><b>Query filters</b>:
     ///     <see cref="ISoftDeletable"/>, <see cref="IActive"/>,
-    ///     <see cref="IProcessingRestrictable"/>, <see cref="IMultiTenant"/>
+    ///     <see cref="IProcessingRestrictable"/>, <see cref="IMultiTenant"/>,
+    ///     <see cref="IPublishable"/>
     ///   </item>
     ///   <item><b>Translation conventions</b>:
     ///     <see cref="ITranslation{TParent}"/> → FK, cascade delete, unique index (ParentId, Culture)
@@ -63,8 +64,9 @@ public static class ModelBuilderExtensions
             bool hasProcessingRestriction = typeof(IProcessingRestrictable).IsAssignableFrom(clrType);
             bool hasMultiTenant = typeof(IMultiTenant).IsAssignableFrom(clrType)
                 && currentTenant is not null;
+            bool hasPublishable = typeof(IPublishable).IsAssignableFrom(clrType);
 
-            if (!hasSoftDelete && !hasActive && !hasProcessingRestriction && !hasMultiTenant)
+            if (!hasSoftDelete && !hasActive && !hasProcessingRestriction && !hasMultiTenant && !hasPublishable)
             {
                 continue;
             }
@@ -182,6 +184,16 @@ public static class ModelBuilderExtensions
             conditions.Add(Expression.OrElse(bypass, tenantMatch));
         }
 
+        if (typeof(IPublishable).IsAssignableFrom(typeof(TEntity)))
+        {
+            // bypass = !proxy.PublishableEnabled
+            // real   = e.IsPublished
+            Expression bypass = Expression.Not(
+                Expression.Property(Expression.Constant(proxy), nameof(FilterProxy.PublishableEnabled)));
+            Expression isPublished = Expression.Property(param, nameof(IPublishable.IsPublished));
+            conditions.Add(Expression.OrElse(bypass, isPublished));
+        }
+
         if (conditions.Count == 0)
         {
             return;
@@ -203,5 +215,6 @@ public static class ModelBuilderExtensions
         public bool ActiveEnabled => _dataFilter?.IsEnabled<IActive>() ?? true;
         public bool ProcessingRestrictableEnabled => _dataFilter?.IsEnabled<IProcessingRestrictable>() ?? true;
         public bool MultiTenantEnabled => _dataFilter?.IsEnabled<IMultiTenant>() ?? true;
+        public bool PublishableEnabled => _dataFilter?.IsEnabled<IPublishable>() ?? true;
     }
 }

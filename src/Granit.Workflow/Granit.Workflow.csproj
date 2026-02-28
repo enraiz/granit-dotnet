@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Workflow</PackageId>
+    <Description>Generic finite state machine (FSM) engine for entity lifecycle management. Fluent API for workflow definitions, approval routing (Odoo-style), domain events (Wolverine), versioned entities with draft/published/archived lifecycle.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Workflow.Tests" />
+    <InternalsVisibleTo Include="Granit.Workflow.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.Workflow.EntityFrameworkCore.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
+  </ItemGroup>
+
+</Project>

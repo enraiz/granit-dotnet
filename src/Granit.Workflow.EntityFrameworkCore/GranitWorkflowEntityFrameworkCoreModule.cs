@@ -1,0 +1,32 @@
+using Granit.Core.Modularity;
+using Granit.Persistence;
+using Granit.Workflow.EntityFrameworkCore.Extensions;
+
+namespace Granit.Workflow.EntityFrameworkCore;
+
+/// <summary>
+/// Granit module for EF Core persistence of workflow transition records.
+/// Registers <see cref="Interceptors.WorkflowTransitionInterceptor"/> for automatic
+/// HDS-compliant audit trail creation during <c>SaveChanges</c>.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The host application's DbContext must implement <see cref="IWorkflowDbContext"/>
+/// and call <c>modelBuilder.ConfigureWorkflowModule()</c> in <c>OnModelCreating</c>.
+/// </para>
+/// <para>
+/// Register via:
+/// <code>
+/// services.AddGranitWorkflowEntityFrameworkCore();
+/// </code>
+/// </para>
+/// </remarks>
+[DependsOn(
+    typeof(GranitWorkflowModule),
+    typeof(GranitPersistenceModule))]
+public sealed class GranitWorkflowEntityFrameworkCoreModule : GranitModule
+{
+    /// <inheritdoc/>
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Services.AddGranitWorkflowEntityFrameworkCore();
+}

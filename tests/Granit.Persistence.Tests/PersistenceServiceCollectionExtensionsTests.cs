@@ -58,6 +58,24 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddGranitPersistence_RegistersVersioningInterceptor()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        AddRequiredDependencies(services);
+
+        // Act
+        services.AddGranitPersistence();
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+        using IServiceScope scope = sp.CreateScope();
+
+        // Assert
+        VersioningInterceptor? interceptor = scope.ServiceProvider.GetService<VersioningInterceptor>();
+        interceptor.ShouldNotBeNull();
+    }
+
+    [Fact]
     public void AddGranitPersistence_InterceptorsAreScoped()
     {
         // Arrange
@@ -69,6 +87,9 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         // Assert
         ServiceDescriptor auditDescriptor = services.First(d => d.ServiceType == typeof(AuditedEntityInterceptor));
         auditDescriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
+
+        ServiceDescriptor versioningDescriptor = services.First(d => d.ServiceType == typeof(VersioningInterceptor));
+        versioningDescriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
 
         ServiceDescriptor softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
         softDeleteDescriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
