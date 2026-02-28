@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -17,6 +17,6 @@ public sealed class NullTenantEnumeratorTests
             result.Add(id);
         }
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 }

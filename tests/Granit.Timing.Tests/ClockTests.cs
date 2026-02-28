@@ -9,10 +9,10 @@
 //   - Works without a configured timezone (returns the value unchanged)
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Timing;
 using Microsoft.Extensions.Time.Testing;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Timing.Tests;
@@ -41,8 +41,8 @@ public sealed class ClockTests
         var now = _clock.Now;
 
         // Assert
-        now.Should().Be(expected);
-        now.Offset.Should().Be(TimeSpan.Zero);
+        now.ShouldBe(expected);
+        now.Offset.ShouldBe(TimeSpan.Zero);
     }
 
     [Fact]
@@ -52,11 +52,11 @@ public sealed class ClockTests
         var now = _clock.Now;
 
         // Assert
-        now.Offset.Should().Be(TimeSpan.Zero, "Clock must always return UTC (HDS compliance)");
+        now.Offset.ShouldBe(TimeSpan.Zero, "Clock must always return UTC (HDS compliance)");
     }
 
     [Fact]
-    public void SupportsMultipleTimezone_ReturnsTrue() => _clock.SupportsMultipleTimezone.Should().BeTrue();
+    public void SupportsMultipleTimezone_ReturnsTrue() => _clock.SupportsMultipleTimezone.ShouldBeTrue();
 
     [Fact]
     public void Normalize_ConvertsLocalOffsetToUtc()
@@ -68,8 +68,8 @@ public sealed class ClockTests
         var normalized = _clock.Normalize(localTime);
 
         // Assert - Must be converted to UTC (+00:00), same instant
-        normalized.Offset.Should().Be(TimeSpan.Zero);
-        normalized.Should().Be(new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero));
+        normalized.Offset.ShouldBe(TimeSpan.Zero);
+        normalized.ShouldBe(new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero));
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public sealed class ClockTests
         var normalized = _clock.Normalize(utcTime);
 
         // Assert
-        normalized.Should().Be(utcTime);
+        normalized.ShouldBe(utcTime);
     }
 
     [Fact]
@@ -95,8 +95,8 @@ public sealed class ClockTests
         var normalized = _clock.Normalize(localTime);
 
         // Assert
-        normalized.Offset.Should().Be(TimeSpan.Zero);
-        normalized.Should().Be(new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero));
+        normalized.Offset.ShouldBe(TimeSpan.Zero);
+        normalized.ShouldBe(new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero));
     }
 
     [Fact]
@@ -111,8 +111,8 @@ public sealed class ClockTests
 
         // Assert - Brussels is UTC+2 in summer (CEST)
         // Use .DateTime.Hour (respects the stored offset) not .LocalDateTime.Hour (machine-timezone-dependent)
-        userTime.Offset.Should().Be(TimeSpan.FromHours(2));
-        userTime.DateTime.Hour.Should().Be(14);
+        userTime.Offset.ShouldBe(TimeSpan.FromHours(2));
+        userTime.DateTime.Hour.ShouldBe(14);
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public sealed class ClockTests
         var userTime = _clock.ConvertToUserTime(utcTime);
 
         // Assert
-        userTime.Should().Be(utcTime);
+        userTime.ShouldBe(utcTime);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public sealed class ClockTests
         var userTime = _clock.ConvertToUserTime(utcTime);
 
         // Assert
-        userTime.Should().Be(utcTime);
+        userTime.ShouldBe(utcTime);
     }
 
     [Fact]
@@ -153,8 +153,8 @@ public sealed class ClockTests
         var utcTime = _clock.ConvertToUtc(localTime);
 
         // Assert
-        utcTime.Offset.Should().Be(TimeSpan.Zero);
-        utcTime.Should().Be(new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero));
+        utcTime.Offset.ShouldBe(TimeSpan.Zero);
+        utcTime.ShouldBe(new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero));
     }
 
     [Fact]
@@ -167,6 +167,6 @@ public sealed class ClockTests
         var result = _clock.ConvertToUtc(utcTime);
 
         // Assert
-        result.Should().Be(utcTime);
+        result.ShouldBe(utcTime);
     }
 }

@@ -7,12 +7,12 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Handlers;
 using Granit.Notifications.Messages;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
@@ -48,7 +48,7 @@ public sealed class NotificationFanoutHandlerTests
         IEnumerable<DeliverNotificationCommand> result =
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public sealed class NotificationFanoutHandlerTests
         IEnumerable<DeliverNotificationCommand> result =
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(6);
+        result.Count().ShouldBe(6);
     }
 
     [Fact]
@@ -86,8 +86,8 @@ public sealed class NotificationFanoutHandlerTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         List<DeliverNotificationCommand> commands = result.ToList();
-        commands.Should().HaveCount(1);
-        commands.Single().ChannelName.Should().Be(NotificationChannels.InApp);
+        commands.Count.ShouldBe(1);
+        commands.Single().ChannelName.ShouldBe(NotificationChannels.InApp);
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public sealed class NotificationFanoutHandlerTests
         IEnumerable<DeliverNotificationCommand> result =
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2, "AllowUserOptOut is false, so opt-out is ignored");
+        result.Count().ShouldBe(2, "AllowUserOptOut is false, so opt-out is ignored");
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public sealed class NotificationFanoutHandlerTests
         IEnumerable<DeliverNotificationCommand> result =
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
+        result.Count().ShouldBe(2);
         await _subscriptionStore.Received(1).GetEntityFollowerIdsAsync(
             entity.EntityType, entity.EntityId, Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
     }
@@ -143,7 +143,7 @@ public sealed class NotificationFanoutHandlerTests
         IEnumerable<DeliverNotificationCommand> result =
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(1);
+        result.Count().ShouldBe(1);
         await _subscriptionStore.Received(1).GetSubscriberIdsAsync(
             "test.notification", Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
     }
@@ -208,7 +208,7 @@ public sealed class NotificationFanoutHandlerTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         List<DeliverNotificationCommand> commands = result.ToList();
-        commands.Select(c => c.DeliveryId).Distinct().Should().HaveCount(commands.Count);
+        commands.Select(c => c.DeliveryId).Distinct().Count().ShouldBe(commands.Count);
     }
 
     // -------------------------------------------------------------------------

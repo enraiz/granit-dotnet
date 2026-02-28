@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Checker;
 using Granit.Features.Definitions;
 using Granit.Features.Limits;
@@ -21,7 +21,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitFeatures();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IFeatureDefinitionStore) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -32,7 +32,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitFeatures();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IFeatureStore) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -43,7 +43,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitFeatures();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IFeatureChecker) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -54,7 +54,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitFeatures();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IFeatureLimitGuard) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -66,7 +66,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitFeatures();
 
         int count = services.Count(d => d.ServiceType == typeof(IFeatureValueProvider));
-        count.Should().Be(3, "Default, Plan, and Tenant providers must be registered");
+        count.ShouldBe(3, "Default, Plan, and Tenant providers must be registered");
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitFeatures(); // TryAdd must not replace
 
         services.Count(d => d.ServiceType == typeof(IFeatureStore))
-                .Should().Be(1, "TryAddSingleton must not add a duplicate");
+                .ShouldBe(1, "TryAddSingleton must not add a duplicate");
     }
 
     // -------------------------------------------------------------------------
@@ -90,7 +90,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddFeatureDefinitions<FakeProvider>();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IFeatureDefinitionProvider) &&
             d.ImplementationType == typeof(FakeProvider) &&
             d.Lifetime == ServiceLifetime.Singleton);
@@ -104,7 +104,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddFeatureDefinitions<AnotherFakeProvider>();
 
         services.Count(d => d.ServiceType == typeof(IFeatureDefinitionProvider))
-                .Should().Be(2);
+                .ShouldBe(2);
     }
 
     // --- Helpers ---

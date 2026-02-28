@@ -6,7 +6,6 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Exceptions;
@@ -17,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
@@ -42,7 +42,7 @@ public sealed class NotificationDeliveryHandlerTests
 
         Func<Task> act = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await _deliveryStore.DidNotReceive().RecordAsync(
             Arg.Any<NotificationDeliveryAttempt>(), Arg.Any<CancellationToken>());
     }
@@ -85,7 +85,7 @@ public sealed class NotificationDeliveryHandlerTests
 
         Func<Task> act = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<NotificationDeliveryException>();
+        await Should.ThrowAsync<NotificationDeliveryException>(act);
         await _deliveryStore.Received(1).RecordAsync(
             Arg.Is<NotificationDeliveryAttempt>(r => !r.IsSuccess),
             Arg.Any<CancellationToken>());
@@ -108,12 +108,12 @@ public sealed class NotificationDeliveryHandlerTests
 
         await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        capturedContext.Should().NotBeNull();
-        capturedContext!.NotificationTypeName.Should().Be(command.NotificationTypeName);
-        capturedContext.RecipientUserId.Should().Be(command.RecipientUserId);
-        capturedContext.Data.ValueKind.Should().NotBe(JsonValueKind.Undefined);
-        capturedContext.DeliveryId.Should().Be(command.DeliveryId);
-        capturedContext.Severity.Should().Be(command.Severity);
+        capturedContext.ShouldNotBeNull();
+        capturedContext!.NotificationTypeName.ShouldBe(command.NotificationTypeName);
+        capturedContext.RecipientUserId.ShouldBe(command.RecipientUserId);
+        capturedContext.Data.ValueKind.ShouldNotBe(JsonValueKind.Undefined);
+        capturedContext.DeliveryId.ShouldBe(command.DeliveryId);
+        capturedContext.Severity.ShouldBe(command.Severity);
     }
 
     // -------------------------------------------------------------------------

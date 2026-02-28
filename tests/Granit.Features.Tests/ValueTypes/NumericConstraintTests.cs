@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Exceptions;
 using Granit.Features.ValueTypes;
 using Xunit;
@@ -14,7 +14,7 @@ public sealed class NumericConstraintTests
 
         Action act = () => constraint.Validate("App.MaxPatients", "500");
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public sealed class NumericConstraintTests
 
         Action act = () => constraint.Validate("App.MaxPatients", "0");
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public sealed class NumericConstraintTests
 
         Action act = () => constraint.Validate("App.MaxPatients", "100");
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -44,8 +44,8 @@ public sealed class NumericConstraintTests
 
         Action act = () => constraint.Validate("App.MaxPatients", "not-a-number");
 
-        act.Should().Throw<FeatureValueValidationException>()
-           .Which.FeatureName.Should().Be("App.MaxPatients");
+        Should.Throw<FeatureValueValidationException>(act)
+           .FeatureName.ShouldBe("App.MaxPatients");
     }
 
     [Fact]
@@ -55,12 +55,12 @@ public sealed class NumericConstraintTests
 
         Action act = () => constraint.Validate("App.MaxPatients", "5");
 
-        FeatureValueValidationException ex = act.Should()
-            .Throw<FeatureValueValidationException>().Which;
+        FeatureValueValidationException ex = Should.Throw<FeatureValueValidationException>(act);
 
-        ex.FeatureName.Should().Be("App.MaxPatients");
-        ex.InvalidValue.Should().Be("5");
-        ex.Message.Should().Contain("10").And.Contain("1000");
+        ex.FeatureName.ShouldBe("App.MaxPatients");
+        ex.InvalidValue.ShouldBe("5");
+        ex.Message.ShouldContain("10");
+        ex.Message.ShouldContain("1000");
     }
 
     [Fact]
@@ -70,10 +70,9 @@ public sealed class NumericConstraintTests
 
         Action act = () => constraint.Validate("App.MaxPatients", "999");
 
-        FeatureValueValidationException ex = act.Should()
-            .Throw<FeatureValueValidationException>().Which;
+        FeatureValueValidationException ex = Should.Throw<FeatureValueValidationException>(act);
 
-        ex.InvalidValue.Should().Be("999");
+        ex.InvalidValue.ShouldBe("999");
     }
 
     [Fact]
@@ -81,7 +80,7 @@ public sealed class NumericConstraintTests
     {
         NumericConstraint constraint = new(5, 500);
 
-        constraint.Min.Should().Be(5);
-        constraint.Max.Should().Be(500);
+        constraint.Min.ShouldBe(5);
+        constraint.Max.ShouldBe(500);
     }
 }

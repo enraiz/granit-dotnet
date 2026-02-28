@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.DocumentGeneration.Pipeline;
 using Granit.Templating.Keys;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DocumentGeneration.Tests;
@@ -18,7 +18,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitDocumentGeneration();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IDocumentGenerator) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -31,7 +31,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitDocumentGeneration();              // TryAdd must not replace
 
         services.Count(d => d.ServiceType == typeof(IDocumentGenerator))
-                .Should().Be(1, "TryAddScoped must not add a duplicate");
+                .ShouldBe(1, "TryAddScoped must not add a duplicate");
     }
 
     // -------------------------------------------------------------------------
@@ -44,7 +44,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddDocumentRenderer<FakeRenderer>();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IDocumentRenderer) &&
             d.ImplementationType == typeof(FakeRenderer) &&
             d.Lifetime == ServiceLifetime.Singleton);
@@ -58,7 +58,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddDocumentRenderer<AnotherFakeRenderer>();
 
         services.Count(d => d.ServiceType == typeof(IDocumentRenderer))
-                .Should().Be(2);
+                .ShouldBe(2);
     }
 
     // -------------------------------------------------------------------------

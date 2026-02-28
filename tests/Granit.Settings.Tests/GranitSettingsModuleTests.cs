@@ -5,7 +5,6 @@
 // à la manière d'AbpIntegratedTest<T> dans ABP Framework.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Extensions;
 using Granit.Core.Modularity;
 using Granit.Security;
@@ -16,6 +15,7 @@ using Granit.Settings.Stores;
 using Granit.Settings.Values;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -53,8 +53,8 @@ public sealed class GranitSettingsModuleTests
         SettingDefinitionManager first = app.Services.GetRequiredService<SettingDefinitionManager>();
         SettingDefinitionManager second = app.Services.GetRequiredService<SettingDefinitionManager>();
 
-        first.Should().NotBeNull();
-        first.Should().BeSameAs(second, "SettingDefinitionManager doit être un singleton");
+        first.ShouldNotBeNull();
+        first.ShouldBeSameAs(second, "SettingDefinitionManager doit être un singleton");
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class GranitSettingsModuleTests
 
         ISettingStore store = app.Services.GetRequiredService<ISettingStore>();
 
-        store.Should().BeOfType<InMemorySettingStore>();
+        store.ShouldBeOfType<InMemorySettingStore>();
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class GranitSettingsModuleTests
         IEnumerable<ISettingValueProvider> providers =
             app.Services.GetRequiredService<IEnumerable<ISettingValueProvider>>();
 
-        providers.Should().HaveCount(5, "U + T + G + C + D = 5 providers");
+        providers.Count().ShouldBe(5, "U + T + G + C + D = 5 providers");
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class GranitSettingsModuleTests
             .Select(p => p.Name)
             .ToList();
 
-        names.Should().ContainInOrder("U", "T", "G", "C", "D");
+        names.ShouldBe(new[] { "U", "T", "G", "C", "D" });
     }
 
     [Fact]
@@ -100,8 +100,8 @@ public sealed class GranitSettingsModuleTests
         SettingValueProviderManager first = app.Services.GetRequiredService<SettingValueProviderManager>();
         SettingValueProviderManager second = app.Services.GetRequiredService<SettingValueProviderManager>();
 
-        first.Should().NotBeNull();
-        first.Should().BeSameAs(second);
+        first.ShouldNotBeNull();
+        first.ShouldBeSameAs(second);
     }
 
     [Fact]
@@ -112,8 +112,8 @@ public sealed class GranitSettingsModuleTests
 
         ISettingProvider settingProvider = scope.ServiceProvider.GetRequiredService<ISettingProvider>();
 
-        settingProvider.Should().NotBeNull();
-        settingProvider.Should().BeOfType<SettingProvider>();
+        settingProvider.ShouldNotBeNull();
+        settingProvider.ShouldBeOfType<SettingProvider>();
     }
 
     [Fact]
@@ -124,8 +124,8 @@ public sealed class GranitSettingsModuleTests
 
         ISettingManager manager = scope.ServiceProvider.GetRequiredService<ISettingManager>();
 
-        manager.Should().NotBeNull();
-        manager.Should().BeOfType<SettingManager>();
+        manager.ShouldNotBeNull();
+        manager.ShouldBeOfType<SettingManager>();
     }
 
     // --- Ordre topologique ---
@@ -137,8 +137,7 @@ public sealed class GranitSettingsModuleTests
 
         GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
 
-        granitApp.GetModuleTypes().Should().ContainInOrder(
-            typeof(GranitSettingsModule));
+        granitApp.GetModuleTypes().ShouldContain(typeof(GranitSettingsModule));
     }
 
     // --- Test fonctionnel (style AbpIntegratedTest) ---
@@ -163,7 +162,7 @@ public sealed class GranitSettingsModuleTests
             "App.Color", GlobalSettingValueProvider.ProviderName, null,
             TestContext.Current.CancellationToken);
 
-        retrieved.Should().NotBeNull();
-        retrieved!.Value.Should().Be("purple");
+        retrieved.ShouldNotBeNull();
+        retrieved!.Value.ShouldBe("purple");
     }
 }

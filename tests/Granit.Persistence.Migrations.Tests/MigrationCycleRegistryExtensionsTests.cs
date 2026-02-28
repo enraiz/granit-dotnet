@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Persistence.Migrations.Extensions;
 using Granit.Persistence.Migrations.Internal;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -17,9 +17,9 @@ public sealed class MigrationCycleRegistryExtensionsTests
         IMigrationCycleRegistry returned = registry.Register<StubDbContext>("cycle-ext", migration);
 
         MigrationCycleRegistration? found = registry.Find("cycle-ext");
-        found.Should().NotBeNull();
-        found!.DbContextType.Should().Be<StubDbContext>();
-        returned.Should().BeSameAs(registry);
+        found.ShouldNotBeNull();
+        found!.DbContextType.ShouldBe(typeof(StubDbContext));
+        returned.ShouldBeSameAs(registry);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public sealed class MigrationCycleRegistryExtensionsTests
 
         IMigrationCycleRegistry result = registry.Register<StubDbContext>("chain-cycle", migration);
 
-        result.Should().BeSameAs(registry);
+        result.ShouldBeSameAs(registry);
     }
 
     private sealed class StubDbContext(DbContextOptions<StubDbContext> options) : DbContext(options);

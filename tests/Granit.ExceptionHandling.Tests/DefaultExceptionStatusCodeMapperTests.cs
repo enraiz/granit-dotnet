@@ -7,10 +7,10 @@
 // a status code; null is for specialized mappers that don't handle an exception).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Exceptions;
 using Granit.ExceptionHandling;
 using Microsoft.AspNetCore.Http;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ExceptionHandling.Tests;
@@ -30,7 +30,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new EntityNotFoundException(typeof(object), 1));
 
-        result.Should().Be(StatusCodes.Status404NotFound);
+        result.ShouldBe(StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new NotFoundException("Resource not found"));
 
-        result.Should().Be(StatusCodes.Status404NotFound);
+        result.ShouldBe(StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new CustomNotFoundException());
 
-        result.Should().Be(StatusCodes.Status404NotFound);
+        result.ShouldBe(StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new ForbiddenException());
 
-        result.Should().Be(StatusCodes.Status403Forbidden);
+        result.ShouldBe(StatusCodes.Status403Forbidden);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new BusinessException("Test:Error"));
 
-        result.Should().Be(StatusCodes.Status400BadRequest);
+        result.ShouldBe(StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new BusinessRuleViolationException("Appointment:SlotUnavailable"));
 
-        result.Should().Be(StatusCodes.Status422UnprocessableEntity);
+        result.ShouldBe(StatusCodes.Status422UnprocessableEntity);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(exception);
 
-        result.Should().Be(StatusCodes.Status422UnprocessableEntity);
+        result.ShouldBe(StatusCodes.Status422UnprocessableEntity);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new ConflictException("Test:Conflict"));
 
-        result.Should().Be(StatusCodes.Status409Conflict);
+        result.ShouldBe(StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
         Dictionary<string, string[]> errors = new() { ["Field"] = ["Required"] };
         int? result = mapper.TryGetStatusCode(new Core.Exceptions.ValidationException(errors));
 
-        result.Should().Be(StatusCodes.Status422UnprocessableEntity);
+        result.ShouldBe(StatusCodes.Status422UnprocessableEntity);
     }
 
     // -------------------------------------------------------------------------
@@ -125,7 +125,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new UnauthorizedAccessException());
 
-        result.Should().Be(StatusCodes.Status403Forbidden);
+        result.ShouldBe(StatusCodes.Status403Forbidden);
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new NotImplementedException());
 
-        result.Should().Be(StatusCodes.Status501NotImplemented);
+        result.ShouldBe(StatusCodes.Status501NotImplemented);
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new OperationCanceledException());
 
-        result.Should().Be(499);
+        result.ShouldBe(499);
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new TimeoutException());
 
-        result.Should().Be(StatusCodes.Status408RequestTimeout);
+        result.ShouldBe(StatusCodes.Status408RequestTimeout);
     }
 
     // -------------------------------------------------------------------------
@@ -169,7 +169,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new InvalidOperationException("Something went wrong"));
 
-        result.Should().Be(StatusCodes.Status500InternalServerError);
+        result.ShouldBe(StatusCodes.Status500InternalServerError);
     }
 
     [Fact]
@@ -179,7 +179,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new DivideByZeroException());
 
-        result.Should().Be(StatusCodes.Status500InternalServerError);
+        result.ShouldBe(StatusCodes.Status500InternalServerError);
     }
 
     // -------------------------------------------------------------------------
@@ -193,7 +193,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new CustomDomainException("Custom:Error"));
 
-        result.Should().Be(StatusCodes.Status400BadRequest);
+        result.ShouldBe(StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -203,7 +203,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new CustomValidationException());
 
-        result.Should().Be(StatusCodes.Status422UnprocessableEntity);
+        result.ShouldBe(StatusCodes.Status422UnprocessableEntity);
     }
 
     // -------------------------------------------------------------------------
@@ -217,7 +217,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 
         int? result = mapper.TryGetStatusCode(new InvalidOperationException("generic"));
 
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     // -------------------------------------------------------------------------

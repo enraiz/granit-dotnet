@@ -8,13 +8,13 @@
 //   - Propriétés IsReady, Username, Password
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Vault.Options;
 using Granit.Vault.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using VaultSharp;
 using VaultSharp.V1;
 using VaultSharp.V1.Commons;
@@ -65,13 +65,13 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
     public void Dispose() => _sut.Dispose();
 
     [Fact]
-    public void IsReady_Initially_ReturnsFalse() => _sut.IsReady.Should().BeFalse();
+    public void IsReady_Initially_ReturnsFalse() => _sut.IsReady.ShouldBeFalse();
 
     [Fact]
-    public void Username_Initially_ReturnsEmpty() => _sut.Username.Should().BeEmpty();
+    public void Username_Initially_ReturnsEmpty() => _sut.Username.ShouldBeEmpty();
 
     [Fact]
-    public void Password_Initially_ReturnsEmpty() => _sut.Password.Should().BeEmpty();
+    public void Password_Initially_ReturnsEmpty() => _sut.Password.ShouldBeEmpty();
 
     [Fact]
     public async Task ExecuteAsync_ObtainsCredentialsOnStart()
@@ -99,9 +99,9 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
         }
 
         // Assert
-        _sut.IsReady.Should().BeTrue();
-        _sut.Username.Should().Be("v-user-123");
-        _sut.Password.Should().Be("p@ssw0rd!");
+        _sut.IsReady.ShouldBeTrue();
+        _sut.Username.ShouldBe("v-user-123");
+        _sut.Password.ShouldBe("p@ssw0rd!");
 
         await _databaseEngine.Received(1).GetCredentialsAsync(
             "readwrite",
@@ -188,14 +188,14 @@ public sealed class VaultCredentialLeaseManagerTests : IDisposable
         }
 
         // Assert - Should have obtained new credentials after renewal failure
-        _sut.IsReady.Should().BeTrue();
-        _sut.Username.Should().Be("v-user-second");
-        _sut.Password.Should().Be("pass2");
+        _sut.IsReady.ShouldBeTrue();
+        _sut.Username.ShouldBe("v-user-second");
+        _sut.Password.ShouldBe("pass2");
     }
 
     [Fact]
     public void IDatabaseCredentialProvider_IsImplemented() =>
-        _sut.Should().BeAssignableTo<IDatabaseCredentialProvider>();
+        _sut.ShouldBeAssignableTo<IDatabaseCredentialProvider>();
 
     private void SetupDatabaseCredentials(string username, string password, string leaseId, int ttl) =>
         _databaseEngine.GetCredentialsAsync("readwrite", mountPoint: "database")

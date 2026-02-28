@@ -6,11 +6,11 @@
 // =============================================================================
 
 using System.Diagnostics;
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Security;
 using Granit.Wolverine.Middleware;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 
@@ -67,8 +67,8 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         middleware.Before(envelope);
 
-        envelope.Headers[OutgoingContextMiddleware.TenantIdHeader].Should().Be(tenantId.ToString());
-        envelope.Headers[OutgoingContextMiddleware.UserIdHeader].Should().Be(userId);
+        envelope.Headers[OutgoingContextMiddleware.TenantIdHeader].ShouldBe(tenantId.ToString());
+        envelope.Headers[OutgoingContextMiddleware.UserIdHeader].ShouldBe(userId);
     }
 
     [Fact]
@@ -87,8 +87,8 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         middleware.Before(envelope);
 
-        envelope.Headers[OutgoingContextMiddleware.TenantIdHeader].Should().Be(tenantId.ToString());
-        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).Should().BeFalse();
+        envelope.Headers[OutgoingContextMiddleware.TenantIdHeader].ShouldBe(tenantId.ToString());
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).ShouldBeFalse();
     }
 
     [Fact]
@@ -108,8 +108,8 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         middleware.Before(envelope);
 
-        envelope.Headers.ContainsKey(OutgoingContextMiddleware.TenantIdHeader).Should().BeFalse();
-        envelope.Headers[OutgoingContextMiddleware.UserIdHeader].Should().Be(userId);
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.TenantIdHeader).ShouldBeFalse();
+        envelope.Headers[OutgoingContextMiddleware.UserIdHeader].ShouldBe(userId);
     }
 
     [Fact]
@@ -126,8 +126,8 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         middleware.Before(envelope);
 
-        envelope.Headers.ContainsKey(OutgoingContextMiddleware.TenantIdHeader).Should().BeFalse();
-        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).Should().BeFalse();
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.TenantIdHeader).ShouldBeFalse();
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).ShouldBeFalse();
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         middleware.Before(envelope);
 
-        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).Should().BeFalse();
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).ShouldBeFalse();
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         middleware.Before(envelope);
 
-        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).Should().BeFalse();
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.UserIdHeader).ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------
@@ -182,7 +182,7 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
         middleware.Before(envelope);
 
         envelope.Headers[OutgoingContextMiddleware.TraceParentHeader]
-            .Should().Be(activity.Id);
+            .ShouldBe(activity.Id);
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         string? traceParent = envelope.Headers[OutgoingContextMiddleware.TraceParentHeader];
         // W3C format: 00-{32 hex}-{16 hex}-{2 hex}
-        traceParent.Should().MatchRegex(@"^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$");
+        traceParent!.ShouldMatch(@"^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$");
     }
 
     [Fact]
@@ -213,6 +213,6 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
 
         middleware.Before(envelope);
 
-        envelope.Headers.ContainsKey(OutgoingContextMiddleware.TraceParentHeader).Should().BeFalse();
+        envelope.Headers.ContainsKey(OutgoingContextMiddleware.TraceParentHeader).ShouldBeFalse();
     }
 }

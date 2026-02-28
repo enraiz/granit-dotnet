@@ -25,13 +25,13 @@
 // =============================================================================
 
 using System.Linq.Expressions;
-using FluentAssertions;
 using Granit.Core.DataFiltering;
 using Granit.Core.Domain;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -64,8 +64,8 @@ public sealed class ModelBuilderExtensionsTests
         List<TestProduct> results = await context.Products.ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        results.Should().HaveCount(1);
-        results[0].Name.Should().Be("Active");
+        results.Count.ShouldBe(1);
+        results[0].Name.ShouldBe("Active");
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public sealed class ModelBuilderExtensionsTests
         List<TestProduct> results = await context.Products.IgnoreQueryFilters().ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        results.Should().HaveCount(2);
+        results.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class ModelBuilderExtensionsTests
         List<TestCategory> results = await context.Categories.ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        results.Should().HaveCount(2);
+        results.Count.ShouldBe(2);
     }
 
     // -------------------------------------------------------------------------
@@ -118,8 +118,8 @@ public sealed class ModelBuilderExtensionsTests
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestTenantEntity));
 
         // Assert
-        entityType.Should().NotBeNull();
-        entityType!.GetDeclaredQueryFilters().FirstOrDefault().Should().NotBeNull("an IMultiTenant filter must be registered");
+        entityType.ShouldNotBeNull();
+        entityType!.GetDeclaredQueryFilters().FirstOrDefault().ShouldNotBeNull("an IMultiTenant filter must be registered");
     }
 
     [Fact]
@@ -132,8 +132,7 @@ public sealed class ModelBuilderExtensionsTests
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestTenantEntity));
 
         // Assert — no multi-tenant filter registered when currentTenant is not provided
-        entityType!.GetDeclaredQueryFilters().FirstOrDefault().Should().BeNull(
-            "no multi-tenant filter must be registered without ICurrentTenant");
+        entityType!.GetDeclaredQueryFilters().FirstOrDefault().ShouldBeNull("no multi-tenant filter must be registered without ICurrentTenant");
     }
 
     [Fact]
@@ -147,14 +146,14 @@ public sealed class ModelBuilderExtensionsTests
 
         using TestMultiTenantDbContext context = CreateMultiTenantContext();
         LambdaExpression? filter = context.Model.FindEntityType(typeof(TestTenantEntity))?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
-        filter.Should().NotBeNull();
+        filter.ShouldNotBeNull();
 
         Func<TestTenantEntity, bool> compiled = (Func<TestTenantEntity, bool>)filter!.Compile();
 
         // Assert — entity matching current tenant: passes the filter
-        compiled(new TestTenantEntity { TenantId = tenantA }).Should().BeTrue("entity of current tenant must pass");
-        compiled(new TestTenantEntity { TenantId = Guid.NewGuid() }).Should().BeFalse("entity of another tenant must be filtered");
-        compiled(new TestTenantEntity { TenantId = null }).Should().BeFalse("entity without tenant must be filtered");
+        compiled(new TestTenantEntity { TenantId = tenantA }).ShouldBeTrue("entity of current tenant must pass");
+        compiled(new TestTenantEntity { TenantId = Guid.NewGuid() }).ShouldBeFalse("entity of another tenant must be filtered");
+        compiled(new TestTenantEntity { TenantId = null }).ShouldBeFalse("entity without tenant must be filtered");
 
         SharedTenant.Id = null;
     }
@@ -172,15 +171,15 @@ public sealed class ModelBuilderExtensionsTests
         Func<TestTenantEntity, bool> compiled = (Func<TestTenantEntity, bool>)filter!.Compile();
 
         // First active tenant
-        compiled(new TestTenantEntity { TenantId = tenantA }).Should().BeTrue();
+        compiled(new TestTenantEntity { TenantId = tenantA }).ShouldBeTrue();
 
         // Change tenant (simulates an AsyncLocal context switch)
         Guid tenantB = Guid.NewGuid();
         SharedTenant.Id = tenantB;
 
         // Assert — filter adapts dynamically
-        compiled(new TestTenantEntity { TenantId = tenantB }).Should().BeTrue("filter must re-evaluate after tenant change");
-        compiled(new TestTenantEntity { TenantId = tenantA }).Should().BeFalse("previous tenant must be filtered");
+        compiled(new TestTenantEntity { TenantId = tenantB }).ShouldBeTrue("filter must re-evaluate after tenant change");
+        compiled(new TestTenantEntity { TenantId = tenantA }).ShouldBeFalse("previous tenant must be filtered");
 
         SharedTenant.Id = null;
     }
@@ -204,8 +203,8 @@ public sealed class ModelBuilderExtensionsTests
         List<TestActiveEntity> results = await context.ActiveEntities.ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        results.Should().HaveCount(1);
-        results[0].Name.Should().Be("Active");
+        results.Count.ShouldBe(1);
+        results[0].Name.ShouldBe("Active");
     }
 
     [Fact]
@@ -225,7 +224,7 @@ public sealed class ModelBuilderExtensionsTests
             .ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        results.Should().HaveCount(2);
+        results.Count.ShouldBe(2);
     }
 
     // -------------------------------------------------------------------------
@@ -243,22 +242,22 @@ public sealed class ModelBuilderExtensionsTests
         LambdaExpression? filter = context.Model
             .FindEntityType(typeof(TestSoftDeleteWithFilter))
             ?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
-        filter.Should().NotBeNull();
+        filter.ShouldNotBeNull();
 
         Func<TestSoftDeleteWithFilter, bool> compiled = (Func<TestSoftDeleteWithFilter, bool>)filter!.Compile();
 
         // Filter active — deleted entity excluded
-        compiled(new TestSoftDeleteWithFilter { IsDeleted = true }).Should().BeFalse("deleted must be filtered");
-        compiled(new TestSoftDeleteWithFilter { IsDeleted = false }).Should().BeTrue("non-deleted must pass");
+        compiled(new TestSoftDeleteWithFilter { IsDeleted = true }).ShouldBeFalse("deleted must be filtered");
+        compiled(new TestSoftDeleteWithFilter { IsDeleted = false }).ShouldBeTrue("non-deleted must pass");
 
         // Bypass — all entities pass (same compiled expression, dynamic re-evaluation)
         SharedDataFilter.SetEnabled<ISoftDeletable>(false);
-        compiled(new TestSoftDeleteWithFilter { IsDeleted = true }).Should().BeTrue("deleted must pass when filter disabled");
-        compiled(new TestSoftDeleteWithFilter { IsDeleted = false }).Should().BeTrue("non-deleted must pass when filter disabled");
+        compiled(new TestSoftDeleteWithFilter { IsDeleted = true }).ShouldBeTrue("deleted must pass when filter disabled");
+        compiled(new TestSoftDeleteWithFilter { IsDeleted = false }).ShouldBeTrue("non-deleted must pass when filter disabled");
 
         // Restore — filter active again
         SharedDataFilter.SetEnabled<ISoftDeletable>(true);
-        compiled(new TestSoftDeleteWithFilter { IsDeleted = true }).Should().BeFalse("filter must be restored");
+        compiled(new TestSoftDeleteWithFilter { IsDeleted = true }).ShouldBeFalse("filter must be restored");
     }
 
     [Fact]
@@ -270,15 +269,15 @@ public sealed class ModelBuilderExtensionsTests
         LambdaExpression? filter = context.Model
             .FindEntityType(typeof(TestActiveWithFilter))
             ?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
-        filter.Should().NotBeNull();
+        filter.ShouldNotBeNull();
 
         Func<TestActiveWithFilter, bool> compiled = (Func<TestActiveWithFilter, bool>)filter!.Compile();
 
-        compiled(new TestActiveWithFilter { IsActive = false }).Should().BeFalse("inactive must be filtered");
-        compiled(new TestActiveWithFilter { IsActive = true }).Should().BeTrue("active must pass");
+        compiled(new TestActiveWithFilter { IsActive = false }).ShouldBeFalse("inactive must be filtered");
+        compiled(new TestActiveWithFilter { IsActive = true }).ShouldBeTrue("active must pass");
 
         SharedDataFilter.SetEnabled<IActive>(false);
-        compiled(new TestActiveWithFilter { IsActive = false }).Should().BeTrue("inactive must pass when filter disabled");
+        compiled(new TestActiveWithFilter { IsActive = false }).ShouldBeTrue("inactive must pass when filter disabled");
 
         SharedDataFilter.SetEnabled<IActive>(true);
     }
@@ -308,8 +307,8 @@ public sealed class ModelBuilderExtensionsTests
         List<TestProcessingRestrictableEntity> results = await context.RestrictableEntities.ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        results.Should().HaveCount(1);
-        results[0].Name.Should().Be("Normal");
+        results.Count.ShouldBe(1);
+        results[0].Name.ShouldBe("Normal");
     }
 
     [Fact]
@@ -329,7 +328,7 @@ public sealed class ModelBuilderExtensionsTests
             .ToListAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        results.Should().HaveCount(2);
+        results.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -341,22 +340,22 @@ public sealed class ModelBuilderExtensionsTests
         LambdaExpression? filter = context.Model
             .FindEntityType(typeof(TestProcessingRestrictableWithFilter))
             ?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
-        filter.Should().NotBeNull();
+        filter.ShouldNotBeNull();
 
         Func<TestProcessingRestrictableWithFilter, bool> compiled =
             (Func<TestProcessingRestrictableWithFilter, bool>)filter!.Compile();
 
         // Filter active — restricted entity excluded
-        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).Should().BeFalse("restricted must be filtered");
-        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = false }).Should().BeTrue("non-restricted must pass");
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).ShouldBeFalse("restricted must be filtered");
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = false }).ShouldBeTrue("non-restricted must pass");
 
         // Bypass — all entities pass
         SharedDataFilter.SetEnabled<IProcessingRestrictable>(false);
-        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).Should().BeTrue("restricted must pass when filter disabled");
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).ShouldBeTrue("restricted must pass when filter disabled");
 
         // Restore
         SharedDataFilter.SetEnabled<IProcessingRestrictable>(true);
-        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).Should().BeFalse("filter must be restored");
+        compiled(new TestProcessingRestrictableWithFilter { IsProcessingRestricted = true }).ShouldBeFalse("filter must be restored");
     }
 
     [Fact]
@@ -366,8 +365,8 @@ public sealed class ModelBuilderExtensionsTests
 
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestCombinedSdPrEntity));
 
-        entityType.Should().NotBeNull();
-        entityType!.GetDeclaredQueryFilters().Should().HaveCount(1,
+        entityType.ShouldNotBeNull();
+        entityType!.GetDeclaredQueryFilters().Count.ShouldBe(1,
             "exactly one HasQueryFilter must be registered for ISoftDeletable + IProcessingRestrictable");
     }
 
@@ -384,16 +383,16 @@ public sealed class ModelBuilderExtensionsTests
         Func<TestCombinedSdPrEntity, bool> compiled = (Func<TestCombinedSdPrEntity, bool>)filter!.Compile();
 
         // Not deleted, not restricted — passes
-        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = false }).Should().BeTrue();
+        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = false }).ShouldBeTrue();
 
         // Deleted — excluded by soft delete
-        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = false }).Should().BeFalse("deleted must be filtered");
+        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = false }).ShouldBeFalse("deleted must be filtered");
 
         // Restricted — excluded by processing restriction
-        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = true }).Should().BeFalse("restricted must be filtered");
+        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = true }).ShouldBeFalse("restricted must be filtered");
 
         // Both — excluded
-        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = true }).Should().BeFalse("both must be filtered");
+        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = true }).ShouldBeFalse("both must be filtered");
     }
 
     [Fact]
@@ -409,10 +408,10 @@ public sealed class ModelBuilderExtensionsTests
         Func<TestCombinedSdPrEntity, bool> compiled = (Func<TestCombinedSdPrEntity, bool>)filter!.Compile();
 
         // Processing restriction bypassed — restricted entity from non-deleted passes
-        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = true }).Should().BeTrue("restriction bypassed");
+        compiled(new TestCombinedSdPrEntity { IsDeleted = false, IsProcessingRestricted = true }).ShouldBeTrue("restriction bypassed");
 
         // Soft delete still active — deleted entity filtered
-        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = false }).Should().BeFalse("soft delete still active");
+        compiled(new TestCombinedSdPrEntity { IsDeleted = true, IsProcessingRestricted = false }).ShouldBeFalse("soft delete still active");
 
         // Reset
         SharedDataFilter.SetEnabled<IProcessingRestrictable>(true);
@@ -433,8 +432,8 @@ public sealed class ModelBuilderExtensionsTests
         IEntityType? entityType = context.Model.FindEntityType(typeof(TestCombinedEntity));
 
         // Assert — single HasQueryFilter (no duplication / silent overwrite)
-        entityType.Should().NotBeNull();
-        entityType!.GetDeclaredQueryFilters().Should().HaveCount(1,
+        entityType.ShouldNotBeNull();
+        entityType!.GetDeclaredQueryFilters().Count.ShouldBe(1,
             "exactly one HasQueryFilter must be registered, even for multi-interface entities");
     }
 
@@ -454,13 +453,13 @@ public sealed class ModelBuilderExtensionsTests
         Func<TestCombinedEntity, bool> compiled = (Func<TestCombinedEntity, bool>)filter!.Compile();
 
         // Correct tenant, not deleted — passes
-        compiled(new TestCombinedEntity { TenantId = tenantA, IsDeleted = false }).Should().BeTrue("correct tenant + not deleted");
+        compiled(new TestCombinedEntity { TenantId = tenantA, IsDeleted = false }).ShouldBeTrue("correct tenant + not deleted");
 
         // Correct tenant but deleted — excluded by soft delete
-        compiled(new TestCombinedEntity { TenantId = tenantA, IsDeleted = true }).Should().BeFalse("correct tenant but deleted");
+        compiled(new TestCombinedEntity { TenantId = tenantA, IsDeleted = true }).ShouldBeFalse("correct tenant but deleted");
 
         // Different tenant, not deleted — excluded by multi-tenant
-        compiled(new TestCombinedEntity { TenantId = Guid.NewGuid(), IsDeleted = false }).Should().BeFalse("wrong tenant");
+        compiled(new TestCombinedEntity { TenantId = Guid.NewGuid(), IsDeleted = false }).ShouldBeFalse("wrong tenant");
 
         SharedTenant.Id = null;
     }
@@ -480,10 +479,10 @@ public sealed class ModelBuilderExtensionsTests
         Func<TestCombinedEntity, bool> compiled = (Func<TestCombinedEntity, bool>)filter!.Compile();
 
         // Soft delete bypassed — deleted entity from correct tenant passes
-        compiled(new TestCombinedEntity { TenantId = tenantA, IsDeleted = true }).Should().BeTrue("soft delete bypassed");
+        compiled(new TestCombinedEntity { TenantId = tenantA, IsDeleted = true }).ShouldBeTrue("soft delete bypassed");
 
         // Multi-tenant still active — wrong tenant still filtered
-        compiled(new TestCombinedEntity { TenantId = Guid.NewGuid(), IsDeleted = true }).Should().BeFalse("multi-tenant still active");
+        compiled(new TestCombinedEntity { TenantId = Guid.NewGuid(), IsDeleted = true }).ShouldBeFalse("multi-tenant still active");
 
         // Reset
         SharedTenant.Id = null;
@@ -502,13 +501,13 @@ public sealed class ModelBuilderExtensionsTests
         LambdaExpression? filter = context.Model
             .FindEntityType(typeof(TestProduct))
             ?.GetDeclaredQueryFilters().FirstOrDefault()?.Expression;
-        filter.Should().NotBeNull("soft delete filter must be registered even without IDataFilter");
+        filter.ShouldNotBeNull("soft delete filter must be registered even without IDataFilter");
 
         Func<TestProduct, bool> compiled = (Func<TestProduct, bool>)filter!.Compile();
 
         // Assert — filter always active
-        compiled(new TestProduct { IsDeleted = true }).Should().BeFalse("deleted must be filtered");
-        compiled(new TestProduct { IsDeleted = false }).Should().BeTrue("non-deleted must pass");
+        compiled(new TestProduct { IsDeleted = true }).ShouldBeFalse("deleted must be filtered");
+        compiled(new TestProduct { IsDeleted = false }).ShouldBeTrue("non-deleted must pass");
     }
 
     // -------------------------------------------------------------------------

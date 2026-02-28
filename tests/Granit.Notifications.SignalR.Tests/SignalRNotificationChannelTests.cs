@@ -7,10 +7,10 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.SignalR;
 using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.SignalR.Tests;
@@ -31,7 +31,7 @@ public sealed class SignalRNotificationChannelTests
 
     [Fact]
     public void Name_ReturnsSignalR() =>
-        _channel.Name.Should().Be(NotificationChannels.SignalR);
+        _channel.Name.ShouldBe(NotificationChannels.SignalR);
 
     [Fact]
     public async Task SendAsync_SendsToRecipientGroup()
@@ -56,12 +56,12 @@ public sealed class SignalRNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.NotificationId.Should().Be(context.NotificationId);
-        captured.NotificationTypeName.Should().Be(context.NotificationTypeName);
-        captured.Severity.Should().Be(context.Severity);
-        captured.Data.GetProperty("key").GetString().Should().Be("value");
-        captured.OccurredAt.Should().Be(context.OccurredAt);
+        captured.ShouldNotBeNull();
+        captured!.NotificationId.ShouldBe(context.NotificationId);
+        captured.NotificationTypeName.ShouldBe(context.NotificationTypeName);
+        captured.Severity.ShouldBe(context.Severity);
+        captured.Data.GetProperty("key").GetString().ShouldBe("value");
+        captured.OccurredAt.ShouldBe(context.OccurredAt);
     }
 
     [Fact]
@@ -77,9 +77,9 @@ public sealed class SignalRNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.RelatedEntityType.Should().Be("Patient");
-        captured.RelatedEntityId.Should().Be("pat-1");
+        captured.ShouldNotBeNull();
+        captured!.RelatedEntityType.ShouldBe("Patient");
+        captured.RelatedEntityId.ShouldBe("pat-1");
     }
 
     [Fact]
@@ -95,9 +95,9 @@ public sealed class SignalRNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.RelatedEntityType.Should().BeNull();
-        captured.RelatedEntityId.Should().BeNull();
+        captured.ShouldNotBeNull();
+        captured!.RelatedEntityType.ShouldBeNull();
+        captured.RelatedEntityId.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------

@@ -5,7 +5,6 @@
 // et OpenTelemetry (traces + métriques) dans le conteneur DI.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Observability.Extensions;
 using Granit.Observability.Options;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Observability.Tests;
@@ -35,8 +35,8 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         // Assert
         ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
-        options.ServiceName.Should().Be("test-service");
-        options.ServiceVersion.Should().Be("1.2.3");
+        options.ServiceName.ShouldBe("test-service");
+        options.ServiceVersion.ShouldBe("1.2.3");
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         // Assert
         TracerProvider? tracerProvider = sp.GetService<TracerProvider>();
-        tracerProvider.Should().NotBeNull();
+        tracerProvider.ShouldNotBeNull();
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         // Assert
         MeterProvider? meterProvider = sp.GetService<MeterProvider>();
-        meterProvider.Should().NotBeNull();
+        meterProvider.ShouldNotBeNull();
     }
 
     [Fact]
@@ -88,10 +88,10 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         // Assert
         ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
-        options.ServiceName.Should().Be("unknown-service");
-        options.OtlpEndpoint.Should().Be("http://localhost:4317");
-        options.EnableTracing.Should().BeTrue();
-        options.EnableMetrics.Should().BeTrue();
+        options.ServiceName.ShouldBe("unknown-service");
+        options.OtlpEndpoint.ShouldBe("http://localhost:4317");
+        options.EnableTracing.ShouldBeTrue();
+        options.EnableMetrics.ShouldBeTrue();
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
         IHostApplicationBuilder result = builder.AddGranitObservability();
 
         // Assert
-        result.Should().BeSameAs(builder);
+        result.ShouldBeSameAs(builder);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         // Should not throw — tracing is skipped gracefully
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
-        sp.Should().NotBeNull();
+        sp.ShouldNotBeNull();
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         // Should not throw — metrics is skipped gracefully
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
-        sp.Should().NotBeNull();
+        sp.ShouldNotBeNull();
     }
 
     [Fact]
@@ -147,9 +147,9 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
-        options.ServiceName.Should().Be("disabled-service");
-        options.EnableTracing.Should().BeFalse();
-        options.EnableMetrics.Should().BeFalse();
+        options.ServiceName.ShouldBe("disabled-service");
+        options.EnableTracing.ShouldBeFalse();
+        options.EnableMetrics.ShouldBeFalse();
     }
 
     [Fact]
@@ -166,11 +166,11 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
-        options.ServiceName.Should().Be("guava-api");
-        options.ServiceVersion.Should().Be("2.0.0");
-        options.ServiceNamespace.Should().Be("digital-dynamics");
-        options.Environment.Should().Be("staging");
-        options.OtlpEndpoint.Should().Be("http://otel:4317");
+        options.ServiceName.ShouldBe("guava-api");
+        options.ServiceVersion.ShouldBe("2.0.0");
+        options.ServiceNamespace.ShouldBe("digital-dynamics");
+        options.Environment.ShouldBe("staging");
+        options.OtlpEndpoint.ShouldBe("http://otel:4317");
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
         PathString path = new(requestPath);
         bool included = !path.StartsWithSegments("/health") && path != "/healthz";
 
-        included.Should().Be(expectedIncluded,
-            because: $"path '{requestPath}' should {(expectedIncluded ? "be included in" : "be excluded from")} tracing");
+        included.ShouldBe(expectedIncluded,
+            $"path '{requestPath}' should {(expectedIncluded ? "be included in" : "be excluded from")} tracing");
     }
 }

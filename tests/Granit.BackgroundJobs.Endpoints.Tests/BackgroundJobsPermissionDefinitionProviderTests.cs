@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Authorization.Abstractions;
 using Granit.BackgroundJobs.Endpoints.Permissions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Endpoints.Tests;
@@ -18,9 +18,9 @@ public sealed class BackgroundJobsPermissionDefinitionProviderTests
         provider.DefinePermissions(context);
 
         // Assert — group and permission declared
-        context.Groups.Should().ContainSingle(g => g.Name == BackgroundJobsPermissions.GroupName);
+        context.Groups.ShouldContain(g => g.Name == BackgroundJobsPermissions.GroupName);
         PermissionGroup group = context.Groups.Single();
-        group.Permissions.Should().ContainSingle(p => p.Name == BackgroundJobsPermissions.Admin.Default);
+        group.Permissions.ShouldContain(p => p.Name == BackgroundJobsPermissions.Admin.Default);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class BackgroundJobsPermissionDefinitionProviderTests
 
         // Assert — AddGroup is idempotent (GetOrAdd): only one group in context
         context.Groups.Select(g => g.Name)
-            .Should().ContainSingle(n => n == BackgroundJobsPermissions.GroupName);
+            .ShouldContain(n => n == BackgroundJobsPermissions.GroupName);
     }
 
     // ── Test double ────────────────────────────────────────────────────────────

@@ -4,9 +4,9 @@
 // Vérifie que AddGranitGuids enregistre les services attendus.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Guids.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Guids.Tests;
@@ -27,8 +27,8 @@ public sealed class GuidsServiceCollectionExtensionsTests
 
         // Assert
         IGuidGenerator? generator = sp.GetService<IGuidGenerator>();
-        generator.Should().NotBeNull();
-        generator.Should().BeOfType<SequentialGuidGenerator>();
+        generator.ShouldNotBeNull();
+        generator.ShouldBeOfType<SequentialGuidGenerator>();
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public sealed class GuidsServiceCollectionExtensionsTests
 
         // Assert
         IGuidGenerator resolved = sp.GetRequiredService<IGuidGenerator>();
-        resolved.Should().BeSameAs(customGenerator);
+        resolved.ShouldBeSameAs(customGenerator);
     }
 
     [Fact]
@@ -65,6 +65,6 @@ public sealed class GuidsServiceCollectionExtensionsTests
 
         // Assert
         GuidGeneratorOptions options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GuidGeneratorOptions>>().Value;
-        options.DefaultSequentialGuidType.Should().Be(SequentialGuidType.SequentialAsBinary);
+        options.DefaultSequentialGuidType.ShouldBe(SequentialGuidType.SequentialAsBinary);
     }
 }

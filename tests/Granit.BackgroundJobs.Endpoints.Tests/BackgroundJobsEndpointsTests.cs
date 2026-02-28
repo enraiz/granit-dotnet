@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using FluentAssertions;
 using Granit.BackgroundJobs.Endpoints.Extensions;
 using Granit.BackgroundJobs.Endpoints.Internal;
 using Granit.Core.Exceptions;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Endpoints.Tests;
@@ -82,25 +82,25 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
         HttpResponseMessage response = await _adminClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         IReadOnlyList<BackgroundJobStatus>? result =
             await response.Content.ReadFromJsonAsync<IReadOnlyList<BackgroundJobStatus>>(
                 TestContext.Current.CancellationToken);
-        result.Should().HaveCount(3);
+        result!.Count.ShouldBe(3);
     }
 
     [Fact]
     public async Task GetAll_WithoutToken_Returns401()
     {
         HttpResponseMessage response = await _anonClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
     public async Task GetAll_WithWrongRole_Returns403()
     {
         HttpResponseMessage response = await _userClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
 
     // ── GET /{name} ───────────────────────────────────────────────────────────
@@ -117,12 +117,12 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/daily-report", TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         BackgroundJobStatus? result =
             await response.Content.ReadFromJsonAsync<BackgroundJobStatus>(
                 TestContext.Current.CancellationToken);
-        result.Should().NotBeNull();
-        result!.JobName.Should().Be("daily-report");
+        result.ShouldNotBeNull();
+        result!.JobName.ShouldBe("daily-report");
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/ghost-job", TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     // ── POST /{name}/pause ────────────────────────────────────────────────────
@@ -152,7 +152,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/daily-report/pause", content: null, TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         await _manager.Received(1).PauseAsync("daily-report", Arg.Any<CancellationToken>());
     }
 
@@ -168,7 +168,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/ghost-job/pause", content: null, TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     // ── POST /{name}/resume ───────────────────────────────────────────────────
@@ -184,7 +184,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/daily-report/resume", content: null, TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         await _manager.Received(1).ResumeAsync("daily-report", Arg.Any<CancellationToken>());
     }
 
@@ -200,7 +200,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/ghost-job/resume", content: null, TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     // ── POST /{name}/trigger ──────────────────────────────────────────────────
@@ -216,7 +216,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/monthly-export/trigger", content: null, TestContext.Current.CancellationToken);
 
         // Assert — 202 Accepted, not 200 (processing is async via Wolverine)
-        response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+        response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
         await _manager.Received(1).TriggerNowAsync("monthly-export", Arg.Any<CancellationToken>());
     }
 
@@ -232,7 +232,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             $"{Prefix}/ghost-job/trigger", content: null, TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     // ── Security: custom role via options ─────────────────────────────────────
@@ -270,8 +270,8 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             "/background-jobs", TestContext.Current.CancellationToken);
 
         // Assert
-        opsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        adminResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        opsResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        adminResponse.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

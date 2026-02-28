@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Net;
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Localization;
 using Granit.Localization.Endpoints.Extensions;
 using Granit.Localization.Endpoints.Tests.TestResources;
@@ -9,6 +8,7 @@ using Granit.Localization.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Endpoints.Tests;
@@ -51,12 +51,12 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-        doc.RootElement.GetProperty("cultureName").GetString().Should().Be("fr");
-        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().Should().Be("Bonjour");
-        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Goodbye").GetString().Should().Be("Au revoir");
+        doc.RootElement.GetProperty("cultureName").GetString().ShouldBe("fr");
+        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().ShouldBe("Bonjour");
+        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Goodbye").GetString().ShouldBe("Au revoir");
     }
 
     [Fact]
@@ -68,11 +68,11 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().Should().Be("Hello");
-        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Goodbye").GetString().Should().Be("Goodbye");
+        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().ShouldBe("Hello");
+        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Goodbye").GetString().ShouldBe("Goodbye");
     }
 
     [Fact]
@@ -84,11 +84,11 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-        doc.RootElement.GetProperty("cultureName").GetString().Should().Be("fr-CA");
-        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().Should().Be("Bonjour");
+        doc.RootElement.GetProperty("cultureName").GetString().ShouldBe("fr-CA");
+        doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().ShouldBe("Bonjour");
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -124,15 +124,16 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         JsonElement languages = doc.RootElement.GetProperty("languages");
 
-        languages.GetArrayLength().Should().Be(2);
+        languages.GetArrayLength().ShouldBe(2);
 
         List<string> cultureCodes = [.. languages.EnumerateArray().Select(l => l.GetProperty("cultureName").GetString()!)];
-        cultureCodes.Should().Contain("fr").And.Contain("en");
+        cultureCodes.ShouldContain("fr");
+        cultureCodes.ShouldContain("en");
     }
 
     [Fact]
@@ -144,16 +145,16 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         JsonElement languages = doc.RootElement.GetProperty("languages");
 
         JsonElement frenchLang = languages.EnumerateArray().First(l => l.GetProperty("cultureName").GetString() == "fr");
-        frenchLang.GetProperty("isDefault").GetBoolean().Should().BeTrue();
+        frenchLang.GetProperty("isDefault").GetBoolean().ShouldBeTrue();
 
         JsonElement englishLang = languages.EnumerateArray().First(l => l.GetProperty("cultureName").GetString() == "en");
-        englishLang.GetProperty("isDefault").GetBoolean().Should().BeFalse();
+        englishLang.GetProperty("isDefault").GetBoolean().ShouldBeFalse();
     }
 
     [Fact]
@@ -166,8 +167,8 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         HttpResponseMessage response = await _client.SendAsync(request, TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
-        response.StatusCode.Should().NotBe(HttpStatusCode.Forbidden);
+        response.StatusCode.ShouldNotBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldNotBe(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -179,9 +180,9 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.Headers.CacheControl.Should().NotBeNull();
-        response.Headers.CacheControl!.Public.Should().BeTrue();
-        response.Headers.CacheControl.MaxAge.Should().Be(TimeSpan.FromHours(1));
+        response.Headers.CacheControl.ShouldNotBeNull();
+        response.Headers.CacheControl!.Public.ShouldBeTrue();
+        response.Headers.CacheControl.MaxAge.ShouldBe(TimeSpan.FromHours(1));
     }
 
     [Fact]
@@ -193,7 +194,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         // Assert
-        response.Headers.Vary.Should().Contain("Accept-Language");
+        response.Headers.Vary.ShouldContain("Accept-Language");
     }
 
     [Fact]
@@ -215,13 +216,13 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
             HttpResponseMessage notFound = await client.GetAsync(
                 "/api/granit/localization",
                 TestContext.Current.CancellationToken);
-            notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
             // Custom route must respond
             HttpResponseMessage ok = await client.GetAsync(
                 "/api/v1/granit/localization",
                 TestContext.Current.CancellationToken);
-            ok.StatusCode.Should().Be(HttpStatusCode.OK);
+            ok.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
         finally
         {

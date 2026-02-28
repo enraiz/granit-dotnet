@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Core.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Domain;
@@ -16,9 +16,9 @@ public sealed class FullAuditedEntityTests
     {
         TestEntity entity = new();
 
-        entity.IsDeleted.Should().BeFalse();
-        entity.DeletedAt.Should().BeNull();
-        entity.DeletedBy.Should().BeNull();
+        entity.IsDeleted.ShouldBeFalse();
+        entity.DeletedAt.ShouldBeNull();
+        entity.DeletedBy.ShouldBeNull();
     }
 
     [Fact]
@@ -32,18 +32,18 @@ public sealed class FullAuditedEntityTests
             DeletedBy = "user-123",
         };
 
-        entity.IsDeleted.Should().BeTrue();
-        entity.DeletedAt.Should().Be(deletedAt);
-        entity.DeletedBy.Should().Be("user-123");
+        entity.IsDeleted.ShouldBeTrue();
+        entity.DeletedAt.ShouldBe(deletedAt);
+        entity.DeletedBy.ShouldBe("user-123");
     }
 
     [Fact]
     public void ImplementsISoftDeletable() =>
-        new TestEntity().Should().BeAssignableTo<ISoftDeletable>();
+        new TestEntity().ShouldBeAssignableTo<ISoftDeletable>();
 
     [Fact]
     public void InheritsAuditedEntity() =>
-        new TestEntity().Should().BeAssignableTo<AuditedEntity>();
+        new TestEntity().ShouldBeAssignableTo<AuditedEntity>();
 
     [Fact]
     public void AuditProperties_AreAccessible()
@@ -57,9 +57,9 @@ public sealed class FullAuditedEntityTests
             ModifiedBy = "admin",
         };
 
-        entity.CreatedAt.Should().Be(fixedDate);
-        entity.CreatedBy.Should().Be("admin");
-        entity.ModifiedAt.Should().Be(fixedDate);
-        entity.ModifiedBy.Should().Be("admin");
+        entity.CreatedAt.ShouldBe(fixedDate);
+        entity.CreatedBy.ShouldBe("admin");
+        entity.ModifiedAt.ShouldBe(fixedDate);
+        entity.ModifiedBy.ShouldBe("admin");
     }
 }

@@ -9,8 +9,8 @@
 //   - Implements IHasErrorCode and IUserFriendlyException
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Exceptions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests.Exceptions;
@@ -26,7 +26,7 @@ public sealed class BusinessRuleViolationExceptionTests
     {
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable");
 
-        exception.ErrorCode.Should().Be("Appointment:SlotUnavailable");
+        exception.ErrorCode.ShouldBe("Appointment:SlotUnavailable");
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public sealed class BusinessRuleViolationExceptionTests
     {
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable", "The requested time slot is no longer available.");
 
-        exception.Message.Should().Be("The requested time slot is no longer available.");
+        exception.Message.ShouldBe("The requested time slot is no longer available.");
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public sealed class BusinessRuleViolationExceptionTests
     {
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable");
 
-        exception.Message.Should().Be("Appointment:SlotUnavailable");
+        exception.Message.ShouldBe("Appointment:SlotUnavailable");
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class BusinessRuleViolationExceptionTests
         InvalidOperationException inner = new("inner");
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable", "message", inner);
 
-        exception.InnerException.Should().BeSameAs(inner);
+        exception.InnerException.ShouldBeSameAs(inner);
     }
 
     // -------------------------------------------------------------------------
@@ -63,7 +63,7 @@ public sealed class BusinessRuleViolationExceptionTests
     {
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable");
 
-        exception.Should().BeAssignableTo<BusinessException>();
+        exception.ShouldBeAssignableTo<BusinessException>();
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class BusinessRuleViolationExceptionTests
     {
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable");
 
-        exception.Should().BeAssignableTo<Exception>();
+        exception.ShouldBeAssignableTo<Exception>();
     }
 
     // -------------------------------------------------------------------------
@@ -83,8 +83,8 @@ public sealed class BusinessRuleViolationExceptionTests
     {
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable");
 
-        exception.Should().BeAssignableTo<IHasErrorCode>();
-        ((IHasErrorCode)exception).ErrorCode.Should().Be("Appointment:SlotUnavailable");
+        exception.ShouldBeAssignableTo<IHasErrorCode>();
+        ((IHasErrorCode)exception).ErrorCode.ShouldBe("Appointment:SlotUnavailable");
     }
 
     [Fact]
@@ -92,6 +92,6 @@ public sealed class BusinessRuleViolationExceptionTests
     {
         BusinessRuleViolationException exception = new("Appointment:SlotUnavailable");
 
-        exception.Should().BeAssignableTo<IUserFriendlyException>();
+        exception.ShouldBeAssignableTo<IUserFriendlyException>();
     }
 }

@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.Templating.EntityFrameworkCore.Internal;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
@@ -6,6 +5,7 @@ using Granit.Templating.Store;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.EntityFrameworkCore.Tests;
@@ -52,7 +52,7 @@ public sealed class EfDocumentTemplateStoreTests
             new TemplateKey("Billing.Invoice"),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -70,10 +70,11 @@ public sealed class EfDocumentTemplateStoreTests
         TemplateDescriptor? result = await store.TryGetPublishedAsync(key,
             TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Content.Should().Be("<p>Hello</p>");
-        result.MimeType.Should().Be("text/html");
-        result.RevisionId.Should().NotBeEmpty();
+        result.ShouldNotBeNull();
+        result!.Content.ShouldBe("<p>Hello</p>");
+        result.MimeType.ShouldBe("text/html");
+        result.RevisionId.ShouldNotBeNull();
+        result.RevisionId!.Value.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -93,7 +94,7 @@ public sealed class EfDocumentTemplateStoreTests
         TemplateDescriptor? result = await store.TryGetPublishedAsync(key,
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -114,9 +115,9 @@ public sealed class EfDocumentTemplateStoreTests
         TemplateDescriptor? neutralResult = await store.TryGetPublishedAsync(neutralKey,
             TestContext.Current.CancellationToken);
 
-        frResult.Should().NotBeNull();
-        frResult!.Content.Should().Be("<p>Français</p>");
-        neutralResult.Should().BeNull("culture-neutral key is distinct from fr-BE");
+        frResult.ShouldNotBeNull();
+        frResult!.Content.ShouldBe("<p>Français</p>");
+        neutralResult.ShouldBeNull("culture-neutral key is distinct from fr-BE");
     }
 
     [Fact]
@@ -133,7 +134,7 @@ public sealed class EfDocumentTemplateStoreTests
             TestContext.Current.CancellationToken);
         TemplateDescriptor? v1 = await store.TryGetPublishedAsync(key,
             TestContext.Current.CancellationToken);
-        v1!.Content.Should().Be("<p>v1</p>");
+        v1!.Content.ShouldBe("<p>v1</p>");
 
         // Publish v2 — must invalidate the cache entry for v1
         await store.SaveDraftAsync(key, "<p>v2</p>", "text/html", "carol",
@@ -144,7 +145,7 @@ public sealed class EfDocumentTemplateStoreTests
         TemplateDescriptor? v2 = await store.TryGetPublishedAsync(key,
             TestContext.Current.CancellationToken);
 
-        v2!.Content.Should().Be("<p>v2</p>", "cache must be invalidated after publish");
+        v2!.Content.ShouldBe("<p>v2</p>", "cache must be invalidated after publish");
     }
 
     [Fact]
@@ -162,7 +163,7 @@ public sealed class EfDocumentTemplateStoreTests
         // Read to populate cache
         TemplateDescriptor? cached = await store.TryGetPublishedAsync(key,
             TestContext.Current.CancellationToken);
-        cached.Should().NotBeNull();
+        cached.ShouldNotBeNull();
 
         // Unpublish — must invalidate the cache entry
         await store.UnpublishAsync(key, "carol",
@@ -171,7 +172,7 @@ public sealed class EfDocumentTemplateStoreTests
         TemplateDescriptor? result = await store.TryGetPublishedAsync(key,
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("cache must be invalidated after unpublish");
+        result.ShouldBeNull("cache must be invalidated after unpublish");
     }
 
     // -------------------------------------------------------------------------
@@ -196,13 +197,13 @@ public sealed class EfDocumentTemplateStoreTests
             r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Draft,
             TestContext.Current.CancellationToken);
 
-        count.Should().Be(1, "SaveDraftAsync must upsert, not append");
+        count.ShouldBe(1, "SaveDraftAsync must upsert, not append");
 
         // Verify the content was updated
         await store.PublishAsync(key, "carol", TestContext.Current.CancellationToken);
         TemplateDescriptor? published = await store.TryGetPublishedAsync(key,
             TestContext.Current.CancellationToken);
-        published!.Content.Should().Be("<p>v2</p>", "latest draft content must be published");
+        published!.Content.ShouldBe("<p>v2</p>", "latest draft content must be published");
     }
 
     // -------------------------------------------------------------------------
@@ -236,8 +237,8 @@ public sealed class EfDocumentTemplateStoreTests
             r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Published,
             TestContext.Current.CancellationToken);
 
-        deprecatedCount.Should().Be(1, "v1 must be deprecated");
-        publishedCount.Should().Be(1, "only v2 must be published");
+        deprecatedCount.ShouldBe(1, "v1 must be deprecated");
+        publishedCount.ShouldBe(1, "only v2 must be published");
     }
 
     [Fact]
@@ -249,8 +250,7 @@ public sealed class EfDocumentTemplateStoreTests
         Func<Task> act = () => store.PublishAsync(key, "alice",
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*no draft*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("no draft");
     }
 
     // -------------------------------------------------------------------------
@@ -266,7 +266,7 @@ public sealed class EfDocumentTemplateStoreTests
         Func<Task> act = () => store.UnpublishAsync(key, "alice",
             TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // -------------------------------------------------------------------------
@@ -290,7 +290,7 @@ public sealed class EfDocumentTemplateStoreTests
             r => r.TemplateName == key.Name,
             TestContext.Current.CancellationToken);
 
-        count.Should().Be(0, "draft must be physically deleted");
+        count.ShouldBe(0, "draft must be physically deleted");
     }
 
     [Fact]
@@ -302,8 +302,7 @@ public sealed class EfDocumentTemplateStoreTests
         Func<Task> act = () => store.DeleteDraftAsync(key, "alice",
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*no draft*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("no draft");
     }
 
     [Fact]
@@ -331,7 +330,7 @@ public sealed class EfDocumentTemplateStoreTests
             r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Deprecated,
             TestContext.Current.CancellationToken);
 
-        deprecatedCount.Should().Be(1, "deprecated revision must be preserved for HDS audit trail");
+        deprecatedCount.ShouldBe(1, "deprecated revision must be preserved for HDS audit trail");
     }
 
     // -------------------------------------------------------------------------
@@ -355,9 +354,9 @@ public sealed class EfDocumentTemplateStoreTests
         IReadOnlyList<TemplateRevision> history = await store.GetHistoryAsync(key,
             TestContext.Current.CancellationToken);
 
-        history.Should().HaveCount(2);
+        history.Count.ShouldBe(2);
         // Draft (v2) was created last → appears first
-        history[0].Status.Should().Be(TemplateLifecycleStatus.Draft);
-        history[1].Status.Should().Be(TemplateLifecycleStatus.Published);
+        history[0].Status.ShouldBe(TemplateLifecycleStatus.Draft);
+        history[1].Status.ShouldBe(TemplateLifecycleStatus.Published);
     }
 }

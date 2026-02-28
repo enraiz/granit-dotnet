@@ -2,9 +2,9 @@
 // Tests - DefaultTenantSchemaProvider
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.MultiTenancy;
@@ -30,7 +30,7 @@ public sealed class DefaultTenantSchemaProviderTests
         string schema = await provider.GetSchemaNameAsync(TenantId, TestContext.Current.CancellationToken);
 
         // GUID sans tirets, en minuscules.
-        schema.Should().Be("tenant_3fa85f6457174562b3fc2c963f66afa6");
+        schema.ShouldBe("tenant_3fa85f6457174562b3fc2c963f66afa6");
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public sealed class DefaultTenantSchemaProviderTests
 
         string schema = await provider.GetSchemaNameAsync(TenantId, TestContext.Current.CancellationToken);
 
-        schema.Should().StartWith("t_");
+        schema.ShouldStartWith("t_");
     }
 
     // -----------------------------------------------------------------------
@@ -63,9 +63,9 @@ public sealed class DefaultTenantSchemaProviderTests
 
         Func<Task> act = async () => await provider.GetSchemaNameAsync(TenantId);
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("*custom*ITenantSchemaProvider*");
+        InvalidOperationException ex1 = await Should.ThrowAsync<InvalidOperationException>(act);
+        ex1.Message.ShouldContain("custom");
+        ex1.Message.ShouldContain("ITenantSchemaProvider");
     }
 
     // -----------------------------------------------------------------------
@@ -83,8 +83,8 @@ public sealed class DefaultTenantSchemaProviderTests
 
         Func<Task> act = async () => await provider.GetSchemaNameAsync(TenantId);
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("*Custom*custom*ITenantSchemaProvider*");
+        InvalidOperationException ex2 = await Should.ThrowAsync<InvalidOperationException>(act);
+        ex2.Message.ShouldContain("Custom");
+        ex2.Message.ShouldContain("ITenantSchemaProvider");
     }
 }

@@ -1,9 +1,8 @@
 using ClosedXML.Excel;
-using FluentAssertions;
 using Granit.DocumentGeneration.Excel.Internal;
 using Granit.Templating.Pipeline;
+using Shouldly;
 using Xunit;
-
 // 'DocumentFormat' is a root namespace from DocumentFormat.OpenXml (transitive ClosedXML dep.).
 using TemplatingDocFormat = Granit.Templating.Keys.DocumentFormat;
 
@@ -41,7 +40,7 @@ public sealed class ClosedXmlTemplateEngineTests
         ClosedXmlTemplateEngine sut = CreateSut();
         TemplateDescriptor descriptor = new() { Content = string.Empty, MimeType = ExcelMimeType };
 
-        sut.CanRender(descriptor).Should().BeTrue();
+        sut.CanRender(descriptor).ShouldBeTrue();
     }
 
     [Theory]
@@ -53,7 +52,7 @@ public sealed class ClosedXmlTemplateEngineTests
         ClosedXmlTemplateEngine sut = CreateSut();
         TemplateDescriptor descriptor = new() { Content = string.Empty, MimeType = mimeType };
 
-        sut.CanRender(descriptor).Should().BeFalse();
+        sut.CanRender(descriptor).ShouldBeFalse();
     }
 
     [Fact]
@@ -66,7 +65,7 @@ public sealed class ClosedXmlTemplateEngineTests
             MimeType = ExcelMimeType.ToUpperInvariant(),
         };
 
-        sut.CanRender(descriptor).Should().BeTrue("MIME type comparison must be case-insensitive");
+        sut.CanRender(descriptor).ShouldBeTrue("MIME type comparison must be case-insensitive");
     }
 
     // -------------------------------------------------------------------------
@@ -87,15 +86,15 @@ public sealed class ClosedXmlTemplateEngineTests
             [],
             TestContext.Current.CancellationToken);
 
-        result.Should().BeOfType<BinaryRenderedContent>();
+        result.ShouldBeOfType<BinaryRenderedContent>();
         BinaryRenderedContent binary = (BinaryRenderedContent)result;
-        binary.Format.Should().Be(TemplatingDocFormat.Excel);
-        binary.Bytes.IsEmpty.Should().BeFalse("must produce non-empty bytes");
+        binary.Format.ShouldBe(TemplatingDocFormat.Excel);
+        binary.Bytes.IsEmpty.ShouldBeFalse("must produce non-empty bytes");
 
         // Verify the output is a valid XLSX (readable by ClosedXML)
         using MemoryStream ms = new(binary.Bytes.ToArray());
         using XLWorkbook wb = new(ms);
-        wb.Worksheets.Should().HaveCount(1);
+        wb.Worksheets.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -119,7 +118,7 @@ public sealed class ClosedXmlTemplateEngineTests
         using MemoryStream ms = new(binary.Bytes.ToArray());
         using XLWorkbook wb = new(ms);
         string cellValue = wb.Worksheet(1).Cell("A1").GetValue<string>();
-        cellValue.Should().Be("Hello Jean Dupont");
+        cellValue.ShouldBe("Hello Jean Dupont");
     }
 
     [Fact]
@@ -143,7 +142,7 @@ public sealed class ClosedXmlTemplateEngineTests
         using MemoryStream ms = new(binary.Bytes.ToArray());
         using XLWorkbook wb = new(ms);
         string cellValue = wb.Worksheet(1).Cell("A1").GetValue<string>();
-        cellValue.Should().Be("City: Bruxelles");
+        cellValue.ShouldBe("City: Bruxelles");
     }
 
     [Fact]
@@ -166,6 +165,6 @@ public sealed class ClosedXmlTemplateEngineTests
             [],
             TestContext.Current.CancellationToken);
 
-        result.RevisionId.Should().Be(revisionId);
+        result.RevisionId.ShouldBe(revisionId);
     }
 }

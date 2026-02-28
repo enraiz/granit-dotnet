@@ -7,7 +7,7 @@
 //   - Returns null by default
 // =============================================================================
 
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Timing.Tests;
@@ -21,7 +21,7 @@ public sealed class CurrentTimezoneProviderTests
         var provider = new CurrentTimezoneProvider();
 
         // Assert
-        provider.Timezone.Should().BeNull();
+        provider.Timezone.ShouldBeNull();
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public sealed class CurrentTimezoneProviderTests
         };
 
         // Assert
-        provider.Timezone.Should().Be("Europe/Brussels");
+        provider.Timezone.ShouldBe("Europe/Brussels");
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class CurrentTimezoneProviderTests
         provider.Timezone = null;
 
         // Assert
-        provider.Timezone.Should().BeNull();
+        provider.Timezone.ShouldBeNull();
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class CurrentTimezoneProviderTests
         }, TestContext.Current.CancellationToken);
 
         // Assert - the value in the parent context is not affected
-        provider.Timezone.Should().Be("Europe/Brussels",
+        provider.Timezone.ShouldBe("Europe/Brussels",
             "AsyncLocal isolates modifications from the child context");
     }
 }

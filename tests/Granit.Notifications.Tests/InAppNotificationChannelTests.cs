@@ -6,12 +6,12 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Internal;
 using Granit.Timing;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
@@ -54,10 +54,10 @@ public sealed class InAppNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.RecipientUserId.Should().Be(context.RecipientUserId);
-        captured.NotificationTypeName.Should().Be(context.NotificationTypeName);
-        captured.Severity.Should().Be(context.Severity);
+        captured.ShouldNotBeNull();
+        captured!.RecipientUserId.ShouldBe(context.RecipientUserId);
+        captured.NotificationTypeName.ShouldBe(context.NotificationTypeName);
+        captured.Severity.ShouldBe(context.Severity);
     }
 
     [Fact]
@@ -74,8 +74,8 @@ public sealed class InAppNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.State.Should().Be(UserNotificationState.Unread);
+        captured.ShouldNotBeNull();
+        captured!.State.ShouldBe(UserNotificationState.Unread);
     }
 
     // -------------------------------------------------------------------------

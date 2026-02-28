@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.Plans;
 using Granit.Features.ValueProviders;
@@ -39,11 +39,11 @@ public sealed class PlanFeatureValueProviderTests
 
     [Fact]
     public void Name_Is_Plan() =>
-        BuildProvider().Name.Should().Be("Plan");
+        BuildProvider().Name.ShouldBe("Plan");
 
     [Fact]
     public void Order_Is_200() =>
-        BuildProvider().Order.Should().Be(200);
+        BuildProvider().Order.ShouldBe(200);
 
     // -------------------------------------------------------------------------
     // GetOrNullAsync — provider not registered
@@ -57,7 +57,7 @@ public sealed class PlanFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("IPlanIdProvider is not registered");
+        result.ShouldBeNull("IPlanIdProvider is not registered");
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public sealed class PlanFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("IPlanFeatureStore is not registered");
+        result.ShouldBeNull("IPlanFeatureStore is not registered");
     }
 
     // -------------------------------------------------------------------------
@@ -92,7 +92,7 @@ public sealed class PlanFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("plan ID is null — store should not be queried");
+        result.ShouldBeNull("plan ID is null — store should not be queried");
         await planFeatureStore.DidNotReceiveWithAnyArgs()
                               .GetOrNullAsync(default!, default!, TestContext.Current.CancellationToken);
     }
@@ -113,7 +113,7 @@ public sealed class PlanFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().Be("true");
+        result.ShouldBe("true");
     }
 
     [Fact]
@@ -132,6 +132,6 @@ public sealed class PlanFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("the starter plan has no override for this feature");
+        result.ShouldBeNull("the starter plan has no override for this feature");
     }
 }

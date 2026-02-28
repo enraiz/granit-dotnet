@@ -7,8 +7,8 @@
 //   - Retourne null pour une clé inexistante
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.DataSeeding;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.DataSeeding;
@@ -22,7 +22,7 @@ public sealed class DataSeedContextTests
         DataSeedContext context = new();
 
         // Assert
-        context.TenantId.Should().BeNull();
+        context.TenantId.ShouldBeNull();
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public sealed class DataSeedContextTests
         DataSeedContext context = new(tenantId);
 
         // Assert
-        context.TenantId.Should().Be(tenantId);
+        context.TenantId.ShouldBe(tenantId);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public sealed class DataSeedContextTests
         DataSeedContext context = new();
 
         // Assert
-        context.Properties.Should().BeEmpty();
+        context.Properties.ShouldBeEmpty();
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class DataSeedContextTests
         context.Properties["AdminEmail"] = "admin@example.com";
 
         // Assert
-        context.Properties["AdminEmail"].Should().Be("admin@example.com");
+        context.Properties["AdminEmail"].ShouldBe("admin@example.com");
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class DataSeedContextTests
         context["Key"] = 42;
 
         // Assert
-        context["Key"].Should().Be(42);
+        context["Key"].ShouldBe(42);
     }
 
     [Fact]
@@ -84,6 +84,6 @@ public sealed class DataSeedContextTests
         object? value = context["NonExistent"];
 
         // Assert
-        value.Should().BeNull();
+        value.ShouldBeNull();
     }
 }

@@ -5,8 +5,8 @@
 // permission, quelle que soit la combinaison rôle / permission / tenant.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authorization.Services;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.Tests;
@@ -27,7 +27,7 @@ public sealed class NullPermissionGrantStoreTests
             TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse("NullPermissionGrantStore denies every permission by design");
+        result.ShouldBeFalse("NullPermissionGrantStore denies every permission by design");
     }
 
     [Theory]
@@ -51,6 +51,6 @@ public sealed class NullPermissionGrantStoreTests
             TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 }

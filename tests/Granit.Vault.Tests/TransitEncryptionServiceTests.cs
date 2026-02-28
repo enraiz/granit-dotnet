@@ -6,12 +6,12 @@
 // =============================================================================
 
 using System.Text;
-using FluentAssertions;
 using Granit.Vault.Options;
 using Granit.Vault.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using VaultSharp;
 using VaultSharp.V1;
 using VaultSharp.V1.SecretsEngines;
@@ -65,7 +65,7 @@ public sealed class TransitEncryptionServiceTests
         string result = await _sut.EncryptAsync("fhir-data", plaintext, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().Be(ciphertext);
+        result.ShouldBe(ciphertext);
     }
 
     [Fact]
@@ -95,6 +95,6 @@ public sealed class TransitEncryptionServiceTests
         string result = await _sut.DecryptAsync("fhir-data", ciphertext, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().Be(originalText);
+        result.ShouldBe(originalText);
     }
 }

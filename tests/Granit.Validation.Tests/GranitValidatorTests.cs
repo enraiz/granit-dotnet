@@ -7,10 +7,10 @@
 //   - Inherits from AbstractValidator<T>
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Granit.Validation;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -26,7 +26,7 @@ public sealed class GranitValidatorTests
     {
         TestCommandValidator validator = new();
 
-        validator.ClassLevelCascadeMode.Should().Be(CascadeMode.Continue);
+        validator.ClassLevelCascadeMode.ShouldBe(CascadeMode.Continue);
     }
 
     [Fact]
@@ -37,10 +37,10 @@ public sealed class GranitValidatorTests
 
         ValidationResult result = validator.Validate(command);
 
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().HaveCountGreaterThan(1);
-        result.Errors.Should().Contain(e => e.PropertyName == nameof(TestCommand.Name));
-        result.Errors.Should().Contain(e => e.PropertyName == nameof(TestCommand.Age));
+        result.IsValid.ShouldBeFalse();
+        result.Errors.Count.ShouldBeGreaterThan(1);
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(TestCommand.Name));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(TestCommand.Age));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class GranitValidatorTests
 
         ValidationResult result = validator.Validate(command);
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -63,7 +63,7 @@ public sealed class GranitValidatorTests
     {
         TestCommandValidator validator = new();
 
-        validator.Should().BeAssignableTo<AbstractValidator<TestCommand>>();
+        validator.ShouldBeAssignableTo<AbstractValidator<TestCommand>>();
     }
 
     // -------------------------------------------------------------------------

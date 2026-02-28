@@ -5,7 +5,7 @@
 // modification (identité pour Encrypt et Decrypt).
 // =============================================================================
 
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -20,7 +20,7 @@ public sealed class NullCacheValueEncryptorTests
 
         byte[] result = encryptor.Encrypt(data);
 
-        result.Should().BeSameAs(data);
+        result.ShouldBeSameAs(data);
     }
 
     [Fact]
@@ -31,6 +31,6 @@ public sealed class NullCacheValueEncryptorTests
 
         byte[] result = encryptor.Decrypt(data);
 
-        result.Should().BeSameAs(data);
+        result.ShouldBeSameAs(data);
     }
 }

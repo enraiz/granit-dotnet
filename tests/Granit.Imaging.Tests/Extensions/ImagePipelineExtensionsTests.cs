@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Imaging.Extensions;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Imaging.Tests.Extensions;
@@ -30,7 +30,7 @@ public sealed class ImagePipelineExtensionsTests
         // Assert
         _pipeline.Received(1).ConvertTo(ImageFormat.Jpeg);
         await _pipeline.Received(1).ToResultAsync(TestContext.Current.CancellationToken);
-        result.Should().Be(_expectedResult);
+        result.ShouldBe(_expectedResult);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public sealed class ImagePipelineExtensionsTests
         // Assert
         _pipeline.Received(1).ConvertTo(ImageFormat.Png);
         await _pipeline.Received(1).ToResultAsync(TestContext.Current.CancellationToken);
-        result.Should().Be(_expectedResult);
+        result.ShouldBe(_expectedResult);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class ImagePipelineExtensionsTests
         // Assert
         _pipeline.Received(1).ConvertTo(ImageFormat.WebP);
         await _pipeline.Received(1).ToResultAsync(TestContext.Current.CancellationToken);
-        result.Should().Be(_expectedResult);
+        result.ShouldBe(_expectedResult);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class ImagePipelineExtensionsTests
         // Assert
         _pipeline.Received(1).ConvertTo(ImageFormat.Avif);
         await _pipeline.Received(1).ToResultAsync(TestContext.Current.CancellationToken);
-        result.Should().Be(_expectedResult);
+        result.ShouldBe(_expectedResult);
     }
 
     [Fact]

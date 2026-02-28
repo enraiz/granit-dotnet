@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.AspNetCore;
 using Granit.Features.Checker;
 using Granit.Features.Exceptions;
@@ -48,7 +48,7 @@ public sealed class RequiresFeatureEndpointFilterTests
 
         await filter.InvokeAsync(context, next);
 
-        nextCalled.Should().BeTrue();
+        nextCalled.ShouldBeTrue();
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public sealed class RequiresFeatureEndpointFilterTests
 
         Func<Task> act = async () => await filter.InvokeAsync(context, next);
 
-        await act.Should().ThrowAsync<FeatureNotEnabledException>();
-        nextCalled.Should().BeFalse();
+        await Should.ThrowAsync<FeatureNotEnabledException>(act);
+        nextCalled.ShouldBeFalse();
     }
 }

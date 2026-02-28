@@ -6,9 +6,9 @@
 // EuropeanVat: dispatch by country code, FR/BE algorithmic, others format only
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -32,7 +32,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(vat));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -48,9 +48,9 @@ public sealed class TaxIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(vat));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBelgianVat");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianVat");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianVat");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianVat");
     }
 
     // =========================================================================
@@ -71,7 +71,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(vat));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -88,9 +88,9 @@ public sealed class TaxIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(vat));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchVat");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchVat");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchVat");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchVat");
     }
 
     // =========================================================================
@@ -111,7 +111,7 @@ public sealed class TaxIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(vat));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -128,9 +128,9 @@ public sealed class TaxIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(vat));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidEuropeanVat");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidEuropeanVat");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidEuropeanVat");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidEuropeanVat");
     }
 
     // -------------------------------------------------------------------------

@@ -5,12 +5,12 @@
 // nécessaires et retourne la collection pour le chaînage.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.Tests;
@@ -30,7 +30,7 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();
         IPermissionDefinitionManager manager = sp.GetRequiredService<IPermissionDefinitionManager>();
-        manager.Should().NotBeNull();
+        manager.ShouldNotBeNull();
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();
         IPermissionGrantStore store = sp.GetRequiredService<IPermissionGrantStore>();
-        store.Should().NotBeNull();
+        store.ShouldNotBeNull();
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         services.AddGranitAuthorization();
 
         // Assert — descriptor registered (transitive dependencies not required here)
-        services.Should().Contain(sd => sd.ServiceType == typeof(IPermissionChecker));
+        services.ShouldContain(sd => sd.ServiceType == typeof(IPermissionChecker));
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         services.AddGranitAuthorization();
 
         // Assert — descriptor registered
-        services.Should().Contain(sd => sd.ServiceType == typeof(IAuthorizationHandler));
+        services.ShouldContain(sd => sd.ServiceType == typeof(IAuthorizationHandler));
     }
 
     [Fact]
@@ -85,6 +85,6 @@ public sealed class AuthorizationServiceCollectionExtensionsTests
         IServiceCollection returned = services.AddGranitAuthorization();
 
         // Assert
-        returned.Should().BeSameAs(services);
+        returned.ShouldBeSameAs(services);
     }
 }

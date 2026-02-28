@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.Cors.Internal;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Cors.Tests;
@@ -18,7 +18,7 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     [Fact]
@@ -30,8 +30,8 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain("wildcard");
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain("wildcard");
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
+        result.Failed.ShouldBeTrue();
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     [Fact]
@@ -67,8 +67,8 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain(nameof(GranitCorsOptions.AllowedOrigins));
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain(nameof(GranitCorsOptions.AllowedOrigins));
     }
 
     [Fact]
@@ -84,8 +84,8 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain(nameof(GranitCorsOptions.AllowCredentials));
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain(nameof(GranitCorsOptions.AllowCredentials));
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     [Fact]
@@ -117,8 +117,8 @@ public sealed class GranitCorsOptionsValidatorTests
 
         ValidateOptionsResult result = sut.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().HaveCountGreaterThanOrEqualTo(2);
+        result.Failed.ShouldBeTrue();
+        result.Failures.Count().ShouldBeGreaterThanOrEqualTo(2);
     }
 
     private static IHostEnvironment CreateEnvironment(string environmentName)

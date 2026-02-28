@@ -5,7 +5,6 @@
 // and cache invalidation keyed by user ID.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Caching;
 using Granit.Security;
 using Granit.Settings.Definitions;
@@ -16,6 +15,7 @@ using Granit.Settings.Values;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -49,11 +49,11 @@ public sealed class UserSettingValueProviderTests
 
     [Fact]
     public void Name_Is_U() =>
-        Create().provider.Name.Should().Be("U");
+        Create().provider.Name.ShouldBe("U");
 
     [Fact]
     public void Order_Is_100() =>
-        Create().provider.Order.Should().Be(100);
+        Create().provider.Order.ShouldBe(100);
 
     [Fact]
     public async Task GetOrNullAsync_NotAuthenticated_Returns_Null()
@@ -63,7 +63,7 @@ public sealed class UserSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("unauthenticated user — provider must short-circuit");
+        result.ShouldBeNull("unauthenticated user — provider must short-circuit");
     }
 
     [Fact]
@@ -75,9 +75,9 @@ public sealed class UserSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Value.Should().Be("red");
-        result.ProviderKey.Should().Be(UserId);
+        result.ShouldNotBeNull();
+        result!.Value.ShouldBe("red");
+        result.ProviderKey.ShouldBe(UserId);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class UserSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("sentinel with Value=null must be filtered out");
+        result.ShouldBeNull("sentinel with Value=null must be filtered out");
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class UserSettingValueProviderTests
 
         IReadOnlyList<SettingValue> entries = await store.GetListAsync(
             "U", null, TestContext.Current.CancellationToken);
-        entries.Should().BeEmpty("unauthenticated — SetAsync must be a no-op");
+        entries.ShouldBeEmpty("unauthenticated — SetAsync must be a no-op");
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public sealed class UserSettingValueProviderTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "U", UserId, TestContext.Current.CancellationToken);
-        stored!.Value.Should().Be("red");
+        stored!.Value.ShouldBe("red");
 
         await cache.Received(1).RemoveAsync(
             Arg.Is<string>(k => k.Contains('U') && k.Contains(UserId) && k.Contains("App.Theme")),
@@ -129,7 +129,7 @@ public sealed class UserSettingValueProviderTests
 
         Func<Task> act = () => provider.ClearAsync(def, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public sealed class UserSettingValueProviderTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "U", UserId, TestContext.Current.CancellationToken);
-        stored.Should().BeNull();
+        stored.ShouldBeNull();
 
         await cache.Received(1).RemoveAsync(
             Arg.Is<string>(k => k.Contains('U') && k.Contains(UserId) && k.Contains("App.Theme")),
@@ -160,6 +160,6 @@ public sealed class UserSettingValueProviderTests
         SettingValue? result = await providerA.GetOrNullAsync(
             new SettingDefinition("App.Theme"), TestContext.Current.CancellationToken);
 
-        result!.Value.Should().Be("red", "provider must only read user-A's value");
+        result!.Value.ShouldBe("red", "provider must only read user-A's value");
     }
 }

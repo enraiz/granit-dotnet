@@ -8,7 +8,6 @@
 // and resolves services from the real DI container.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Extensions;
 using Granit.Core.Modularity;
 using Granit.Core.MultiTenancy;
@@ -17,6 +16,7 @@ using Granit.MultiTenancy.Pipeline;
 using Granit.MultiTenancy.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.MultiTenancy.Tests;
@@ -40,9 +40,9 @@ public sealed class GranitMultiTenancyModuleTests
         ICurrentTenant first = app.Services.GetRequiredService<ICurrentTenant>();
         ICurrentTenant second = app.Services.GetRequiredService<ICurrentTenant>();
 
-        first.Should().NotBeNull();
-        first.Should().BeOfType<CurrentTenant>();
-        first.Should().BeSameAs(second, "ICurrentTenant must be a singleton");
+        first.ShouldNotBeNull();
+        first.ShouldBeOfType<CurrentTenant>();
+        first.ShouldBeSameAs(second, "ICurrentTenant must be a singleton");
     }
 
     [Fact]
@@ -53,8 +53,8 @@ public sealed class GranitMultiTenancyModuleTests
         TenantResolverPipeline first = app.Services.GetRequiredService<TenantResolverPipeline>();
         TenantResolverPipeline second = app.Services.GetRequiredService<TenantResolverPipeline>();
 
-        first.Should().NotBeNull();
-        first.Should().BeSameAs(second, "TenantResolverPipeline must be a singleton");
+        first.ShouldNotBeNull();
+        first.ShouldBeSameAs(second, "TenantResolverPipeline must be a singleton");
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class GranitMultiTenancyModuleTests
 
         IEnumerable<ITenantResolver> resolvers = app.Services.GetRequiredService<IEnumerable<ITenantResolver>>();
 
-        resolvers.Should().HaveCount(2);
+        resolvers.Count().ShouldBe(2);
     }
 
     [Fact]
@@ -77,8 +77,8 @@ public sealed class GranitMultiTenancyModuleTests
             .OrderBy(r => r.Order)
             .ToList();
 
-        ordered[0].Should().BeOfType<HeaderTenantResolver>("Header (order=100) must precede JWT (order=200)");
-        ordered[1].Should().BeOfType<JwtClaimTenantResolver>();
+        ordered[0].ShouldBeOfType<HeaderTenantResolver>("Header (order=100) must precede JWT (order=200)");
+        ordered[1].ShouldBeOfType<JwtClaimTenantResolver>();
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class GranitMultiTenancyModuleTests
 
         TenantResolutionMiddleware middleware = scope.ServiceProvider.GetRequiredService<TenantResolutionMiddleware>();
 
-        middleware.Should().NotBeNull();
+        middleware.ShouldNotBeNull();
     }
 
     // --- Topological order ---
@@ -101,9 +101,8 @@ public sealed class GranitMultiTenancyModuleTests
 
         GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
 
-        granitApp.GetModuleTypes().Should().Contain(
-            typeof(GranitMultiTenancyModule),
-            because: "MultiTenancy module is standalone with no Security dependency");
+        granitApp.GetModuleTypes().ShouldContain(typeof(GranitMultiTenancyModule),
+            "MultiTenancy module is standalone with no Security dependency");
     }
 
     // --- Functional test (AbpIntegratedTest style) ---
@@ -115,16 +114,16 @@ public sealed class GranitMultiTenancyModuleTests
         ICurrentTenant currentTenant = app.Services.GetRequiredService<ICurrentTenant>();
         var tenantId = Guid.NewGuid();
 
-        currentTenant.IsAvailable.Should().BeFalse("no active tenant at startup");
+        currentTenant.IsAvailable.ShouldBeFalse("no active tenant at startup");
 
         using (currentTenant.Change(tenantId, "Acme"))
         {
-            currentTenant.IsAvailable.Should().BeTrue();
-            currentTenant.Id.Should().Be(tenantId);
-            currentTenant.Name.Should().Be("Acme");
+            currentTenant.IsAvailable.ShouldBeTrue();
+            currentTenant.Id.ShouldBe(tenantId);
+            currentTenant.Name.ShouldBe("Acme");
         }
 
-        currentTenant.IsAvailable.Should().BeFalse("the scope must be restored after Dispose");
+        currentTenant.IsAvailable.ShouldBeFalse("the scope must be restored after Dispose");
     }
 
     [Fact]
@@ -137,16 +136,16 @@ public sealed class GranitMultiTenancyModuleTests
 
         using (currentTenant.Change(outer, "Outer"))
         {
-            currentTenant.Id.Should().Be(outer);
+            currentTenant.Id.ShouldBe(outer);
 
             using (currentTenant.Change(inner, "Inner"))
             {
-                currentTenant.Id.Should().Be(inner);
+                currentTenant.Id.ShouldBe(inner);
             }
 
-            currentTenant.Id.Should().Be(outer, "the outer scope must be restored after the inner scope is disposed");
+            currentTenant.Id.ShouldBe(outer, "the outer scope must be restored after the inner scope is disposed");
         }
 
-        currentTenant.IsAvailable.Should().BeFalse();
+        currentTenant.IsAvailable.ShouldBeFalse();
     }
 }

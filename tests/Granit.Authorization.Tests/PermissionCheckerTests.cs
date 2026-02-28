@@ -11,7 +11,6 @@
 //   7. Logique OR multi-rôles
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Cache;
 using Granit.Authorization.Options;
@@ -22,6 +21,7 @@ using Granit.Security;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.Tests;
@@ -51,7 +51,7 @@ public sealed class PermissionCheckerTests
         bool result = await checker.IsGrantedAsync(DefinedPermission, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
         await cache.DidNotReceive().GetOrAddAsync(
             Arg.Any<string>(),
             Arg.Any<Func<CancellationToken, Task<PermissionGrantCacheItem>>>(),
@@ -73,7 +73,7 @@ public sealed class PermissionCheckerTests
         bool result = await checker.IsGrantedAsync(DefinedPermission, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     // --- AdminRole bypass ---
@@ -94,7 +94,7 @@ public sealed class PermissionCheckerTests
         bool result = await checker.IsGrantedAsync(DefinedPermission, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
         await cache.DidNotReceive().GetOrAddAsync(
             Arg.Any<string>(),
             Arg.Any<Func<CancellationToken, Task<PermissionGrantCacheItem>>>(),
@@ -116,8 +116,7 @@ public sealed class PermissionCheckerTests
         Func<Task> act = () => checker.IsGrantedAsync(UndefinedPermission);
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"*'{UndefinedPermission}'*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain($"'{UndefinedPermission}'");
     }
 
     // --- Cache miss → store called ---
@@ -143,7 +142,7 @@ public sealed class PermissionCheckerTests
         bool result = await checker.IsGrantedAsync(DefinedPermission, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
         await store.Received(1).IsGrantedAsync(
             "editor", DefinedPermission, TenantId, Arg.Any<CancellationToken>());
         await cache.Received(1).GetOrAddAsync(
@@ -179,7 +178,7 @@ public sealed class PermissionCheckerTests
         bool result = await checker.IsGrantedAsync(DefinedPermission, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
         await store.DidNotReceive().IsGrantedAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
     }
@@ -206,7 +205,7 @@ public sealed class PermissionCheckerTests
         bool result = await checker.IsGrantedAsync(DefinedPermission, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Fact]
@@ -227,7 +226,7 @@ public sealed class PermissionCheckerTests
         bool result = await checker.IsGrantedAsync(DefinedPermission, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     // --- BuildCacheKey ---
@@ -237,14 +236,14 @@ public sealed class PermissionCheckerTests
     {
         Guid tenant = Guid.Parse("12345678-1234-1234-1234-123456789abc");
         string key = PermissionChecker.BuildCacheKey(tenant, "editor", "Invoices.Delete");
-        key.Should().Be($"perm:{tenant}:editor:Invoices.Delete");
+        key.ShouldBe($"perm:{tenant}:editor:Invoices.Delete");
     }
 
     [Fact]
     public void BuildCacheKey_WithoutTenantId_UsesGlobalSegment()
     {
         string key = PermissionChecker.BuildCacheKey(null, "editor", "Invoices.Delete");
-        key.Should().Be("perm:global:editor:Invoices.Delete");
+        key.ShouldBe("perm:global:editor:Invoices.Delete");
     }
 
     // --- Helpers ---

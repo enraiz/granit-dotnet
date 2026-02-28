@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.EntityFrameworkCore.Tests;
@@ -30,7 +30,7 @@ public sealed class BackgroundJobsDbContextTests
         Func<Task> act = () => ctx.Database.EnsureCreatedAsync(
             TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // =========================================================================
@@ -46,7 +46,7 @@ public sealed class BackgroundJobsDbContextTests
             .FindEntityType(typeof(BackgroundJobDefinition))!
             .GetTableName();
 
-        tableName.Should().Be("scheduling_background_jobs");
+        tableName.ShouldBe("scheduling_background_jobs");
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class BackgroundJobsDbContextTests
                 i.IsUnique &&
                 i.Properties.Any(p => p.Name == nameof(BackgroundJobDefinition.JobName)));
 
-        uniqueIndex.Should().NotBeNull("a unique index on JobName must be configured");
+        uniqueIndex.ShouldNotBeNull("a unique index on JobName must be configured");
     }
 
     [Fact]
@@ -73,8 +73,8 @@ public sealed class BackgroundJobsDbContextTests
             .FindEntityType(typeof(BackgroundJobDefinition))!
             .FindProperty(nameof(BackgroundJobDefinition.JobName));
 
-        property!.GetMaxLength().Should().Be(200);
-        property.IsNullable.Should().BeFalse();
+        property!.GetMaxLength().ShouldBe(200);
+        property.IsNullable.ShouldBeFalse();
     }
 
     [Fact]
@@ -86,8 +86,8 @@ public sealed class BackgroundJobsDbContextTests
             .FindEntityType(typeof(BackgroundJobDefinition))!
             .FindProperty(nameof(BackgroundJobDefinition.MessageType));
 
-        property!.GetMaxLength().Should().Be(500);
-        property.IsNullable.Should().BeFalse();
+        property!.GetMaxLength().ShouldBe(500);
+        property.IsNullable.ShouldBeFalse();
     }
 
     [Fact]
@@ -99,8 +99,8 @@ public sealed class BackgroundJobsDbContextTests
             .FindEntityType(typeof(BackgroundJobDefinition))!
             .FindProperty(nameof(BackgroundJobDefinition.CronExpression));
 
-        property!.GetMaxLength().Should().Be(100);
-        property.IsNullable.Should().BeFalse();
+        property!.GetMaxLength().ShouldBe(100);
+        property.IsNullable.ShouldBeFalse();
     }
 
     [Fact]
@@ -112,8 +112,8 @@ public sealed class BackgroundJobsDbContextTests
             .FindEntityType(typeof(BackgroundJobDefinition))!
             .FindProperty(nameof(BackgroundJobDefinition.LastErrorMessage));
 
-        property!.GetMaxLength().Should().Be(2000);
-        property.IsNullable.Should().BeTrue();
+        property!.GetMaxLength().ShouldBe(2000);
+        property.IsNullable.ShouldBeTrue();
     }
 
     [Fact]
@@ -125,8 +125,8 @@ public sealed class BackgroundJobsDbContextTests
             .FindEntityType(typeof(BackgroundJobDefinition))!
             .FindProperty(nameof(BackgroundJobDefinition.TriggeredBy));
 
-        property!.GetMaxLength().Should().Be(450);
-        property.IsNullable.Should().BeTrue();
+        property!.GetMaxLength().ShouldBe(450);
+        property.IsNullable.ShouldBeTrue();
     }
 
     // =========================================================================
@@ -160,15 +160,15 @@ public sealed class BackgroundJobsDbContextTests
         BackgroundJobDefinition? loaded = await ctx.Jobs
             .FindAsync([job.Id], TestContext.Current.CancellationToken);
 
-        loaded.Should().NotBeNull();
-        loaded!.JobName.Should().Be("daily-report");
-        loaded.MessageType.Should().Be("My.App.DailyReportMessage, My.App");
-        loaded.CronExpression.Should().Be("0 8 * * *");
-        loaded.IsEnabled.Should().BeTrue();
-        loaded.LastExecutedAt.Should().Be(job.LastExecutedAt);
-        loaded.NextExecutionAt.Should().Be(job.NextExecutionAt);
-        loaded.ConsecutiveFailureCount.Should().Be(2);
-        loaded.LastErrorMessage.Should().Be("Timeout after 30s");
-        loaded.TriggeredBy.Should().Be("admin-user");
+        loaded.ShouldNotBeNull();
+        loaded!.JobName.ShouldBe("daily-report");
+        loaded.MessageType.ShouldBe("My.App.DailyReportMessage, My.App");
+        loaded.CronExpression.ShouldBe("0 8 * * *");
+        loaded.IsEnabled.ShouldBeTrue();
+        loaded.LastExecutedAt.ShouldBe(job.LastExecutedAt);
+        loaded.NextExecutionAt.ShouldBe(job.NextExecutionAt);
+        loaded.ConsecutiveFailureCount.ShouldBe(2);
+        loaded.LastErrorMessage.ShouldBe("Timeout after 30s");
+        loaded.TriggeredBy.ShouldBe("admin-user");
     }
 }

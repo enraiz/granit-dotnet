@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.BlobStorage.Validators;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.Tests.Validators;
@@ -35,7 +35,7 @@ public sealed class MagicBytesValidatorTests
 
         string? result = MagicByteDetector.Detect(buffer);
 
-        result.Should().Be("application/pdf");
+        result.ShouldBe("application/pdf");
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public sealed class MagicBytesValidatorTests
 
         string? result = MagicByteDetector.Detect(buffer);
 
-        result.Should().Be("image/jpeg");
+        result.ShouldBe("image/jpeg");
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public sealed class MagicBytesValidatorTests
 
         string? result = MagicByteDetector.Detect(buffer);
 
-        result.Should().Be("image/png");
+        result.ShouldBe("image/png");
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class MagicBytesValidatorTests
 
         string? result = MagicByteDetector.Detect(buffer);
 
-        result.Should().Be("application/dicom");
+        result.ShouldBe("application/dicom");
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public sealed class MagicBytesValidatorTests
 
         string? result = MagicByteDetector.Detect(buffer);
 
-        result.Should().Be("application/zip");
+        result.ShouldBe("application/zip");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public sealed class MagicBytesValidatorTests
 
         string? result = MagicByteDetector.Detect(buffer);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public sealed class MagicBytesValidatorTests
 
         string? result = MagicByteDetector.Detect(buffer);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // ── MagicBytesValidator.ValidateAsync ────────────────────────────────────
@@ -119,8 +119,8 @@ public sealed class MagicBytesValidatorTests
         BlobValidationResult result = await validator.ValidateAsync(
             context, TestContext.Current.CancellationToken);
 
-        result.IsValid.Should().BeTrue();
-        result.VerifiedContentType.Should().Be("application/pdf");
+        result.IsValid.ShouldBeTrue();
+        result.VerifiedContentType.ShouldBe("application/pdf");
     }
 
     [Fact]
@@ -133,9 +133,9 @@ public sealed class MagicBytesValidatorTests
         BlobValidationResult result = await validator.ValidateAsync(
             context, TestContext.Current.CancellationToken);
 
-        result.IsValid.Should().BeFalse();
-        result.FailureReason.Should().Contain("image/jpeg");
-        result.FailureReason.Should().Contain("application/pdf");
+        result.IsValid.ShouldBeFalse();
+        result.FailureReason!.ShouldContain("image/jpeg");
+        result.FailureReason!.ShouldContain("application/pdf");
     }
 
     [Fact]
@@ -149,8 +149,8 @@ public sealed class MagicBytesValidatorTests
         BlobValidationResult result = await validator.ValidateAsync(
             context, TestContext.Current.CancellationToken);
 
-        result.IsValid.Should().BeTrue("unknown formats pass through to avoid false negatives");
-        result.VerifiedContentType.Should().Be("application/octet-stream");
+        result.IsValid.ShouldBeTrue("unknown formats pass through to avoid false negatives");
+        result.VerifiedContentType.ShouldBe("application/octet-stream");
     }
 
     [Fact]
@@ -164,10 +164,10 @@ public sealed class MagicBytesValidatorTests
         BlobValidationResult result = await validator.ValidateAsync(
             context, TestContext.Current.CancellationToken);
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Fact]
     public void Order_Is10() =>
-        new MagicBytesValidator().Order.Should().Be(10);
+        new MagicBytesValidator().Order.ShouldBe(10);
 }

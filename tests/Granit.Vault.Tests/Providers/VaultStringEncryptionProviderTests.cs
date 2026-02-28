@@ -1,9 +1,9 @@
-using FluentAssertions;
 using Granit.Encryption;
 using Granit.Vault.Providers;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Vault.Tests.Providers;
@@ -32,7 +32,7 @@ public sealed class VaultStringEncryptionProviderTests
     {
         VaultStringEncryptionProvider provider = CreateProvider();
 
-        provider.ProviderName.Should().Be(StringEncryptionOptions.VaultProviderName);
+        provider.ProviderName.ShouldBe(StringEncryptionOptions.VaultProviderName);
     }
 
     // -------------------------------------------------------------------------
@@ -48,7 +48,7 @@ public sealed class VaultStringEncryptionProviderTests
 
         string result = provider.Encrypt("plain");
 
-        result.Should().Be("vault:v1:encrypted");
+        result.ShouldBe("vault:v1:encrypted");
         service.Received(1).EncryptAsync(KeyName, "plain", Arg.Any<CancellationToken>());
     }
 
@@ -65,7 +65,7 @@ public sealed class VaultStringEncryptionProviderTests
 
         string? result = provider.Decrypt("vault:v1:encrypted");
 
-        result.Should().Be("plain");
+        result.ShouldBe("plain");
         service.Received(1).DecryptAsync(KeyName, "vault:v1:encrypted", Arg.Any<CancellationToken>());
     }
 
@@ -79,7 +79,7 @@ public sealed class VaultStringEncryptionProviderTests
 
         string? result = provider.Decrypt(cipherText!);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
         service.DidNotReceive().DecryptAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -93,6 +93,6 @@ public sealed class VaultStringEncryptionProviderTests
 
         string? result = provider.Decrypt("vault:v1:corrupted");
 
-        result.Should().BeNull("exceptions must be silenced — return null instead of propagating");
+        result.ShouldBeNull("exceptions must be silenced — return null instead of propagating");
     }
 }

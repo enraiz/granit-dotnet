@@ -5,12 +5,12 @@
 // AddGranitWolverineWithPostgresql() registers Wolverine services without throwing.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Persistence;
 using Granit.Wolverine.Postgresql.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Wolverine.Postgresql.Tests;
@@ -19,11 +19,11 @@ public sealed class GranitWolverinePostgresqlModuleTests
 {
     [Fact]
     public void GranitWolverinePostgresqlModule_IsGranitModule() =>
-        typeof(GranitWolverinePostgresqlModule).Should().BeAssignableTo<GranitModule>();
+        typeof(GranitWolverinePostgresqlModule).IsAssignableTo(typeof(GranitModule)).ShouldBeTrue();
 
     [Fact]
     public void GranitWolverinePostgresqlModule_IsSealed() =>
-        typeof(GranitWolverinePostgresqlModule).IsSealed.Should().BeTrue();
+        typeof(GranitWolverinePostgresqlModule).IsSealed.ShouldBeTrue();
 
     [Fact]
     public void GranitWolverinePostgresqlModule_DependsOn_WolverineModule()
@@ -31,7 +31,7 @@ public sealed class GranitWolverinePostgresqlModuleTests
         DependsOnAttribute[] attributes = (DependsOnAttribute[])
             typeof(GranitWolverinePostgresqlModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
-        attributes.Should().ContainSingle(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));
+        attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public sealed class GranitWolverinePostgresqlModuleTests
         DependsOnAttribute[] attributes = (DependsOnAttribute[])
             typeof(GranitWolverinePostgresqlModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
-        attributes.Should().ContainSingle(a => a.DependedTypes.Contains(typeof(GranitPersistenceModule)));
+        attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitPersistenceModule)));
     }
 
     [Fact]
@@ -61,6 +61,6 @@ public sealed class GranitWolverinePostgresqlModuleTests
 
         Action act = () => builder.AddGranitWolverineWithPostgresql();
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 }

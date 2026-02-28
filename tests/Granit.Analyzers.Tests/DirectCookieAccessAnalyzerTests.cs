@@ -2,8 +2,8 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Analyzers.Tests;
@@ -37,7 +37,7 @@ public sealed class DirectCookieAccessAnalyzerTests
                 CookieStubs,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class DirectCookieAccessAnalyzerTests
                 CookieStubs,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId);
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public sealed class DirectCookieAccessAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public sealed class DirectCookieAccessAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId)
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public sealed class DirectCookieAccessAnalyzerTests
                 TestContext.Current.CancellationToken);
 
         diagnostics.Where(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId)
-            .Should().HaveCount(3);
+            .Count().ShouldBe(3);
     }
 
     [Fact]
@@ -166,6 +166,6 @@ public sealed class DirectCookieAccessAnalyzerTests
                 CookieStubs,
                 TestContext.Current.CancellationToken);
 
-        diagnostics.Should().ContainSingle(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId);
+        diagnostics.ShouldContain(d => d.Id == DirectCookieAccessAnalyzer.DiagnosticId);
     }
 }

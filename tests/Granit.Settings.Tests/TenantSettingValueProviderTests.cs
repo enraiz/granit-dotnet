@@ -5,7 +5,6 @@
 // and cache invalidation keyed by tenant ID.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Caching;
 using Granit.Core.MultiTenancy;
 using Granit.Settings.Definitions;
@@ -16,6 +15,7 @@ using Granit.Settings.Values;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -49,11 +49,11 @@ public sealed class TenantSettingValueProviderTests
 
     [Fact]
     public void Name_Is_T() =>
-        Create().provider.Name.Should().Be("T");
+        Create().provider.Name.ShouldBe("T");
 
     [Fact]
     public void Order_Is_200() =>
-        Create().provider.Order.Should().Be(200);
+        Create().provider.Order.ShouldBe(200);
 
     [Fact]
     public async Task GetOrNullAsync_NoTenant_Returns_Null()
@@ -63,7 +63,7 @@ public sealed class TenantSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("no active tenant — provider must short-circuit");
+        result.ShouldBeNull("no active tenant — provider must short-circuit");
     }
 
     [Fact]
@@ -75,9 +75,9 @@ public sealed class TenantSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Value.Should().Be("blue");
-        result.ProviderKey.Should().Be(TenantId.ToString());
+        result.ShouldNotBeNull();
+        result!.Value.ShouldBe("blue");
+        result.ProviderKey.ShouldBe(TenantId.ToString());
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class TenantSettingValueProviderTests
 
         SettingValue? result = await provider.GetOrNullAsync(def, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("sentinel with Value=null must be filtered out");
+        result.ShouldBeNull("sentinel with Value=null must be filtered out");
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class TenantSettingValueProviderTests
 
         IReadOnlyList<SettingValue> entries = await store.GetListAsync(
             "T", null, TestContext.Current.CancellationToken);
-        entries.Should().BeEmpty("no tenant — SetAsync must be a no-op");
+        entries.ShouldBeEmpty("no tenant — SetAsync must be a no-op");
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public sealed class TenantSettingValueProviderTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "T", TenantId.ToString(), TestContext.Current.CancellationToken);
-        stored!.Value.Should().Be("blue");
+        stored!.Value.ShouldBe("blue");
 
         await cache.Received(1).RemoveAsync(
             Arg.Is<string>(k => k.Contains('T') && k.Contains(TenantId.ToString()) && k.Contains("App.Theme")),
@@ -129,7 +129,7 @@ public sealed class TenantSettingValueProviderTests
 
         Func<Task> act = () => provider.ClearAsync(def, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public sealed class TenantSettingValueProviderTests
 
         SettingValue? stored = await store.GetOrNullAsync(
             "App.Theme", "T", TenantId.ToString(), TestContext.Current.CancellationToken);
-        stored.Should().BeNull();
+        stored.ShouldBeNull();
 
         await cache.Received(1).RemoveAsync(
             Arg.Is<string>(k => k.Contains('T') && k.Contains(TenantId.ToString()) && k.Contains("App.Theme")),
@@ -163,6 +163,6 @@ public sealed class TenantSettingValueProviderTests
         SettingValue? result = await providerA.GetOrNullAsync(
             new SettingDefinition("App.Theme"), TestContext.Current.CancellationToken);
 
-        result!.Value.Should().Be("blue", "provider must only see tenant A's value");
+        result!.Value.ShouldBe("blue", "provider must only see tenant A's value");
     }
 }

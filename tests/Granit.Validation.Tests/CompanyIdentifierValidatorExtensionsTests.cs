@@ -6,9 +6,9 @@
 // BelgianBce:  10 digits, check = 97 − (first 8 mod 97)
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -33,7 +33,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(siren));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -50,9 +50,9 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(siren));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchSiren");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchSiren");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchSiren");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchSiren");
     }
 
     // =========================================================================
@@ -71,7 +71,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(siret));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -88,9 +88,9 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(siret));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchSiret");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchSiret");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchSiret");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchSiret");
     }
 
     // =========================================================================
@@ -112,7 +112,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(bce));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -128,9 +128,9 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(bce));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBelgianBce");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianBce");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianBce");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianBce");
     }
 
     // =========================================================================
@@ -149,7 +149,7 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -166,9 +166,9 @@ public sealed class CompanyIdentifierValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(code));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchNafCode");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchNafCode");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchNafCode");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchNafCode");
     }
 
     // -------------------------------------------------------------------------

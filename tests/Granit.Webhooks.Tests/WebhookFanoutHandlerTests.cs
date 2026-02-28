@@ -6,13 +6,13 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Handlers;
 using Granit.Webhooks.Messages;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Webhooks.Tests;
@@ -38,7 +38,7 @@ public sealed class WebhookFanoutHandlerTests
         WebhookTrigger trigger = BuildTrigger();
         IEnumerable<SendWebhookCommand> result = await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class WebhookFanoutHandlerTests
         WebhookTrigger trigger = BuildTrigger();
         IEnumerable<SendWebhookCommand> result = await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(3);
+        result.Count().ShouldBe(3);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class WebhookFanoutHandlerTests
             await _handler.HandleAsync(BuildTrigger(), TestContext.Current.CancellationToken);
 
         List<SendWebhookCommand> commands = result.ToList();
-        commands.Select(c => c.DeliveryId).Distinct().Should().HaveCount(2);
+        commands.Select(c => c.DeliveryId).Distinct().Count().ShouldBe(2);
     }
 
     [Fact]
@@ -81,8 +81,7 @@ public sealed class WebhookFanoutHandlerTests
         IEnumerable<SendWebhookCommand> result = await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         List<SendWebhookCommand> commands = result.ToList();
-        commands.Select(c => c.Envelope.EventId).Distinct().Should().ContainSingle()
-            .Which.Should().Be(trigger.EventId);
+        commands.Select(c => c.Envelope.EventId).Distinct().ShouldHaveSingleItem().ShouldBe(trigger.EventId);
     }
 
     [Fact]
@@ -128,7 +127,7 @@ public sealed class WebhookFanoutHandlerTests
         IEnumerable<SendWebhookCommand> result =
             await _handler.HandleAsync(BuildTrigger(), TestContext.Current.CancellationToken);
 
-        result.Single().Envelope.ApiVersion.Should().Be(WebhooksConstants.ApiVersion);
+        result.Single().Envelope.ApiVersion.ShouldBe(WebhooksConstants.ApiVersion);
     }
 
     // -------------------------------------------------------------------------

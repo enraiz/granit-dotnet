@@ -2,10 +2,10 @@
 // AesStringEncryptionProviderTests - Tests unitaires AES-256-CBC
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Encryption;
 using Granit.Encryption.Providers;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Encryption.Tests;
@@ -29,7 +29,7 @@ public sealed class AesStringEncryptionProviderTests
     {
         AesStringEncryptionProvider provider = CreateProvider();
 
-        provider.ProviderName.Should().Be("Aes");
+        provider.ProviderName.ShouldBe("Aes");
     }
 
     [Theory]
@@ -44,7 +44,7 @@ public sealed class AesStringEncryptionProviderTests
         string cipherText = provider.Encrypt(plainText);
         string? decrypted = provider.Decrypt(cipherText);
 
-        decrypted.Should().Be(plainText);
+        decrypted.ShouldBe(plainText);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public sealed class AesStringEncryptionProviderTests
         string cipher1 = provider.Encrypt(plainText);
         string cipher2 = provider.Encrypt(plainText);
 
-        cipher1.Should().NotBe(cipher2, "l'IV aléatoire doit produire des ciphertexts distincts");
+        cipher1.ShouldNotBe(cipher2, "l'IV aléatoire doit produire des ciphertexts distincts");
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public sealed class AesStringEncryptionProviderTests
         string cipherText = provider.Encrypt("test");
 
         byte[] bytes = Convert.FromBase64String(cipherText);
-        bytes.Should().HaveCountGreaterThan(16, "le ciphertext doit contenir au moins IV(16) + un bloc AES");
+        bytes.Length.ShouldBeGreaterThan(16, "le ciphertext doit contenir au moins IV(16) + un bloc AES");
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class AesStringEncryptionProviderTests
 
         string? result = provider.Decrypt(null!);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class AesStringEncryptionProviderTests
 
         string? result = provider.Decrypt(string.Empty);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public sealed class AesStringEncryptionProviderTests
 
         string? result = provider.Decrypt("ceci-n-est-pas-du-base64!!!");
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public sealed class AesStringEncryptionProviderTests
 
         string? result = provider.Decrypt(tampered);
 
-        result.Should().BeNull("un ciphertext falsifié doit échouer silencieusement");
+        result.ShouldBeNull("un ciphertext falsifié doit échouer silencieusement");
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public sealed class AesStringEncryptionProviderTests
 
         string? result = provider.Decrypt(tooShort);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -139,8 +139,7 @@ public sealed class AesStringEncryptionProviderTests
 
         Action act = () => _ = new AesStringEncryptionProvider(options);
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*PassPhrase*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("PassPhrase");
     }
 
     [Fact]
@@ -152,6 +151,6 @@ public sealed class AesStringEncryptionProviderTests
         string cipherText = providerA.Encrypt("données confidentielles");
         string? result = providerB.Decrypt(cipherText);
 
-        result.Should().BeNull("un ciphertext chiffré avec la clé A ne peut pas être déchiffré avec la clé B");
+        result.ShouldBeNull("un ciphertext chiffré avec la clé A ne peut pas être déchiffré avec la clé B");
     }
 }

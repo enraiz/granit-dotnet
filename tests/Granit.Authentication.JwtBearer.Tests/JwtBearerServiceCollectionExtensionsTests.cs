@@ -7,7 +7,6 @@
 //   - CurrentUser and HttpContextAccessor services
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authentication.JwtBearer.Authentication;
 using Granit.Authentication.JwtBearer.Extensions;
 using Granit.Authentication.JwtBearer.Options;
@@ -18,6 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authentication.JwtBearer.Tests;
@@ -51,10 +51,10 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
 
         // Assert
         JwtBearerAuthOptions options = sp.GetRequiredService<IOptions<JwtBearerAuthOptions>>().Value;
-        options.Authority.Should().Be("https://auth.test.com/realms/test");
-        options.Audience.Should().Be("test-client");
-        options.RequireHttpsMetadata.Should().BeFalse();
-        options.NameClaimType.Should().Be("sub");
+        options.Authority.ShouldBe("https://auth.test.com/realms/test");
+        options.Audience.ShouldBe("test-client");
+        options.RequireHttpsMetadata.ShouldBeFalse();
+        options.NameClaimType.ShouldBe("sub");
     }
 
     [Fact]
@@ -74,13 +74,13 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
         JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
             .Get(JwtBearerDefaults.AuthenticationScheme);
 
-        jwtOptions.Authority.Should().Be("https://auth.test.com/realms/test");
-        jwtOptions.Audience.Should().Be("test-client");
-        jwtOptions.RequireHttpsMetadata.Should().BeFalse();
-        jwtOptions.TokenValidationParameters.ValidateIssuer.Should().BeTrue();
-        jwtOptions.TokenValidationParameters.ValidateAudience.Should().BeTrue();
-        jwtOptions.TokenValidationParameters.ValidateLifetime.Should().BeTrue();
-        jwtOptions.TokenValidationParameters.NameClaimType.Should().Be("sub");
+        jwtOptions.Authority.ShouldBe("https://auth.test.com/realms/test");
+        jwtOptions.Audience.ShouldBe("test-client");
+        jwtOptions.RequireHttpsMetadata.ShouldBeFalse();
+        jwtOptions.TokenValidationParameters.ValidateIssuer.ShouldBeTrue();
+        jwtOptions.TokenValidationParameters.ValidateAudience.ShouldBeTrue();
+        jwtOptions.TokenValidationParameters.ValidateLifetime.ShouldBeTrue();
+        jwtOptions.TokenValidationParameters.NameClaimType.ShouldBe("sub");
     }
 
     [Fact]
@@ -99,9 +99,8 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
         // Assert — only "Authenticated" is registered in Granit.Authentication.JwtBearer (base)
         AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
 
-        authOptions.GetPolicy("Authenticated").Should().NotBeNull();
-        authOptions.GetPolicy("Admin").Should().BeNull(
-            "Admin is specific to Keycloak, registered by Granit.Authentication.Keycloak");
+        authOptions.GetPolicy("Authenticated").ShouldNotBeNull();
+        authOptions.GetPolicy("Admin").ShouldBeNull("Admin is specific to Keycloak, registered by Granit.Authentication.Keycloak");
     }
 
     [Fact]
@@ -119,9 +118,9 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(ICurrentUserService));
 
-        descriptor.Should().NotBeNull();
-        descriptor!.ImplementationType.Should().Be<CurrentUserService>();
-        descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+        descriptor.ShouldNotBeNull();
+        descriptor!.ImplementationType.ShouldBe(typeof(CurrentUserService));
+        descriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 
     [Fact]
@@ -139,7 +138,7 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(IHttpContextAccessor));
 
-        descriptor.Should().NotBeNull();
+        descriptor.ShouldNotBeNull();
     }
 
     [Fact]
@@ -166,6 +165,6 @@ public sealed class JwtBearerServiceCollectionExtensionsTests
         JwtBearerOptions jwtOptions = sp.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
             .Get(JwtBearerDefaults.AuthenticationScheme);
 
-        jwtOptions.TokenValidationParameters.NameClaimType.Should().Be("email");
+        jwtOptions.TokenValidationParameters.NameClaimType.ShouldBe("email");
     }
 }

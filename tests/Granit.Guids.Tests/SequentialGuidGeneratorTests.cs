@@ -8,10 +8,10 @@
 //   - Respecte la configuration du type sequentiel
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Guids.Tests;
@@ -41,7 +41,7 @@ public sealed class SequentialGuidGeneratorTests
         Guid guid = generator.Create();
 
         // Assert
-        guid.Should().NotBe(Guid.Empty);
+        guid.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class SequentialGuidGeneratorTests
         }
 
         // Assert
-        guids.Should().HaveCount(10_000, "tous les GUID doivent etre uniques");
+        guids.Count.ShouldBe(10_000, "tous les GUID doivent etre uniques");
     }
 
     [Fact]
@@ -76,8 +76,7 @@ public sealed class SequentialGuidGeneratorTests
         }
 
         // Assert - les representations string doivent etre en ordre croissant
-        guids.Should().BeInAscendingOrder(
-            "les GUID SequentialAsString doivent etre ordonnes par string");
+        guids.ShouldBeInOrder(SortDirection.Ascending);
     }
 
     [Fact]
@@ -90,7 +89,7 @@ public sealed class SequentialGuidGeneratorTests
         Guid guid = generator.Create();
 
         // Assert
-        guid.Should().NotBe(Guid.Empty);
+        guid.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -103,7 +102,7 @@ public sealed class SequentialGuidGeneratorTests
         Guid guid = generator.Create();
 
         // Assert
-        guid.Should().NotBe(Guid.Empty);
+        guid.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -121,8 +120,7 @@ public sealed class SequentialGuidGeneratorTests
         }
 
         // Assert - si le defaut est SequentialAsString, les strings sont ordonnees
-        guids.Should().BeInAscendingOrder(
-            "le defaut doit etre SequentialAsString (PostgreSQL)");
+        guids.ShouldBeInOrder(SortDirection.Ascending);
     }
 
     [Fact]
@@ -146,7 +144,7 @@ public sealed class SequentialGuidGeneratorTests
         for (int i = 1; i < lastSixBytesList.Count; i++)
         {
             int comparison = CompareBytes(lastSixBytesList[i], lastSixBytesList[i - 1]);
-            comparison.Should().BeGreaterThanOrEqualTo(0,
+            comparison.ShouldBeGreaterThanOrEqualTo(0,
                 "les 6 derniers octets (timestamp) doivent etre croissants pour SequentialAtEnd");
         }
     }

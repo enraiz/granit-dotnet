@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -17,10 +17,10 @@ public sealed class MigrationCycleRegistryTests
         _registry.Register("cycle-1", typeof(DbContext), migration);
 
         MigrationCycleRegistration? found = _registry.Find("cycle-1");
-        found.Should().NotBeNull();
-        found!.CycleId.Should().Be("cycle-1");
-        found.DbContextType.Should().Be<DbContext>();
-        found.Migration.Should().BeSameAs(migration);
+        found.ShouldNotBeNull();
+        found!.CycleId.ShouldBe("cycle-1");
+        found.DbContextType.ShouldBe(typeof(DbContext));
+        found.Migration.ShouldBeSameAs(migration);
     }
 
     [Fact]
@@ -31,8 +31,7 @@ public sealed class MigrationCycleRegistryTests
 
         Action act = () => _registry.Register("cycle-dup", typeof(DbContext), migration);
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*cycle-dup*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("cycle-dup");
     }
 
     [Fact]
@@ -43,7 +42,7 @@ public sealed class MigrationCycleRegistryTests
 
         Action act = () => _registry.Register("cycle-case", typeof(DbContext), migration);
 
-        act.Should().Throw<InvalidOperationException>();
+        Should.Throw<InvalidOperationException>(act);
     }
 
     [Fact]
@@ -51,7 +50,7 @@ public sealed class MigrationCycleRegistryTests
     {
         MigrationCycleRegistration? result = _registry.Find("unknown");
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -62,7 +61,7 @@ public sealed class MigrationCycleRegistryTests
 
         MigrationCycleRegistration? result = _registry.Find("cyclea");
 
-        result.Should().NotBeNull();
-        result!.CycleId.Should().Be("CycleA");
+        result.ShouldNotBeNull();
+        result!.CycleId.ShouldBe("CycleA");
     }
 }

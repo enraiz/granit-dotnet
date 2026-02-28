@@ -6,11 +6,11 @@
 //   - Avec configure != null → options personnalisées enregistrées
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Diagnostics.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 using HealthCheckService = Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckService;
 
@@ -30,7 +30,7 @@ public sealed class DiagnosticsServiceCollectionExtensionsTests
         // Assert — AddHealthChecks was called: HealthCheckService is registered
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(HealthCheckService));
-        descriptor.Should().NotBeNull("AddHealthChecks must register HealthCheckService");
+        descriptor.ShouldNotBeNull("AddHealthChecks must register HealthCheckService");
     }
 
     [Fact]
@@ -49,8 +49,8 @@ public sealed class DiagnosticsServiceCollectionExtensionsTests
         // Assert — DiagnosticsOptions reflects the customization
         using ServiceProvider sp = services.BuildServiceProvider();
         DiagnosticsOptions diagnosticsOptions = sp.GetRequiredService<IOptions<DiagnosticsOptions>>().Value;
-        diagnosticsOptions.LivenessPath.Should().Be("/ping");
-        diagnosticsOptions.DefaultCacheDuration.Should().Be(TimeSpan.FromSeconds(30));
+        diagnosticsOptions.LivenessPath.ShouldBe("/ping");
+        diagnosticsOptions.DefaultCacheDuration.ShouldBe(TimeSpan.FromSeconds(30));
     }
 
     [Fact]
@@ -63,6 +63,6 @@ public sealed class DiagnosticsServiceCollectionExtensionsTests
         IServiceCollection returned = services.AddGranitDiagnostics();
 
         // Assert
-        returned.Should().BeSameAs(services);
+        returned.ShouldBeSameAs(services);
     }
 }

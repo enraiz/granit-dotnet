@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.Diagnostics.Caching;
 using Granit.Timing;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Diagnostics.Tests;
@@ -29,7 +29,7 @@ public sealed class CachedHealthCheckTests
 
         HealthCheckResult result = await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
 
-        result.Status.Should().Be(HealthStatus.Healthy);
+        result.Status.ShouldBe(HealthStatus.Healthy);
         await inner.Received(1).CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>());
     }
 
@@ -46,7 +46,7 @@ public sealed class CachedHealthCheckTests
         await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
         HealthCheckResult cached = await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
 
-        cached.Status.Should().Be(HealthStatus.Healthy);
+        cached.Status.ShouldBe(HealthStatus.Healthy);
         await inner.Received(1).CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>());
     }
 
@@ -72,8 +72,8 @@ public sealed class CachedHealthCheckTests
 
         HealthCheckResult[] results = await Task.WhenAll(tasks);
 
-        callCount.Should().Be(1);
-        results.Should().AllSatisfy(r => r.Status.Should().Be(HealthStatus.Healthy));
+        callCount.ShouldBe(1);
+        results.ToList().ForEach(r => r.Status.ShouldBe(HealthStatus.Healthy));
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public sealed class CachedHealthCheckTests
         await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
         HealthCheckResult result = await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
 
-        result.Status.Should().Be(HealthStatus.Degraded);
+        result.Status.ShouldBe(HealthStatus.Degraded);
         await inner.Received(1).CheckHealthAsync(Arg.Any<HealthCheckContext>(), Arg.Any<CancellationToken>());
     }
 
@@ -120,7 +120,7 @@ public sealed class CachedHealthCheckTests
 
         // Act & Assert — Dispose must not throw; SemaphoreSlim is released
         Action act = sut.Dispose;
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -165,9 +165,9 @@ public sealed class CachedHealthCheckTests
         HealthCheckResult secondResult = await secondCall;
 
         // Only one call to inner
-        callCount.Should().Be(1);
-        firstResult.Status.Should().Be(HealthStatus.Healthy);
-        secondResult.Status.Should().Be(HealthStatus.Healthy);
+        callCount.ShouldBe(1);
+        firstResult.Status.ShouldBe(HealthStatus.Healthy);
+        secondResult.Status.ShouldBe(HealthStatus.Healthy);
     }
 
     private static HealthCheckContext BuildContext() =>

@@ -99,7 +99,7 @@ and is available in every module without referencing `Granit.MultiTenancy`.
 - Application modules (`GuavaHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
   as usual when multi-tenancy is required in the application.
 
-**Tests**: each package has a test project (`*.Tests`). xUnit + FluentAssertions +
+**Tests**: each package has a test project (`*.Tests`). xUnit + Shouldly +
 NSubstitute + Bogus. Tests are part of the DoD for every story.
 
 **Markdown**: all `.md` files must comply with markdownlint (config in `.markdownlint.json`).

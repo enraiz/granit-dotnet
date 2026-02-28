@@ -10,7 +10,6 @@
 //   - Retourne les rôles ayant accès à une permission
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Cache;
 using Granit.Authorization.EntityFrameworkCore.DbContext;
@@ -21,6 +20,7 @@ using Granit.Caching;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.EntityFrameworkCore.Tests;
@@ -48,7 +48,7 @@ public sealed class PermissionManagerTests
         bool exists = await context.PermissionGrants.AnyAsync(
             g => g.Name == DefinedPermission && g.RoleName == "accountant" && g.TenantId == TenantId,
             TestContext.Current.CancellationToken);
-        exists.Should().BeTrue();
+        exists.ShouldBeTrue();
 
         // Assert — cache invalidated
         await cache.Received(1).RemoveAsync(
@@ -83,7 +83,7 @@ public sealed class PermissionManagerTests
         bool exists = await context.PermissionGrants.AnyAsync(
             g => g.Name == DefinedPermission && g.RoleName == "accountant" && g.TenantId == TenantId,
             TestContext.Current.CancellationToken);
-        exists.Should().BeFalse();
+        exists.ShouldBeFalse();
 
         // Assert — cache invalidated
         await cache.Received(1).RemoveAsync(
@@ -118,7 +118,7 @@ public sealed class PermissionManagerTests
         int count = await context.PermissionGrants.CountAsync(
             g => g.Name == DefinedPermission && g.RoleName == "accountant",
             TestContext.Current.CancellationToken);
-        count.Should().Be(1);
+        count.ShouldBe(1);
 
         // Assert — cache NOT invalidated (no-op)
         await cache.DidNotReceive().RemoveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
@@ -144,11 +144,10 @@ public sealed class PermissionManagerTests
         Func<Task> act = () => manager.SetAsync(UndefinedPermission, "accountant", TenantId, isGranted: true);
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"*'{UndefinedPermission}'*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain($"'{UndefinedPermission}'");
 
         int count = await context.PermissionGrants.CountAsync(TestContext.Current.CancellationToken);
-        count.Should().Be(0);
+        count.ShouldBe(0);
     }
 
     // --- GetGrantedPermissionsAsync ---
@@ -167,7 +166,7 @@ public sealed class PermissionManagerTests
             await manager.GetGrantedPermissionsAsync("accountant", TenantId, TestContext.Current.CancellationToken);
 
         // Assert
-        permissions.Should().BeEquivalentTo(["Invoices.Delete", "Invoices.Read"]);
+        permissions.ShouldBe(["Invoices.Delete", "Invoices.Read"]);
     }
 
     // --- GetGrantedRolesAsync ---
@@ -186,7 +185,7 @@ public sealed class PermissionManagerTests
             await manager.GetGrantedRolesAsync("Invoices.Delete", TenantId, TestContext.Current.CancellationToken);
 
         // Assert
-        roles.Should().BeEquivalentTo(["accountant", "manager"]);
+        roles.ShouldBe(["accountant", "manager"]);
     }
 
     // --- Helpers ---

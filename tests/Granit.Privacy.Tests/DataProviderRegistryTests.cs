@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Privacy.DataExport.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Privacy.Tests;
@@ -13,8 +13,8 @@ public sealed class DataProviderRegistryTests
     {
         _sut.Register("patients");
 
-        _sut.Count.Should().Be(1);
-        _sut.GetAll().Should().Contain("patients");
+        _sut.Count.ShouldBe(1);
+        _sut.GetAll().ShouldContain("patients");
     }
 
     [Fact]
@@ -24,8 +24,7 @@ public sealed class DataProviderRegistryTests
 
         Action act = () => _sut.Register("patients");
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*already registered*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("already registered");
     }
 
     [Fact]
@@ -35,7 +34,7 @@ public sealed class DataProviderRegistryTests
 
         Action act = () => _sut.Register("patients");
 
-        act.Should().Throw<InvalidOperationException>();
+        Should.Throw<InvalidOperationException>(act);
     }
 
     [Fact]
@@ -45,9 +44,9 @@ public sealed class DataProviderRegistryTests
         Action actEmpty = () => _sut.Register("");
         Action actWhitespace = () => _sut.Register("   ");
 
-        actNull.Should().Throw<ArgumentException>();
-        actEmpty.Should().Throw<ArgumentException>();
-        actWhitespace.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(actNull);
+        Should.Throw<ArgumentException>(actEmpty);
+        Should.Throw<ArgumentException>(actWhitespace);
     }
 
     [Fact]
@@ -59,10 +58,10 @@ public sealed class DataProviderRegistryTests
 
         IReadOnlyList<string> result = _sut.GetAll();
 
-        result.Should().HaveCount(3);
-        result.Should().Contain("patients");
-        result.Should().Contain("billing");
-        result.Should().Contain("appointments");
+        result.Count.ShouldBe(3);
+        result.ShouldContain("patients");
+        result.ShouldContain("billing");
+        result.ShouldContain("appointments");
     }
 
     [Fact]
@@ -71,10 +70,10 @@ public sealed class DataProviderRegistryTests
         _sut.Register("a");
         _sut.Register("b");
 
-        _sut.Count.Should().Be(2);
+        _sut.Count.ShouldBe(2);
     }
 
     [Fact]
     public void Count_Empty_ReturnsZero() =>
-        _sut.Count.Should().Be(0);
+        _sut.Count.ShouldBe(0);
 }

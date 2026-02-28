@@ -8,11 +8,11 @@
 //   - Exception levée → Unhealthy avec message sanitisé
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Vault.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using VaultSharp;
 using VaultSharp.V1.SystemBackend;
 using Xunit;
@@ -40,7 +40,7 @@ public sealed class VaultHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(MsHealthStatus.Healthy);
+        result.Status.ShouldBe(MsHealthStatus.Healthy);
     }
 
     [Fact]
@@ -57,8 +57,8 @@ public sealed class VaultHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(MsHealthStatus.Degraded);
-        result.Description.Should().Be("Vault standby");
+        result.Status.ShouldBe(MsHealthStatus.Degraded);
+        result.Description.ShouldBe("Vault standby");
     }
 
     [Fact]
@@ -75,8 +75,8 @@ public sealed class VaultHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(MsHealthStatus.Unhealthy);
-        result.Description.Should().Be("Vault sealed");
+        result.Status.ShouldBe(MsHealthStatus.Unhealthy);
+        result.Description.ShouldBe("Vault sealed");
     }
 
     [Fact]
@@ -92,10 +92,10 @@ public sealed class VaultHealthCheckTests
         HealthCheckResult result = await sut.CheckHealthAsync(BuildContext(), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Status.Should().Be(MsHealthStatus.Unhealthy);
-        result.Description.Should().Be("Vault unreachable: HttpRequestException");
+        result.Status.ShouldBe(MsHealthStatus.Unhealthy);
+        result.Description.ShouldBe("Vault unreachable: HttpRequestException");
         // No connection details or tokens in the message
-        result.Description.Should().NotContain("vault:8200");
-        result.Description.Should().NotContain("token");
+        result.Description!.ShouldNotContain("vault:8200");
+        result.Description!.ShouldNotContain("token");
     }
 }

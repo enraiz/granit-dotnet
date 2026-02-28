@@ -5,10 +5,10 @@
 // MaxRetryAttempts < 1, RetryDelays empty, any delay ≤ 0, and the happy path.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Wolverine;
 using Granit.Wolverine.Internal;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Wolverine.Tests;
@@ -21,21 +21,20 @@ public sealed class WolverineMessagingOptionsTests
 
     [Fact]
     public void SectionName_IsWolverine() =>
-        WolverineMessagingOptions.SectionName.Should().Be("Wolverine");
+        WolverineMessagingOptions.SectionName.ShouldBe("Wolverine");
 
     [Fact]
     public void DefaultMaxRetryAttempts_IsThree() =>
-        new WolverineMessagingOptions().MaxRetryAttempts.Should().Be(3);
+        new WolverineMessagingOptions().MaxRetryAttempts.ShouldBe(3);
 
     [Fact]
     public void DefaultRetryDelays_AreFiveThirtyAndFiveMin()
     {
         TimeSpan[] delays = new WolverineMessagingOptions().RetryDelays;
 
-        delays.Should().Equal(
-            TimeSpan.FromSeconds(5),
+        delays.ShouldBe(new[] { TimeSpan.FromSeconds(5),
             TimeSpan.FromSeconds(30),
-            TimeSpan.FromMinutes(5));
+            TimeSpan.FromMinutes(5) });
     }
 
     // -----------------------------------------------------------------------
@@ -49,7 +48,7 @@ public sealed class WolverineMessagingOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, new WolverineMessagingOptions());
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     // -----------------------------------------------------------------------
@@ -66,8 +65,8 @@ public sealed class WolverineMessagingOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().ContainMatch("*MaxRetryAttempts*");
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(x => x.Contains("MaxRetryAttempts"));
     }
 
     // -----------------------------------------------------------------------
@@ -82,8 +81,8 @@ public sealed class WolverineMessagingOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().ContainMatch("*RetryDelays*");
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(x => x.Contains("RetryDelays"));
     }
 
     [Theory]
@@ -99,8 +98,8 @@ public sealed class WolverineMessagingOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().ContainMatch("*RetryDelays*");
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(x => x.Contains("RetryDelays"));
     }
 
     [Fact]
@@ -115,6 +114,6 @@ public sealed class WolverineMessagingOptionsTests
 
         ValidateOptionsResult result = validator.Validate(null, options);
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 }

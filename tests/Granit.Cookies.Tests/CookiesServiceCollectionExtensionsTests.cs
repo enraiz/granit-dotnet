@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.Cookies.Extensions;
 using Granit.Timing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Cookies.Tests;
@@ -21,9 +21,9 @@ public sealed class CookiesServiceCollectionExtensionsTests
 
         ServiceProvider provider = services.BuildServiceProvider();
 
-        provider.GetService<ICookieRegistry>().Should().NotBeNull();
-        provider.GetService<IGranitCookieManager>().Should().NotBeNull();
-        provider.GetService<IConsentResolver>().Should().NotBeNull();
+        provider.GetService<ICookieRegistry>().ShouldNotBeNull();
+        provider.GetService<IGranitCookieManager>().ShouldNotBeNull();
+        provider.GetService<IConsentResolver>().ShouldNotBeNull();
     }
 
     [Fact]
@@ -39,10 +39,10 @@ public sealed class CookiesServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
         ICookieRegistry? registry = provider.GetService<ICookieRegistry>();
 
-        registry.Should().NotBeNull();
-        registry!.IsRegistered("session").Should().BeTrue();
-        registry.IsRegistered("_ga").Should().BeTrue();
-        registry.GetAll().Should().HaveCount(2);
+        registry.ShouldNotBeNull();
+        registry!.IsRegistered("session").ShouldBeTrue();
+        registry.IsRegistered("_ga").ShouldBeTrue();
+        registry.GetAll().Count.ShouldBe(2);
     }
 
     [Fact]
@@ -57,8 +57,8 @@ public sealed class CookiesServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
         IConsentResolver? resolver = provider.GetService<IConsentResolver>();
 
-        resolver.Should().NotBeNull();
-        resolver.Should().BeOfType<FakeConsentResolver>();
+        resolver.ShouldNotBeNull();
+        resolver.ShouldBeOfType<FakeConsentResolver>();
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public sealed class CookiesServiceCollectionExtensionsTests
 
         Action act = () => services.AddGranitCookies(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(act);
     }
 
     private sealed class FakeConsentResolver : IConsentResolver

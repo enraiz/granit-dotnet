@@ -4,12 +4,12 @@
 // Vérifie que le module enregistre les services Observability via ConfigureServices.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Observability.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Observability.Tests;
@@ -34,7 +34,7 @@ public sealed class GranitObservabilityModuleTests
 
         // Assert
         ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
-        options.Should().NotBeNull();
-        options.ServiceName.Should().NotBeNullOrEmpty();
+        options.ShouldNotBeNull();
+        options.ServiceName.ShouldNotBeNullOrEmpty();
     }
 }

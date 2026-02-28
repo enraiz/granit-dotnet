@@ -6,7 +6,6 @@
 // =============================================================================
 
 using System.Reflection;
-using FluentAssertions;
 using Granit.ApiDocumentation.Extensions;
 using Granit.ApiDocumentation.Options;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -17,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -42,9 +42,9 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
-        options.Title.Should().Be("Guava API");
-        options.MajorVersions.Should().Contain(2);
-        options.EnableInProduction.Should().BeFalse();
+        options.Title.ShouldBe("Guava API");
+        options.MajorVersions.ShouldContain(2);
+        options.EnableInProduction.ShouldBeFalse();
     }
 
     [Fact]
@@ -66,8 +66,9 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
-        options.Title.Should().Be("Test API");
-        options.MajorVersions.Should().Contain(2).And.Contain(3);
+        options.Title.ShouldBe("Test API");
+        options.MajorVersions.ShouldContain(2);
+        options.MajorVersions.ShouldContain(3);
     }
 
     [Fact]
@@ -83,8 +84,8 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
-        options.Title.Should().Be("API");
-        options.MajorVersions.Should().ContainSingle().Which.Should().Be(1);
+        options.Title.ShouldBe("API");
+        options.MajorVersions.ShouldHaveSingleItem().ShouldBe(1);
     }
 
     [Fact]
@@ -97,7 +98,7 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         IHostApplicationBuilder returned = builder.AddGranitApiDocumentation();
 
         // Assert
-        returned.Should().BeSameAs(builder);
+        returned.ShouldBeSameAs(builder);
     }
 
     [Fact]
@@ -119,7 +120,7 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         // Assert — one AddOpenApi registration per version → each is named "v1", "v2", "v3"
         // AddOpenApi registers IConfigureOptions<OpenApiOptions> keyed by document name.
         // We verify services are registered (not zero), which indicates documents were added.
-        builder.Services.Should().NotBeEmpty("versions [1, 2, 3] must register OpenAPI services");
+        builder.Services.ShouldNotBeEmpty("versions [1, 2, 3] must register OpenAPI services");
     }
 
     // --- OpenApiOptions : déclenchement du callback AddOpenApi et du transformer inline ---
@@ -155,9 +156,9 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         await transformers[0].TransformAsync(doc, ctx, TestContext.Current.CancellationToken);
 
         // Assert
-        doc.Info.Title.Should().Be("My API");
-        doc.Info.Description.Should().Be("My description");
-        doc.Info.Contact.Should().BeNull("ContactEmail is null → no contact block");
+        doc.Info.Title.ShouldBe("My API");
+        doc.Info.Description.ShouldBe("My description");
+        doc.Info.Contact.ShouldBeNull("ContactEmail is null → no contact block");
     }
 
     [Fact]
@@ -186,9 +187,9 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         await transformers[0].TransformAsync(doc, ctx, TestContext.Current.CancellationToken);
 
         // Assert
-        doc.Info.Contact.Should().NotBeNull();
-        doc.Info.Contact!.Email.Should().Be("api@example.com");
-        doc.Info.Description.Should().BeNull();
+        doc.Info.Contact.ShouldNotBeNull();
+        doc.Info.Contact!.Email.ShouldBe("api@example.com");
+        doc.Info.Description.ShouldBeNull();
     }
 
     // --- Helpers ---

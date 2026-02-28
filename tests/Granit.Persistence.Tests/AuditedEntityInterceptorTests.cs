@@ -12,7 +12,6 @@
 // IClock est mocké pour des assertions exactes (pas de BeCloseTo).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Domain;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
@@ -21,6 +20,7 @@ using Granit.Security;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -67,9 +67,9 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.CreatedAt.Should().Be(FixedNow);
-        entity.CreatedBy.Should().Be("user-test-123");
-        entity.Id.Should().Be(FixedGuid);
+        entity.CreatedAt.ShouldBe(FixedNow);
+        entity.CreatedBy.ShouldBe("user-test-123");
+        entity.Id.ShouldBe(FixedGuid);
     }
 
     [Fact]
@@ -95,8 +95,8 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.ModifiedAt.Should().Be(FixedNow);
-        entity.ModifiedBy.Should().Be("user-test-123");
+        entity.ModifiedAt.ShouldBe(FixedNow);
+        entity.ModifiedBy.ShouldBe("user-test-123");
     }
 
     [Fact]
@@ -127,10 +127,10 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert — les champs de création ne doivent pas être modifiés
-        entity.CreatedAt.Should().Be(originalCreatedAt);
-        entity.CreatedBy.Should().Be(originalCreatedBy);
+        entity.CreatedAt.ShouldBe(originalCreatedAt);
+        entity.CreatedBy.ShouldBe(originalCreatedBy);
         // Mais ModifiedAt doit refléter le nouveau temps
-        entity.ModifiedAt.Should().Be(FixedNow.AddHours(1));
+        entity.ModifiedAt.ShouldBe(FixedNow.AddHours(1));
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.CreatedBy.Should().Be("system");
+        entity.CreatedBy.ShouldBe("system");
     }
 
     // -------------------------------------------------------------------------
@@ -165,9 +165,9 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.CreatedAt.Should().Be(FixedNow);
-        entity.CreatedBy.Should().Be("user-test-123");
-        entity.Id.Should().Be(FixedGuid);
+        entity.CreatedAt.ShouldBe(FixedNow);
+        entity.CreatedBy.ShouldBe("user-test-123");
+        entity.Id.ShouldBe(FixedGuid);
     }
 
     [Fact]
@@ -197,8 +197,8 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert — les champs de création sont protégés
-        entity.CreatedAt.Should().Be(originalCreatedAt);
-        entity.CreatedBy.Should().Be(originalCreatedBy);
+        entity.CreatedAt.ShouldBe(originalCreatedAt);
+        entity.CreatedBy.ShouldBe(originalCreatedBy);
     }
 
     // -------------------------------------------------------------------------
@@ -217,10 +217,10 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.CreatedAt.Should().Be(FixedNow);
-        entity.CreatedBy.Should().Be("user-test-123");
-        entity.Id.Should().Be(FixedGuid);
-        entity.IsDeleted.Should().BeFalse();
+        entity.CreatedAt.ShouldBe(FixedNow);
+        entity.CreatedBy.ShouldBe("user-test-123");
+        entity.Id.ShouldBe(FixedGuid);
+        entity.IsDeleted.ShouldBeFalse();
     }
 
     [Fact]
@@ -244,8 +244,8 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.ModifiedAt.Should().Be(FixedNow);
-        entity.ModifiedBy.Should().Be("user-test-123");
+        entity.ModifiedAt.ShouldBe(FixedNow);
+        entity.ModifiedBy.ShouldBe("user-test-123");
     }
 
     // -------------------------------------------------------------------------
@@ -266,7 +266,7 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.TenantId.Should().Be(TenantId);
+        entity.TenantId.ShouldBe(TenantId);
     }
 
     [Fact]
@@ -282,7 +282,7 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.TenantId.Should().BeNull();
+        entity.TenantId.ShouldBeNull();
     }
 
     [Fact]
@@ -300,7 +300,7 @@ public sealed class AuditedEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert — le TenantId explicite est conservé
-        entity.TenantId.Should().Be(explicitTenant);
+        entity.TenantId.ShouldBe(explicitTenant);
     }
 
     // -------------------------------------------------------------------------

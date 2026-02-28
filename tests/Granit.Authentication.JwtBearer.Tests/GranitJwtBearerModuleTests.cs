@@ -4,11 +4,11 @@
 // Verifies that the module registers JWT Bearer services via ConfigureServices.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authentication.JwtBearer.Tests;
@@ -35,6 +35,6 @@ public sealed class GranitJwtBearerModuleTests
 
         // Assert
         ICurrentUserService? userService = sp.GetService<ICurrentUserService>();
-        userService.Should().NotBeNull();
+        userService.ShouldNotBeNull();
     }
 }

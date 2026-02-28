@@ -5,9 +5,9 @@
 // record multiple attempts for the same notification.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Notifications.Domain;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.EntityFrameworkCore.Tests;
@@ -33,11 +33,11 @@ public sealed class EfCoreNotificationDeliveryStoreTests : IDisposable
 
         await using NotificationDbContext db = _factory.CreateDbContext();
         NotificationDeliveryAttempt? result = await db.DeliveryAttempts.FindAsync([attempt.Id], TestContext.Current.CancellationToken);
-        result.Should().NotBeNull();
-        result!.NotificationId.Should().Be(attempt.NotificationId);
-        result.ChannelName.Should().Be(attempt.ChannelName);
-        result.IsSuccess.Should().Be(attempt.IsSuccess);
-        result.RecipientUserId.Should().Be(attempt.RecipientUserId);
+        result.ShouldNotBeNull();
+        result!.NotificationId.ShouldBe(attempt.NotificationId);
+        result.ChannelName.ShouldBe(attempt.ChannelName);
+        result.IsSuccess.ShouldBe(attempt.IsSuccess);
+        result.RecipientUserId.ShouldBe(attempt.RecipientUserId);
     }
 
     [Fact]
@@ -57,10 +57,10 @@ public sealed class EfCoreNotificationDeliveryStoreTests : IDisposable
             .Where(a => a.NotificationId == notificationId)
             .ToListAsync(TestContext.Current.CancellationToken);
 
-        all.Should().HaveCount(3);
-        all.Where(a => a.ChannelName == "email").Should().HaveCount(2);
-        all.Where(a => a.IsSuccess).Should().HaveCount(2);
-        all.Single(a => !a.IsSuccess).ErrorMessage.Should().Be("SMTP timeout");
+        all.Count.ShouldBe(3);
+        all.Where(a => a.ChannelName == "email").Count().ShouldBe(2);
+        all.Where(a => a.IsSuccess).Count().ShouldBe(2);
+        all.Single(a => !a.IsSuccess).ErrorMessage.ShouldBe("SMTP timeout");
     }
 
     // -------------------------------------------------------------------------

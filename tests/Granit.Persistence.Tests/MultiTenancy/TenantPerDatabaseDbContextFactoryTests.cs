@@ -7,12 +7,12 @@
 // connection is never opened (only happens on query execution, not construction).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.MultiTenancy;
@@ -78,7 +78,7 @@ public sealed class TenantPerDatabaseDbContextFactoryTests
         await using StubPerTenantDbContext ctx =
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
-        ctx.Should().NotBeNull();
+        ctx.ShouldNotBeNull();
     }
 
     [Fact]
@@ -122,9 +122,7 @@ public sealed class TenantPerDatabaseDbContextFactoryTests
         Func<Task> act = async () =>
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("*No active tenant context*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("No active tenant context");
     }
 
     [Fact]
@@ -156,7 +154,7 @@ public sealed class TenantPerDatabaseDbContextFactoryTests
 
         using StubPerTenantDbContext ctx = factory.CreateDbContext();
 
-        ctx.Should().NotBeNull();
+        ctx.ShouldNotBeNull();
     }
 
     [Fact]
@@ -167,9 +165,7 @@ public sealed class TenantPerDatabaseDbContextFactoryTests
 
         Action act = () => factory.CreateDbContext();
 
-        act.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("*No active tenant context*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("No active tenant context");
     }
 
     // -----------------------------------------------------------------------
@@ -216,7 +212,8 @@ public sealed class TenantPerDatabaseDbContextFactoryTests
         await using StubPerTenantDbContext ctxB =
             await factoryB.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
-        capturedConnections.Should().Contain(ConnA).And.Contain(ConnB);
-        capturedConnections.Should().OnlyHaveUniqueItems();
+        capturedConnections.ShouldContain(ConnA);
+        capturedConnections.ShouldContain(ConnB);
+        capturedConnections.Distinct().Count().ShouldBe(capturedConnections.Count);
     }
 }

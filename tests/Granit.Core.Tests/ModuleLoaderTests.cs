@@ -9,8 +9,8 @@
 //   - Deduplicates duplicate declared dependencies
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Core.Tests;
@@ -67,9 +67,9 @@ public sealed class ModuleLoaderTests
     {
         var modules = ModuleLoader.LoadModules<StandaloneModule>();
 
-        modules.Should().HaveCount(1);
-        modules[0].ModuleType.Should().Be<StandaloneModule>();
-        modules[0].Instance.Should().BeOfType<StandaloneModule>();
+        modules.Count.ShouldBe(1);
+        modules[0].ModuleType.ShouldBe(typeof(StandaloneModule));
+        modules[0].Instance.ShouldBeOfType<StandaloneModule>();
     }
 
     [Fact]
@@ -78,10 +78,10 @@ public sealed class ModuleLoaderTests
         // C → B → A : expected order A, B, C
         var modules = ModuleLoader.LoadModules<ModuleC>();
 
-        modules.Should().HaveCount(3);
+        modules.Count.ShouldBe(3);
         var types = modules.Select(m => m.ModuleType).ToList();
-        types.IndexOf(typeof(ModuleA)).Should().BeLessThan(types.IndexOf(typeof(ModuleB)));
-        types.IndexOf(typeof(ModuleB)).Should().BeLessThan(types.IndexOf(typeof(ModuleC)));
+        types.IndexOf(typeof(ModuleA)).ShouldBeLessThan(types.IndexOf(typeof(ModuleB)));
+        types.IndexOf(typeof(ModuleB)).ShouldBeLessThan(types.IndexOf(typeof(ModuleC)));
     }
 
     [Fact]
@@ -91,19 +91,19 @@ public sealed class ModuleLoaderTests
 
         var modules = ModuleLoader.LoadModules<DiamondRootModule>();
 
-        modules.Should().HaveCount(4);
+        modules.Count.ShouldBe(4);
 
         // Shared must appear exactly once
-        modules.Where(m => m.ModuleType == typeof(SharedModule)).Should().HaveCount(1);
+        modules.Where(m => m.ModuleType == typeof(SharedModule)).Count().ShouldBe(1);
 
         // Shared must come before Left and Right
         var types = modules.Select(m => m.ModuleType).ToList();
-        types.IndexOf(typeof(SharedModule)).Should().BeLessThan(types.IndexOf(typeof(LeftModule)));
-        types.IndexOf(typeof(SharedModule)).Should().BeLessThan(types.IndexOf(typeof(RightModule)));
+        types.IndexOf(typeof(SharedModule)).ShouldBeLessThan(types.IndexOf(typeof(LeftModule)));
+        types.IndexOf(typeof(SharedModule)).ShouldBeLessThan(types.IndexOf(typeof(RightModule)));
 
         // Left and Right must come before DiamondRoot
-        types.IndexOf(typeof(LeftModule)).Should().BeLessThan(types.IndexOf(typeof(DiamondRootModule)));
-        types.IndexOf(typeof(RightModule)).Should().BeLessThan(types.IndexOf(typeof(DiamondRootModule)));
+        types.IndexOf(typeof(LeftModule)).ShouldBeLessThan(types.IndexOf(typeof(DiamondRootModule)));
+        types.IndexOf(typeof(RightModule)).ShouldBeLessThan(types.IndexOf(typeof(DiamondRootModule)));
     }
 
     [Fact]
@@ -111,8 +111,7 @@ public sealed class ModuleLoaderTests
     {
         var act = () => ModuleLoader.LoadModules<CircularA>();
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*Circular dependency*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("Circular dependency");
     }
 
     [Fact]
@@ -120,8 +119,7 @@ public sealed class ModuleLoaderTests
     {
         var act = () => ModuleLoader.LoadModules(typeof(NotAModule));
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*GranitModule*");
+        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("GranitModule");
     }
 
     [Fact]
@@ -129,8 +127,8 @@ public sealed class ModuleLoaderTests
     {
         var modules = ModuleLoader.LoadModules<DuplicateDepsModule>();
 
-        modules.Should().HaveCount(2);
-        modules.Where(m => m.ModuleType == typeof(StandaloneModule)).Should().HaveCount(1);
+        modules.Count.ShouldBe(2);
+        modules.Where(m => m.ModuleType == typeof(StandaloneModule)).Count().ShouldBe(1);
     }
 
     [Fact]
@@ -139,6 +137,6 @@ public sealed class ModuleLoaderTests
         var modules = ModuleLoader.LoadModules<DependentModule>();
 
         var dependent = modules.Single(m => m.ModuleType == typeof(DependentModule));
-        dependent.Dependencies.Should().Contain(typeof(StandaloneModule));
+        dependent.Dependencies.ShouldContain(typeof(StandaloneModule));
     }
 }

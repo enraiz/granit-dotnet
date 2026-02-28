@@ -9,7 +9,6 @@
 // IClock is mocked for exact assertions (no BeCloseTo).
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Domain;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
@@ -18,6 +17,7 @@ using Granit.Security;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -59,9 +59,9 @@ public sealed class AuditableEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.CreatedAt.Should().Be(FixedNow);
-        entity.CreatedBy.Should().Be("user-test-123");
-        entity.Id.Should().Be(FixedGuid);
+        entity.CreatedAt.ShouldBe(FixedNow);
+        entity.CreatedBy.ShouldBe("user-test-123");
+        entity.Id.ShouldBe(FixedGuid);
     }
 
     [Fact]
@@ -87,8 +87,8 @@ public sealed class AuditableEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.ModifiedAt.Should().Be(FixedNow);
-        entity.ModifiedBy.Should().Be("user-test-123");
+        entity.ModifiedAt.ShouldBe(FixedNow);
+        entity.ModifiedBy.ShouldBe("user-test-123");
     }
 
     [Fact]
@@ -119,10 +119,10 @@ public sealed class AuditableEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert — creation fields must not be overwritten
-        entity.CreatedAt.Should().Be(originalCreatedAt);
-        entity.CreatedBy.Should().Be(originalCreatedBy);
+        entity.CreatedAt.ShouldBe(originalCreatedAt);
+        entity.CreatedBy.ShouldBe(originalCreatedBy);
         // But ModifiedAt must reflect the new time
-        entity.ModifiedAt.Should().Be(FixedNow.AddHours(1));
+        entity.ModifiedAt.ShouldBe(FixedNow.AddHours(1));
     }
 
     [Fact]
@@ -138,7 +138,7 @@ public sealed class AuditableEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        entity.CreatedBy.Should().Be("system");
+        entity.CreatedBy.ShouldBe("system");
     }
 
     private TestDbContext CreateContext()

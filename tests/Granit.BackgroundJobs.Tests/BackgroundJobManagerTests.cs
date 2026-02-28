@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
 using Granit.Core.Exceptions;
 using Granit.Security;
@@ -7,6 +6,7 @@ using JasperFx.Core;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Wolverine;
 using Wolverine.Persistence.Durability;
 using Wolverine.Persistence.Durability.DeadLetterManagement;
@@ -72,10 +72,10 @@ public sealed class BackgroundJobManagerTests
         IReadOnlyList<BackgroundJobStatus> result = await sut.GetAllAsync(ct);
 
         // Assert
-        result.Should().HaveCount(1);
-        result[0].JobName.Should().Be("daily-report");
-        result[0].CronExpression.Should().Be("0 8 * * *");
-        result[0].IsEnabled.Should().BeTrue();
+        result.Count.ShouldBe(1);
+        result[0].JobName.ShouldBe("daily-report");
+        result[0].CronExpression.ShouldBe("0 8 * * *");
+        result[0].IsEnabled.ShouldBeTrue();
     }
 
     [Fact]
@@ -110,10 +110,10 @@ public sealed class BackgroundJobManagerTests
             await sut.GetAllAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().HaveCount(1);
-        result[0].ConsecutiveFailures.Should().Be(3);
-        result[0].LastError.Should().Be("timeout");
-        result[0].DeadLetterCount.Should().Be(5);
+        result.Count.ShouldBe(1);
+        result[0].ConsecutiveFailures.ShouldBe(3);
+        result[0].LastError.ShouldBe("timeout");
+        result[0].DeadLetterCount.ShouldBe(5);
     }
 
     [Fact]
@@ -135,8 +135,8 @@ public sealed class BackgroundJobManagerTests
             await sut.GetAllAsync(TestContext.Current.CancellationToken);
 
         // Assert — graceful degradation
-        result.Should().HaveCount(1);
-        result[0].DeadLetterCount.Should().Be(0);
+        result.Count.ShouldBe(1);
+        result[0].DeadLetterCount.ShouldBe(0);
     }
 
     // =========================================================================
@@ -158,8 +158,8 @@ public sealed class BackgroundJobManagerTests
             await sut.FindAsync("daily-report", TestContext.Current.CancellationToken);
 
         // Assert
-        status.Should().NotBeNull();
-        status!.JobName.Should().Be("daily-report");
+        status.ShouldNotBeNull();
+        status!.JobName.ShouldBe("daily-report");
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public sealed class BackgroundJobManagerTests
             await sut.FindAsync("ghost", TestContext.Current.CancellationToken);
 
         // Assert
-        status.Should().BeNull();
+        status.ShouldBeNull();
     }
 
     // =========================================================================
@@ -214,7 +214,7 @@ public sealed class BackgroundJobManagerTests
         Func<Task> act = () => sut.PauseAsync("ghost", TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<EntityNotFoundException>();
+        await Should.ThrowAsync<EntityNotFoundException>(act);
     }
 
     // =========================================================================
@@ -255,7 +255,7 @@ public sealed class BackgroundJobManagerTests
         Func<Task> act = () => sut.ResumeAsync("ghost", TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<EntityNotFoundException>();
+        await Should.ThrowAsync<EntityNotFoundException>(act);
     }
 
     [Fact]
@@ -274,7 +274,7 @@ public sealed class BackgroundJobManagerTests
             sut.ResumeAsync("daily-report", TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
         await _store.DidNotReceive()
             .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
                 Arg.Any<CancellationToken>());
@@ -343,6 +343,6 @@ public sealed class BackgroundJobManagerTests
             sut.TriggerNowAsync("ghost", TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<EntityNotFoundException>();
+        await Should.ThrowAsync<EntityNotFoundException>(act);
     }
 }

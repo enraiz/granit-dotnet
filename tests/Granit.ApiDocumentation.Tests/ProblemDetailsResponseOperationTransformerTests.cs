@@ -5,7 +5,6 @@
 // et que les 404 fantômes de Wolverine sont nettoyés.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.ApiDocumentation.Transformers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -33,10 +33,10 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().ContainKey("401");
-        operation.Responses.Should().ContainKey("403");
-        operation.Responses.Should().ContainKey("500");
-        operation.Responses.Should().NotContainKey("422", "GET without body should not have 422");
+        operation.Responses.ShouldContainKey("401");
+        operation.Responses.ShouldContainKey("403");
+        operation.Responses.ShouldContainKey("500");
+        operation.Responses.ShouldNotContainKey("422", "GET without body should not have 422");
     }
 
     // --- Protected POST with body → 401, 403, 422, 500 ---
@@ -57,10 +57,10 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().ContainKey("422");
-        operation.Responses.Should().ContainKey("401");
-        operation.Responses.Should().ContainKey("403");
-        operation.Responses.Should().ContainKey("500");
+        operation.Responses.ShouldContainKey("422");
+        operation.Responses.ShouldContainKey("401");
+        operation.Responses.ShouldContainKey("403");
+        operation.Responses.ShouldContainKey("500");
     }
 
     // --- Public endpoint without route param → phantom 404 removed, 500 added ---
@@ -84,9 +84,9 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().NotContainKey("404");
-        operation.Responses.Should().ContainKey("500");
-        operation.Responses.Should().NotContainKey("401", "no [Authorize] → no 401");
+        operation.Responses.ShouldNotContainKey("404");
+        operation.Responses.ShouldContainKey("500");
+        operation.Responses.ShouldNotContainKey("401", "no [Authorize] → no 401");
     }
 
     // --- Endpoint with route param {id} → 404 preserved ---
@@ -114,8 +114,8 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().ContainKey("404", "endpoint with route parameter should keep 404");
-        operation.Responses.Should().ContainKey("500");
+        operation.Responses.ShouldContainKey("404", "endpoint with route parameter should keep 404");
+        operation.Responses.ShouldContainKey("500");
     }
 
     // --- Does not overwrite existing responses ---
@@ -136,7 +136,7 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses["500"].Should().BeSameAs(custom500, "existing responses are not overwritten");
+        operation.Responses["500"].ShouldBeSameAs(custom500, "existing responses are not overwritten");
     }
 
     // --- [Authorize] + [AllowAnonymous] → not protected ---
@@ -154,9 +154,9 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
 
         // Assert
-        operation.Responses.Should().NotContainKey("401");
-        operation.Responses.Should().NotContainKey("403");
-        operation.Responses.Should().ContainKey("500", "500 is always added");
+        operation.Responses.ShouldNotContainKey("401");
+        operation.Responses.ShouldNotContainKey("403");
+        operation.Responses.ShouldContainKey("500", "500 is always added");
     }
 
     // --- Helpers ---

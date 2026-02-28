@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.ValueTypes;
 using Xunit;
@@ -16,9 +16,9 @@ public sealed class FeatureDefinitionTests
     {
         FeatureDefinition definition = new("App.Feature", "false", FeatureValueType.Toggle);
 
-        definition.Name.Should().Be("App.Feature");
-        definition.DefaultValue.Should().Be("false");
-        definition.ValueType.Should().Be(FeatureValueType.Toggle);
+        definition.Name.ShouldBe("App.Feature");
+        definition.DefaultValue.ShouldBe("false");
+        definition.ValueType.ShouldBe(FeatureValueType.Toggle);
     }
 
     [Fact]
@@ -31,12 +31,12 @@ public sealed class FeatureDefinitionTests
             Description = "Maximum number of patients per tenant",
         };
 
-        definition.ValueType.Should().Be(FeatureValueType.Numeric);
-        definition.NumericConstraint.Should().NotBeNull();
-        definition.NumericConstraint!.Min.Should().Be(0);
-        definition.NumericConstraint.Max.Should().Be(1000);
-        definition.DisplayName.Should().Be("Max patients");
-        definition.Description.Should().Be("Maximum number of patients per tenant");
+        definition.ValueType.ShouldBe(FeatureValueType.Numeric);
+        definition.NumericConstraint.ShouldNotBeNull();
+        definition.NumericConstraint!.Min.ShouldBe(0);
+        definition.NumericConstraint.Max.ShouldBe(1000);
+        definition.DisplayName.ShouldBe("Max patients");
+        definition.Description.ShouldBe("Maximum number of patients per tenant");
     }
 
     [Fact]
@@ -48,8 +48,8 @@ public sealed class FeatureDefinitionTests
             SelectionValues = selection,
         };
 
-        definition.ValueType.Should().Be(FeatureValueType.Selection);
-        definition.SelectionValues.Should().BeSameAs(selection);
+        definition.ValueType.ShouldBe(FeatureValueType.Selection);
+        definition.SelectionValues.ShouldBeSameAs(selection);
     }
 
     [Fact]
@@ -57,10 +57,10 @@ public sealed class FeatureDefinitionTests
     {
         FeatureDefinition definition = new("App.Feature", "true", FeatureValueType.Toggle);
 
-        definition.NumericConstraint.Should().BeNull();
-        definition.SelectionValues.Should().BeNull();
-        definition.DisplayName.Should().BeNull();
-        definition.Description.Should().BeNull();
+        definition.NumericConstraint.ShouldBeNull();
+        definition.SelectionValues.ShouldBeNull();
+        definition.DisplayName.ShouldBeNull();
+        definition.Description.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -75,7 +75,7 @@ public sealed class FeatureDefinitionTests
     {
         Action act = () => _ = new FeatureDefinition(name!, "false", FeatureValueType.Toggle);
 
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(act);
     }
 
     [Theory]
@@ -86,6 +86,6 @@ public sealed class FeatureDefinitionTests
     {
         Action act = () => _ = new FeatureDefinition("App.Feature", defaultValue!, FeatureValueType.Toggle);
 
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(act);
     }
 }

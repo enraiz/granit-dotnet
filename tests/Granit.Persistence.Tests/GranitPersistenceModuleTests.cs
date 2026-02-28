@@ -6,7 +6,6 @@
 //   - Déclare les dépendances [DependsOn] correctes
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
@@ -16,6 +15,7 @@ using Granit.Security;
 using Granit.Timing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -39,11 +39,11 @@ public sealed class GranitPersistenceModuleTests
         // Assert
         ServiceDescriptor? auditDescriptor = builder.Services.FirstOrDefault(
             d => d.ServiceType == typeof(AuditedEntityInterceptor));
-        auditDescriptor.Should().NotBeNull();
+        auditDescriptor.ShouldNotBeNull();
 
         ServiceDescriptor? softDeleteDescriptor = builder.Services.FirstOrDefault(
             d => d.ServiceType == typeof(SoftDeleteInterceptor));
-        softDeleteDescriptor.Should().NotBeNull();
+        softDeleteDescriptor.ShouldNotBeNull();
     }
 
     [Fact]
@@ -55,12 +55,12 @@ public sealed class GranitPersistenceModuleTests
             .Cast<DependsOnAttribute>()];
 
         // Assert
-        attributes.Should().HaveCount(1);
+        attributes.Length.ShouldBe(1);
         Type[] dependedTypes = attributes[0].DependedTypes;
-        dependedTypes.Should().Contain(typeof(GranitTimingModule));
-        dependedTypes.Should().Contain(typeof(GranitGuidsModule));
-        dependedTypes.Should().Contain(typeof(GranitSecurityModule));
-        dependedTypes.Should().NotContain(typeof(GranitMultiTenancyModule),
+        dependedTypes.ShouldContain(typeof(GranitTimingModule));
+        dependedTypes.ShouldContain(typeof(GranitGuidsModule));
+        dependedTypes.ShouldContain(typeof(GranitSecurityModule));
+        dependedTypes.ShouldNotContain(typeof(GranitMultiTenancyModule),
             "ICurrentTenant is now sourced from Granit.Core.MultiTenancy — Granit.MultiTenancy is a soft dependency");
     }
 }

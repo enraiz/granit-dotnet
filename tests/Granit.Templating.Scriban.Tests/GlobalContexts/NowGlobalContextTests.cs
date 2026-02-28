@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Templating.Scriban.GlobalContexts;
 using Granit.Timing;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Scriban.Tests.GlobalContexts;
@@ -14,7 +14,7 @@ public sealed class NowGlobalContextTests
         IClock clock = Substitute.For<IClock>();
         NowGlobalContext sut = new(clock);
 
-        sut.ContextName.Should().Be("now");
+        sut.ContextName.ShouldBe("now");
     }
 
     [Fact]
@@ -31,12 +31,12 @@ public sealed class NowGlobalContextTests
         // Verify properties via reflection (anonymous type)
         System.Type type = resolved.GetType();
 
-        ((string)type.GetProperty("date")!.GetValue(resolved)!).Should().Be("27/02/2026");
-        ((string)type.GetProperty("datetime")!.GetValue(resolved)!).Should().Be("27/02/2026 14:35");
-        ((string)type.GetProperty("year")!.GetValue(resolved)!).Should().Be("2026");
-        ((string)type.GetProperty("month")!.GetValue(resolved)!).Should().Be("02");
-        ((string)type.GetProperty("day")!.GetValue(resolved)!).Should().Be("27");
-        ((string)type.GetProperty("time")!.GetValue(resolved)!).Should().Be("14:35");
+        ((string)type.GetProperty("date")!.GetValue(resolved)!).ShouldBe("27/02/2026");
+        ((string)type.GetProperty("datetime")!.GetValue(resolved)!).ShouldBe("27/02/2026 14:35");
+        ((string)type.GetProperty("year")!.GetValue(resolved)!).ShouldBe("2026");
+        ((string)type.GetProperty("month")!.GetValue(resolved)!).ShouldBe("02");
+        ((string)type.GetProperty("day")!.GetValue(resolved)!).ShouldBe("27");
+        ((string)type.GetProperty("time")!.GetValue(resolved)!).ShouldBe("14:35");
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class NowGlobalContextTests
         dynamic resolved = sut.Resolve();
 
         string iso = (string)resolved.GetType().GetProperty("iso")!.GetValue(resolved)!;
-        DateTimeOffset.TryParse(iso, out DateTimeOffset parsed).Should().BeTrue();
-        parsed.Should().Be(fixedTime);
+        DateTimeOffset.TryParse(iso, out DateTimeOffset parsed).ShouldBeTrue();
+        parsed.ShouldBe(fixedTime);
     }
 }

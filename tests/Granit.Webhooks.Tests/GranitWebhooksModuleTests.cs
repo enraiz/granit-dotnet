@@ -5,7 +5,6 @@
 // registers services without throwing, and that DI registrations are present.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Extensions;
@@ -13,6 +12,7 @@ using Granit.Wolverine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Webhooks.Tests;
@@ -21,11 +21,11 @@ public sealed class GranitWebhooksModuleTests
 {
     [Fact]
     public void GranitWebhooksModule_IsGranitModule() =>
-        typeof(GranitWebhooksModule).Should().BeAssignableTo<GranitModule>();
+        typeof(GranitWebhooksModule).IsAssignableTo(typeof(GranitModule)).ShouldBeTrue();
 
     [Fact]
     public void GranitWebhooksModule_IsSealed() =>
-        typeof(GranitWebhooksModule).IsSealed.Should().BeTrue();
+        typeof(GranitWebhooksModule).IsSealed.ShouldBeTrue();
 
     [Fact]
     public void GranitWebhooksModule_DependsOn_WolverineModule()
@@ -33,7 +33,7 @@ public sealed class GranitWebhooksModuleTests
         DependsOnAttribute[] attributes = (DependsOnAttribute[])
             typeof(GranitWebhooksModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
-        attributes.Should().ContainSingle(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));
+        attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class GranitWebhooksModuleTests
 
         Action act = () => builder.AddGranitWebhooks();
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class GranitWebhooksModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWebhooks();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IWebhookPublisher) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -63,7 +63,7 @@ public sealed class GranitWebhooksModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWebhooks();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IWebhookSubscriptionStore) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -74,7 +74,7 @@ public sealed class GranitWebhooksModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWebhooks();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IWebhookDeliveryStore) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -85,7 +85,7 @@ public sealed class GranitWebhooksModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWebhooks();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IWebhookSecretProtector) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -96,7 +96,7 @@ public sealed class GranitWebhooksModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWebhooks();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IValidateOptions<WebhooksOptions>));
     }
 
@@ -108,6 +108,6 @@ public sealed class GranitWebhooksModuleTests
         builder.AddGranitWebhooks(opts => opts.MaxParallelDeliveries = 5);
 
         // No exception = callback was invoked successfully.
-        builder.Services.Should().Contain(d => d.ServiceType == typeof(IWebhookPublisher));
+        builder.Services.ShouldContain(d => d.ServiceType == typeof(IWebhookPublisher));
     }
 }

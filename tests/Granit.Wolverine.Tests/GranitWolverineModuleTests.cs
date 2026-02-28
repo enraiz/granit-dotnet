@@ -6,7 +6,6 @@
 // are present in the service collection.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Core.MultiTenancy;
 using Granit.MultiTenancy;
@@ -17,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Wolverine;
 using Xunit;
 
@@ -26,7 +26,7 @@ public sealed class GranitWolverineModuleTests
 {
     [Fact]
     public void GranitWolverineModule_IsGranitModule() =>
-        typeof(GranitWolverineModule).Should().BeAssignableTo<GranitModule>();
+        typeof(GranitWolverineModule).IsAssignableTo(typeof(GranitModule)).ShouldBeTrue();
 
     [Fact]
     public void GranitWolverineModule_DependsOn_SecurityModule()
@@ -34,7 +34,7 @@ public sealed class GranitWolverineModuleTests
         DependsOnAttribute[] attributes = (DependsOnAttribute[])
             typeof(GranitWolverineModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
-        attributes.Should().ContainSingle(a => a.DependedTypes.Contains(typeof(GranitSecurityModule)));
+        attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitSecurityModule)));
     }
 
     [Fact]
@@ -43,13 +43,13 @@ public sealed class GranitWolverineModuleTests
         DependsOnAttribute[] attributes = (DependsOnAttribute[])
             typeof(GranitWolverineModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
-        attributes.Should().NotContain(a => a.DependedTypes.Contains(typeof(GranitMultiTenancyModule)),
+        attributes.ShouldNotContain(a => a.DependedTypes.Contains(typeof(GranitMultiTenancyModule)),
             "ICurrentTenant is now sourced from Granit.Core.MultiTenancy — Granit.MultiTenancy is a soft dependency");
     }
 
     [Fact]
     public void GranitWolverineModule_IsSealed() =>
-        typeof(GranitWolverineModule).IsSealed.Should().BeTrue();
+        typeof(GranitWolverineModule).IsSealed.ShouldBeTrue();
 
     [Fact]
     public void AddGranitWolverine_RegistersWolverineServices()
@@ -58,7 +58,7 @@ public sealed class GranitWolverineModuleTests
 
         Action act = () => builder.AddGranitWolverine();
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     // -------------------------------------------------------------------------
@@ -72,7 +72,7 @@ public sealed class GranitWolverineModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWolverine();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(ICurrentUserService) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -83,7 +83,7 @@ public sealed class GranitWolverineModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWolverine();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IWolverineUserContextSetter) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -94,7 +94,7 @@ public sealed class GranitWolverineModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWolverine();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(WolverineCurrentUserService) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -105,7 +105,7 @@ public sealed class GranitWolverineModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWolverine();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IHttpContextAccessor));
     }
 
@@ -115,7 +115,7 @@ public sealed class GranitWolverineModuleTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWolverine();
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IValidateOptions<WolverineMessagingOptions>));
     }
 
@@ -127,6 +127,6 @@ public sealed class GranitWolverineModuleTests
 
         builder.AddGranitWolverine(opts => { callbackInvoked = true; });
 
-        callbackInvoked.Should().BeTrue();
+        callbackInvoked.ShouldBeTrue();
     }
 }

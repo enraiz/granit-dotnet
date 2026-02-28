@@ -4,7 +4,6 @@
 // Vérifie que AddGranitVault enregistre les services attendus.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Vault.Extensions;
 using Granit.Vault.HealthChecks;
 using Granit.Vault.Options;
@@ -16,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using VaultSharp;
 using Xunit;
 
@@ -49,9 +49,9 @@ public sealed class VaultServiceCollectionExtensionsTests
 
         // Assert
         VaultOptions options = sp.GetRequiredService<IOptions<VaultOptions>>().Value;
-        options.Address.Should().Be("https://vault.test.com");
-        options.AuthMethod.Should().Be("Token");
-        options.DatabaseRoleName.Should().Be("readwrite");
+        options.Address.ShouldBe("https://vault.test.com");
+        options.AuthMethod.ShouldBe("Token");
+        options.DatabaseRoleName.ShouldBe("readwrite");
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public sealed class VaultServiceCollectionExtensionsTests
 
         // Assert
         IVaultClient? client = sp.GetService<IVaultClient>();
-        client.Should().NotBeNull();
+        client.ShouldNotBeNull();
     }
 
     [Fact]
@@ -86,8 +86,8 @@ public sealed class VaultServiceCollectionExtensionsTests
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(IDatabaseCredentialProvider));
 
-        descriptor.Should().NotBeNull();
-        descriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        descriptor.ShouldNotBeNull();
+        descriptor!.Lifetime.ShouldBe(ServiceLifetime.Singleton);
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public sealed class VaultServiceCollectionExtensionsTests
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(IHostedService));
 
-        descriptor.Should().NotBeNull();
+        descriptor.ShouldNotBeNull();
     }
 
     [Fact]
@@ -121,9 +121,9 @@ public sealed class VaultServiceCollectionExtensionsTests
         ServiceDescriptor? descriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(ITransitEncryptionService));
 
-        descriptor.Should().NotBeNull();
-        descriptor!.ImplementationType.Should().Be<TransitEncryptionService>();
-        descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+        descriptor.ShouldNotBeNull();
+        descriptor!.ImplementationType.ShouldBe(typeof(TransitEncryptionService));
+        descriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 
     [Fact]
@@ -141,15 +141,15 @@ public sealed class VaultServiceCollectionExtensionsTests
         // Assert — VaultHealthCheck singleton registered
         ServiceDescriptor? healthCheckDescriptor = services.FirstOrDefault(
             d => d.ServiceType == typeof(VaultHealthCheck));
-        healthCheckDescriptor.Should().NotBeNull();
-        healthCheckDescriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        healthCheckDescriptor.ShouldNotBeNull();
+        healthCheckDescriptor!.Lifetime.ShouldBe(ServiceLifetime.Singleton);
 
         // Assert — HealthCheckRegistration tagged "readiness"
         using ServiceProvider sp = services.BuildServiceProvider();
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "vault");
-        registration.Should().NotBeNull();
-        registration!.Tags.Should().Contain("readiness");
+        registration.ShouldNotBeNull();
+        registration!.Tags.ShouldContain("readiness");
     }
 
     [Fact]
@@ -167,6 +167,6 @@ public sealed class VaultServiceCollectionExtensionsTests
         using ServiceProvider sp = services.BuildServiceProvider();
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "vault-primary");
-        registration.Should().NotBeNull();
+        registration.ShouldNotBeNull();
     }
 }

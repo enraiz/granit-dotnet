@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.ValueProviders;
 using Granit.Features.ValueTypes;
@@ -17,11 +17,11 @@ public sealed class DefaultValueFeatureValueProviderTests
 
     [Fact]
     public void Name_Is_Default() =>
-        new DefaultValueFeatureValueProvider().Name.Should().Be("Default");
+        new DefaultValueFeatureValueProvider().Name.ShouldBe("Default");
 
     [Fact]
     public void Order_Is_300() =>
-        new DefaultValueFeatureValueProvider().Order.Should().Be(300);
+        new DefaultValueFeatureValueProvider().Order.ShouldBe(300);
 
     // -------------------------------------------------------------------------
     // GetOrNullAsync
@@ -35,7 +35,7 @@ public sealed class DefaultValueFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition("true"), TestContext.Current.CancellationToken);
 
-        result.Should().Be("true");
+        result.ShouldBe("true");
     }
 
     [Fact]
@@ -46,8 +46,8 @@ public sealed class DefaultValueFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             MakeDefinition("some-value"), TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result.Should().Be("some-value");
+        result.ShouldNotBeNull();
+        result.ShouldBe("some-value");
     }
 
     [Fact]
@@ -59,6 +59,6 @@ public sealed class DefaultValueFeatureValueProviderTests
         string? result = await provider.GetOrNullAsync(
             definition, TestContext.Current.CancellationToken);
 
-        result.Should().Be("100");
+        result.ShouldBe("100");
     }
 }

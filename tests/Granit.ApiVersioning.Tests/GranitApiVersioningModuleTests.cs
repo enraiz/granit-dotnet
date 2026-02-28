@@ -5,11 +5,11 @@
 // de versioning via AddGranitApiVersioning.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiVersioning.Tests;
@@ -35,7 +35,7 @@ public sealed class GranitApiVersioningModuleTests
             builder.Services.BuildServiceProvider();
         Options.GranitApiVersioningOptions options =
             sp.GetRequiredService<IOptions<Options.GranitApiVersioningOptions>>().Value;
-        options.Should().NotBeNull();
-        options.DefaultMajorVersion.Should().Be(1);
+        options.ShouldNotBeNull();
+        options.DefaultMajorVersion.ShouldBe(1);
     }
 }

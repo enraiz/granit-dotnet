@@ -5,11 +5,11 @@
 // ---------------------------------------------------------------------------
 
 using System.Globalization;
-using FluentAssertions;
 using Granit.Localization.Extensions;
 using Granit.Localization.Tests.TestResources;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Tests;
@@ -35,7 +35,7 @@ public sealed class LocalizationAutoDiscoveryTests
         IStringLocalizer<TestResource> localizer =
             provider.GetRequiredService<IStringLocalizer<TestResource>>();
 
-        localizer.Should().NotBeNull();
+        localizer.ShouldNotBeNull();
     }
 
     [Fact]
@@ -52,8 +52,8 @@ public sealed class LocalizationAutoDiscoveryTests
 
             LocalizedString result = localizer["Test:Hello"];
 
-            result.ResourceNotFound.Should().BeFalse();
-            result.Value.Should().Be("Bonjour");
+            result.ResourceNotFound.ShouldBeFalse();
+            result.Value.ShouldBe("Bonjour");
         }
         finally
         {
@@ -75,8 +75,8 @@ public sealed class LocalizationAutoDiscoveryTests
 
             LocalizedString result = localizer["Test:Hello"];
 
-            result.ResourceNotFound.Should().BeFalse();
-            result.Value.Should().Be("Hello");
+            result.ResourceNotFound.ShouldBeFalse();
+            result.Value.ShouldBe("Hello");
         }
         finally
         {
@@ -113,7 +113,7 @@ public sealed class LocalizationAutoDiscoveryTests
             LocalizedString result = localizer["Parent:OnlyInParent"];
 
             // L'enregistrement explicite (source Parent) est utilisé, pas l'auto-discovery
-            result.ResourceNotFound.Should().BeFalse();
+            result.ResourceNotFound.ShouldBeFalse();
         }
         finally
         {
@@ -130,7 +130,7 @@ public sealed class LocalizationAutoDiscoveryTests
 
         LocalizedString result = localizer["AnyKey"];
 
-        result.ResourceNotFound.Should().BeTrue();
-        result.Value.Should().Be("AnyKey");
+        result.ResourceNotFound.ShouldBeTrue();
+        result.Value.ShouldBe("AnyKey");
     }
 }

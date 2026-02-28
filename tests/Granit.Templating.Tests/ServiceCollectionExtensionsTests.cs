@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.Templating.Enrichment;
 using Granit.Templating.GlobalContext;
 using Granit.Templating.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Tests;
@@ -19,7 +19,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitTemplating();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITextTemplateRenderer) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -32,7 +32,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddGranitTemplating();                         // TryAdd must not replace
 
         services.Count(d => d.ServiceType == typeof(ITextTemplateRenderer))
-                .Should().Be(1, "TryAddScoped must not add a duplicate");
+                .ShouldBe(1, "TryAddScoped must not add a duplicate");
     }
 
     // -------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddEmbeddedTemplates(typeof(ServiceCollectionExtensionsTests).Assembly);
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITemplateResolver) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -58,7 +58,7 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddEmbeddedTemplates(typeof(object).Assembly);
 
         services.Count(d => d.ServiceType == typeof(ITemplateResolver))
-                .Should().Be(2);
+                .ShouldBe(2);
     }
 
     // -------------------------------------------------------------------------
@@ -71,7 +71,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddTemplateGlobalContext<FakeGlobalContext>();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITemplateGlobalContext) &&
             d.ImplementationType == typeof(FakeGlobalContext) &&
             d.Lifetime == ServiceLifetime.Singleton);
@@ -87,7 +87,7 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddTemplateDataEnricher<string, FakeEnricher>();
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITemplateDataEnricher<string>) &&
             d.ImplementationType == typeof(FakeEnricher) &&
             d.Lifetime == ServiceLifetime.Transient);

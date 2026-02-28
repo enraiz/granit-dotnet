@@ -2,8 +2,8 @@
 // CurrentTenantTests - Unit tests for ICurrentTenant / CurrentTenant
 // =============================================================================
 
-using FluentAssertions;
 using Granit.MultiTenancy;
+using Shouldly;
 using Xunit;
 
 namespace Granit.MultiTenancy.Tests;
@@ -17,9 +17,9 @@ public sealed class CurrentTenantTests
     {
         CurrentTenant tenant = Create();
 
-        tenant.IsAvailable.Should().BeFalse();
-        tenant.Id.Should().BeNull();
-        tenant.Name.Should().BeNull();
+        tenant.IsAvailable.ShouldBeFalse();
+        tenant.Id.ShouldBeNull();
+        tenant.Name.ShouldBeNull();
     }
 
     [Fact]
@@ -30,9 +30,9 @@ public sealed class CurrentTenantTests
 
         using IDisposable _ = tenant.Change(id, "Acme");
 
-        tenant.IsAvailable.Should().BeTrue();
-        tenant.Id.Should().Be(id);
-        tenant.Name.Should().Be("Acme");
+        tenant.IsAvailable.ShouldBeTrue();
+        tenant.Id.ShouldBe(id);
+        tenant.Name.ShouldBe("Acme");
     }
 
     [Fact]
@@ -42,8 +42,8 @@ public sealed class CurrentTenantTests
 
         using IDisposable _ = tenant.Change(null);
 
-        tenant.IsAvailable.Should().BeFalse();
-        tenant.Id.Should().BeNull();
+        tenant.IsAvailable.ShouldBeFalse();
+        tenant.Id.ShouldBeNull();
     }
 
     [Fact]
@@ -55,8 +55,8 @@ public sealed class CurrentTenantTests
         IDisposable scope = tenant.Change(id, "Acme");
         scope.Dispose();
 
-        tenant.IsAvailable.Should().BeFalse();
-        tenant.Id.Should().BeNull();
+        tenant.IsAvailable.ShouldBeFalse();
+        tenant.Id.ShouldBeNull();
     }
 
     [Fact]
@@ -70,13 +70,13 @@ public sealed class CurrentTenantTests
 
         using (IDisposable inner = tenant.Change(innerTenant, "Inner"))
         {
-            tenant.Id.Should().Be(innerTenant);
-            tenant.Name.Should().Be("Inner");
+            tenant.Id.ShouldBe(innerTenant);
+            tenant.Name.ShouldBe("Inner");
         }
 
         // After disposing the inner scope, the outer scope is restored
-        tenant.Id.Should().Be(outerTenant);
-        tenant.Name.Should().Be("Outer");
+        tenant.Id.ShouldBe(outerTenant);
+        tenant.Name.ShouldBe("Outer");
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class CurrentTenantTests
         scope.Dispose();
         scope.Dispose(); // second dispose must not throw or alter the context
 
-        tenant.IsAvailable.Should().BeFalse();
+        tenant.IsAvailable.ShouldBeFalse();
     }
 
     [Fact]
@@ -105,20 +105,20 @@ public sealed class CurrentTenantTests
         {
             using IDisposable _ = tenant.Change(tenantA, "A");
             await Task.Delay(10, TestContext.Current.CancellationToken);
-            tenant.Id.Should().Be(tenantA, "task A must see its own tenant");
+            tenant.Id.ShouldBe(tenantA, "task A must see its own tenant");
         }, TestContext.Current.CancellationToken);
 
         var taskB = Task.Run(async () =>
         {
             using IDisposable _ = tenant.Change(tenantB, "B");
             await Task.Delay(10, TestContext.Current.CancellationToken);
-            tenant.Id.Should().Be(tenantB, "task B must see its own tenant");
+            tenant.Id.ShouldBe(tenantB, "task B must see its own tenant");
         }, TestContext.Current.CancellationToken);
 
         await Task.WhenAll(taskA, taskB);
 
         // The root context is intact
-        tenant.IsAvailable.Should().BeFalse();
+        tenant.IsAvailable.ShouldBeFalse();
     }
 
     [Fact]
@@ -129,8 +129,8 @@ public sealed class CurrentTenantTests
 
         using IDisposable _ = tenant.Change(id);
 
-        tenant.Id.Should().Be(id);
-        tenant.Name.Should().BeNull();
-        tenant.IsAvailable.Should().BeTrue();
+        tenant.Id.ShouldBe(id);
+        tenant.Name.ShouldBeNull();
+        tenant.IsAvailable.ShouldBeTrue();
     }
 }

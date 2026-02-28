@@ -7,10 +7,10 @@
 // =============================================================================
 
 using System.Security.Claims;
-using FluentAssertions;
 using Granit.Authentication.JwtBearer.Authentication;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authentication.JwtBearer.Tests;
@@ -24,8 +24,8 @@ public sealed class CurrentUserServiceTests
         CurrentUserService sut = CreateService(new Claim("sub", "user-abc-123"));
 
         // Act & Assert
-        sut.UserId.Should().Be("user-abc-123");
-        sut.IsAuthenticated.Should().BeTrue();
+        sut.UserId.ShouldBe("user-abc-123");
+        sut.IsAuthenticated.ShouldBeTrue();
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public sealed class CurrentUserServiceTests
             new Claim("preferred_username", "jean.dupont"));
 
         // Act & Assert — User.Identity.Name resolves the "preferred_username" claim
-        sut.UserName.Should().Be("jean.dupont");
+        sut.UserName.ShouldBe("jean.dupont");
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class CurrentUserServiceTests
             new Claim("sub", "user-abc-123"));
 
         // Act & Assert — User.Identity.Name resolves the "sub" claim
-        sut.UserName.Should().Be("user-abc-123");
+        sut.UserName.ShouldBe("user-abc-123");
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class CurrentUserServiceTests
             new Claim(ClaimTypes.Email, "jean@guava-health.com"));
 
         // Act & Assert
-        sut.Email.Should().Be("jean@guava-health.com");
+        sut.Email.ShouldBe("jean@guava-health.com");
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class CurrentUserServiceTests
             new Claim(ClaimTypes.Role, "practitioner"));
 
         // Act & Assert
-        sut.GetRoles().Should().BeEquivalentTo(["admin", "practitioner"]);
+        sut.GetRoles().ShouldBe(["admin", "practitioner"]);
     }
 
     [Fact]
@@ -87,8 +87,8 @@ public sealed class CurrentUserServiceTests
             new Claim(ClaimTypes.Role, "admin"));
 
         // Act & Assert
-        sut.IsInRole("admin").Should().BeTrue();
-        sut.IsInRole("unknown").Should().BeFalse();
+        sut.IsInRole("admin").ShouldBeTrue();
+        sut.IsInRole("unknown").ShouldBeFalse();
     }
 
     [Fact]
@@ -100,11 +100,11 @@ public sealed class CurrentUserServiceTests
         var sut = new CurrentUserService(accessor);
 
         // Act & Assert
-        sut.UserId.Should().BeNull();
-        sut.UserName.Should().BeNull();
-        sut.Email.Should().BeNull();
-        sut.IsAuthenticated.Should().BeFalse();
-        sut.GetRoles().Should().BeEmpty();
+        sut.UserId.ShouldBeNull();
+        sut.UserName.ShouldBeNull();
+        sut.Email.ShouldBeNull();
+        sut.IsAuthenticated.ShouldBeFalse();
+        sut.GetRoles().ShouldBeEmpty();
     }
 
     // --- Helpers ---

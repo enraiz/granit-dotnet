@@ -8,12 +8,12 @@
 
 using System.Net;
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Email;
 using Granit.Notifications.Sms;
 using Granit.Notifications.WhatsApp;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Brevo.Tests;
@@ -63,8 +63,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        _handler.Requests.Should().HaveCount(1);
-        _handler.Requests[0].Url.Should().Contain("smtp/email");
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("smtp/email");
     }
 
     [Fact]
@@ -82,14 +82,14 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        _handler.Requests.Should().HaveCount(1);
+        _handler.Requests.Count.ShouldBe(1);
         string body = _handler.Requests[0].Body;
         using JsonDocument doc = JsonDocument.Parse(body);
         JsonElement root = doc.RootElement;
-        root.GetProperty("to")[0].GetProperty("email").GetString().Should().Be("user@test.com");
-        root.GetProperty("subject").GetString().Should().Be("Test Subject");
-        root.GetProperty("htmlContent").GetString().Should().Be("<p>Hello</p>");
-        root.GetProperty("textContent").GetString().Should().Be("Hello");
+        root.GetProperty("to")[0].GetProperty("email").GetString().ShouldBe("user@test.com");
+        root.GetProperty("subject").GetString().ShouldBe("Test Subject");
+        root.GetProperty("htmlContent").GetString().ShouldBe("<p>Hello</p>");
+        root.GetProperty("textContent").GetString().ShouldBe("Hello");
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             TestContext.Current.CancellationToken);
 
         string body = _handler.Requests[0].Body;
-        body.Should().Contain("custom@test.com");
+        body.ShouldContain("custom@test.com");
     }
 
     [Fact]
@@ -126,8 +126,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             TestContext.Current.CancellationToken);
 
         string body = _handler.Requests[0].Body;
-        body.Should().Contain("default@test.com");
-        body.Should().Contain("Test App");
+        body.ShouldContain("default@test.com");
+        body.ShouldContain("Test App");
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<HttpRequestException>();
+        await Should.ThrowAsync<HttpRequestException>(act);
     }
 
     // -------------------------------------------------------------------------
@@ -165,8 +165,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        _handler.Requests.Should().HaveCount(1);
-        _handler.Requests[0].Url.Should().Contain("transactionalSMS/sms");
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("transactionalSMS/sms");
     }
 
     [Fact]
@@ -182,13 +182,13 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        _handler.Requests.Should().HaveCount(1);
+        _handler.Requests.Count.ShouldBe(1);
         string body = _handler.Requests[0].Body;
         using JsonDocument doc = JsonDocument.Parse(body);
         JsonElement root = doc.RootElement;
-        root.GetProperty("recipient").GetString().Should().Be("+32470000000");
-        root.GetProperty("content").GetString().Should().Be("Hello SMS");
-        root.GetProperty("type").GetString().Should().Be("transactional");
+        root.GetProperty("recipient").GetString().ShouldBe("+32470000000");
+        root.GetProperty("content").GetString().ShouldBe("Hello SMS");
+        root.GetProperty("type").GetString().ShouldBe("transactional");
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             TestContext.Current.CancellationToken);
 
         string body = _handler.Requests[0].Body;
-        body.Should().Contain("CustomId");
+        body.ShouldContain("CustomId");
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             TestContext.Current.CancellationToken);
 
         string body = _handler.Requests[0].Body;
-        body.Should().Contain("TestApp");
+        body.ShouldContain("TestApp");
     }
 
     // -------------------------------------------------------------------------
@@ -243,8 +243,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        _handler.Requests.Should().HaveCount(1);
-        _handler.Requests[0].Url.Should().Contain("whatsapp/sendTemplate");
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("whatsapp/sendTemplate");
     }
 
     [Fact]
@@ -261,14 +261,14 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        _handler.Requests.Should().HaveCount(1);
+        _handler.Requests.Count.ShouldBe(1);
         string body = _handler.Requests[0].Body;
         using JsonDocument doc = JsonDocument.Parse(body);
         JsonElement root = doc.RootElement;
-        root.GetProperty("contactNumbers")[0].GetString().Should().Be("+32470000000");
-        root.GetProperty("templateId").GetString().Should().Be("welcome_template");
-        root.GetProperty("params")[0].GetString().Should().Be("Jean");
-        root.GetProperty("params")[1].GetString().Should().Be("2026");
+        root.GetProperty("contactNumbers")[0].GetString().ShouldBe("+32470000000");
+        root.GetProperty("templateId").GetString().ShouldBe("welcome_template");
+        root.GetProperty("params")[0].GetString().ShouldBe("Jean");
+        root.GetProperty("params")[1].GetString().ShouldBe("2026");
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             TestContext.Current.CancellationToken);
 
         string body = _handler.Requests[0].Body;
-        body.Should().Contain("\"language\":\"fr\"");
+        body.ShouldContain("\"language\":\"fr\"");
     }
 
     // -------------------------------------------------------------------------

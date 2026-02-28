@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Granit.Cors.Extensions;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Cors.Tests;
@@ -13,11 +13,11 @@ public sealed class GranitCorsModuleTests
 {
     [Fact]
     public void GranitCorsModule_IsGranitModule() =>
-        typeof(GranitCorsModule).Should().BeAssignableTo<GranitModule>();
+        typeof(GranitCorsModule).IsAssignableTo(typeof(GranitModule)).ShouldBeTrue();
 
     [Fact]
     public void GranitCorsModule_IsSealed() =>
-        typeof(GranitCorsModule).IsSealed.Should().BeTrue();
+        typeof(GranitCorsModule).IsSealed.ShouldBeTrue();
 
     [Fact]
     public void AddGranitCors_RegistersCorsOptionsValidator()
@@ -26,7 +26,7 @@ public sealed class GranitCorsModuleTests
 
         builder.AddGranitCors();
 
-        builder.Services.Should().Contain(descriptor =>
+        builder.Services.ShouldContain(descriptor =>
             descriptor.ServiceType == typeof(IValidateOptions<GranitCorsOptions>));
     }
 
@@ -37,7 +37,7 @@ public sealed class GranitCorsModuleTests
 
         builder.AddGranitCors();
 
-        builder.Services.Should().Contain(descriptor =>
+        builder.Services.ShouldContain(descriptor =>
             descriptor.ServiceType == typeof(IConfigureOptions<CorsOptions>));
     }
 
@@ -48,7 +48,7 @@ public sealed class GranitCorsModuleTests
 
         builder.AddGranitCors();
 
-        builder.Services.Should().Contain(descriptor =>
+        builder.Services.ShouldContain(descriptor =>
             descriptor.ServiceType == typeof(ICorsService));
     }
 }

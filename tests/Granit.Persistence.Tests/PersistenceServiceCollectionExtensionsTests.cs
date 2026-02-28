@@ -6,7 +6,6 @@
 // Verifies that AddGranitDbContextCheck<T> registers a readiness health check.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.DataFiltering;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.Extensions;
@@ -15,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests;
@@ -36,7 +36,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
         // Assert
         AuditedEntityInterceptor? interceptor = scope.ServiceProvider.GetService<AuditedEntityInterceptor>();
-        interceptor.Should().NotBeNull();
+        interceptor.ShouldNotBeNull();
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
         // Assert
         SoftDeleteInterceptor? interceptor = scope.ServiceProvider.GetService<SoftDeleteInterceptor>();
-        interceptor.Should().NotBeNull();
+        interceptor.ShouldNotBeNull();
     }
 
     [Fact]
@@ -68,10 +68,10 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
         // Assert
         ServiceDescriptor auditDescriptor = services.First(d => d.ServiceType == typeof(AuditedEntityInterceptor));
-        auditDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+        auditDescriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
 
         ServiceDescriptor softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
-        softDeleteDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+        softDeleteDescriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 
     [Fact]
@@ -85,9 +85,9 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
         // Assert
         ServiceDescriptor? descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IDataFilter));
-        descriptor.Should().NotBeNull();
-        descriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
-        descriptor.ImplementationType.Should().Be<DataFilter>();
+        descriptor.ShouldNotBeNull();
+        descriptor.Lifetime.ShouldBe(ServiceLifetime.Singleton);
+        descriptor.ImplementationType.ShouldBe(typeof(DataFilter));
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(
             r => r.Name == nameof(TestDbContext));
-        registration.Should().NotBeNull();
-        registration!.Tags.Should().Contain("readiness");
+        registration.ShouldNotBeNull();
+        registration.Tags.ShouldContain("readiness");
     }
 
     [Fact]
@@ -125,8 +125,8 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         using ServiceProvider sp = services.BuildServiceProvider();
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "database");
-        registration.Should().NotBeNull();
-        registration!.Tags.Should().Contain("readiness");
+        registration.ShouldNotBeNull();
+        registration.Tags.ShouldContain("readiness");
     }
 
     private static void AddRequiredDependencies(ServiceCollection services)

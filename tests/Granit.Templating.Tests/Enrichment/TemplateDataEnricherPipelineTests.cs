@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Templating.Enrichment;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Tests.Enrichment;
@@ -39,10 +39,10 @@ public sealed class TemplateDataEnricherPipelineTests
         }
 
         // Assert
-        current.Name.Should().Be("ALICE");
-        current.Age.Should().Be(30);
-        initial.Age.Should().BeNull(because: "original instance must not be mutated");
-        initial.Name.Should().Be("Alice");
+        current.Name.ShouldBe("ALICE");
+        current.Age.ShouldBe(30);
+        initial.Age.ShouldBeNull("original instance must not be mutated");
+        initial.Name.ShouldBe("Alice");
     }
 
     [Fact]
@@ -60,6 +60,6 @@ public sealed class TemplateDataEnricherPipelineTests
         }
 
         // Assert
-        current.Should().BeSameAs(original);
+        current.ShouldBeSameAs(original);
     }
 }

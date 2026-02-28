@@ -11,11 +11,11 @@
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json;
-using FluentAssertions;
 using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Push.Tests;
@@ -47,7 +47,7 @@ public sealed class PushNotificationChannelTests
     {
         PushNotificationChannel channel = BuildChannel();
 
-        channel.Name.Should().Be(NotificationChannels.Push);
+        channel.Name.ShouldBe(NotificationChannels.Push);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class PushNotificationChannelTests
 
         Func<Task> act = () => channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -90,10 +90,9 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        handler.Requests.Should().ContainSingle();
+        handler.Requests.ShouldHaveSingleItem();
         // The body is AES-128-GCM encrypted, so we verify content was sent (non-empty).
-        handler.RequestBodies.Should().ContainSingle()
-            .Which.Should().NotBeEmpty();
+        handler.RequestBodies.ShouldHaveSingleItem().ShouldNotBeEmpty();
     }
 
     [Fact]
@@ -107,8 +106,7 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        handler.Requests.Should().ContainSingle()
-            .Which.Method.Should().Be(HttpMethod.Post);
+        handler.Requests.ShouldHaveSingleItem().Method.ShouldBe(HttpMethod.Post);
     }
 
     [Fact]
@@ -127,7 +125,7 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        handler.Requests.Should().HaveCount(3);
+        handler.Requests.Count.ShouldBe(3);
     }
 
     [Fact]
@@ -141,8 +139,8 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        handler.Requests.Should().ContainSingle();
-        handler.Requests[0].RequestUri!.ToString().Should().Contain("unique-endpoint");
+        handler.Requests.ShouldHaveSingleItem();
+        handler.Requests[0].RequestUri!.ToString().ShouldContain("unique-endpoint");
     }
 
     [Fact]
@@ -211,7 +209,7 @@ public sealed class PushNotificationChannelTests
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
         // All three subscriptions should have been attempted.
-        handler.Requests.Should().HaveCount(3);
+        handler.Requests.Count.ShouldBe(3);
         // Only the expired endpoint should be removed.
         await _subscriptionStore.Received(1).RemoveSubscriptionAsync(
             "https://push.example.com/expired", context.TenantId, Arg.Any<CancellationToken>());
@@ -260,7 +258,7 @@ public sealed class PushNotificationChannelTests
 
         HttpRequestMessage request = handler.Requests[0];
         // VAPID authentication adds an Authorization header (vapid scheme).
-        request.Headers.Authorization.Should().NotBeNull();
+        request.Headers.Authorization.ShouldNotBeNull();
     }
 
     [Fact]
@@ -275,7 +273,7 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        handler.Requests.Should().BeEmpty();
+        handler.Requests.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------

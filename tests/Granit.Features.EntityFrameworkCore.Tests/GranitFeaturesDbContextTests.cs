@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Features.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.EntityFrameworkCore.Tests;
@@ -25,7 +25,7 @@ public sealed class GranitFeaturesDbContextTests
         Func<Task> act = () => ctx.Database.EnsureCreatedAsync(
             TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // -------------------------------------------------------------------------
@@ -41,7 +41,7 @@ public sealed class GranitFeaturesDbContextTests
             .FindEntityType(typeof(TenantFeatureOverride))!
             .GetTableName();
 
-        tableName.Should().Be("saas_feature_overrides");
+        tableName.ShouldBe("saas_feature_overrides");
     }
 
     [Fact]
@@ -56,8 +56,7 @@ public sealed class GranitFeaturesDbContextTests
             i.Properties.Any(p => p.Name == nameof(TenantFeatureOverride.TenantId)) &&
             i.Properties.Any(p => p.Name == nameof(TenantFeatureOverride.FeatureName)));
 
-        uniqueIndex.Should().NotBeNull(
-            "a unique composite index on (TenantId, FeatureName) must be configured");
+        uniqueIndex.ShouldNotBeNull("a unique composite index on (TenantId, FeatureName) must be configured");
     }
 
     [Fact]
@@ -69,8 +68,8 @@ public sealed class GranitFeaturesDbContextTests
             .FindEntityType(typeof(TenantFeatureOverride))!
             .FindProperty(nameof(TenantFeatureOverride.FeatureName));
 
-        property!.GetMaxLength().Should().Be(200);
-        property.IsNullable.Should().BeFalse();
+        property!.GetMaxLength().ShouldBe(200);
+        property.IsNullable.ShouldBeFalse();
     }
 
     [Fact]
@@ -82,8 +81,8 @@ public sealed class GranitFeaturesDbContextTests
             .FindEntityType(typeof(TenantFeatureOverride))!
             .FindProperty(nameof(TenantFeatureOverride.Value));
 
-        property!.GetMaxLength().Should().Be(2000);
-        property.IsNullable.Should().BeFalse();
+        property!.GetMaxLength().ShouldBe(2000);
+        property.IsNullable.ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------
@@ -113,11 +112,11 @@ public sealed class GranitFeaturesDbContextTests
         TenantFeatureOverride? loaded = await ctx.FeatureOverrides
             .FindAsync([entity.Id], TestContext.Current.CancellationToken);
 
-        loaded.Should().NotBeNull();
-        loaded!.TenantId.Should().Be(tenantId);
-        loaded.FeatureName.Should().Be("Guava.MaxPatientsCount");
-        loaded.Value.Should().Be("5000");
-        loaded.CreatedBy.Should().Be("admin@digitaldynamics.be");
-        loaded.CreatedAt.Should().Be(entity.CreatedAt);
+        loaded.ShouldNotBeNull();
+        loaded!.TenantId.ShouldBe(tenantId);
+        loaded.FeatureName.ShouldBe("Guava.MaxPatientsCount");
+        loaded.Value.ShouldBe("5000");
+        loaded.CreatedBy.ShouldBe("admin@digitaldynamics.be");
+        loaded.CreatedAt.ShouldBe(entity.CreatedAt);
     }
 }

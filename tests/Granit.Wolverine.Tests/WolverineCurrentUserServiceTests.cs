@@ -7,10 +7,10 @@
 // =============================================================================
 
 using System.Security.Claims;
-using FluentAssertions;
 using Granit.Wolverine.Internal;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Wolverine.Tests;
@@ -44,7 +44,7 @@ public sealed class WolverineCurrentUserServiceTests
     {
         WolverineCurrentUserService sut = CreateWithoutHttpContext();
 
-        sut.UserId.Should().BeNull();
+        sut.UserId.ShouldBeNull();
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class WolverineCurrentUserServiceTests
     {
         WolverineCurrentUserService sut = CreateWithoutHttpContext();
 
-        sut.IsAuthenticated.Should().BeFalse();
+        sut.IsAuthenticated.ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------
@@ -67,7 +67,7 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change(expectedUserId);
 
-        sut.UserId.Should().Be(expectedUserId);
+        sut.UserId.ShouldBe(expectedUserId);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change("any-user");
 
-        sut.IsAuthenticated.Should().BeTrue();
+        sut.IsAuthenticated.ShouldBeTrue();
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class WolverineCurrentUserServiceTests
         IDisposable scope = sut.Change("temp-user");
         scope.Dispose();
 
-        sut.UserId.Should().BeNull();
+        sut.UserId.ShouldBeNull();
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public sealed class WolverineCurrentUserServiceTests
         scope.Dispose();
         Action act = scope.Dispose;
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -111,16 +111,16 @@ public sealed class WolverineCurrentUserServiceTests
         const string inner = "inner-user";
 
         IDisposable outerScope = sut.Change(outer);
-        sut.UserId.Should().Be(outer);
+        sut.UserId.ShouldBe(outer);
 
         IDisposable innerScope = sut.Change(inner);
-        sut.UserId.Should().Be(inner);
+        sut.UserId.ShouldBe(inner);
 
         innerScope.Dispose();
-        sut.UserId.Should().Be(outer);
+        sut.UserId.ShouldBe(outer);
 
         outerScope.Dispose();
-        sut.UserId.Should().BeNull();
+        sut.UserId.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -134,7 +134,7 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change("user");
 
-        sut.GetRoles().Should().BeEmpty();
+        sut.GetRoles().ShouldBeEmpty();
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change("user");
 
-        sut.IsInRole("admin").Should().BeFalse();
+        sut.IsInRole("admin").ShouldBeFalse();
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change("user");
 
-        sut.UserName.Should().BeNull();
+        sut.UserName.ShouldBeNull();
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change("user");
 
-        sut.Email.Should().BeNull();
+        sut.Email.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -178,7 +178,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim("sub", "sub-user-123"));
 
-        sut.UserId.Should().Be("sub-user-123");
+        sut.UserId.ShouldBe("sub-user-123");
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim(ClaimTypes.NameIdentifier, "ni-user-456"));
 
-        sut.UserId.Should().Be("ni-user-456");
+        sut.UserId.ShouldBe("ni-user-456");
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim(ClaimTypes.Email, "user@example.com"));
 
-        sut.UserId.Should().BeNull();
+        sut.UserId.ShouldBeNull();
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public sealed class WolverineCurrentUserServiceTests
     {
         WolverineCurrentUserService sut = CreateWithHttpContext(isAuthenticated: true);
 
-        sut.IsAuthenticated.Should().BeTrue();
+        sut.IsAuthenticated.ShouldBeTrue();
     }
 
     [Fact]
@@ -214,7 +214,7 @@ public sealed class WolverineCurrentUserServiceTests
     {
         WolverineCurrentUserService sut = CreateWithHttpContext(isAuthenticated: false);
 
-        sut.IsAuthenticated.Should().BeFalse();
+        sut.IsAuthenticated.ShouldBeFalse();
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim(ClaimTypes.Name, "jean.dupont"));
 
-        sut.UserName.Should().Be("jean.dupont");
+        sut.UserName.ShouldBe("jean.dupont");
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim(ClaimTypes.Email, "user@example.com"));
 
-        sut.Email.Should().Be("user@example.com");
+        sut.Email.ShouldBe("user@example.com");
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim("email", "shorthand@example.com"));
 
-        sut.Email.Should().Be("shorthand@example.com");
+        sut.Email.ShouldBe("shorthand@example.com");
     }
 
     [Fact]
@@ -255,7 +255,7 @@ public sealed class WolverineCurrentUserServiceTests
             new Claim(ClaimTypes.Role, "admin"),
             new Claim(ClaimTypes.Role, "editor"));
 
-        sut.GetRoles().Should().BeEquivalentTo(["admin", "editor"]);
+        sut.GetRoles().ShouldBe(["admin", "editor"]);
     }
 
     [Fact]
@@ -265,7 +265,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim(ClaimTypes.Role, "admin"));
 
-        sut.IsInRole("admin").Should().BeTrue();
+        sut.IsInRole("admin").ShouldBeTrue();
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public sealed class WolverineCurrentUserServiceTests
             isAuthenticated: true,
             new Claim(ClaimTypes.Role, "editor"));
 
-        sut.IsInRole("admin").Should().BeFalse();
+        sut.IsInRole("admin").ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------
@@ -291,6 +291,6 @@ public sealed class WolverineCurrentUserServiceTests
 
         using IDisposable scope = sut.Change("override-user");
 
-        sut.UserId.Should().Be("override-user");
+        sut.UserId.ShouldBe("override-user");
     }
 }

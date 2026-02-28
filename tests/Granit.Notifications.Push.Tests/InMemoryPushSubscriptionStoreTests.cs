@@ -5,7 +5,7 @@
 // deduplication (upsert), tenant isolation, and multi-subscription support.
 // =============================================================================
 
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Push.Tests;
@@ -23,8 +23,7 @@ public sealed class InMemoryPushSubscriptionStoreTests
         IReadOnlyList<PushSubscriptionInfo> result = await _store.GetSubscriptionsAsync(
             "user-1", null, TestContext.Current.CancellationToken);
 
-        result.Should().ContainSingle()
-            .Which.Endpoint.Should().Be("https://push.example.com/1");
+        result.ShouldHaveSingleItem().Endpoint.ShouldBe("https://push.example.com/1");
     }
 
     [Fact]
@@ -38,8 +37,7 @@ public sealed class InMemoryPushSubscriptionStoreTests
         IReadOnlyList<PushSubscriptionInfo> result = await _store.GetSubscriptionsAsync(
             "user-1", null, TestContext.Current.CancellationToken);
 
-        result.Should().ContainSingle()
-            .Which.Auth.Should().Be("auth-new");
+        result.ShouldHaveSingleItem().Auth.ShouldBe("auth-new");
     }
 
     [Fact]
@@ -52,7 +50,7 @@ public sealed class InMemoryPushSubscriptionStoreTests
         IReadOnlyList<PushSubscriptionInfo> result = await _store.GetSubscriptionsAsync(
             "user-1", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -61,7 +59,7 @@ public sealed class InMemoryPushSubscriptionStoreTests
         IReadOnlyList<PushSubscriptionInfo> result = await _store.GetSubscriptionsAsync(
             "user-1", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -75,7 +73,7 @@ public sealed class InMemoryPushSubscriptionStoreTests
         IReadOnlyList<PushSubscriptionInfo> result = await _store.GetSubscriptionsAsync(
             "user-1", tenantB, TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -89,7 +87,7 @@ public sealed class InMemoryPushSubscriptionStoreTests
         IReadOnlyList<PushSubscriptionInfo> result = await _store.GetSubscriptionsAsync(
             "user-1", null, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
+        result.Count.ShouldBe(2);
     }
 
     // -------------------------------------------------------------------------

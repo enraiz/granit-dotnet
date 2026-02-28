@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Checker;
 using Granit.Features.Definitions;
 using Granit.Features.Exceptions;
@@ -96,7 +96,7 @@ public sealed class FeatureCheckerTests
 
         bool result = await checker.IsEnabledAsync("App.Feature", TestContext.Current.CancellationToken);
 
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public sealed class FeatureCheckerTests
 
         bool result = await checker.IsEnabledAsync("App.Feature", TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     // -------------------------------------------------------------------------
@@ -126,7 +126,7 @@ public sealed class FeatureCheckerTests
 
         long result = await checker.GetNumericAsync("App.MaxPatients", TestContext.Current.CancellationToken);
 
-        result.Should().Be(50);
+        result.ShouldBe(50);
     }
 
     // -------------------------------------------------------------------------
@@ -143,7 +143,7 @@ public sealed class FeatureCheckerTests
 
         Func<Task> act = () => checker.RequireEnabledAsync("App.Feature", TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -156,8 +156,7 @@ public sealed class FeatureCheckerTests
 
         Func<Task> act = () => checker.RequireEnabledAsync("App.Feature", TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<FeatureNotEnabledException>()
-            .WithMessage("*App.Feature*");
+        (await Should.ThrowAsync<FeatureNotEnabledException>(act)).Message.ShouldContain("App.Feature");
     }
 
     // -------------------------------------------------------------------------
@@ -186,7 +185,7 @@ public sealed class FeatureCheckerTests
 
         bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
 
-        result.Should().BeTrue("tenant override is 'true' even though default is 'false'");
+        result.ShouldBeTrue("tenant override is 'true' even though default is 'false'");
     }
 
     [Fact]
@@ -207,7 +206,7 @@ public sealed class FeatureCheckerTests
 
         bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse("no tenant context, falls back to default 'false'");
+        result.ShouldBeFalse("no tenant context, falls back to default 'false'");
     }
 
     // -------------------------------------------------------------------------
@@ -232,7 +231,7 @@ public sealed class FeatureCheckerTests
 
         bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse("ICurrentTenant not registered, cascade falls through to default 'false'");
+        result.ShouldBeFalse("ICurrentTenant not registered, cascade falls through to default 'false'");
     }
 
     [Fact]
@@ -257,6 +256,6 @@ public sealed class FeatureCheckerTests
 
         bool result = await checker.IsEnabledAsync("App.VideoConsultation", TestContext.Current.CancellationToken);
 
-        result.Should().BeFalse("no ICurrentTenant registered, store override must not be resolved");
+        result.ShouldBeFalse("no ICurrentTenant registered, store override must not be resolved");
     }
 }

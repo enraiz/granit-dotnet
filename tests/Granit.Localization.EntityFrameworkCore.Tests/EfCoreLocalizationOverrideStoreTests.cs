@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Localization.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.EntityFrameworkCore.Tests;
@@ -66,9 +66,9 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
-        result["Patient.Title"].Should().Be("Patient");
-        result["Doctor.Title"].Should().Be("Médecin");
+        result.Count.ShouldBe(2);
+        result["Patient.Title"].ShouldBe("Patient");
+        result["Doctor.Title"].ShouldBe("Médecin");
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -96,8 +96,8 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(1, "only the fr culture of Guava resource should be returned");
-        result["Key1"].Should().Be("Valeur1");
+        result.Count.ShouldBe(1, "only the fr culture of Guava resource should be returned");
+        result["Key1"].ShouldBe("Valeur1");
     }
 
     // -------------------------------------------------------------------------
@@ -116,7 +116,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result["Patient.Title"].Should().Be("Patient personnalisé");
+        result["Patient.Title"].ShouldBe("Patient personnalisé");
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result["Patient.Title"].Should().Be("Bénéficiaire", "upsert should update the existing value");
+        result["Patient.Title"].ShouldBe("Bénéficiaire", "upsert should update the existing value");
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
             o => o.ResourceName == "Guava" && o.CultureName == "fr" && o.Key == "Key",
             TestContext.Current.CancellationToken);
 
-        count.Should().Be(1, "upsert must not create duplicates");
+        count.ShouldBe(1, "upsert must not create duplicates");
     }
 
     // -------------------------------------------------------------------------
@@ -174,7 +174,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         Func<Task> act = () => store.RemoveOverrideAsync(
             "Guava", "fr", "Ghost.Key", TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(1);
-        result["Key2"].Should().Be("Valeur2", "Key2 must not be affected");
+        result.Count.ShouldBe(1);
+        result["Key2"].ShouldBe("Valeur2", "Key2 must not be affected");
     }
 }

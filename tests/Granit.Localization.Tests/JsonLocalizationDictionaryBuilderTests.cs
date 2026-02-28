@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 
 using Xunit;
 
@@ -18,11 +18,11 @@ public sealed class JsonLocalizationDictionaryBuilderTests
             Json.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
 
         // Assert
-        result.Should().ContainKey("fr");
-        result.Should().ContainKey("en");
-        result["fr"].Should().ContainKey("Test:Hello");
-        result["fr"]["Test:Hello"].Should().Be("Bonjour");
-        result["en"]["Test:Hello"].Should().Be("Hello");
+        result.ShouldContainKey("fr");
+        result.ShouldContainKey("en");
+        result["fr"].ShouldContainKey("Test:Hello");
+        result["fr"]["Test:Hello"].ShouldBe("Bonjour");
+        result["en"]["Test:Hello"].ShouldBe("Hello");
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class JsonLocalizationDictionaryBuilderTests
             Json.JsonLocalizationDictionaryBuilder.Build(assembly, "NonExistent.Prefix");
 
         // Assert
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -51,8 +51,8 @@ public sealed class JsonLocalizationDictionaryBuilderTests
             Json.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
 
         // Assert
-        result["fr"]["Test:Welcome"].Should().Contain("{0}");
-        result["fr"]["Test:Welcome"].Should().Contain("{1}");
+        result["fr"]["Test:Welcome"].ShouldContain("{0}");
+        result["fr"]["Test:Welcome"].ShouldContain("{1}");
     }
 
     [Fact]
@@ -67,8 +67,8 @@ public sealed class JsonLocalizationDictionaryBuilderTests
             Json.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
 
         // Assert
-        result.Should().ContainKey("fr");
-        result["fr"].Should().ContainKey("Parent:SharedKey");
-        result["fr"]["Parent:SharedKey"].Should().Be("Valeur partagée du parent");
+        result.ShouldContainKey("fr");
+        result["fr"].ShouldContainKey("Parent:SharedKey");
+        result["fr"]["Parent:SharedKey"].ShouldBe("Valeur partagée du parent");
     }
 }

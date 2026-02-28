@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.Idempotency.Internal;
 using Granit.Idempotency.Models;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Idempotency.Tests;
@@ -28,7 +28,7 @@ public sealed class IdempotencyOptionsValidatorTests
     {
         ValidateOptionsResult result = _validator.Validate(null, ValidOptions());
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -46,8 +46,8 @@ public sealed class IdempotencyOptionsValidatorTests
 
         ValidateOptionsResult result = _validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().Contain(f => f.Contains("HeaderName"));
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(f => f.Contains("HeaderName"));
     }
 
     // -------------------------------------------------------------------------
@@ -65,8 +65,8 @@ public sealed class IdempotencyOptionsValidatorTests
 
         ValidateOptionsResult result = _validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().Contain(f => f.Contains("KeyPrefix"));
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(f => f.Contains("KeyPrefix"));
     }
 
     // -------------------------------------------------------------------------
@@ -84,8 +84,8 @@ public sealed class IdempotencyOptionsValidatorTests
 
         ValidateOptionsResult result = _validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().Contain(f => f.Contains("MaxBodySizeBytes"));
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(f => f.Contains("MaxBodySizeBytes"));
     }
 
     // -------------------------------------------------------------------------
@@ -101,8 +101,8 @@ public sealed class IdempotencyOptionsValidatorTests
 
         ValidateOptionsResult result = _validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().Contain(f =>
+        result.Failed.ShouldBeTrue();
+        result.Failures.ShouldContain(f =>
             f.Contains("ExecutionTimeout") && f.Contains("InProgressTtl"));
     }
 
@@ -115,7 +115,7 @@ public sealed class IdempotencyOptionsValidatorTests
 
         ValidateOptionsResult result = _validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
+        result.Failed.ShouldBeTrue();
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public sealed class IdempotencyOptionsValidatorTests
 
         ValidateOptionsResult result = _validator.Validate(null, options);
 
-        result.Succeeded.Should().BeTrue();
+        result.Succeeded.ShouldBeTrue();
     }
 
     // -------------------------------------------------------------------------
@@ -148,7 +148,7 @@ public sealed class IdempotencyOptionsValidatorTests
 
         ValidateOptionsResult result = _validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().HaveCountGreaterThanOrEqualTo(4);
+        result.Failed.ShouldBeTrue();
+        result.Failures.Count().ShouldBeGreaterThanOrEqualTo(4);
     }
 }

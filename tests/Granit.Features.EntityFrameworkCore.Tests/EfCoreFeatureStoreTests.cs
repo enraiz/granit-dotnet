@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.Features.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.EntityFrameworkCore.Tests;
@@ -63,7 +63,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.MaxPatientsCount", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
-        result.Should().Be("500");
+        result.ShouldBe("500");
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.VideoConsultation", Guid.NewGuid().ToString(),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.MaxPatientsCount", tenantB.ToString(),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("override belongs to tenant A, not tenant B");
+        result.ShouldBeNull("override belongs to tenant A, not tenant B");
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.GlobalFeature", null,
             TestContext.Current.CancellationToken);
 
-        result.Should().Be("global-value");
+        result.ShouldBe("global-value");
     }
 
     // -------------------------------------------------------------------------
@@ -132,7 +132,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.MaxPatientsCount", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
-        result.Should().Be("1000");
+        result.ShouldBe("1000");
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.MaxPatientsCount", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
-        result.Should().Be("5000");
+        result.ShouldBe("5000");
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public sealed class EfCoreFeatureStoreTests
             o => o.FeatureName == "Guava.Feature" && o.TenantId == tenantId,
             TestContext.Current.CancellationToken);
 
-        count.Should().Be(1, "upsert must not create duplicates");
+        count.ShouldBe(1, "upsert must not create duplicates");
     }
 
     // -------------------------------------------------------------------------
@@ -199,7 +199,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.VideoConsultation", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.Ghost", Guid.NewGuid().ToString(),
             TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -234,6 +234,6 @@ public sealed class EfCoreFeatureStoreTests
             "Guava.Feature", tenantB.ToString(),
             TestContext.Current.CancellationToken);
 
-        resultB.Should().Be("true", "tenant B override must not be affected");
+        resultB.ShouldBe("true", "tenant B override must not be affected");
     }
 }

@@ -1,6 +1,6 @@
-using FluentAssertions;
 using Granit.BlobStorage.S3;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.S3.Tests;
@@ -22,7 +22,7 @@ public sealed class S3BlobOptionsValidatorTests
     {
         ValidateOptionsResult result = Validator.Validate(null, ValidOptions());
 
-        result.Failed.Should().BeFalse();
+        result.Failed.ShouldBeFalse();
     }
 
     [Theory]
@@ -35,8 +35,8 @@ public sealed class S3BlobOptionsValidatorTests
 
         ValidateOptionsResult result = Validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain(nameof(S3BlobOptions.ServiceUrl));
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain(nameof(S3BlobOptions.ServiceUrl));
     }
 
     [Theory]
@@ -49,8 +49,8 @@ public sealed class S3BlobOptionsValidatorTests
 
         ValidateOptionsResult result = Validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain(nameof(S3BlobOptions.AccessKey));
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain(nameof(S3BlobOptions.AccessKey));
     }
 
     [Theory]
@@ -63,8 +63,8 @@ public sealed class S3BlobOptionsValidatorTests
 
         ValidateOptionsResult result = Validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain(nameof(S3BlobOptions.SecretKey));
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain(nameof(S3BlobOptions.SecretKey));
     }
 
     [Theory]
@@ -77,8 +77,8 @@ public sealed class S3BlobOptionsValidatorTests
 
         ValidateOptionsResult result = Validator.Validate(null, options);
 
-        result.Failed.Should().BeTrue();
-        result.FailureMessage.Should().Contain(nameof(S3BlobOptions.DefaultBucket));
+        result.Failed.ShouldBeTrue();
+        result.FailureMessage.ShouldContain(nameof(S3BlobOptions.DefaultBucket));
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public sealed class S3BlobOptionsValidatorTests
 
         ValidateOptionsResult result = Validator.Validate(null, options);
 
-        result.Failed.Should().BeFalse();
+        result.Failed.ShouldBeFalse();
     }
 
     [Fact]
@@ -103,6 +103,6 @@ public sealed class S3BlobOptionsValidatorTests
 
         ValidateOptionsResult result = Validator.Validate(null, options);
 
-        result.Failed.Should().BeFalse();
+        result.Failed.ShouldBeFalse();
     }
 }

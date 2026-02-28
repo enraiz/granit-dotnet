@@ -6,8 +6,8 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.EntityFrameworkCore.Tests;
@@ -32,11 +32,11 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
         await _store.InsertAsync(notification, TestContext.Current.CancellationToken);
 
         UserNotification? result = await _store.GetAsync(notification.Id, TestContext.Current.CancellationToken);
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(notification.Id);
-        result.RecipientUserId.Should().Be(notification.RecipientUserId);
-        result.NotificationTypeName.Should().Be(notification.NotificationTypeName);
-        result.State.Should().Be(UserNotificationState.Unread);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(notification.Id);
+        result.RecipientUserId.ShouldBe(notification.RecipientUserId);
+        result.NotificationTypeName.ShouldBe(notification.NotificationTypeName);
+        result.State.ShouldBe(UserNotificationState.Unread);
     }
 
     [Fact]
@@ -56,10 +56,10 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
         // Request page of 3, skipping 1
         IReadOnlyList<UserNotification> result = await _store.GetListAsync(userId, tenantId, skipCount: 1, maxResultCount: 3, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(3);
+        result.Count.ShouldBe(3);
         // Should be sorted descending by CreatedAt, so after skip 1 we get items at index 3, 2, 1
-        result[0].CreatedAt.Should().BeOnOrAfter(result[1].CreatedAt);
-        result[1].CreatedAt.Should().BeOnOrAfter(result[2].CreatedAt);
+        result[0].CreatedAt.ShouldBeGreaterThanOrEqualTo(result[1].CreatedAt);
+        result[1].CreatedAt.ShouldBeGreaterThanOrEqualTo(result[2].CreatedAt);
     }
 
     [Fact]
@@ -74,9 +74,9 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
 
         IReadOnlyList<UserNotification> result = await _store.GetListAsync("user-a", tenantA, skipCount: 0, maxResultCount: 100, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(1);
-        result[0].RecipientUserId.Should().Be("user-a");
-        result[0].TenantId.Should().Be(tenantA);
+        result.Count.ShouldBe(1);
+        result[0].RecipientUserId.ShouldBe("user-a");
+        result[0].TenantId.ShouldBe(tenantA);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
 
         int count = await _store.GetUnreadCountAsync(userId, tenantId, TestContext.Current.CancellationToken);
 
-        count.Should().Be(3);
+        count.ShouldBe(3);
     }
 
     [Fact]
@@ -112,9 +112,9 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
         await _store.MarkAsReadAsync(notification.Id, readAt, TestContext.Current.CancellationToken);
 
         UserNotification? result = await _store.GetAsync(notification.Id, TestContext.Current.CancellationToken);
-        result.Should().NotBeNull();
-        result!.State.Should().Be(UserNotificationState.Read);
-        result.ReadAt.Should().BeCloseTo(readAt, TimeSpan.FromSeconds(1));
+        result.ShouldNotBeNull();
+        result!.State.ShouldBe(UserNotificationState.Read);
+        (result.ReadAt!.Value - readAt).Duration().ShouldBeLessThanOrEqualTo(TimeSpan.FromSeconds(1));
     }
 
     [Fact]
@@ -133,10 +133,10 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
         await _store.MarkAllAsReadAsync(userId, tenantId, readAt, TestContext.Current.CancellationToken);
 
         int unreadCount = await _store.GetUnreadCountAsync(userId, tenantId, TestContext.Current.CancellationToken);
-        unreadCount.Should().Be(0);
+        unreadCount.ShouldBe(0);
 
         IReadOnlyList<UserNotification> all = await _store.GetListAsync(userId, tenantId, skipCount: 0, maxResultCount: 100, TestContext.Current.CancellationToken);
-        all.Should().OnlyContain(n => n.State == UserNotificationState.Read);
+        all.ShouldAllBe(n => n.State == UserNotificationState.Read);
     }
 
     [Fact]
@@ -153,8 +153,8 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
 
         IReadOnlyList<UserNotification> result = await _store.GetByEntityAsync(entityType, entityId, tenantId, skipCount: 0, maxResultCount: 100, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
-        result.Should().OnlyContain(n => n.RelatedEntityType == entityType && n.RelatedEntityId == entityId);
+        result.Count.ShouldBe(2);
+        result.ShouldAllBe(n => n.RelatedEntityType == entityType && n.RelatedEntityId == entityId);
     }
 
     // -------------------------------------------------------------------------

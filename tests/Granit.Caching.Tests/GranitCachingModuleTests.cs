@@ -7,9 +7,9 @@
 //   - ICacheValueEncryptor → NullCacheValueEncryptor (par défaut)
 // =============================================================================
 
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Tests;
@@ -37,7 +37,7 @@ public sealed class GranitCachingModuleTests
 
         // Assert
         ICacheService<TestCacheItem> service = sp.GetRequiredService<ICacheService<TestCacheItem>>();
-        service.Should().BeOfType<DistributedCacheService<TestCacheItem>>();
+        service.ShouldBeOfType<DistributedCacheService<TestCacheItem>>();
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public sealed class GranitCachingModuleTests
 
         // Assert
         ICacheService<TestCacheItem, Guid> service = sp.GetRequiredService<ICacheService<TestCacheItem, Guid>>();
-        service.Should().NotBeNull();
+        service.ShouldNotBeNull();
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public sealed class GranitCachingModuleTests
 
         // Assert — en l'absence de configuration EncryptValues, l'encrypteur no-op est utilisé
         ICacheValueEncryptor encryptor = sp.GetRequiredService<ICacheValueEncryptor>();
-        encryptor.Should().BeOfType<NullCacheValueEncryptor>();
+        encryptor.ShouldBeOfType<NullCacheValueEncryptor>();
     }
 
     // Type de test

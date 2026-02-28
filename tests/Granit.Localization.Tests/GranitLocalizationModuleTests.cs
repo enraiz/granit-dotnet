@@ -1,9 +1,9 @@
 using System.Globalization;
-using FluentAssertions;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Tests;
@@ -32,7 +32,7 @@ public sealed class GranitLocalizationModuleTests : IDisposable
 
         // Assert
         IStringLocalizerFactory? factory = sp.GetService<IStringLocalizerFactory>();
-        factory.Should().NotBeNull();
+        factory.ShouldNotBeNull();
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class GranitLocalizationModuleTests : IDisposable
         // Assert
         IStringLocalizer<GranitLocalizationResource>? localizer =
             sp.GetService<IStringLocalizer<GranitLocalizationResource>>();
-        localizer.Should().NotBeNull();
+        localizer.ShouldNotBeNull();
     }
 
     [Fact]
@@ -78,10 +78,10 @@ public sealed class GranitLocalizationModuleTests : IDisposable
         LocalizedString result = localizer["Granit:EntityNotFound", "Patient", "123"];
 
         // Assert
-        result.ResourceNotFound.Should().BeFalse();
-        result.Value.Should().Contain("Patient");
-        result.Value.Should().Contain("123");
-        result.Value.Should().Contain("entité");
+        result.ResourceNotFound.ShouldBeFalse();
+        result.Value.ShouldContain("Patient");
+        result.Value.ShouldContain("123");
+        result.Value.ShouldContain("entité");
     }
 
     [Fact]
@@ -106,10 +106,10 @@ public sealed class GranitLocalizationModuleTests : IDisposable
         LocalizedString result = localizer["Granit:EntityNotFound", "Patient", "123"];
 
         // Assert
-        result.ResourceNotFound.Should().BeFalse();
-        result.Value.Should().Contain("Patient");
-        result.Value.Should().Contain("123");
-        result.Value.Should().Contain("Entity");
+        result.ResourceNotFound.ShouldBeFalse();
+        result.Value.ShouldContain("Patient");
+        result.Value.ShouldContain("123");
+        result.Value.ShouldContain("Entity");
     }
 
     [Fact]
@@ -133,9 +133,9 @@ public sealed class GranitLocalizationModuleTests : IDisposable
             sp.GetRequiredService<IStringLocalizer<GranitLocalizationResource>>();
 
         // Assert
-        localizer["Granit:ValidationError"].ResourceNotFound.Should().BeFalse();
-        localizer["Granit:Unauthorized"].ResourceNotFound.Should().BeFalse();
-        localizer["Granit:Forbidden"].ResourceNotFound.Should().BeFalse();
-        localizer["Granit:InternalError"].ResourceNotFound.Should().BeFalse();
+        localizer["Granit:ValidationError"].ResourceNotFound.ShouldBeFalse();
+        localizer["Granit:Unauthorized"].ResourceNotFound.ShouldBeFalse();
+        localizer["Granit:Forbidden"].ResourceNotFound.ShouldBeFalse();
+        localizer["Granit:InternalError"].ResourceNotFound.ShouldBeFalse();
     }
 }

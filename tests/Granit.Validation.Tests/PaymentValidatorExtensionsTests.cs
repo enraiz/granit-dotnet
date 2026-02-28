@@ -5,9 +5,9 @@
 // SepaCreditorIdentifier: CC + 2 check + 3 CBA + national ID, ISO 7064 MOD 97-10
 // =============================================================================
 
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -30,7 +30,7 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(bic));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -48,9 +48,9 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(bic));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBicSwift");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBicSwift");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBicSwift");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBicSwift");
     }
 
     // =========================================================================
@@ -71,7 +71,7 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(sci));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -88,9 +88,9 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(sci));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidSepaCreditorIdentifier");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidSepaCreditorIdentifier");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidSepaCreditorIdentifier");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidSepaCreditorIdentifier");
     }
 
     // =========================================================================
@@ -112,7 +112,7 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(rib));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -128,9 +128,9 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(rib));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidFrenchRib");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidFrenchRib");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchRib");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidFrenchRib");
     }
 
     // =========================================================================
@@ -151,7 +151,7 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(account));
 
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Theory]
@@ -167,9 +167,9 @@ public sealed class PaymentValidatorExtensionsTests
 
         ValidationResult result = validator.Validate(new TestModel(account));
 
-        result.IsValid.Should().BeFalse();
-        result.Errors[0].ErrorMessage.Should().Be("Granit:Validation:InvalidBelgianAccountNumber");
-        result.Errors[0].ErrorCode.Should().Be("Granit:Validation:InvalidBelgianAccountNumber");
+        result.IsValid.ShouldBeFalse();
+        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianAccountNumber");
+        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianAccountNumber");
     }
 
     // -------------------------------------------------------------------------

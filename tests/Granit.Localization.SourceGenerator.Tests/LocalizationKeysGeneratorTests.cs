@@ -1,10 +1,10 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.SourceGenerator.Tests;
@@ -29,9 +29,9 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, json);
 
         // Assert
-        generatedSource.Should().Contain("public static class Granit");
-        generatedSource.Should().Contain("public const string EntityNotFound = \"Granit:EntityNotFound\";");
-        generatedSource.Should().Contain("public const string ValidationError = \"Granit:ValidationError\";");
+        generatedSource.ShouldContain("public static class Granit");
+        generatedSource.ShouldContain("public const string EntityNotFound = \"Granit:EntityNotFound\";");
+        generatedSource.ShouldContain("public const string ValidationError = \"Granit:ValidationError\";");
     }
 
     [Fact]
@@ -54,9 +54,9 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, json);
 
         // Assert
-        generatedSource.Should().Contain("public static class Validation");
-        generatedSource.Should().Contain("public const string Required = \"Validation.Required\";");
-        generatedSource.Should().Contain("public const string MaxLength = \"Validation.MaxLength\";");
+        generatedSource.ShouldContain("public static class Validation");
+        generatedSource.ShouldContain("public const string Required = \"Validation.Required\";");
+        generatedSource.ShouldContain("public const string MaxLength = \"Validation.MaxLength\";");
     }
 
     [Fact]
@@ -77,10 +77,10 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, json);
 
         // Assert
-        generatedSource.Should().Contain("public static class Granit");
-        generatedSource.Should().Contain("public static class Validation");
-        generatedSource.Should().Contain("public const string Required = \"Granit:Validation.Required\";");
-        generatedSource.Should().Contain("public const string MaxLength = \"Granit:Validation.MaxLength\";");
+        generatedSource.ShouldContain("public static class Granit");
+        generatedSource.ShouldContain("public static class Validation");
+        generatedSource.ShouldContain("public const string Required = \"Granit:Validation.Required\";");
+        generatedSource.ShouldContain("public const string MaxLength = \"Granit:Validation.MaxLength\";");
     }
 
     [Fact]
@@ -111,9 +111,9 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, frJson, enJson);
 
         // Assert — all unique keys from both files
-        generatedSource.Should().Contain("public const string EntityNotFound = \"Granit:EntityNotFound\";");
-        generatedSource.Should().Contain("public const string Forbidden = \"Granit:Forbidden\";");
-        generatedSource.Should().Contain("public const string Unauthorized = \"Granit:Unauthorized\";");
+        generatedSource.ShouldContain("public const string EntityNotFound = \"Granit:EntityNotFound\";");
+        generatedSource.ShouldContain("public const string Forbidden = \"Granit:Forbidden\";");
+        generatedSource.ShouldContain("public const string Unauthorized = \"Granit:Unauthorized\";");
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null);
 
         // Assert
-        generatedSource.Should().BeEmpty();
+        generatedSource.ShouldBeEmpty();
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, json);
 
         // Assert
-        generatedSource.Should().BeEmpty();
+        generatedSource.ShouldBeEmpty();
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, json);
 
         // Assert — no crash, no output
-        generatedSource.Should().BeEmpty();
+        generatedSource.ShouldBeEmpty();
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator("MyApp.Domain", json);
 
         // Assert
-        generatedSource.Should().Contain("namespace MyApp.Domain;");
+        generatedSource.ShouldContain("namespace MyApp.Domain;");
     }
 
     [Fact]
@@ -195,10 +195,10 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, json);
 
         // Assert — hyphens replaced with underscores, leading digit prefixed
-        generatedSource.Should().Contain("public static class my_resource");
-        generatedSource.Should().Contain("public const string my_key = \"my-resource:my-key\";");
-        generatedSource.Should().Contain("public static class _123");
-        generatedSource.Should().Contain("public const string starts_with_digit = \"123:starts-with-digit\";");
+        generatedSource.ShouldContain("public static class my_resource");
+        generatedSource.ShouldContain("public const string my_key = \"my-resource:my-key\";");
+        generatedSource.ShouldContain("public static class _123");
+        generatedSource.ShouldContain("public const string starts_with_digit = \"123:starts-with-digit\";");
     }
 
     [Fact]
@@ -232,7 +232,7 @@ public sealed class LocalizationKeysGeneratorTests
 
         ImmutableArray<Diagnostic> diagnostics = compilation.GetDiagnostics(ct);
         IEnumerable<Diagnostic> errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
-        errors.Should().BeEmpty("generated source should compile without errors");
+        errors.ShouldBeEmpty("generated source should compile without errors");
     }
 
     private static string RunGenerator(string? rootNamespace, params string[] jsonContents)

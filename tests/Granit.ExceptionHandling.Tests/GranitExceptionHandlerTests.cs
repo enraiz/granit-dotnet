@@ -12,7 +12,6 @@
 // =============================================================================
 
 using System.Diagnostics;
-using FluentAssertions;
 using Granit.Core.Exceptions;
 using Granit.ExceptionHandling;
 using Granit.ExceptionHandling.Extensions;
@@ -23,6 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ExceptionHandling.Tests;
@@ -57,7 +57,7 @@ public sealed class GranitExceptionHandlerTests
         httpContext.Response.Body = new System.IO.MemoryStream();
 
         bool handled = await handler.TryHandleAsync(httpContext, exception, CancellationToken.None);
-        handled.Should().BeTrue();
+        handled.ShouldBeTrue();
 
         // Read ProblemDetails written to the body
         httpContext.Response.Body.Seek(0, System.IO.SeekOrigin.Begin);
@@ -89,8 +89,8 @@ public sealed class GranitExceptionHandlerTests
         bool handled = await handler.TryHandleAsync(
             httpContext, new OperationCanceledException(), CancellationToken.None);
 
-        handled.Should().BeTrue();
-        httpContext.Response.Body.Length.Should().Be(0, "no response should be written for cancelled requests");
+        handled.ShouldBeTrue();
+        httpContext.Response.Body.Length.ShouldBe(0, "no response should be written for cancelled requests");
     }
 
     // -------------------------------------------------------------------------
@@ -105,7 +105,7 @@ public sealed class GranitExceptionHandlerTests
         (int statusCode, _, _, _) = await InvokeHandlerAsync(
             sp, new EntityNotFoundException(typeof(object), 1));
 
-        statusCode.Should().Be(StatusCodes.Status404NotFound);
+        statusCode.ShouldBe(StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public sealed class GranitExceptionHandlerTests
         (int statusCode, _, _, _) = await InvokeHandlerAsync(
             sp, new NotFoundException("Resource not found"));
 
-        statusCode.Should().Be(StatusCodes.Status404NotFound);
+        statusCode.ShouldBe(StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public sealed class GranitExceptionHandlerTests
         (int statusCode, _, _, _) = await InvokeHandlerAsync(
             sp, new BusinessException("Test:Error", "Business rule violated."));
 
-        statusCode.Should().Be(StatusCodes.Status400BadRequest);
+        statusCode.ShouldBe(StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public sealed class GranitExceptionHandlerTests
         (int statusCode, _, _, _) = await InvokeHandlerAsync(
             sp, new Core.Exceptions.ValidationException(errors));
 
-        statusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
+        statusCode.ShouldBe(StatusCodes.Status422UnprocessableEntity);
     }
 
     // -------------------------------------------------------------------------
@@ -154,8 +154,8 @@ public sealed class GranitExceptionHandlerTests
         (_, IDictionary<string, object?> extensions, _, _) = await InvokeHandlerAsync(
             sp, new BusinessException("Test:Error"));
 
-        extensions.Should().ContainKey("traceId");
-        extensions["traceId"].Should().NotBeNull();
+        extensions.ShouldContainKey("traceId");
+        extensions["traceId"].ShouldNotBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -170,7 +170,7 @@ public sealed class GranitExceptionHandlerTests
         (_, IDictionary<string, object?> extensions, _, _) = await InvokeHandlerAsync(
             sp, new BusinessException("Appointment:SlotUnavailable", "Slot unavailable."));
 
-        extensions.Should().ContainKey("errorCode");
+        extensions.ShouldContainKey("errorCode");
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public sealed class GranitExceptionHandlerTests
         (_, IDictionary<string, object?> extensions, _, _) = await InvokeHandlerAsync(
             sp, new EntityNotFoundException(typeof(object), 99));
 
-        extensions.Should().NotContainKey("errorCode");
+        extensions.ShouldNotContainKey("errorCode");
     }
 
     // -------------------------------------------------------------------------
@@ -197,9 +197,9 @@ public sealed class GranitExceptionHandlerTests
         (_, _, string? title, _) = await InvokeHandlerAsync(
             sp, new InvalidOperationException("Patient#12345 caused NullRef"));
 
-        title.Should().Be("An unexpected error occurred.",
+        title.ShouldBe("An unexpected error occurred.",
             "internal exception messages must never be exposed in production");
-        title.Should().NotContain("Patient");
+        title!.ShouldNotContain("Patient");
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public sealed class GranitExceptionHandlerTests
         (_, _, string? title, _) = await InvokeHandlerAsync(
             sp, new InvalidOperationException("Detailed dev error"));
 
-        title.Should().Be("Detailed dev error");
+        title.ShouldBe("Detailed dev error");
     }
 
     // -------------------------------------------------------------------------
@@ -226,7 +226,7 @@ public sealed class GranitExceptionHandlerTests
         (_, _, string? title, _) = await InvokeHandlerAsync(
             sp, new BusinessException("Test:Error", "The business rule was violated."));
 
-        title.Should().Be("The business rule was violated.");
+        title.ShouldBe("The business rule was violated.");
     }
 
     // -------------------------------------------------------------------------
@@ -253,7 +253,7 @@ public sealed class GranitExceptionHandlerTests
 
         (_, _, string? title, _) = await InvokeHandlerAsync(sp, new DomainException("Domain:ErrorCode"));
 
-        title.Should().Be("Message traduit.");
+        title.ShouldBe("Message traduit.");
     }
 
     // -------------------------------------------------------------------------

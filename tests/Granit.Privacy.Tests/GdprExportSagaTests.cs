@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.Privacy.DataExport;
 using Granit.Privacy.DataExport.Events;
 using Granit.Privacy.DataExport.Internal;
 using Granit.Privacy.Options;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 using Xunit.v3;
@@ -43,10 +43,11 @@ public sealed class GdprExportSagaTests
 
         await saga.StartAsync(evt, registry, DefaultOptions(), context);
 
-        saga.Id.Should().Be(requestId);
-        saga.UserId.Should().Be(userId);
-        saga.ExpectedCount.Should().Be(2);
-        saga.PendingProviders.Should().Contain("patients").And.Contain("billing");
+        saga.Id.ShouldBe(requestId);
+        saga.UserId.ShouldBe(userId);
+        saga.ExpectedCount.ShouldBe(2);
+        saga.PendingProviders.ShouldContain("patients");
+        saga.PendingProviders.ShouldContain("billing");
     }
 
     [Fact]
@@ -81,10 +82,10 @@ public sealed class GdprExportSagaTests
         ExportCompletedEvent? result2 = saga.Handle(
             new PersonalDataPreparedEvent(startEvt.RequestId, "billing", "blob-2", "application/json"));
 
-        result1.Should().BeNull();
-        result2.Should().BeNull();
-        saga.ReceivedFragments.Should().HaveCount(2);
-        saga.PendingProviders.Should().ContainSingle("appointments");
+        result1.ShouldBeNull();
+        result2.ShouldBeNull();
+        saga.ReceivedFragments.Count.ShouldBe(2);
+        saga.PendingProviders.ShouldContain("appointments");
     }
 
     [Fact]
@@ -100,12 +101,12 @@ public sealed class GdprExportSagaTests
         ExportCompletedEvent? result = saga.Handle(
             new PersonalDataPreparedEvent(startEvt.RequestId, "billing", "blob-billing", "application/json"));
 
-        result.Should().NotBeNull();
-        result!.RequestId.Should().Be(startEvt.RequestId);
-        result.UserId.Should().Be(startEvt.UserId);
-        result.IsPartial.Should().BeFalse();
-        result.MissingProviders.Should().BeEmpty();
-        result.ArchiveBlobReferenceId.Should().Be($"gdpr-export/{startEvt.RequestId}");
+        result.ShouldNotBeNull();
+        result!.RequestId.ShouldBe(startEvt.RequestId);
+        result.UserId.ShouldBe(startEvt.UserId);
+        result.IsPartial.ShouldBeFalse();
+        result.MissingProviders.ShouldBeEmpty();
+        result.ArchiveBlobReferenceId.ShouldBe($"gdpr-export/{startEvt.RequestId}");
     }
 
     // -------------------------------------------------------------------------
@@ -125,9 +126,9 @@ public sealed class GdprExportSagaTests
         saga.Handle(new PersonalDataPreparedEvent(startEvt.RequestId, "billing", "blob-billing", "application/json"));
         ExportCompletedEvent result = saga.Handle(new ExportTimedOutEvent(startEvt.RequestId));
 
-        result.IsPartial.Should().BeTrue();
-        result.MissingProviders.Should().ContainSingle("appointments");
-        result.ArchiveBlobReferenceId.Should().Be($"gdpr-export/{startEvt.RequestId}");
+        result.IsPartial.ShouldBeTrue();
+        result.MissingProviders.ShouldContain("appointments");
+        result.ArchiveBlobReferenceId.ShouldBe($"gdpr-export/{startEvt.RequestId}");
     }
 
     // -------------------------------------------------------------------------
@@ -144,9 +145,9 @@ public sealed class GdprExportSagaTests
 
         ExportCompletedEvent? result = await saga.StartAsync(evt, emptyRegistry, DefaultOptions(), context);
 
-        result.Should().NotBeNull();
-        result!.IsPartial.Should().BeFalse();
-        result.MissingProviders.Should().BeEmpty();
+        result.ShouldNotBeNull();
+        result!.IsPartial.ShouldBeFalse();
+        result.MissingProviders.ShouldBeEmpty();
 
         // No timeout scheduled when there are no providers
         await context.DidNotReceive().PublishAsync(
@@ -166,13 +167,13 @@ public sealed class GdprExportSagaTests
         PersonalDataPreparedEvent evt = new(
             Guid.NewGuid(), "patients", "blob-ref-123", "application/json");
 
-        evt.BlobReferenceId.Should().Be("blob-ref-123");
+        evt.BlobReferenceId.ShouldBe("blob-ref-123");
 
         System.Reflection.PropertyInfo[] properties =
             typeof(PersonalDataPreparedEvent).GetProperties();
         string[] allowedProperties =
             ["RequestId", "ProviderName", "BlobReferenceId", "ContentType", "EqualityContract"];
-        properties.Select(p => p.Name).Should().OnlyContain(name => allowedProperties.Contains(name));
+        properties.Select(p => p.Name).ShouldAllBe(name => allowedProperties.Contains(name));
     }
 
     // -------------------------------------------------------------------------
@@ -215,6 +216,6 @@ public sealed class GdprExportSagaTests
         ExportCompletedEvent? result = saga.Handle(
             new PersonalDataPreparedEvent(startEvt.RequestId, "auth", "blob-auth", "application/json"));
 
-        result!.ArchiveBlobReferenceId.Should().Be($"gdpr-export/{startEvt.RequestId}");
+        result!.ArchiveBlobReferenceId.ShouldBe($"gdpr-export/{startEvt.RequestId}");
     }
 }

@@ -6,12 +6,12 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Email;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Email.Tests;
@@ -94,13 +94,13 @@ public sealed class EmailNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.FromOverride.Should().Be("no-reply@test.com");
+        captured.ShouldNotBeNull();
+        captured!.FromOverride.ShouldBe("no-reply@test.com");
     }
 
     [Fact]
     public void Name_ReturnsEmail() =>
-        _channel.Name.Should().Be(NotificationChannels.Email);
+        _channel.Name.ShouldBe(NotificationChannels.Email);
 
     // -------------------------------------------------------------------------
     // Helpers

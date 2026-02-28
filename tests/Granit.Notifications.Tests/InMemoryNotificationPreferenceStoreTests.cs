@@ -5,9 +5,9 @@
 // check with default fallback, update existing preference, tenant isolation.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
@@ -34,8 +34,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         IReadOnlyList<NotificationPreference> results =
             await _store.GetListAsync("user-1", tenantId: null, TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(2);
-        results.Should().OnlyContain(p => p.UserId == "user-1");
+        results.Count.ShouldBe(2);
+        results.ShouldAllBe(p => p.UserId == "user-1");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         IReadOnlyList<NotificationPreference> results =
             await _store.GetListAsync("user-1", tenantId: null, TestContext.Current.CancellationToken);
 
-        results.Should().BeEmpty();
+        results.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -60,10 +60,10 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         NotificationPreference? retrieved = await _store.GetAsync(
             "user-1", "order.created", "email", tenantId: null, TestContext.Current.CancellationToken);
 
-        retrieved.Should().NotBeNull();
-        retrieved!.UserId.Should().Be("user-1");
-        retrieved.NotificationTypeName.Should().Be("order.created");
-        retrieved.ChannelName.Should().Be("email");
+        retrieved.ShouldNotBeNull();
+        retrieved!.UserId.ShouldBe("user-1");
+        retrieved.NotificationTypeName.ShouldBe("order.created");
+        retrieved.ChannelName.ShouldBe("email");
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         NotificationPreference? retrieved = await _store.GetAsync(
             "user-1", "order.created", "email", tenantId: null, TestContext.Current.CancellationToken);
 
-        retrieved.Should().BeNull();
+        retrieved.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -89,8 +89,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         NotificationPreference? retrieved = await _store.GetAsync(
             "user-1", "order.created", "email", tenantId: null, TestContext.Current.CancellationToken);
 
-        retrieved.Should().NotBeNull();
-        retrieved!.IsEnabled.Should().BeFalse();
+        retrieved.ShouldNotBeNull();
+        retrieved!.IsEnabled.ShouldBeFalse();
     }
 
     [Fact]
@@ -105,8 +105,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         NotificationPreference? retrieved = await _store.GetAsync(
             "user-1", "order.created", "email", tenantId: null, TestContext.Current.CancellationToken);
 
-        retrieved.Should().NotBeNull();
-        retrieved!.IsEnabled.Should().BeFalse("the preference should have been overwritten");
+        retrieved.ShouldNotBeNull();
+        retrieved!.IsEnabled.ShouldBeFalse("the preference should have been overwritten");
     }
 
     // -------------------------------------------------------------------------
@@ -122,7 +122,7 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         bool isEnabled = await _store.IsChannelEnabledAsync(
             "user-1", "order.created", "email", tenantId: null, TestContext.Current.CancellationToken);
 
-        isEnabled.Should().BeFalse();
+        isEnabled.ShouldBeFalse();
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         bool isEnabled = await _store.IsChannelEnabledAsync(
             "user-1", "order.created", "email", tenantId: null, TestContext.Current.CancellationToken);
 
-        isEnabled.Should().BeTrue("default should be enabled when no preference is stored");
+        isEnabled.ShouldBeTrue("default should be enabled when no preference is stored");
     }
 
     // -------------------------------------------------------------------------
@@ -155,8 +155,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         IReadOnlyList<NotificationPreference> resultsB =
             await _store.GetListAsync("user-1", tenantId: tenantB, TestContext.Current.CancellationToken);
 
-        resultsA.Should().ContainSingle().Which.TenantId.Should().Be(tenantA);
-        resultsB.Should().ContainSingle().Which.TenantId.Should().Be(tenantB);
+        resultsA.ShouldHaveSingleItem().TenantId.ShouldBe(tenantA);
+        resultsB.ShouldHaveSingleItem().TenantId.ShouldBe(tenantB);
     }
 
     [Fact]
@@ -176,10 +176,10 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         NotificationPreference? retrievedB = await _store.GetAsync(
             "user-1", "order.created", "email", tenantId: tenantB, TestContext.Current.CancellationToken);
 
-        retrievedA.Should().NotBeNull();
-        retrievedA!.IsEnabled.Should().BeFalse();
-        retrievedB.Should().NotBeNull();
-        retrievedB!.IsEnabled.Should().BeTrue();
+        retrievedA.ShouldNotBeNull();
+        retrievedA!.IsEnabled.ShouldBeFalse();
+        retrievedB.ShouldNotBeNull();
+        retrievedB!.IsEnabled.ShouldBeTrue();
     }
 
     [Fact]
@@ -196,8 +196,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
         bool enabledForB = await _store.IsChannelEnabledAsync(
             "user-1", "order.created", "email", tenantId: tenantB, TestContext.Current.CancellationToken);
 
-        enabledForA.Should().BeFalse("tenant A has an explicit disabled preference");
-        enabledForB.Should().BeTrue("tenant B has no preference, so default applies");
+        enabledForA.ShouldBeFalse("tenant A has an explicit disabled preference");
+        enabledForB.ShouldBeTrue("tenant B has no preference, so default applies");
     }
 
     // -------------------------------------------------------------------------

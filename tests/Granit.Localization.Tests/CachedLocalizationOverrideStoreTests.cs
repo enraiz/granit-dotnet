@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Tests;
@@ -47,7 +47,7 @@ public sealed class CachedLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> result =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        result["Key1"].Should().Be("Valeur1");
+        result["Key1"].ShouldBe("Valeur1");
         await inner.Received(1).GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>());
     }
 
@@ -116,8 +116,8 @@ public sealed class CachedLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> second =
             await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
 
-        first["Key"].Should().Be("value1");
-        second["Key"].Should().Be("value2");
+        first["Key"].ShouldBe("value1");
+        second["Key"].ShouldBe("value2");
         await inner.Received(2).GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>());
     }
 
@@ -188,7 +188,7 @@ public sealed class CachedLocalizationOverrideStoreTests
         IReadOnlyDictionary<string, string> en =
             await store.GetOverridesAsync("Guava", "en", TestContext.Current.CancellationToken);
 
-        fr["Key"].Should().Be("Français");
-        en["Key"].Should().Be("English");
+        fr["Key"].ShouldBe("Français");
+        en["Key"].ShouldBe("English");
     }
 }

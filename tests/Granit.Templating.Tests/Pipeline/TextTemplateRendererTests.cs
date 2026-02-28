@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Granit.Templating.Enrichment;
 using Granit.Templating.Exceptions;
 using Granit.Templating.GlobalContext;
@@ -7,6 +6,7 @@ using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Templating.Tests.Pipeline;
@@ -60,7 +60,7 @@ public sealed class TextTemplateRendererTests
             TemplateType, new TextTestData("World"), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Html.Should().Be("Hello World");
+        result.Html.ShouldBe("Hello World");
     }
 
     [Fact]
@@ -86,9 +86,8 @@ public sealed class TextTemplateRendererTests
                 TemplateType, new TextTestData("World"), TestContext.Current.CancellationToken);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<TemplateNotFoundException>()
-            .Where(e => e.TemplateName == TemplateType.Name);
+        TemplateNotFoundException ex = await Should.ThrowAsync<TemplateNotFoundException>(act);
+        ex.TemplateName.ShouldBe(TemplateType.Name);
     }
 
     [Fact]
@@ -143,8 +142,8 @@ public sealed class TextTemplateRendererTests
             TemplateType, new TextTestData("Test"), TestContext.Current.CancellationToken);
 
         // Assert
-        callOrder.Should().ContainInOrder(10, 20);
-        callOrder.Should().HaveCount(2, because: "both enrichers must have been called");
+        callOrder.ShouldBe(new[] { 10, 20 });
+        callOrder.Count.ShouldBe(2, "both enrichers must have been called");
     }
 
     [Fact]
@@ -179,7 +178,7 @@ public sealed class TextTemplateRendererTests
         await sut.RenderAsync(TemplateType, data, TestContext.Current.CancellationToken);
 
         // Assert
-        capturedData.Should().Be(data);
+        capturedData.ShouldBe(data);
     }
 
     [Fact]
@@ -218,6 +217,6 @@ public sealed class TextTemplateRendererTests
             TemplateType, new TextTestData("X"), TestContext.Current.CancellationToken);
 
         // Assert
-        result.Html.Should().Be("<p>neutral</p>");
+        result.Html.ShouldBe("<p>neutral</p>");
     }
 }

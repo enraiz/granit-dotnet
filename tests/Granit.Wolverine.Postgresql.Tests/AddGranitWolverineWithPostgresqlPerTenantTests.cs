@@ -7,12 +7,12 @@
 // built to avoid requiring a live PostgreSQL Outbox connection.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Wolverine.Postgresql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Wolverine.Postgresql.Tests;
@@ -51,7 +51,7 @@ public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
 
         Action act = () => builder.AddGranitWolverineWithPostgresqlPerTenant<StubTenantDbContext>();
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     // -----------------------------------------------------------------------
@@ -67,8 +67,8 @@ public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
         ServiceDescriptor? descriptor = builder.Services.FirstOrDefault(
             s => s.ServiceType == typeof(IDbContextFactory<StubTenantDbContext>));
 
-        descriptor.Should().NotBeNull();
-        descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
+        descriptor.ShouldNotBeNull();
+        descriptor!.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 
     [Fact]
@@ -82,9 +82,9 @@ public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
 
         // The concrete factory type is internal to Granit.Persistence; we verify
         // a named implementation type is registered (not a factory lambda).
-        descriptor.Should().NotBeNull();
-        descriptor!.ImplementationType.Should().NotBeNull();
-        descriptor.ImplementationType!.Name.Should().Contain("TenantPerDatabase");
+        descriptor.ShouldNotBeNull();
+        descriptor!.ImplementationType.ShouldNotBeNull();
+        descriptor.ImplementationType!.Name.ShouldContain("TenantPerDatabase");
     }
 
     // -----------------------------------------------------------------------
@@ -100,8 +100,8 @@ public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
         ServiceDescriptor? descriptor = builder.Services.FirstOrDefault(
             s => s.ServiceType == typeof(StubTenantDbContext));
 
-        descriptor.Should().NotBeNull();
-        descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
+        descriptor.ShouldNotBeNull();
+        descriptor!.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 
     // -----------------------------------------------------------------------
@@ -124,6 +124,6 @@ public sealed class AddGranitWolverineWithPostgresqlPerTenantTests
             s => s.ServiceType == typeof(IDbContextFactory<StubTenantDbContext>));
 
         // Lambda registration has no ImplementationType (it's null).
-        descriptor!.ImplementationType.Should().BeNull();
+        descriptor!.ImplementationType.ShouldBeNull();
     }
 }

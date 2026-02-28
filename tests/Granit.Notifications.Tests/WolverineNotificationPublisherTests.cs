@@ -5,12 +5,12 @@
 // recipients, entity references, subscriber/follower variants, tenant capture.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Notifications.Internal;
 using Granit.Notifications.Messages;
 using Granit.Timing;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BlobStorage.Tests;
@@ -10,8 +10,8 @@ public sealed class DownloadUrlOptionsTests
     {
         DownloadUrlOptions options = new();
 
-        options.Expiry.Should().BeNull();
-        options.DownloadFileName.Should().BeNull();
+        options.Expiry.ShouldBeNull();
+        options.DownloadFileName.ShouldBeNull();
     }
 
     [Fact]
@@ -19,7 +19,7 @@ public sealed class DownloadUrlOptionsTests
     {
         DownloadUrlOptions options = new(Expiry: TimeSpan.FromMinutes(30));
 
-        options.Expiry.Should().Be(TimeSpan.FromMinutes(30));
+        options.Expiry.ShouldBe(TimeSpan.FromMinutes(30));
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public sealed class DownloadUrlOptionsTests
     {
         DownloadUrlOptions options = new(DownloadFileName: "report.pdf");
 
-        options.DownloadFileName.Should().Be("report.pdf");
+        options.DownloadFileName.ShouldBe("report.pdf");
     }
 
     [Fact]
@@ -37,8 +37,8 @@ public sealed class DownloadUrlOptionsTests
             Expiry: TimeSpan.FromHours(1),
             DownloadFileName: "data.csv");
 
-        options.Expiry.Should().Be(TimeSpan.FromHours(1));
-        options.DownloadFileName.Should().Be("data.csv");
+        options.Expiry.ShouldBe(TimeSpan.FromHours(1));
+        options.DownloadFileName.ShouldBe("data.csv");
     }
 
     [Fact]
@@ -47,6 +47,6 @@ public sealed class DownloadUrlOptionsTests
         DownloadUrlOptions a = new(Expiry: TimeSpan.FromMinutes(5));
         DownloadUrlOptions b = new(Expiry: TimeSpan.FromMinutes(5));
 
-        a.Should().Be(b);
+        a.ShouldBe(b);
     }
 }

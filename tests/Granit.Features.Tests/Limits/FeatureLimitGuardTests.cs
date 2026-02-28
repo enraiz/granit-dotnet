@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Checker;
 using Granit.Features.Exceptions;
 using Granit.Features.Limits;
@@ -25,7 +25,7 @@ public sealed class FeatureLimitGuardTests
         Func<Task> act = () => guard.CheckAsync("App.MaxPatients", currentCount: 50,
             TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -36,8 +36,7 @@ public sealed class FeatureLimitGuardTests
         Func<Task> act = () => guard.CheckAsync("App.MaxPatients", currentCount: 50,
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<FeatureLimitExceededException>()
-            .WithMessage("*App.MaxPatients*");
+        (await Should.ThrowAsync<FeatureLimitExceededException>(act)).Message.ShouldContain("App.MaxPatients");
     }
 
     [Fact]
@@ -48,7 +47,7 @@ public sealed class FeatureLimitGuardTests
         Func<Task> act = () => guard.CheckAsync("App.MaxPatients", currentCount: 99,
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<FeatureLimitExceededException>();
+        await Should.ThrowAsync<FeatureLimitExceededException>(act);
     }
 
     [Fact]
@@ -58,7 +57,7 @@ public sealed class FeatureLimitGuardTests
 
         long limit = await guard.GetLimitAsync("App.MaxPatients", TestContext.Current.CancellationToken);
 
-        limit.Should().Be(200);
+        limit.ShouldBe(200);
     }
 
     [Fact]
@@ -77,10 +76,10 @@ public sealed class FeatureLimitGuardTests
             ex = caught;
         }
 
-        ex.Should().NotBeNull();
-        ex!.FeatureName.Should().Be("App.MaxPatients");
-        ex.Current.Should().Be(10);
-        ex.Limit.Should().Be(10);
-        ex.ErrorCode.Should().Be("Features:LimitExceeded");
+        ex.ShouldNotBeNull();
+        ex!.FeatureName.ShouldBe("App.MaxPatients");
+        ex.Current.ShouldBe(10);
+        ex.Limit.ShouldBe(10);
+        ex.ErrorCode.ShouldBe("Features:LimitExceeded");
     }
 }

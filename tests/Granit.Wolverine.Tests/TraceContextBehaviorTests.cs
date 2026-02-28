@@ -7,11 +7,11 @@
 // =============================================================================
 
 using System.Diagnostics;
-using FluentAssertions;
 using Granit.Wolverine.Behaviors;
 using Granit.Wolverine.Middleware;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Wolverine;
 using Xunit;
 
@@ -53,9 +53,9 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         behavior.Before(envelope);
 
-        _capturedActivities.Should().HaveCount(1);
-        _capturedActivities[0].OperationName.Should().Be("wolverine.message.handle");
-        _capturedActivities[0].Kind.Should().Be(ActivityKind.Consumer);
+        _capturedActivities.Count.ShouldBe(1);
+        _capturedActivities[0].OperationName.ShouldBe("wolverine.message.handle");
+        _capturedActivities[0].Kind.ShouldBe(ActivityKind.Consumer);
 
         behavior.After();
     }
@@ -70,7 +70,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
         behavior.Before(envelope);
 
         ActivityTraceId expectedTraceId = ActivityTraceId.CreateFromString("4bf92f3577b34da6a3ce929d0e0e4736");
-        _capturedActivities[0].TraceId.Should().Be(expectedTraceId);
+        _capturedActivities[0].TraceId.ShouldBe(expectedTraceId);
 
         behavior.After();
     }
@@ -86,10 +86,10 @@ public sealed class TraceContextBehaviorTests : IDisposable
         behavior.Before(envelope);
 
         Activity started = _capturedActivities[0];
-        started.GetTagItem("messaging.system").Should().Be("wolverine");
-        started.GetTagItem("messaging.operation").Should().Be("process");
-        started.GetTagItem("messaging.message_id").Should().Be(messageId.ToString());
-        started.GetTagItem("messaging.message_type").Should().Be("MyApp.OrderPlaced");
+        started.GetTagItem("messaging.system").ShouldBe("wolverine");
+        started.GetTagItem("messaging.operation").ShouldBe("process");
+        started.GetTagItem("messaging.message_id").ShouldBe(messageId.ToString());
+        started.GetTagItem("messaging.message_type").ShouldBe("MyApp.OrderPlaced");
 
         behavior.After();
     }
@@ -106,7 +106,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         behavior.Before(envelope);
 
-        _capturedActivities.Should().BeEmpty();
+        _capturedActivities.ShouldBeEmpty();
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         behavior.Before(envelope);
 
-        _capturedActivities.Should().BeEmpty();
+        _capturedActivities.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -134,7 +134,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         Action act = () => behavior.Before(envelope);
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         behavior.Before(envelope);
 
-        _capturedActivities.Should().BeEmpty();
+        _capturedActivities.ShouldBeEmpty();
     }
 
     [Fact]
@@ -179,11 +179,11 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         behavior.Before(envelope);
         Activity started = _capturedActivities[0];
-        started.Status.Should().NotBe(ActivityStatusCode.Error);
+        started.Status.ShouldNotBe(ActivityStatusCode.Error);
 
         behavior.After();
 
-        started.Duration.Should().BeGreaterThan(TimeSpan.Zero);
+        started.Duration.ShouldBeGreaterThan(TimeSpan.Zero);
     }
 
     [Fact]
@@ -193,6 +193,6 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         Action act = behavior.After;
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 }

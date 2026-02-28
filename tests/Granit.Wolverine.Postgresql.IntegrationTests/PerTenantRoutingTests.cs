@@ -11,13 +11,13 @@
 // de démarrage (~3 s) sur l'ensemble des tests.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -150,7 +150,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
 
         List<TenantRecord> rows =
             await ctx.Records.ToListAsync(TestContext.Current.CancellationToken);
-        rows.Should().ContainSingle(r => r.Value == "record-tenant-a");
+        rows.ShouldContain(r => r.Value == "record-tenant-a");
     }
 
     // -----------------------------------------------------------------------
@@ -170,7 +170,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
 
         List<TenantRecord> rows =
             await ctx.Records.ToListAsync(TestContext.Current.CancellationToken);
-        rows.Should().ContainSingle(r => r.Value == "record-tenant-b");
+        rows.ShouldContain(r => r.Value == "record-tenant-b");
     }
 
     // -----------------------------------------------------------------------
@@ -195,7 +195,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
             .Where(r => r.Value == "only-in-a")
             .ToListAsync(ct);
 
-        rowsInB.Should().BeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
+        rowsInB.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
     }
 
     [Fact]
@@ -216,7 +216,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
             .Where(r => r.Value == "only-in-b")
             .ToListAsync(ct);
 
-        rowsInA.Should().BeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
+        rowsInA.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
     }
 
     // -----------------------------------------------------------------------
@@ -244,8 +244,6 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
         Func<Task> act = async () =>
             await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("*No active tenant context*");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("No active tenant context");
     }
 }

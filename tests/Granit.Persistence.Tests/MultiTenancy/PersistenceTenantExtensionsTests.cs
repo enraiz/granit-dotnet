@@ -1,8 +1,8 @@
-using FluentAssertions;
 using Granit.Persistence.Extensions;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Tests.MultiTenancy;
@@ -23,7 +23,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddTenantPerDatabaseDbContext<TestDbContext>((opts, cs) =>
             opts.UseInMemoryDatabase(cs));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IDbContextFactory<TestDbContext>) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -36,7 +36,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddTenantPerDatabaseDbContext<TestDbContext>((opts, cs) =>
             opts.UseInMemoryDatabase(cs));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(TestDbContext) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -51,7 +51,7 @@ public sealed class PersistenceTenantExtensionsTests
             opts.UseInMemoryDatabase(cs));
 
         services.Count(d => d.ServiceType == typeof(IDbContextFactory<TestDbContext>))
-                .Should().Be(1, "TryAddScoped must not override pre-registered factory");
+                .ShouldBe(1, "TryAddScoped must not override pre-registered factory");
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class PersistenceTenantExtensionsTests
         IServiceCollection result = services.AddTenantPerDatabaseDbContext<TestDbContext>(
             (opts, cs) => opts.UseInMemoryDatabase(cs));
 
-        result.Should().BeSameAs(services);
+        result.ShouldBeSameAs(services);
     }
 
     // -------------------------------------------------------------------------
@@ -77,7 +77,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddTenantPerSchemaDbContext<TestDbContext>(opts =>
             opts.UseInMemoryDatabase("shared-db"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IDbContextFactory<TestDbContext>) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -90,7 +90,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddTenantPerSchemaDbContext<TestDbContext>(opts =>
             opts.UseInMemoryDatabase("shared-db"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITenantSchemaProvider) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -104,7 +104,7 @@ public sealed class PersistenceTenantExtensionsTests
             opts => opts.UseInMemoryDatabase("shared-db"),
             schema => schema.Prefix = "t_");
 
-        services.Should().NotBeEmpty();
+        services.ShouldNotBeEmpty();
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public sealed class PersistenceTenantExtensionsTests
         IServiceCollection result = services.AddTenantPerSchemaDbContext<TestDbContext>(
             opts => opts.UseInMemoryDatabase("shared-db"));
 
-        result.Should().BeSameAs(services);
+        result.ShouldBeSameAs(services);
     }
 
     // -------------------------------------------------------------------------
@@ -130,7 +130,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddGranitIsolatedDbContext<TestDbContext>(
             configureShared: opts => opts.UseInMemoryDatabase("shared"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(Microsoft.Extensions.Options.IValidateOptions<TenantIsolationOptions>));
     }
 
@@ -142,7 +142,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddGranitIsolatedDbContext<TestDbContext>(
             configureShared: opts => opts.UseInMemoryDatabase("shared"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(IDbContextFactory<TestDbContext>) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -155,7 +155,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddGranitIsolatedDbContext<TestDbContext>(
             configureShared: opts => opts.UseInMemoryDatabase("shared"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(TestDbContext) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
@@ -168,7 +168,7 @@ public sealed class PersistenceTenantExtensionsTests
         services.AddGranitIsolatedDbContext<TestDbContext>(
             configureShared: opts => opts.UseInMemoryDatabase("shared"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITenantIsolationStrategyProvider) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
@@ -184,7 +184,7 @@ public sealed class PersistenceTenantExtensionsTests
 
         // Should have multiple keyed registrations
         services.Count(d => d.ServiceType == typeof(IDbContextFactory<TestDbContext>))
-                .Should().BeGreaterThanOrEqualTo(2);
+                .ShouldBeGreaterThanOrEqualTo(2);
     }
 
     [Fact]
@@ -196,7 +196,7 @@ public sealed class PersistenceTenantExtensionsTests
             configureShared: opts => opts.UseInMemoryDatabase("shared"),
             configureSchemaPerTenant: opts => opts.UseInMemoryDatabase("schema-db"));
 
-        services.Should().Contain(d =>
+        services.ShouldContain(d =>
             d.ServiceType == typeof(ITenantSchemaProvider));
     }
 
@@ -208,6 +208,6 @@ public sealed class PersistenceTenantExtensionsTests
         IServiceCollection result = services.AddGranitIsolatedDbContext<TestDbContext>(
             configureShared: opts => opts.UseInMemoryDatabase("shared"));
 
-        result.Should().BeSameAs(services);
+        result.ShouldBeSameAs(services);
     }
 }

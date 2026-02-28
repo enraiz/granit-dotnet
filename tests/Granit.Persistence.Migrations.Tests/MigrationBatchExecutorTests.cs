@@ -6,7 +6,6 @@
 // MigrationProgressDbContext uses the EF Core InMemory provider.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
@@ -14,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Persistence.Migrations.Tests;
@@ -83,7 +83,7 @@ public sealed class MigrationBatchExecutorTests : IDisposable
             new RunMigrationBatchCommand("missing", Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -114,7 +114,7 @@ public sealed class MigrationBatchExecutorTests : IDisposable
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -138,14 +138,14 @@ public sealed class MigrationBatchExecutorTests : IDisposable
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
 
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
-        progress.Should().NotBeNull();
-        progress!.Status.Should().Be(MigrationStatus.Completed);
-        progress.ProcessedRows.Should().Be(42);
-        progress.CompletedAt.Should().Be(completedAt);
+        progress.ShouldNotBeNull();
+        progress!.Status.ShouldBe(MigrationStatus.Completed);
+        progress.ProcessedRows.ShouldBe(42);
+        progress.CompletedAt.ShouldBe(completedAt);
     }
 
     // -------------------------------------------------------------------------
@@ -166,11 +166,11 @@ public sealed class MigrationBatchExecutorTests : IDisposable
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.CycleId.Should().Be(cycleId);
-        result.Cursor.Should().Be("{\"lastId\":999}");
-        result.BatchSize.Should().Be(100);
-        result.TenantId.Should().Be(Guid.Empty);
+        result.ShouldNotBeNull();
+        result!.CycleId.ShouldBe(cycleId);
+        result.Cursor.ShouldBe("{\"lastId\":999}");
+        result.BatchSize.ShouldBe(100);
+        result.TenantId.ShouldBe(Guid.Empty);
     }
 
     // -------------------------------------------------------------------------
@@ -197,17 +197,17 @@ public sealed class MigrationBatchExecutorTests : IDisposable
         RunMigrationBatchCommand? result1 = await executor.ExecuteBatchAsync(
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
-        result1.Should().NotBeNull();
+        result1.ShouldNotBeNull();
 
         RunMigrationBatchCommand? result2 = await executor.ExecuteBatchAsync(
             result1!,
             TestContext.Current.CancellationToken);
-        result2.Should().BeNull();
+        result2.ShouldBeNull();
 
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
-        progress!.ProcessedRows.Should().Be(100);
-        progress.Status.Should().Be(MigrationStatus.Completed);
+        progress!.ProcessedRows.ShouldBe(100);
+        progress.Status.ShouldBe(MigrationStatus.Completed);
     }
 
     // -------------------------------------------------------------------------
@@ -271,8 +271,8 @@ public sealed class MigrationBatchExecutorTests : IDisposable
 
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
-        progress.Should().NotBeNull();
-        progress!.TenantId.Should().BeNull();
+        progress.ShouldNotBeNull();
+        progress!.TenantId.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -293,13 +293,13 @@ public sealed class MigrationBatchExecutorTests : IDisposable
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("boom");
+        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldBe("boom");
 
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
-        progress.Should().NotBeNull();
-        progress!.Status.Should().Be(MigrationStatus.Failed);
-        progress.Error.Should().Be("boom");
+        progress.ShouldNotBeNull();
+        progress!.Status.ShouldBe(MigrationStatus.Failed);
+        progress.Error.ShouldBe("boom");
     }
 
     [Fact]
@@ -323,12 +323,12 @@ public sealed class MigrationBatchExecutorTests : IDisposable
             new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100),
             cts.Token);
 
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        await Should.ThrowAsync<OperationCanceledException>(act);
 
         // Progress should NOT be marked as Failed for cancellation.
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
-        progress.Should().BeNull();
+        progress.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
@@ -356,7 +356,7 @@ public sealed class MigrationBatchExecutorTests : IDisposable
 
         MigrationProgress? progress = await _progressContext.MigrationProgresses
             .FirstOrDefaultAsync(p => p.CycleId == cycleId, TestContext.Current.CancellationToken);
-        progress!.Error.Should().HaveLength(4000);
+        progress!.Error!.Length.ShouldBe(4000);
     }
 
     // -------------------------------------------------------------------------

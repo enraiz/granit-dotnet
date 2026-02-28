@@ -1,7 +1,7 @@
-using FluentAssertions;
 using Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 using Granit.BackgroundJobs.Internal;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.EntityFrameworkCore.Tests;
@@ -58,7 +58,7 @@ public sealed class EfBackgroundJobStoreTests
         BackgroundJobDefinition? result = await store.FindAsync(
             "non-existent", TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -70,8 +70,8 @@ public sealed class EfBackgroundJobStoreTests
         BackgroundJobDefinition? result = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.JobName.Should().Be("test-job");
+        result.ShouldNotBeNull();
+        result!.JobName.ShouldBe("test-job");
     }
 
     // =========================================================================
@@ -88,9 +88,9 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job.Should().NotBeNull();
-        job!.IsEnabled.Should().BeTrue();
-        job.ConsecutiveFailureCount.Should().Be(0);
+        job.ShouldNotBeNull();
+        job!.IsEnabled.ShouldBeTrue();
+        job.ConsecutiveFailureCount.ShouldBe(0);
     }
 
     [Fact]
@@ -105,8 +105,8 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job!.IsEnabled.Should().BeFalse("administrative state must be preserved");
-        job.CronExpression.Should().Be("0 8 * * *", "cron expression must be updated");
+        job!.IsEnabled.ShouldBeFalse("administrative state must be preserved");
+        job.CronExpression.ShouldBe("0 8 * * *", "cron expression must be updated");
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public sealed class EfBackgroundJobStoreTests
 
         IReadOnlyList<BackgroundJobDefinition> all = await store.GetAllJobsAsync(
             TestContext.Current.CancellationToken);
-        all.Should().HaveCount(1);
+        all.Count.ShouldBe(1);
     }
 
     // =========================================================================
@@ -137,7 +137,7 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job!.IsEnabled.Should().BeFalse();
+        job!.IsEnabled.ShouldBeFalse();
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public sealed class EfBackgroundJobStoreTests
         Func<Task> act = () => store.SetEnabledAsync(
             "ghost", false, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // =========================================================================
@@ -169,10 +169,10 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job!.LastExecutedAt.Should().Be(startedAt);
-        job.ConsecutiveFailureCount.Should().Be(0);
-        job.LastErrorMessage.Should().BeNull();
-        job.TriggeredBy.Should().BeNull();
+        job!.LastExecutedAt.ShouldBe(startedAt);
+        job.ConsecutiveFailureCount.ShouldBe(0);
+        job.LastErrorMessage.ShouldBeNull();
+        job.TriggeredBy.ShouldBeNull();
     }
 
     // =========================================================================
@@ -191,7 +191,7 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job!.NextExecutionAt.Should().Be(next);
+        job!.NextExecutionAt.ShouldBe(next);
     }
 
     // =========================================================================
@@ -211,8 +211,8 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job!.ConsecutiveFailureCount.Should().Be(2);
-        job.LastErrorMessage.Should().Be("timeout");
+        job!.ConsecutiveFailureCount.ShouldBe(2);
+        job.LastErrorMessage.ShouldBe("timeout");
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public sealed class EfBackgroundJobStoreTests
         Func<Task> act = () => store.RecordExecutionFailureAsync(
             "ghost", "err", TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     // =========================================================================
@@ -243,8 +243,8 @@ public sealed class EfBackgroundJobStoreTests
         IReadOnlyList<BackgroundJobDefinition> enabled = await store.GetEnabledJobsAsync(
             TestContext.Current.CancellationToken);
 
-        enabled.Should().HaveCount(1);
-        enabled[0].JobName.Should().Be("job-a");
+        enabled.Count.ShouldBe(1);
+        enabled[0].JobName.ShouldBe("job-a");
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public sealed class EfBackgroundJobStoreTests
         IReadOnlyList<BackgroundJobDefinition> all = await store.GetAllJobsAsync(
             TestContext.Current.CancellationToken);
 
-        all.Should().HaveCount(2);
+        all.Count.ShouldBe(2);
     }
 
     // =========================================================================
@@ -278,7 +278,7 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job!.TriggeredBy.Should().Be("operator-42");
+        job!.TriggeredBy.ShouldBe("operator-42");
     }
 
     [Fact]
@@ -294,6 +294,6 @@ public sealed class EfBackgroundJobStoreTests
 
         BackgroundJobDefinition? job = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
-        job!.TriggeredBy.Should().BeNull();
+        job!.TriggeredBy.ShouldBeNull();
     }
 }

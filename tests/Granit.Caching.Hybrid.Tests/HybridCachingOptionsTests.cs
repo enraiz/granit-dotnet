@@ -6,7 +6,7 @@
 //   - La section de configuration est correcte
 // =============================================================================
 
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Caching.Hybrid.Tests;
@@ -20,8 +20,7 @@ public sealed class HybridCachingOptionsTests
         HybridCachingOptions options = new();
 
         // Assert — valeur par défaut bornée pour limiter la staleness inter-pods Kubernetes
-        options.LocalCacheExpiration.TotalSeconds.Should().BeLessThanOrEqualTo(
-            60,
+        options.LocalCacheExpiration.TotalSeconds.ShouldBeLessThanOrEqualTo(60,
             "LocalCacheExpiration doit être ≤ 60 s pour borner la fenêtre de données obsolètes entre pods");
     }
 
@@ -32,10 +31,10 @@ public sealed class HybridCachingOptionsTests
         HybridCachingOptions options = new();
 
         // Assert
-        options.LocalCacheExpiration.Should().Be(TimeSpan.FromSeconds(30));
+        options.LocalCacheExpiration.ShouldBe(TimeSpan.FromSeconds(30));
     }
 
     [Fact]
     public void SectionName_IsCorrect() =>
-        HybridCachingOptions.SectionName.Should().Be("Cache:Hybrid");
+        HybridCachingOptions.SectionName.ShouldBe("Cache:Hybrid");
 }

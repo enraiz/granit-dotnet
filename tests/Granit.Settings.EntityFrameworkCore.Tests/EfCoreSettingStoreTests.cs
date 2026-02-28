@@ -5,12 +5,12 @@
 // Each test uses an isolated database name to prevent state leakage.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.EntityFrameworkCore.Extensions;
 using Granit.Settings.EntityFrameworkCore.Internal;
 using Granit.Settings.Values;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.EntityFrameworkCore.Tests;
@@ -87,11 +87,11 @@ public sealed class EfCoreSettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
-        result!.Name.Should().Be("App.Theme");
-        result.ProviderName.Should().Be("G");
-        result.ProviderKey.Should().BeNull();
-        result.Value.Should().Be("dark");
+        result.ShouldNotBeNull();
+        result!.Name.ShouldBe("App.Theme");
+        result.ProviderName.ShouldBe("G");
+        result.ProviderKey.ShouldBeNull();
+        result.Value.ShouldBe("dark");
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public sealed class EfCoreSettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public sealed class EfCoreSettingStoreTests
         SettingValue? tenantResult = await store.GetOrNullAsync(
             "App.Theme", "T", tenantId.ToString(), TestContext.Current.CancellationToken);
 
-        tenantResult!.Value.Should().Be("light-tenant");
+        tenantResult!.Value.ShouldBe("light-tenant");
     }
 
     // -------------------------------------------------------------------------
@@ -142,9 +142,9 @@ public sealed class EfCoreSettingStoreTests
         IReadOnlyList<SettingValue> result = await store.GetListAsync(
             "T", tenantId.ToString(), TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
-        result.Should().Contain(v => v.Name == "App.Theme" && v.Value == "dark");
-        result.Should().Contain(v => v.Name == "App.Language" && v.Value == "fr");
+        result.Count.ShouldBe(2);
+        result.ShouldContain(v => v.Name == "App.Theme" && v.Value == "dark");
+        result.ShouldContain(v => v.Name == "App.Language" && v.Value == "fr");
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public sealed class EfCoreSettingStoreTests
         IReadOnlyList<SettingValue> result = await store.GetListAsync(
             "G", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     // -------------------------------------------------------------------------
@@ -174,7 +174,7 @@ public sealed class EfCoreSettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result!.Value.Should().Be("dark");
+        result!.Value.ShouldBe("dark");
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public sealed class EfCoreSettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result!.Value.Should().Be("light");
+        result!.Value.ShouldBe("light");
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public sealed class EfCoreSettingStoreTests
         IReadOnlyList<SettingValue> all = await store.GetListAsync(
             "G", null, TestContext.Current.CancellationToken);
 
-        all.Where(v => v.Name == "App.Theme").Should().HaveCount(1,
+        all.Where(v => v.Name == "App.Theme").Count().ShouldBe(1,
             "upsert must not create duplicate records");
     }
 
@@ -230,7 +230,7 @@ public sealed class EfCoreSettingStoreTests
         SettingValue? result = await store.GetOrNullAsync(
             "App.Theme", "G", null, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -241,7 +241,7 @@ public sealed class EfCoreSettingStoreTests
         Func<Task> act = () => store.DeleteAsync(
             "Ghost.Setting", "G", null, TestContext.Current.CancellationToken);
 
-        await act.Should().NotThrowAsync();
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -260,6 +260,6 @@ public sealed class EfCoreSettingStoreTests
         SettingValue? language = await store.GetOrNullAsync(
             "App.Language", "G", null, TestContext.Current.CancellationToken);
 
-        language!.Value.Should().Be("fr", "App.Language must not be affected");
+        language!.Value.ShouldBe("fr", "App.Language must not be affected");
     }
 }

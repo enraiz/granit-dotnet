@@ -7,12 +7,12 @@
 //   - Retourne null pour une policy totalement inconnue
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Authorization.Tests;
@@ -34,10 +34,9 @@ public sealed class DynamicPermissionPolicyProviderTests
         AuthorizationPolicy? policy = await provider.GetPolicyAsync("Invoices.Delete");
 
         // Assert
-        policy.Should().NotBeNull();
-        policy!.Requirements.Should().ContainSingle()
-            .Which.Should().BeOfType<PermissionRequirement>()
-            .Which.PermissionName.Should().Be("Invoices.Delete");
+        policy.ShouldNotBeNull();
+        policy!.Requirements.ShouldHaveSingleItem().ShouldBeOfType<PermissionRequirement>()
+            .PermissionName.ShouldBe("Invoices.Delete");
     }
 
     [Fact]
@@ -55,7 +54,7 @@ public sealed class DynamicPermissionPolicyProviderTests
         AuthorizationPolicy? policy = await provider.GetPolicyAsync("Unknown.Policy");
 
         // Assert
-        policy.Should().BeNull();
+        policy.ShouldBeNull();
     }
 
     [Fact]
@@ -76,7 +75,7 @@ public sealed class DynamicPermissionPolicyProviderTests
         AuthorizationPolicy? policy = await provider.GetPolicyAsync("Authenticated");
 
         // Assert
-        policy.Should().NotBeNull("the fallback provider should resolve the registered policy");
+        policy.ShouldNotBeNull("the fallback provider should resolve the registered policy");
     }
 
     [Fact]
@@ -92,6 +91,6 @@ public sealed class DynamicPermissionPolicyProviderTests
         AuthorizationPolicy defaultPolicy = await provider.GetDefaultPolicyAsync();
 
         // Assert
-        defaultPolicy.Should().NotBeNull();
+        defaultPolicy.ShouldNotBeNull();
     }
 }

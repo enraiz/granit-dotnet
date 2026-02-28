@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Exceptions;
 using Granit.Features.ValueTypes;
 using Xunit;
@@ -15,7 +15,7 @@ public sealed class SelectionValuesTests
     {
         Action act = () => Tiers.Validate("App.Plan", "professional");
 
-        act.Should().NotThrow();
+        Should.NotThrow(act);
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public sealed class SelectionValuesTests
         foreach (string value in Tiers.AllowedValues)
         {
             Action act = () => Tiers.Validate("App.Plan", value);
-            act.Should().NotThrow(because: $"'{value}' is in the allowed list");
+            Should.NotThrow(act);
         }
     }
 
@@ -33,12 +33,12 @@ public sealed class SelectionValuesTests
     {
         Action act = () => Tiers.Validate("App.Plan", "ultimate");
 
-        FeatureValueValidationException ex = act.Should()
-            .Throw<FeatureValueValidationException>().Which;
+        FeatureValueValidationException ex = Should.Throw<FeatureValueValidationException>(act);
 
-        ex.FeatureName.Should().Be("App.Plan");
-        ex.InvalidValue.Should().Be("ultimate");
-        ex.Message.Should().Contain("starter").And.Contain("enterprise");
+        ex.FeatureName.ShouldBe("App.Plan");
+        ex.InvalidValue.ShouldBe("ultimate");
+        ex.Message.ShouldContain("starter");
+        ex.Message.ShouldContain("enterprise");
     }
 
     [Fact]
@@ -47,14 +47,12 @@ public sealed class SelectionValuesTests
         // Ordinal comparison — "Starter" ≠ "starter"
         Action act = () => Tiers.Validate("App.Plan", "Starter");
 
-        act.Should().Throw<FeatureValueValidationException>();
+        Should.Throw<FeatureValueValidationException>(act);
     }
 
     [Fact]
     public void AllowedValues_ArePreserved()
     {
-        Tiers.AllowedValues.Should().BeEquivalentTo(
-            ["starter", "professional", "enterprise"],
-            opts => opts.WithStrictOrdering());
+        Tiers.AllowedValues.ShouldBe(new[] { "starter", "professional", "enterprise" });
     }
 }

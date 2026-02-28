@@ -6,7 +6,6 @@
 // =============================================================================
 
 using System.Reflection;
-using FluentAssertions;
 using Granit.ApiDocumentation.Attributes;
 using Granit.ApiDocumentation.Transformers;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.ApiDocumentation.Tests;
@@ -37,7 +37,7 @@ public sealed class InternalApiDocumentTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        document.Paths.Should().NotContainKey("/api/v1/internal");
+        document.Paths.ShouldNotContainKey("/api/v1/internal");
     }
 
     // --- Action marked [InternalApi] → path removed ---
@@ -57,7 +57,7 @@ public sealed class InternalApiDocumentTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        document.Paths.Should().NotContainKey("/api/v1/action");
+        document.Paths.ShouldNotContainKey("/api/v1/action");
     }
 
     // --- No [InternalApi] → path kept ---
@@ -77,7 +77,7 @@ public sealed class InternalApiDocumentTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        document.Paths.Should().ContainKey("/api/v1/public");
+        document.Paths.ShouldContainKey("/api/v1/public");
     }
 
     // --- Non-ControllerActionDescriptor without [InternalApi] → path kept ---
@@ -107,7 +107,7 @@ public sealed class InternalApiDocumentTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        document.Paths.Should().ContainKey("/api/v1/minimal");
+        document.Paths.ShouldContainKey("/api/v1/minimal");
     }
 
     // --- Non-ControllerActionDescriptor with [InternalApi] in EndpointMetadata → path removed ---
@@ -140,7 +140,7 @@ public sealed class InternalApiDocumentTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        document.Paths.Should().NotContainKey("/api/v1/wolverine-internal");
+        document.Paths.ShouldNotContainKey("/api/v1/wolverine-internal");
     }
 
     // --- Helpers ---

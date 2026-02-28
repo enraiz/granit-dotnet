@@ -1,10 +1,10 @@
-using FluentAssertions;
 using Granit.Features.EntityFrameworkCore.Extensions;
 using Granit.Features.EntityFrameworkCore.Internal;
 using Granit.Features.Store;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.EntityFrameworkCore.Tests;
@@ -40,8 +40,7 @@ public sealed class FeaturesEfCoreDiRegistrationTests
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         IFeatureStore store = sp.CreateScope().ServiceProvider.GetRequiredService<IFeatureStore>();
 
-        store.Should().BeOfType<EfCoreFeatureStore>(
-            "AddGranitFeaturesEntityFrameworkCore must replace the pre-registered store with EfCoreFeatureStore");
+        store.ShouldBeOfType<EfCoreFeatureStore>("AddGranitFeaturesEntityFrameworkCore must replace the pre-registered store with EfCoreFeatureStore");
     }
 
     [Fact]
@@ -52,7 +51,7 @@ public sealed class FeaturesEfCoreDiRegistrationTests
         IHostApplicationBuilder result = builder.AddGranitFeaturesEntityFrameworkCore(opts =>
             opts.UseInMemoryDatabase("features-chain"));
 
-        result.Should().BeSameAs(builder);
+        result.ShouldBeSameAs(builder);
     }
 
     [Fact]
@@ -63,7 +62,7 @@ public sealed class FeaturesEfCoreDiRegistrationTests
         builder.AddGranitFeaturesEntityFrameworkCore(opts =>
             opts.UseInMemoryDatabase("features-factory"));
 
-        builder.Services.Should().Contain(d =>
+        builder.Services.ShouldContain(d =>
             d.ServiceType == typeof(IDbContextFactory<GranitFeaturesDbContext>) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }

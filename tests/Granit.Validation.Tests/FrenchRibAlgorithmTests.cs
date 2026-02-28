@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Validation.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Validation.Tests;
@@ -20,7 +20,7 @@ public sealed class FrenchRibAlgorithmTests
     [InlineData("30004-00001-00000004045-29")]         // formatted with dashes
     [InlineData("00000000000000000000097")]            // all-zero account, key = 97
     public void IsValid_ValidRibs_ReturnsTrue(string rib) =>
-        FrenchRibAlgorithm.IsValid(rib).Should().BeTrue();
+        FrenchRibAlgorithm.IsValid(rib).ShouldBeTrue();
 
     // -------------------------------------------------------------------------
     // Letters in account number (conversion A–Z → digits)
@@ -33,7 +33,7 @@ public sealed class FrenchRibAlgorithmTests
     /// </summary>
     [Fact]
     public void IsValid_LettersInAccount_ConvertedCorrectly() =>
-        FrenchRibAlgorithm.IsValid("30004 00001 00000004045 29").Should().BeTrue();
+        FrenchRibAlgorithm.IsValid("30004 00001 00000004045 29").ShouldBeTrue();
 
     // -------------------------------------------------------------------------
     // Invalid — null / empty / whitespace
@@ -44,7 +44,7 @@ public sealed class FrenchRibAlgorithmTests
     [InlineData("")]
     [InlineData("   ")]
     public void IsValid_NullOrWhitespace_ReturnsFalse(string? rib) =>
-        FrenchRibAlgorithm.IsValid(rib).Should().BeFalse();
+        FrenchRibAlgorithm.IsValid(rib).ShouldBeFalse();
 
     // -------------------------------------------------------------------------
     // Invalid — wrong length
@@ -54,7 +54,7 @@ public sealed class FrenchRibAlgorithmTests
     [InlineData("3000400001000000040452")]             // 22 chars — too short
     [InlineData("300040000100000004045290")]           // 24 chars — too long
     public void IsValid_WrongLength_ReturnsFalse(string rib) =>
-        FrenchRibAlgorithm.IsValid(rib).Should().BeFalse();
+        FrenchRibAlgorithm.IsValid(rib).ShouldBeFalse();
 
     // -------------------------------------------------------------------------
     // Invalid — wrong checksum
@@ -62,7 +62,7 @@ public sealed class FrenchRibAlgorithmTests
 
     [Fact]
     public void IsValid_WrongKey_ReturnsFalse() =>
-        FrenchRibAlgorithm.IsValid("30004000010000000404530").Should().BeFalse();
+        FrenchRibAlgorithm.IsValid("30004000010000000404530").ShouldBeFalse();
 
     // -------------------------------------------------------------------------
     // Invalid — letters in bank code / branch code / key
@@ -70,15 +70,15 @@ public sealed class FrenchRibAlgorithmTests
 
     [Fact]
     public void IsValid_LettersInBankCode_ReturnsFalse() =>
-        FrenchRibAlgorithm.IsValid("3000A000010000000404529").Should().BeFalse();
+        FrenchRibAlgorithm.IsValid("3000A000010000000404529").ShouldBeFalse();
 
     [Fact]
     public void IsValid_LettersInBranchCode_ReturnsFalse() =>
-        FrenchRibAlgorithm.IsValid("300040000A0000000404529").Should().BeFalse();
+        FrenchRibAlgorithm.IsValid("300040000A0000000404529").ShouldBeFalse();
 
     [Fact]
     public void IsValid_LettersInKey_ReturnsFalse() =>
-        FrenchRibAlgorithm.IsValid("3000400001000000040452A").Should().BeFalse();
+        FrenchRibAlgorithm.IsValid("3000400001000000040452A").ShouldBeFalse();
 
     // -------------------------------------------------------------------------
     // Invalid — special characters in account number
@@ -86,7 +86,7 @@ public sealed class FrenchRibAlgorithmTests
 
     [Fact]
     public void IsValid_SpecialCharsInAccount_ReturnsFalse() =>
-        FrenchRibAlgorithm.IsValid("30004000010000!004045XX").Should().BeFalse();
+        FrenchRibAlgorithm.IsValid("30004000010000!004045XX").ShouldBeFalse();
 
     // -------------------------------------------------------------------------
     // Case insensitivity
@@ -97,6 +97,6 @@ public sealed class FrenchRibAlgorithmTests
     {
         // Same as uppercase variant — Normalize converts to upper
         string lower = "30004 00001 00000004045 29";
-        FrenchRibAlgorithm.IsValid(lower).Should().BeTrue();
+        FrenchRibAlgorithm.IsValid(lower).ShouldBeTrue();
     }
 }

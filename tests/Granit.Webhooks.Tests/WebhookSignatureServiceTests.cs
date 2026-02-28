@@ -5,8 +5,8 @@
 // payload hash helper.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Webhooks.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Webhooks.Tests;
@@ -24,7 +24,7 @@ public sealed class WebhookSignatureServiceTests
 
         string signature = WebhookSignatureService.Compute(TestSecret, timestamp, TestBody);
 
-        signature.Should().StartWith("t=1736935200,v1=");
+        signature.ShouldStartWith("t=1736935200,v1=");
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public sealed class WebhookSignatureServiceTests
 
         string signature = WebhookSignatureService.Compute(TestSecret, timestamp, TestBody);
 
-        signature.Should().Contain($"t={expectedUnix}");
+        signature.ShouldContain($"t={expectedUnix}");
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public sealed class WebhookSignatureServiceTests
         string signature = WebhookSignatureService.Compute(TestSecret, timestamp, TestBody);
         string hexPart = signature.Split(",v1=")[1];
 
-        hexPart.Should().Be(hexPart.ToLowerInvariant(), "the HMAC hex must be lowercase");
+        hexPart.ShouldBe(hexPart.ToLowerInvariant(), "the HMAC hex must be lowercase");
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public sealed class WebhookSignatureServiceTests
         string sig1 = WebhookSignatureService.Compute("secret-a", timestamp, TestBody);
         string sig2 = WebhookSignatureService.Compute("secret-b", timestamp, TestBody);
 
-        sig1.Should().NotBe(sig2);
+        sig1.ShouldNotBe(sig2);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public sealed class WebhookSignatureServiceTests
         string sig1 = WebhookSignatureService.Compute(TestSecret, t1, TestBody);
         string sig2 = WebhookSignatureService.Compute(TestSecret, t2, TestBody);
 
-        sig1.Should().NotBe(sig2);
+        sig1.ShouldNotBe(sig2);
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public sealed class WebhookSignatureServiceTests
         string sig1 = WebhookSignatureService.Compute(TestSecret, timestamp, TestBody);
         string sig2 = WebhookSignatureService.Compute(TestSecret, timestamp, TestBody);
 
-        sig1.Should().Be(sig2);
+        sig1.ShouldBe(sig2);
     }
 
     [Fact]
@@ -88,8 +88,8 @@ public sealed class WebhookSignatureServiceTests
     {
         string hash = WebhookSignatureService.ComputePayloadHash(TestBody);
 
-        hash.Should().Be(hash.ToLowerInvariant());
-        hash.Should().HaveLength(64, "SHA-256 produces 32 bytes = 64 hex chars");
+        hash.ShouldBe(hash.ToLowerInvariant());
+        hash.Length.ShouldBe(64, "SHA-256 produces 32 bytes = 64 hex chars");
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public sealed class WebhookSignatureServiceTests
         string hash1 = WebhookSignatureService.ComputePayloadHash("""{"key":"a"}""");
         string hash2 = WebhookSignatureService.ComputePayloadHash("""{"key":"b"}""");
 
-        hash1.Should().NotBe(hash2);
+        hash1.ShouldNotBe(hash2);
     }
 
     [Fact]
@@ -107,6 +107,6 @@ public sealed class WebhookSignatureServiceTests
         string hash1 = WebhookSignatureService.ComputePayloadHash(TestBody);
         string hash2 = WebhookSignatureService.ComputePayloadHash(TestBody);
 
-        hash1.Should().Be(hash2);
+        hash1.ShouldBe(hash2);
     }
 }

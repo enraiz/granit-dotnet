@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Granit.Localization.Tests.TestResources;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Localization.Tests;
@@ -16,9 +16,9 @@ public sealed class LocalizationResourceStoreTests
         LocalizationResourceInfo info = dictionary.Add<TestResource>("fr");
 
         // Assert
-        info.Should().NotBeNull();
-        info.ResourceType.Should().Be<TestResource>();
-        info.DefaultCulture.Should().Be("fr");
+        info.ShouldNotBeNull();
+        info.ResourceType.ShouldBe(typeof(TestResource));
+        info.DefaultCulture.ShouldBe("fr");
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public sealed class LocalizationResourceStoreTests
         LocalizationResourceInfo info = dictionary.Get<TestResource>();
 
         // Assert
-        info.ResourceType.Should().Be<TestResource>();
+        info.ResourceType.ShouldBe(typeof(TestResource));
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public sealed class LocalizationResourceStoreTests
         Action act = () => dictionary.Get<TestResource>();
 
         // Assert
-        act.Should().Throw<KeyNotFoundException>();
+        Should.Throw<KeyNotFoundException>(act);
     }
 
     [Fact]
@@ -59,8 +59,8 @@ public sealed class LocalizationResourceStoreTests
         bool found = dictionary.TryGetValue(typeof(TestResource), out LocalizationResourceInfo? info);
 
         // Assert
-        found.Should().BeTrue();
-        info.Should().NotBeNull();
+        found.ShouldBeTrue();
+        info.ShouldNotBeNull();
     }
 
     [Fact]
@@ -73,8 +73,8 @@ public sealed class LocalizationResourceStoreTests
         bool found = dictionary.TryGetValue(typeof(TestResource), out LocalizationResourceInfo? info);
 
         // Assert
-        found.Should().BeFalse();
-        info.Should().BeNull();
+        found.ShouldBeFalse();
+        info.ShouldBeNull();
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class LocalizationResourceStoreTests
         _ = dictionary.Add<TestResource>("en");
 
         // Assert
-        dictionary.Get<TestResource>().DefaultCulture.Should().Be("en");
+        dictionary.Get<TestResource>().DefaultCulture.ShouldBe("en");
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public sealed class LocalizationResourceStoreTests
         var all = dictionary.GetAll().ToList();
 
         // Assert
-        all.Should().HaveCount(2);
+        all.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public sealed class LocalizationResourceStoreTests
             .AddJson(typeof(TestResource).Assembly, "Some.Prefix");
 
         // Assert
-        info.JsonSources.Should().HaveCount(1);
+        info.JsonSources.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public sealed class LocalizationResourceStoreTests
             .AddBaseTypes(typeof(ParentTestResource));
 
         // Assert
-        info.BaseTypes.Should().HaveCount(1);
-        info.BaseTypes.Should().Contain(typeof(ParentTestResource));
+        info.BaseTypes.Count.ShouldBe(1);
+        info.BaseTypes.ShouldContain(typeof(ParentTestResource));
     }
 }

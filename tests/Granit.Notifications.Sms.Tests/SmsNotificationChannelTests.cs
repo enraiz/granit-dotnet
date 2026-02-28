@@ -6,12 +6,12 @@
 // =============================================================================
 
 using System.Text.Json;
-using FluentAssertions;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Sms;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Sms.Tests;
@@ -93,13 +93,13 @@ public sealed class SmsNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        captured.Should().NotBeNull();
-        captured!.SenderId.Should().Be("MyApp");
+        captured.ShouldNotBeNull();
+        captured!.SenderId.ShouldBe("MyApp");
     }
 
     [Fact]
     public void Name_ReturnsSms() =>
-        _channel.Name.Should().Be(NotificationChannels.Sms);
+        _channel.Name.ShouldBe(NotificationChannels.Sms);
 
     // -------------------------------------------------------------------------
     // Helpers

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.Exceptions;
 using Granit.Features.ValueTypes;
@@ -30,7 +30,7 @@ public sealed class FeatureDefinitionStoreTests
     {
         FeatureDefinitionStore store = new([]);
 
-        store.GetAll().Should().BeEmpty();
+        store.GetAll().ShouldBeEmpty();
     }
 
     [Fact]
@@ -44,8 +44,8 @@ public sealed class FeatureDefinitionStoreTests
 
         FeatureDefinition result = store.GetRequired("App.VideoConsultation");
 
-        result.Name.Should().Be("App.VideoConsultation");
-        result.ValueType.Should().Be(FeatureValueType.Toggle);
+        result.Name.ShouldBe("App.VideoConsultation");
+        result.ValueType.ShouldBe(FeatureValueType.Toggle);
     }
 
     [Fact]
@@ -55,8 +55,7 @@ public sealed class FeatureDefinitionStoreTests
 
         Action act = () => store.GetRequired("Unknown.Feature");
 
-        act.Should().Throw<FeatureNotFoundException>()
-            .WithMessage("*Unknown.Feature*");
+        Should.Throw<FeatureNotFoundException>(act).Message.ShouldContain("Unknown.Feature");
     }
 
     [Fact]
@@ -66,7 +65,7 @@ public sealed class FeatureDefinitionStoreTests
 
         FeatureDefinition? result = store.GetOrNull("Unknown.Feature");
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -81,8 +80,8 @@ public sealed class FeatureDefinitionStoreTests
 
         IReadOnlyList<FeatureDefinition> all = store.GetAll();
 
-        all.Should().HaveCount(2);
-        all.Select(d => d.Name).Should().Contain(["App.VideoConsultation", "App.MaxPatients"]);
+        all.Count.ShouldBe(2);
+        all.Select(d => d.Name).ShouldContain(["App.VideoConsultation", "App.MaxPatients"]);
     }
 
     [Fact]
@@ -101,8 +100,8 @@ public sealed class FeatureDefinitionStoreTests
             })
         ]);
 
-        store.GetAll().Should().HaveCount(2);
-        store.GetOrNull("ModuleA.FeatureX").Should().NotBeNull();
-        store.GetOrNull("ModuleB.FeatureY").Should().NotBeNull();
+        store.GetAll().Count.ShouldBe(2);
+        store.GetOrNull("ModuleA.FeatureX").ShouldNotBeNull();
+        store.GetOrNull("ModuleB.FeatureY").ShouldNotBeNull();
     }
 }

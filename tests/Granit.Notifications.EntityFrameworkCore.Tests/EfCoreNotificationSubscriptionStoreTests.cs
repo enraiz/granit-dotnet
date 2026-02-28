@@ -5,8 +5,8 @@
 // entity follow/unfollow, entity followers list.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Notifications.Domain;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.EntityFrameworkCore.Tests;
@@ -33,7 +33,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         await _store.SubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
 
         IReadOnlyList<string> subscribers = await _store.GetSubscriberIdsAsync(typeName, tenantId, TestContext.Current.CancellationToken);
-        subscribers.Should().Contain(userId);
+        subscribers.ShouldContain(userId);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         await _store.SubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
 
         IReadOnlyList<NotificationSubscription> subscriptions = await _store.GetUserSubscriptionsAsync(userId, tenantId, TestContext.Current.CancellationToken);
-        subscriptions.Where(s => s.NotificationTypeName == typeName && s.EntityType == null).Should().HaveCount(1);
+        subscriptions.Where(s => s.NotificationTypeName == typeName && s.EntityType == null).Count().ShouldBe(1);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         await _store.UnsubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
 
         IReadOnlyList<string> subscribers = await _store.GetSubscriberIdsAsync(typeName, tenantId, TestContext.Current.CancellationToken);
-        subscribers.Should().NotContain(userId);
+        subscribers.ShouldNotContain(userId);
     }
 
     [Fact]
@@ -76,9 +76,9 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
 
         IReadOnlyList<string> result = await _store.GetSubscriberIdsAsync(typeName, tenantId, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
-        result.Should().Contain("user-a");
-        result.Should().Contain("user-b");
+        result.Count.ShouldBe(2);
+        result.ShouldContain("user-a");
+        result.ShouldContain("user-b");
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         await _store.FollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
 
         bool isFollowing = await _store.IsFollowingEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
-        isFollowing.Should().BeTrue();
+        isFollowing.ShouldBeTrue();
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         await _store.FollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
 
         IReadOnlyList<NotificationSubscription> followers = await _store.GetEntityFollowersAsync(entityType, entityId, tenantId, TestContext.Current.CancellationToken);
-        followers.Where(s => s.UserId == userId).Should().HaveCount(1);
+        followers.Where(s => s.UserId == userId).Count().ShouldBe(1);
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         await _store.UnfollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
 
         bool isFollowing = await _store.IsFollowingEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
-        isFollowing.Should().BeFalse();
+        isFollowing.ShouldBeFalse();
     }
 
     [Fact]
@@ -138,9 +138,9 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
 
         IReadOnlyList<string> result = await _store.GetEntityFollowerIdsAsync(entityType, entityId, tenantId, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
-        result.Should().Contain("user-x");
-        result.Should().Contain("user-y");
+        result.Count.ShouldBe(2);
+        result.ShouldContain("user-x");
+        result.ShouldContain("user-y");
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
 
         IReadOnlyList<NotificationSubscription> result = await _store.GetEntityFollowersAsync(entityType, entityId, tenantId, TestContext.Current.CancellationToken);
 
-        result.Should().HaveCount(2);
-        result.Should().OnlyContain(s => s.EntityType == entityType && s.EntityId == entityId);
+        result.Count.ShouldBe(2);
+        result.ShouldAllBe(s => s.EntityType == entityType && s.EntityId == entityId);
     }
 }

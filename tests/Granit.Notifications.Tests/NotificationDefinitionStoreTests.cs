@@ -5,8 +5,8 @@
 // null, GetAll returns all definitions, Initialize populates the store.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Notifications.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
@@ -20,7 +20,7 @@ public sealed class NotificationDefinitionStoreTests
 
         NotificationDefinition? result = store.Get("unknown.notification");
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -34,9 +34,9 @@ public sealed class NotificationDefinitionStoreTests
 
         IReadOnlyList<NotificationDefinition> all = store.GetAll();
 
-        all.Should().HaveCount(2);
-        all.Should().Contain(d => d.Name == "notif.one");
-        all.Should().Contain(d => d.Name == "notif.two");
+        all.Count.ShouldBe(2);
+        all.ShouldContain(d => d.Name == "notif.one");
+        all.ShouldContain(d => d.Name == "notif.two");
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class NotificationDefinitionStoreTests
         store.Initialize([definition]);
 
         NotificationDefinition? result = store.Get("provider.notif");
-        result.Should().NotBeNull();
-        result!.DisplayName.Should().Be("Test Notification");
+        result.ShouldNotBeNull();
+        result!.DisplayName.ShouldBe("Test Notification");
     }
 }

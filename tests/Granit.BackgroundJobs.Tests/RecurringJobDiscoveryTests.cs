@@ -1,6 +1,6 @@
 using System.Reflection;
-using FluentAssertions;
 using Granit.BackgroundJobs.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
@@ -15,8 +15,8 @@ public sealed class RecurringJobDiscoveryTests
             RecurringJobDiscovery.Discover([typeof(RecurringJobDiscoveryTests).Assembly]);
 
         // Assert — at least FakeDailyReport and FakeHourlyCleanup are present
-        registrations.Should().Contain(r => r.JobName == "fake-daily-report");
-        registrations.Should().Contain(r => r.JobName == "fake-hourly-cleanup");
+        registrations.ShouldContain(r => r.JobName == "fake-daily-report");
+        registrations.ShouldContain(r => r.JobName == "fake-hourly-cleanup");
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public sealed class RecurringJobDiscoveryTests
 
         // Assert
         RecurringJobRegistration reg = registrations.Single(r => r.JobName == "fake-daily-report");
-        reg.CronExpression.Should().Be("0 8 * * *");
+        reg.CronExpression.ShouldBe("0 8 * * *");
     }
 
     [Fact]
@@ -40,9 +40,9 @@ public sealed class RecurringJobDiscoveryTests
 
         // Assert
         RecurringJobRegistration reg = registrations.Single(r => r.JobName == "fake-daily-report");
-        reg.MessageType.Should().Contain(nameof(FakeDailyReportMessage));
+        reg.MessageType.ShouldContain(nameof(FakeDailyReportMessage));
         Type? resolved = Type.GetType(reg.MessageType);
-        resolved.Should().Be<FakeDailyReportMessage>();
+        resolved.ShouldBe(typeof(FakeDailyReportMessage));
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class RecurringJobDiscoveryTests
             RecurringJobDiscovery.Discover([typeof(RecurringJobDiscoveryTests).Assembly]);
 
         // Assert — UndecoratedMessage must NOT appear
-        registrations.Should().NotContain(r => r.JobName == "undecorated");
+        registrations.ShouldNotContain(r => r.JobName == "undecorated");
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class RecurringJobDiscoveryTests
             RecurringJobDiscovery.Discover([]);
 
         // Assert
-        registrations.Should().BeEmpty();
+        registrations.ShouldBeEmpty();
     }
 }
 

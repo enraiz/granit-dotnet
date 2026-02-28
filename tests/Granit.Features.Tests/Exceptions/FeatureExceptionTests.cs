@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Granit.Core.Exceptions;
 using Granit.Features.Exceptions;
 using Xunit;
@@ -16,7 +16,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotFoundException ex = new("App.Missing");
 
-        ex.FeatureName.Should().Be("App.Missing");
+        ex.FeatureName.ShouldBe("App.Missing");
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotFoundException ex = new("App.Missing");
 
-        ex.Message.Should().Contain("App.Missing");
+        ex.Message.ShouldContain("App.Missing");
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotFoundException ex = new("App.Missing");
 
-        ex.Should().BeAssignableTo<Exception>();
+        ex.ShouldBeAssignableTo<Exception>();
     }
 
     // -------------------------------------------------------------------------
@@ -44,7 +44,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotEnabledException ex = new("App.Video");
 
-        ex.FeatureName.Should().Be("App.Video");
+        ex.FeatureName.ShouldBe("App.Video");
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotEnabledException ex = new("App.Video");
 
-        ex.ErrorCode.Should().Be("Features:NotEnabled");
+        ex.ErrorCode.ShouldBe("Features:NotEnabled");
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotEnabledException ex = new("App.Video");
 
-        ex.Message.Should().Contain("App.Video");
+        ex.Message.ShouldContain("App.Video");
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotEnabledException ex = new("App.Video");
 
-        ex.Should().BeAssignableTo<ForbiddenException>();
+        ex.ShouldBeAssignableTo<ForbiddenException>();
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureNotEnabledException ex = new("App.Video");
 
-        ex.Should().BeAssignableTo<IHasErrorCode>();
+        ex.ShouldBeAssignableTo<IHasErrorCode>();
     }
 
     // -------------------------------------------------------------------------
@@ -88,9 +88,9 @@ public sealed class FeatureExceptionTests
     {
         FeatureLimitExceededException ex = new("App.MaxPatients", 50, 50);
 
-        ex.FeatureName.Should().Be("App.MaxPatients");
-        ex.Current.Should().Be(50);
-        ex.Limit.Should().Be(50);
+        ex.FeatureName.ShouldBe("App.MaxPatients");
+        ex.Current.ShouldBe(50);
+        ex.Limit.ShouldBe(50);
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureLimitExceededException ex = new("App.MaxPatients", 10, 5);
 
-        ex.ErrorCode.Should().Be("Features:LimitExceeded");
+        ex.ErrorCode.ShouldBe("Features:LimitExceeded");
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public sealed class FeatureExceptionTests
     {
         FeatureLimitExceededException ex = new("App.MaxPatients", 50, 50);
 
-        ex.Message.Should().Contain("App.MaxPatients");
-        ex.Message.Should().Contain("50/50");
+        ex.Message.ShouldContain("App.MaxPatients");
+        ex.Message.ShouldContain("50/50");
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public sealed class FeatureExceptionTests
     {
         FeatureLimitExceededException ex = new("App.MaxPatients", 1, 1);
 
-        ex.Should().BeAssignableTo<ForbiddenException>();
+        ex.ShouldBeAssignableTo<ForbiddenException>();
     }
 
     // -------------------------------------------------------------------------
@@ -127,8 +127,8 @@ public sealed class FeatureExceptionTests
     {
         FeatureValueValidationException ex = new("App.MaxPatients", "abc", "must be integer");
 
-        ex.FeatureName.Should().Be("App.MaxPatients");
-        ex.InvalidValue.Should().Be("abc");
+        ex.FeatureName.ShouldBe("App.MaxPatients");
+        ex.InvalidValue.ShouldBe("abc");
     }
 
     [Fact]
@@ -136,9 +136,9 @@ public sealed class FeatureExceptionTests
     {
         FeatureValueValidationException ex = new("App.MaxPatients", "abc", "must be integer");
 
-        ex.Message.Should().Contain("App.MaxPatients");
-        ex.Message.Should().Contain("abc");
-        ex.Message.Should().Contain("must be integer");
+        ex.Message.ShouldContain("App.MaxPatients");
+        ex.Message.ShouldContain("abc");
+        ex.Message.ShouldContain("must be integer");
     }
 
     [Fact]
@@ -146,6 +146,6 @@ public sealed class FeatureExceptionTests
     {
         FeatureValueValidationException ex = new("App.Plan", "ultimate", "not in allowed list");
 
-        ex.Should().BeAssignableTo<BusinessException>();
+        ex.ShouldBeAssignableTo<BusinessException>();
     }
 }

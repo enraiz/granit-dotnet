@@ -4,12 +4,12 @@
 // Verifies the creation of the Vault client with different auth methods.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Vault.Exceptions;
 using Granit.Vault.Options;
 using Granit.Vault.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Shouldly;
 using VaultSharp;
 using Xunit;
 
@@ -33,7 +33,7 @@ public sealed class VaultClientFactoryTests
         IVaultClient client = factory.Create();
 
         // Assert
-        client.Should().NotBeNull();
+        client.ShouldNotBeNull();
     }
 
     [Fact]
@@ -50,8 +50,8 @@ public sealed class VaultClientFactoryTests
 
         // Act & Assert
         Action act = () => factory.Create();
-        act.Should().Throw<VaultConfigurationException>()
-            .Which.ErrorCode.Should().Be("Vault:TokenRequired");
+        Should.Throw<VaultConfigurationException>(act)
+            .ErrorCode.ShouldBe("Vault:TokenRequired");
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class VaultClientFactoryTests
 
         // Act & Assert
         Action act = () => factory.Create();
-        act.Should().Throw<VaultConfigurationException>()
-            .Which.ErrorCode.Should().Be("Vault:UnknownAuthMethod");
+        Should.Throw<VaultConfigurationException>(act)
+            .ErrorCode.ShouldBe("Vault:UnknownAuthMethod");
     }
 }

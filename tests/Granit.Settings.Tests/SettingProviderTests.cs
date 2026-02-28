@@ -5,12 +5,12 @@
 // et la liste blanche Providers.
 // =============================================================================
 
-using FluentAssertions;
 using Granit.Settings.Definitions;
 using Granit.Settings.Providers;
 using Granit.Settings.Services;
 using Granit.Settings.Values;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Settings.Tests;
@@ -57,7 +57,7 @@ public sealed class SettingProviderTests
 
         string? result = await provider.GetOrNullAsync("Unknown.Setting", TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class SettingProviderTests
 
         string? result = await settingProvider.GetOrNullAsync(def.Name, TestContext.Current.CancellationToken);
 
-        result.Should().Be("blue", "le provider Tenant (T) doit l'emporter sur Global");
+        result.ShouldBe("blue", "le provider Tenant (T) doit l'emporter sur Global");
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public sealed class SettingProviderTests
 
         string? result = await settingProvider.GetOrNullAsync(def.Name, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public sealed class SettingProviderTests
 
         string? result = await settingProvider.GetOrNullAsync(def.Name, TestContext.Current.CancellationToken);
 
-        result.Should().Be("dark");
+        result.ShouldBe("dark");
     }
 
     // -------------------------------------------------------------------------
@@ -134,7 +134,7 @@ public sealed class SettingProviderTests
 
         string? result = await settingProvider.GetOrNullAsync(def.Name, TestContext.Current.CancellationToken);
 
-        result.Should().BeNull("la cascade doit s'arrêter après U quand IsInherited=false");
+        result.ShouldBeNull("la cascade doit s'arrêter après U quand IsInherited=false");
     }
 
     // -------------------------------------------------------------------------
@@ -159,7 +159,7 @@ public sealed class SettingProviderTests
 
         string? result = await settingProvider.GetOrNullAsync(def.Name, TestContext.Current.CancellationToken);
 
-        result.Should().Be("global-value", "seul le provider G est autorisé");
+        result.ShouldBe("global-value", "seul le provider G est autorisé");
         await userProvider.DidNotReceive().GetOrNullAsync(Arg.Any<SettingDefinition>(), Arg.Any<CancellationToken>());
     }
 
@@ -188,8 +188,8 @@ public sealed class SettingProviderTests
         IReadOnlyList<SettingValue> results = await settingProvider.GetAllAsync(
             [def1.Name, def2.Name], TestContext.Current.CancellationToken);
 
-        results.Should().HaveCount(2);
-        results.First(v => v.Name == def1.Name).Value.Should().Be("dark");
-        results.First(v => v.Name == def2.Name).Value.Should().Be("fr");
+        results.Count.ShouldBe(2);
+        results.First(v => v.Name == def1.Name).Value.ShouldBe("dark");
+        results.First(v => v.Name == def2.Name).Value.ShouldBe("fr");
     }
 }
