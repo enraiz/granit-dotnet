@@ -7,7 +7,7 @@ sans aucun doublon possible en cluster multi-nœuds.
 | Package | Rôle |
 | --- | --- |
 | `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager`, `IBackgroundJobStore` |
-| `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `granit_background_jobs` (SQL Server / PostgreSQL) |
+| `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `scheduling_background_jobs` (SQL Server / PostgreSQL) |
 | `Granit.BackgroundJobs.Endpoints` | Administration HTTP : endpoints Minimal API, politique d'autorisation `BackgroundJobs.Admin` |
 
 ## Concepts clés
@@ -73,7 +73,7 @@ Ajouter le module EF Core et enregistrer le DbContext :
 public sealed class MyAppModule : GranitModule { }
 ```
 
-La table `granit_background_jobs` est créée par la migration EF Core (Story #129).
+La table `scheduling_background_jobs` est créée par la migration EF Core (Story #129).
 Compatible SQL Server et PostgreSQL.
 
 ### 3 — Assemblies additionnelles (optionnel)
@@ -344,7 +344,7 @@ services.AddSingleton<IBackgroundJobStore, RedisBackgroundJobStore>();
 | --- | --- | --- |
 | #127 | ✅ Terminé | `BackgroundJobDefinition` EF Core entity + `BackgroundJobsDbContext` (package `Granit.BackgroundJobs.EntityFrameworkCore`) |
 | #128 | ✅ Terminé | `EfBackgroundJobStore` (SQL Server / PostgreSQL) + `AddGranitBackgroundJobsEntityFrameworkCore()` |
-| #129 | ✅ Terminé | Migrations EF Core + schéma `granit_background_jobs` |
+| #129 | ✅ Terminé | Migrations EF Core + schéma `scheduling_background_jobs` |
 | #130 | ✅ Terminé | Intégration `GranitWolverinePostgresqlModule` |
 | #136 | ✅ Terminé | `CronSchedulerAgent` (`SingularAgent`) — démarrage cluster-safe, anti-doublon |
 | #137 | ✅ Terminé | Étendre `OutgoingContextMiddleware` pour propager `X-Triggered-By` |

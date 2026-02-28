@@ -6,14 +6,14 @@ namespace Granit.Webhooks.EntityFrameworkCore.Configurations;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="WebhookSubscription"/>.
-/// Table: <c>granit_webhook_subscriptions</c>.
+/// Table: <c>webhook_subscriptions</c>.
 /// </summary>
 internal sealed class WebhookSubscriptionConfiguration : IEntityTypeConfiguration<WebhookSubscription>
 {
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<WebhookSubscription> builder)
     {
-        builder.ToTable("granit_webhook_subscriptions");
+        builder.ToTable("webhook_subscriptions");
 
         builder.HasKey(e => e.Id);
 
@@ -58,6 +58,6 @@ internal sealed class WebhookSubscriptionConfiguration : IEntityTypeConfiguratio
 
         // Hot path: fan-out query filters on (EventType, TenantId, Status).
         builder.HasIndex(e => new { e.EventType, e.TenantId, e.Status })
-            .HasDatabaseName("ix_granit_webhook_subscriptions_eventtype_tenantid_status");
+            .HasDatabaseName("ix_webhook_subscriptions_eventtype_tenantid_status");
     }
 }

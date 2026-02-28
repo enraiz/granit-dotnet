@@ -4,7 +4,7 @@ namespace Granit.Localization.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core implementation of <see cref="ILocalizationOverrideStore"/>.
-/// Persists translation overrides in PostgreSQL (table <c>granit_localization_overrides</c>)
+/// Persists translation overrides in PostgreSQL (table <c>i18n_localization_overrides</c>)
 /// with HDS audit trail.
 /// </summary>
 /// <remarks>

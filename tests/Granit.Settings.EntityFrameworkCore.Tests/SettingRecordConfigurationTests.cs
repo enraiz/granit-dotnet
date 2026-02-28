@@ -38,12 +38,12 @@ public sealed class SettingRecordConfigurationTests
     }
 
     [Fact]
-    public void SettingRecord_MapsTo_GranitSettingRecordsTable()
+    public void SettingRecord_MapsTo_CoreSettingRecordsTable()
     {
         IModel model = BuildModel();
         IEntityType entity = model.FindEntityType(typeof(SettingRecord))!;
 
-        entity.GetTableName().Should().Be("granit_setting_records");
+        entity.GetTableName().Should().Be("core_setting_records");
     }
 
     [Fact]

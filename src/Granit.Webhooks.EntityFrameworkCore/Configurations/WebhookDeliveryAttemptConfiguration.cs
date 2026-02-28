@@ -6,11 +6,11 @@ namespace Granit.Webhooks.EntityFrameworkCore.Configurations;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="WebhookDeliveryAttempt"/>.
-/// Table: <c>granit_webhook_delivery_attempts</c>.
+/// Table: <c>webhook_delivery_attempts</c>.
 /// </summary>
 /// <remarks>
 /// HDS compliance: this table is INSERT-only. No cascade deletes are configured from
-/// <c>granit_webhook_subscriptions</c> — delivery records must be retained for 3 years
+/// <c>webhook_subscriptions</c> — delivery records must be retained for 3 years
 /// even after the subscription is deactivated.
 /// </remarks>
 internal sealed class WebhookDeliveryAttemptConfiguration : IEntityTypeConfiguration<WebhookDeliveryAttempt>
@@ -18,7 +18,7 @@ internal sealed class WebhookDeliveryAttemptConfiguration : IEntityTypeConfigura
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<WebhookDeliveryAttempt> builder)
     {
-        builder.ToTable("granit_webhook_delivery_attempts");
+        builder.ToTable("webhook_delivery_attempts");
 
         builder.HasKey(e => e.Id);
 
@@ -60,15 +60,15 @@ internal sealed class WebhookDeliveryAttemptConfiguration : IEntityTypeConfigura
 
         // Delivery lookup by subscription (e.g., history view).
         builder.HasIndex(e => new { e.SubscriptionId, e.OccurredAt })
-            .HasDatabaseName("ix_granit_webhook_delivery_attempts_subscriptionid_occurredat");
+            .HasDatabaseName("ix_webhook_delivery_attempts_subscriptionid_occurredat");
 
         // RGPD: enables bulk export and erasure by tenant.
         builder.HasIndex(e => new { e.TenantId, e.OccurredAt })
-            .HasDatabaseName("ix_granit_webhook_delivery_attempts_tenantid_occurredat");
+            .HasDatabaseName("ix_webhook_delivery_attempts_tenantid_occurredat");
 
         // Unique index on DeliveryId for deduplication.
         builder.HasIndex(e => e.DeliveryId)
             .IsUnique()
-            .HasDatabaseName("uq_granit_webhook_delivery_attempts_deliveryid");
+            .HasDatabaseName("uq_webhook_delivery_attempts_deliveryid");
     }
 }

@@ -22,7 +22,7 @@ JsonStringLocalizer
   │         └── IMemoryCache (L1, 5 min)
   │                   │
   │                   └── EfCoreLocalizationOverrideStore (cache miss)
-  │                             └── PostgreSQL (table granit_localization_overrides)
+  │                             └── PostgreSQL (table i18n_localization_overrides)
   │
   ├── 2. JSON embarqué (chaîne de cultures : fr-BE → fr → défaut)
   └── 3. Héritage (ressources parentes)
@@ -86,7 +86,7 @@ dotnet ef migrations add AddLocalizationOverrides
 dotnet ef database update
 ```
 
-Colonnes de la table `granit_localization_overrides` :
+Colonnes de la table `i18n_localization_overrides` :
 
 | Colonne | Type | Description |
 | --- | --- | --- |

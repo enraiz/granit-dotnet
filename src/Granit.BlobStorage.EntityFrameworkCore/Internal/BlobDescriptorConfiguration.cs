@@ -5,14 +5,14 @@ namespace Granit.BlobStorage.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="BlobDescriptor"/>.
-/// Table: <c>granit_blob_descriptors</c>.
+/// Table: <c>storage_blob_descriptors</c>.
 /// </summary>
 internal sealed class BlobDescriptorConfiguration : IEntityTypeConfiguration<BlobDescriptor>
 {
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<BlobDescriptor> builder)
     {
-        builder.ToTable("granit_blob_descriptors");
+        builder.ToTable("storage_blob_descriptors");
 
         builder.HasKey(e => e.Id);
 
@@ -67,11 +67,11 @@ internal sealed class BlobDescriptorConfiguration : IEntityTypeConfiguration<Blo
 
         // Composite index for tenant-scoped queries by container.
         builder.HasIndex(e => new { e.TenantId, e.ContainerName })
-            .HasDatabaseName("ix_granit_blob_descriptors_tenant_container");
+            .HasDatabaseName("ix_storage_blob_descriptors_tenant_container");
 
         // The S3 object key is globally unique across all tenants.
         builder.HasIndex(e => e.ObjectKey)
             .IsUnique()
-            .HasDatabaseName("uq_granit_blob_descriptors_object_key");
+            .HasDatabaseName("uq_storage_blob_descriptors_object_key");
     }
 }

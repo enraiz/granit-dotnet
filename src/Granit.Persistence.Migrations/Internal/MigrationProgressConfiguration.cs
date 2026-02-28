@@ -5,13 +5,13 @@ namespace Granit.Persistence.Migrations.Internal;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="MigrationProgress"/>.
-/// Table: <c>granit_migration_progress</c> (system schema, never affected by tenant schema switches).
+/// Table: <c>data_migration_progress</c> (system schema, never affected by tenant schema switches).
 /// </summary>
 internal sealed class MigrationProgressConfiguration : IEntityTypeConfiguration<MigrationProgress>
 {
     public void Configure(EntityTypeBuilder<MigrationProgress> builder)
     {
-        builder.ToTable("granit_migration_progress");
+        builder.ToTable("data_migration_progress");
 
         builder.HasKey(e => e.Id);
 
@@ -47,6 +47,6 @@ internal sealed class MigrationProgressConfiguration : IEntityTypeConfiguration<
         // NULL TenantId is valid for single-tenant applications.
         builder.HasIndex(e => new { e.CycleId, e.TenantId })
             .IsUnique()
-            .HasDatabaseName("uq_granit_migration_progress");
+            .HasDatabaseName("uq_data_migration_progress");
     }
 }

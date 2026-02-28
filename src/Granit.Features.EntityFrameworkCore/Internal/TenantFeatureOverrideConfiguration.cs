@@ -5,7 +5,7 @@ namespace Granit.Features.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core Fluent API configuration for <see cref="TenantFeatureOverride"/>.
-/// Table: <c>feature_overrides</c>.
+/// Table: <c>saas_feature_overrides</c>.
 /// </summary>
 internal sealed class TenantFeatureOverrideConfiguration
     : IEntityTypeConfiguration<TenantFeatureOverride>
@@ -13,7 +13,7 @@ internal sealed class TenantFeatureOverrideConfiguration
     /// <inheritdoc/>
     public void Configure(EntityTypeBuilder<TenantFeatureOverride> builder)
     {
-        builder.ToTable("feature_overrides");
+        builder.ToTable("saas_feature_overrides");
 
         builder.HasKey(e => e.Id);
 
@@ -46,6 +46,6 @@ internal sealed class TenantFeatureOverrideConfiguration
         // Unique composite index: one override per (tenant, feature)
         builder.HasIndex(e => new { e.TenantId, e.FeatureName })
                .IsUnique()
-               .HasDatabaseName("uq_feature_overrides_tenant_feature");
+               .HasDatabaseName("uq_saas_feature_overrides_tenant_feature");
     }
 }

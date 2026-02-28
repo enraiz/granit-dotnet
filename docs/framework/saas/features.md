@@ -229,7 +229,7 @@ public sealed class OverrideTenantFeatureHandler(IFeatureStore store, IMessageBu
 ## Persistance EF Core
 
 `GranitFeaturesEntityFrameworkCoreModule` remplace `InMemoryFeatureStore` par
-`EfCoreFeatureStore`. Les overrides sont stockés dans la table `granit_feature_overrides`
+`EfCoreFeatureStore`. Les overrides sont stockés dans la table `saas_feature_overrides`
 avec une piste d'audit HDS complète (créé par, modifié par, horodatages).
 
 ```csharp

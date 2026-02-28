@@ -211,7 +211,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ConfigureSettingsModule();  // crée granit_setting_records
+        modelBuilder.ConfigureSettingsModule();  // crée core_setting_records
     }
 }
 ```
@@ -235,7 +235,7 @@ dotnet ef migrations add InitSettings \
   --startup-project src/MyApp
 ```
 
-La migration crée la table `granit_setting_records` avec un index unique sur
+La migration crée la table `core_setting_records` avec un index unique sur
 `(Name, ProviderName, ProviderKey)`.
 
 ### Schéma de la table
@@ -252,7 +252,7 @@ La migration crée la table `granit_setting_records` avec un index unique sur
 | `ModifiedAt` | `timestamptz` | NULL |
 | `ModifiedBy` | `varchar(256)` | NULL |
 
-Index unique : `uq_granit_setting_records_name_provider` sur `(Name, ProviderName, ProviderKey)`.
+Index unique : `uq_core_setting_records_name_provider` sur `(Name, ProviderName, ProviderKey)`.
 
 ## Architecture
 

@@ -7,7 +7,7 @@ namespace Granit.Settings.EntityFrameworkCore.Internal;
 /// <summary>
 /// EF Core implementation of <see cref="ISettingStore"/>.
 /// Persists setting values in the host application's DbContext
-/// (table <c>granit_setting_records</c>) with HDS audit trail.
+/// (table <c>core_setting_records</c>) with HDS audit trail.
 /// </summary>
 /// <remarks>
 /// <para>
