@@ -18,7 +18,7 @@ internal sealed class PushNotificationChannel(
     public string Name => NotificationChannels.Push;
 
     /// <inheritdoc />
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
     {
         IReadOnlyList<PushSubscriptionInfo> subscriptions = await subscriptionStore.GetSubscriptionsAsync(
             context.RecipientUserId, context.TenantId, ct);
@@ -63,6 +63,7 @@ internal sealed class PushNotificationChannel(
             catch (PushServiceClientException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Gone)
             {
                 logger.LogInformation(
+                    ex,
                     "Push subscription expired for endpoint {Endpoint}, removing",
                     sub.Endpoint);
                 await subscriptionStore.RemoveSubscriptionAsync(sub.Endpoint, context.TenantId, ct);

@@ -30,10 +30,8 @@ public sealed class SignalRNotificationChannelTests
     }
 
     [Fact]
-    public void Name_ReturnsSignalR()
-    {
+    public void Name_ReturnsSignalR() =>
         _channel.Name.Should().Be(NotificationChannels.SignalR);
-    }
 
     [Fact]
     public async Task SendAsync_SendsToRecipientGroup()

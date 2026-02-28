@@ -98,10 +98,8 @@ public sealed class SmsNotificationChannelTests
     }
 
     [Fact]
-    public void Name_ReturnsSms()
-    {
+    public void Name_ReturnsSms() =>
         _channel.Name.Should().Be(NotificationChannels.Sms);
-    }
 
     // -------------------------------------------------------------------------
     // Helpers

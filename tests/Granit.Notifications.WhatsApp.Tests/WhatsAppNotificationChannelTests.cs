@@ -136,10 +136,8 @@ public sealed class WhatsAppNotificationChannelTests
     }
 
     [Fact]
-    public void Name_ReturnsWhatsApp()
-    {
+    public void Name_ReturnsWhatsApp() =>
         _channel.Name.Should().Be(NotificationChannels.WhatsApp);
-    }
 
     // -------------------------------------------------------------------------
     // Helpers

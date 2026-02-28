@@ -99,10 +99,8 @@ public sealed class EmailNotificationChannelTests
     }
 
     [Fact]
-    public void Name_ReturnsEmail()
-    {
+    public void Name_ReturnsEmail() =>
         _channel.Name.Should().Be(NotificationChannels.Email);
-    }
 
     // -------------------------------------------------------------------------
     // Helpers

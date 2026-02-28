@@ -41,7 +41,6 @@ public sealed class EntityTrackingInterceptor(
                     OldValue = change.OldValue,
                     NewValue = change.NewValue,
                     ChangedAt = clock.Now,
-                    ChangedByUserId = change.ChangedByUserId,
                 },
                 new EntityReference(change.EntityType, change.EntityId),
                 cancellationToken);
@@ -114,7 +113,6 @@ public sealed class EntityTrackingInterceptor(
         public string? NewValue { get; init; }
         public required string NotificationTypeName { get; init; }
         public NotificationSeverity Severity { get; init; }
-        public string? ChangedByUserId { get; init; }
     }
 
     /// <summary>

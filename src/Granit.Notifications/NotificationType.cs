@@ -7,6 +7,9 @@ namespace Granit.Notifications;
 /// <typeparam name="TData">The notification data payload type.</typeparam>
 public abstract class NotificationType<TData> where TData : notnull
 {
+    /// <summary>The CLR type of the notification data payload.</summary>
+    public Type DataType => typeof(TData);
+
     /// <summary>Unique name (convention: <c>"Module.NotificationName"</c>).</summary>
     public abstract string Name { get; }
 

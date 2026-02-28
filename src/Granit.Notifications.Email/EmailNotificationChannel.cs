@@ -26,7 +26,6 @@ internal sealed class EmailNotificationChannel(
             return;
         }
 
-        // TODO: integrate with Granit.Templating.Scriban for template rendering when available
         string subject = $"Notification: {context.NotificationTypeName}";
         string htmlBody = $"<p>You have a new notification of type <strong>{context.NotificationTypeName}</strong>.</p>";
 
