@@ -485,16 +485,16 @@ public void LoadModules_LinearChain_ReturnsDependenciesFirst()
     var modules = ModuleLoader.LoadModules<ModuleC>();
     var types = modules.Select(m => m.ModuleType).ToList();
 
-    types.IndexOf(typeof(ModuleA)).Should().BeLessThan(types.IndexOf(typeof(ModuleB)));
-    types.IndexOf(typeof(ModuleB)).Should().BeLessThan(types.IndexOf(typeof(ModuleC)));
+    types.IndexOf(typeof(ModuleA)).ShouldBeLessThan(types.IndexOf(typeof(ModuleB)));
+    types.IndexOf(typeof(ModuleB)).ShouldBeLessThan(types.IndexOf(typeof(ModuleC)));
 }
 
 [Fact]
 public void LoadModules_CircularDependency_ThrowsInvalidOperationException()
 {
     var act = () => ModuleLoader.LoadModules<CircularA>();
-    act.Should().Throw<InvalidOperationException>()
-        .WithMessage("*circulaire*");
+    InvalidOperationException ex = Should.Throw<InvalidOperationException>(act);
+        ex.Message.ShouldContain("circulaire");
 }
 ```
 
@@ -519,7 +519,7 @@ public void ConfigureServices_CallsModulesInTopologicalOrder()
     var app = new GranitApplication(modules);
     // ...
     app.ConfigureServices(context);
-    CallOrder.Should().ContainInOrder("ConfigureServices:A", "ConfigureServices:B");
+    CallOrder.ShouldBe(["ConfigureServices:A", "ConfigureServices:B"]);
 }
 
 [Fact]
@@ -529,7 +529,7 @@ public async Task ConfigureServicesAsync_CallsModulesInTopologicalOrder()
     var app = new GranitApplication(modules);
     // ...
     await app.ConfigureServicesAsync(context);
-    CallOrder.Should().ContainInOrder("ConfigureServicesAsync:A", "ConfigureServicesAsync:B");
+    CallOrder.ShouldBe(["ConfigureServicesAsync:A", "ConfigureServicesAsync:B"]);
 }
 ```
 
@@ -552,7 +552,7 @@ public async Task AddGranitAsync_RegistersGranitApplicationAsSingleton()
     await using var app = builder.Build();
 
     var granitApp = app.Services.GetService<GranitApplication>();
-    granitApp.Should().NotBeNull();
+    granitApp.ShouldNotBeNull();
 }
 ```
 

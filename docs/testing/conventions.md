@@ -44,8 +44,8 @@ public void Normalize_ConvertsLocalOffsetToUtc()
     var normalized = _clock.Normalize(localTime);
 
     // Assert - Doit être converti en UTC (+00:00), même instant
-    normalized.Offset.Should().Be(TimeSpan.Zero);
-    normalized.Should().Be(new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero));
+    normalized.Offset.ShouldBe(TimeSpan.Zero);
+    normalized.ShouldBe(new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero));
 }
 ```
 
@@ -86,6 +86,6 @@ l'approche utilisée :
 //
 // Approche : on enregistre l'intercepteur dans le DbContext et on appelle
 // SaveChangesAsync directement, ce qui déclenche l'intercepteur naturellement.
-// IClock est mocké pour des assertions exactes (pas de BeCloseTo).
+// IClock est mocké pour des assertions exactes .
 // =============================================================================
 ```

@@ -427,7 +427,7 @@ var clock = new Clock(fakeTimeProvider, timezoneProvider);
 var fixedTime = new DateTimeOffset(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
 fakeTimeProvider.SetUtcNow(fixedTime);
 
-clock.Now.Should().Be(fixedTime);
+clock.Now.ShouldBe(fixedTime);
 ```
 
 ### Mock IClock avec NSubstitute
@@ -439,20 +439,20 @@ var clock = Substitute.For<IClock>();
 var fixedNow = new DateTimeOffset(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
 clock.Now.Returns(fixedNow);
 
-// Assertions exactes (pas de BeCloseTo)
-entity.CreatedAt.Should().Be(fixedNow);
+// Assertions exactes
+entity.CreatedAt.ShouldBe(fixedNow);
 ```
 
 ### Assertions exactes vs approximatives
 
-Avant `IClock`, les tests utilisaient `BeCloseTo` avec une tolérance de 5 secondes :
+Avant `IClock`, les tests utilisaient des tolérances arbitraires :
 
 ```csharp
 // Avant (fragile, tolérance 5s)
-entity.CreatedAt.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(5));
+entity.CreatedAt.ShouldBe(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(5));
 
 // Après (déterministe, assertion exacte)
-entity.CreatedAt.Should().Be(fixedNow);
+entity.CreatedAt.ShouldBe(fixedNow);
 ```
 
 ## Dépendances

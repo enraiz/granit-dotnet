@@ -183,8 +183,8 @@ public void GivenFrenchCulture_WhenLocalizing_ThenReturnsFrenchTranslation()
 
     using IDisposable _ = new CultureScope("fr");
 
-    localizer["MyKey"].Value.Should().Be("Ma traduction");
-    localizer["MyKey"].ResourceNotFound.Should().BeFalse();
+    localizer["MyKey"].Value.ShouldBe("Ma traduction");
+    localizer["MyKey"].ResourceNotFound.ShouldBeFalse();
 }
 ```
 
@@ -196,8 +196,8 @@ public void GivenMissingKey_WhenLocalizing_ThenReturnsKeyAsValue()
 {
     // ...
     LocalizedString result = localizer["NonExistentKey"];
-    result.Value.Should().Be("NonExistentKey");
-    result.ResourceNotFound.Should().BeTrue();
+    result.Value.ShouldBe("NonExistentKey");
+    result.ResourceNotFound.ShouldBeTrue();
 }
 ```
 
@@ -210,7 +210,7 @@ CultureInfo previous = CultureInfo.CurrentUICulture;
 try
 {
     CultureInfo.CurrentUICulture = new CultureInfo("en");
-    localizer["MyKey"].Value.Should().Be("My translation");
+    localizer["MyKey"].Value.ShouldBe("My translation");
 }
 finally
 {
