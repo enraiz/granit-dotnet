@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Granit.Timeline</PackageId>
+    <Description>Unified activity stream engine for Granit (Odoo Chatter-inspired). Aggregates comments, internal notes, and system logs per entity. Opt-in via ITimelined marker interface, with graceful degradation when Notifications or BlobStorage are absent.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Timeline.Tests" />
+    <InternalsVisibleTo Include="Granit.Timeline.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.Timeline.EntityFrameworkCore.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
+    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
+    <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
+  </ItemGroup>
+</Project>

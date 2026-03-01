@@ -1,0 +1,39 @@
+using Granit.Timeline.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Granit.Timeline.EntityFrameworkCore.Configurations;
+
+/// <summary>
+/// EF Core Fluent API configuration for <see cref="TimelineEntry"/>.
+/// Table: <c>timeline_entries</c>.
+/// </summary>
+internal sealed class TimelineEntryConfiguration : IEntityTypeConfiguration<TimelineEntry>
+{
+    public void Configure(EntityTypeBuilder<TimelineEntry> builder)
+    {
+        builder.ToTable("timeline_entries");
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.EntityType).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.EntityId).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.EntryType).IsRequired();
+        builder.Property(x => x.Body).IsRequired();
+        builder.Property(x => x.AuthorId).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.AuthorName).HasMaxLength(512).IsRequired();
+        builder.Property(x => x.CreatedBy).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.DeletedBy).HasMaxLength(256);
+
+        // Primary stream query: all entries for an entity, newest first
+        builder.HasIndex(x => new { x.EntityType, x.EntityId, x.TenantId, x.CreatedAt })
+            .IsDescending(false, false, false, true)
+            .HasDatabaseName("ix_timeline_entries_entity_stream");
+
+        // Soft-delete global filter
+        builder.HasQueryFilter(x => !x.IsDeleted);
+
+        // Self-referencing for threaded replies (no navigation property)
+        builder.HasIndex(x => x.ParentEntryId)
+            .HasDatabaseName("ix_timeline_entries_parent");
+    }
+}
