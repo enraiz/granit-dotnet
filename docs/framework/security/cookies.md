@@ -7,9 +7,11 @@ toute tentative d'écrire un cookie non déclaré provoque une exception immédi
 ```text
 Granit.Core
       ↑
-Granit.Timing         ← IClock (calcul d'expiration)
+Granit.Timing               ← IClock (calcul d'expiration)
       ↑
-Granit.Cookies        ← ICookieRegistry, IGranitCookieManager, IConsentResolver
+Granit.Cookies              ← ICookieRegistry, IGranitCookieManager, IConsentResolver
+      ↑
+Granit.Cookies.Klaro        ← KlaroConsentResolver (implémentation Klaro)
 ```
 
 ## Installation
@@ -267,6 +269,88 @@ public sealed class AxeptioConsentResolver : IConsentResolver
 
 ---
 
+## Intégration Klaro CMP — Granit.Cookies.Klaro
+
+[Klaro](https://klaro.org/) (KIProtect GmbH, Berlin — licence BSD-3) est une CMP
+self-hosted, souveraine EU, retenue comme intégration officielle pour Granit.
+Le package `Granit.Cookies.Klaro` fournit un `IConsentResolver` prêt à l'emploi.
+
+### Installation
+
+```bash
+dotnet add package Granit.Cookies.Klaro
+```
+
+### Enregistrement
+
+Via le builder (recommandé) :
+
+```csharp
+services.AddGranitCookies(cookies =>
+{
+    cookies.RegisterCookie(new CookieDefinition(
+        "_ga", CookieCategory.Analytics, 730, false, "Google Analytics"));
+    cookies.UseKlaro();
+});
+```
+
+Ou via le système de modules :
+
+```csharp
+[DependsOn(typeof(GranitCookiesKlaroModule))]
+public sealed class MyAppModule : GranitModule { }
+```
+
+### Configuration appsettings.json
+
+```json
+{
+  "Klaro": {
+    "CookieName": "klaro",
+    "ServiceMappings": {
+      "google-analytics": "Analytics",
+      "matomo": "Analytics",
+      "youtube": "Marketing",
+      "theme-preference": "Preferences"
+    }
+  }
+}
+```
+
+| Option | Type | Défaut | Description |
+| --- | --- | --- | --- |
+| `CookieName` | `string` | `"klaro"` | Nom du cookie Klaro côté client |
+| `ServiceMappings` | `Dictionary<string, CookieCategory>` | — (requis) | Correspondance service Klaro → catégorie RGPD |
+
+### Logique de résolution
+
+Klaro stocke le consentement dans un cookie JSON : `{"service": true/false, ...}`.
+Le résolveur mappe chaque service vers une `CookieCategory` via `ServiceMappings` :
+
+1. `StrictlyNecessary` → toujours `true` (sans lecture du cookie)
+2. Cookie absent ou vide → `false` (fail-safe)
+3. Chercher les services mappés à la catégorie demandée
+4. Retourner `true` uniquement si **tous** les services de la catégorie sont consentis
+5. Service absent du JSON, JSON invalide, aucun mapping → `false` (fail-safe)
+
+> La logique « tout-ou-rien » par catégorie garantit qu'aucun service non
+> consenti ne soit activé, même si un seul service de la catégorie est refusé.
+
+### Architecture des fichiers
+
+```text
+Granit.Cookies.Klaro (NuGet)
+├── KlaroConsentResolver.cs                     IConsentResolver (Klaro)
+├── GranitCookiesKlaroModule.cs                 [DependsOn(GranitCookiesModule)]
+├── Options/
+│   └── KlaroOptions.cs                         configuration (CookieName, ServiceMappings)
+└── Extensions/
+    ├── KlaroServiceCollectionExtensions.cs      AddGranitCookiesKlaro()
+    └── GranitCookiesBuilderExtensions.cs        UseKlaro()
+```
+
+---
+
 ## Analyzer Roslyn — GRSEC004
 
 L'analyzer `DirectCookieAccessAnalyzer` (diagnostic `GRSEC004`) est inclus dans
@@ -409,6 +493,15 @@ Granit.Cookies (NuGet)
 └── Extensions/
     └── CookiesServiceCollectionExtensions.cs AddGranitCookies()
 
+Granit.Cookies.Klaro (NuGet)
+├── KlaroConsentResolver.cs                     IConsentResolver (Klaro CMP)
+├── GranitCookiesKlaroModule.cs                 [DependsOn(GranitCookiesModule)]
+├── Options/
+│   └── KlaroOptions.cs                         CookieName + ServiceMappings
+└── Extensions/
+    ├── KlaroServiceCollectionExtensions.cs      AddGranitCookiesKlaro()
+    └── GranitCookiesBuilderExtensions.cs        UseKlaro()
+
 frontend/granit.cookies (npm — @granit/cookies)
 ├── types.ts                                  CookieCategory, ConsentState, Provider
 ├── CookieConsentContext.tsx                   React Context + Provider
@@ -426,4 +519,5 @@ Granit.Analyzers.CodeFixes
 | Package | Dépend de | Utilisé par |
 | --- | --- | --- |
 | `Granit.Cookies` | `Granit.Core`, `Granit.Timing` | Applications (via `AddGranitCookies()`) |
+| `Granit.Cookies.Klaro` | `Granit.Cookies` | Applications utilisant Klaro (via `UseKlaro()`) |
 | `Granit.Analyzers` (GRSEC004) | Compilation uniquement | Projets référençant `Granit.Cookies` |
