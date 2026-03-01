@@ -7,10 +7,11 @@ Digital Dynamics.
 | --- | --- |
 | `Granit.Templating` | Socle générique : interfaces, pipeline, enrichisseurs |
 | `Granit.Templating.Scriban` | Moteur Scriban 6 sandboxé + contextes globaux (`now.*`, `context.*`) |
-| `Granit.Templating.EntityFrameworkCore` | `IDocumentTemplateStore` EF Core — cycle de vie Draft/Published/Deprecated + **cache hybride** |
+| `Granit.Templating.EntityFrameworkCore` | `IDocumentTemplateStore` EF Core — cycle de vie Draft/Published/Archived + **cache hybride** |
 | `Granit.DocumentGeneration` | Façade `IDocumentGenerator`, `IDocumentRenderer`, `DocumentResult` |
 | `Granit.DocumentGeneration.Pdf` | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête *(à venir)* |
 | `Granit.DocumentGeneration.Excel` | `ClosedXmlTemplateEngine` — génération de tableurs *.xlsx* natifs |
+| `Granit.Templating.Workflow` | Pont optionnel vers `Granit.Workflow` — FSM, approbation, piste d'audit unifiée |
 
 ## Pipeline complet
 
@@ -158,18 +159,47 @@ Le remplacement est effectué sur toutes les feuilles du classeur.
 
 ### Cycle de vie des templates (IDocumentTemplateStore)
 
+Sans le module Workflow :
+
 ```text
-Draft → Published → Deprecated
+Draft → Published → Archived
+                  → Draft (nouvelle version)
+```
+
+Avec `Granit.Templating.Workflow` installé :
+
+```text
+Draft → PendingReview → Published → Archived
+  ↓                                     ↑
+  └──── Publication directe ────────────┘
+                                  Published → Draft (nouvelle version)
 ```
 
 | État | Règle |
 | --- | --- |
 | `Draft` | Éditable ; jamais utilisé par le pipeline de rendu |
+| `PendingReview` | Soumis pour validation ; uniquement si `Granit.Templating.Workflow` est installé |
 | `Published` | Version active ; une seule par clé à un instant donné |
-| `Deprecated` | Conservé pour la piste d'audit HDS — **jamais supprimé physiquement** |
+| `Archived` | Conservé pour la piste d'audit HDS — **jamais supprimé physiquement** |
 
 Seuls les brouillons (`Draft`) peuvent être supprimés physiquement. Les révisions dépréciées
 sont conservées sans limite de durée (obligation HDS, article L. 1111-8 CSP — 3 ans minimum).
+
+### Hook de transition (ITemplateTransitionHook)
+
+Le cycle de vie est extensible via `ITemplateTransitionHook`, un point d'extension
+enregistré par défaut avec un no-op (`NullTemplateTransitionHook`) :
+
+- `CanTransitionAsync(from, target)` — vérifie si la transition est autorisée
+- `OnTransitionedAsync(revisionId, from, target, userId)` — notifié après la persistance
+
+Sans module externe, seules les transitions simples (Draft → Published, Published → Archived,
+Published → Draft) sont autorisées. `Granit.Templating.Workflow` remplace ce hook par
+`WorkflowTemplateTransitionHook` qui délègue au `IWorkflowManager<WorkflowLifecycleStatus>`
+et persiste un `WorkflowTransitionRecord` pour la piste d'audit HDS unifiée.
+
+Ce patron est identique à `ICurrentTenant` / `NullTenantContext` dans `Granit.Core` :
+aucune dépendance forte vers le module Workflow n'est nécessaire dans les packages Templating.
 
 ### Cache hybride (HybridCache)
 
@@ -227,6 +257,9 @@ builder.Services.AddTemplateGlobalContext<MyCustomContext>();
 
 // Façade de génération documentaire
 builder.Services.AddGranitDocumentGeneration();
+
+// Pont Workflow (optionnel — FSM, approbation, piste d'audit unifiée)
+builder.Services.AddGranitTemplatingWorkflow<AppDbContext>();
 ```
 
 ### 3 — Ressources embarquées
@@ -345,6 +378,7 @@ public sealed class TemplateAdminService(IDocumentTemplateStore store)
 | --- | --- |
 | `TemplateNotFoundException` | Aucun resolver n'a trouvé le template pour la clé et la culture demandées |
 | `TemplateParseException` | Le source du template contient des erreurs de syntaxe Scriban |
+| `TemplateTransitionDeniedException` | `ITemplateTransitionHook.CanTransitionAsync` a refusé la transition demandée |
 | `DocumentRendererNotFoundException` | Aucun `IDocumentRenderer` enregistré pour le `DocumentFormat` demandé |
 | `InvalidOperationException` | Aucun `ITemplateEngine` ne peut rendre le MIME type du template résolu |
 
@@ -365,7 +399,10 @@ ITextTemplateRenderer (TextTemplateRenderer — internal, scoped)
 
 IDocumentTemplateStore (EfDocumentTemplateStore — internal, scoped)
   ├── IDbContextFactory<TemplatingDbContext>
-  └── HybridCache                                  (L1 MemoryCache + L2 Redis optionnel)
+  ├── HybridCache                                  (L1 MemoryCache + L2 Redis optionnel)
+  └── ITemplateTransitionHook
+        ├── NullTemplateTransitionHook (défaut — transitions simples, pas de workflow)
+        └── WorkflowTemplateTransitionHook<TDbContext> (via Granit.Templating.Workflow)
 
 IDocumentGenerator (DocumentGenerator — internal, scoped)
   ├── ITextTemplateRenderer        (rendu via pipeline ci-dessus)
@@ -384,7 +421,7 @@ Flux selon le type de moteur :
 | #327 | ✅ Terminé | Interfaces du pipeline (`ITextTemplateRenderer`, `ITemplateEngine`, `ITemplateResolver`) |
 | #328 | ✅ Terminé | Types de template fortement typés (`TextTemplateType<TData>`, `DocumentTemplateType<TData>`) |
 | #329 | ✅ Terminé | Rendu Scriban 6 sandboxé — scalaires, collections, conditions, snake_case |
-| #331 | ✅ Terminé | Store EF Core — cycle de vie Draft/Published/Deprecated + historique audit HDS |
+| #331 | ✅ Terminé | Store EF Core — cycle de vie Draft/Published/Archived + historique audit HDS |
 | #332 | ✅ Terminé | Cache hybride des templates résolus avec invalidation sur publication |
 | #333 | ✅ Terminé | Traçabilité HDS — `RevisionId` propagé du store jusqu'au `DocumentResult` |
 | #334 | ✅ Terminé | `Granit.DocumentGeneration.Excel` — tableurs *.xlsx* via ClosedXML |
@@ -392,6 +429,7 @@ Flux selon le type de moteur :
 | #336 | ✅ Terminé | Variables globales Scriban : `NowGlobalContext` et `ExecutionContextGlobalContext` |
 | #338 | ✅ Terminé | Façade `IDocumentGenerator` et pipeline d'orchestration binaire |
 | #339 | ✅ Terminé | Pipeline d'enrichissement `ITemplateDataEnricher<TData>` |
+| #454 | 🔨 En cours | `Granit.Templating.Workflow` — intégration optionnelle du module Workflow |
 | #330 | 🔜 Planifié | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête |
 | #340 | ⏸ Différé | PDF/A-3b — Factur-X (loi e-facture sept. 2026, licence iText7 en attente) |
 
@@ -399,7 +437,7 @@ Flux selon le type de moteur :
 
 - **Piste d'audit** : `TemplateRevision.RevisionId` est propagé dans `RenderedContent.RevisionId`,
   permettant de tracer quelle version du template a produit chaque document.
-- **Immutabilité** : les révisions `Deprecated` ne sont jamais supprimées physiquement.
+- **Immutabilité** : les révisions `Archived` ne sont jamais supprimées physiquement.
 - **Cache invalidé à la publication** : le cache hybride est vidé immédiatement après
   `PublishAsync` et `UnpublishAsync` — aucune fenêtre de stale read.
 - **Données personnelles** : ne jamais exposer de PII dans les `ITemplateGlobalContext`.
@@ -417,5 +455,6 @@ Flux selon le type de moteur :
 | `Granit.DocumentGeneration` | `Granit.Templating` |
 | `Granit.DocumentGeneration.Pdf` | `Granit.DocumentGeneration`, `PuppeteerSharp` |
 | `Granit.DocumentGeneration.Excel` | `Granit.Templating`, `ClosedXML 0.104.*` |
+| `Granit.Templating.Workflow` | `Granit.Templating`, `Granit.Workflow`, `Granit.Workflow.EntityFrameworkCore` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

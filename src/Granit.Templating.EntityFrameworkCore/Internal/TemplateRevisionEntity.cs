@@ -7,7 +7,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// </summary>
 /// <remarks>
 /// Revisions are append-only once promoted beyond <c>Draft</c>.
-/// Published and deprecated revisions are preserved indefinitely (HDS audit trail).
+/// Published and archived revisions are preserved indefinitely (HDS audit trail).
 /// </remarks>
 internal sealed class TemplateRevisionEntity
 {
@@ -41,9 +41,9 @@ internal sealed class TemplateRevisionEntity
     /// <summary>Identity of the user who published this revision. <c>null</c> for drafts.</summary>
     public string? PublishedBy { get; set; }
 
-    /// <summary>UTC timestamp when this revision was deprecated. <c>null</c> unless deprecated.</summary>
-    public DateTimeOffset? DeprecatedAt { get; set; }
+    /// <summary>UTC timestamp when this revision was archived. <c>null</c> unless archived.</summary>
+    public DateTimeOffset? ArchivedAt { get; set; }
 
-    /// <summary>Identity of the user who deprecated this revision. <c>null</c> unless deprecated.</summary>
-    public string? DeprecatedBy { get; set; }
+    /// <summary>Identity of the user who archived this revision. <c>null</c> unless archived.</summary>
+    public string? ArchivedBy { get; set; }
 }

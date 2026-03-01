@@ -12,14 +12,20 @@ public enum TemplateLifecycleStatus
     Draft = 0,
 
     /// <summary>
+    /// Submitted for review, awaiting approval from a user with the required permission.
+    /// Only used when <c>Granit.Templating.Workflow</c> bridge is installed.
+    /// </summary>
+    PendingReview = 1,
+
+    /// <summary>
     /// Active version resolved by <c>StoreTemplateResolver</c>.
     /// Exactly one published version exists per <c>TemplateKey</c> at any time.
     /// </summary>
-    Published = 1,
+    Published = 2,
 
     /// <summary>
     /// Former published version, superseded by a newer publication.
     /// Preserved indefinitely for HDS audit trail — never physically deleted.
     /// </summary>
-    Deprecated = 2,
+    Archived = 3,
 }

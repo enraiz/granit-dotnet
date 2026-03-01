@@ -1,0 +1,19 @@
+using Granit.Core.Modularity;
+using Granit.Workflow;
+
+namespace Granit.Templating.Workflow;
+
+/// <summary>
+/// Granit module bridging <c>Granit.Templating</c> and <c>Granit.Workflow</c>.
+/// Replaces the default lifecycle management with Workflow FSM validation,
+/// approval routing, and unified HDS audit trail.
+/// </summary>
+/// <remarks>
+/// This module does NOT register services automatically because it requires
+/// a generic <c>TDbContext</c> parameter. Call
+/// <see cref="ServiceCollectionExtensions.AddGranitTemplatingWorkflow{TDbContext}"/>
+/// explicitly from the host application.
+/// </remarks>
+[DependsOn(typeof(GranitTemplatingModule))]
+[DependsOn(typeof(GranitWorkflowModule))]
+public sealed class GranitTemplatingWorkflowModule : GranitModule;

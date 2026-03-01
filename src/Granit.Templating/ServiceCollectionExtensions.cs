@@ -4,6 +4,7 @@ using Granit.Templating.GlobalContext;
 using Granit.Templating.Internal;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Resolvers;
+using Granit.Templating.Store;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -36,6 +37,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGranitTemplating(this IServiceCollection services)
     {
         services.TryAddScoped<ITextTemplateRenderer, TextTemplateRenderer>();
+        services.TryAddSingleton<ITemplateTransitionHook, NullTemplateTransitionHook>();
         return services;
     }
 

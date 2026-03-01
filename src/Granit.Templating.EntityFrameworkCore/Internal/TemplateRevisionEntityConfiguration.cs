@@ -51,10 +51,10 @@ internal sealed class TemplateRevisionEntityConfiguration
         builder.Property(e => e.PublishedBy)
             .HasMaxLength(200);
 
-        // HDS: deprecation metadata retained for 3-year audit trail.
-        builder.Property(e => e.DeprecatedAt);
+        // HDS: archival metadata retained for 3-year audit trail.
+        builder.Property(e => e.ArchivedAt);
 
-        builder.Property(e => e.DeprecatedBy)
+        builder.Property(e => e.ArchivedBy)
             .HasMaxLength(200);
 
         // Composite index for lifecycle queries: find draft/published by (name, culture, status)

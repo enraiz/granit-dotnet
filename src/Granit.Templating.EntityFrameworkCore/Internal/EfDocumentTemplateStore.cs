@@ -1,3 +1,4 @@
+using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
@@ -8,7 +9,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core implementation of <see cref="IDocumentTemplateStore"/>.
-/// Manages the Draft → Published → Deprecated lifecycle of template revisions.
+/// Manages the Draft → Published → Archived lifecycle of template revisions.
 /// </summary>
 /// <remarks>
 /// Each operation creates and disposes its own <see cref="TemplatingDbContext"/>
@@ -20,12 +21,13 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// </para>
 /// <para>
 /// <strong>HDS compliance:</strong> only <c>Draft</c> revisions are physically deleted.
-/// <c>Published</c> → <c>Deprecated</c> transitions are always preserved for the 3-year audit trail.
+/// <c>Published</c> → <c>Archived</c> transitions are always preserved for the 3-year audit trail.
 /// </para>
 /// </remarks>
 internal sealed class EfDocumentTemplateStore(
     IDbContextFactory<TemplatingDbContext> contextFactory,
-    HybridCache cache) : IDocumentTemplateStore
+    HybridCache cache,
+    ITemplateTransitionHook transitionHook) : IDocumentTemplateStore
 {
     /// <inheritdoc/>
     public async Task<TemplateDescriptor?> TryGetPublishedAsync(
@@ -98,6 +100,11 @@ internal sealed class EfDocumentTemplateStore(
         string publishedBy,
         CancellationToken ct = default)
     {
+        if (!await transitionHook.CanTransitionAsync(TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, ct))
+        {
+            throw new TemplateTransitionDeniedException(TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published);
+        }
+
         await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct);
         TemplateRevisionEntity? draft = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
@@ -111,7 +118,7 @@ internal sealed class EfDocumentTemplateStore(
                 $"Cannot publish template '{key.Name}' (culture: {key.Culture ?? "neutral"}): no draft exists.");
         }
 
-        // Deprecate any currently published revision (HDS: row is kept, status changes)
+        // Archive any currently published revision (HDS: row is kept, status changes)
         List<TemplateRevisionEntity> currentlyPublished = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
@@ -121,9 +128,9 @@ internal sealed class EfDocumentTemplateStore(
         DateTimeOffset now = DateTimeOffset.UtcNow;
         foreach (TemplateRevisionEntity published in currentlyPublished)
         {
-            published.Status = TemplateLifecycleStatus.Deprecated;
-            published.DeprecatedAt = now;
-            published.DeprecatedBy = publishedBy;
+            published.Status = TemplateLifecycleStatus.Archived;
+            published.ArchivedAt = now;
+            published.ArchivedBy = publishedBy;
         }
 
         draft.Status = TemplateLifecycleStatus.Published;
@@ -131,6 +138,17 @@ internal sealed class EfDocumentTemplateStore(
         draft.PublishedBy = publishedBy;
 
         await ctx.SaveChangesAsync(ct);
+
+        // Notify hook after persistence (archival of previous + promotion of draft)
+        foreach (TemplateRevisionEntity archived in currentlyPublished)
+        {
+            await transitionHook.OnTransitionedAsync(
+                archived.RevisionId, TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, publishedBy, ct);
+        }
+
+        await transitionHook.OnTransitionedAsync(
+            draft.RevisionId, TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, publishedBy, ct);
+
         await cache.RemoveAsync(CacheKey(key), ct);
     }
 
@@ -149,18 +167,30 @@ internal sealed class EfDocumentTemplateStore(
 
         if (published.Count == 0)
         {
-            return; // Idempotent — nothing published to deprecate
+            return; // Idempotent — nothing published to archive
+        }
+
+        if (!await transitionHook.CanTransitionAsync(TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, ct))
+        {
+            throw new TemplateTransitionDeniedException(TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived);
         }
 
         DateTimeOffset now = DateTimeOffset.UtcNow;
         foreach (TemplateRevisionEntity entity in published)
         {
-            entity.Status = TemplateLifecycleStatus.Deprecated;
-            entity.DeprecatedAt = now;
-            entity.DeprecatedBy = unpublishedBy;
+            entity.Status = TemplateLifecycleStatus.Archived;
+            entity.ArchivedAt = now;
+            entity.ArchivedBy = unpublishedBy;
         }
 
         await ctx.SaveChangesAsync(ct);
+
+        foreach (TemplateRevisionEntity entity in published)
+        {
+            await transitionHook.OnTransitionedAsync(
+                entity.RevisionId, TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, unpublishedBy, ct);
+        }
+
         await cache.RemoveAsync(CacheKey(key), ct);
     }
 
@@ -183,7 +213,7 @@ internal sealed class EfDocumentTemplateStore(
                 $"Cannot delete draft for template '{key.Name}' (culture: {key.Culture ?? "neutral"}): no draft exists.");
         }
 
-        // Only drafts are physically deleted. Published/deprecated rows are kept (HDS).
+        // Only drafts are physically deleted. Published/archived rows are kept (HDS).
         ctx.TemplateRevisions.Remove(draft);
         await ctx.SaveChangesAsync(ct);
     }

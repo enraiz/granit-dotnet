@@ -12,7 +12,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 internal sealed class TemplatingDbContext(DbContextOptions<TemplatingDbContext> options)
     : DbContext(options)
 {
-    /// <summary>All template revisions (Draft, Published, Deprecated).</summary>
+    /// <summary>All template revisions (Draft, PendingReview, Published, Archived).</summary>
     public DbSet<TemplateRevisionEntity> TemplateRevisions { get; set; } = null!;
 
     /// <inheritdoc/>

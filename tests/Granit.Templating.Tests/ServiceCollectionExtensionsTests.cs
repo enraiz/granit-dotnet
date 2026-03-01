@@ -1,7 +1,9 @@
 using Granit.Templating.Enrichment;
 using Granit.Templating.GlobalContext;
 using Granit.Templating.Pipeline;
+using Granit.Templating.Store;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shouldly;
 using Xunit;
 
@@ -33,6 +35,42 @@ public sealed class ServiceCollectionExtensionsTests
 
         services.Count(d => d.ServiceType == typeof(ITextTemplateRenderer))
                 .ShouldBe(1, "TryAddScoped must not add a duplicate");
+    }
+
+    [Fact]
+    public void AddGranitTemplating_Registers_ITemplateTransitionHook_Singleton()
+    {
+        ServiceCollection services = new();
+        services.AddGranitTemplating();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(ITemplateTransitionHook) &&
+            d.ImplementationType == typeof(NullTemplateTransitionHook) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void AddGranitTemplating_ITemplateTransitionHook_IsReplaceable_WithTryAdd()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton<ITemplateTransitionHook>(_ => null!); // pre-register
+        services.AddGranitTemplating();                              // TryAdd must not replace
+
+        services.Count(d => d.ServiceType == typeof(ITemplateTransitionHook))
+                .ShouldBe(1, "TryAddSingleton must not add a duplicate");
+    }
+
+    [Fact]
+    public void AddGranitTemplating_ITemplateTransitionHook_CanBeReplaced()
+    {
+        ServiceCollection services = new();
+        services.AddGranitTemplating();
+        services.Replace(ServiceDescriptor.Singleton<ITemplateTransitionHook, FakeTransitionHook>());
+
+        ServiceProvider provider = services.BuildServiceProvider();
+        ITemplateTransitionHook hook = provider.GetRequiredService<ITemplateTransitionHook>();
+
+        hook.ShouldBeOfType<FakeTransitionHook>();
     }
 
     // -------------------------------------------------------------------------
@@ -108,5 +146,14 @@ public sealed class ServiceCollectionExtensionsTests
         public int Order => 0;
         public Task<string> EnrichAsync(string data, CancellationToken ct = default) =>
             Task.FromResult(data);
+    }
+
+    private sealed class FakeTransitionHook : ITemplateTransitionHook
+    {
+        public bool IsWorkflowEnabled => true;
+        public Task<bool> CanTransitionAsync(TemplateLifecycleStatus from, TemplateLifecycleStatus to, CancellationToken ct) =>
+            Task.FromResult(true);
+        public Task OnTransitionedAsync(Guid revisionId, TemplateLifecycleStatus from, TemplateLifecycleStatus to, string userId, CancellationToken ct) =>
+            Task.CompletedTask;
     }
 }
