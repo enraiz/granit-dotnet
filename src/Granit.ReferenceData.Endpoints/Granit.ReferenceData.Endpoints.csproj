@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.ReferenceData.Endpoints</PackageId>
+    <Description>Minimal API endpoints for administering reference data entities. Provides GET (list, by code), POST, PUT, and DELETE (soft deactivation) routes with configurable authorization and OpenAPI tags.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.ReferenceData.Endpoints.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.ReferenceData\Granit.ReferenceData.csproj" />
+  </ItemGroup>
+
+</Project>
