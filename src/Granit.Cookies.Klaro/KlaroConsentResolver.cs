@@ -1,0 +1,90 @@
+using System.Text.Json;
+using Granit.Cookies.Klaro.Options;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+namespace Granit.Cookies.Klaro;
+
+/// <summary>
+/// Resolves cookie consent by reading the Klaro consent cookie.
+/// Maps Klaro per-service consent to Granit per-category consent.
+/// </summary>
+/// <remarks>
+/// Resolution logic:
+/// <list type="number">
+///   <item>Read the Klaro cookie from the request (name configured in <see cref="KlaroOptions.CookieName"/>).</item>
+///   <item>Parse it as a JSON object: <c>{"serviceName": true/false, ...}</c>.</item>
+///   <item>Find all service names mapped to the requested <see cref="CookieCategory"/>.</item>
+///   <item>Return <c>true</c> only if <b>all</b> mapped services have consent granted.</item>
+///   <item>If no services are mapped for the category, return <c>false</c> (fail-safe).</item>
+/// </list>
+/// </remarks>
+internal sealed class KlaroConsentResolver(
+    IOptions<KlaroOptions> options,
+    ILogger<KlaroConsentResolver> logger) : IConsentResolver
+{
+    /// <inheritdoc/>
+    public Task<bool> ResolveAsync(HttpContext httpContext, CookieCategory category)
+    {
+        if (category == CookieCategory.StrictlyNecessary)
+        {
+            return Task.FromResult(true);
+        }
+
+        KlaroOptions klaroOptions = options.Value;
+        string? cookieValue = httpContext.Request.Cookies[klaroOptions.CookieName];
+
+        if (string.IsNullOrEmpty(cookieValue))
+        {
+            return Task.FromResult(false);
+        }
+
+        List<string> serviceNames = klaroOptions.ServiceMappings
+            .Where(kvp => kvp.Value == category)
+            .Select(kvp => kvp.Key)
+            .ToList();
+
+        if (serviceNames.Count == 0)
+        {
+            logger.LogDebug(
+                "No Klaro services mapped to category {Category}; returning false (fail-safe)",
+                category);
+            return Task.FromResult(false);
+        }
+
+        bool granted = ParseAndCheckConsent(cookieValue, serviceNames, category);
+        return Task.FromResult(granted);
+    }
+
+    private bool ParseAndCheckConsent(
+        string cookieValue,
+        List<string> serviceNames,
+        CookieCategory category)
+    {
+        try
+        {
+            using JsonDocument document = JsonDocument.Parse(cookieValue);
+            JsonElement root = document.RootElement;
+
+            foreach (string serviceName in serviceNames)
+            {
+                if (!root.TryGetProperty(serviceName, out JsonElement element)
+                    || element.ValueKind != JsonValueKind.True)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        catch (JsonException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Failed to parse Klaro cookie for category {Category}; returning false (fail-safe)",
+                category);
+            return false;
+        }
+    }
+}
