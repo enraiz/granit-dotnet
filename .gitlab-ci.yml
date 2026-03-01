@@ -38,6 +38,7 @@ stages:
   - docs
   - pack
   - publish
+  - deploy
 
 # ---------------------------------------------------------------------------
 # HIDDEN JOBS
@@ -219,6 +220,22 @@ docfx:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
+
+pages:
+  stage: deploy
+  tags:
+    - docker
+  image: alpine:latest
+  needs:
+    - job: docfx
+      artifacts: true
+  script:
+    - mv _site public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
 # PACK
