@@ -12,7 +12,7 @@ Dernière mise à jour : 2026-02-28
 
 | Licence      | Nombre de packages |
 | ------------ | ------------------ |
-| MIT          | 34                 |
+| MIT          | 35                 |
 | Apache-2.0   | 15                 |
 | BSD-3-Clause | 2                  |
 | BSD-2-Clause | 1                  |
@@ -30,6 +30,7 @@ Dernière mise à jour : 2026-02-28
 | Asp.Versioning.Mvc.ApiExplorer | 10.0.0-preview.1 | (c) .NET Foundation |
 | ClosedXML | 0.104.2 | ClosedXML Contributors |
 | Cronos | 0.11.1 | Copyright (c) 2016-2025 Hangfire OU |
+| Lib.Net.Http.WebPush | 3.3.1 | Copyright (c) Tomasz Pęczek |
 | Microsoft.AspNetCore.Authentication.JwtBearer | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.AspNetCore.OpenApi | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.EntityFrameworkCore | 10.0.3 | (c) Microsoft Corporation |
