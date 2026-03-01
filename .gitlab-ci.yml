@@ -85,6 +85,8 @@ build:
 test:
   extends: .dotnet
   stage: quality
+  variables:
+    VSTEST_CONNECTION_TIMEOUT: "300"
   script:
     - dotnet build -c $CONFIGURATION
     - >
