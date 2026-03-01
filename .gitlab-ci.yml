@@ -91,6 +91,7 @@ test:
       dotnet test -c $CONFIGURATION --no-build
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+      -- RunConfiguration.MaxCpuCount=4
   artifacts:
     when: always
     paths:
