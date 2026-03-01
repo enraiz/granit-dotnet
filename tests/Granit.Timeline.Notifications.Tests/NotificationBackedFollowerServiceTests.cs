@@ -57,7 +57,7 @@ public sealed class NotificationBackedFollowerServiceTests
     public async Task GetFollowerIdsAsync_DelegatesToSubscriptionStore()
     {
         _subscriptionStore.GetEntityFollowerIdsAsync("Patient", "p-1", null, TestContext.Current.CancellationToken)
-            .Returns(new List<string> { "user-1", "user-2" });
+            .Returns(["user-1", "user-2"]);
 
         IReadOnlyList<string> result = await _service.GetFollowerIdsAsync("Patient", "p-1", TestContext.Current.CancellationToken);
 
