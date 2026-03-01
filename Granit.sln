@@ -271,6 +271,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.ReferenceData.Entity
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.ReferenceData.Endpoints.Tests", "tests\Granit.ReferenceData.Endpoints.Tests\Granit.ReferenceData.Endpoints.Tests.csproj", "{B05E291B-53AD-4B33-99DD-E301D2BCF554}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Workflow.Notifications.Tests", "tests\Granit.Workflow.Notifications.Tests\Granit.Workflow.Notifications.Tests.csproj", "{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1865,6 +1867,18 @@ Global
 		{B05E291B-53AD-4B33-99DD-E301D2BCF554}.Release|x64.Build.0 = Release|Any CPU
 		{B05E291B-53AD-4B33-99DD-E301D2BCF554}.Release|x86.ActiveCfg = Release|Any CPU
 		{B05E291B-53AD-4B33-99DD-E301D2BCF554}.Release|x86.Build.0 = Release|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Debug|x64.Build.0 = Debug|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Debug|x86.Build.0 = Debug|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Release|x64.ActiveCfg = Release|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Release|x64.Build.0 = Release|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Release|x86.ActiveCfg = Release|Any CPU
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2002,5 +2016,6 @@ Global
 		{188B7ABE-3349-4B27-AA97-FF5C4331BCB0} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{8A9AFE32-7346-41F6-BBA4-3A31B1EC7915} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{B05E291B-53AD-4B33-99DD-E301D2BCF554} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6} = {A1B2C3D4-0002-0002-0002-000000000002}
 	EndGlobalSection
 EndGlobal
