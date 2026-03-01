@@ -87,13 +87,14 @@ test:
   stage: quality
   variables:
     VSTEST_CONNECTION_TIMEOUT: "300"
+    XUNIT_LAUNCH_TIMEOUT: "300"
   script:
     - dotnet build -c $CONFIGURATION
     - >
       dotnet test -c $CONFIGURATION --no-build
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage;Format=opencover,cobertura"
-      -- RunConfiguration.MaxCpuCount=4
+      -- RunConfiguration.MaxCpuCount=2
   artifacts:
     when: always
     paths:
