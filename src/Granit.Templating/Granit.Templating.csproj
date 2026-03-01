@@ -10,6 +10,7 @@
     <InternalsVisibleTo Include="Granit.Templating.Tests" />
     <InternalsVisibleTo Include="Granit.Templating.Scriban" />
     <InternalsVisibleTo Include="Granit.Templating.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.Templating.Workflow" />
     <InternalsVisibleTo Include="Granit.DocumentGeneration" />
     <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal types in tests -->
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />

@@ -1,10 +1,12 @@
 using Granit.Templating.EntityFrameworkCore.Internal;
+using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -35,8 +37,19 @@ public sealed class EfDocumentTemplateStoreTests
         return services.BuildServiceProvider().GetRequiredService<HybridCache>();
     }
 
+    private static ITemplateTransitionHook CreateAllowAllHook()
+    {
+        ITemplateTransitionHook hook = Substitute.For<ITemplateTransitionHook>();
+        hook.CanTransitionAsync(Arg.Any<TemplateLifecycleStatus>(), Arg.Any<TemplateLifecycleStatus>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        return hook;
+    }
+
     private static EfDocumentTemplateStore CreateStore(string dbName) =>
-        new(new InMemoryContextFactory(dbName), CreateHybridCache());
+        new(new InMemoryContextFactory(dbName), CreateHybridCache(), CreateAllowAllHook());
+
+    private static EfDocumentTemplateStore CreateStore(string dbName, ITemplateTransitionHook hook) =>
+        new(new InMemoryContextFactory(dbName), CreateHybridCache(), hook);
 
     private static string NewDb() => Guid.NewGuid().ToString();
 
@@ -211,7 +224,7 @@ public sealed class EfDocumentTemplateStoreTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task PublishAsync_DeprecatesPreviousPublishedRevision()
+    public async Task PublishAsync_ArchivesPreviousPublishedRevision()
     {
         string db = NewDb();
         EfDocumentTemplateStore store = CreateStore(db);
@@ -230,14 +243,14 @@ public sealed class EfDocumentTemplateStoreTests
             TestContext.Current.CancellationToken);
 
         await using TemplatingDbContext ctx = new InMemoryContextFactory(db).CreateDbContext();
-        int deprecatedCount = await ctx.TemplateRevisions.CountAsync(
-            r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Deprecated,
+        int archivedCount = await ctx.TemplateRevisions.CountAsync(
+            r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Archived,
             TestContext.Current.CancellationToken);
         int publishedCount = await ctx.TemplateRevisions.CountAsync(
             r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Published,
             TestContext.Current.CancellationToken);
 
-        deprecatedCount.ShouldBe(1, "v1 must be deprecated");
+        archivedCount.ShouldBe(1, "v1 must be archived");
         publishedCount.ShouldBe(1, "only v2 must be published");
     }
 
@@ -251,6 +264,52 @@ public sealed class EfDocumentTemplateStoreTests
             TestContext.Current.CancellationToken);
 
         (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("no draft");
+    }
+
+    [Fact]
+    public async Task PublishAsync_HookDeniesTransition_ThrowsTemplateTransitionDeniedException()
+    {
+        string db = NewDb();
+        ITemplateTransitionHook hook = Substitute.For<ITemplateTransitionHook>();
+        hook.CanTransitionAsync(TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        EfDocumentTemplateStore store = CreateStore(db, hook);
+        TemplateKey key = new("Billing.Invoice");
+
+        await store.SaveDraftAsync(key, "<p>v1</p>", "text/html", "alice",
+            TestContext.Current.CancellationToken);
+
+        Func<Task> act = () => store.PublishAsync(key, "bob",
+            TestContext.Current.CancellationToken);
+
+        TemplateTransitionDeniedException ex = await Should.ThrowAsync<TemplateTransitionDeniedException>(act);
+        ex.From.ShouldBe(TemplateLifecycleStatus.Draft);
+        ex.To.ShouldBe(TemplateLifecycleStatus.Published);
+    }
+
+    [Fact]
+    public async Task PublishAsync_HookOnTransitionedAsync_CalledAfterPersist()
+    {
+        string db = NewDb();
+        ITemplateTransitionHook hook = Substitute.For<ITemplateTransitionHook>();
+        hook.CanTransitionAsync(Arg.Any<TemplateLifecycleStatus>(), Arg.Any<TemplateLifecycleStatus>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        EfDocumentTemplateStore store = CreateStore(db, hook);
+        TemplateKey key = new("Billing.Invoice");
+
+        await store.SaveDraftAsync(key, "<p>v1</p>", "text/html", "alice",
+            TestContext.Current.CancellationToken);
+        await store.PublishAsync(key, "bob",
+            TestContext.Current.CancellationToken);
+
+        await hook.Received(1).OnTransitionedAsync(
+            Arg.Any<Guid>(),
+            TemplateLifecycleStatus.Draft,
+            TemplateLifecycleStatus.Published,
+            "bob",
+            Arg.Any<CancellationToken>());
     }
 
     // -------------------------------------------------------------------------
@@ -267,6 +326,32 @@ public sealed class EfDocumentTemplateStoreTests
             TestContext.Current.CancellationToken);
 
         await Should.NotThrowAsync(act);
+    }
+
+    [Fact]
+    public async Task UnpublishAsync_HookDeniesTransition_ThrowsTemplateTransitionDeniedException()
+    {
+        string db = NewDb();
+        ITemplateTransitionHook hook = Substitute.For<ITemplateTransitionHook>();
+        hook.CanTransitionAsync(TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, Arg.Any<CancellationToken>())
+            .Returns(true);
+        hook.CanTransitionAsync(TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        EfDocumentTemplateStore store = CreateStore(db, hook);
+        TemplateKey key = new("Billing.Invoice");
+
+        await store.SaveDraftAsync(key, "<p>v1</p>", "text/html", "alice",
+            TestContext.Current.CancellationToken);
+        await store.PublishAsync(key, "bob",
+            TestContext.Current.CancellationToken);
+
+        Func<Task> act = () => store.UnpublishAsync(key, "carol",
+            TestContext.Current.CancellationToken);
+
+        TemplateTransitionDeniedException ex = await Should.ThrowAsync<TemplateTransitionDeniedException>(act);
+        ex.From.ShouldBe(TemplateLifecycleStatus.Published);
+        ex.To.ShouldBe(TemplateLifecycleStatus.Archived);
     }
 
     // -------------------------------------------------------------------------
@@ -306,9 +391,9 @@ public sealed class EfDocumentTemplateStoreTests
     }
 
     [Fact]
-    public async Task DeleteDraftAsync_DeprecatedRowsArePreserved()
+    public async Task DeleteDraftAsync_ArchivedRowsArePreserved()
     {
-        // Ensures published/deprecated revisions survive even after a draft is deleted
+        // Ensures published/archived revisions survive even after a draft is deleted
         string db = NewDb();
         EfDocumentTemplateStore store = CreateStore(db);
         TemplateKey key = new("Billing.Invoice");
@@ -326,11 +411,11 @@ public sealed class EfDocumentTemplateStoreTests
             TestContext.Current.CancellationToken);
 
         await using TemplatingDbContext ctx = new InMemoryContextFactory(db).CreateDbContext();
-        int deprecatedCount = await ctx.TemplateRevisions.CountAsync(
-            r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Deprecated,
+        int archivedCount = await ctx.TemplateRevisions.CountAsync(
+            r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Archived,
             TestContext.Current.CancellationToken);
 
-        deprecatedCount.ShouldBe(1, "deprecated revision must be preserved for HDS audit trail");
+        archivedCount.ShouldBe(1, "archived revision must be preserved for HDS audit trail");
     }
 
     // -------------------------------------------------------------------------

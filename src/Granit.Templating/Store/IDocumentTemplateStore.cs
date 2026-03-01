@@ -4,7 +4,7 @@ using Granit.Templating.Pipeline;
 namespace Granit.Templating.Store;
 
 /// <summary>
-/// Contract for reading and writing template content with draft/published/deprecated lifecycle.
+/// Contract for reading and writing template content with draft/published/archived lifecycle.
 /// </summary>
 /// <remarks>
 /// Implemented by <c>EfCoreDocumentTemplateStore</c> in <c>Granit.Templating.EntityFrameworkCore</c>.
@@ -14,11 +14,11 @@ namespace Granit.Templating.Store;
 /// <list type="number">
 ///   <item><see cref="SaveDraftAsync"/> — create or update the editable draft for a key.</item>
 ///   <item><see cref="PublishAsync"/> — promote the current draft to <c>Published</c>,
-///     deprecating any previous published revision.</item>
-///   <item><see cref="UnpublishAsync"/> — deprecate the published revision without promoting a new one.</item>
+///     archiving any previous published revision.</item>
+///   <item><see cref="UnpublishAsync"/> — archive the published revision without promoting a new one.</item>
 ///   <item><see cref="DeleteAsync"/> — physically delete a draft (only allowed for drafts).</item>
 /// </list>
-/// Published and deprecated revisions are never physically deleted (HDS requirement).
+/// Published and archived revisions are never physically deleted (HDS requirement).
 /// </para>
 /// </remarks>
 public interface IDocumentTemplateStore
@@ -51,7 +51,7 @@ public interface IDocumentTemplateStore
         CancellationToken ct = default);
 
     /// <summary>
-    /// Promotes the current draft to <c>Published</c>, deprecating any previous published revision.
+    /// Promotes the current draft to <c>Published</c>, archiving any previous published revision.
     /// </summary>
     /// <param name="key">Template key.</param>
     /// <param name="publishedBy">Identity of the user publishing.</param>
@@ -63,7 +63,7 @@ public interface IDocumentTemplateStore
         CancellationToken ct = default);
 
     /// <summary>
-    /// Deprecates the currently published revision without promoting a new one.
+    /// Archives the currently published revision without promoting a new one.
     /// After this call, <see cref="TryGetPublishedAsync"/> returns <c>null</c> for this key.
     /// </summary>
     /// <param name="key">Template key.</param>
@@ -78,7 +78,7 @@ public interface IDocumentTemplateStore
     /// Physically deletes the draft for the given key.
     /// </summary>
     /// <remarks>
-    /// Only drafts may be deleted. Published and deprecated revisions are preserved
+    /// Only drafts may be deleted. Published and archived revisions are preserved
     /// permanently for HDS compliance.
     /// </remarks>
     /// <param name="key">Template key.</param>
