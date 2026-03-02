@@ -4,7 +4,7 @@ Ce fichier répertorie les bibliothèques tierces utilisées par le projet
 **granit-dotnet** ainsi que leurs licences respectives. Il est mis à jour
 à chaque ajout ou modification de dépendance externe.
 
-Dernière mise à jour : 2026-02-28
+Dernière mise à jour : 2026-03-02
 
 ---
 
@@ -12,7 +12,7 @@ Dernière mise à jour : 2026-02-28
 
 | Licence      | Nombre de packages |
 | ------------ | ------------------ |
-| MIT          | 35                 |
+| MIT          | 36                 |
 | Apache-2.0   | 15                 |
 | BSD-3-Clause | 2                  |
 | BSD-2-Clause | 1                  |
@@ -49,6 +49,7 @@ Dernière mise à jour : 2026-02-28
 | Microsoft.IO.RecyclableMemoryStream | 3.0.1 | (c) Microsoft Corporation |
 | PuppeteerSharp | 21.1.1 | PuppeteerSharp Contributors |
 | Scalar.AspNetCore | 2.12.50 | Scalar Contributors |
+| Sep | 0.12.2 | Copyright (c) 2023 nietras |
 | SmartFormat | 3.6.1 | Copyright 2011-2025 SmartFormat Project |
 | StackExchange.Redis | 2.11.8 | Copyright 2014-2026 Stack Exchange, Inc. |
 | System.Composition.AttributedModel | 10.0.3 | (c) Microsoft Corporation |
