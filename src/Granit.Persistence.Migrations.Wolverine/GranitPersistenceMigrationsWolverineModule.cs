@@ -30,7 +30,7 @@ public sealed class GranitPersistenceMigrationsWolverineModule : GranitModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         // Replace the default Channel-based dispatcher with Wolverine's IMessageBus.
-        ServiceDescriptor descriptor = ServiceDescriptor
+        var descriptor = ServiceDescriptor
             .Singleton<IMigrationBatchDispatcher, WolverineMigrationBatchDispatcher>();
         context.Services.Replace(descriptor);
     }

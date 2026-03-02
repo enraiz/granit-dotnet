@@ -31,7 +31,7 @@ public sealed class AuditableEntityTests
     public void AuditableEntity_Properties_CanBeAssigned()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         DateTimeOffset now = DateTimeOffset.UtcNow;
         DateTimeOffset modified = now.AddHours(1);
 

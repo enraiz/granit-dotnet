@@ -27,7 +27,7 @@ public sealed class RenderedContentTests
     [Fact]
     public void BinaryRenderedContent_RevisionId_CanBeSet()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         BinaryRenderedContent result = new(ReadOnlyMemory<byte>.Empty, DocumentFormat.Pdf)
         {
             RevisionId = id,
@@ -43,7 +43,7 @@ public sealed class RenderedContentTests
     [Fact]
     public void TextRenderedContent_RevisionId_CanBeSet()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         TextRenderedContent result = new("<p>ok</p>", DocumentFormat.Html)
         {
             RevisionId = id,

@@ -48,7 +48,7 @@ public sealed class NotificationDeliveryHandler(
             Culture = command.Culture,
         };
 
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         try
         {
             await channel.SendAsync(context, cancellationToken).ConfigureAwait(false);

@@ -74,7 +74,7 @@ internal static class MigrationAnalyzerHelpers
             INamedTypeSymbol migrationBase,
             string methodName)
     {
-        InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
+        var invocation = (InvocationExpressionSyntax)context.Node;
 
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
         {

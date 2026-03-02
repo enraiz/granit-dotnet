@@ -74,7 +74,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task Execute_WhenJobIsMapped_Returns202()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Mapped);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
         _dispatcher.DispatchAsync(Arg.Any<ExecuteImportCommand>(), Arg.Any<CancellationToken>())
@@ -95,7 +95,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task Execute_WhenJobNotMapped_Returns400()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Created);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -111,7 +111,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task Execute_WhenJobNotFound_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
@@ -128,7 +128,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task DryRun_WhenJobIsMapped_Returns200WithReport()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Mapped);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -151,7 +151,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task DryRun_WhenJobNotMapped_Returns400()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Created);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -169,7 +169,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task GetStatus_WhenJobExists_Returns200()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Completed);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -188,7 +188,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task GetStatus_WhenJobNotFound_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
@@ -205,7 +205,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task Cancel_WhenJobIsCancellable_Returns204()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Mapped);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
         _fileProvider.DeleteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -225,7 +225,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task Cancel_WhenJobIsExecuting_Returns400()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Executing);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -241,7 +241,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task Cancel_WhenJobNotFound_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
@@ -258,7 +258,7 @@ public sealed class DataImportExecutionEndpointsTests : IAsyncDisposable
     public async Task Execute_WithoutAuth_Returns401()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
 
         // Act
         HttpResponseMessage response = await _anonClient.PostAsync(

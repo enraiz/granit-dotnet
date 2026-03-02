@@ -55,7 +55,7 @@ public sealed class WorkflowManagerTests
     public async Task TransitionAsync_WithNoRequiredPermission_ShouldComplete()
     {
         // Arrange — create a definition with no permission required
-        WorkflowDefinition<WorkflowLifecycleStatus> openDefinition =
+        var openDefinition =
             WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
                 .InitialState(WorkflowLifecycleStatus.Draft)
                 .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published));

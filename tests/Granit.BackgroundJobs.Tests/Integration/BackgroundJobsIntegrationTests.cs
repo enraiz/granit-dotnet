@@ -126,7 +126,7 @@ public sealed class BackgroundJobsIntegrationTests
         ICall publishCall = bus.ReceivedCalls()
             .First(c => c.GetMethodInfo().Name == nameof(IMessageBus.PublishAsync));
         object capturedMessage = publishCall.GetArguments()[0]!;
-        DeliveryOptions capturedOptions = (DeliveryOptions)publishCall.GetArguments()[1]!;
+        var capturedOptions = (DeliveryOptions)publishCall.GetArguments()[1]!;
 
         // Simulate Wolverine copying DeliveryOptions.Headers into Envelope.Headers
         Envelope envelope = new(capturedMessage);

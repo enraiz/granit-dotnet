@@ -165,7 +165,7 @@ internal static class AnalyzerTestHelpers
 
         ImmutableArray<MetadataReference> references = GetNetCoreReferences();
 
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        var compilation = CSharpCompilation.Create(
             assemblyName: "TestAssembly",
             syntaxTrees: treeBuilder.ToImmutable(),
             references: references,
@@ -200,7 +200,7 @@ internal static class AnalyzerTestHelpers
 
         ImmutableArray<MetadataReference> references = GetNetCoreReferences();
 
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        var compilation = CSharpCompilation.Create(
             assemblyName: "TestAssembly",
             syntaxTrees: treeBuilder.ToImmutable(),
             references: references,

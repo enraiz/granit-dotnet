@@ -76,7 +76,7 @@ public static class TranslatableQueryExtensions
         // Combine: t.Culture == culture && predicate(t)
         BinaryExpression combinedBody = Expression.AndAlso(cultureMatch, predicate.Body);
 
-        Expression<Func<TTranslation, bool>> combinedPredicate =
+        var combinedPredicate =
             Expression.Lambda<Func<TTranslation, bool>>(combinedBody, translationParam);
 
         // Build: e => e.Translations.Any(combinedPredicate)
@@ -93,7 +93,7 @@ public static class TranslatableQueryExtensions
             translationsProperty,
             combinedPredicate);
 
-        Expression<Func<TEntity, bool>> whereExpression =
+        var whereExpression =
             Expression.Lambda<Func<TEntity, bool>>(anyCall, entityParam);
 
         return query.Where(whereExpression);
@@ -135,7 +135,7 @@ public static class TranslatableQueryExtensions
             Expression.Property(translationParam, nameof(ITranslation.Culture)),
             Expression.Constant(culture));
 
-        Expression<Func<TTranslation, bool>> filterLambda =
+        var filterLambda =
             Expression.Lambda<Func<TTranslation, bool>>(cultureMatch, translationParam);
 
         MemberExpression translationsProperty = Expression.Property(
@@ -165,7 +165,7 @@ public static class TranslatableQueryExtensions
             [typeof(TKey)],
             selectCall);
 
-        Expression<Func<TEntity, TKey>> orderExpression =
+        var orderExpression =
             Expression.Lambda<Func<TEntity, TKey>>(firstOrDefaultCall, entityParam);
 
         return query.OrderBy(orderExpression);

@@ -36,7 +36,7 @@ internal sealed class DocumentGenerator(
         }
 
         // 2b. Text engine result: find a renderer that converts HTML → target format.
-        TextRenderedContent text = (TextRenderedContent)content;
+        var text = (TextRenderedContent)content;
         IDocumentRenderer? renderer = _documentRenderers.FirstOrDefault(r => r.CanRender(format));
 
         if (renderer is null)

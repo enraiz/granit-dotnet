@@ -8,7 +8,7 @@ public sealed class PresignedUploadTicketTests
     [Fact]
     public void Constructor_SetsAllProperties()
     {
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         Uri uploadUrl = new("https://s3.example.com/bucket/key?signature=abc");
         DateTimeOffset expiresAt = DateTimeOffset.UtcNow.AddMinutes(15);
         Dictionary<string, string> headers = new()
@@ -28,9 +28,9 @@ public sealed class PresignedUploadTicketTests
     [Fact]
     public void RecordEquality_WorksCorrectly()
     {
-        Guid blobId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var blobId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         Uri url = new("https://s3.example.com/key");
-        DateTimeOffset expiry = DateTimeOffset.Parse("2026-01-01T00:00:00Z");
+        var expiry = DateTimeOffset.Parse("2026-01-01T00:00:00Z");
         Dictionary<string, string> headers = new() { ["Content-Type"] = "text/plain" };
 
         PresignedUploadTicket a = new(blobId, url, "PUT", expiry, headers);

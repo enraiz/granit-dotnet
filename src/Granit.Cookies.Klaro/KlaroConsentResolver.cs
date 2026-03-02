@@ -40,7 +40,7 @@ internal sealed class KlaroConsentResolver(
             return Task.FromResult(false);
         }
 
-        List<string> serviceNames = klaroOptions.ServiceMappings
+        var serviceNames = klaroOptions.ServiceMappings
             .Where(kvp => kvp.Value == category)
             .Select(kvp => kvp.Key)
             .ToList();
@@ -64,7 +64,7 @@ internal sealed class KlaroConsentResolver(
     {
         try
         {
-            using JsonDocument document = JsonDocument.Parse(cookieValue);
+            using var document = JsonDocument.Parse(cookieValue);
             JsonElement root = document.RootElement;
 
             foreach (string serviceName in serviceNames)

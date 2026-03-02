@@ -35,10 +35,14 @@ public abstract class MigrationAnalyzerBase : DiagnosticAnalyzer
 /// <summary>
 /// Base for migration analyzers that opt in to <c>Granit.Persistence.Migrations</c>.
 /// Resolves <c>MigrationCycleAttribute</c> and the EF Core <c>Migration</c> base class,
-/// then delegates to <see cref="AnalyzeNode"/>.
+/// filters invocations to <see cref="TargetMethodName"/>, then delegates to
+/// <see cref="AnalyzeMigrationInvocation"/>.
 /// </summary>
 public abstract class GranitMigrationAnalyzerBase : MigrationAnalyzerBase
 {
+    /// <summary>The <c>MigrationBuilder</c> method name this analyzer targets (e.g. "DropColumn").</summary>
+    protected abstract string TargetMethodName { get; }
+
     /// <inheritdoc/>
     protected sealed override void OnCompilationStart(CompilationStartAnalysisContext context)
     {
@@ -50,24 +54,41 @@ public abstract class GranitMigrationAnalyzerBase : MigrationAnalyzerBase
         }
 
         context.RegisterSyntaxNodeAction(
-            nodeContext => AnalyzeNode(nodeContext, symbols.Value.Migration, symbols.Value.CycleAttr),
+            nodeContext =>
+            {
+                (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+                    MigrationAnalyzerHelpers.TryGetMigrationInvocation(
+                        nodeContext, symbols.Value.Migration, TargetMethodName);
+                if (result is null)
+                {
+                    return;
+                }
+
+                AnalyzeMigrationInvocation(nodeContext, result.Value, symbols.Value.CycleAttr);
+            },
             SyntaxKind.InvocationExpression);
     }
 
-    /// <summary>Analyzes an invocation expression inside a Granit migration.</summary>
-    protected abstract void AnalyzeNode(
+    /// <summary>
+    /// Analyzes a validated <see cref="TargetMethodName"/> invocation inside a Granit migration.
+    /// Called only when <see cref="MigrationAnalyzerHelpers.TryGetMigrationInvocation"/> succeeds.
+    /// </summary>
+    protected abstract void AnalyzeMigrationInvocation(
         SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol migrationBase,
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration,
         INamedTypeSymbol cycleAttrType);
 }
 
 /// <summary>
 /// Base for migration analyzers that require only EF Core (no Granit opt-in).
-/// Resolves the EF Core <c>Migration</c> base class symbol, then delegates to
-/// <see cref="AnalyzeNode"/>.
+/// Resolves the EF Core <c>Migration</c> base class symbol, filters invocations
+/// to <see cref="TargetMethodName"/>, then delegates to <see cref="AnalyzeMigrationInvocation"/>.
 /// </summary>
 public abstract class EfCoreMigrationAnalyzerBase : MigrationAnalyzerBase
 {
+    /// <summary>The <c>MigrationBuilder</c> method name this analyzer targets (e.g. "RenameColumn").</summary>
+    protected abstract string TargetMethodName { get; }
+
     /// <inheritdoc/>
     protected sealed override void OnCompilationStart(CompilationStartAnalysisContext context)
     {
@@ -79,12 +100,26 @@ public abstract class EfCoreMigrationAnalyzerBase : MigrationAnalyzerBase
         }
 
         context.RegisterSyntaxNodeAction(
-            nodeContext => AnalyzeNode(nodeContext, migrationSymbol),
+            nodeContext =>
+            {
+                (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
+                    MigrationAnalyzerHelpers.TryGetMigrationInvocation(
+                        nodeContext, migrationSymbol, TargetMethodName);
+                if (result is null)
+                {
+                    return;
+                }
+
+                AnalyzeMigrationInvocation(nodeContext, result.Value);
+            },
             SyntaxKind.InvocationExpression);
     }
 
-    /// <summary>Analyzes an invocation expression inside an EF Core migration.</summary>
-    protected abstract void AnalyzeNode(
+    /// <summary>
+    /// Analyzes a validated <see cref="TargetMethodName"/> invocation inside an EF Core migration.
+    /// Called only when <see cref="MigrationAnalyzerHelpers.TryGetMigrationInvocation"/> succeeds.
+    /// </summary>
+    protected abstract void AnalyzeMigrationInvocation(
         SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol migrationBase);
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration);
 }

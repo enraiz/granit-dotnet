@@ -36,7 +36,7 @@ public sealed class NotificationBackedFollowerServiceTests
     [Fact]
     public async Task FollowAsync_WithTenant_PassesTenantId()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         _tenant.IsAvailable.Returns(true);
         _tenant.Id.Returns(tenantId);
 

@@ -45,7 +45,7 @@ internal static class CodeFixTestHelpers
             }
         }
 
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        var compilation = CSharpCompilation.Create(
             assemblyName: "TestAssembly",
             syntaxTrees: treeBuilder.ToImmutable(),
             references: GetNetCoreReferences(),
@@ -129,7 +129,7 @@ internal static class CodeFixTestHelpers
             }
         }
 
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        var compilation = CSharpCompilation.Create(
             assemblyName: "TestAssembly",
             syntaxTrees: treeBuilder.ToImmutable(),
             references: GetNetCoreReferences(),

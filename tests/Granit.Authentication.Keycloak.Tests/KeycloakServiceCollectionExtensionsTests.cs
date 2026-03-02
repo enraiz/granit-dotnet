@@ -125,7 +125,7 @@ public sealed class KeycloakServiceCollectionExtensionsTests
         services.AddGranitKeycloak();
 
         // Assert
-        List<ServiceDescriptor> descriptors = services
+        var descriptors = services
             .Where(d => d.ServiceType == typeof(IClaimsTransformation))
             .ToList();
 

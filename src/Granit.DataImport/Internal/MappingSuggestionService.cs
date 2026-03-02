@@ -43,7 +43,7 @@ internal sealed class MappingSuggestionService(
         ApplyFuzzyMatches(suggestions, matchedTargets, headers, properties, options.Value.FuzzyMatchThreshold);
 
         // Tier 4: Semantic (AI) — only if available and unmapped columns remain
-        List<string> unmappedHeaders = headers
+        var unmappedHeaders = headers
             .Where(h => !suggestions.ContainsKey(h))
             .ToList();
 

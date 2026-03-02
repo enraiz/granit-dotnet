@@ -26,7 +26,7 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
         IProgress<ImportProgress>? progress = null,
         CancellationToken ct = default)
     {
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         List<ImportRowError> errors = [];
         int totalRows = 0;
         int succeededRows = 0;

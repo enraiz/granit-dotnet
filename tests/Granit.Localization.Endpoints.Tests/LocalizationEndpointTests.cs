@@ -53,7 +53,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         doc.RootElement.GetProperty("cultureName").GetString().ShouldBe("fr");
         doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().ShouldBe("Bonjour");
         doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Goodbye").GetString().ShouldBe("Au revoir");
@@ -70,7 +70,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().ShouldBe("Hello");
         doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Goodbye").GetString().ShouldBe("Goodbye");
     }
@@ -86,7 +86,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         doc.RootElement.GetProperty("cultureName").GetString().ShouldBe("fr-CA");
         doc.RootElement.GetProperty("resources").GetProperty("Test").GetProperty("Hello").GetString().ShouldBe("Bonjour");
     }
@@ -126,7 +126,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         JsonElement languages = doc.RootElement.GetProperty("languages");
 
         languages.GetArrayLength().ShouldBe(2);
@@ -147,7 +147,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         JsonElement languages = doc.RootElement.GetProperty("languages");
 
         JsonElement frenchLang = languages.EnumerateArray().First(l => l.GetProperty("cultureName").GetString() == "fr");

@@ -57,7 +57,7 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         // Assert
         document.Components.ShouldNotBeNull();
         document.Components!.SecuritySchemes!.ShouldContainKey("Bearer");
-        OpenApiSecurityScheme scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["Bearer"];
+        var scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["Bearer"];
         scheme.Type.ShouldBe(SecuritySchemeType.Http);
         scheme.Scheme.ShouldBe("bearer");
         scheme.BearerFormat.ShouldBe("JWT");

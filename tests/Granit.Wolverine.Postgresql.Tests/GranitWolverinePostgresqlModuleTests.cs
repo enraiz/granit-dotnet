@@ -28,7 +28,7 @@ public sealed class GranitWolverinePostgresqlModuleTests
     [Fact]
     public void GranitWolverinePostgresqlModule_DependsOn_WolverineModule()
     {
-        DependsOnAttribute[] attributes = (DependsOnAttribute[])
+        var attributes = (DependsOnAttribute[])
             typeof(GranitWolverinePostgresqlModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
         attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));
@@ -37,7 +37,7 @@ public sealed class GranitWolverinePostgresqlModuleTests
     [Fact]
     public void GranitWolverinePostgresqlModule_DependsOn_PersistenceModule()
     {
-        DependsOnAttribute[] attributes = (DependsOnAttribute[])
+        var attributes = (DependsOnAttribute[])
             typeof(GranitWolverinePostgresqlModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
         attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitPersistenceModule)));

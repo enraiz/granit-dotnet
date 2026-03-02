@@ -41,7 +41,7 @@ public sealed class RecurringJobDiscoveryTests
         // Assert
         RecurringJobRegistration reg = registrations.Single(r => r.JobName == "fake-daily-report");
         reg.MessageType.ShouldContain(nameof(FakeDailyReportMessage));
-        Type? resolved = Type.GetType(reg.MessageType);
+        var resolved = Type.GetType(reg.MessageType);
         resolved.ShouldBe(typeof(FakeDailyReportMessage));
     }
 

@@ -224,7 +224,7 @@ public sealed class LocalizationKeysGeneratorTests
         // Assert — the generated source should compile without errors
         System.Threading.CancellationToken ct = TestContext.Current.CancellationToken;
         SyntaxTree tree = CSharpSyntaxTree.ParseText(generatedSource, cancellationToken: ct);
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        var compilation = CSharpCompilation.Create(
             assemblyName: "GeneratedAssembly",
             syntaxTrees: new[] { tree },
             references: GetNetCoreReferences(),
@@ -238,7 +238,7 @@ public sealed class LocalizationKeysGeneratorTests
     private static string RunGenerator(string? rootNamespace, params string[] jsonContents)
     {
         SyntaxTree dummyTree = CSharpSyntaxTree.ParseText("");
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        var compilation = CSharpCompilation.Create(
             assemblyName: "TestAssembly",
             syntaxTrees: new[] { dummyTree },
             references: GetNetCoreReferences(),

@@ -116,7 +116,7 @@ public sealed class InMemoryTimelineQueryTests
     {
         TimelineEntry entry = await _store.PostEntryAsync(
             "Patient", "p-1", TimelineEntryType.Comment, "With attachment", ct: TestContext.Current.CancellationToken);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         await _store.AddAttachmentAsync(entry.Id, blobId, "report.pdf", "application/pdf", 2048, ct: TestContext.Current.CancellationToken);
 
         TimelineStreamPage page = await _query.GetStreamAsync(

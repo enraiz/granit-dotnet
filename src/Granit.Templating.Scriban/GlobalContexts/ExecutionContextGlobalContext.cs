@@ -39,7 +39,7 @@ internal sealed class ExecutionContextGlobalContext(IServiceProvider serviceProv
         CultureInfo culture = CultureInfo.CurrentCulture;
 
         // Soft dependency — resolves NullTenantContext when multi-tenancy is not installed
-        ICurrentTenant? tenant = serviceProvider.GetService(typeof(ICurrentTenant)) as ICurrentTenant;
+        var tenant = serviceProvider.GetService(typeof(ICurrentTenant)) as ICurrentTenant;
 
         return new
         {

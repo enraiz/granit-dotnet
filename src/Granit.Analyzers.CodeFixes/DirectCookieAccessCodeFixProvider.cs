@@ -27,8 +27,8 @@ public sealed class DirectCookieAccessCodeFixProvider : DependencyInjectionCodeF
 
     protected override SyntaxNode BuildReplacement(SyntaxNode trackedNode)
     {
-        InvocationExpressionSyntax tracked = (InvocationExpressionSyntax)trackedNode;
-        MemberAccessExpressionSyntax memberAccess = (MemberAccessExpressionSyntax)tracked.Expression;
+        var tracked = (InvocationExpressionSyntax)trackedNode;
+        var memberAccess = (MemberAccessExpressionSyntax)tracked.Expression;
         string methodName = memberAccess.Name.Identifier.Text;
         ArgumentListSyntax originalArgs = tracked.ArgumentList;
 

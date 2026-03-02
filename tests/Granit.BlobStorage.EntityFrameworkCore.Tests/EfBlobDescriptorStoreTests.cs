@@ -78,7 +78,7 @@ public sealed class EfBlobDescriptorStoreTests
     {
         string db = Guid.NewGuid().ToString();
         EfBlobDescriptorStore store = CreateStore(db);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = MakeDescriptor(id: blobId);
 
         await store.SaveAsync(descriptor, TestContext.Current.CancellationToken);
@@ -97,9 +97,9 @@ public sealed class EfBlobDescriptorStoreTests
     {
         string db = Guid.NewGuid().ToString();
         EfBlobDescriptorStore store = CreateStore(db);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         DateTimeOffset createdAt = new(2026, 2, 23, 10, 0, 0, TimeSpan.Zero);
-        BlobDescriptor descriptor = BlobDescriptor.Create(
+        var descriptor = BlobDescriptor.Create(
             id: blobId,
             tenantId: TenantId.ToString(),
             containerName: "medical-images",
@@ -128,7 +128,7 @@ public sealed class EfBlobDescriptorStoreTests
     {
         string db = Guid.NewGuid().ToString();
         EfBlobDescriptorStore store = CreateStore(db);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         await store.SaveAsync(MakeDescriptor(id: blobId), TestContext.Current.CancellationToken);
 
         BlobDescriptor? descriptor = await store.FindAsync(
@@ -146,7 +146,7 @@ public sealed class EfBlobDescriptorStoreTests
     {
         string db = Guid.NewGuid().ToString();
         EfBlobDescriptorStore store = CreateStore(db);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         await store.SaveAsync(MakeDescriptor(id: blobId), TestContext.Current.CancellationToken);
 
         BlobDescriptor? descriptor = await store.FindAsync(
@@ -173,7 +173,7 @@ public sealed class EfBlobDescriptorStoreTests
     {
         string db = Guid.NewGuid().ToString();
         EfBlobDescriptorStore store = CreateStore(db);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         await store.SaveAsync(MakeDescriptor(id: blobId), TestContext.Current.CancellationToken);
 
         BlobDescriptor? descriptor = await store.FindAsync(
@@ -197,7 +197,7 @@ public sealed class EfBlobDescriptorStoreTests
     {
         string db = Guid.NewGuid().ToString();
         EfBlobDescriptorStore store = CreateStore(db);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         await store.SaveAsync(MakeDescriptor(id: blobId), TestContext.Current.CancellationToken);
 
         // Advance through Pending -> Uploading -> Valid -> Deleted.
@@ -232,7 +232,7 @@ public sealed class EfBlobDescriptorStoreTests
         string db = Guid.NewGuid().ToString();
         // Save a descriptor for OtherTenant.
         EfBlobDescriptorStore storeOther = CreateStore(db, OtherTenantId);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptorOther = MakeDescriptor(
             id: blobId, tenantId: OtherTenantId.ToString());
         await storeOther.SaveAsync(descriptorOther, TestContext.Current.CancellationToken);

@@ -160,7 +160,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         // Arrange
         CancellationToken ct = TestContext.Current.CancellationToken;
         string cycleId = "shutdown-during";
-        using CancellationTokenSource workerCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        using var workerCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
 
         IMigrationCycleRegistry registry = RegistryWith(cycleId, async (_, _, _) =>
         {
@@ -191,7 +191,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         // Arrange
         CancellationToken ct = TestContext.Current.CancellationToken;
         string cycleId = "shutdown-between";
-        using CancellationTokenSource workerCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        using var workerCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         int callCount = 0;
 
         IMigrationCycleRegistry registry = RegistryWith(cycleId, (_, _, _) =>

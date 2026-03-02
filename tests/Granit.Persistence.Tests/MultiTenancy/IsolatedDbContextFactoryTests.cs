@@ -160,7 +160,7 @@ public sealed class IsolatedDbContextFactoryTests
         CountingFactory premiumFactory = new();
         CountingFactory standardFactory = new();
 
-        Guid premiumTenantId = Guid.NewGuid();
+        var premiumTenantId = Guid.NewGuid();
 
         // Provider custom : tenant premium → DatabasePerTenant, sinon SharedDatabase.
         ITenantIsolationStrategyProvider dynamicProvider =

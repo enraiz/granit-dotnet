@@ -68,7 +68,7 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
         }
 
         // Fallback: resolve by fully-qualified CLR type name (e.g. "Granit.Localization.GranitLocalizationResource, Granit.Localization").
-        Type? resourceType = Type.GetType($"{baseName}, {location}");
+        var resourceType = Type.GetType($"{baseName}, {location}");
         if (resourceType is not null)
         {
             return Create(resourceType);
@@ -99,7 +99,7 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
         }
 
         // Check [InheritResource] attributes on the marker class
-        InheritResourceAttribute[] inheritAttributes =
+        var inheritAttributes =
             (InheritResourceAttribute[])resourceType
                 .GetCustomAttributes(typeof(InheritResourceAttribute), true);
 

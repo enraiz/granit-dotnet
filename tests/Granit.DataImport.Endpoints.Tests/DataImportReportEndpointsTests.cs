@@ -80,7 +80,7 @@ public sealed class DataImportReportEndpointsTests : IAsyncDisposable
     public async Task GetReport_WhenJobHasReport_Returns200()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportReport report = BuildReport();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Completed, JsonSerializer.Serialize(report));
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
@@ -101,7 +101,7 @@ public sealed class DataImportReportEndpointsTests : IAsyncDisposable
     public async Task GetReport_WhenJobNotFound_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
@@ -116,7 +116,7 @@ public sealed class DataImportReportEndpointsTests : IAsyncDisposable
     public async Task GetReport_WhenNoReportJson_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Executing, reportJson: null);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -134,7 +134,7 @@ public sealed class DataImportReportEndpointsTests : IAsyncDisposable
     public async Task GetCorrectionFile_WhenErrorsExist_ReturnsFile()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportReport report = BuildReport();
         ImportJob job = BuildJob(jobId, ImportJobStatus.PartiallyCompleted, JsonSerializer.Serialize(report));
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
@@ -154,7 +154,7 @@ public sealed class DataImportReportEndpointsTests : IAsyncDisposable
     public async Task GetCorrectionFile_WhenNoErrors_Returns204()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportReport report = new()
         {
             TotalRows = 10,
@@ -182,7 +182,7 @@ public sealed class DataImportReportEndpointsTests : IAsyncDisposable
     public async Task GetCorrectionFile_WhenJobNotFound_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act

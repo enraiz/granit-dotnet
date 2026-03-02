@@ -87,7 +87,7 @@ public sealed class ClosedXmlTemplateEngineTests
             TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<BinaryRenderedContent>();
-        BinaryRenderedContent binary = (BinaryRenderedContent)result;
+        var binary = (BinaryRenderedContent)result;
         binary.Format.ShouldBe(TemplatingDocFormat.Excel);
         binary.Bytes.IsEmpty.ShouldBeFalse("must produce non-empty bytes");
 
@@ -114,7 +114,7 @@ public sealed class ClosedXmlTemplateEngineTests
             [],
             TestContext.Current.CancellationToken);
 
-        BinaryRenderedContent binary = (BinaryRenderedContent)result;
+        var binary = (BinaryRenderedContent)result;
         using MemoryStream ms = new(binary.Bytes.ToArray());
         using XLWorkbook wb = new(ms);
         string cellValue = wb.Worksheet(1).Cell("A1").GetValue<string>();
@@ -138,7 +138,7 @@ public sealed class ClosedXmlTemplateEngineTests
             [],
             TestContext.Current.CancellationToken);
 
-        BinaryRenderedContent binary = (BinaryRenderedContent)result;
+        var binary = (BinaryRenderedContent)result;
         using MemoryStream ms = new(binary.Bytes.ToArray());
         using XLWorkbook wb = new(ms);
         string cellValue = wb.Worksheet(1).Cell("A1").GetValue<string>();
@@ -149,7 +149,7 @@ public sealed class ClosedXmlTemplateEngineTests
     public async Task RenderAsync_PropagatesRevisionId()
     {
         ClosedXmlTemplateEngine sut = CreateSut();
-        Guid revisionId = Guid.NewGuid();
+        var revisionId = Guid.NewGuid();
         string base64 = CreateBase64Template(ws => ws.Cell("A1").SetValue("test"));
         TemplateDescriptor descriptor = new()
         {

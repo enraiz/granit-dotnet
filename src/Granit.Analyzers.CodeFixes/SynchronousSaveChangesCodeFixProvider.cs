@@ -70,7 +70,7 @@ public sealed class SynchronousSaveChangesCodeFixProvider : CodeFixProvider
             return document;
         }
 
-        InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)node;
+        var invocation = (InvocationExpressionSyntax)node;
 
         // 1. Replace SaveChanges with SaveChangesAsync (preserve arguments)
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
@@ -117,7 +117,7 @@ public sealed class SynchronousSaveChangesCodeFixProvider : CodeFixProvider
                 if (targetInvocation is not null)
                 {
                     // Rebuild the replacement for the tracked invocation
-                    MemberAccessExpressionSyntax trackedMemberAccess =
+                    var trackedMemberAccess =
                         (MemberAccessExpressionSyntax)targetInvocation.Expression;
                     MemberAccessExpressionSyntax newTrackedMemberAccess = trackedMemberAccess.WithName(
                         SyntaxFactory.IdentifierName("SaveChangesAsync"));

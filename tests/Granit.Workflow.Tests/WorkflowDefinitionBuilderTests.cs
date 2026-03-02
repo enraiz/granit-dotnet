@@ -14,7 +14,7 @@ public sealed class WorkflowDefinitionBuilderTests
     public void Build_WithValidDefinition_ShouldCreateImmutableDefinition()
     {
         // Arrange & Act
-        WorkflowDefinition<WorkflowLifecycleStatus> definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
+        var definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
             .InitialState(WorkflowLifecycleStatus.Draft)
             .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.PendingReview)
             .Transition(WorkflowLifecycleStatus.PendingReview, WorkflowLifecycleStatus.Published)
@@ -29,7 +29,7 @@ public sealed class WorkflowDefinitionBuilderTests
     public void Build_WithNamedTransitions_ShouldPreserveNames()
     {
         // Arrange & Act
-        WorkflowDefinition<WorkflowLifecycleStatus> definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
+        var definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
             .InitialState(WorkflowLifecycleStatus.Draft)
             .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published, t => t
                 .Named("Publier")
@@ -47,7 +47,7 @@ public sealed class WorkflowDefinitionBuilderTests
     public void GetAllowedTransitions_ShouldReturnOnlyFromMatchingState()
     {
         // Arrange
-        WorkflowDefinition<WorkflowLifecycleStatus> definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
+        var definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
             .InitialState(WorkflowLifecycleStatus.Draft)
             .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.PendingReview)
             .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published)
@@ -68,7 +68,7 @@ public sealed class WorkflowDefinitionBuilderTests
     public void GetAllowedTransitions_FromStateWithNoTransitions_ShouldReturnEmpty()
     {
         // Arrange
-        WorkflowDefinition<WorkflowLifecycleStatus> definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
+        var definition = WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
             .InitialState(WorkflowLifecycleStatus.Draft)
             .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published));
 

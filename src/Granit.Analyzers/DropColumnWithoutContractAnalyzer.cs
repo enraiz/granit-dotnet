@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Granit.Analyzers;
@@ -32,25 +31,20 @@ public sealed class DropColumnWithoutContractAnalyzer : GranitMigrationAnalyzerB
     protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    protected override void AnalyzeNode(
+    protected override string TargetMethodName => "DropColumn";
+
+    /// <inheritdoc/>
+    protected override void AnalyzeMigrationInvocation(
         SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol migrationBase,
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration,
         INamedTypeSymbol cycleAttrType)
     {
-        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
-            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "DropColumn");
-        if (result is null)
+        if (MigrationAnalyzerHelpers.HasContractAnnotation(migration.MigrationClass, cycleAttrType))
         {
             return;
         }
 
-        if (MigrationAnalyzerHelpers.HasContractAnnotation(result.Value.MigrationClass, cycleAttrType))
-        {
-            return;
-        }
-
-        InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
         context.ReportDiagnostic(
-            Diagnostic.Create(_rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
+            Diagnostic.Create(_rule, context.Node.GetLocation(), migration.MigrationClass.Name));
     }
 }

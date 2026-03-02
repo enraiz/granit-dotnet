@@ -83,7 +83,7 @@ public sealed class ExecutionContextGlobalContextTests
     [Fact]
     public void Resolve_WithAvailableTenant_ReturnsTenantIdAndName()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(true);
         tenant.Id.Returns(id);

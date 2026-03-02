@@ -234,7 +234,7 @@ public sealed class PermissionCheckerTests
     [Fact]
     public void BuildCacheKey_WithTenantId_FormatsCorrectly()
     {
-        Guid tenant = Guid.Parse("12345678-1234-1234-1234-123456789abc");
+        var tenant = Guid.Parse("12345678-1234-1234-1234-123456789abc");
         string key = PermissionChecker.BuildCacheKey(tenant, "editor", "Invoices.Delete");
         key.ShouldBe($"perm:{tenant}:editor:Invoices.Delete");
     }

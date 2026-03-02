@@ -111,7 +111,7 @@ public sealed class DataSeederTests
     public async Task SeedAsync_PassesContextToContributor()
     {
         // Arrange
-        Guid tenantId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+        var tenantId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         DataSeedContext context = new(tenantId);
         context["AdminEmail"] = "admin@test.com";
 

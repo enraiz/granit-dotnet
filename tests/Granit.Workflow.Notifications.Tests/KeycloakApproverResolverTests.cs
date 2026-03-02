@@ -150,7 +150,7 @@ public sealed class KeycloakApproverResolverTests : IDisposable
     [Fact]
     public async Task ResolveApproversAsync_WithTenant_PassesTenantId()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
 

@@ -31,7 +31,7 @@ public sealed class GranitWolverineModuleTests
     [Fact]
     public void GranitWolverineModule_DependsOn_SecurityModule()
     {
-        DependsOnAttribute[] attributes = (DependsOnAttribute[])
+        var attributes = (DependsOnAttribute[])
             typeof(GranitWolverineModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
         attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitSecurityModule)));
@@ -40,7 +40,7 @@ public sealed class GranitWolverineModuleTests
     [Fact]
     public void GranitWolverineModule_DoesNotDependOn_MultiTenancyModule()
     {
-        DependsOnAttribute[] attributes = (DependsOnAttribute[])
+        var attributes = (DependsOnAttribute[])
             typeof(GranitWolverineModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
         attributes.ShouldNotContain(a => a.DependedTypes.Contains(typeof(GranitMultiTenancyModule)),

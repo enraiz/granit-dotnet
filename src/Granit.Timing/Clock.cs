@@ -31,7 +31,7 @@ public sealed class Clock(TimeProvider timeProvider, ICurrentTimezoneProvider ti
             return utcDateTime;
         }
 
-        TimeZoneInfo tzInfo = TimeZoneInfo.FindSystemTimeZoneById(tz);
+        var tzInfo = TimeZoneInfo.FindSystemTimeZoneById(tz);
         return TimeZoneInfo.ConvertTime(utcDateTime, tzInfo);
     }
 

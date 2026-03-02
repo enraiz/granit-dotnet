@@ -36,7 +36,7 @@ internal sealed class EfCoreTimelineQuery(
             .Take(take)
             .ToListAsync(ct).ConfigureAwait(false);
 
-        List<Guid> entryIds = entries.Select(e => e.Id).ToList();
+        var entryIds = entries.Select(e => e.Id).ToList();
 
         List<TimelineAttachment> attachments = await db.TimelineAttachments
             .AsNoTracking()
@@ -45,7 +45,7 @@ internal sealed class EfCoreTimelineQuery(
 
         ILookup<Guid, TimelineAttachment> attachmentLookup = attachments.ToLookup(a => a.EntryId);
 
-        List<TimelineStreamEntry> items = entries
+        var items = entries
             .Select(e => new TimelineStreamEntry
             {
                 Id = e.Id,

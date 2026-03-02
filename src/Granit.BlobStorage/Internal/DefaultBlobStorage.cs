@@ -34,7 +34,7 @@ internal sealed class DefaultBlobStorage(
             ? currentTenant.Id.Value.ToString()
             : string.Empty;
 
-        BlobDescriptor descriptor = BlobDescriptor.Create(
+        var descriptor = BlobDescriptor.Create(
             id: blobId,
             tenantId: tenantId,
             containerName: containerName,

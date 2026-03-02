@@ -24,7 +24,7 @@ internal sealed class NotificationBackedNotifier(
         }
 
         // Exclude the author from receiving their own notification
-        List<string> recipients = followerUserIds
+        var recipients = followerUserIds
             .Where(id => id != entry.AuthorId)
             .ToList();
 
@@ -63,7 +63,7 @@ internal sealed class NotificationBackedNotifier(
         }
 
         // Exclude the author from receiving their own mention notification
-        List<string> recipients = mentionedUserIds
+        var recipients = mentionedUserIds
             .Where(id => id != entry.AuthorId)
             .ToList();
 

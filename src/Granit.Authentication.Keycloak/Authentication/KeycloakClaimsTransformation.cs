@@ -31,7 +31,7 @@ public sealed class KeycloakClaimsTransformation(IOptions<KeycloakOptions> optio
             return Task.FromResult(principal);
         }
 
-        using JsonDocument doc = JsonDocument.Parse(accessClaim.Value);
+        using var doc = JsonDocument.Parse(accessClaim.Value);
         JsonElement root = doc.RootElement;
 
         // For resource_access, descend into the ClientId node before "roles"

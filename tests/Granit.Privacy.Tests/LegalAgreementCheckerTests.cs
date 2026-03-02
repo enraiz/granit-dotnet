@@ -22,7 +22,7 @@ public sealed class LegalAgreementCheckerTests
     [Fact]
     public async Task HasAcceptedLatestAsync_UserAcceptedCurrentVersion_ReturnsTrue()
     {
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         _store.FindLatestAsync(userId, "privacy-policy", Arg.Any<CancellationToken>())
             .Returns(CreateAgreement(userId, "privacy-policy", "2.0.0"));
 
@@ -34,7 +34,7 @@ public sealed class LegalAgreementCheckerTests
     [Fact]
     public async Task HasAcceptedLatestAsync_UserAcceptedOldVersion_ReturnsFalse()
     {
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         _store.FindLatestAsync(userId, "privacy-policy", Arg.Any<CancellationToken>())
             .Returns(CreateAgreement(userId, "privacy-policy", "1.0.0"));
 
@@ -46,7 +46,7 @@ public sealed class LegalAgreementCheckerTests
     [Fact]
     public async Task HasAcceptedLatestAsync_UserNeverConsented_ReturnsFalse()
     {
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         _store.FindLatestAsync(userId, "privacy-policy", Arg.Any<CancellationToken>())
             .Returns((LegalAgreementBase?)null);
 
@@ -58,7 +58,7 @@ public sealed class LegalAgreementCheckerTests
     [Fact]
     public async Task HasAcceptedLatestAsync_UnknownDocument_ReturnsFalse()
     {
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         bool result = await _sut.HasAcceptedLatestAsync(userId, "unknown-doc", TestContext.Current.CancellationToken);
 
@@ -68,7 +68,7 @@ public sealed class LegalAgreementCheckerTests
     [Fact]
     public async Task GetUserAgreementsAsync_DelegatestoStore()
     {
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         List<LegalAgreementBase> expected =
         [
             CreateAgreement(userId, "privacy-policy", "2.0.0"),

@@ -93,7 +93,7 @@ public sealed class GranitFeaturesDbContextTests
     public async Task SaveAndReload_AllFields_MatchOriginal()
     {
         await using GranitFeaturesDbContext ctx = CreateInMemory();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         TenantFeatureOverride entity = new()
         {

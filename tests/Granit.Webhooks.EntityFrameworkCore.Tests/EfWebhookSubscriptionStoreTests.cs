@@ -31,7 +31,7 @@ public sealed class EfWebhookSubscriptionStoreTests : IAsyncDisposable
     public async Task GetActiveSubscriptionsAsync_filters_by_event_type_and_active_status()
     {
         // Arrange
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         await SeedSubscriptions(
             CreateSubscription("doc.uploaded", tenantId, WebhookSubscriptionStatus.Active),
             CreateSubscription("doc.uploaded", tenantId, WebhookSubscriptionStatus.Deactivated),
@@ -50,7 +50,7 @@ public sealed class EfWebhookSubscriptionStoreTests : IAsyncDisposable
     public async Task GetActiveSubscriptionsAsync_includes_global_subscriptions()
     {
         // Arrange
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         await SeedSubscriptions(
             CreateSubscription("doc.uploaded", tenantId, WebhookSubscriptionStatus.Active),
             CreateSubscription("doc.uploaded", null, WebhookSubscriptionStatus.Active));
@@ -67,8 +67,8 @@ public sealed class EfWebhookSubscriptionStoreTests : IAsyncDisposable
     public async Task GetActiveSubscriptionsAsync_excludes_other_tenants()
     {
         // Arrange
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         await SeedSubscriptions(
             CreateSubscription("doc.uploaded", tenantA, WebhookSubscriptionStatus.Active),
             CreateSubscription("doc.uploaded", tenantB, WebhookSubscriptionStatus.Active));

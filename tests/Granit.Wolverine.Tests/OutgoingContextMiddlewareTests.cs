@@ -52,7 +52,7 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
     [Fact]
     public void Before_WithTenantAndUser_SetsBothHeaders()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         const string userId = "user-123";
 
         ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
@@ -74,7 +74,7 @@ public sealed class OutgoingContextMiddlewareTests : IDisposable
     [Fact]
     public void Before_WithTenantOnly_SetsTenantHeaderOnly()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.Id.Returns(tenantId);

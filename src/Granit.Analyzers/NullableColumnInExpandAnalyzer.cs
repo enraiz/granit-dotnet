@@ -41,18 +41,14 @@ public sealed class NullableColumnInExpandAnalyzer : GranitMigrationAnalyzerBase
     protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    protected override void AnalyzeNode(
+    protected override string TargetMethodName => "AddColumn";
+
+    /// <inheritdoc/>
+    protected override void AnalyzeMigrationInvocation(
         SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol migrationBase,
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration,
         INamedTypeSymbol cycleAttrType)
     {
-        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
-            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "AddColumn");
-        if (result is null)
-        {
-            return;
-        }
-
         ArgumentListSyntax argList = ((InvocationExpressionSyntax)context.Node).ArgumentList;
 
         // Safe: nullable: true
@@ -69,6 +65,6 @@ public sealed class NullableColumnInExpandAnalyzer : GranitMigrationAnalyzerBase
         }
 
         context.ReportDiagnostic(
-            Diagnostic.Create(_rule, context.Node.GetLocation(), result.Value.MigrationClass.Name));
+            Diagnostic.Create(_rule, context.Node.GetLocation(), migration.MigrationClass.Name));
     }
 }

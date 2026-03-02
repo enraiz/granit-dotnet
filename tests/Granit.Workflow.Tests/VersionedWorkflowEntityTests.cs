@@ -35,7 +35,7 @@ public sealed class VersionedWorkflowEntityTests
     public void Properties_ShouldBeSettable()
     {
         // Arrange
-        Guid businessId = Guid.NewGuid();
+        var businessId = Guid.NewGuid();
         TestVersionedWorkflowEntity entity = new()
         {
             BusinessId = businessId,
@@ -59,7 +59,7 @@ public sealed class VersionedWorkflowEntityTests
     public void GetWorkflowEntityId_ShouldReturnIdAsString()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         TestVersionedWorkflowEntity entity = new() { Id = id };
 
         // Act
@@ -152,7 +152,7 @@ public sealed class VersionedWorkflowEntityTests
     public void Entity_ShouldImplementIWorkflowStateful()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         TestVersionedWorkflowEntity entity = new() { Id = id };
 
         // Act — cast to interface

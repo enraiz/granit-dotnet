@@ -69,7 +69,7 @@ public sealed class HardcodedSecretAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeStringLiteral(SyntaxNodeAnalysisContext context)
     {
-        LiteralExpressionSyntax literal = (LiteralExpressionSyntax)context.Node;
+        var literal = (LiteralExpressionSyntax)context.Node;
 
         string value = literal.Token.ValueText;
         if (value.Length < 4)
