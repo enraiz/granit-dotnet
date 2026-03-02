@@ -20,7 +20,7 @@ internal sealed class EmailNotificationChannel(
     {
         IEmailSender sender = serviceProvider.GetRequiredKeyedService<IEmailSender>(options.Value.Provider);
 
-        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct);
+        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct).ConfigureAwait(false);
         if (recipient?.Email is null)
         {
             return;
@@ -35,6 +35,6 @@ internal sealed class EmailNotificationChannel(
             Subject = subject,
             HtmlBody = htmlBody,
             FromOverride = options.Value.SenderAddress,
-        }, ct);
+        }, ct).ConfigureAwait(false);
     }
 }

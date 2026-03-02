@@ -48,7 +48,7 @@ internal sealed class NotificationBackedNotifier(
             data,
             recipients,
             relatedEntity,
-            ct);
+            ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -87,6 +87,6 @@ internal sealed class NotificationBackedNotifier(
             data,
             recipients,
             relatedEntity,
-            ct);
+            ct).ConfigureAwait(false);
     }
 }

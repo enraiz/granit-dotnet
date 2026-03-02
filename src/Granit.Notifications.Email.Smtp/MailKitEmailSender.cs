@@ -37,14 +37,14 @@ internal sealed class MailKitEmailSender(IOptions<SmtpOptions> options) : IEmail
 
         using SmtpClient client = new();
         SecureSocketOptions socketOptions = smtp.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
-        await client.ConnectAsync(smtp.Host, smtp.Port, socketOptions, ct);
+        await client.ConnectAsync(smtp.Host, smtp.Port, socketOptions, ct).ConfigureAwait(false);
 
         if (smtp.Username is not null && smtp.Password is not null)
         {
-            await client.AuthenticateAsync(smtp.Username, smtp.Password, ct);
+            await client.AuthenticateAsync(smtp.Username, smtp.Password, ct).ConfigureAwait(false);
         }
 
-        await client.SendAsync(mimeMessage, ct);
-        await client.DisconnectAsync(quit: true, ct);
+        await client.SendAsync(mimeMessage, ct).ConfigureAwait(false);
+        await client.DisconnectAsync(quit: true, ct).ConfigureAwait(false);
     }
 }

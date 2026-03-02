@@ -16,8 +16,8 @@ internal sealed class EfCoreNotificationDeliveryStore(IDbContextFactory<Notifica
     /// <inheritdoc/>
     public async Task RecordAsync(NotificationDeliveryAttempt attempt, CancellationToken ct = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         db.DeliveryAttempts.Add(attempt);
-        await db.SaveChangesAsync(ct);
+        await db.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 }

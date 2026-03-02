@@ -27,14 +27,14 @@ internal sealed class FeatureChecker(
     /// <inheritdoc/>
     public async Task<bool> IsEnabledAsync(string featureName, CancellationToken ct = default)
     {
-        string value = await GetValueAsync(featureName, ct);
+        string value = await GetValueAsync(featureName, ct).ConfigureAwait(false);
         return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public async Task<long> GetNumericAsync(string featureName, CancellationToken ct = default)
     {
-        string value = await GetValueAsync(featureName, ct);
+        string value = await GetValueAsync(featureName, ct).ConfigureAwait(false);
         return long.TryParse(value, out long parsed) ? parsed : 0L;
     }
 
@@ -50,7 +50,7 @@ internal sealed class FeatureChecker(
             cacheKey,
             async innerCt =>
             {
-                string? value = await ResolveAsync(definition, innerCt);
+                string? value = await ResolveAsync(definition, innerCt).ConfigureAwait(false);
                 return value ?? definition.DefaultValue;
             },
             cancellationToken: ct);
@@ -61,7 +61,7 @@ internal sealed class FeatureChecker(
     /// <inheritdoc/>
     public async Task RequireEnabledAsync(string featureName, CancellationToken ct = default)
     {
-        bool enabled = await IsEnabledAsync(featureName, ct);
+        bool enabled = await IsEnabledAsync(featureName, ct).ConfigureAwait(false);
         if (!enabled)
         {
             throw new FeatureNotEnabledException(featureName);
@@ -72,7 +72,7 @@ internal sealed class FeatureChecker(
     {
         foreach (IFeatureValueProvider provider in _providers)
         {
-            string? value = await provider.GetOrNullAsync(definition, ct);
+            string? value = await provider.GetOrNullAsync(definition, ct).ConfigureAwait(false);
             if (value is not null)
             {
                 return value;

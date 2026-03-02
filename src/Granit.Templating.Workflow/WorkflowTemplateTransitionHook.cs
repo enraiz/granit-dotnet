@@ -39,7 +39,7 @@ internal sealed class WorkflowTemplateTransitionHook<TDbContext>(
         WorkflowLifecycleStatus wFrom = ToWorkflow(from);
         WorkflowLifecycleStatus wTo = ToWorkflow(target);
         IReadOnlyList<WorkflowTransition<WorkflowLifecycleStatus>> allowed =
-            await workflowManager.GetAllowedTransitionsAsync(wFrom, ct);
+            await workflowManager.GetAllowedTransitionsAsync(wFrom, ct).ConfigureAwait(false);
         return allowed.Any(t => t.To == wTo);
     }
 
@@ -51,7 +51,7 @@ internal sealed class WorkflowTemplateTransitionHook<TDbContext>(
         string userId,
         CancellationToken ct = default)
     {
-        await using TDbContext ctx = await contextFactory.CreateDbContextAsync(ct);
+        await using TDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         ctx.WorkflowTransitionRecords.Add(new WorkflowTransitionRecord
         {
             Id = guidGenerator.Create(),
@@ -64,7 +64,7 @@ internal sealed class WorkflowTemplateTransitionHook<TDbContext>(
             Comment = WorkflowTransitionContext.Current?.Comment,
             TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
         });
-        await ctx.SaveChangesAsync(ct);
+        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 
     private static WorkflowLifecycleStatus ToWorkflow(TemplateLifecycleStatus status) =>

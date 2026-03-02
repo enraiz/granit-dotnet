@@ -68,7 +68,7 @@ public partial class HybridCacheService<TCacheItem>(
         TCacheItem? result = await _hybridCache.GetOrCreateAsync<TCacheItem?>(
             compositeKey,
             _ => ValueTask.FromResult<TCacheItem?>(null),
-            cancellationToken: ct);
+            cancellationToken: ct).ConfigureAwait(false);
 
         return result;
     }
@@ -92,7 +92,7 @@ public partial class HybridCacheService<TCacheItem>(
             async (innerCt) =>
             {
                 LogFactory(_logger, compositeKey);
-                TCacheItem value = await factory(innerCt);
+                TCacheItem value = await factory(innerCt).ConfigureAwait(false);
                 return value;
             },
             hybridOptions,
@@ -115,7 +115,7 @@ public partial class HybridCacheService<TCacheItem>(
             ? BuildHybridOptions(options)
             : null;
 
-        await _hybridCache.SetAsync(compositeKey, value, hybridOptions, cancellationToken: ct);
+        await _hybridCache.SetAsync(compositeKey, value, hybridOptions, cancellationToken: ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -124,7 +124,7 @@ public partial class HybridCacheService<TCacheItem>(
         string compositeKey = BuildKey(key);
         LogRemove(_logger, compositeKey);
 
-        await _hybridCache.RemoveAsync(compositeKey, ct);
+        await _hybridCache.RemoveAsync(compositeKey, ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

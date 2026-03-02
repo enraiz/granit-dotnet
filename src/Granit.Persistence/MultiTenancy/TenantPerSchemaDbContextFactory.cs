@@ -34,10 +34,6 @@ internal sealed class TenantPerSchemaDbContextFactory<TContext>(
     TenantPerSchemaDbContextOptions<TContext> options) : IDbContextFactory<TContext>
     where TContext : DbContext
 {
-    private readonly ICurrentTenant _currentTenant = currentTenant;
-    private readonly ITenantSchemaProvider _schemaProvider = schemaProvider;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly TenantPerSchemaDbContextOptions<TContext> _options = options;
 
     /// <inheritdoc/>
     public TContext CreateDbContext() =>
@@ -46,7 +42,7 @@ internal sealed class TenantPerSchemaDbContextFactory<TContext>(
     /// <inheritdoc/>
     public async Task<TContext> CreateDbContextAsync(CancellationToken cancellationToken = default)
     {
-        if (!_currentTenant.IsAvailable)
+        if (!currentTenant.IsAvailable)
         {
             throw new InvalidOperationException(
                 "No active tenant context. Ensure the tenant is resolved before accessing " +
@@ -59,13 +55,13 @@ internal sealed class TenantPerSchemaDbContextFactory<TContext>(
     private TContext BuildContext()
     {
         DbContextOptionsBuilder<TContext> optionsBuilder = new();
-        _options.Configure(optionsBuilder);
+        options.Configure(optionsBuilder);
 
-        TenantSchemaConnectionInterceptor schemaInterceptor = new(_currentTenant, _schemaProvider);
+        TenantSchemaConnectionInterceptor schemaInterceptor = new(currentTenant, schemaProvider);
         optionsBuilder.AddInterceptors(schemaInterceptor);
 
         AuditedEntityInterceptor? auditInterceptor =
-            _serviceProvider.GetService<AuditedEntityInterceptor>();
+            serviceProvider.GetService<AuditedEntityInterceptor>();
 
         if (auditInterceptor is not null)
         {

@@ -39,10 +39,6 @@ internal sealed class TenantPerDatabaseDbContextFactory<TContext>(
     TenantPerDatabaseDbContextOptions<TContext> options) : IDbContextFactory<TContext>
     where TContext : DbContext
 {
-    private readonly ICurrentTenant _currentTenant = currentTenant;
-    private readonly ITenantConnectionStringProvider _connectionStringProvider = connectionStringProvider;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly TenantPerDatabaseDbContextOptions<TContext> _options = options;
 
     /// <inheritdoc/>
     public TContext CreateDbContext() =>
@@ -51,12 +47,12 @@ internal sealed class TenantPerDatabaseDbContextFactory<TContext>(
     /// <inheritdoc/>
     public async Task<TContext> CreateDbContextAsync(CancellationToken cancellationToken = default)
     {
-        Guid tenantId = _currentTenant.Id
+        Guid tenantId = currentTenant.Id
             ?? throw new InvalidOperationException(
                 "No active tenant context. Ensure the tenant is resolved before accessing " +
                 "per-tenant data (HTTP: TenantResolutionMiddleware; messaging: TenantContextBehavior).");
 
-        string connectionString = await _connectionStringProvider
+        string connectionString = await connectionStringProvider
             .GetConnectionStringAsync(tenantId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -66,10 +62,10 @@ internal sealed class TenantPerDatabaseDbContextFactory<TContext>(
     private TContext BuildContext(string connectionString)
     {
         DbContextOptionsBuilder<TContext> optionsBuilder = new();
-        _options.Configure(optionsBuilder, connectionString);
+        options.Configure(optionsBuilder, connectionString);
 
         AuditedEntityInterceptor? auditInterceptor =
-            _serviceProvider.GetService<AuditedEntityInterceptor>();
+            serviceProvider.GetService<AuditedEntityInterceptor>();
 
         if (auditInterceptor is not null)
         {

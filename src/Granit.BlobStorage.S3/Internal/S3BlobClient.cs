@@ -131,7 +131,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
             Key = objectKey,
         };
 
-        await _s3.DeleteObjectAsync(deleteRequest, cancellationToken);
+        await _s3.DeleteObjectAsync(deleteRequest, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -146,7 +146,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
             Key = objectKey,
         };
 
-        GetObjectMetadataResponse response = await _s3.GetObjectMetadataAsync(metadataRequest, cancellationToken);
+        GetObjectMetadataResponse response = await _s3.GetObjectMetadataAsync(metadataRequest, cancellationToken).ConfigureAwait(false);
         return response.ContentLength;
     }
 
@@ -164,7 +164,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
             ByteRange = new ByteRange(0, byteCount - 1),
         };
 
-        GetObjectResponse response = await _s3.GetObjectAsync(rangeRequest, cancellationToken);
+        GetObjectResponse response = await _s3.GetObjectAsync(rangeRequest, cancellationToken).ConfigureAwait(false);
         return response.ResponseStream;
     }
 

@@ -12,8 +12,6 @@ namespace Granit.Persistence.Interceptors;
 /// </summary>
 public sealed class SoftDeleteInterceptor(ICurrentUserService currentUserService, IClock clock) : SaveChangesInterceptor
 {
-    private readonly ICurrentUserService _currentUserService = currentUserService;
-    private readonly IClock _clock = clock;
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
@@ -39,8 +37,8 @@ public sealed class SoftDeleteInterceptor(ICurrentUserService currentUserService
             return;
         }
 
-        DateTimeOffset now = _clock.Now;
-        string userId = _currentUserService.UserId ?? "system";
+        DateTimeOffset now = clock.Now;
+        string userId = currentUserService.UserId ?? "system";
 
         foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ISoftDeletable> entry in context.ChangeTracker.Entries<ISoftDeletable>())
         {

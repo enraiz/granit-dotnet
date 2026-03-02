@@ -28,6 +28,6 @@ internal sealed class SignalRNotificationChannel(IHubContext<NotificationHub> hu
 
         await hubContext.Clients
             .Group(context.RecipientUserId)
-            .SendAsync("ReceiveNotification", message, ct);
+            .SendAsync("ReceiveNotification", message, ct).ConfigureAwait(false);
     }
 }

@@ -51,7 +51,7 @@ public sealed class NotificationDeliveryHandler(
         Stopwatch stopwatch = Stopwatch.StartNew();
         try
         {
-            await channel.SendAsync(context, cancellationToken);
+            await channel.SendAsync(context, cancellationToken).ConfigureAwait(false);
             stopwatch.Stop();
 
             await deliveryStore.RecordAsync(new NotificationDeliveryAttempt
@@ -66,7 +66,7 @@ public sealed class NotificationDeliveryHandler(
                 OccurredAt = clock.Now,
                 DurationMs = stopwatch.ElapsedMilliseconds,
                 IsSuccess = true,
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
 
             logger.LogDebug(
                 "Notification delivered via '{ChannelName}' for delivery {DeliveryId} notification {NotificationId}",
@@ -89,7 +89,7 @@ public sealed class NotificationDeliveryHandler(
                 DurationMs = stopwatch.ElapsedMilliseconds,
                 ErrorMessage = ex.Message,
                 IsSuccess = false,
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
 
             logger.LogWarning(ex,
                 "Notification delivery failed via '{ChannelName}' for delivery {DeliveryId} notification {NotificationId}",

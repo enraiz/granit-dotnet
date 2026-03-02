@@ -54,7 +54,7 @@ public sealed class SendWebhookHandler(
         string payloadHash = WebhookSignatureService.ComputePayloadHash(bodyJson);
         DateTimeOffset sentAt = clock.Now;
 
-        string plainSecret = await secretProtector.UnprotectAsync(command.SigningSecret, cancellationToken);
+        string plainSecret = await secretProtector.UnprotectAsync(command.SigningSecret, cancellationToken).ConfigureAwait(false);
         string signature = WebhookSignatureService.Compute(plainSecret, sentAt, bodyJson);
 
         using StringContent content = new(bodyJson, Encoding.UTF8, "application/json");
@@ -72,7 +72,7 @@ public sealed class SendWebhookHandler(
         try
         {
             using HttpClient client = httpClientFactory.CreateClient(WebhooksConstants.HttpClientName);
-            response = await client.SendAsync(request, cancellationToken);
+            response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
         catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
@@ -85,7 +85,7 @@ public sealed class SendWebhookHandler(
                 command.SubscriptionId, command.DeliveryId);
 
             await deliveryStore.RecordFailureAsync(
-                command, httpStatusCode: null, stopwatch.ElapsedMilliseconds, timeoutMessage, cancellationToken);
+                command, httpStatusCode: null, stopwatch.ElapsedMilliseconds, timeoutMessage, cancellationToken).ConfigureAwait(false);
 
             throw new WebhookDeliveryException(timeoutMessage, ex);
         }
@@ -101,14 +101,14 @@ public sealed class SendWebhookHandler(
 
             await deliveryStore.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds,
-                $"Non-retriable HTTP {statusCode}", cancellationToken);
+                $"Non-retriable HTTP {statusCode}", cancellationToken).ConfigureAwait(false);
 
             if (ShouldSuspend(response.StatusCode))
             {
                 await deliveryStore.SuspendSubscriptionAsync(
                     command.SubscriptionId,
                     $"Auto-suspended: HTTP {statusCode}",
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
             }
 
             return; // Message considered processed — no retry.
@@ -123,7 +123,7 @@ public sealed class SendWebhookHandler(
                 statusCode, command.SubscriptionId, command.DeliveryId);
 
             await deliveryStore.RecordFailureAsync(
-                command, statusCode, stopwatch.ElapsedMilliseconds, retriableMessage, cancellationToken);
+                command, statusCode, stopwatch.ElapsedMilliseconds, retriableMessage, cancellationToken).ConfigureAwait(false);
 
             throw new WebhookDeliveryException(retriableMessage);
         }
@@ -134,7 +134,7 @@ public sealed class SendWebhookHandler(
             statusCode, command.SubscriptionId, command.DeliveryId);
 
         await deliveryStore.RecordSuccessAsync(
-            command, statusCode, stopwatch.ElapsedMilliseconds, payloadHash, cancellationToken);
+            command, statusCode, stopwatch.ElapsedMilliseconds, payloadHash, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

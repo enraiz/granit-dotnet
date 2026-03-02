@@ -28,15 +28,15 @@ internal sealed class PuppeteerSharpRenderer(
     {
         PdfRenderOptions opts = options.Value;
 
-        await chromiumLifetime.PageSemaphore.WaitAsync(ct);
+        await chromiumLifetime.PageSemaphore.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            await using IPage page = await chromiumLifetime.Browser.NewPageAsync();
+            await using IPage page = await chromiumLifetime.Browser.NewPageAsync().ConfigureAwait(false);
 
             await page.SetContentAsync(html, new NavigationOptions
             {
                 WaitUntil = [WaitUntilNavigation.Networkidle0],
-            });
+            }).ConfigureAwait(false);
 
             PdfOptions pdfOptions = new()
             {
@@ -59,7 +59,7 @@ internal sealed class PuppeteerSharpRenderer(
                 pdfOptions.FooterTemplate = opts.FooterTemplate ?? "<span></span>";
             }
 
-            byte[] pdfBytes = await page.PdfDataAsync(pdfOptions);
+            byte[] pdfBytes = await page.PdfDataAsync(pdfOptions).ConfigureAwait(false);
 
             logger.LogDebug(
                 "PDF rendered successfully ({Size} bytes, format={Format})",

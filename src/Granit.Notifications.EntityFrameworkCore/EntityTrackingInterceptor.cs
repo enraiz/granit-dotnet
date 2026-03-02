@@ -22,12 +22,12 @@ public sealed class EntityTrackingInterceptor(
     {
         if (eventData.Context is null)
         {
-            return await base.SavingChangesAsync(eventData, result, cancellationToken);
+            return await base.SavingChangesAsync(eventData, result, cancellationToken).ConfigureAwait(false);
         }
 
         List<EntityStateChange> changes = DetectChanges(eventData.Context);
 
-        InterceptionResult<int> baseResult = await base.SavingChangesAsync(eventData, result, cancellationToken);
+        InterceptionResult<int> baseResult = await base.SavingChangesAsync(eventData, result, cancellationToken).ConfigureAwait(false);
 
         foreach (EntityStateChange change in changes)
         {
@@ -43,7 +43,7 @@ public sealed class EntityTrackingInterceptor(
                     ChangedAt = clock.Now,
                 },
                 new EntityReference(change.EntityType, change.EntityId),
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
         }
 
         return baseResult;

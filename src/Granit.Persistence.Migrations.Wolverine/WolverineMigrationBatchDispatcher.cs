@@ -20,7 +20,7 @@ internal sealed class WolverineMigrationBatchDispatcher(
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-        await bus.SendAsync(command);
+        await bus.SendAsync(command).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -31,7 +31,7 @@ internal sealed class WolverineMigrationBatchDispatcher(
 
         foreach (RunMigrationBatchCommand command in commands)
         {
-            await bus.SendAsync(command);
+            await bus.SendAsync(command).ConfigureAwait(false);
         }
     }
 }

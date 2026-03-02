@@ -15,10 +15,10 @@ public sealed class NotificationHub : Hub
         string? userId = Context.UserIdentifier;
         if (userId is not null)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, userId);
+            await Groups.AddToGroupAsync(Context.ConnectionId, userId).ConfigureAwait(false);
         }
 
-        await base.OnConnectedAsync();
+        await base.OnConnectedAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -27,9 +27,9 @@ public sealed class NotificationHub : Hub
         string? userId = Context.UserIdentifier;
         if (userId is not null)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId).ConfigureAwait(false);
         }
 
-        await base.OnDisconnectedAsync(exception);
+        await base.OnDisconnectedAsync(exception).ConfigureAwait(false);
     }
 }

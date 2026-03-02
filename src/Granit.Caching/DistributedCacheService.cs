@@ -49,7 +49,7 @@ public partial class DistributedCacheService<TCacheItem>(
     public async Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default)
     {
         string compositeKey = BuildKey(key);
-        byte[]? bytes = await _cache.GetAsync(compositeKey, ct);
+        byte[]? bytes = await _cache.GetAsync(compositeKey, ct).ConfigureAwait(false);
 
         if (bytes is null)
         {
@@ -72,7 +72,7 @@ public partial class DistributedCacheService<TCacheItem>(
         CancellationToken ct = default)
     {
         // 1. Vérification rapide sans verrou (chemin chaud — évite la contention)
-        TCacheItem? cached = await GetAsync(key, ct);
+        TCacheItem? cached = await GetAsync(key, ct).ConfigureAwait(false);
         if (cached is not null)
         {
             return cached;
@@ -81,19 +81,19 @@ public partial class DistributedCacheService<TCacheItem>(
         // 2. Acquisition du verrou stocké dans IMemoryCache (TTL 30 s — auto-nettoyage par le GC)
         string compositeKey = BuildKey(key);
         SemaphoreSlim semaphore = GetOrCreateLock(compositeKey);
-        await semaphore.WaitAsync(ct);
+        await semaphore.WaitAsync(ct).ConfigureAwait(false);
         try
         {
             // 3. Double-check locking : un autre thread peut avoir rempli le cache pendant l'attente
-            cached = await GetAsync(key, ct);
+            cached = await GetAsync(key, ct).ConfigureAwait(false);
             if (cached is not null)
             {
                 return cached;
             }
 
             // 4. Exécution de la factory (garantie une seule fois sous concurrence)
-            TCacheItem value = await factory(ct);
-            await SetAsync(key, value, options, ct);
+            TCacheItem value = await factory(ct).ConfigureAwait(false);
+            await SetAsync(key, value, options, ct).ConfigureAwait(false);
 
             LogCacheMiss(_logger, compositeKey);
 
@@ -122,7 +122,7 @@ public partial class DistributedCacheService<TCacheItem>(
             bytes = _encryptor.Encrypt(bytes);
         }
 
-        await _cache.SetAsync(compositeKey, bytes, entryOptions, ct);
+        await _cache.SetAsync(compositeKey, bytes, entryOptions, ct).ConfigureAwait(false);
 
         LogCacheSet(_logger, compositeKey);
     }

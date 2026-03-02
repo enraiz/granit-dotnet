@@ -40,7 +40,7 @@ internal sealed partial class MigrationBatchWorker(
 
         await foreach (RunMigrationBatchCommand initial in channel.Reader.ReadAllAsync(stoppingToken))
         {
-            await ProcessCascadeAsync(initial, stoppingToken);
+            await ProcessCascadeAsync(initial, stoppingToken).ConfigureAwait(false);
         }
 
         LogWorkerStopped();
@@ -66,7 +66,7 @@ internal sealed partial class MigrationBatchWorker(
                 // Do NOT pass stoppingToken — the in-flight batch must finish to avoid
                 // leaving the database in a partially migrated state.
                 using CancellationTokenSource batchTimeout = new(options.Value.BatchExecutionTimeout);
-                next = await executor.ExecuteBatchAsync(command, batchTimeout.Token);
+                next = await executor.ExecuteBatchAsync(command, batchTimeout.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

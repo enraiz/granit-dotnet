@@ -36,7 +36,7 @@ internal sealed class ChromiumLifetimeService(
         {
             logger.LogInformation("Downloading Chromium browser for PDF rendering...");
             BrowserFetcher fetcher = new();
-            await fetcher.DownloadAsync();
+            await fetcher.DownloadAsync().ConfigureAwait(false);
         }
 
         LaunchOptions launchOptions = new()
@@ -51,7 +51,7 @@ internal sealed class ChromiumLifetimeService(
         }
 
         logger.LogInformation("Starting headless Chromium for PDF rendering...");
-        _browser = await Puppeteer.LaunchAsync(launchOptions);
+        _browser = await Puppeteer.LaunchAsync(launchOptions).ConfigureAwait(false);
         logger.LogInformation("Headless Chromium started successfully");
     }
 
@@ -61,7 +61,7 @@ internal sealed class ChromiumLifetimeService(
         if (_browser is not null)
         {
             logger.LogInformation("Shutting down headless Chromium...");
-            await _browser.DisposeAsync();
+            await _browser.DisposeAsync().ConfigureAwait(false);
             _browser = null;
         }
     }
@@ -71,7 +71,7 @@ internal sealed class ChromiumLifetimeService(
     {
         if (_browser is not null)
         {
-            await _browser.DisposeAsync();
+            await _browser.DisposeAsync().ConfigureAwait(false);
             _browser = null;
         }
 

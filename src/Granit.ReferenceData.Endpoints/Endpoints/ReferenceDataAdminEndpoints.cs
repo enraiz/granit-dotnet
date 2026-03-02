@@ -64,7 +64,7 @@ internal static class ReferenceDataAdminEndpoints
             IsActive = true,
         };
 
-        await store.CreateAsync(entity, ct);
+        await store.CreateAsync(entity, ct).ConfigureAwait(false);
 
         return TypedResults.Created($"{request.Code}");
     }
@@ -76,7 +76,7 @@ internal static class ReferenceDataAdminEndpoints
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity, new()
     {
-        TEntity? existing = await store.GetByCodeAsync(code, ct);
+        TEntity? existing = await store.GetByCodeAsync(code, ct).ConfigureAwait(false);
         if (existing is null)
         {
             return TypedResults.NotFound();
@@ -94,7 +94,7 @@ internal static class ReferenceDataAdminEndpoints
         existing.ValidFrom = request.ValidFrom;
         existing.ValidTo = request.ValidTo;
 
-        await store.UpdateAsync(existing, ct);
+        await store.UpdateAsync(existing, ct).ConfigureAwait(false);
 
         return TypedResults.Ok();
     }
@@ -105,13 +105,13 @@ internal static class ReferenceDataAdminEndpoints
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity, new()
     {
-        TEntity? existing = await store.GetByCodeAsync(code, ct);
+        TEntity? existing = await store.GetByCodeAsync(code, ct).ConfigureAwait(false);
         if (existing is null)
         {
             return TypedResults.NotFound();
         }
 
-        await store.SetActiveAsync(code, false, ct);
+        await store.SetActiveAsync(code, false, ct).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

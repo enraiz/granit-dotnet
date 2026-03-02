@@ -42,7 +42,7 @@ internal sealed partial class ReferenceDataSeedContributor<TEntity>(
             try
             {
                 LogSeederStarted(seederName, typeof(TEntity).Name);
-                await seeder.SeedAsync(store, cancellationToken);
+                await seeder.SeedAsync(store, cancellationToken).ConfigureAwait(false);
                 LogSeederCompleted(seederName, typeof(TEntity).Name);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)

@@ -21,7 +21,7 @@ public sealed class TenantResolverPipeline(IEnumerable<ITenantResolver> resolver
     {
         foreach (ITenantResolver resolver in _resolvers)
         {
-            TenantInfo? tenant = await resolver.ResolveAsync(context, cancellationToken);
+            TenantInfo? tenant = await resolver.ResolveAsync(context, cancellationToken).ConfigureAwait(false);
             if (tenant is not null)
             {
                 return tenant;

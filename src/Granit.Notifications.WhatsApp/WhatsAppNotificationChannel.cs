@@ -20,7 +20,7 @@ internal sealed class WhatsAppNotificationChannel(
     {
         IWhatsAppSender sender = serviceProvider.GetRequiredKeyedService<IWhatsAppSender>(options.Value.Provider);
 
-        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct);
+        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct).ConfigureAwait(false);
         if (recipient?.PhoneNumber is null)
         {
             return;
@@ -31,6 +31,6 @@ internal sealed class WhatsAppNotificationChannel(
             To = recipient.PhoneNumber,
             TemplateName = context.NotificationTypeName,
             Language = context.Culture ?? recipient.PreferredCulture ?? "fr",
-        }, ct);
+        }, ct).ConfigureAwait(false);
     }
 }

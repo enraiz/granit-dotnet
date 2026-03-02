@@ -32,7 +32,7 @@ internal sealed class MappingSuggestionService(
         IMappingStore? mappingStore = serviceProvider.GetService<IMappingStore>();
         if (mappingStore is not null)
         {
-            IReadOnlyList<ColumnMapping> saved = await mappingStore.LoadAsync(definition.Name, ct);
+            IReadOnlyList<ColumnMapping> saved = await mappingStore.LoadAsync(definition.Name, ct).ConfigureAwait(false);
             ApplySuggestions(suggestions, matchedTargets, headers, saved);
         }
 
@@ -51,7 +51,7 @@ internal sealed class MappingSuggestionService(
         {
             IReadOnlyList<FieldMetadata> targetFields = definition.GetFieldMetadata();
             IReadOnlyList<SemanticMappingSuggestion> semanticSuggestions =
-                await semanticMappingService.SuggestSemanticMappingsAsync(unmappedHeaders, targetFields, ct);
+                await semanticMappingService.SuggestSemanticMappingsAsync(unmappedHeaders, targetFields, ct).ConfigureAwait(false);
 
             foreach (SemanticMappingSuggestion suggestion in semanticSuggestions
                 .Where(s => !suggestions.ContainsKey(s.SourceColumn) &&

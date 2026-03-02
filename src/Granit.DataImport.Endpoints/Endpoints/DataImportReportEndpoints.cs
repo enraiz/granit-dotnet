@@ -38,7 +38,7 @@ internal static class DataImportReportEndpoints
         IImportJobStore jobStore,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null || string.IsNullOrEmpty(job.ReportJson))
         {
             return TypedResults.NotFound();
@@ -60,7 +60,7 @@ internal static class DataImportReportEndpoints
         IServiceProvider serviceProvider,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null || string.IsNullOrEmpty(job.ReportJson))
         {
             return TypedResults.NotFound();
@@ -84,11 +84,11 @@ internal static class DataImportReportEndpoints
             return TypedResults.NoContent();
         }
 
-        Stream originalStream = await fileProvider.OpenAsync(job.BlobReference, ct);
+        Stream originalStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
         FileParsingOptions parsingOptions = new() { MimeType = job.MimeType };
 
         Stream correctionStream = await generator.GenerateAsync(
-            originalStream, job.MimeType, report, parsingOptions, ct);
+            originalStream, job.MimeType, report, parsingOptions, ct).ConfigureAwait(false);
 
         string correctionFileName = $"corrections_{job.OriginalFileName}";
         return TypedResults.File(correctionStream, job.MimeType, correctionFileName);

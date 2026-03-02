@@ -20,8 +20,8 @@ internal sealed class RequiresFeatureEndpointFilter(string featureName) : IEndpo
         IFeatureChecker checker =
             context.HttpContext.RequestServices.GetRequiredService<IFeatureChecker>();
 
-        await checker.RequireEnabledAsync(_featureName, context.HttpContext.RequestAborted);
+        await checker.RequireEnabledAsync(_featureName, context.HttpContext.RequestAborted).ConfigureAwait(false);
 
-        return await next(context);
+        return await next(context).ConfigureAwait(false);
     }
 }

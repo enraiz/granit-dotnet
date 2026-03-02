@@ -43,7 +43,7 @@ internal static class ReferenceDataReadEndpoints
             Skip: parameters.Skip,
             Take: parameters.Take);
 
-        ReferenceDataResult<TEntity> result = await store.GetAllAsync(query, ct);
+        ReferenceDataResult<TEntity> result = await store.GetAllAsync(query, ct).ConfigureAwait(false);
 
         return TypedResults.Ok(new ReferenceDataListResponse<TEntity>(result.Items, result.TotalCount));
     }
@@ -54,7 +54,7 @@ internal static class ReferenceDataReadEndpoints
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity
     {
-        TEntity? entity = await store.GetByCodeAsync(code, ct);
+        TEntity? entity = await store.GetByCodeAsync(code, ct).ConfigureAwait(false);
 
         if (entity is null)
         {

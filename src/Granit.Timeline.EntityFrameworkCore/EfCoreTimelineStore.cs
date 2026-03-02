@@ -46,9 +46,9 @@ internal sealed class EfCoreTimelineStore(
             TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
         };
 
-        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct);
+        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         db.TimelineEntries.Add(entry);
-        await db.SaveChangesAsync(ct);
+        await db.SaveChangesAsync(ct).ConfigureAwait(false);
 
         return entry;
     }
@@ -56,10 +56,10 @@ internal sealed class EfCoreTimelineStore(
     /// <inheritdoc/>
     public async Task DeleteEntryAsync(Guid entryId, CancellationToken ct = default)
     {
-        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct);
+        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         TimelineEntry entry = await db.TimelineEntries
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(e => e.Id == entryId, ct)
+            .FirstOrDefaultAsync(e => e.Id == entryId, ct).ConfigureAwait(false)
             ?? throw new KeyNotFoundException($"Timeline entry '{entryId}' not found.");
 
         if (entry.EntryType == TimelineEntryType.SystemLog)
@@ -70,7 +70,7 @@ internal sealed class EfCoreTimelineStore(
         entry.IsDeleted = true;
         entry.DeletedAt = clock.Now;
         entry.DeletedBy = currentUser.UserId;
-        await db.SaveChangesAsync(ct);
+        await db.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -82,11 +82,11 @@ internal sealed class EfCoreTimelineStore(
         long sizeBytes,
         CancellationToken ct = default)
     {
-        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct);
+        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
         bool entryExists = await db.TimelineEntries
             .IgnoreQueryFilters()
-            .AnyAsync(e => e.Id == entryId, ct);
+            .AnyAsync(e => e.Id == entryId, ct).ConfigureAwait(false);
 
         if (!entryExists)
         {
@@ -107,7 +107,7 @@ internal sealed class EfCoreTimelineStore(
         };
 
         db.TimelineAttachments.Add(attachment);
-        await db.SaveChangesAsync(ct);
+        await db.SaveChangesAsync(ct).ConfigureAwait(false);
 
         return attachment;
     }

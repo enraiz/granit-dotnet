@@ -31,7 +31,7 @@ internal sealed class ExternalIdResolver<TEntity, TContext>(
             return new RecordIdentity<TEntity> { Operation = RecordOperation.Insert };
         }
 
-        await using DataImportDbContext importContext = await importContextFactory.CreateDbContextAsync(ct);
+        await using DataImportDbContext importContext = await importContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         string definitionName = definition.Name;
 
@@ -41,15 +41,15 @@ internal sealed class ExternalIdResolver<TEntity, TContext>(
                 e => e.DefinitionName == definitionName
                      && e.ExternalId == externalId
                      && e.TenantId == tenantId,
-                ct);
+                ct).ConfigureAwait(false);
 
         if (mapping is null)
         {
             return new RecordIdentity<TEntity> { Operation = RecordOperation.Insert };
         }
 
-        await using TContext appContext = await appContextFactory.CreateDbContextAsync(ct);
-        TEntity? existing = await appContext.Set<TEntity>().FindAsync([mapping.InternalId], ct);
+        await using TContext appContext = await appContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        TEntity? existing = await appContext.Set<TEntity>().FindAsync([mapping.InternalId], ct).ConfigureAwait(false);
 
         if (existing is null)
         {

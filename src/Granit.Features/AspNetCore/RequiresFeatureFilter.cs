@@ -17,7 +17,7 @@ internal sealed class RequiresFeatureFilter(
     /// <inheritdoc/>
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        await _featureChecker.RequireEnabledAsync(_featureName, context.HttpContext.RequestAborted);
-        await next();
+        await _featureChecker.RequireEnabledAsync(_featureName, context.HttpContext.RequestAborted).ConfigureAwait(false);
+        await next().ConfigureAwait(false);
     }
 }

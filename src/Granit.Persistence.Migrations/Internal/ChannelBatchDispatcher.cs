@@ -16,14 +16,14 @@ internal sealed class ChannelBatchDispatcher(
 {
     /// <inheritdoc/>
     public async Task DispatchAsync(RunMigrationBatchCommand command, CancellationToken ct = default) =>
-        await channel.Writer.WriteAsync(command, ct);
+        await channel.Writer.WriteAsync(command, ct).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public async Task DispatchAsync(IEnumerable<RunMigrationBatchCommand> commands, CancellationToken ct = default)
     {
         foreach (RunMigrationBatchCommand command in commands)
         {
-            await channel.Writer.WriteAsync(command, ct);
+            await channel.Writer.WriteAsync(command, ct).ConfigureAwait(false);
         }
     }
 }

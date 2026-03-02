@@ -37,7 +37,7 @@ internal static class TimelineFollowerEndpoints
         CancellationToken ct)
     {
         string userId = currentUser.UserId ?? string.Empty;
-        await followerService.FollowAsync(userId, entityType, entityId, ct);
+        await followerService.FollowAsync(userId, entityType, entityId, ct).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -49,7 +49,7 @@ internal static class TimelineFollowerEndpoints
         CancellationToken ct)
     {
         string userId = currentUser.UserId ?? string.Empty;
-        await followerService.UnfollowAsync(userId, entityType, entityId, ct);
+        await followerService.UnfollowAsync(userId, entityType, entityId, ct).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -59,7 +59,7 @@ internal static class TimelineFollowerEndpoints
         ITimelineFollowerService followerService,
         CancellationToken ct)
     {
-        IReadOnlyList<string> followers = await followerService.GetFollowerIdsAsync(entityType, entityId, ct);
+        IReadOnlyList<string> followers = await followerService.GetFollowerIdsAsync(entityType, entityId, ct).ConfigureAwait(false);
         return TypedResults.Ok(followers);
     }
 }

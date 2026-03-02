@@ -46,7 +46,7 @@ public sealed class CachedHealthCheck : IHealthCheck, IDisposable
             return _cached.Value;
         }
 
-        await _lock.WaitAsync(cancellationToken);
+        await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             // Double-check after acquiring the lock: another thread may have populated the cache
@@ -56,7 +56,7 @@ public sealed class CachedHealthCheck : IHealthCheck, IDisposable
                 return _cached.Value;
             }
 
-            HealthCheckResult result = await _inner.CheckHealthAsync(context, cancellationToken);
+            HealthCheckResult result = await _inner.CheckHealthAsync(context, cancellationToken).ConfigureAwait(false);
             _cached = result;
             _expiresAt = now.Add(_cacheDuration);
             return result;

@@ -208,7 +208,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         }
 
         IReadOnlyDictionary<string, string> overrides =
-            await store.GetOverridesAsync(resourceName, cultureName, ct);
+            await store.GetOverridesAsync(resourceName, cultureName, ct).ConfigureAwait(false);
 
         return Results.Ok(overrides);
     }
@@ -266,7 +266,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        await store.SetOverrideAsync(resourceName, cultureName, key, body.Value, ct);
+        await store.SetOverrideAsync(resourceName, cultureName, key, body.Value, ct).ConfigureAwait(false);
         return Results.NoContent();
     }
 
@@ -308,7 +308,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        await store.RemoveOverrideAsync(resourceName, cultureName, key, ct);
+        await store.RemoveOverrideAsync(resourceName, cultureName, key, ct).ConfigureAwait(false);
         return Results.NoContent();
     }
 

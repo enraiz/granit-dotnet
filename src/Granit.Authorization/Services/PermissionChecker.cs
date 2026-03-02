@@ -70,7 +70,7 @@ internal sealed class PermissionChecker(
                 {
                     AbsoluteExpirationRelativeToNow = opts.CacheDuration
                 },
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
 
             if (result.IsGranted)
             {

@@ -17,7 +17,7 @@ public sealed class SettingProvider(
     /// <inheritdoc/>
     public async Task<string?> GetOrNullAsync(string name, CancellationToken ct = default)
     {
-        SettingValue? resolved = await ResolveAsync(name, ct);
+        SettingValue? resolved = await ResolveAsync(name, ct).ConfigureAwait(false);
         return resolved?.Value;
     }
 
@@ -27,7 +27,7 @@ public sealed class SettingProvider(
         List<SettingValue> result = new(names.Length);
         foreach (string name in names)
         {
-            SettingValue? resolved = await ResolveAsync(name, ct);
+            SettingValue? resolved = await ResolveAsync(name, ct).ConfigureAwait(false);
             result.Add(resolved ?? new SettingValue(name, string.Empty, null, null));
         }
         return result;
@@ -50,7 +50,7 @@ public sealed class SettingProvider(
                 continue;
             }
 
-            SettingValue? value = await provider.GetOrNullAsync(definition, ct);
+            SettingValue? value = await provider.GetOrNullAsync(definition, ct).ConfigureAwait(false);
             if (value is not null)
             {
                 return value;

@@ -10,7 +10,7 @@ internal sealed class PermissionAuthorizationHandler(IPermissionChecker permissi
         AuthorizationHandlerContext context,
         PermissionRequirement requirement)
     {
-        if (await permissionChecker.IsGrantedAsync(requirement.PermissionName))
+        if (await permissionChecker.IsGrantedAsync(requirement.PermissionName).ConfigureAwait(false))
         {
             context.Succeed(requirement);
         }

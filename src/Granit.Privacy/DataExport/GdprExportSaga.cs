@@ -73,7 +73,7 @@ public sealed class GdprExportSaga : Saga
 
         await context.ScheduleAsync(
             new ExportTimedOutEvent(evt.RequestId),
-            TimeSpan.FromMinutes(options.Value.ExportTimeoutMinutes));
+            TimeSpan.FromMinutes(options.Value.ExportTimeoutMinutes)).ConfigureAwait(false);
 
         return null;
     }

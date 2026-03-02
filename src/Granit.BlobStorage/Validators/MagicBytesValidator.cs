@@ -28,12 +28,12 @@ public sealed class MagicBytesValidator : IBlobValidator
         byte[] buffer = new byte[MagicByteDetector.RequiredByteCount];
 
         await using Stream stream = await context.OpenPartialStreamAsync(
-            MagicByteDetector.RequiredByteCount, cancellationToken);
+            MagicByteDetector.RequiredByteCount, cancellationToken).ConfigureAwait(false);
 
         int totalRead = 0;
         int read;
         while ((read = await stream.ReadAsync(
-            buffer.AsMemory(totalRead, buffer.Length - totalRead), cancellationToken)) > 0)
+            buffer.AsMemory(totalRead, buffer.Length - totalRead), cancellationToken).ConfigureAwait(false)) > 0)
         {
             totalRead += read;
         }

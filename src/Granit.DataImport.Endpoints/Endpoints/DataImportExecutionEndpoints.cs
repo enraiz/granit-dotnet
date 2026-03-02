@@ -46,7 +46,7 @@ internal static class DataImportExecutionEndpoints
         IImportCommandDispatcher dispatcher,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -59,7 +59,7 @@ internal static class DataImportExecutionEndpoints
         }
 
         ExecuteImportCommand command = new(job.Id, job.DefinitionName);
-        await dispatcher.DispatchAsync(command, ct);
+        await dispatcher.DispatchAsync(command, ct).ConfigureAwait(false);
 
         return TypedResults.Accepted($"/{job.Id}");
     }
@@ -70,7 +70,7 @@ internal static class DataImportExecutionEndpoints
         IImportOrchestrator orchestrator,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -82,7 +82,7 @@ internal static class DataImportExecutionEndpoints
                 $"Cannot dry-run import job in status '{job.Status}'. Expected: Mapped.");
         }
 
-        ImportReport report = await orchestrator.DryRunAsync(jobId, ct);
+        ImportReport report = await orchestrator.DryRunAsync(jobId, ct).ConfigureAwait(false);
 
         return TypedResults.Ok(ImportReportResponse.FromReport(jobId, report));
     }
@@ -92,7 +92,7 @@ internal static class DataImportExecutionEndpoints
         IImportJobStore jobStore,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -107,7 +107,7 @@ internal static class DataImportExecutionEndpoints
         IImportFileProvider fileProvider,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -121,8 +121,8 @@ internal static class DataImportExecutionEndpoints
         }
 
         job.Status = ImportJobStatus.Cancelled;
-        await jobStore.UpdateAsync(job, ct);
-        await fileProvider.DeleteAsync(job.BlobReference, ct);
+        await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+        await fileProvider.DeleteAsync(job.BlobReference, ct).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

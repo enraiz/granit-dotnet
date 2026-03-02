@@ -31,7 +31,6 @@ namespace Granit.Persistence.Interceptors;
 /// </remarks>
 public sealed class VersioningInterceptor(IGuidGenerator guidGenerator) : SaveChangesInterceptor
 {
-    private readonly IGuidGenerator _guidGenerator = guidGenerator;
 
     /// <inheritdoc/>
     public override InterceptionResult<int> SavingChanges(
@@ -76,7 +75,7 @@ public sealed class VersioningInterceptor(IGuidGenerator guidGenerator) : SaveCh
             // Assign a new BusinessId for brand-new logical entities
             if (versioned.BusinessId == Guid.Empty)
             {
-                versioned.BusinessId = _guidGenerator.Create();
+                versioned.BusinessId = guidGenerator.Create();
             }
 
             // Determine the next version for this BusinessId.

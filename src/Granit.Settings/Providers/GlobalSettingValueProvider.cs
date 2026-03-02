@@ -43,7 +43,7 @@ public sealed class GlobalSettingValueProvider(
             async innerCt =>
             {
                 SettingValue? stored = await _store.GetOrNullAsync(
-                    definition.Name, ProviderName, null, innerCt);
+                    definition.Name, ProviderName, null, innerCt).ConfigureAwait(false);
                 // Sentinel to distinguish "stored null" from "absent from cache"
                 return stored ?? new SettingValue(definition.Name, ProviderName, null, null);
             },
@@ -56,14 +56,14 @@ public sealed class GlobalSettingValueProvider(
     /// <inheritdoc/>
     public async Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default)
     {
-        await _store.SetAsync(definition.Name, ProviderName, null, value, ct);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, null, definition.Name), ct);
+        await _store.SetAsync(definition.Name, ProviderName, null, value, ct).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, null, definition.Name), ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task ClearAsync(SettingDefinition definition, CancellationToken ct = default)
     {
-        await _store.DeleteAsync(definition.Name, ProviderName, null, ct);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, null, definition.Name), ct);
+        await _store.DeleteAsync(definition.Name, ProviderName, null, ct).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, null, definition.Name), ct).ConfigureAwait(false);
     }
 }

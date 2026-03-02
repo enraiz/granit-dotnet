@@ -35,7 +35,7 @@ internal sealed class TextTemplateRenderer(
         TData data,
         CancellationToken ct = default) where TData : notnull
     {
-        RenderedContent rendered = await RenderCoreAsync(templateType, data, DocumentFormat.Html, ct);
+        RenderedContent rendered = await RenderCoreAsync(templateType, data, DocumentFormat.Html, ct).ConfigureAwait(false);
 
         if (rendered is not TextRenderedContent text)
         {
@@ -62,12 +62,12 @@ internal sealed class TextTemplateRenderer(
         CancellationToken ct) where TData : notnull
     {
         // 1. Enrich data (ordered, immutable)
-        TData enrichedData = await EnrichAsync(data, ct);
+        TData enrichedData = await EnrichAsync(data, ct).ConfigureAwait(false);
 
         // 2. Resolve template (culture-specific, then neutral fallback)
         string culture = CultureInfo.CurrentCulture.Name;
         TemplateDescriptor descriptor =
-            await ResolveAsync(templateType.Name, culture, ct)
+            await ResolveAsync(templateType.Name, culture, ct).ConfigureAwait(false)
             ?? throw new TemplateNotFoundException(templateType.Name, culture);
 
         // 3. Select engine by MIME type and render
@@ -80,7 +80,7 @@ internal sealed class TextTemplateRenderer(
                 "Register a compatible engine (e.g. AddGranitTemplatingWithScriban or AddGranitDocumentGenerationExcel).");
         }
 
-        return await engine.RenderAsync(descriptor, enrichedData, targetFormat, _globalContexts, ct);
+        return await engine.RenderAsync(descriptor, enrichedData, targetFormat, _globalContexts, ct).ConfigureAwait(false);
     }
 
     private async Task<TData> EnrichAsync<TData>(TData data, CancellationToken ct)
@@ -92,7 +92,7 @@ internal sealed class TextTemplateRenderer(
         TData current = data;
         foreach (ITemplateDataEnricher<TData> enricher in enrichers.OrderBy(e => e.Order))
         {
-            current = await enricher.EnrichAsync(current, ct);
+            current = await enricher.EnrichAsync(current, ct).ConfigureAwait(false);
         }
 
         return current;
@@ -105,7 +105,7 @@ internal sealed class TextTemplateRenderer(
         TemplateKey culturalKey = new(name, culture);
         foreach (ITemplateResolver resolver in _resolvers)
         {
-            TemplateDescriptor? descriptor = await resolver.TryResolveAsync(culturalKey, ct);
+            TemplateDescriptor? descriptor = await resolver.TryResolveAsync(culturalKey, ct).ConfigureAwait(false);
             if (descriptor is not null)
             {
                 return descriptor;
@@ -116,7 +116,7 @@ internal sealed class TextTemplateRenderer(
         TemplateKey neutralKey = new(name);
         foreach (ITemplateResolver resolver in _resolvers)
         {
-            TemplateDescriptor? descriptor = await resolver.TryResolveAsync(neutralKey, ct);
+            TemplateDescriptor? descriptor = await resolver.TryResolveAsync(neutralKey, ct).ConfigureAwait(false);
             if (descriptor is not null)
             {
                 return descriptor;

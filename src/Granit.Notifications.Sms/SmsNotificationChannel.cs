@@ -20,7 +20,7 @@ internal sealed class SmsNotificationChannel(
     {
         ISmsSender sender = serviceProvider.GetRequiredKeyedService<ISmsSender>(options.Value.Provider);
 
-        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct);
+        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct).ConfigureAwait(false);
         if (recipient?.PhoneNumber is null)
         {
             return;
@@ -33,6 +33,6 @@ internal sealed class SmsNotificationChannel(
             To = recipient.PhoneNumber,
             Body = body,
             SenderId = options.Value.SenderId,
-        }, ct);
+        }, ct).ConfigureAwait(false);
     }
 }

@@ -30,7 +30,7 @@ public sealed class WorkflowManager<TState>(
             }
 
             bool hasPermission = await _permissionChecker.IsGrantedAsync(
-                transition.RequiredPermission, cancellationToken);
+                transition.RequiredPermission, cancellationToken).ConfigureAwait(false);
 
             if (hasPermission || transition.RequiresApproval)
             {
@@ -74,7 +74,7 @@ public sealed class WorkflowManager<TState>(
         if (transition.RequiredPermission is not null)
         {
             bool hasPermission = await _permissionChecker.IsGrantedAsync(
-                transition.RequiredPermission, cancellationToken);
+                transition.RequiredPermission, cancellationToken).ConfigureAwait(false);
 
             if (!hasPermission)
             {

@@ -62,7 +62,7 @@ public abstract class DependencyInjectionCodeFixProviderBase : CodeFixProvider
     /// <inheritdoc/>
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
+        SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
         if (root is null)
         {
             return;
@@ -89,7 +89,7 @@ public abstract class DependencyInjectionCodeFixProviderBase : CodeFixProvider
         SyntaxNode node,
         CancellationToken ct)
     {
-        SyntaxNode? root = await document.GetSyntaxRootAsync(ct);
+        SyntaxNode? root = await document.GetSyntaxRootAsync(ct).ConfigureAwait(false);
         if (root is null)
         {
             return document;

@@ -16,6 +16,7 @@ using Granit.Persistence;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using NSubstitute;
 using Shouldly;
 using Testcontainers.PostgreSql;
@@ -70,8 +71,8 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
 
         await Task.WhenAll(_containerA.StartAsync(), _containerB.StartAsync());
 
-        ConnectionStringA = _containerA.GetConnectionString();
-        ConnectionStringB = _containerB.GetConnectionString();
+        ConnectionStringA = ApplyHostOverride(_containerA.GetConnectionString());
+        ConnectionStringB = ApplyHostOverride(_containerB.GetConnectionString());
 
         await MigrateAsync(ConnectionStringA);
         await MigrateAsync(ConnectionStringB);
@@ -81,6 +82,23 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
     {
         await _containerA.DisposeAsync();
         await _containerB.DisposeAsync();
+    }
+
+    /// <summary>
+    /// In DinD (Docker-in-Docker) CI environments, Testcontainers returns the internal
+    /// bridge IP (172.17.0.x) which is not routable from the CI job container.
+    /// Replace the host with TESTCONTAINERS_HOST_OVERRIDE when set.
+    /// </summary>
+    private static string ApplyHostOverride(string connectionString)
+    {
+        string? hostOverride = Environment.GetEnvironmentVariable("TESTCONTAINERS_HOST_OVERRIDE");
+        if (string.IsNullOrEmpty(hostOverride))
+        {
+            return connectionString;
+        }
+
+        NpgsqlConnectionStringBuilder builder = new(connectionString) { Host = hostOverride };
+        return builder.ConnectionString;
     }
 
     private static async Task MigrateAsync(string connectionString)

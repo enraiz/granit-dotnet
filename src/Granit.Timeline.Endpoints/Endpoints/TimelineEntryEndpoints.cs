@@ -37,23 +37,23 @@ internal static class TimelineEntryEndpoints
     {
         TimelineEntry entry = await store.PostEntryAsync(
             entityType, entityId, request.EntryType, request.Body,
-            request.ParentEntryId, ct);
+            request.ParentEntryId, ct).ConfigureAwait(false);
 
         // Parse @mentions and auto-subscribe mentioned users
         IReadOnlyList<string> mentionedUserIds = MentionParser.ExtractMentionedUserIds(entry.Body);
         foreach (string userId in mentionedUserIds)
         {
-            await followerService.FollowAsync(userId, entityType, entityId, ct);
+            await followerService.FollowAsync(userId, entityType, entityId, ct).ConfigureAwait(false);
         }
 
         // Notify followers
-        IReadOnlyList<string> followerIds = await followerService.GetFollowerIdsAsync(entityType, entityId, ct);
-        await notifier.NotifyEntryPostedAsync(entry, followerIds, ct);
+        IReadOnlyList<string> followerIds = await followerService.GetFollowerIdsAsync(entityType, entityId, ct).ConfigureAwait(false);
+        await notifier.NotifyEntryPostedAsync(entry, followerIds, ct).ConfigureAwait(false);
 
         // Notify mentioned users separately (may include extra channels like email)
         if (mentionedUserIds.Count > 0)
         {
-            await notifier.NotifyMentionedUsersAsync(entry, mentionedUserIds, ct);
+            await notifier.NotifyMentionedUsersAsync(entry, mentionedUserIds, ct).ConfigureAwait(false);
         }
 
         TimelineStreamEntry result = new()
@@ -87,7 +87,7 @@ internal static class TimelineEntryEndpoints
     {
         try
         {
-            await store.DeleteEntryAsync(entryId, ct);
+            await store.DeleteEntryAsync(entryId, ct).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
         catch (KeyNotFoundException)

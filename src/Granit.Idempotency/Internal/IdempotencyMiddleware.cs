@@ -45,7 +45,7 @@ internal sealed partial class IdempotencyMiddleware(
         IIdempotencyMetadata? meta = context.GetEndpoint()?.Metadata.GetMetadata<IIdempotencyMetadata>();
         if (meta is null)
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
             return;
         }
 
@@ -55,13 +55,13 @@ internal sealed partial class IdempotencyMiddleware(
         {
             if (!meta.Required)
             {
-                await next(context);
+                await next(context).ConfigureAwait(false);
                 return;
             }
 
             await WriteProblemAsync(context, StatusCodes.Status422UnprocessableEntity,
                 "Missing Idempotency-Key",
-                $"The '{_opts.HeaderName}' header is required for this endpoint.");
+                $"The '{_opts.HeaderName}' header is required for this endpoint.").ConfigureAwait(false);
             return;
         }
 
@@ -70,21 +70,21 @@ internal sealed partial class IdempotencyMiddleware(
         {
             await WriteProblemAsync(context, StatusCodes.Status422UnprocessableEntity,
                 "Unsupported Content-Type",
-                "Multipart/form-data requests cannot be made idempotent due to non-deterministic boundaries.");
+                "Multipart/form-data requests cannot be made idempotent due to non-deterministic boundaries.").ConfigureAwait(false);
             return;
         }
 
         // 4. Compute payload hash once (reads + rewinds the buffered body)
-        string payloadHash = await ComputePayloadHashAsync(context, idempotencyKey);
+        string payloadHash = await ComputePayloadHashAsync(context, idempotencyKey).ConfigureAwait(false);
 
         // 5. Build the composite Redis key
         string redisKey = BuildRedisKey(context, idempotencyKey);
 
         // 6. Check for an existing entry
-        IdempotencyEntry? existing = await _store.GetAsync(redisKey, context.RequestAborted);
+        IdempotencyEntry? existing = await _store.GetAsync(redisKey, context.RequestAborted).ConfigureAwait(false);
         if (existing is not null)
         {
-            await HandleExistingEntryAsync(context, existing, redisKey, payloadHash, meta);
+            await HandleExistingEntryAsync(context, existing, redisKey, payloadHash, meta).ConfigureAwait(false);
             return;
         }
 
@@ -97,14 +97,14 @@ internal sealed partial class IdempotencyMiddleware(
             CreatedAt = createdAt,
         };
 
-        bool acquired = await _store.TryAcquireAsync(redisKey, inProgressEntry, _opts.InProgressTtl, context.RequestAborted);
+        bool acquired = await _store.TryAcquireAsync(redisKey, inProgressEntry, _opts.InProgressTtl, context.RequestAborted).ConfigureAwait(false);
         if (!acquired)
         {
             // Another pod acquired between GetAsync and TryAcquireAsync — re-read
-            IdempotencyEntry? concurrent = await _store.GetAsync(redisKey, context.RequestAborted);
+            IdempotencyEntry? concurrent = await _store.GetAsync(redisKey, context.RequestAborted).ConfigureAwait(false);
             if (concurrent is not null)
             {
-                await HandleExistingEntryAsync(context, concurrent, redisKey, payloadHash, meta);
+                await HandleExistingEntryAsync(context, concurrent, redisKey, payloadHash, meta).ConfigureAwait(false);
                 return;
             }
 
@@ -114,7 +114,7 @@ internal sealed partial class IdempotencyMiddleware(
         }
 
         // 8. Execute downstream handler and capture the response
-        await ExecuteAndCaptureAsync(context, next, redisKey, payloadHash, createdAt, meta);
+        await ExecuteAndCaptureAsync(context, next, redisKey, payloadHash, createdAt, meta).ConfigureAwait(false);
     }
 
     // =========================================================================
@@ -134,7 +134,7 @@ internal sealed partial class IdempotencyMiddleware(
             context.Response.Headers.RetryAfter = retryAfter.ToString();
             await WriteProblemAsync(context, StatusCodes.Status409Conflict,
                 "Request In Progress",
-                $"A request with this idempotency key is already being processed. Retry after {retryAfter}s.");
+                $"A request with this idempotency key is already being processed. Retry after {retryAfter}s.").ConfigureAwait(false);
             return;
         }
 
@@ -143,12 +143,12 @@ internal sealed partial class IdempotencyMiddleware(
         {
             await WriteProblemAsync(context, StatusCodes.Status422UnprocessableEntity,
                 "Idempotency Key Conflict",
-                "The request payload does not match the original request associated with this idempotency key.");
+                "The request payload does not match the original request associated with this idempotency key.").ConfigureAwait(false);
             return;
         }
 
         // Replay the completed response
-        await ReplayResponseAsync(context, entry);
+        await ReplayResponseAsync(context, entry).ConfigureAwait(false);
         LogReplay(_logger, redisKey, entry.StatusCode, entry.CompletedAt);
 
         // meta may carry per-endpoint TTL overrides — kept as parameter for symmetry
@@ -182,13 +182,13 @@ internal sealed partial class IdempotencyMiddleware(
 
         try
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
             executedSuccessfully = true;
         }
         catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !originalAborted.IsCancellationRequested)
         {
             // ExecutionTimeout fired: release InProgress lock and write 503 so clients can retry
-            await _store.DeleteAsync(redisKey, CancellationToken.None);
+            await _store.DeleteAsync(redisKey, CancellationToken.None).ConfigureAwait(false);
             LogExecutionTimeout(_logger, redisKey, (int)_opts.ExecutionTimeout.TotalSeconds);
 
             // Restore before WriteProblemAsync so 503 goes to the client socket, not the capture stream
@@ -197,7 +197,7 @@ internal sealed partial class IdempotencyMiddleware(
 
             await WriteProblemAsync(context, StatusCodes.Status503ServiceUnavailable,
                 "Execution Timeout",
-                $"The request handler exceeded the maximum allowed execution time of {(int)_opts.ExecutionTimeout.TotalSeconds}s. Please retry.");
+                $"The request handler exceeded the maximum allowed execution time of {(int)_opts.ExecutionTimeout.TotalSeconds}s. Please retry.").ConfigureAwait(false);
             return; // executedSuccessfully = false; finally block is a no-op
         }
         catch (OperationCanceledException) when (originalAborted.IsCancellationRequested)
@@ -209,7 +209,7 @@ internal sealed partial class IdempotencyMiddleware(
         catch
         {
             // 5xx or unexpected exception — release the InProgress lock
-            await _store.DeleteAsync(redisKey, CancellationToken.None);
+            await _store.DeleteAsync(redisKey, CancellationToken.None).ConfigureAwait(false);
             throw;
         }
         finally
@@ -225,13 +225,13 @@ internal sealed partial class IdempotencyMiddleware(
 
         // Copy captured bytes to the actual response body
         captureStream.Seek(0, SeekOrigin.Begin);
-        await captureStream.CopyToAsync(originalBody, originalAborted);
+        await captureStream.CopyToAsync(originalBody, originalAborted).ConfigureAwait(false);
 
         // Decide whether to cache the response
         int statusCode = context.Response.StatusCode;
         if (!_opts.ShouldCacheStatusCode(statusCode))
         {
-            await _store.DeleteAsync(redisKey, CancellationToken.None);
+            await _store.DeleteAsync(redisKey, CancellationToken.None).ConfigureAwait(false);
             return;
         }
 
@@ -269,7 +269,7 @@ internal sealed partial class IdempotencyMiddleware(
             CompletedAt = _timeProvider.GetUtcNow(),
         };
 
-        await _store.SetCompletedAsync(redisKey, completedEntry, completedTtl, CancellationToken.None);
+        await _store.SetCompletedAsync(redisKey, completedEntry, completedTtl, CancellationToken.None).ConfigureAwait(false);
     }
 
     // =========================================================================
@@ -297,7 +297,7 @@ internal sealed partial class IdempotencyMiddleware(
 
         if (entry.ResponseBody is { Length: > 0 })
         {
-            await context.Response.Body.WriteAsync(entry.ResponseBody);
+            await context.Response.Body.WriteAsync(entry.ResponseBody).ConfigureAwait(false);
         }
     }
 
@@ -325,7 +325,7 @@ internal sealed partial class IdempotencyMiddleware(
         {
             int totalRead = 0;
             int read;
-            while ((read = await context.Request.Body.ReadAsync(buffer, context.RequestAborted)) > 0
+            while ((read = await context.Request.Body.ReadAsync(buffer, context.RequestAborted).ConfigureAwait(false)) > 0
                    && totalRead < _opts.MaxBodySizeBytes)
             {
                 int toHash = Math.Min(read, _opts.MaxBodySizeBytes - totalRead);

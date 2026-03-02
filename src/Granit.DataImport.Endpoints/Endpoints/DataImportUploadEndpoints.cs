@@ -75,7 +75,7 @@ internal static class DataImportUploadEndpoints
         }
 
         await using Stream stream = file.OpenReadStream();
-        string blobReference = await fileProvider.SaveAsync(file.FileName, stream, ct);
+        string blobReference = await fileProvider.SaveAsync(file.FileName, stream, ct).ConfigureAwait(false);
 
         ImportJob job = new()
         {
@@ -90,7 +90,7 @@ internal static class DataImportUploadEndpoints
             CreatedAt = clock.Now,
         };
 
-        await jobStore.CreateAsync(job, ct);
+        await jobStore.CreateAsync(job, ct).ConfigureAwait(false);
 
         return TypedResults.Created($"/{job.Id}", ImportJobResponse.FromJob(job));
     }
@@ -103,7 +103,7 @@ internal static class DataImportUploadEndpoints
         IMappingSuggestionService mappingService,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -125,19 +125,19 @@ internal static class DataImportUploadEndpoints
 
         FileParsingOptions parsingOptions = new() { MimeType = job.MimeType };
 
-        await using Stream headerStream = await fileProvider.OpenAsync(job.BlobReference, ct);
-        IReadOnlyList<string> headers = await parser.ExtractHeadersAsync(headerStream, parsingOptions, ct);
+        await using Stream headerStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
+        IReadOnlyList<string> headers = await parser.ExtractHeadersAsync(headerStream, parsingOptions, ct).ConfigureAwait(false);
 
-        await using Stream previewStream = await fileProvider.OpenAsync(job.BlobReference, ct);
-        IReadOnlyList<string[]> previewRows = await parser.ReadPreviewAsync(previewStream, parsingOptions, ct: ct);
+        await using Stream previewStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
+        IReadOnlyList<string[]> previewRows = await parser.ReadPreviewAsync(previewStream, parsingOptions, ct: ct).ConfigureAwait(false);
 
         IReadOnlyList<ColumnMapping> suggestions =
-            await ImportDefinitionResolver.SuggestMappingsAsync(mappingService, descriptor.EntityType, headers, ct);
+            await ImportDefinitionResolver.SuggestMappingsAsync(mappingService, descriptor.EntityType, headers, ct).ConfigureAwait(false);
 
         IReadOnlyList<FieldMetadata> fieldMetadata = descriptor.GetFieldMetadata();
 
         job.Status = ImportJobStatus.Previewed;
-        await jobStore.UpdateAsync(job, ct);
+        await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
 
         return TypedResults.Ok(new ImportPreviewResponse(headers, previewRows, suggestions, fieldMetadata));
     }
@@ -148,7 +148,7 @@ internal static class DataImportUploadEndpoints
         IImportJobStore jobStore,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct);
+        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -161,7 +161,7 @@ internal static class DataImportUploadEndpoints
 
         job.MappingsJson = JsonSerializer.Serialize(request.Mappings);
         job.Status = ImportJobStatus.Mapped;
-        await jobStore.UpdateAsync(job, ct);
+        await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

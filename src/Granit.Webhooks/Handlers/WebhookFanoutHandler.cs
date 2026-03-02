@@ -38,7 +38,7 @@ public sealed class WebhookFanoutHandler(
             await subscriptionStore.GetActiveSubscriptionsAsync(
                 trigger.EventType,
                 tenantId,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
 
         if (subscriptions.Count == 0)
         {
