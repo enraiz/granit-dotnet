@@ -19,7 +19,7 @@ internal static class TimelineEntryEndpoints
             .WithName("PostTimelineEntry")
             .WithSummary("Posts a new comment, internal note, or system log entry.");
 
-        group.MapDelete("/entries/{entryId:guid}", DeleteEntryAsync)
+        group.MapDelete("/{entityType}/{entityId}/entries/{entryId:guid}", DeleteEntryAsync)
             .WithName("DeleteTimelineEntry")
             .WithSummary("Soft-deletes a comment or internal note (RGPD right to erasure).");
 
@@ -76,10 +76,14 @@ internal static class TimelineEntryEndpoints
         return TypedResults.Created($"/api/timeline/{entityType}/{entityId}/entries/{entry.Id}", result);
     }
 
+#pragma warning disable S1172 // Route parameters bound by ASP.NET Core minimal API
     private static async Task<Results<NoContent, NotFound>> DeleteEntryAsync(
+        string entityType,
+        string entityId,
         Guid entryId,
         ITimelineStore store,
         CancellationToken ct)
+#pragma warning restore S1172
     {
         try
         {
