@@ -64,6 +64,33 @@ mais **sans** la permission requise :
 3. `Granit.Workflow.Notifications` notifie les approbateurs désignés
 4. Un approbateur (utilisateur avec la permission) peut ensuite valider
 
+#### Résolution des approbateurs Keycloak
+
+Le résolveur intégré `KeycloakApproverResolver` suit le flux :
+
+1. **Permission → rôles** : interroge `IPermissionManager.GetGrantedRolesAsync()`
+   pour trouver les rôles ayant la permission requise (via la base de données
+   d'autorisation)
+2. **Rôles → utilisateurs** : pour chaque rôle, appelle l'API Admin Keycloak
+   (`GET /admin/realms/{realm}/roles/{role}/users`) pour obtenir les membres
+3. Les identifiants utilisateurs sont dédupliqués et retournés
+
+Configuration requise (`appsettings.json`) :
+
+```json
+{
+  "KeycloakAdmin": {
+    "BaseUrl": "https://keycloak.example.com",
+    "Realm": "guava-health",
+    "ClientId": "guava-admin-service",
+    "ClientSecret": "vault-injected"
+  }
+}
+```
+
+Le service account doit disposer du rôle `realm-management:view-users`.
+Le secret doit être injecté depuis Vault — jamais en clair dans la configuration.
+
 ### Piste d'audit HDS
 
 Le `WorkflowTransitionInterceptor` crée automatiquement un `WorkflowTransitionRecord`
@@ -136,6 +163,11 @@ services.AddGranitWorkflowEntityFrameworkCore();
 
 // Granit.Workflow.Notifications
 services.AddGranitWorkflowNotifications();
+
+// Option 1 : résolveur Keycloak intégré (permission → rôle → users via Admin API)
+services.AddKeycloakApproverResolver();
+
+// Option 2 : résolveur custom
 services.AddWorkflowApproverResolver<MyApproverResolver>();
 
 // Granit.Workflow.Endpoints
