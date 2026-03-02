@@ -143,9 +143,14 @@ integration-test:
     - |
       cat > ~/.testcontainers.properties <<EOF
       docker.host=tcp://docker:2375
-      host.override=docker
+      docker.host.override=docker
       ryuk.disabled=true
       EOF
+    - echo "--- DinD diagnostic ---"
+    - echo "DOCKER_HOST=$DOCKER_HOST"
+    - echo "TESTCONTAINERS_HOST_OVERRIDE=$TESTCONTAINERS_HOST_OVERRIDE"
+    - cat ~/.testcontainers.properties
+    - echo "--- end diagnostic ---"
     - dotnet build -c $CONFIGURATION
     - >
       dotnet test -c $CONFIGURATION --no-build

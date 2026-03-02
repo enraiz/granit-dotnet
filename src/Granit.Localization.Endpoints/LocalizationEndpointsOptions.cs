@@ -10,23 +10,32 @@ namespace Granit.Localization.Endpoints;
 public sealed class LocalizationEndpointsOptions
 {
     /// <summary>
-    /// Route prefix for both the bootstrapping endpoint and the overrides management endpoints.
-    /// Default: <c>"api/granit/localization"</c>.
+    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
+    /// (e.g., <c>"api/v1"</c>). Empty by default (no prefix).
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>MapGranitLocalization</c> registers <c>GET /{RoutePrefix}</c>.
-    /// <c>MapGranitLocalizationOverrides</c> registers CRUD under <c>/{RoutePrefix}/overrides</c>.
-    /// </para>
-    /// <para>
-    /// Change this to include a version segment when needed:
+    /// Example with versioning:
     /// <code>
-    /// app.MapGranitLocalization(opts => opts.RoutePrefix = "api/v1/granit/localization");
-    /// app.MapGranitLocalizationOverrides(opts => opts.RoutePrefix = "api/v1/granit/localization");
+    /// app.MapGranitLocalization(opts => opts.ApiPrefix = "api/v1");
+    /// app.MapGranitLocalizationOverrides(opts => opts.ApiPrefix = "api/v1");
     /// </code>
+    /// This produces routes like <c>GET /api/v1/localization</c>.
     /// </para>
     /// </remarks>
-    public string RoutePrefix { get; set; } = "api/granit/localization";
+    public string ApiPrefix { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Route prefix for both the bootstrapping endpoint and the overrides management endpoints.
+    /// Default: <c>"localization"</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>MapGranitLocalization</c> registers <c>GET /{EffectivePrefix}</c>.
+    /// <c>MapGranitLocalizationOverrides</c> registers CRUD under <c>/{EffectivePrefix}/overrides</c>.
+    /// </para>
+    /// </remarks>
+    public string RoutePrefix { get; set; } = "localization";
 
     /// <summary>
     /// OpenAPI tag name for all localization endpoints.

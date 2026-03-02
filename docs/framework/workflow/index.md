@@ -193,7 +193,14 @@ public sealed class AppDbContext : DbContext, IWorkflowDbContext
 
 | Méthode | Route | Description |
 | --- | --- | --- |
-| `GET` | `/api/workflow/{entityType}/{entityId}/history` | Piste d'audit des transitions |
+| `GET` | `/workflow/{entityType}/{entityId}/history` | Piste d'audit des transitions |
+
+Le préfixe par défaut est `workflow`. Avec `ApiPrefix = "api/v1"`, la route
+devient `/api/v1/workflow/{entityType}/{entityId}/history`.
+
+```csharp
+app.MapWorkflowEndpoints(opts => opts.ApiPrefix = "api/v1");
+```
 
 ## Composant React
 

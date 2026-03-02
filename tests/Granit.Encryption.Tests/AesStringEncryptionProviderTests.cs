@@ -68,7 +68,8 @@ public sealed class AesStringEncryptionProviderTests
         string cipherText = provider.Encrypt("test");
 
         byte[] bytes = Convert.FromBase64String(cipherText);
-        bytes.Length.ShouldBeGreaterThan(16, "le ciphertext doit contenir au moins IV(16) + un bloc AES");
+        // IV(16) + at least one AES block(16) + HMAC-SHA256(32) = 64 bytes minimum
+        bytes.Length.ShouldBeGreaterThanOrEqualTo(64, "le ciphertext doit contenir IV(16) + bloc AES + HMAC(32)");
     }
 
     [Fact]
@@ -121,8 +122,8 @@ public sealed class AesStringEncryptionProviderTests
     public void Decrypt_TooShortInput_Returns_Null()
     {
         AesStringEncryptionProvider provider = CreateProvider();
-        // Moins de 17 octets (IV=16 + au moins 1 octet de données)
-        string tooShort = Convert.ToBase64String(new byte[10]);
+        // Moins de 64 octets (IV=16 + bloc AES=16 + HMAC-SHA256=32)
+        string tooShort = Convert.ToBase64String(new byte[50]);
 
         string? result = provider.Decrypt(tooShort);
 

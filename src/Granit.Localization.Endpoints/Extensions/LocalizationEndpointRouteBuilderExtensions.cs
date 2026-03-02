@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // LocalizationEndpointRouteBuilderExtensions.cs
 // Minimal API extensions for Granit localization:
-//   - MapGranitLocalization: GET /api/granit/localization (SPA bootstrapping, anonymous)
-//   - MapGranitLocalizationOverrides: CRUD /api/granit/localization/overrides
+//   - MapGranitLocalization: GET /{prefix}/localization (SPA bootstrapping, anonymous)
+//   - MapGranitLocalizationOverrides: CRUD /{prefix}/localization/overrides
 //     (admin, requires Localization.Overrides.Manage permission)
 // ---------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
     private const int MaxValueLength = 4000;
 
     /// <summary>
-    /// Maps <c>GET /api/granit/localization</c> — returns all registered localization
+    /// Maps <c>GET /{prefix}/localization</c> — returns all registered localization
     /// resources for the requested culture, plus the list of available languages.
     /// </summary>
     /// <remarks>
@@ -56,8 +56,12 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         LocalizationEndpointsOptions options = new();
         configure?.Invoke(options);
 
+        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
+            ? options.RoutePrefix
+            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+
         endpoints
-            .MapGet(options.RoutePrefix, HandleGetLocalizationAsync)
+            .MapGet(prefix, HandleGetLocalizationAsync)
             .AllowAnonymous()
             .WithName("GetGranitLocalization")
             .WithTags(options.TagName)
@@ -71,7 +75,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers 3 endpoints under <c>/api/granit/localization/overrides</c>:
+    /// Registers 3 endpoints under <c>/{prefix}/localization/overrides</c>:
     /// <list type="bullet">
     /// <item><c>GET ?resourceName=X&amp;cultureName=fr</c> — list all overrides for a resource/culture</item>
     /// <item><c>PUT /{resourceName}/{cultureName}/{key}</c> — create or update an override</item>
@@ -94,8 +98,12 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         LocalizationEndpointsOptions options = new();
         configure?.Invoke(options);
 
+        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
+            ? options.RoutePrefix
+            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+
         RouteGroupBuilder group = endpoints
-            .MapGroup($"{options.RoutePrefix}/overrides")
+            .MapGroup($"{prefix}/overrides")
             .RequireAuthorization(LocalizationOverridesPermissions.Manage)
             .WithTags(options.TagName);
 
@@ -115,7 +123,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
     }
 
     // -------------------------------------------------------------------------
-    // Handlers — GET /api/granit/localization
+    // Handlers — GET /{prefix}/localization
     // -------------------------------------------------------------------------
 
     private static IResult HandleGetLocalizationAsync(HttpContext context, string? cultureName = null)
@@ -159,7 +167,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
     }
 
     // -------------------------------------------------------------------------
-    // Handlers — CRUD /api/granit/localization/overrides
+    // Handlers — CRUD /{prefix}/localization/overrides
     // -------------------------------------------------------------------------
 
     private static async Task<IResult> HandleGetOverridesAsync(

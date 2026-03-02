@@ -58,10 +58,14 @@ configurable (par défaut : `ReferenceData.Admin`, rôle `granit-reference-data-
 
 | Option | Par défaut | Description |
 | --- | --- | --- |
-| `RoutePrefix` | `reference-data` | Préfixe de route |
+| `ApiPrefix` | *(vide)* | Préfixe API prépendé au `RoutePrefix` (ex. `api/v1`) |
+| `RoutePrefix` | `reference-data` | Segment de domaine |
 | `TagName` | `Reference Data` | Tag OpenAPI pour Swagger |
 | `AdminPolicyName` | `ReferenceData.Admin` | Politique d'autorisation admin |
 | `RequiredRole` | `granit-reference-data-admin` | Rôle requis (fallback) |
+
+Le préfixe effectif est calculé : `{ApiPrefix}/{RoutePrefix}/{entity}`. Sans
+`ApiPrefix`, seul `{RoutePrefix}/{entity}` est utilisé.
 
 ## DTOs
 

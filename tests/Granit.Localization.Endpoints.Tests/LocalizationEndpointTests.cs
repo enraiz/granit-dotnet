@@ -47,7 +47,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=fr",
+            "/localization?cultureName=fr",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -64,7 +64,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=en",
+            "/localization?cultureName=en",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -80,7 +80,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act — fr-CA falls back to fr
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=fr-CA",
+            "/localization?cultureName=fr-CA",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -96,7 +96,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=en:invalid",
+            "/localization?cultureName=en:invalid",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -108,7 +108,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act — falls back to CultureInfo.CurrentUICulture
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization",
+            "/localization",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -120,7 +120,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=fr",
+            "/localization?cultureName=fr",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -141,7 +141,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=fr",
+            "/localization?cultureName=fr",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -161,7 +161,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     public async Task GetLocalization_IsAllowedAnonymously()
     {
         // Arrange — no Authorization header
-        using HttpRequestMessage request = new(HttpMethod.Get, "/api/granit/localization?cultureName=fr");
+        using HttpRequestMessage request = new(HttpMethod.Get, "/localization?cultureName=fr");
 
         // Act
         HttpResponseMessage response = await _client.SendAsync(request, TestContext.Current.CancellationToken);
@@ -176,7 +176,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=fr",
+            "/localization?cultureName=fr",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -190,7 +190,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync(
-            "/api/granit/localization?cultureName=fr",
+            "/localization?cultureName=fr",
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -206,7 +206,7 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         builder.Services.AddGranitLocalization(opts => opts.Resources.Add<TestResource>("fr"));
 
         WebApplication app = builder.Build();
-        app.MapGranitLocalization(opts => opts.RoutePrefix = "api/v1/granit/localization");
+        app.MapGranitLocalization(opts => opts.RoutePrefix = "i18n");
         await app.StartAsync(TestContext.Current.CancellationToken);
         HttpClient client = app.GetTestClient();
 
@@ -214,13 +214,47 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         {
             // Default route must not be registered
             HttpResponseMessage notFound = await client.GetAsync(
-                "/api/granit/localization",
+                "/localization",
                 TestContext.Current.CancellationToken);
             notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
             // Custom route must respond
             HttpResponseMessage ok = await client.GetAsync(
-                "/api/v1/granit/localization",
+                "/i18n",
+                TestContext.Current.CancellationToken);
+            ok.StatusCode.ShouldBe(HttpStatusCode.OK);
+        }
+        finally
+        {
+            client.Dispose();
+            await app.DisposeAsync();
+        }
+    }
+
+    [Fact]
+    public async Task MapGranitLocalization_WithApiPrefix_RespondsOnPrefixedRoute()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+        builder.Services.AddGranitLocalization(opts => opts.Resources.Add<TestResource>("fr"));
+
+        WebApplication app = builder.Build();
+        app.MapGranitLocalization(opts => opts.ApiPrefix = "api/v1");
+        await app.StartAsync(TestContext.Current.CancellationToken);
+        HttpClient client = app.GetTestClient();
+
+        try
+        {
+            // Default route (without prefix) must not be registered
+            HttpResponseMessage notFound = await client.GetAsync(
+                "/localization",
+                TestContext.Current.CancellationToken);
+            notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+            // Prefixed route must respond
+            HttpResponseMessage ok = await client.GetAsync(
+                "/api/v1/localization",
                 TestContext.Current.CancellationToken);
             ok.StatusCode.ShouldBe(HttpStatusCode.OK);
         }

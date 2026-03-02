@@ -13,6 +13,7 @@ d'une application Granit sur infrastructure souveraine OVHcloud.
 
 | Guide | Description |
 | --- | --- |
+| [Pipeline CI/CD](ci-cd-pipeline.md) | Stages, cache NuGet, tests d'intégration DinD, SonarQube, packaging |
 | [Observabilité en production](observabilite-production.md) | Stack LGTM, dashboards Grafana, queries LogQL, alerting |
 | [Configuration Vault](configuration-vault.md) | Authentification K8s, credentials dynamiques, Transit, rotation |
 | [Déploiement Kubernetes](kubernetes.md) | Probes santé, resource limits, rolling update, graceful shutdown |

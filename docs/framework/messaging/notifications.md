@@ -111,6 +111,13 @@ builder.Services.AddGranitNotificationsBrevo();
 app.MapGranitNotificationEndpoints();
 ```
 
+Le préfixe par défaut est `notifications`. Pour ajouter un préfixe API :
+
+```csharp
+app.MapGranitNotificationEndpoints(opts => opts.ApiPrefix = "api/v1");
+// Routes : /api/v1/notifications, /api/v1/notifications/unread/count, etc.
+```
+
 ### Configuration minimale
 
 ```json
