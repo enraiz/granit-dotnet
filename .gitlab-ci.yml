@@ -90,10 +90,9 @@ test:
     VSTEST_CONNECTION_TIMEOUT: "300"
     XUNIT_LAUNCH_TIMEOUT: "300"
   script:
-    - dotnet build -c $CONFIGURATION
+    - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true
     - >
       dotnet test -c $CONFIGURATION --no-build
-      --filter "FullyQualifiedName!~IntegrationTests"
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage;Format=opencover,cobertura"
       -- RunConfiguration.MaxCpuCount=2

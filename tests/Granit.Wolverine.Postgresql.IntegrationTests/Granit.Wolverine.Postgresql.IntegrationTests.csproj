@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <!-- Exclude from dotnet test in CI unit-test job (no Docker available). -->
+    <IsTestProject Condition="'$(SkipIntegrationTests)' == 'true'">false</IsTestProject>
     <!--
       NU1608: same transitive Roslyn conflict as in Granit.Wolverine.Postgresql — no runtime impact.
     -->
