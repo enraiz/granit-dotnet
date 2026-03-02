@@ -39,4 +39,20 @@ public sealed class MapBackgroundJobsEndpointsTests
         // Assert
         group.ShouldNotBeNull();
     }
+
+    [Fact]
+    public void MapBackgroundJobsEndpoints_WithApiPrefix_ReturnsRouteGroupBuilder()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+        WebApplication app = builder.Build();
+
+        // Act
+        RouteGroupBuilder group = app.MapBackgroundJobsEndpoints(
+            opts => opts.ApiPrefix = "api/v1");
+
+        // Assert
+        group.ShouldNotBeNull();
+    }
 }

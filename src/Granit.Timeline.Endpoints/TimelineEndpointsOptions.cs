@@ -9,10 +9,16 @@ public sealed class TimelineEndpointsOptions
     public const string SectionName = "TimelineEndpoints";
 
     /// <summary>
-    /// Route prefix for all timeline endpoints.
-    /// Default: <c>"api/timeline"</c>.
+    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
+    /// (e.g., <c>"api/v1"</c>). Empty by default (no prefix).
     /// </summary>
-    public string RoutePrefix { get; set; } = "api/timeline";
+    public string ApiPrefix { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Route prefix for all timeline endpoints.
+    /// Default: <c>"timeline"</c>.
+    /// </summary>
+    public string RoutePrefix { get; set; } = "timeline";
 
     /// <summary>
     /// OpenAPI tag name for grouping timeline endpoints in Swagger UI.

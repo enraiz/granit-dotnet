@@ -27,7 +27,11 @@ public static class NotificationEndpointRouteBuilderExtensions
         NotificationEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        RouteGroupBuilder group = endpoints.MapGroup(options.RoutePrefix)
+        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
+            ? options.RoutePrefix
+            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+
+        RouteGroupBuilder group = endpoints.MapGroup(prefix)
             .RequireAuthorization()
             .WithTags(options.TagName);
 

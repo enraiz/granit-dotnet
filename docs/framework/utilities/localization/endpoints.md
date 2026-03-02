@@ -33,28 +33,41 @@ app.MapGranitLocalization();
 
 ## Personnalisation du préfixe de route
 
-Le préfixe de route est configurable via `LocalizationEndpointsOptions`. Cela permet
-à chaque application de choisir son schéma de versioning d'URL :
+Le préfixe de route est configurable via `LocalizationEndpointsOptions`. Deux propriétés
+permettent de composer l'URL finale :
+
+| Option | Par défaut | Description |
+| --- | --- | --- |
+| `ApiPrefix` | *(vide)* | Préfixe API prépendé au `RoutePrefix` (ex. `api/v1`) |
+| `RoutePrefix` | `localization` | Segment de domaine |
+| `TagName` | `Localization` | Tag OpenAPI |
 
 ```csharp
-// Ajouter un segment de version
-app.MapGranitLocalization(opts => opts.RoutePrefix = "api/v1/granit/localization");
-app.MapGranitLocalizationOverrides(opts => opts.RoutePrefix = "api/v1/granit/localization");
+// Ajouter un segment de version via ApiPrefix
+app.MapGranitLocalization(opts => opts.ApiPrefix = "api/v1");
+app.MapGranitLocalizationOverrides(opts => opts.ApiPrefix = "api/v1");
 ```
 
-Le préfixe par défaut est `api/granit/localization`. Les deux méthodes acceptent
-la même option indépendamment, ce qui permet de versionner l'un sans l'autre.
+Le préfixe effectif est calculé : `{ApiPrefix}/{RoutePrefix}`. Sans `ApiPrefix`,
+seul le `RoutePrefix` est utilisé. Les deux méthodes acceptent la même option
+indépendamment, ce qui permet de versionner l'un sans l'autre.
 
 ## Endpoint
 
 ```text
-GET /{RoutePrefix}?cultureName={culture}
+GET /{prefix}?cultureName={culture}
 ```
 
-Par défaut :
+Par défaut (sans `ApiPrefix`) :
 
 ```text
-GET /api/granit/localization?cultureName={culture}
+GET /localization?cultureName={culture}
+```
+
+Avec `ApiPrefix = "api/v1"` :
+
+```text
+GET /api/v1/localization?cultureName={culture}
 ```
 
 | Paramètre | Obligatoire | Description |

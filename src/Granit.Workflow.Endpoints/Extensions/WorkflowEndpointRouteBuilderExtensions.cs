@@ -36,8 +36,12 @@ public static class WorkflowEndpointRouteBuilderExtensions
         WorkflowEndpointsOptions options = new();
         configure?.Invoke(options);
 
+        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
+            ? options.RoutePrefix
+            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+
         RouteGroupBuilder group = endpoints
-            .MapGroup(options.RoutePrefix)
+            .MapGroup(prefix)
             .WithTags(options.TagName);
 
         group.MapReadEndpoints();
