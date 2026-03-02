@@ -46,9 +46,9 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
 
                 try
                 {
-                    if (row.Identity?.Operation == RecordOperation.Update && row.Identity.ExistingEntity is not null)
+                    if (IsUpdateOperation(row))
                     {
-                        context.Entry(row.Identity.ExistingEntity).CurrentValues.SetValues(row.Entity);
+                        context.Entry(row.Identity!.ExistingEntity!).CurrentValues.SetValues(row.Entity);
                         updatedRows++;
                     }
                     else
@@ -95,14 +95,7 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
                 await context.SaveChangesAsync(ct);
             }
 
-            if (options.DryRun)
-            {
-                await transaction.RollbackAsync(ct);
-            }
-            else
-            {
-                await transaction.CommitAsync(ct);
-            }
+            await CommitOrRollbackAsync(transaction, options.DryRun, ct);
         }
         catch (Exception) when (options.ErrorBehavior != ImportErrorBehavior.FailFast)
         {
@@ -113,12 +106,6 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
 
         progress?.Report(new ImportProgress(totalRows, totalRows, succeededRows, failedRows));
 
-        ImportJobStatus finalStatus = failedRows == 0
-            ? ImportJobStatus.Completed
-            : succeededRows > 0
-                ? ImportJobStatus.PartiallyCompleted
-                : ImportJobStatus.Failed;
-
         return new ImportReport
         {
             TotalRows = totalRows,
@@ -128,19 +115,45 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
             InsertedRows = insertedRows,
             UpdatedRows = updatedRows,
             Duration = stopwatch.Elapsed,
-            FinalStatus = finalStatus,
+            FinalStatus = DetermineFinalStatus(failedRows, succeededRows),
             RowErrors = errors.AsReadOnly(),
         };
     }
 
+    private static bool IsUpdateOperation(ValidatedRow<TEntity> row) =>
+        row.Identity?.Operation == RecordOperation.Update && row.Identity.ExistingEntity is not null;
+
+    private static async Task CommitOrRollbackAsync(
+        IDbContextTransaction transaction, bool dryRun, CancellationToken ct)
+    {
+        if (dryRun)
+        {
+            await transaction.RollbackAsync(ct);
+        }
+        else
+        {
+            await transaction.CommitAsync(ct);
+        }
+    }
+
+    private static ImportJobStatus DetermineFinalStatus(int failedRows, int succeededRows)
+    {
+        if (failedRows == 0)
+        {
+            return ImportJobStatus.Completed;
+        }
+
+        return succeededRows > 0
+            ? ImportJobStatus.PartiallyCompleted
+            : ImportJobStatus.Failed;
+    }
+
     private static void DetachFailedEntities(TContext context)
     {
-        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry in context.ChangeTracker.Entries())
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry in
+            context.ChangeTracker.Entries().Where(e => e.State is EntityState.Added or EntityState.Modified))
         {
-            if (entry.State is EntityState.Added or EntityState.Modified)
-            {
-                entry.State = EntityState.Detached;
-            }
+            entry.State = EntityState.Detached;
         }
     }
 }

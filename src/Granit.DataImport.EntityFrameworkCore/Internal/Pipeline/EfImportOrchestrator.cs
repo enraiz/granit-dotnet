@@ -42,7 +42,7 @@ internal sealed class EfImportOrchestrator(
 
         try
         {
-            ImportReport report = await ExecuteTypedPipelineAsync(job, ct);
+            ImportReport report = await ExecuteTypedPipelineAsync(job, dryRun: false, ct);
 
             stopwatch.Stop();
             job.Status = report.FinalStatus;
@@ -82,7 +82,19 @@ internal sealed class EfImportOrchestrator(
         }
     }
 
-    private async Task<ImportReport> ExecuteTypedPipelineAsync(ImportJob job, CancellationToken ct)
+    /// <inheritdoc/>
+    public async Task<ImportReport> DryRunAsync(Guid importJobId, CancellationToken ct = default)
+    {
+        ImportJob? job = await jobStore.GetAsync(importJobId, ct);
+        if (job is null)
+        {
+            throw new InvalidOperationException($"Import job '{importJobId}' not found.");
+        }
+
+        return await ExecuteTypedPipelineAsync(job, dryRun: true, ct);
+    }
+
+    private async Task<ImportReport> ExecuteTypedPipelineAsync(ImportJob job, bool dryRun, CancellationToken ct)
     {
         // Resolve the file parser for this MIME type
         IEnumerable<IFileParser> parsers = serviceProvider.GetServices<IFileParser>();
@@ -121,24 +133,11 @@ internal sealed class EfImportOrchestrator(
         }
 
         return await ExecuteWithReflectionAsync(
-            executorType, parser, fileStream, parsingOptions, mappings, ct);
+            executorType, parser, fileStream, parsingOptions, mappings, dryRun, ct);
     }
 
     private Type? FindExecutorType(string entityTypeName)
     {
-        // Scan registered IImportExecutor<T> services to find the matching entity type
-        IEnumerable<ServiceDescriptor> descriptors = serviceProvider
-            .GetType()
-            .Assembly
-            .GetTypes()
-            .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IImportExecutor<>))
-            .Select(t => t.GetGenericArguments()[0])
-            .Where(t => t.Name == entityTypeName)
-            .Select(t => ServiceDescriptor.Scoped(typeof(IImportExecutor<>).MakeGenericType(t), sp => sp))
-            .ToList() as IEnumerable<ServiceDescriptor>;
-
-        // Simpler approach: try to resolve the executor directly from service descriptions
-        // by iterating registered services
         foreach (Type entityType in GetRegisteredEntityTypes())
         {
             if (entityType.Name == entityTypeName)
@@ -174,37 +173,18 @@ internal sealed class EfImportOrchestrator(
         Stream fileStream,
         FileParsingOptions parsingOptions,
         List<ColumnMapping> mappings,
+        bool dryRun,
         CancellationToken ct)
     {
-        // Resolve IImportExecutor<TEntity>
-        Type executorServiceType = typeof(IImportExecutor<>).MakeGenericType(entityType);
-        object? executor = serviceProvider.GetService(executorServiceType);
-        if (executor is null)
-        {
-            throw new InvalidOperationException(
-                $"No IImportExecutor<{entityType.Name}> registered.");
-        }
-
-        // Resolve optional IRecordIdentityResolver<TEntity>
-        Type resolverServiceType = typeof(IRecordIdentityResolver<>).MakeGenericType(entityType);
-        object? identityResolver = serviceProvider.GetService(resolverServiceType);
-
-        // Resolve optional IDataMapper<TEntity>
-        Type mapperServiceType = typeof(IDataMapper<>).MakeGenericType(entityType);
-        object? dataMapper = serviceProvider.GetService(mapperServiceType);
-
-        // Resolve optional IRowValidator<TEntity>
-        Type validatorServiceType = typeof(IRowValidator<>).MakeGenericType(entityType);
-        object? rowValidator = serviceProvider.GetService(validatorServiceType);
-
-        // Build the typed pipeline via a generic method
+#pragma warning disable S3011 // Reflection on private member — needed to invoke generic method with runtime Type
         System.Reflection.MethodInfo pipelineMethod = typeof(EfImportOrchestrator)
             .GetMethod(nameof(RunTypedPipelineAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
             .MakeGenericMethod(entityType);
+#pragma warning restore S3011
 
         Task<ImportReport>? task = pipelineMethod.Invoke(
             this,
-            [parser, fileStream, parsingOptions, mappings, executor, identityResolver, dataMapper, rowValidator, ct]) as Task<ImportReport>;
+            [parser, fileStream, parsingOptions, mappings, dryRun, ct]) as Task<ImportReport>;
 
         return await task!;
     }
@@ -214,20 +194,20 @@ internal sealed class EfImportOrchestrator(
         Stream fileStream,
         FileParsingOptions parsingOptions,
         IReadOnlyList<ColumnMapping> mappings,
-        IImportExecutor<TEntity> executor,
-        IRecordIdentityResolver<TEntity>? identityResolver,
-        IDataMapper<TEntity>? dataMapper,
-        IRowValidator<TEntity>? rowValidator,
+        bool dryRun,
         CancellationToken ct) where TEntity : class
     {
+        IImportExecutor<TEntity> executor = serviceProvider.GetRequiredService<IImportExecutor<TEntity>>();
+
         ImportExecutionOptions executionOptions = new()
         {
             BatchSize = options.Value.DefaultBatchSize,
+            DryRun = dryRun,
         };
 
         // Build the streaming pipeline
-        IAsyncEnumerable<ValidatedRow<TEntity>> pipeline = BuildPipeline(
-            parser, fileStream, parsingOptions, mappings, identityResolver, dataMapper, rowValidator, ct);
+        IAsyncEnumerable<ValidatedRow<TEntity>> pipeline = BuildPipeline<TEntity>(
+            parser, fileStream, parsingOptions, mappings, ct);
 
         return await executor.ExecuteAsync(pipeline, executionOptions, null, ct);
     }
@@ -237,11 +217,11 @@ internal sealed class EfImportOrchestrator(
         Stream fileStream,
         FileParsingOptions parsingOptions,
         IReadOnlyList<ColumnMapping> mappings,
-        IRecordIdentityResolver<TEntity>? identityResolver,
-        IDataMapper<TEntity>? dataMapper,
-        IRowValidator<TEntity>? rowValidator,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct) where TEntity : class
     {
+        IRecordIdentityResolver<TEntity>? identityResolver = serviceProvider.GetService<IRecordIdentityResolver<TEntity>>();
+        IDataMapper<TEntity>? dataMapper = serviceProvider.GetService<IDataMapper<TEntity>>();
+        IRowValidator<TEntity>? rowValidator = serviceProvider.GetService<IRowValidator<TEntity>>();
         DataImportOptions importOptions = options.Value;
 
         await foreach (RawImportRow row in parser.ParseAsync(fileStream, parsingOptions, ct))
