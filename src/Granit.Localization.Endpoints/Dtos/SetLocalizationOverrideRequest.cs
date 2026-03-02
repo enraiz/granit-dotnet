@@ -1,4 +1,4 @@
-namespace Granit.Localization.Endpoints.Dto;
+namespace Granit.Localization.Endpoints.Dtos;
 
 /// <summary>
 /// Request body for the <c>PUT /api/granit/localization/overrides/{resourceName}/{cultureName}/{key}</c> endpoint.

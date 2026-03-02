@@ -1,4 +1,4 @@
-namespace Granit.Localization.Endpoints.Dto;
+namespace Granit.Localization.Endpoints.Dtos;
 
 /// <summary>
 /// Represents a language available in the application, for use in a language selector UI.
@@ -7,7 +7,7 @@ namespace Granit.Localization.Endpoints.Dto;
 /// <param name="DisplayName">Display name (e.g. "Français", "English").</param>
 /// <param name="FlagIcon">Optional flag icon identifier (e.g. "fr", "gb").</param>
 /// <param name="IsDefault">Whether this is the default language for the application.</param>
-public sealed record LanguageInfoDto(
+public sealed record LanguageInfoResponse(
     string CultureName,
     string DisplayName,
     string? FlagIcon,

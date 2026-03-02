@@ -19,7 +19,7 @@ public interface IWorkflowHistoryQuery
     /// <param name="entityType">Logical entity type name.</param>
     /// <param name="entityId">Entity identifier.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task<IReadOnlyList<TransitionHistoryDto>> GetHistoryAsync(
+    Task<IReadOnlyList<TransitionHistoryResponse>> GetHistoryAsync(
         string entityType,
         string entityId,
         CancellationToken cancellationToken = default);

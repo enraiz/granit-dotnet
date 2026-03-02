@@ -8,7 +8,7 @@ namespace Granit.Workflow.Endpoints.Dtos;
 /// <param name="TransitionedAt">UTC timestamp of the transition.</param>
 /// <param name="TransitionedBy">User ID who triggered the transition.</param>
 /// <param name="Comment">Optional regulatory comment or justification.</param>
-public sealed record TransitionHistoryDto(
+public sealed record TransitionHistoryResponse(
     string PreviousState,
     string NewState,
     DateTimeOffset TransitionedAt,

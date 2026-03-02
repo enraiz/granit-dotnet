@@ -16,15 +16,15 @@ internal sealed class DefaultWorkflowHistoryQuery<TDbContext>(TDbContext dbConte
     private readonly TDbContext _dbContext = dbContext;
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<TransitionHistoryDto>> GetHistoryAsync(
+    public async Task<IReadOnlyList<TransitionHistoryResponse>> GetHistoryAsync(
         string entityType,
         string entityId,
         CancellationToken cancellationToken = default)
     {
-        List<TransitionHistoryDto> history = await _dbContext.WorkflowTransitionRecords
+        List<TransitionHistoryResponse> history = await _dbContext.WorkflowTransitionRecords
             .Where(r => r.EntityType == entityType && r.EntityId == entityId)
             .OrderBy(r => r.TransitionedAt)
-            .Select(r => new TransitionHistoryDto(
+            .Select(r => new TransitionHistoryResponse(
                 r.PreviousState,
                 r.NewState,
                 r.TransitionedAt,
