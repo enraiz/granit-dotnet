@@ -108,7 +108,7 @@ test:
   script:
     - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true
     - >
-      dotnet test -c $CONFIGURATION --no-build
+      dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage;Format=opencover,cobertura"
   artifacts:
