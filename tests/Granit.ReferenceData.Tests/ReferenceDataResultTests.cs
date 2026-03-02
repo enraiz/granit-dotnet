@@ -10,7 +10,7 @@ public sealed class ReferenceDataResultTests
     [Fact]
     public void Items_And_TotalCount_Are_Preserved()
     {
-        TestEntity entity = new() { Code = "BE", Label = "Belgium" };
+        TestEntity entity = new() { Code = "BE", LabelEn = "Belgium" };
         List<TestEntity> items = [entity];
 
         ReferenceDataResult<TestEntity> result = new(items, 42);

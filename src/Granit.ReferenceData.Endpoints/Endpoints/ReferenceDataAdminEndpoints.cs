@@ -51,7 +51,7 @@ internal static class ReferenceDataAdminEndpoints
         {
             Id = Guid.NewGuid(),
             Code = request.Code,
-            Label = request.Label,
+            LabelEn = request.LabelEn,
             SortOrder = request.SortOrder,
             ValidFrom = request.ValidFrom,
             ValidTo = request.ValidTo,
@@ -76,7 +76,7 @@ internal static class ReferenceDataAdminEndpoints
             return TypedResults.NotFound();
         }
 
-        existing.Label = request.Label;
+        existing.LabelEn = request.LabelEn;
         existing.SortOrder = request.SortOrder;
         existing.IsActive = request.IsActive;
         existing.ValidFrom = request.ValidFrom;

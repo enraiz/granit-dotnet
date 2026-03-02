@@ -60,8 +60,11 @@ public abstract class ReferenceDataEntityTypeConfiguration<TEntity>
                .IsUnique()
                .HasDatabaseName($"uq_{_tableName}_code");
 
-        // Label
-        builder.Property(e => e.Label)
+        // Label (not mapped — virtual property)
+        builder.Ignore(e => e.Label);
+
+        // LabelEn
+        builder.Property(e => e.LabelEn)
                .HasMaxLength(250)
                .IsRequired();
 

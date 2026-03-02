@@ -38,7 +38,8 @@ La classe de base configure automatiquement :
 - `HasKey(e => e.Id)`
 - Index unique sur `Code` (`uq_{table}_code`)
 - Index sur `IsActive` (`ix_{table}_is_active`)
-- Colonnes `Code` (50 car.), `Label` (250 car.), `SortOrder` (défaut 0)
+- `Label` est ignoré (propriété virtuelle `[NotMapped]`)
+- Colonnes `Code` (50 car.), `LabelEn` (250 car.), `SortOrder` (défaut 0)
 - Colonnes d'audit HDS (`CreatedAt`, `CreatedBy`, `ModifiedAt`, `ModifiedBy`)
 
 ### 2. Appliquer la configuration dans OnModelCreating

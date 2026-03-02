@@ -49,13 +49,13 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
             queryable = queryable.Where(e => e.IsActive);
         }
 
-        // Search filter (Code or Label, case-insensitive)
+        // Search filter (Code or LabelEn, case-insensitive)
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
         {
             string term = query.SearchTerm;
             queryable = queryable.Where(e =>
                 EF.Functions.Like(e.Code, $"%{term}%") ||
-                EF.Functions.Like(e.Label, $"%{term}%"));
+                EF.Functions.Like(e.LabelEn, $"%{term}%"));
         }
 
         // Total count before pagination
@@ -68,8 +68,8 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
                 ? queryable.OrderByDescending(e => e.Code)
                 : queryable.OrderBy(e => e.Code),
             "LABEL" => query.Descending
-                ? queryable.OrderByDescending(e => e.Label)
-                : queryable.OrderBy(e => e.Label),
+                ? queryable.OrderByDescending(e => e.LabelEn)
+                : queryable.OrderBy(e => e.LabelEn),
             _ => query.Descending
                 ? queryable.OrderByDescending(e => e.SortOrder).ThenBy(e => e.Code)
                 : queryable.OrderBy(e => e.SortOrder).ThenBy(e => e.Code),
