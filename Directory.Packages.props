@@ -54,6 +54,9 @@
   <ItemGroup Label="Blob Storage">
     <PackageVersion Include="AWSSDK.S3" Version="3.*" />
   </ItemGroup>
+  <ItemGroup Label="DataImport">
+    <PackageVersion Include="Sep" Version="0.*" />
+  </ItemGroup>
   <ItemGroup Label="Imaging">
     <PackageVersion Include="Magick.NET-Q8-AnyCPU" Version="14.*" />
   </ItemGroup>
