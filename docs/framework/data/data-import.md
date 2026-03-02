@@ -235,5 +235,5 @@ foreach (ImportRowError error in report.RowErrors)
 
 ## Voir aussi
 
-- ADR-019 — Sep pour le parsing CSV
-- ADR-020 — Sylvan.Data.Excel pour le parsing Excel
+- [ADR-019 — Sep pour le parsing CSV](../../ADR/ADR-019-sep-parsing-csv.md)
+- [ADR-020 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-020-sylvan-data-excel-parsing.md)
