@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 using Granit.Core.Domain;
 
 namespace Granit.ReferenceData;
@@ -9,9 +11,10 @@ namespace Granit.ReferenceData;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Each reference data entity has a unique <see cref="Code"/> (business key) and a default
-/// <see cref="Label"/> (English). Applications extend this class to add type-specific properties
-/// (e.g., Alpha3Code, CallingCode for a Country entity).
+/// Each reference data entity has a unique <see cref="Code"/> (business key) and an English
+/// label (<see cref="LabelEn"/>). The virtual <see cref="Label"/> property returns <see cref="LabelEn"/>
+/// by default; derived entities can override it to resolve the label based on the current culture
+/// (e.g., returning LabelFr when <c>CultureInfo.CurrentUICulture</c> is "fr").
 /// </para>
 /// <para>
 /// Soft activation/deactivation is controlled by <see cref="IsActive"/>. Deactivated entries
@@ -27,10 +30,22 @@ public abstract class ReferenceDataEntity : AuditedEntity, IActive
     public string Code { get; set; } = string.Empty;
 
     /// <summary>
-    /// Default display label (English). Applications needing translations should
-    /// add locale-specific properties (e.g., LabelFr, LabelNl).
+    /// English display label. Persisted in the database. Applications needing translations
+    /// should add locale-specific properties (e.g., LabelFr, LabelNl) and override
+    /// <see cref="Label"/> to resolve based on the current culture.
     /// </summary>
-    public string Label { get; set; } = string.Empty;
+    public string LabelEn { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Resolved display label for the current culture. Returns <see cref="LabelEn"/> by default.
+    /// Override in derived entities to provide culture-aware label resolution.
+    /// </summary>
+    /// <remarks>
+    /// This property is not mapped to the database. It is intended for use in application
+    /// code and API responses where culture-specific labels are needed.
+    /// </remarks>
+    [NotMapped]
+    public virtual string Label => LabelEn;
 
     /// <inheritdoc/>
     public bool IsActive { get; set; } = true;

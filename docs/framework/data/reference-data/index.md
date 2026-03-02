@@ -39,7 +39,9 @@ public sealed class Country : ReferenceDataEntity
 
 - `Guid Id` — identifiant unique (hérité de `Entity`)
 - `string Code` — clé métier unique (ex : "BE", "EUR")
-- `string Label` — libellé par défaut (anglais)
+- `string LabelEn` — libellé anglais (colonne DB)
+- `string Label` — propriété virtuelle `[NotMapped]`, retourne `LabelEn` par défaut ;
+  surcharger dans les entités dérivées pour résoudre selon la culture courante
 - `bool IsActive` — activation/désactivation logique
 - `int SortOrder` — ordre d'affichage
 - `DateTimeOffset? ValidFrom` / `ValidTo` — période de validité optionnelle
@@ -121,7 +123,7 @@ public sealed class CountrySeeder : IReferenceDataSeeder<Country>
             await store.CreateAsync(new Country
             {
                 Code = "BE",
-                Label = "Belgium",
+                LabelEn = "Belgium",
                 Alpha3Code = "BEL",
             }, ct);
         }

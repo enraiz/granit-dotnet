@@ -42,11 +42,19 @@ public sealed class ReferenceDataEntityTests
     }
 
     [Fact]
-    public void Default_Label_Is_Empty()
+    public void Default_LabelEn_Is_Empty()
     {
         TestEntity entity = new();
 
-        entity.Label.ShouldBe(string.Empty);
+        entity.LabelEn.ShouldBe(string.Empty);
+    }
+
+    [Fact]
+    public void Label_Returns_LabelEn_By_Default()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium" };
+
+        entity.Label.ShouldBe("Belgium");
     }
 
     [Fact]
@@ -89,7 +97,7 @@ public sealed class ReferenceDataEntityTests
         TestEntity entity = new()
         {
             Code = "BE",
-            Label = "Belgium",
+            LabelEn = "Belgium",
             IsActive = false,
             SortOrder = 42,
             ValidFrom = now,
@@ -97,7 +105,7 @@ public sealed class ReferenceDataEntityTests
         };
 
         entity.Code.ShouldBe("BE");
-        entity.Label.ShouldBe("Belgium");
+        entity.LabelEn.ShouldBe("Belgium");
         entity.IsActive.ShouldBeFalse();
         entity.SortOrder.ShouldBe(42);
         entity.ValidFrom.ShouldBe(now);

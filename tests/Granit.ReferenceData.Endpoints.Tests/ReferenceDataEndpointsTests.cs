@@ -66,7 +66,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     {
         // Arrange
         ReferenceDataResult<TestRefEntity> result = new(
-            [new TestRefEntity { Code = "BE", Label = "Belgium" }], 1);
+            [new TestRefEntity { Code = "BE", LabelEn = "Belgium" }], 1);
         _store.GetAllAsync(Arg.Any<ReferenceDataQuery?>(), Arg.Any<CancellationToken>())
             .Returns(result);
 
@@ -90,7 +90,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     public async Task GetByCode_WhenExists_Returns200()
     {
         // Arrange
-        TestRefEntity entity = new() { Code = "BE", Label = "Belgium" };
+        TestRefEntity entity = new() { Code = "BE", LabelEn = "Belgium" };
         _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(entity);
 
         // Act
@@ -134,7 +134,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         await _store.Received(1).CreateAsync(
-            Arg.Is<TestRefEntity>(e => e.Code == "DE" && e.Label == "Germany"),
+            Arg.Is<TestRefEntity>(e => e.Code == "DE" && e.LabelEn == "Germany"),
             Arg.Any<CancellationToken>());
     }
 
@@ -158,7 +158,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     public async Task Update_WhenExists_Returns200()
     {
         // Arrange
-        TestRefEntity existing = new() { Code = "BE", Label = "Belgium" };
+        TestRefEntity existing = new() { Code = "BE", LabelEn = "Belgium" };
         _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
         ReferenceDataUpdateRequest request = new("Kingdom of Belgium");
 
@@ -169,7 +169,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await _store.Received(1).UpdateAsync(
-            Arg.Is<TestRefEntity>(e => e.Label == "Kingdom of Belgium"),
+            Arg.Is<TestRefEntity>(e => e.LabelEn == "Kingdom of Belgium"),
             Arg.Any<CancellationToken>());
     }
 
@@ -195,7 +195,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     public async Task Delete_WhenExists_Returns204()
     {
         // Arrange
-        TestRefEntity existing = new() { Code = "BE", Label = "Belgium" };
+        TestRefEntity existing = new() { Code = "BE", LabelEn = "Belgium" };
         _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
 
         // Act

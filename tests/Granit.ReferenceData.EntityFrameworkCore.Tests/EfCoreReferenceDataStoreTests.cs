@@ -66,7 +66,7 @@ public sealed class EfCoreReferenceDataStoreTests
         {
             Id = Guid.NewGuid(),
             Code = code,
-            Label = label,
+            LabelEn = label,
             IsActive = isActive,
             SortOrder = sortOrder,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -90,7 +90,7 @@ public sealed class EfCoreReferenceDataStoreTests
 
         result.ShouldNotBeNull();
         result!.Code.ShouldBe("BE");
-        result.Label.ShouldBe("Belgium");
+        result.LabelEn.ShouldBe("Belgium");
     }
 
     [Fact]
@@ -202,8 +202,8 @@ public sealed class EfCoreReferenceDataStoreTests
             new ReferenceDataQuery(SortBy: "Label"),
             TestContext.Current.CancellationToken);
 
-        result.Items[0].Label.ShouldBe("Belgium");
-        result.Items[1].Label.ShouldBe("Netherlands");
+        result.Items[0].LabelEn.ShouldBe("Belgium");
+        result.Items[1].LabelEn.ShouldBe("Netherlands");
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public sealed class EfCoreReferenceDataStoreTests
         {
             Id = Guid.NewGuid(),
             Code = "DE",
-            Label = "Germany",
+            LabelEn = "Germany",
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,
             CreatedBy = "test",
@@ -277,7 +277,7 @@ public sealed class EfCoreReferenceDataStoreTests
         TestEntity? loaded = await store.GetByCodeAsync("DE", TestContext.Current.CancellationToken);
 
         loaded.ShouldNotBeNull();
-        loaded!.Label.ShouldBe("Germany");
+        loaded!.LabelEn.ShouldBe("Germany");
     }
 
     // -------------------------------------------------------------------------
@@ -295,14 +295,14 @@ public sealed class EfCoreReferenceDataStoreTests
         TestEntity? entity = await store.GetByCodeAsync("BE", TestContext.Current.CancellationToken);
         entity.ShouldNotBeNull();
 
-        entity!.Label = "Kingdom of Belgium";
+        entity!.LabelEn = "Kingdom of Belgium";
         await store.UpdateAsync(entity, TestContext.Current.CancellationToken);
 
         // Read again from a fresh store to confirm persistence
         EfCoreReferenceDataStore<TestEntity, TestDbContext> freshStore = CreateStore(db);
         TestEntity? updated = await freshStore.GetByCodeAsync("BE", TestContext.Current.CancellationToken);
 
-        updated!.Label.ShouldBe("Kingdom of Belgium");
+        updated!.LabelEn.ShouldBe("Kingdom of Belgium");
     }
 
     // -------------------------------------------------------------------------
@@ -369,7 +369,7 @@ public sealed class EfCoreReferenceDataStoreTests
         {
             Id = Guid.NewGuid(),
             Code = "DE",
-            Label = "Germany",
+            LabelEn = "Germany",
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,
             CreatedBy = "test",
@@ -377,6 +377,6 @@ public sealed class EfCoreReferenceDataStoreTests
 
         TestEntity? result = await store.GetByCodeAsync("DE", TestContext.Current.CancellationToken);
         result.ShouldNotBeNull();
-        result!.Label.ShouldBe("Germany");
+        result!.LabelEn.ShouldBe("Germany");
     }
 }

@@ -62,21 +62,30 @@ public sealed class ReferenceDataEntityTypeConfigurationTests
     }
 
     [Fact]
-    public void Label_Has_MaxLength_250()
+    public void LabelEn_Has_MaxLength_250()
     {
         IEntityType entityType = GetEntityType();
-        IProperty label = entityType.FindProperty(nameof(TestEntity.Label))!;
+        IProperty labelEn = entityType.FindProperty(nameof(TestEntity.LabelEn))!;
 
-        label.GetMaxLength().ShouldBe(250);
+        labelEn.GetMaxLength().ShouldBe(250);
     }
 
     [Fact]
-    public void Label_Is_Required()
+    public void LabelEn_Is_Required()
     {
         IEntityType entityType = GetEntityType();
-        IProperty label = entityType.FindProperty(nameof(TestEntity.Label))!;
+        IProperty labelEn = entityType.FindProperty(nameof(TestEntity.LabelEn))!;
 
-        label.IsNullable.ShouldBeFalse();
+        labelEn.IsNullable.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Label_Is_Not_Mapped()
+    {
+        IEntityType entityType = GetEntityType();
+        IProperty? label = entityType.FindProperty(nameof(TestEntity.Label));
+
+        label.ShouldBeNull();
     }
 
     [Fact]
