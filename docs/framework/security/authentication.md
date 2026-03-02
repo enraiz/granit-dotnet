@@ -277,6 +277,122 @@ standard .NET, permettant `[Authorize(Roles = "admin")]` et `User.IsInRole("admi
 
 ---
 
+## Back-channel logout Keycloak
+
+Le back-channel logout permet à Keycloak de révoquer les sessions côté serveur
+sans intervention de l'utilisateur. Quand un administrateur révoque une session
+dans Keycloak (ou qu'un `logout` est déclenché sur un autre client), Keycloak
+envoie un `logout_token` (JWT signé) au backend.
+
+### Architecture du back-channel logout
+
+```text
+Keycloak ──POST logout_token──► BackChannelLogoutEndpoint
+                                   │
+                                   ▼
+                         BackChannelLogoutTokenValidator
+                           (signature JWKS, iss, aud, events claim)
+                                   │
+                                   ▼
+                         IRevokedSessionStore.RevokeSessionAsync(sid, ttl)
+                           (IDistributedCache, clé = "granit:revoked-session:{sid}")
+
+Requête ──JWT──► JwtBearerEvents.OnTokenValidated
+                    │
+                    ▼
+                 IRevokedSessionStore.IsSessionRevokedAsync(sid)
+                    ├── révoqué → 401 Unauthorized
+                    └── ok → continue
+```
+
+### Configuration du back-channel logout
+
+```json
+{
+  "Keycloak": {
+    "Authority": "https://keycloak.example.com/realms/my-realm",
+    "ClientId": "my-backend",
+    "BackChannelLogout": {
+      "Enabled": true,
+      "EndpointPath": "/auth/back-channel-logout",
+      "SessionRevocationTtl": "01:00:00"
+    }
+  }
+}
+```
+
+| Option | Type | Défaut | Description |
+| ------ | ---- | ------ | ----------- |
+| `Enabled` | `bool` | `false` | Active le back-channel logout (opt-in) |
+| `EndpointPath` | `string` | `"/auth/back-channel-logout"` | Chemin de l'endpoint POST |
+| `SessionRevocationTtl` | `TimeSpan` | `1 heure` | Durée de conservation de la session révoquée dans le cache |
+
+### Activation dans Program.cs
+
+```csharp
+// Les services sont enregistrés automatiquement par AddGranitKeycloak()
+builder.Services.AddGranitJwtBearer();
+builder.Services.AddGranitKeycloak();
+
+WebApplication app = builder.Build();
+
+// Mapper l'endpoint de back-channel logout
+app.MapKeycloakBackChannelLogout();
+```
+
+`MapKeycloakBackChannelLogout()` ne mappe l'endpoint que si
+`BackChannelLogout.Enabled == true`. Si désactivé, l'appel est un no-op.
+
+### Configuration Keycloak Admin
+
+Dans la console d'administration Keycloak :
+
+1. Aller dans **Clients** → sélectionner le client backend
+2. Onglet **Settings** → **Logout settings**
+3. Activer **Back-channel logout URL** et saisir l'URL complète :
+   `https://api.example.com/auth/back-channel-logout`
+4. Activer **Back-channel logout session required** (recommandé)
+
+### Store de sessions révoquées
+
+Les sessions révoquées sont stockées dans `IDistributedCache` avec la clé
+`granit:revoked-session:{sessionId}` et une expiration absolue configurée par
+`SessionRevocationTtl`.
+
+| Aspect | Détail |
+| ------ | ------ |
+| **Implémentation** | `DistributedCacheRevokedSessionStore` |
+| **Clé** | `granit:revoked-session:{sid}` (ou `{sub}` en fallback) |
+| **Valeur** | Marqueur d'existence (`byte[] { 1 }`) |
+| **TTL** | Configurable, défaut 1 heure |
+
+En multi-instance, utiliser un cache distribué (Redis, SQL Server) au lieu du
+cache mémoire par défaut. Le cache mémoire ne partage pas les révocations entre
+les instances.
+
+### Sécurité du back-channel logout
+
+- L'endpoint est **anonyme** (`AllowAnonymous`) car Keycloak l'appelle
+  server-to-server sans token Bearer
+- L'endpoint est exclu de la documentation OpenAPI (`ExcludeFromDescription`)
+- Le `logout_token` est validé : signature JWKS, issuer, audience, claim `events`
+  contenant `http://schemas.openid.net/event/backchannel-logout`
+- Le support `sid` (session-specific) est préféré ; `sub` (user-wide) sert de
+  fallback si `sid` est absent du token
+
+### Détection côté requête
+
+Quand `BackChannelLogout.Enabled == true`, un hook `OnTokenValidated` est
+enregistré sur `JwtBearerEvents`. À chaque validation de token JWT :
+
+1. Le claim `sid` (ou `sub`) est extrait du principal
+2. `IRevokedSessionStore.IsSessionRevokedAsync()` vérifie le cache
+3. Si la session est révoquée → `context.Fail()` → réponse 401
+
+Ce hook ne s'exécute qu'une fois par validation de token (pas sur chaque requête).
+
+---
+
 ## Architecture des fichiers
 
 ```text
@@ -291,8 +407,16 @@ Granit.Authentication.JwtBearer
 
 Granit.Authentication.Keycloak
 ├── Options/KeycloakOptions.cs
+├── Options/BackChannelLogoutOptions.cs
 ├── Authentication/KeycloakClaimsTransformation.cs
+├── BackChannelLogout/
+│   ├── IRevokedSessionStore.cs
+│   ├── DistributedCacheRevokedSessionStore.cs
+│   ├── BackChannelLogoutTokenValidator.cs
+│   ├── BackChannelLogoutResult.cs
+│   └── BackChannelLogoutEndpoint.cs
 ├── Extensions/KeycloakServiceCollectionExtensions.cs    (AddGranitKeycloak)
+├── Extensions/KeycloakEndpointRouteBuilderExtensions.cs (MapKeycloakBackChannelLogout)
 └── GranitAuthenticationKeycloakModule.cs            [DependsOn(JwtBearer)]
 ```
 
@@ -328,7 +452,7 @@ public sealed class GranitAuthenticationAuth0Module : GranitModule
 ## Dépendances Granit
 
 | Package | Dépend de | Utilisé par |
-|---------|-----------|-------------|
+| ------- | --------- | ----------- |
 | `Granit.Security` | `Granit.Core` | `Persistence`, `Authorization`, `Wolverine`, `BackgroundJobs`, `Settings`, `Idempotency`, `ApiDocumentation`, `Authentication.JwtBearer` |
 | `Granit.Authentication.JwtBearer` | `Granit.Security` | `Granit.Authentication.Keycloak` |
 | `Granit.Authentication.Keycloak` | `Granit.Authentication.JwtBearer` | Module feuille |

@@ -6,6 +6,11 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Authentication.Keycloak.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
   <!-- ASP.NET Core shared framework (IClaimsTransformation, JwtBearerOptions, etc.) -->
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

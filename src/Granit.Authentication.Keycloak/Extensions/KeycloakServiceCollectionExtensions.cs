@@ -1,9 +1,12 @@
 using Granit.Authentication.Keycloak.Authentication;
+using Granit.Authentication.Keycloak.BackChannelLogout;
 using Granit.Authentication.Keycloak.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Authentication.Keycloak.Extensions;
@@ -52,6 +55,45 @@ public static class KeycloakServiceCollectionExtensions
             {
                 authOpts.AddPolicy("Admin",
                     policy => policy.RequireRole(keycloakOpts.Value.AdminRole));
+            });
+
+        // Back-channel logout: revoked session store + token validator
+        services.AddDistributedMemoryCache();
+        services.TryAddSingleton<IRevokedSessionStore, DistributedCacheRevokedSessionStore>();
+        services.TryAddSingleton<BackChannelLogoutTokenValidator>();
+
+        // Wire OnTokenValidated to check revoked sessions when back-channel logout is enabled
+        services
+            .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .PostConfigure<IOptions<KeycloakOptions>>((jwt, keycloakOpts) =>
+            {
+                if (!keycloakOpts.Value.BackChannelLogout.Enabled)
+                {
+                    return;
+                }
+
+                JwtBearerEvents existing = jwt.Events ?? new JwtBearerEvents();
+                Func<TokenValidatedContext, Task> previous = existing.OnTokenValidated;
+
+                existing.OnTokenValidated = async context =>
+                {
+                    await previous(context).ConfigureAwait(false);
+
+                    IRevokedSessionStore store = context.HttpContext.RequestServices
+                        .GetRequiredService<IRevokedSessionStore>();
+
+                    string? sid = context.Principal?.FindFirst("sid")?.Value;
+                    string? sub = context.Principal?.FindFirst("sub")?.Value;
+                    string? sessionKey = sid ?? sub;
+
+                    if (sessionKey is not null
+                        && await store.IsSessionRevokedAsync(sessionKey, context.HttpContext.RequestAborted).ConfigureAwait(false))
+                    {
+                        context.Fail("Session has been revoked via back-channel logout.");
+                    }
+                };
+
+                jwt.Events = existing;
             });
 
         return services;

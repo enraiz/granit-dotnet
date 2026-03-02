@@ -52,4 +52,10 @@ public sealed class ApiDocumentationOptions
     /// </list>
     /// </summary>
     public string? AuthorizationPolicy { get; set; }
+
+    /// <summary>
+    /// OAuth2 configuration for the OpenAPI document and Scalar UI.
+    /// When configured, replaces the HTTP Bearer scheme with an OAuth2 Authorization Code flow.
+    /// </summary>
+    public OAuth2Options OAuth2 { get; set; } = new();
 }

@@ -105,7 +105,7 @@ une dépendance compile-time sur `Wolverine.Http`. Il distingue les
 > **Note** : Wolverine ajoute aussi une réponse 404 fantôme sur tous les endpoints.
 > Le transformer RFC 7807 supprime automatiquement ces 404 sur les endpoints
 > sans paramètre de route.
-
+>
 > **Voir aussi** : [http-responses.md](http-responses.md) pour les conventions
 > sur les codes de retour HTTP (quand utiliser 200, 202, 204, etc.).
 
@@ -232,6 +232,68 @@ Le bouton **Authorize** apparaît alors dans l'UI Scalar sans configuration supp
 
 Si l'application n'utilise pas de JWT Bearer, aucune définition de sécurité n'est ajoutée.
 Le transformer vérifie dynamiquement la présence du schéma au démarrage.
+
+## Intégration OAuth2
+
+Quand la configuration OAuth2 est renseignée, le module remplace automatiquement
+le schéma HTTP Bearer par un schéma OAuth2 Authorization Code dans le document
+OpenAPI. Cela permet l'authentification interactive directement depuis l'UI Scalar.
+
+**Aucun couplage** entre `Granit.ApiDocumentation` et `Granit.Authentication.Keycloak` :
+les URLs OAuth2 sont configurées indépendamment dans `appsettings.json`.
+
+### Configuration OAuth2
+
+```json
+{
+  "ApiDocumentation": {
+    "Title": "Guava API",
+    "OAuth2": {
+      "AuthorizationUrl": "https://keycloak.example.com/realms/my-realm/protocol/openid-connect/auth",
+      "TokenUrl": "https://keycloak.example.com/realms/my-realm/protocol/openid-connect/token",
+      "ClientId": "my-frontend",
+      "Scopes": ["openid", "profile"]
+    }
+  }
+}
+```
+
+| Option | Type | Défaut | Description |
+| ------ | ---- | ------ | ----------- |
+| `AuthorizationUrl` | `string?` | `null` | URL d'autorisation OAuth2 |
+| `TokenUrl` | `string?` | `null` | URL du token OAuth2 |
+| `ClientId` | `string?` | `null` | Client ID **public** (frontend, PKCE) |
+| `EnablePkce` | `bool` | `true` | Active PKCE (S256) dans le flow Authorization Code |
+| `Scopes` | `string[]` | `["openid"]` | Scopes OAuth2 à demander |
+
+Les trois premières options (`AuthorizationUrl`, `TokenUrl`, `ClientId`) sont
+obligatoires. Si l'une d'entre elles est absente ou vide, le schéma OAuth2 n'est
+pas activé et le schéma Bearer reste en place (backward-compatible).
+
+> **Important** : `OAuth2.ClientId` est le client **public** (frontend) qui
+> supporte PKCE, pas le client confidentiel du backend. Pour Keycloak, c'est
+> typiquement un client distinct avec **Standard flow** activé et **Client
+> authentication** désactivé.
+
+### Comportement des transformers
+
+Deux transformers s'exécutent séquentiellement :
+
+1. `JwtBearerSecuritySchemeTransformer` — ajoute le schéma Bearer (toujours)
+2. `OAuth2SecuritySchemeTransformer` — remplace Bearer par OAuth2 (si configuré)
+
+Si OAuth2 n'est pas configuré, le second transformer est un no-op et le schéma
+Bearer reste. Cela garantit la backward-compatibility.
+
+### UI Scalar
+
+Quand OAuth2 est configuré, l'UI Scalar affiche un bouton **Authorize** qui
+déclenche un flow Authorization Code avec PKCE. L'utilisateur est redirigé vers
+l'IDP (Keycloak), s'authentifie, et le token est automatiquement injecté dans
+les requêtes suivantes.
+
+La configuration Scalar est automatique via `AddAuthorizationCodeFlow()` dans
+`UseGranitApiDocumentation()`.
 
 ## Génération de clients typés
 
@@ -449,9 +511,9 @@ et évite de révéler l'architecture interne aux auditeurs externes.
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.ApiVersioning`, `Granit.Security` |
+| Direction       | Modules                                        |
+| --------------- | ---------------------------------------------- |
+| **Dépend de**   | `Granit.ApiVersioning`, `Granit.Security`      |
 | **Utilisé par** | Module feuille (consommé par les applications) |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).
