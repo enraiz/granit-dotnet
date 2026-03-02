@@ -17,11 +17,19 @@ public static class NotificationEndpointRouteBuilderExtensions
     /// <summary>
     /// Maps all Granit.Notifications REST endpoints.
     /// </summary>
-    public static IEndpointRouteBuilder MapGranitNotificationEndpoints(this IEndpointRouteBuilder endpoints)
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="configure">Optional delegate to customize <see cref="NotificationEndpointsOptions"/>.</param>
+    /// <returns>The endpoint route builder for chaining.</returns>
+    public static IEndpointRouteBuilder MapGranitNotificationEndpoints(
+        this IEndpointRouteBuilder endpoints,
+        Action<NotificationEndpointsOptions>? configure = null)
     {
-        RouteGroupBuilder group = endpoints.MapGroup("/notifications")
+        NotificationEndpointsOptions options = new();
+        configure?.Invoke(options);
+
+        RouteGroupBuilder group = endpoints.MapGroup(options.RoutePrefix)
             .RequireAuthorization()
-            .WithTags("Notifications");
+            .WithTags(options.TagName);
 
         MapInboxEndpoints(group);
         MapActivityFeedEndpoints(group);

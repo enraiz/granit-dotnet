@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Granit.Core.Localization;
-using Granit.Localization.Endpoints.Dto;
+using Granit.Localization.Endpoints.Dtos;
 using Granit.Localization.Endpoints.Permissions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -60,7 +60,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
             .MapGet(options.RoutePrefix, HandleGetLocalizationAsync)
             .AllowAnonymous()
             .WithName("GetGranitLocalization")
-            .WithTags("Granit")
+            .WithTags(options.TagName)
             .WithSummary("Returns all localization resources for the requested culture.");
 
         return endpoints;
@@ -97,7 +97,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         RouteGroupBuilder group = endpoints
             .MapGroup($"{options.RoutePrefix}/overrides")
             .RequireAuthorization(LocalizationOverridesPermissions.Manage)
-            .WithTags("Granit");
+            .WithTags(options.TagName);
 
         group.MapGet("", HandleGetOverridesAsync)
              .WithName("GetLocalizationOverrides")
@@ -149,13 +149,13 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
             CultureInfo.CurrentUICulture = previousCulture;
         }
 
-        List<LanguageInfoDto> languages = [.. options.Value.Languages
-            .Select(l => new LanguageInfoDto(l.CultureName, l.DisplayName, l.FlagIcon, l.IsDefault))];
+        List<LanguageInfoResponse> languages = [.. options.Value.Languages
+            .Select(l => new LanguageInfoResponse(l.CultureName, l.DisplayName, l.FlagIcon, l.IsDefault))];
 
         context.Response.Headers.CacheControl = "public, max-age=3600";
         context.Response.Headers.Vary = "Accept-Language";
 
-        return Results.Ok(new ApplicationLocalizationDto(culture.Name, resources, languages));
+        return Results.Ok(new ApplicationLocalizationResponse(culture.Name, resources, languages));
     }
 
     // -------------------------------------------------------------------------

@@ -27,4 +27,10 @@ public sealed class LocalizationEndpointsOptions
     /// </para>
     /// </remarks>
     public string RoutePrefix { get; set; } = "api/granit/localization";
+
+    /// <summary>
+    /// OpenAPI tag name for all localization endpoints.
+    /// Default: <c>"Localization"</c>.
+    /// </summary>
+    public string TagName { get; set; } = "Localization";
 }
