@@ -47,4 +47,11 @@ public sealed class FileParsingOptions
     /// When <c>null</c>, the parser uses the invariant culture defaults.
     /// </summary>
     public string? DateFormat { get; init; }
+
+    /// <summary>
+    /// MIME type of the file being parsed (e.g. <c>"text/csv"</c>,
+    /// <c>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"</c>).
+    /// Used by parsers that need to distinguish between sub-formats (e.g. <c>.xlsx</c> vs <c>.xls</c>).
+    /// </summary>
+    public string? MimeType { get; init; }
 }
