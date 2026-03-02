@@ -28,7 +28,7 @@ internal static class TimelineStreamEndpoints
         int take = 20,
         CancellationToken ct = default)
     {
-        TimelineStreamPage page = await query.GetStreamAsync(entityType, entityId, skip, take, ct);
+        TimelineStreamPage page = await query.GetStreamAsync(entityType, entityId, skip, take, ct).ConfigureAwait(false);
         return TypedResults.Ok(page);
     }
 }

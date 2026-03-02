@@ -17,7 +17,6 @@ public sealed partial class VaultClientFactory(
     ILogger<VaultClientFactory> logger)
 {
     private readonly VaultOptions _options = options.Value;
-    private readonly ILogger<VaultClientFactory> _logger = logger;
 
     /// <summary>Creates an authenticated VaultSharp client.</summary>
     public IVaultClient Create()
@@ -32,7 +31,7 @@ public sealed partial class VaultClientFactory(
         };
 
         VaultClientSettings settings = new(_options.Address, authMethod);
-        LogClientCreated(_logger, _options.AuthMethod, _options.Address);
+        LogClientCreated(logger, _options.AuthMethod, _options.Address);
 
         return new VaultClient(settings);
     }
@@ -40,7 +39,7 @@ public sealed partial class VaultClientFactory(
     private KubernetesAuthMethodInfo CreateKubernetesAuth()
     {
         string jwt = File.ReadAllText(_options.KubernetesTokenPath);
-        LogKubernetesAuth(_logger, _options.KubernetesRole);
+        LogKubernetesAuth(logger, _options.KubernetesRole);
         return new KubernetesAuthMethodInfo(_options.KubernetesRole, jwt);
     }
 
@@ -54,7 +53,7 @@ public sealed partial class VaultClientFactory(
                 "Vault token is required for token authentication. Configure Vault:Token in configuration.");
         }
 
-        LogTokenAuth(_logger);
+        LogTokenAuth(logger);
         return new TokenAuthMethodInfo(_options.Token);
     }
 

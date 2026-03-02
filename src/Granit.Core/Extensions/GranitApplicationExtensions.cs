@@ -57,7 +57,7 @@ public static class GranitApplicationExtensions
         GranitApplication granitApp = app.ApplicationServices
             .GetRequiredService<GranitApplication>();
         ApplicationInitializationContext context = new(app.ApplicationServices);
-        await granitApp.InitializeApplicationAsync(context);
+        await granitApp.InitializeApplicationAsync(context).ConfigureAwait(false);
         return app;
     }
 
@@ -66,7 +66,7 @@ public static class GranitApplicationExtensions
     /// </summary>
     public static async Task<WebApplication> UseGranitAsync(this WebApplication app)
     {
-        await ((IApplicationBuilder)app).UseGranitAsync();
+        await ((IApplicationBuilder)app).UseGranitAsync().ConfigureAwait(false);
         return app;
     }
 
@@ -78,7 +78,7 @@ public static class GranitApplicationExtensions
         GranitApplication granitApp = host.Services
             .GetRequiredService<GranitApplication>();
         ApplicationInitializationContext context = new(host.Services);
-        await granitApp.InitializeApplicationAsync(context);
+        await granitApp.InitializeApplicationAsync(context).ConfigureAwait(false);
         return host;
     }
 }

@@ -65,7 +65,7 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
         }
 
         // Total count before pagination
-        int totalCount = await queryable.CountAsync(cancellationToken);
+        int totalCount = await queryable.CountAsync(cancellationToken).ConfigureAwait(false);
 
         // Sorting
         queryable = query.SortBy?.ToUpperInvariant() switch
@@ -92,7 +92,7 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
             queryable = queryable.Take(query.Take.Value);
         }
 
-        List<TEntity> items = await queryable.ToListAsync(cancellationToken);
+        List<TEntity> items = await queryable.ToListAsync(cancellationToken).ConfigureAwait(false);
 
         return new ReferenceDataResult<TEntity>(items, totalCount);
     }
@@ -114,7 +114,7 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
 
         TEntity? entity = await context.Set<TEntity>()
             .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Code == code, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Code == code, cancellationToken).ConfigureAwait(false);
 
         if (entity is not null)
         {
@@ -131,7 +131,7 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
         TDbContext context = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
         context.Set<TEntity>().Add(entity);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         InvalidateCache(entity.Code);
     }
@@ -143,7 +143,7 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
         TDbContext context = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
         context.Set<TEntity>().Update(entity);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         InvalidateCache(entity.Code);
     }
@@ -158,12 +158,12 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
         TDbContext context = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
         TEntity? entity = await context.Set<TEntity>()
-            .FirstOrDefaultAsync(e => e.Code == code, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Code == code, cancellationToken).ConfigureAwait(false);
 
         if (entity is not null)
         {
             entity.IsActive = isActive;
-            await context.SaveChangesAsync(cancellationToken);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
         InvalidateCache(code);

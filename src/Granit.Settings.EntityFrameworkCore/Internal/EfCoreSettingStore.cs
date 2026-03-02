@@ -39,7 +39,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
             .AsNoTracking()
             .FirstOrDefaultAsync(
                 r => r.Name == name && r.ProviderName == providerName && r.ProviderKey == providerKey,
-                ct);
+                ct).ConfigureAwait(false);
 
         return record is null
             ? null
@@ -58,7 +58,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         List<SettingRecord> records = await context.SettingRecords
             .AsNoTracking()
             .Where(r => r.ProviderName == providerName && r.ProviderKey == providerKey)
-            .ToListAsync(ct);
+            .ToListAsync(ct).ConfigureAwait(false);
 
         return records
             .Select(r => new SettingValue(r.Name, r.ProviderName, r.ProviderKey, r.Value))
@@ -79,7 +79,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         SettingRecord? existing = await context.SettingRecords
             .FirstOrDefaultAsync(
                 r => r.Name == name && r.ProviderName == providerName && r.ProviderKey == providerKey,
-                ct);
+                ct).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -96,7 +96,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
             existing.Value = value;
         }
 
-        await context.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -112,7 +112,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         SettingRecord? existing = await context.SettingRecords
             .FirstOrDefaultAsync(
                 r => r.Name == name && r.ProviderName == providerName && r.ProviderKey == providerKey,
-                ct);
+                ct).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -120,6 +120,6 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         }
 
         context.SettingRecords.Remove(existing);
-        await context.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 }

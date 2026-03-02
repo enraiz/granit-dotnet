@@ -22,26 +22,26 @@ internal sealed class EfCoreTimelineQuery(
         int take = 20,
         CancellationToken ct = default)
     {
-        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct);
+        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
         IQueryable<TimelineEntry> query = db.TimelineEntries
             .AsNoTracking()
             .Where(e => e.EntityType == entityType && e.EntityId == entityId);
 
-        int totalCount = await query.CountAsync(ct);
+        int totalCount = await query.CountAsync(ct).ConfigureAwait(false);
 
         List<TimelineEntry> entries = await query
             .OrderByDescending(e => e.CreatedAt)
             .Skip(skip)
             .Take(take)
-            .ToListAsync(ct);
+            .ToListAsync(ct).ConfigureAwait(false);
 
         List<Guid> entryIds = entries.Select(e => e.Id).ToList();
 
         List<TimelineAttachment> attachments = await db.TimelineAttachments
             .AsNoTracking()
             .Where(a => entryIds.Contains(a.EntryId))
-            .ToListAsync(ct);
+            .ToListAsync(ct).ConfigureAwait(false);
 
         ILookup<Guid, TimelineAttachment> attachmentLookup = attachments.ToLookup(a => a.EntryId);
 

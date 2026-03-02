@@ -63,7 +63,7 @@ internal sealed partial class GranitExceptionHandler(
             HttpContext = httpContext,
             ProblemDetails = problemDetails,
             Exception = exception
-        });
+        }).ConfigureAwait(false);
     }
 
     private int ResolveStatusCode(Exception exception)

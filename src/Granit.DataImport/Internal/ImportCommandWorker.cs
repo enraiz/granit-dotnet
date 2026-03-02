@@ -36,7 +36,7 @@ internal sealed partial class ImportCommandWorker(
                 await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
                 IImportOrchestrator orchestrator =
                     scope.ServiceProvider.GetRequiredService<IImportOrchestrator>();
-                await orchestrator.ExecuteAsync(command.ImportJobId, stoppingToken);
+                await orchestrator.ExecuteAsync(command.ImportJobId, stoppingToken).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

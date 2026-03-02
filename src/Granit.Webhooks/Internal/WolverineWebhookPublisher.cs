@@ -32,6 +32,6 @@ internal sealed class WolverineWebhookPublisher(IMessageBus bus, ICurrentTenant 
             OccurredAt = clock.Now,
         };
 
-        await bus.PublishAsync(trigger);
+        await bus.PublishAsync(trigger).ConfigureAwait(false);
     }
 }

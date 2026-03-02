@@ -31,6 +31,6 @@ internal sealed class InAppNotificationChannel(
             RelatedEntityId = context.RelatedEntity?.EntityId,
         };
 
-        await userNotificationStore.InsertAsync(notification, ct);
+        await userNotificationStore.InsertAsync(notification, ct).ConfigureAwait(false);
     }
 }

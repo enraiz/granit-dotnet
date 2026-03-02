@@ -39,7 +39,7 @@ internal sealed class PermissionManager<TContext>(
         PermissionGrant? existing = await context.PermissionGrants
             .FirstOrDefaultAsync(
                 g => g.TenantId == tenantId && g.Name == permissionName && g.RoleName == roleName,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
 
         if (isGranted && existing is null)
         {
@@ -60,12 +60,12 @@ internal sealed class PermissionManager<TContext>(
             return; // no-op: state already matches requested value
         }
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // Cache invalidation — same key format as PermissionChecker.BuildCacheKey
         await cache.RemoveAsync(
             PermissionChecker.BuildCacheKey(tenantId, roleName, permissionName),
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         // HDS audit trail: emitted as structured log → Serilog → OTLP → Loki (3-year retention)
         // RGPD: no personal data — only role name, permission name, tenant scope
@@ -101,7 +101,7 @@ internal sealed class PermissionManager<TContext>(
             .AsNoTracking()
             .Where(g => g.TenantId == tenantId && g.RoleName == roleName)
             .Select(g => g.Name)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<string>> GetGrantedRolesAsync(
@@ -112,5 +112,5 @@ internal sealed class PermissionManager<TContext>(
             .AsNoTracking()
             .Where(g => g.TenantId == tenantId && g.Name == permissionName)
             .Select(g => g.RoleName)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 }

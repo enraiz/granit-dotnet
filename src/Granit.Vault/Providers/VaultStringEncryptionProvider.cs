@@ -11,7 +11,6 @@ public sealed class VaultStringEncryptionProvider(
     ITransitEncryptionService transitEncryption,
     IOptions<StringEncryptionOptions> options) : IStringEncryptionProvider
 {
-    private readonly ITransitEncryptionService _transitEncryption = transitEncryption;
     private readonly string _keyName = options.Value.VaultKeyName;
 
     /// <inheritdoc/>
@@ -19,7 +18,7 @@ public sealed class VaultStringEncryptionProvider(
 
     /// <inheritdoc/>
     public string Encrypt(string plainText) =>
-        _transitEncryption.EncryptAsync(_keyName, plainText)
+        transitEncryption.EncryptAsync(_keyName, plainText)
             .GetAwaiter()
             .GetResult();
 
@@ -33,7 +32,7 @@ public sealed class VaultStringEncryptionProvider(
 
         try
         {
-            return _transitEncryption.DecryptAsync(_keyName, cipherText)
+            return transitEncryption.DecryptAsync(_keyName, cipherText)
                 .GetAwaiter()
                 .GetResult();
         }

@@ -24,7 +24,7 @@ internal sealed class RunMigrationBatchHandler(MigrationBatchExecutor executor)
     /// </summary>
     public async Task<object[]> HandleAsync(RunMigrationBatchCommand command, CancellationToken ct)
     {
-        RunMigrationBatchCommand? next = await executor.ExecuteBatchAsync(command, ct);
+        RunMigrationBatchCommand? next = await executor.ExecuteBatchAsync(command, ct).ConfigureAwait(false);
         return next is null ? [] : [next];
     }
 }

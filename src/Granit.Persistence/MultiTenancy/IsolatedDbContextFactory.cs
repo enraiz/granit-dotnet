@@ -31,10 +31,6 @@ internal sealed class IsolatedDbContextFactory<TContext>(
     ILogger<IsolatedDbContextFactory<TContext>> logger) : IDbContextFactory<TContext>
     where TContext : DbContext
 {
-    private readonly ICurrentTenant _currentTenant = currentTenant;
-    private readonly ITenantIsolationStrategyProvider _strategyProvider = strategyProvider;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly ILogger<IsolatedDbContextFactory<TContext>> _logger = logger;
 
     /// <inheritdoc/>
     public TContext CreateDbContext() =>
@@ -43,18 +39,18 @@ internal sealed class IsolatedDbContextFactory<TContext>(
     /// <inheritdoc/>
     public async Task<TContext> CreateDbContextAsync(CancellationToken cancellationToken = default)
     {
-        TenantIsolationStrategy strategy = await _strategyProvider
-            .GetStrategyAsync(_currentTenant.IsAvailable ? _currentTenant.Id : null, cancellationToken)
+        TenantIsolationStrategy strategy = await strategyProvider
+            .GetStrategyAsync(currentTenant.IsAvailable ? currentTenant.Id : null, cancellationToken)
             .ConfigureAwait(false);
 
-        _logger.LogDebug(
+        logger.LogDebug(
             "Resolving DbContext<{ContextType}> using isolation strategy {Strategy} for tenant {TenantId}.",
             typeof(TContext).Name,
             strategy,
-            _currentTenant.Id);
+            currentTenant.Id);
 
         IDbContextFactory<TContext> factory =
-            _serviceProvider.GetKeyedService<IDbContextFactory<TContext>>(strategy)
+            serviceProvider.GetKeyedService<IDbContextFactory<TContext>>(strategy)
             ?? throw new InvalidOperationException(
                 $"No factory registered for isolation strategy '{strategy}'. " +
                 $"Configure the '{strategy}' strategy in AddGranitIsolatedDbContext<{typeof(TContext).Name}>().");

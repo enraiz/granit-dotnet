@@ -20,13 +20,13 @@ internal sealed class EfMappingStore(
     public async Task<IReadOnlyList<ColumnMapping>> LoadAsync(
         string definitionName, CancellationToken ct = default)
     {
-        await using DataImportDbContext context = await contextFactory.CreateDbContextAsync(ct);
+        await using DataImportDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         SavedMappingEntity? entity = await context.SavedMappings
             .AsNoTracking()
             .FirstOrDefaultAsync(
-                e => e.DefinitionName == definitionName && e.TenantId == tenantId, ct);
+                e => e.DefinitionName == definitionName && e.TenantId == tenantId, ct).ConfigureAwait(false);
 
         if (entity is null)
         {
@@ -43,13 +43,13 @@ internal sealed class EfMappingStore(
         IReadOnlyList<ColumnMapping> mappings,
         CancellationToken ct = default)
     {
-        await using DataImportDbContext context = await contextFactory.CreateDbContextAsync(ct);
+        await using DataImportDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         string json = JsonSerializer.Serialize(mappings);
 
         SavedMappingEntity? existing = await context.SavedMappings
             .FirstOrDefaultAsync(
-                e => e.DefinitionName == definitionName && e.TenantId == tenantId, ct);
+                e => e.DefinitionName == definitionName && e.TenantId == tenantId, ct).ConfigureAwait(false);
 
         if (existing is not null)
         {
@@ -69,6 +69,6 @@ internal sealed class EfMappingStore(
             });
         }
 
-        await context.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 }

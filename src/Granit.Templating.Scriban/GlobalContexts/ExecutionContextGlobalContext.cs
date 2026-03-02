@@ -29,7 +29,6 @@ namespace Granit.Templating.Scriban.GlobalContexts;
 /// </remarks>
 internal sealed class ExecutionContextGlobalContext(IServiceProvider serviceProvider) : ITemplateGlobalContext
 {
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     /// <inheritdoc/>
     public string ContextName => "context";
@@ -40,7 +39,7 @@ internal sealed class ExecutionContextGlobalContext(IServiceProvider serviceProv
         CultureInfo culture = CultureInfo.CurrentCulture;
 
         // Soft dependency — resolves NullTenantContext when multi-tenancy is not installed
-        ICurrentTenant? tenant = _serviceProvider.GetService(typeof(ICurrentTenant)) as ICurrentTenant;
+        ICurrentTenant? tenant = serviceProvider.GetService(typeof(ICurrentTenant)) as ICurrentTenant;
 
         return new
         {

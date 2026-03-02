@@ -38,7 +38,7 @@ internal sealed partial class MigrationStartupService(
     {
         try
         {
-            await ResumeAsync(cancellationToken);
+            await ResumeAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -51,11 +51,11 @@ internal sealed partial class MigrationStartupService(
 
     private async Task ResumeAsync(CancellationToken ct)
     {
-        await using MigrationProgressDbContext db = await progressFactory.CreateDbContextAsync(ct);
+        await using MigrationProgressDbContext db = await progressFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
         List<MigrationProgress> pending = await db.MigrationProgresses
             .Where(p => p.Status == MigrationStatus.Pending || p.Status == MigrationStatus.InProgress)
-            .ToListAsync(ct);
+            .ToListAsync(ct).ConfigureAwait(false);
 
         if (pending.Count == 0)
         {
@@ -72,7 +72,7 @@ internal sealed partial class MigrationStartupService(
         int batchSize = options.Value.DefaultBatchSize;
         List<RunMigrationBatchCommand> commands = BuildCommands(pending, tenantIds, batchSize);
 
-        await dispatcher.DispatchAsync(commands, ct);
+        await dispatcher.DispatchAsync(commands, ct).ConfigureAwait(false);
 
         LogCommandsDispatched(commands.Count);
     }

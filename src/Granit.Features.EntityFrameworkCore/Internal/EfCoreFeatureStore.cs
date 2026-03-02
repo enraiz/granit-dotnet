@@ -24,13 +24,13 @@ internal sealed class EfCoreFeatureStore(
         CancellationToken ct = default)
     {
         Guid? tenantGuid = ParseTenantId(tenantId);
-        await using GranitFeaturesDbContext context = await contextFactory.CreateDbContextAsync(ct);
+        await using GranitFeaturesDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
         TenantFeatureOverride? row = await context.FeatureOverrides
             .AsNoTracking()
             .FirstOrDefaultAsync(
                 o => o.TenantId == tenantGuid && o.FeatureName == featureName,
-                ct);
+                ct).ConfigureAwait(false);
 
         return row?.Value;
     }
@@ -43,12 +43,12 @@ internal sealed class EfCoreFeatureStore(
         CancellationToken ct = default)
     {
         Guid? tenantGuid = ParseTenantId(tenantId);
-        await using GranitFeaturesDbContext context = await contextFactory.CreateDbContextAsync(ct);
+        await using GranitFeaturesDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
         TenantFeatureOverride? existing = await context.FeatureOverrides
             .FirstOrDefaultAsync(
                 o => o.TenantId == tenantGuid && o.FeatureName == featureName,
-                ct);
+                ct).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -64,7 +64,7 @@ internal sealed class EfCoreFeatureStore(
             existing.Value = value;
         }
 
-        await context.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -74,12 +74,12 @@ internal sealed class EfCoreFeatureStore(
         CancellationToken ct = default)
     {
         Guid? tenantGuid = ParseTenantId(tenantId);
-        await using GranitFeaturesDbContext context = await contextFactory.CreateDbContextAsync(ct);
+        await using GranitFeaturesDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
         TenantFeatureOverride? existing = await context.FeatureOverrides
             .FirstOrDefaultAsync(
                 o => o.TenantId == tenantGuid && o.FeatureName == featureName,
-                ct);
+                ct).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -87,7 +87,7 @@ internal sealed class EfCoreFeatureStore(
         }
 
         context.FeatureOverrides.Remove(existing);
-        await context.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 
     private static Guid? ParseTenantId(string? tenantId) =>

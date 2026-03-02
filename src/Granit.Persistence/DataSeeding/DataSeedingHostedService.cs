@@ -21,7 +21,7 @@ internal sealed partial class DataSeedingHostedService(
         try
         {
             DataSeedContext context = new();
-            await seeder.SeedAsync(context, cancellationToken);
+            await seeder.SeedAsync(context, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

@@ -27,7 +27,7 @@ internal sealed class DocumentGenerator(
 
         // 1. Render via the shared text pipeline (enrichers + resolver + engine).
         //    Binary engines (e.g. ClosedXML for Excel) return BinaryRenderedContent directly.
-        RenderedContent content = await _textRenderer.RenderDocumentAsync(templateType, data, format, ct);
+        RenderedContent content = await _textRenderer.RenderDocumentAsync(templateType, data, format, ct).ConfigureAwait(false);
 
         // 2a. Binary engine result: return directly, no IDocumentRenderer step needed.
         if (content is BinaryRenderedContent binary)
@@ -45,6 +45,6 @@ internal sealed class DocumentGenerator(
         }
 
         // 3. Convert HTML → binary document.
-        return await renderer.RenderAsync(text.Html, format, ct);
+        return await renderer.RenderAsync(text.Html, format, ct).ConfigureAwait(false);
     }
 }

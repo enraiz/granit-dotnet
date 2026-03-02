@@ -35,7 +35,7 @@ public sealed class NotificationFanoutHandler(
                 trigger.RelatedEntity.EntityType,
                 trigger.RelatedEntity.EntityId,
                 tenantId,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
         }
 
         if (recipientUserIds.Count == 0)
@@ -43,7 +43,7 @@ public sealed class NotificationFanoutHandler(
             recipientUserIds = await subscriptionStore.GetSubscriberIdsAsync(
                 trigger.NotificationTypeName,
                 tenantId,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
         }
 
         if (recipientUserIds.Count == 0)
@@ -60,7 +60,7 @@ public sealed class NotificationFanoutHandler(
                 if (allowOptOut)
                 {
                     bool isEnabled = await preferenceStore.IsChannelEnabledAsync(
-                        userId, trigger.NotificationTypeName, channelName, tenantId, cancellationToken);
+                        userId, trigger.NotificationTypeName, channelName, tenantId, cancellationToken).ConfigureAwait(false);
                     if (!isEnabled)
                     {
                         continue;

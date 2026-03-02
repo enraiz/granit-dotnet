@@ -45,10 +45,10 @@ internal sealed class MigrationBatchExecutor(
 
         if (tenantId.HasValue)
         {
-            await isolator.IsolateAsync(tenantContext, tenantId.Value, ct);
+            await isolator.IsolateAsync(tenantContext, tenantId.Value, ct).ConfigureAwait(false);
         }
 
-        MigrationProgress progress = await FindOrCreateProgressAsync(command, tenantId, ct);
+        MigrationProgress progress = await FindOrCreateProgressAsync(command, tenantId, ct).ConfigureAwait(false);
 
         if (progress.Status == MigrationStatus.Completed)
         {
@@ -63,13 +63,13 @@ internal sealed class MigrationBatchExecutor(
 
         try
         {
-            result = await registration.Migration(tenantContext, batchContext, ct);
+            result = await registration.Migration(tenantContext, batchContext, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             progress.Status = MigrationStatus.Failed;
             progress.Error = ex.Message.Length > 4000 ? ex.Message[..4000] : ex.Message;
-            await SaveProgressAsync(command.CycleId, tenantId, ct);
+            await SaveProgressAsync(command.CycleId, tenantId, ct).ConfigureAwait(false);
 
             throw;
         }
@@ -93,7 +93,7 @@ internal sealed class MigrationBatchExecutor(
                 command.CycleId, tenantId, result.ProcessedCount, result.NextCursor);
         }
 
-        await SaveProgressAsync(command.CycleId, tenantId, ct);
+        await SaveProgressAsync(command.CycleId, tenantId, ct).ConfigureAwait(false);
 
         return result.NextCursor is null
             ? null
@@ -106,7 +106,7 @@ internal sealed class MigrationBatchExecutor(
         CancellationToken ct)
     {
         MigrationProgress? existing = await progressContext.MigrationProgresses
-            .FirstOrDefaultAsync(p => p.CycleId == command.CycleId && p.TenantId == tenantId, ct);
+            .FirstOrDefaultAsync(p => p.CycleId == command.CycleId && p.TenantId == tenantId, ct).ConfigureAwait(false);
 
         if (existing is not null)
         {
@@ -134,7 +134,7 @@ internal sealed class MigrationBatchExecutor(
     {
         try
         {
-            await progressContext.SaveChangesAsync(ct);
+            await progressContext.SaveChangesAsync(ct).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {

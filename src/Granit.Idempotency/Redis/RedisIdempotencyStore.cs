@@ -26,14 +26,14 @@ internal sealed class RedisIdempotencyStore(
     public async Task<bool> TryAcquireAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken ct)
     {
         RedisValue payload = Serialize(entry);
-        bool acquired = await _db.StringSetAsync(key, payload, ttl, When.NotExists).WaitAsync(ct);
+        bool acquired = await _db.StringSetAsync(key, payload, ttl, When.NotExists).WaitAsync(ct).ConfigureAwait(false);
         return acquired;
     }
 
     /// <inheritdoc/>
     public async Task<IdempotencyEntry?> GetAsync(string key, CancellationToken ct)
     {
-        RedisValue raw = await _db.StringGetAsync(key).WaitAsync(ct);
+        RedisValue raw = await _db.StringGetAsync(key).WaitAsync(ct).ConfigureAwait(false);
         if (raw.IsNullOrEmpty)
         {
             return null;
@@ -46,7 +46,7 @@ internal sealed class RedisIdempotencyStore(
     public async Task SetCompletedAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken ct)
     {
         RedisValue payload = Serialize(entry);
-        bool updated = await _db.StringSetAsync(key, payload, ttl, When.Exists).WaitAsync(ct);
+        bool updated = await _db.StringSetAsync(key, payload, ttl, When.Exists).WaitAsync(ct).ConfigureAwait(false);
 
         if (!updated)
         {

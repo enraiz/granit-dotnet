@@ -16,7 +16,7 @@ internal sealed class LegalAgreementChecker(
             return false;
         }
 
-        LegalAgreementBase? latest = await store.FindLatestAsync(userId, documentId, ct);
+        LegalAgreementBase? latest = await store.FindLatestAsync(userId, documentId, ct).ConfigureAwait(false);
         if (latest is null)
         {
             return false;

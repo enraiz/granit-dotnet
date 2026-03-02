@@ -64,7 +64,7 @@ public static class GranitHostBuilderExtensions
         // Default: NullTenantContext (no-op). Granit.MultiTenancy replaces it if present.
         builder.Services.TryAddSingleton<ICurrentTenant>(NullTenantContext.Instance);
 
-        await application.ConfigureServicesAsync(context);
+        await application.ConfigureServicesAsync(context).ConfigureAwait(false);
 
         builder.Services.AddSingleton(application);
 

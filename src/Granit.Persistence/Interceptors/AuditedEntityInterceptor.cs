@@ -20,10 +20,6 @@ public sealed class AuditedEntityInterceptor(
     IGuidGenerator guidGenerator,
     ICurrentTenant currentTenant) : SaveChangesInterceptor
 {
-    private readonly ICurrentUserService _currentUserService = currentUserService;
-    private readonly IClock _clock = clock;
-    private readonly IGuidGenerator _guidGenerator = guidGenerator;
-    private readonly ICurrentTenant _currentTenant = currentTenant;
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
@@ -49,8 +45,8 @@ public sealed class AuditedEntityInterceptor(
             return;
         }
 
-        DateTimeOffset now = _clock.Now;
-        string userId = _currentUserService.UserId ?? "system";
+        DateTimeOffset now = clock.Now;
+        string userId = currentUserService.UserId ?? "system";
 
         foreach (EntityEntry<CreationAuditedEntity> entry in context.ChangeTracker.Entries<CreationAuditedEntity>())
         {
@@ -74,14 +70,14 @@ public sealed class AuditedEntityInterceptor(
 
         if (entry.Entity.Id == Guid.Empty)
         {
-            entry.Entity.Id = _guidGenerator.Create();
+            entry.Entity.Id = guidGenerator.Create();
         }
 
         // Multi-tenant isolation: inject current TenantId if the entity supports it.
         // Explicit IsAvailable check per soft-dependency contract (NullTenantContext returns null).
         if (entry.Entity is IMultiTenant multiTenant && multiTenant.TenantId is null)
         {
-            multiTenant.TenantId = _currentTenant.IsAvailable ? _currentTenant.Id : null;
+            multiTenant.TenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         }
     }
 

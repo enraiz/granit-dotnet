@@ -37,7 +37,7 @@ public sealed class SynchronousSaveChangesCodeFixProvider : CodeFixProvider
     /// <inheritdoc/>
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
+        SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
         if (root is null)
         {
             return;
@@ -64,7 +64,7 @@ public sealed class SynchronousSaveChangesCodeFixProvider : CodeFixProvider
         SyntaxNode node,
         CancellationToken ct)
     {
-        SyntaxNode? root = await document.GetSyntaxRootAsync(ct);
+        SyntaxNode? root = await document.GetSyntaxRootAsync(ct).ConfigureAwait(false);
         if (root is null)
         {
             return document;

@@ -30,7 +30,7 @@ internal sealed class DefaultWorkflowHistoryQuery<TDbContext>(TDbContext dbConte
                 r.TransitionedAt,
                 r.TransitionedBy,
                 r.Comment))
-            .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         return history;
     }

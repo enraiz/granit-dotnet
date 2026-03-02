@@ -27,7 +27,7 @@ internal sealed class SylvanExcelFileParser : IFileParser
         FileParsingOptions options,
         CancellationToken ct = default)
     {
-        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct);
+        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct).ConfigureAwait(false);
 
         List<string> headers = new(reader.FieldCount);
         for (int i = 0; i < reader.FieldCount; i++)
@@ -45,13 +45,13 @@ internal sealed class SylvanExcelFileParser : IFileParser
         int maxRows = 10,
         CancellationToken ct = default)
     {
-        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct);
+        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct).ConfigureAwait(false);
         int fieldCount = reader.FieldCount;
 
         List<string[]> rows = [];
         int count = 0;
 
-        while (count < maxRows && await reader.ReadAsync(ct))
+        while (count < maxRows && await reader.ReadAsync(ct).ConfigureAwait(false))
         {
             int cellCount = Math.Min(fieldCount, reader.RowFieldCount);
             string[] values = new string[fieldCount];
@@ -79,7 +79,7 @@ internal sealed class SylvanExcelFileParser : IFileParser
         FileParsingOptions options,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
-        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct);
+        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct).ConfigureAwait(false);
 
         List<string> headers = new(reader.FieldCount);
         for (int i = 0; i < reader.FieldCount; i++)
@@ -89,7 +89,7 @@ internal sealed class SylvanExcelFileParser : IFileParser
 
         int rowNumber = 0;
 
-        while (await reader.ReadAsync(ct))
+        while (await reader.ReadAsync(ct).ConfigureAwait(false))
         {
             rowNumber++;
             int cellCount = Math.Min(headers.Count, reader.RowFieldCount);
@@ -117,7 +117,7 @@ internal sealed class SylvanExcelFileParser : IFileParser
     {
         ExcelWorkbookType workbookType = GetWorkbookType(options.MimeType);
         ExcelDataReaderOptions readerOptions = new() { OwnsStream = false };
-        ExcelDataReader reader = await ExcelDataReader.CreateAsync(stream, workbookType, readerOptions, ct);
+        ExcelDataReader reader = await ExcelDataReader.CreateAsync(stream, workbookType, readerOptions, ct).ConfigureAwait(false);
 
         if (options.SheetName is not null)
         {

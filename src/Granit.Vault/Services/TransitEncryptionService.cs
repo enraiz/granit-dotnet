@@ -16,9 +16,7 @@ public sealed partial class TransitEncryptionService(
     IOptions<VaultOptions> options,
     ILogger<TransitEncryptionService> logger) : ITransitEncryptionService
 {
-    private readonly IVaultClient _vaultClient = vaultClient;
     private readonly VaultOptions _options = options.Value;
-    private readonly ILogger<TransitEncryptionService> _logger = logger;
 
     public async Task<string> EncryptAsync(
         string keyName,
@@ -28,15 +26,15 @@ public sealed partial class TransitEncryptionService(
         string base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(plaintext));
 
         // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
-        Secret<EncryptionResponse> result = await _vaultClient.V1.Secrets.Transit.EncryptAsync(
+        Secret<EncryptionResponse> result = await vaultClient.V1.Secrets.Transit.EncryptAsync(
             keyName,
             new EncryptRequestOptions
             {
                 Base64EncodedPlainText = base64Plaintext
             },
-            mountPoint: _options.TransitMountPoint).WaitAsync(cancellationToken);
+            mountPoint: _options.TransitMountPoint).WaitAsync(cancellationToken).ConfigureAwait(false);
 
-        LogEncrypted(_logger, keyName);
+        LogEncrypted(logger, keyName);
         return result.Data.CipherText;
     }
 
@@ -46,16 +44,16 @@ public sealed partial class TransitEncryptionService(
         CancellationToken cancellationToken = default)
     {
         // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
-        Secret<DecryptionResponse> result = await _vaultClient.V1.Secrets.Transit.DecryptAsync(
+        Secret<DecryptionResponse> result = await vaultClient.V1.Secrets.Transit.DecryptAsync(
             keyName,
             new DecryptRequestOptions
             {
                 CipherText = ciphertext
             },
-            mountPoint: _options.TransitMountPoint).WaitAsync(cancellationToken);
+            mountPoint: _options.TransitMountPoint).WaitAsync(cancellationToken).ConfigureAwait(false);
 
         byte[] bytes = Convert.FromBase64String(result.Data.Base64EncodedPlainText);
-        LogDecrypted(_logger, keyName);
+        LogDecrypted(logger, keyName);
         return Encoding.UTF8.GetString(bytes);
     }
 

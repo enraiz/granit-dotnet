@@ -29,14 +29,14 @@ internal static class BackgroundJobsReadEndpoints
     private static async Task<Ok<IReadOnlyList<BackgroundJobStatus>>> GetAllJobsAsync(
         IBackgroundJobManager manager,
         CancellationToken ct) =>
-        TypedResults.Ok(await manager.GetAllAsync(ct));
+        TypedResults.Ok(await manager.GetAllAsync(ct).ConfigureAwait(false));
 
     private static async Task<Results<Ok<BackgroundJobStatus>, NotFound>> GetJobByNameAsync(
         string name,
         IBackgroundJobManager manager,
         CancellationToken ct)
     {
-        BackgroundJobStatus? job = await manager.FindAsync(name, ct);
+        BackgroundJobStatus? job = await manager.FindAsync(name, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();

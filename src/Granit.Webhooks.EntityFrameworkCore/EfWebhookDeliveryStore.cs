@@ -23,7 +23,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
         string payloadHash,
         CancellationToken cancellationToken = default)
     {
-        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         context.WebhookDeliveryAttempts.Add(new WebhookDeliveryAttempt
         {
@@ -41,7 +41,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
         });
 
         WebhookSubscription? subscription = await context.WebhookSubscriptions
-            .FindAsync([command.SubscriptionId], cancellationToken);
+            .FindAsync([command.SubscriptionId], cancellationToken).ConfigureAwait(false);
 
         if (subscription is not null)
         {
@@ -49,7 +49,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
             subscription.ConsecutiveFailureCount = 0;
         }
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task RecordFailureAsync(
@@ -59,7 +59,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
         string errorMessage,
         CancellationToken cancellationToken = default)
     {
-        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         context.WebhookDeliveryAttempts.Add(new WebhookDeliveryAttempt
         {
@@ -78,14 +78,14 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
         });
 
         WebhookSubscription? subscription = await context.WebhookSubscriptions
-            .FindAsync([command.SubscriptionId], cancellationToken);
+            .FindAsync([command.SubscriptionId], cancellationToken).ConfigureAwait(false);
 
         if (subscription is not null)
         {
             subscription.ConsecutiveFailureCount++;
         }
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task SuspendSubscriptionAsync(
@@ -93,10 +93,10 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
         string reason,
         CancellationToken cancellationToken = default)
     {
-        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         WebhookSubscription? subscription = await context.WebhookSubscriptions
-            .FindAsync([subscriptionId], cancellationToken);
+            .FindAsync([subscriptionId], cancellationToken).ConfigureAwait(false);
 
         if (subscription is null)
         {
@@ -108,6 +108,6 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
         subscription.SuspendedAt = clock.Now;
         subscription.SuspendedBy = "system";
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

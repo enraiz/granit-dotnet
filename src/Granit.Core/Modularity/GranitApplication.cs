@@ -38,7 +38,7 @@ public sealed class GranitApplication
     {
         foreach (ModuleDescriptor module in _modules)
         {
-            await module.Instance.ConfigureServicesAsync(context);
+            await module.Instance.ConfigureServicesAsync(context).ConfigureAwait(false);
         }
     }
 
@@ -62,7 +62,7 @@ public sealed class GranitApplication
     {
         foreach (ModuleDescriptor module in _modules)
         {
-            await module.Instance.OnApplicationInitializationAsync(context);
+            await module.Instance.OnApplicationInitializationAsync(context).ConfigureAwait(false);
         }
     }
 }

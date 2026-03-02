@@ -15,22 +15,22 @@ internal sealed class EfWebhookSubscriptionStore(IDbContextFactory<WebhooksDbCon
         Guid? tenantId,
         CancellationToken cancellationToken = default)
     {
-        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         return await context.WebhookSubscriptions
             .Where(s => s.Status == WebhookSubscriptionStatus.Active
                      && s.EventType == eventType
                      && (s.TenantId == null || s.TenantId == tenantId))
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<WebhookSubscription?> FindByIdAsync(
         Guid subscriptionId,
         CancellationToken cancellationToken = default)
     {
-        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        return await context.WebhookSubscriptions.FindAsync([subscriptionId], cancellationToken);
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.WebhookSubscriptions.FindAsync([subscriptionId], cancellationToken).ConfigureAwait(false);
     }
 
     public async Task DeactivateAsync(
@@ -38,10 +38,10 @@ internal sealed class EfWebhookSubscriptionStore(IDbContextFactory<WebhooksDbCon
         string reason,
         CancellationToken cancellationToken = default)
     {
-        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         WebhookSubscription? subscription = await context.WebhookSubscriptions
-            .FindAsync([subscriptionId], cancellationToken);
+            .FindAsync([subscriptionId], cancellationToken).ConfigureAwait(false);
 
         if (subscription is null)
         {
@@ -51,6 +51,6 @@ internal sealed class EfWebhookSubscriptionStore(IDbContextFactory<WebhooksDbCon
         subscription.Status = WebhookSubscriptionStatus.Deactivated;
         subscription.DeactivationReason = reason;
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

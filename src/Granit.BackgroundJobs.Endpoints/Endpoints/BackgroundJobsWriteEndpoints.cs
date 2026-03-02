@@ -39,7 +39,7 @@ internal static class BackgroundJobsWriteEndpoints
     {
         try
         {
-            await manager.PauseAsync(name, ct);
+            await manager.PauseAsync(name, ct).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
         catch (EntityNotFoundException)
@@ -55,7 +55,7 @@ internal static class BackgroundJobsWriteEndpoints
     {
         try
         {
-            await manager.ResumeAsync(name, ct);
+            await manager.ResumeAsync(name, ct).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
         catch (EntityNotFoundException)
@@ -71,7 +71,7 @@ internal static class BackgroundJobsWriteEndpoints
     {
         try
         {
-            await manager.TriggerNowAsync(name, ct);
+            await manager.TriggerNowAsync(name, ct).ConfigureAwait(false);
             return TypedResults.Accepted((string?)null);
         }
         catch (EntityNotFoundException)

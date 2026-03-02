@@ -52,7 +52,7 @@ public sealed class TenantSettingValueProvider(
             async innerCt =>
             {
                 SettingValue? stored = await _store.GetOrNullAsync(
-                    definition.Name, ProviderName, tenantKey, innerCt);
+                    definition.Name, ProviderName, tenantKey, innerCt).ConfigureAwait(false);
                 return stored ?? new SettingValue(definition.Name, ProviderName, tenantKey, null);
             },
             cacheOptions,
@@ -70,8 +70,8 @@ public sealed class TenantSettingValueProvider(
         }
 
         string tenantKey = _currentTenant.Id!.Value.ToString();
-        await _store.SetAsync(definition.Name, ProviderName, tenantKey, value, ct);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct);
+        await _store.SetAsync(definition.Name, ProviderName, tenantKey, value, ct).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -83,7 +83,7 @@ public sealed class TenantSettingValueProvider(
         }
 
         string tenantKey = _currentTenant.Id!.Value.ToString();
-        await _store.DeleteAsync(definition.Name, ProviderName, tenantKey, ct);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct);
+        await _store.DeleteAsync(definition.Name, ProviderName, tenantKey, ct).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct).ConfigureAwait(false);
     }
 }

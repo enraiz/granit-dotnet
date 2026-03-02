@@ -28,10 +28,7 @@ internal sealed class CachedLocalizationOverrideStore(
     IServiceScopeFactory scopeFactory,
     IServiceProvider serviceProvider) : ILocalizationOverrideStore
 {
-    private readonly IMemoryCache _memoryCache = memoryCache;
     private readonly LocalizationOverridesCacheOptions _options = options.Value;
-    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     /// <summary>
     /// Keyed service key used to register the underlying (non-cached) store.
@@ -45,7 +42,7 @@ internal sealed class CachedLocalizationOverrideStore(
     {
         string cacheKey = BuildCacheKey(resourceName, culture);
 
-        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyDictionary<string, string>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyDictionary<string, string>? cached) && cached is not null)
         {
             return Task.FromResult(cached);
         }
@@ -57,49 +54,49 @@ internal sealed class CachedLocalizationOverrideStore(
     public async Task SetOverrideAsync(
         string resourceName, string culture, string key, string value, CancellationToken ct = default)
     {
-        await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+        await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         ILocalizationOverrideStore inner =
             scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStore>(RawStoreKey);
 
-        await inner.SetOverrideAsync(resourceName, culture, key, value, ct);
-        _memoryCache.Remove(BuildCacheKey(resourceName, culture));
+        await inner.SetOverrideAsync(resourceName, culture, key, value, ct).ConfigureAwait(false);
+        memoryCache.Remove(BuildCacheKey(resourceName, culture));
     }
 
     /// <inheritdoc />
     public async Task RemoveOverrideAsync(
         string resourceName, string culture, string key, CancellationToken ct = default)
     {
-        await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+        await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         ILocalizationOverrideStore inner =
             scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStore>(RawStoreKey);
 
-        await inner.RemoveOverrideAsync(resourceName, culture, key, ct);
-        _memoryCache.Remove(BuildCacheKey(resourceName, culture));
+        await inner.RemoveOverrideAsync(resourceName, culture, key, ct).ConfigureAwait(false);
+        memoryCache.Remove(BuildCacheKey(resourceName, culture));
     }
 
     private async Task<IReadOnlyDictionary<string, string>> LoadAndCacheAsync(
         string cacheKey, string resourceName, string culture, CancellationToken ct)
     {
-        await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+        await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         ILocalizationOverrideStore? inner =
             scope.ServiceProvider.GetKeyedService<ILocalizationOverrideStore>(RawStoreKey);
 
         // No raw store registered (EF Core package not installed): fall back to empty overrides
         // so the localizer resolves translations from embedded JSON files transparently.
         IReadOnlyDictionary<string, string> overrides = inner is not null
-            ? await inner.GetOverridesAsync(resourceName, culture, ct)
+            ? await inner.GetOverridesAsync(resourceName, culture, ct).ConfigureAwait(false)
             : new Dictionary<string, string>(StringComparer.Ordinal);
 
         MemoryCacheEntryOptions entryOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(_options.CacheTtl);
 
-        _memoryCache.Set(cacheKey, overrides, entryOptions);
+        memoryCache.Set(cacheKey, overrides, entryOptions);
         return overrides;
     }
 
     private string BuildCacheKey(string resourceName, string culture)
     {
-        ICurrentTenant? currentTenant = _serviceProvider.GetService<ICurrentTenant>();
+        ICurrentTenant? currentTenant = serviceProvider.GetService<ICurrentTenant>();
         string tenantSegment = currentTenant?.IsAvailable == true
             ? currentTenant.Id!.Value.ToString()
             : "host";

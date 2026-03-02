@@ -30,7 +30,7 @@ internal static class WorkflowReadEndpoints
         CancellationToken ct)
     {
         IReadOnlyList<TransitionHistoryResponse> history = await historyQuery.GetHistoryAsync(
-            entityType, entityId, ct);
+            entityType, entityId, ct).ConfigureAwait(false);
         return TypedResults.Ok(history);
     }
 }

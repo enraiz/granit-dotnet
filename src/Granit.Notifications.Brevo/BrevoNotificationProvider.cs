@@ -43,7 +43,7 @@ internal sealed class BrevoNotificationProvider(
         };
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
-            "smtp/email", payload, JsonOptions, ct);
+            "smtp/email", payload, JsonOptions, ct).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 
@@ -62,7 +62,7 @@ internal sealed class BrevoNotificationProvider(
         };
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
-            "transactionalSMS/sms", payload, JsonOptions, ct);
+            "transactionalSMS/sms", payload, JsonOptions, ct).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 
@@ -81,7 +81,7 @@ internal sealed class BrevoNotificationProvider(
         };
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
-            "whatsapp/sendTemplate", payload, JsonOptions, ct);
+            "whatsapp/sendTemplate", payload, JsonOptions, ct).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 }

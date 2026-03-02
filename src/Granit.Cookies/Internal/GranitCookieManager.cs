@@ -20,7 +20,7 @@ internal sealed class GranitCookieManager(
 
         if (definition.Category != CookieCategory.StrictlyNecessary)
         {
-            bool hasConsent = await consentResolver.ResolveAsync(httpContext, definition.Category);
+            bool hasConsent = await consentResolver.ResolveAsync(httpContext, definition.Category).ConfigureAwait(false);
             if (!hasConsent)
             {
                 return;

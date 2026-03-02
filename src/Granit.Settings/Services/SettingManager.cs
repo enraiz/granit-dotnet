@@ -22,9 +22,9 @@ public sealed class SettingManager(
     public async Task SetGlobalAsync(string name, string? value, CancellationToken ct = default)
     {
         _definitions.Get(name); // Validates that the setting is declared
-        await _store.SetAsync(name, GlobalSettingValueProvider.ProviderName, null, value, ct);
+        await _store.SetAsync(name, GlobalSettingValueProvider.ProviderName, null, value, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(
-            SettingCacheKey.Build(GlobalSettingValueProvider.ProviderName, null, name), ct);
+            SettingCacheKey.Build(GlobalSettingValueProvider.ProviderName, null, name), ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -32,9 +32,9 @@ public sealed class SettingManager(
     {
         _definitions.Get(name);
         string tenantKey = tenantId.ToString();
-        await _store.SetAsync(name, TenantSettingValueProvider.ProviderName, tenantKey, value, ct);
+        await _store.SetAsync(name, TenantSettingValueProvider.ProviderName, tenantKey, value, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(
-            SettingCacheKey.Build(TenantSettingValueProvider.ProviderName, tenantKey, name), ct);
+            SettingCacheKey.Build(TenantSettingValueProvider.ProviderName, tenantKey, name), ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -42,9 +42,9 @@ public sealed class SettingManager(
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userId);
         _definitions.Get(name);
-        await _store.SetAsync(name, UserSettingValueProvider.ProviderName, userId, value, ct);
+        await _store.SetAsync(name, UserSettingValueProvider.ProviderName, userId, value, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(
-            SettingCacheKey.Build(UserSettingValueProvider.ProviderName, userId, name), ct);
+            SettingCacheKey.Build(UserSettingValueProvider.ProviderName, userId, name), ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -54,7 +54,7 @@ public sealed class SettingManager(
         string? providerKey = null,
         CancellationToken ct = default)
     {
-        await _store.DeleteAsync(name, providerName, providerKey, ct);
-        await _cache.RemoveAsync(SettingCacheKey.Build(providerName, providerKey, name), ct);
+        await _store.DeleteAsync(name, providerName, providerKey, ct).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(providerName, providerKey, name), ct).ConfigureAwait(false);
     }
 }

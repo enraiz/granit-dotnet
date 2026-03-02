@@ -22,20 +22,20 @@ public sealed class TenantResolutionMiddleware(
     {
         if (!_options.IsEnabled)
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
             return;
         }
 
-        TenantInfo? tenant = await _pipeline.ResolveAsync(context, context.RequestAborted);
+        TenantInfo? tenant = await _pipeline.ResolveAsync(context, context.RequestAborted).ConfigureAwait(false);
 
         if (tenant is not null)
         {
             using IDisposable _ = _currentTenant.Change(tenant.Id, tenant.Name);
-            await next(context);
+            await next(context).ConfigureAwait(false);
         }
         else
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
         }
     }
 }

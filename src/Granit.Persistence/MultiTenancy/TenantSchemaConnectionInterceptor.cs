@@ -33,8 +33,6 @@ internal sealed partial class TenantSchemaConnectionInterceptor(
     ICurrentTenant currentTenant,
     ITenantSchemaProvider schemaProvider) : DbConnectionInterceptor
 {
-    private readonly ICurrentTenant _currentTenant = currentTenant;
-    private readonly ITenantSchemaProvider _schemaProvider = schemaProvider;
 
     /// <summary>
     /// Matches valid PostgreSQL unquoted identifiers: lower-case letters, digits, underscores,
@@ -71,7 +69,7 @@ internal sealed partial class TenantSchemaConnectionInterceptor(
     /// <inheritdoc/>
     public override void ConnectionOpened(DbConnection connection, ConnectionEndEventData eventData)
     {
-        if (!_currentTenant.IsAvailable)
+        if (!currentTenant.IsAvailable)
         {
             return;
         }
@@ -80,8 +78,8 @@ internal sealed partial class TenantSchemaConnectionInterceptor(
         // DefaultTenantSchemaProvider returns a completed ValueTask so AsTask() is allocation-free.
         // Custom implementations should avoid async I/O in GetSchemaNameAsync when called
         // from the synchronous EF Core path.
-        string schema = _schemaProvider
-            .GetSchemaNameAsync(_currentTenant.Id!.Value)
+        string schema = schemaProvider
+            .GetSchemaNameAsync(currentTenant.Id!.Value)
             .AsTask()
             .GetAwaiter()
             .GetResult();
@@ -95,13 +93,13 @@ internal sealed partial class TenantSchemaConnectionInterceptor(
         ConnectionEndEventData eventData,
         CancellationToken cancellationToken = default)
     {
-        if (!_currentTenant.IsAvailable)
+        if (!currentTenant.IsAvailable)
         {
             return;
         }
 
-        string schema = await _schemaProvider
-            .GetSchemaNameAsync(_currentTenant.Id!.Value, cancellationToken)
+        string schema = await schemaProvider
+            .GetSchemaNameAsync(currentTenant.Id!.Value, cancellationToken)
             .ConfigureAwait(false);
 
         await SetSearchPathAsync(connection, schema, cancellationToken)

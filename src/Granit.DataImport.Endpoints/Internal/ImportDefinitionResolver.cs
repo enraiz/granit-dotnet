@@ -38,6 +38,6 @@ internal static class ImportDefinitionResolver
         Task<IReadOnlyList<ColumnMapping>> task =
             (Task<IReadOnlyList<ColumnMapping>>)method.Invoke(mappingService, [headers, ct])!;
 
-        return await task;
+        return await task.ConfigureAwait(false);
     }
 }

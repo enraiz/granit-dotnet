@@ -39,7 +39,7 @@ public sealed class WorkflowApprovalRequestedHandler(
         CancellationToken cancellationToken)
     {
         IReadOnlyList<string> approverIds = await approverResolver.ResolveApproversAsync(
-            message.RequiredPermission, cancellationToken);
+            message.RequiredPermission, cancellationToken).ConfigureAwait(false);
 
         if (approverIds.Count == 0)
         {
@@ -64,7 +64,7 @@ public sealed class WorkflowApprovalRequestedHandler(
             data,
             approverIds,
             relatedEntity,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         logger.LogInformation(
             "Approval notification sent to {ApproverCount} approvers for {EntityType} {EntityId} " +

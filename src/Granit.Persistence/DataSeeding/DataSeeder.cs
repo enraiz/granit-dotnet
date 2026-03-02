@@ -26,7 +26,7 @@ internal sealed partial class DataSeeder(
             try
             {
                 LogContributorStarted(contributorName);
-                await contributor.SeedAsync(context, cancellationToken);
+                await contributor.SeedAsync(context, cancellationToken).ConfigureAwait(false);
                 LogContributorCompleted(contributorName);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)

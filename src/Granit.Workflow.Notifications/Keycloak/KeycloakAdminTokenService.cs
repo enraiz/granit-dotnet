@@ -32,7 +32,7 @@ internal sealed class KeycloakAdminTokenService(
             return _cachedToken;
         }
 
-        await _semaphore.WaitAsync(cancellationToken);
+        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             // Double-check after acquiring the lock.
@@ -52,12 +52,12 @@ internal sealed class KeycloakAdminTokenService(
             ]);
 
             using HttpResponseMessage response = await client.PostAsync(
-                opts.GetTokenEndpoint(), content, cancellationToken);
+                opts.GetTokenEndpoint(), content, cancellationToken).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
             TokenResponse? token = await response.Content
-                .ReadFromJsonAsync<TokenResponse>(cancellationToken);
+                .ReadFromJsonAsync<TokenResponse>(cancellationToken).ConfigureAwait(false);
 
             if (token is null || string.IsNullOrEmpty(token.AccessToken))
             {

@@ -48,12 +48,12 @@ internal sealed partial class RecurringJobSchedulingMiddleware(
             return;
         }
 
-        await store.RecordExecutionStartAsync(attr.Name, clock.Now, ct);
+        await store.RecordExecutionStartAsync(attr.Name, clock.Now, ct).ConfigureAwait(false);
 
         if (envelope.Headers.TryGetValue(TriggeredByHeader, out string? triggeredBy)
             && !string.IsNullOrEmpty(triggeredBy))
         {
-            await store.SetTriggeredByAsync(attr.Name, triggeredBy, ct);
+            await store.SetTriggeredByAsync(attr.Name, triggeredBy, ct).ConfigureAwait(false);
         }
     }
 
@@ -71,7 +71,7 @@ internal sealed partial class RecurringJobSchedulingMiddleware(
             return;
         }
 
-        BackgroundJobDefinition? job = await store.FindAsync(attr.Name, ct);
+        BackgroundJobDefinition? job = await store.FindAsync(attr.Name, ct).ConfigureAwait(false);
         if (job is not { IsEnabled: true })
         {
             return;
@@ -96,8 +96,8 @@ internal sealed partial class RecurringJobSchedulingMiddleware(
         }
 
         object nextMessage = Activator.CreateInstance(envelope.Message!.GetType())!;
-        await context.ScheduleAsync(nextMessage, next.Value);
-        await store.RecordNextExecutionAsync(job.JobName, next.Value, ct);
+        await context.ScheduleAsync(nextMessage, next.Value).ConfigureAwait(false);
+        await store.RecordNextExecutionAsync(job.JobName, next.Value, ct).ConfigureAwait(false);
     }
 
     // =========================================================================

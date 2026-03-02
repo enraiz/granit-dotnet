@@ -34,7 +34,7 @@ internal sealed partial class CronSchedulerAgent(
     /// <inheritdoc/>
     protected override async Task startAsync(CancellationToken cancellationToken)
     {
-        IReadOnlyList<BackgroundJobDefinition> jobs = await store.GetEnabledJobsAsync(cancellationToken);
+        IReadOnlyList<BackgroundJobDefinition> jobs = await store.GetEnabledJobsAsync(cancellationToken).ConfigureAwait(false);
 
         foreach (BackgroundJobDefinition job in jobs)
         {
@@ -52,8 +52,8 @@ internal sealed partial class CronSchedulerAgent(
             }
 
             object message = CreateMessage(job.MessageType, job.JobName);
-            await bus.ScheduleAsync(message, next.Value);
-            await store.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken);
+            await bus.ScheduleAsync(message, next.Value).ConfigureAwait(false);
+            await store.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken).ConfigureAwait(false);
             LogJobScheduled(logger, job.JobName, next.Value);
         }
     }

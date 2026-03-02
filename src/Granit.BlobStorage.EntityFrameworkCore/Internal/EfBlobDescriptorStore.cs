@@ -21,9 +21,9 @@ internal sealed class EfBlobDescriptorStore(
         CancellationToken cancellationToken = default)
     {
         string tenantId = GetOptionalTenantId();
-        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await context.Blobs
-            .FirstOrDefaultAsync(b => b.Id == blobId && b.TenantId == tenantId, cancellationToken);
+            .FirstOrDefaultAsync(b => b.Id == blobId && b.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -31,9 +31,9 @@ internal sealed class EfBlobDescriptorStore(
         BlobDescriptor descriptor,
         CancellationToken cancellationToken = default)
     {
-        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         context.Blobs.Add(descriptor);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -41,9 +41,9 @@ internal sealed class EfBlobDescriptorStore(
         BlobDescriptor descriptor,
         CancellationToken cancellationToken = default)
     {
-        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         context.Blobs.Update(descriptor);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private string GetOptionalTenantId() =>

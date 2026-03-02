@@ -24,6 +24,6 @@ public static class FeatureCacheInvalidationHandler
         CancellationToken ct)
     {
         string key = FeatureCacheKey.Build(@event.TenantId, @event.FeatureName);
-        await hybridCache.RemoveAsync(key, ct);
+        await hybridCache.RemoveAsync(key, ct).ConfigureAwait(false);
     }
 }

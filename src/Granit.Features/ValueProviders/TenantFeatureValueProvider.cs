@@ -36,6 +36,6 @@ internal sealed class TenantFeatureValueProvider(
         }
 
         string tenantId = currentTenant.Id!.Value.ToString();
-        return await _featureStore.GetOrNullAsync(definition.Name, tenantId, ct);
+        return await _featureStore.GetOrNullAsync(definition.Name, tenantId, ct).ConfigureAwait(false);
     }
 }

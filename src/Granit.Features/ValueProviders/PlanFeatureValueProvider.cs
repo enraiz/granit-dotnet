@@ -34,12 +34,12 @@ internal sealed class PlanFeatureValueProvider(IServiceProvider serviceProvider)
             return null;
         }
 
-        string? planId = await planIdProvider.GetCurrentPlanIdAsync(ct);
+        string? planId = await planIdProvider.GetCurrentPlanIdAsync(ct).ConfigureAwait(false);
         if (planId is null)
         {
             return null;
         }
 
-        return await planFeatureStore.GetOrNullAsync(planId, definition.Name, ct);
+        return await planFeatureStore.GetOrNullAsync(planId, definition.Name, ct).ConfigureAwait(false);
     }
 }

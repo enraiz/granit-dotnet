@@ -47,7 +47,7 @@ internal sealed class KeycloakApproverResolver(
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         IReadOnlyList<string> roles = await permissionManager.GetGrantedRolesAsync(
-            requiredPermission, tenantId, cancellationToken);
+            requiredPermission, tenantId, cancellationToken).ConfigureAwait(false);
 
         if (roles.Count == 0)
         {
@@ -59,7 +59,7 @@ internal sealed class KeycloakApproverResolver(
 
         try
         {
-            string token = await tokenService.GetTokenAsync(cancellationToken);
+            string token = await tokenService.GetTokenAsync(cancellationToken).ConfigureAwait(false);
             HttpClient client = httpClientFactory.CreateClient("KeycloakAdmin");
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -69,7 +69,7 @@ internal sealed class KeycloakApproverResolver(
             foreach (string role in roles)
             {
                 List<KeycloakUserRepresentation>? users = await GetRoleMembersAsync(
-                    client, role, cancellationToken);
+                    client, role, cancellationToken).ConfigureAwait(false);
 
                 if (users is not null)
                 {
@@ -104,10 +104,10 @@ internal sealed class KeycloakApproverResolver(
     {
         string endpoint = options.Value.GetRoleUsersEndpoint(roleName);
 
-        HttpResponseMessage response = await client.GetAsync(endpoint, cancellationToken);
+        HttpResponseMessage response = await client.GetAsync(endpoint, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
         return await response.Content
-            .ReadFromJsonAsync<List<KeycloakUserRepresentation>>(cancellationToken);
+            .ReadFromJsonAsync<List<KeycloakUserRepresentation>>(cancellationToken).ConfigureAwait(false);
     }
 }

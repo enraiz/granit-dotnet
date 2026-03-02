@@ -38,7 +38,7 @@ public static class RequiresFeatureMiddleware
 
         foreach (RequiresFeatureAttribute attribute in attributes)
         {
-            await featureChecker.RequireEnabledAsync(attribute.FeatureName, ct);
+            await featureChecker.RequireEnabledAsync(attribute.FeatureName, ct).ConfigureAwait(false);
         }
     }
 }

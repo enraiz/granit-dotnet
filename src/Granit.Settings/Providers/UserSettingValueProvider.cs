@@ -52,7 +52,7 @@ public sealed class UserSettingValueProvider(
             async innerCt =>
             {
                 SettingValue? stored = await _store.GetOrNullAsync(
-                    definition.Name, ProviderName, userId, innerCt);
+                    definition.Name, ProviderName, userId, innerCt).ConfigureAwait(false);
                 return stored ?? new SettingValue(definition.Name, ProviderName, userId, null);
             },
             cacheOptions,
@@ -70,8 +70,8 @@ public sealed class UserSettingValueProvider(
         }
 
         string userId = _currentUser.UserId;
-        await _store.SetAsync(definition.Name, ProviderName, userId, value, ct);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct);
+        await _store.SetAsync(definition.Name, ProviderName, userId, value, ct).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -83,7 +83,7 @@ public sealed class UserSettingValueProvider(
         }
 
         string userId = _currentUser.UserId;
-        await _store.DeleteAsync(definition.Name, ProviderName, userId, ct);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct);
+        await _store.DeleteAsync(definition.Name, ProviderName, userId, ct).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct).ConfigureAwait(false);
     }
 }

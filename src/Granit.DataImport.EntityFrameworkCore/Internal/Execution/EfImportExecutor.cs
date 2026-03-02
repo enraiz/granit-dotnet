@@ -35,8 +35,8 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
         int updatedRows = 0;
         int batchCount = 0;
 
-        await using TContext context = await contextFactory.CreateDbContextAsync(ct);
-        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(ct);
+        await using TContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(ct).ConfigureAwait(false);
 
         try
         {
@@ -62,7 +62,7 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
 
                     if (batchCount >= options.BatchSize)
                     {
-                        await context.SaveChangesAsync(ct);
+                        await context.SaveChangesAsync(ct).ConfigureAwait(false);
                         batchCount = 0;
 
                         progress?.Report(new ImportProgress(
@@ -92,14 +92,14 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
             // Save remaining batch
             if (batchCount > 0)
             {
-                await context.SaveChangesAsync(ct);
+                await context.SaveChangesAsync(ct).ConfigureAwait(false);
             }
 
-            await CommitOrRollbackAsync(transaction, options.DryRun, ct);
+            await CommitOrRollbackAsync(transaction, options.DryRun, ct).ConfigureAwait(false);
         }
         catch (Exception) when (options.ErrorBehavior != ImportErrorBehavior.FailFast)
         {
-            await transaction.RollbackAsync(ct);
+            await transaction.RollbackAsync(ct).ConfigureAwait(false);
         }
 
         stopwatch.Stop();
@@ -128,11 +128,11 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
     {
         if (dryRun)
         {
-            await transaction.RollbackAsync(ct);
+            await transaction.RollbackAsync(ct).ConfigureAwait(false);
         }
         else
         {
-            await transaction.CommitAsync(ct);
+            await transaction.CommitAsync(ct).ConfigureAwait(false);
         }
     }
 

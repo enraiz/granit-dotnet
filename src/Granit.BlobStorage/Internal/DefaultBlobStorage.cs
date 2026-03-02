@@ -42,7 +42,7 @@ internal sealed class DefaultBlobStorage(
             request: request,
             createdAt: clock.Now);
 
-        await store.SaveAsync(descriptor, cancellationToken);
+        await store.SaveAsync(descriptor, cancellationToken).ConfigureAwait(false);
 
         PresignedUploadTicket ticket = await storageClient.GenerateUploadTicketAsync(
             bucket,
@@ -50,7 +50,7 @@ internal sealed class DefaultBlobStorage(
             blobId,
             request,
             Options.UploadUrlExpiry,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         return ticket;
     }
@@ -62,7 +62,7 @@ internal sealed class DefaultBlobStorage(
         DownloadUrlOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        BlobDescriptor descriptor = await FindOrThrowAsync(containerName, blobId, cancellationToken);
+        BlobDescriptor descriptor = await FindOrThrowAsync(containerName, blobId, cancellationToken).ConfigureAwait(false);
 
         if (descriptor.Status != BlobStatus.Valid)
         {
@@ -77,7 +77,7 @@ internal sealed class DefaultBlobStorage(
             descriptor.ObjectKey,
             options,
             expiry,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -85,7 +85,7 @@ internal sealed class DefaultBlobStorage(
         string containerName,
         Guid blobId,
         CancellationToken cancellationToken = default) =>
-        await store.FindAsync(blobId, cancellationToken);
+        await store.FindAsync(blobId, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public async Task DeleteAsync(
@@ -94,7 +94,7 @@ internal sealed class DefaultBlobStorage(
         string? deletionReason = null,
         CancellationToken cancellationToken = default)
     {
-        BlobDescriptor? descriptor = await store.FindAsync(blobId, cancellationToken);
+        BlobDescriptor? descriptor = await store.FindAsync(blobId, cancellationToken).ConfigureAwait(false);
 
         if (descriptor is null)
         {
@@ -109,10 +109,10 @@ internal sealed class DefaultBlobStorage(
 
         string bucket = keyStrategy.ResolveBucketName(containerName);
 
-        await storageClient.DeleteObjectAsync(bucket, descriptor.ObjectKey, cancellationToken);
+        await storageClient.DeleteObjectAsync(bucket, descriptor.ObjectKey, cancellationToken).ConfigureAwait(false);
 
         descriptor.MarkAsDeleted(clock.Now, deletionReason);
-        await store.UpdateAsync(descriptor, cancellationToken);
+        await store.UpdateAsync(descriptor, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<BlobDescriptor> FindOrThrowAsync(
@@ -120,7 +120,7 @@ internal sealed class DefaultBlobStorage(
         Guid blobId,
         CancellationToken cancellationToken)
     {
-        BlobDescriptor? descriptor = await store.FindAsync(blobId, cancellationToken);
+        BlobDescriptor? descriptor = await store.FindAsync(blobId, cancellationToken).ConfigureAwait(false);
         if (descriptor is null)
         {
             throw new BlobNotFoundException(blobId, containerName);

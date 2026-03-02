@@ -32,7 +32,7 @@ internal sealed class WolverineNotificationPublisher(
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity);
         trigger = trigger with { RecipientUserIds = recipientUserIds };
-        await messageBus.PublishAsync(trigger);
+        await messageBus.PublishAsync(trigger).ConfigureAwait(false);
     }
 
     public async ValueTask PublishToSubscribersAsync<TData>(
@@ -41,7 +41,7 @@ internal sealed class WolverineNotificationPublisher(
         CancellationToken ct = default) where TData : notnull
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity: null);
-        await messageBus.PublishAsync(trigger);
+        await messageBus.PublishAsync(trigger).ConfigureAwait(false);
     }
 
     public async ValueTask PublishToEntityFollowersAsync<TData>(
@@ -51,7 +51,7 @@ internal sealed class WolverineNotificationPublisher(
         CancellationToken ct = default) where TData : notnull
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity);
-        await messageBus.PublishAsync(trigger);
+        await messageBus.PublishAsync(trigger).ConfigureAwait(false);
     }
 
     private NotificationTrigger BuildTrigger<TData>(

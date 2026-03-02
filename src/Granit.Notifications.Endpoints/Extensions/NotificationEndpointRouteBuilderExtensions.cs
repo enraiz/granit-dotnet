@@ -54,7 +54,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            IReadOnlyList<UserNotification> notifications = await store.GetListAsync(userId, tenantId, skip, take);
+            IReadOnlyList<UserNotification> notifications = await store.GetListAsync(userId, tenantId, skip, take).ConfigureAwait(false);
             return Results.Ok(notifications);
         }).WithName("GetNotifications");
 
@@ -65,7 +65,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            int count = await store.GetUnreadCountAsync(userId, tenantId);
+            int count = await store.GetUnreadCountAsync(userId, tenantId).ConfigureAwait(false);
             return Results.Ok(new { count });
         }).WithName("GetUnreadCount");
 
@@ -74,7 +74,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             IUserNotificationStore store,
             IClock clock) =>
         {
-            await store.MarkAsReadAsync(id, clock.Now);
+            await store.MarkAsReadAsync(id, clock.Now).ConfigureAwait(false);
             return Results.NoContent();
         }).WithName("MarkAsRead");
 
@@ -86,7 +86,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            await store.MarkAllAsReadAsync(userId, tenantId, clock.Now);
+            await store.MarkAllAsReadAsync(userId, tenantId, clock.Now).ConfigureAwait(false);
             return Results.NoContent();
         }).WithName("MarkAllAsRead");
     }
@@ -101,7 +101,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             int skip = 0, int take = 20) =>
         {
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            IReadOnlyList<UserNotification> notifications = await store.GetByEntityAsync(entityType, entityId, tenantId, skip, take);
+            IReadOnlyList<UserNotification> notifications = await store.GetByEntityAsync(entityType, entityId, tenantId, skip, take).ConfigureAwait(false);
             return Results.Ok(notifications);
         }).WithName("GetEntityActivityFeed");
     }
@@ -115,7 +115,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            IReadOnlyList<NotificationPreference> preferences = await store.GetListAsync(userId, tenantId);
+            IReadOnlyList<NotificationPreference> preferences = await store.GetListAsync(userId, tenantId).ConfigureAwait(false);
             return Results.Ok(preferences);
         }).WithName("GetPreferences");
 
@@ -141,7 +141,7 @@ public static class NotificationEndpointRouteBuilderExtensions
                 ModifiedAt = clock.Now,
                 ModifiedBy = userId,
             };
-            await store.SetAsync(preference);
+            await store.SetAsync(preference).ConfigureAwait(false);
             return Results.NoContent();
         }).WithName("UpdatePreference");
 
@@ -161,7 +161,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            IReadOnlyList<NotificationSubscription> subscriptions = await store.GetUserSubscriptionsAsync(userId, tenantId);
+            IReadOnlyList<NotificationSubscription> subscriptions = await store.GetUserSubscriptionsAsync(userId, tenantId).ConfigureAwait(false);
             return Results.Ok(subscriptions);
         }).WithName("GetSubscriptions");
 
@@ -173,7 +173,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            await store.SubscribeAsync(userId, typeName, tenantId);
+            await store.SubscribeAsync(userId, typeName, tenantId).ConfigureAwait(false);
             return Results.NoContent();
         }).WithName("Subscribe");
 
@@ -185,7 +185,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            await store.UnsubscribeAsync(userId, typeName, tenantId);
+            await store.UnsubscribeAsync(userId, typeName, tenantId).ConfigureAwait(false);
             return Results.NoContent();
         }).WithName("Unsubscribe");
     }
@@ -201,7 +201,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            await store.FollowEntityAsync(userId, entityType, entityId, tenantId);
+            await store.FollowEntityAsync(userId, entityType, entityId, tenantId).ConfigureAwait(false);
             return Results.NoContent();
         }).WithName("FollowEntity");
 
@@ -214,7 +214,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         {
             string userId = GetUserId(user);
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            await store.UnfollowEntityAsync(userId, entityType, entityId, tenantId);
+            await store.UnfollowEntityAsync(userId, entityType, entityId, tenantId).ConfigureAwait(false);
             return Results.NoContent();
         }).WithName("UnfollowEntity");
 
@@ -225,7 +225,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             ICurrentTenant tenant) =>
         {
             Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-            IReadOnlyList<NotificationSubscription> followers = await store.GetEntityFollowersAsync(entityType, entityId, tenantId);
+            IReadOnlyList<NotificationSubscription> followers = await store.GetEntityFollowersAsync(entityType, entityId, tenantId).ConfigureAwait(false);
             return Results.Ok(followers);
         }).WithName("GetEntityFollowers");
     }
