@@ -40,7 +40,25 @@ public static class ApiDocumentationApplicationBuilderExtensions
         }
 
         IEndpointConventionBuilder scalarEndpoint =
-            app.MapScalarApiReference(scalarOptions => scalarOptions.WithTitle(options.Title));
+            app.MapScalarApiReference(scalarOptions =>
+            {
+                scalarOptions.WithTitle(options.Title);
+
+                if (options.OAuth2.IsConfigured)
+                {
+                    scalarOptions.AddAuthorizationCodeFlow("OAuth2", flow =>
+                    {
+                        flow
+                            .WithClientId(options.OAuth2.ClientId!)
+                            .WithSelectedScopes(options.OAuth2.Scopes);
+
+                        if (options.OAuth2.EnablePkce)
+                        {
+                            flow.WithPkce(Pkce.Sha256);
+                        }
+                    });
+                }
+            });
         ApplyAuthorizationPolicy(scalarEndpoint, options.AuthorizationPolicy);
 
         return app;
