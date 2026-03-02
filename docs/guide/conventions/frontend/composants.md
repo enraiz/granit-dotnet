@@ -283,7 +283,7 @@ Conventions :
 ```tsx
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { PatientCard } from "./PatientCard";
+import { PatientCard } from "./patient-card";
 
 const meta: Meta<typeof PatientCard> = {
   component: PatientCard,
