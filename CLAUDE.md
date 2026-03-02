@@ -84,6 +84,17 @@ entity fields.
 - **IDE0022**: Use expression body (`=>`) for single-statement methods
 - **ASP0025**: Use `AddAuthorizationBuilder()` instead of `AddAuthorization(Action<AuthorizationOptions>)`
 
+**Regex**: ALWAYS use `[GeneratedRegex]` (source-generated) instead of `new Regex(..., RegexOptions.Compiled)`.
+This compiles the pattern at build time (zero runtime cost, NativeAOT-compatible).
+For regex that match user input, always set a timeout (3rd parameter, in ms):
+
+```csharp
+[GeneratedRegex(@"^pattern$", RegexOptions.None, 100)]
+private static partial Regex MyRegex();
+```
+
+Never use `RegexOptions.Compiled` with `[GeneratedRegex]` — it is ignored by the source generator.
+
 **Projects**: one project = one NuGet package, namespace = project name, zero circular references
 
 **Extension method receiver — `IServiceCollection` vs `IHostApplicationBuilder`**:
