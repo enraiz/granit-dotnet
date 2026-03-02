@@ -353,6 +353,75 @@ FileParsingOptions sheetOptions = new()
 | `application/vnd.ms-excel` | BIFF (Excel 97–2003) | `.xls` |
 | `application/vnd.ms-excel.sheet.binary.macroenabled.12` | Binary | `.xlsb` |
 
+## Persistance EF Core (`Granit.DataImport.EntityFrameworkCore`)
+
+Couche de persistance EF Core pour le pipeline DataImport. Fournit un `DataImportDbContext`
+isolé, les stores (mappings sauvegardés, import jobs), les identity resolvers (business key,
+composite key, external ID) et l'executor batché.
+
+### Installation
+
+```bash
+dotnet add package Granit.DataImport.EntityFrameworkCore
+```
+
+### Enregistrement DI
+
+```csharp
+// Host builder — enregistre le DataImportDbContext isolé
+builder.AddGranitDataImportEntityFrameworkCore(opts =>
+    opts.UseNpgsql(connectionString));
+
+// Par entité — executor et identity resolver
+services.AddImportExecutor<Patient, GuavaDbContext>();
+services.AddBusinessKeyResolver<Patient, GuavaDbContext>();
+
+// Ou composite key / external ID :
+// services.AddCompositeKeyResolver<Patient, GuavaDbContext>();
+// services.AddExternalIdResolver<Patient, GuavaDbContext>();
+```
+
+### Double DbContext
+
+Le package manipule **deux** DbContexts distincts :
+
+1. **`DataImportDbContext`** (isolé, propriété du package) — stocke `ImportJob`,
+   `SavedMappingEntity`, `ExternalIdMappingEntity`. Utilisé via `IDbContextFactory<>`.
+2. **DbContext applicatif** (ex. `GuavaDbContext`) — contient les entités importées
+   (ex. `Patient`). Fourni par l'application.
+
+Les classes génériques (`EfImportExecutor`, identity resolvers) prennent **deux paramètres
+de type** : `<TEntity, TContext>` où `TContext : DbContext`.
+
+### Tables créées
+
+| Table | Entité | Rôle |
+| --- | --- | --- |
+| `data_import_jobs` | `ImportJob` | Suivi du cycle de vie des imports |
+| `data_import_saved_mappings` | `SavedMappingEntity` | Mappings sauvegardés par définition + tenant |
+| `data_import_external_id_mappings` | `ExternalIdMappingEntity` | Mapping ID externe → ID interne |
+
+### Identity Resolvers
+
+| Resolver | Usage |
+| --- | --- |
+| `BusinessKeyResolver` | Clé métier unique (ex. NISS) via `HasBusinessKey()` |
+| `CompositeKeyResolver` | Clé composite (ex. Nom + Email) via `HasCompositeKey()` |
+| `ExternalIdResolver` | ID externe (pattern Odoo `__export__`) via `HasExternalId()` |
+
+### EfImportExecutor
+
+L'executor persiste les entités validées en batch :
+
+1. Crée le `TContext` via `IDbContextFactory<TContext>`
+2. Ouvre une transaction
+3. Streame les `ValidatedRow<TEntity>` par batch de `BatchSize`
+4. Par row : Insert → `Add()`, Update → copie via `SetValues()`
+5. Tous les N rows : `SaveChangesAsync()`, report progress
+6. Erreurs selon `ErrorBehavior` (FailFast / SkipErrors / CollectAll)
+7. DryRun : rollback de la transaction
+8. Commit et retourne `ImportReport`
+
 ## Voir aussi
 
 - [ADR-019 — Sep pour le parsing CSV](../../ADR/ADR-019-sep-parsing-csv.md)

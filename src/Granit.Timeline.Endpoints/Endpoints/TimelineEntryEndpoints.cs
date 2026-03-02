@@ -76,12 +76,14 @@ internal static class TimelineEntryEndpoints
         return TypedResults.Created($"/api/timeline/{entityType}/{entityId}/entries/{entry.Id}", result);
     }
 
+#pragma warning disable S1172 // Route parameters bound by ASP.NET Core minimal API
     private static async Task<Results<NoContent, NotFound>> DeleteEntryAsync(
         string entityType,
         string entityId,
         Guid entryId,
         ITimelineStore store,
         CancellationToken ct)
+#pragma warning restore S1172
     {
         try
         {

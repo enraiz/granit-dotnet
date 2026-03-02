@@ -19,6 +19,8 @@ public static class ServiceCollectionExtensions
     /// <list type="bullet">
     ///   <item><see cref="IMappingSuggestionService"/> (scoped) — 4-tier mapping facade.</item>
     ///   <item><see cref="ISemanticMappingService"/> (singleton) — null-object default.</item>
+    ///   <item><see cref="IImportJobStore"/> (scoped) — null-object default.</item>
+    ///   <item><see cref="IImportFileProvider"/> (scoped) — null-object default.</item>
     ///   <item><see cref="IImportOrchestrator"/> (scoped) — pipeline orchestrator.</item>
     /// </list>
     /// <para>
@@ -37,6 +39,8 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton<ISemanticMappingService, NullSemanticMappingService>();
         services.TryAddScoped<IMappingSuggestionService, MappingSuggestionService>();
+        services.TryAddScoped<IImportJobStore, NullImportJobStore>();
+        services.TryAddScoped<IImportFileProvider, NullImportFileProvider>();
         services.TryAddScoped<IImportOrchestrator, ImportOrchestrator>();
 
         return services;
