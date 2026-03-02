@@ -273,7 +273,7 @@ export function useCreatePatientForm() {
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { PatientCard } from "./PatientCard";
+import { PatientCard } from "./patient-card";
 
 describe("PatientCard", () => {
   // ✅ Test de comportement

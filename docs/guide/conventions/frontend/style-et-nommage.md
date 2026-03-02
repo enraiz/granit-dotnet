@@ -59,10 +59,10 @@ type Role = "admin" | "user" | "viewer"; // redondant si ROLES existe
 | Interfaces | PascalCase, pas de préfixe `I` | `Patient`, `ApiResponse` |
 | Props | `{Component}Props` | `PatientCardProps` |
 | Enums | PascalCase + valeurs PascalCase | `LogLevel.Debug` |
-| Fichiers composant | PascalCase `.tsx` | `PatientCard.tsx` |
+| Fichiers composant | kebab-case `.tsx` | `patient-card.tsx` |
 | Fichiers utilitaire | kebab-case `.ts` | `format-date.ts` |
-| Fichiers de test | même nom + `.test.ts(x)` | `PatientCard.test.tsx` |
-| Fichiers Storybook | même nom + `.stories.tsx` | `PatientCard.stories.tsx` |
+| Fichiers de test | même nom + `.test.ts(x)` | `patient-card.test.tsx` |
+| Fichiers Storybook | même nom + `.stories.tsx` | `patient-card.stories.tsx` |
 | Dossiers | kebab-case | `patient-list/`, `auth-context/` |
 
 ## `type` vs `interface`
@@ -183,11 +183,11 @@ src/
 │       ├── api/              ← query keys, hooks API (si pas Orval)
 │       │   └── patient-queries.ts
 │       ├── components/
-│       │   ├── PatientCard.tsx
-│       │   ├── PatientCard.test.tsx
-│       │   └── PatientCard.stories.tsx
+│       │   ├── patient-card.tsx
+│       │   ├── patient-card.test.tsx
+│       │   └── patient-card.stories.tsx
 │       ├── hooks/
-│       │   └── usePatientSearch.ts
+│       │   └── use-patient-search.ts
 │       ├── types/
 │       │   └── patient.ts
 │       └── index.ts          ← barrel export public
