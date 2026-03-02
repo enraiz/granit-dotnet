@@ -10,10 +10,11 @@ public static class ContactValidatorExtensions
 {
     private static readonly Regex E164Regex = new(@"^\+[1-9]\d{6,14}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
-    // Practical RFC 5321 subset: local-part chars + @ + domain + dot + TLD (2+ letters).
+    // Practical RFC 5321 subset: local-part chars + @ + domain labels + dot + TLD (2+ letters).
     // Rejects null, empty, missing @, spaces, and missing TLD.
+    // Domain uses (label.)+ pattern to avoid backtracking (dot not in character class).
     private static readonly Regex EmailRegex =
-        new(@"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$",
+        new(@"^[a-zA-Z0-9._%+\-]+@([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}$",
             RegexOptions.Compiled,
             TimeSpan.FromMilliseconds(100));
 
