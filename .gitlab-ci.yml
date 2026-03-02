@@ -138,6 +138,7 @@ integration-test:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
     TESTCONTAINERS_HOST_OVERRIDE: docker
+    TESTCONTAINERS_RYUK_DISABLED: "true"
   script:
     - dotnet build -c $CONFIGURATION
     - >
