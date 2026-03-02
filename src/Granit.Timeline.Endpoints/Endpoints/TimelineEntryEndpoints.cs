@@ -19,7 +19,7 @@ internal static class TimelineEntryEndpoints
             .WithName("PostTimelineEntry")
             .WithSummary("Posts a new comment, internal note, or system log entry.");
 
-        group.MapDelete("/{entityType}/{entityId}/entries/{entryId:guid}", DeleteEntryAsync)
+        group.MapDelete("/entries/{entryId:guid}", DeleteEntryAsync)
             .WithName("DeleteTimelineEntry")
             .WithSummary("Soft-deletes a comment or internal note (RGPD right to erasure).");
 
