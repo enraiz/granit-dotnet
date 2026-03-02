@@ -64,22 +64,56 @@ NRT est activé globalement (`<Nullable>enable</Nullable>` dans `Directory.Build
 
 ### Guard clauses
 
-Préférez les méthodes statiques du framework pour la validation des paramètres :
+Deux cas distincts selon la nature de l'erreur :
+
+**Erreur de programmeur** (paramètre null dans du code interne / bibliothèque) —
+utilisez les méthodes statiques du framework :
 
 ```csharp
-// ✅ moderne — 1 ligne, nom du paramètre déduit automatiquement
+// ✅ guard clause — erreur de programmeur, jamais exposée à l'utilisateur
 ArgumentNullException.ThrowIfNull(service);
 ArgumentException.ThrowIfNullOrEmpty(name);
+```
 
-// ❌ verbeux — à réserver quand null est un cas normal (pas une erreur)
-if (service is null)
+`ArgumentNullException` produit un **500 masqué** en production via
+`Granit.ExceptionHandling` (le message n'atteint jamais l'UI).
+
+**Validation d'input utilisateur** — levez une exception domain user-friendly :
+
+```csharp
+// ✅ validation utilisateur — message affiché dans l'UI (422 avec erreurs par champ)
+if (string.IsNullOrWhiteSpace(email))
 {
-    throw new ArgumentNullException(nameof(service));
+    throw new ValidationException(new Dictionary<string, string[]>
+    {
+        ["Email"] = ["The Email field is required."]
+    });
+}
+
+// ✅ règle métier — message affiché dans l'UI (400 avec errorCode)
+if (patient is null)
+{
+    throw new EntityNotFoundException(typeof(Patient), patientId);
 }
 ```
 
-Utilisez `is null` + early return uniquement quand `null` est un cas de flux
-normal (pas une condition d'erreur).
+**Ne convertissez pas aveuglément** les `is null` + throw en `ThrowIfNull()` :
+si le code lève une `BusinessException`, `ValidationException`,
+`EntityNotFoundException` ou toute autre exception implémentant
+`IUserFriendlyException`, c'est intentionnel — le message est destiné à l'UI
+via `Granit.ExceptionHandling`.
+
+| Contexte | Exception | HTTP | Message visible UI |
+| --- | --- | --- | --- |
+| Erreur de programmeur | `ArgumentNullException.ThrowIfNull()` | 500 | Non (masqué HDS) |
+| Champ manquant / invalide | `ValidationException` | 422 | Oui (par champ) |
+| Règle métier violée | `BusinessException` | 400 | Oui (errorCode) |
+| Entité introuvable | `EntityNotFoundException` | 404 | Oui |
+| Accès interdit | `ForbiddenException` | 403 | Oui |
+| Conflit (doublon, concurrence) | `ConflictException` | 409 | Oui (errorCode) |
+
+Utilisez `is null` + early return quand `null` est un cas de flux normal
+(pas une condition d'erreur).
 
 ## Collections et types de retour
 
