@@ -233,6 +233,62 @@ foreach (ImportRowError error in report.RowErrors)
 | `Granit.DataImport.EntityFrameworkCore` | Executor EF Core, stores, identity resolvers |
 | `Granit.DataImport.Endpoints` | API REST + Wolverine (upload, preview, execute, rapport) |
 
+## Parseur CSV (`Granit.DataImport.Csv`)
+
+Implémente `IFileParser` via [Sep](https://github.com/nietras/Sep) (MIT, SIMD
+AVX-512/NEON, zero-alloc). Accepte les MIME types `text/csv` et `application/csv`.
+
+### Fonctionnalités
+
+- **Streaming** : `ParseAsync` retourne un `IAsyncEnumerable<RawImportRow>` —
+  une seule ligne en mémoire à la fois
+- **Séparateur configurable** : virgule par défaut, point-virgule, tabulation, etc.
+  via `FileParsingOptions.Separator`
+- **RFC 4180** : guillemets gérés (valeurs contenant le séparateur, retours à la
+  ligne dans les champs)
+- **Encodage** : UTF-8 par défaut (avec support BOM), ou encodage explicite via
+  `FileParsingOptions.Encoding`
+- **Valeurs vides** : les cellules vides sont retournées comme `null` dans
+  `RawImportRow.Values`
+
+### Exemple d'utilisation
+
+```csharp
+// Enregistrement DI
+services.AddGranitDataImportCsv();
+
+// Utilisation directe (tests, scripts)
+SepCsvFileParser parser = new();
+
+// Extraction des en-têtes
+using FileStream stream = File.OpenRead("patients.csv");
+FileParsingOptions options = new() { Separator = ";" };
+IReadOnlyList<string> headers = await parser.ExtractHeadersAsync(stream, options);
+// → ["NISS", "Prénom", "Nom", "Email"]
+
+// Preview (10 premières lignes)
+stream.Position = 0;
+IReadOnlyList<string[]> preview = await parser.ReadPreviewAsync(stream, options, maxRows: 10);
+
+// Parsing complet (streaming)
+stream.Position = 0;
+await foreach (RawImportRow row in parser.ParseAsync(stream, options))
+{
+    // row.RowNumber = 1, 2, 3...
+    // row.Values["NISS"] = "85073100145"
+}
+```
+
+### Options de parsing
+
+| Option | Défaut | Description |
+| --- | --- | --- |
+| `Separator` | `","` | Séparateur de colonnes (premier caractère utilisé) |
+| `Encoding` | `null` | Encodage du fichier (`null` = UTF-8 auto-détecté) |
+| `QuoteChar` | `"\""` | Caractère de guillemet (géré par Sep nativement) |
+| `SkipRows` | `0` | Lignes à ignorer avant l'en-tête |
+| `HeaderRowIndex` | `0` | Index de la ligne d'en-tête (après `SkipRows`) |
+
 ## Voir aussi
 
 - [ADR-019 — Sep pour le parsing CSV](../../ADR/ADR-019-sep-parsing-csv.md)
