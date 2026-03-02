@@ -16,7 +16,6 @@ using Granit.Persistence;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
 using NSubstitute;
 using Shouldly;
 using Testcontainers.PostgreSql;
@@ -71,8 +70,8 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
 
         await Task.WhenAll(_containerA.StartAsync(), _containerB.StartAsync());
 
-        ConnectionStringA = ApplyHostOverride(_containerA.GetConnectionString());
-        ConnectionStringB = ApplyHostOverride(_containerB.GetConnectionString());
+        ConnectionStringA = _containerA.GetConnectionString();
+        ConnectionStringB = _containerB.GetConnectionString();
 
         await MigrateAsync(ConnectionStringA);
         await MigrateAsync(ConnectionStringB);
@@ -82,40 +81,6 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
     {
         await _containerA.DisposeAsync();
         await _containerB.DisposeAsync();
-    }
-
-    /// <summary>
-    /// Replaces the host in the connection string for DinD environments where
-    /// Testcontainers .NET v4.x returns the Docker bridge IP (172.17.0.x)
-    /// instead of the DinD service hostname.
-    /// <para>
-    /// Resolution order:
-    /// 1. <c>TESTCONTAINERS_HOST_OVERRIDE</c> (explicit override)
-    /// 2. Hostname extracted from <c>DOCKER_HOST</c> (e.g. <c>tcp://docker:2375</c> → <c>docker</c>)
-    /// </para>
-    /// </summary>
-    private static string ApplyHostOverride(string connectionString)
-    {
-        string? hostOverride = Environment.GetEnvironmentVariable("TESTCONTAINERS_HOST_OVERRIDE");
-
-        // Fallback: extract hostname from DOCKER_HOST (e.g. "tcp://docker:2375" → "docker")
-        if (string.IsNullOrEmpty(hostOverride))
-        {
-            string? dockerHost = Environment.GetEnvironmentVariable("DOCKER_HOST");
-            if (!string.IsNullOrEmpty(dockerHost)
-                && Uri.TryCreate(dockerHost, UriKind.Absolute, out Uri? uri))
-            {
-                hostOverride = uri.Host;
-            }
-        }
-
-        if (string.IsNullOrEmpty(hostOverride))
-        {
-            return connectionString;
-        }
-
-        NpgsqlConnectionStringBuilder builder = new(connectionString) { Host = hostOverride };
-        return builder.ConnectionString;
     }
 
     private static async Task MigrateAsync(string connectionString)
