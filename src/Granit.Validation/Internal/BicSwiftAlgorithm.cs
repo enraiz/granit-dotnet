@@ -14,12 +14,10 @@ namespace Granit.Validation.Internal;
 ///   <item>3 alphanumeric — branch code (omitted or <c>XXX</c> for primary office)</item>
 /// </list>
 /// </remarks>
-internal static class BicSwiftAlgorithm
+internal static partial class BicSwiftAlgorithm
 {
-    private static readonly Regex BicRegex = new(
-        @"^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-        RegexOptions.Compiled,
-        TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$", RegexOptions.None, 100)]
+    private static partial Regex BicRegex();
 
     /// <summary>
     /// Returns <see langword="true"/> if <paramref name="value"/> is a valid BIC/SWIFT code.
@@ -31,6 +29,6 @@ internal static class BicSwiftAlgorithm
             return false;
         }
 
-        return BicRegex.IsMatch(value.Trim().ToUpperInvariant());
+        return BicRegex().IsMatch(value.Trim().ToUpperInvariant());
     }
 }

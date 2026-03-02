@@ -6,24 +6,22 @@ namespace Granit.Validation;
 /// <summary>
 /// FluentValidation extension methods for postal address fields.
 /// </summary>
-public static class AddressValidatorExtensions
+public static partial class AddressValidatorExtensions
 {
     // French postal codes: 01000–99999 (excludes 00xxx which does not exist).
     // DOM-TOM codes 97xxx and 98xxx are included.
-    private static readonly Regex FrenchPostalCodeRegex =
-        new(@"^(0[1-9]|[1-9]\d)\d{3}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^(0[1-9]|[1-9]\d)\d{3}$", RegexOptions.None, 100)]
+    private static partial Regex FrenchPostalCodeRegex();
 
     // Belgian postal codes: 1000–9999.
-    private static readonly Regex BelgianPostalCodeRegex =
-        new(@"^[1-9]\d{3}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^[1-9]\d{3}$", RegexOptions.None, 100)]
+    private static partial Regex BelgianPostalCodeRegex();
 
     // French INSEE commune code: 5 characters.
     //   Metropolitan: dept 01–95 (not 96–99 which don't exist) or 2A/2B (Corse) + 3-digit commune.
     //   DOM (971–976): 3-digit dept + 2-digit commune.
-    private static readonly Regex FrenchInseeCodeRegex =
-        new(@"^((0[1-9]|[1-8]\d|9[0-5]|2[AB])\d{3}|97[1-6]\d{2})$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase,
-            TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^((0[1-9]|[1-8]\d|9[0-5]|2[AB])\d{3}|97[1-6]\d{2})$", RegexOptions.IgnoreCase, 100)]
+    private static partial Regex FrenchInseeCodeRegex();
 
     /// <summary>
     /// Validates a French postal code (code postal).
@@ -36,7 +34,7 @@ public static class AddressValidatorExtensions
     public static IRuleBuilderOptions<T, string?> FrenchPostalCode<T>(
         this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
-            .Must(value => value != null && FrenchPostalCodeRegex.IsMatch(value))
+            .Must(value => value != null && FrenchPostalCodeRegex().IsMatch(value))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidFrenchPostalCode");
 
     /// <summary>
@@ -48,7 +46,7 @@ public static class AddressValidatorExtensions
     public static IRuleBuilderOptions<T, string?> BelgianPostalCode<T>(
         this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
-            .Must(value => value != null && BelgianPostalCodeRegex.IsMatch(value))
+            .Must(value => value != null && BelgianPostalCodeRegex().IsMatch(value))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidBelgianPostalCode");
 
     /// <summary>
@@ -62,6 +60,6 @@ public static class AddressValidatorExtensions
     public static IRuleBuilderOptions<T, string?> FrenchInseeCode<T>(
         this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
-            .Must(value => value != null && FrenchInseeCodeRegex.IsMatch(value))
+            .Must(value => value != null && FrenchInseeCodeRegex().IsMatch(value))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidFrenchInseeCode");
 }
