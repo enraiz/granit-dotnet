@@ -83,29 +83,16 @@ Trois jobs parallèles :
 | --- | --- | --- |
 | `format` | `dotnet format --verify-no-changes` | Oui |
 | `test` | Tests unitaires + coverage (OpenCover + Cobertura) | Oui |
-| `integration-test` | Testcontainers (PostgreSQL via DinD) | Non (`allow_failure`) |
+| `integration-test` | Testcontainers (PostgreSQL via Docker natif) | Non (`allow_failure`) |
 
-#### Tests d'intégration et DinD
+#### Tests d'intégration
 
-Le job `integration-test` utilise un service `docker:27-dind` pour exécuter
-des conteneurs PostgreSQL via Testcontainers .NET.
+Le job `integration-test` utilise Testcontainers .NET pour démarrer deux
+conteneurs PostgreSQL et valider l'isolation physique par tenant (HDS).
 
-Configuration requise :
-
-```yaml
-services:
-  - docker:27-dind
-variables:
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
-  TESTCONTAINERS_HOST_OVERRIDE: docker
-  TESTCONTAINERS_RYUK_DISABLED: "true"
-```
-
-**Problème connu** : Testcontainers .NET v4.x retourne l'IP du bridge Docker
-(`172.17.0.x`) au lieu du hostname DinD (`docker`). La fixture de test
-(`TwoPostgresContainersFixture`) contient un workaround `ApplyHostOverride()`
-qui extrait le hostname depuis `DOCKER_HOST` ou `TESTCONTAINERS_HOST_OVERRIDE`.
+Le runner Docker dispose du socket Docker monté nativement — pas besoin de
+DinD (`docker:27-dind`). Testcontainers se connecte au daemon local et les
+conteneurs sont accessibles directement sur `localhost`.
 
 ### gitlab-security
 
