@@ -56,9 +56,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         LocalizationEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+        string prefix = BuildRoutePrefix(options);
 
         endpoints
             .MapGet(prefix, HandleGetLocalizationAsync)
@@ -98,9 +96,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         LocalizationEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+        string prefix = BuildRoutePrefix(options);
 
         RouteGroupBuilder group = endpoints
             .MapGroup($"{prefix}/overrides")
@@ -181,9 +177,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
         if (store is null)
         {
-            return Results.Problem(
-                detail: "No ILocalizationOverrideStore is registered. Add GranitLocalizationDatabaseSourceEntityFrameworkCoreModule.",
-                statusCode: StatusCodes.Status501NotImplemented);
+            return StoreNotRegistered();
         }
 
         if (string.IsNullOrWhiteSpace(resourceName) || string.IsNullOrWhiteSpace(cultureName))
@@ -193,18 +187,12 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (resourceName.Length > MaxResourceNameLength)
-        {
-            return Results.Problem(
-                detail: $"resourceName must not exceed {MaxResourceNameLength} characters.",
-                statusCode: StatusCodes.Status400BadRequest);
-        }
+        IResult? error = ValidateMaxLength(resourceName, nameof(resourceName), MaxResourceNameLength)
+            ?? ValidateBcp47(cultureName);
 
-        if (!Bcp47Pattern().IsMatch(cultureName))
+        if (error is not null)
         {
-            return Results.Problem(
-                detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
-                statusCode: StatusCodes.Status400BadRequest);
+            return error;
         }
 
         IReadOnlyDictionary<string, string> overrides =
@@ -226,30 +214,16 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
         if (store is null)
         {
-            return Results.Problem(
-                detail: "No ILocalizationOverrideStore is registered. Add GranitLocalizationDatabaseSourceEntityFrameworkCoreModule.",
-                statusCode: StatusCodes.Status501NotImplemented);
+            return StoreNotRegistered();
         }
 
-        if (resourceName.Length > MaxResourceNameLength)
-        {
-            return Results.Problem(
-                detail: $"resourceName must not exceed {MaxResourceNameLength} characters.",
-                statusCode: StatusCodes.Status400BadRequest);
-        }
+        IResult? error = ValidateMaxLength(resourceName, nameof(resourceName), MaxResourceNameLength)
+            ?? ValidateBcp47(cultureName)
+            ?? ValidateMaxLength(key, nameof(key), MaxKeyLength);
 
-        if (!Bcp47Pattern().IsMatch(cultureName))
+        if (error is not null)
         {
-            return Results.Problem(
-                detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
-                statusCode: StatusCodes.Status400BadRequest);
-        }
-
-        if (key.Length > MaxKeyLength)
-        {
-            return Results.Problem(
-                detail: $"key must not exceed {MaxKeyLength} characters.",
-                statusCode: StatusCodes.Status400BadRequest);
+            return error;
         }
 
         if (string.IsNullOrWhiteSpace(body.Value))
@@ -282,35 +256,49 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
         if (store is null)
         {
-            return Results.Problem(
-                detail: "No ILocalizationOverrideStore is registered. Add GranitLocalizationDatabaseSourceEntityFrameworkCoreModule.",
-                statusCode: StatusCodes.Status501NotImplemented);
+            return StoreNotRegistered();
         }
 
-        if (resourceName.Length > MaxResourceNameLength)
-        {
-            return Results.Problem(
-                detail: $"resourceName must not exceed {MaxResourceNameLength} characters.",
-                statusCode: StatusCodes.Status400BadRequest);
-        }
+        IResult? error = ValidateMaxLength(resourceName, nameof(resourceName), MaxResourceNameLength)
+            ?? ValidateBcp47(cultureName)
+            ?? ValidateMaxLength(key, nameof(key), MaxKeyLength);
 
-        if (!Bcp47Pattern().IsMatch(cultureName))
+        if (error is not null)
         {
-            return Results.Problem(
-                detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
-                statusCode: StatusCodes.Status400BadRequest);
-        }
-
-        if (key.Length > MaxKeyLength)
-        {
-            return Results.Problem(
-                detail: $"key must not exceed {MaxKeyLength} characters.",
-                statusCode: StatusCodes.Status400BadRequest);
+            return error;
         }
 
         await store.RemoveOverrideAsync(resourceName, cultureName, key, ct).ConfigureAwait(false);
         return Results.NoContent();
     }
+
+    // -------------------------------------------------------------------------
+    // Shared validation helpers
+    // -------------------------------------------------------------------------
+
+    private static string BuildRoutePrefix(LocalizationEndpointsOptions options) =>
+        string.IsNullOrEmpty(options.ApiPrefix)
+            ? options.RoutePrefix
+            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+
+    private static IResult StoreNotRegistered() =>
+        Results.Problem(
+            detail: "No ILocalizationOverrideStore is registered. Add GranitLocalizationDatabaseSourceEntityFrameworkCoreModule.",
+            statusCode: StatusCodes.Status501NotImplemented);
+
+    private static IResult? ValidateBcp47(string cultureName) =>
+        Bcp47Pattern().IsMatch(cultureName)
+            ? null
+            : Results.Problem(
+                detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
+                statusCode: StatusCodes.Status400BadRequest);
+
+    private static IResult? ValidateMaxLength(string value, string paramName, int maxLength) =>
+        value.Length <= maxLength
+            ? null
+            : Results.Problem(
+                detail: $"{paramName} must not exceed {maxLength} characters.",
+                statusCode: StatusCodes.Status400BadRequest);
 
     // -------------------------------------------------------------------------
     // Private helpers

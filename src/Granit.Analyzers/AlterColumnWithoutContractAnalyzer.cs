@@ -37,18 +37,14 @@ public sealed class AlterColumnWithoutContractAnalyzer : GranitMigrationAnalyzer
     protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    protected override void AnalyzeNode(
+    protected override string TargetMethodName => "AlterColumn";
+
+    /// <inheritdoc/>
+    protected override void AnalyzeMigrationInvocation(
         SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol migrationBase,
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration,
         INamedTypeSymbol cycleAttrType)
     {
-        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
-            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "AlterColumn");
-        if (result is null)
-        {
-            return;
-        }
-
         var invocation = (InvocationExpressionSyntax)context.Node;
 
         // Find the oldClrType argument — if absent, this is a constraint-only change.
@@ -60,12 +56,12 @@ public sealed class AlterColumnWithoutContractAnalyzer : GranitMigrationAnalyzer
         }
 
         // Compare oldClrType with the generic type argument T of AlterColumn<T>.
-        if (result.Value.Method.TypeArguments.Length == 0)
+        if (migration.Method.TypeArguments.Length == 0)
         {
             return;
         }
 
-        ITypeSymbol targetType = result.Value.Method.TypeArguments[0];
+        ITypeSymbol targetType = migration.Method.TypeArguments[0];
 
         // oldClrType must be typeof(SomeType) to be statically comparable.
         if (oldClrTypeArg.Expression is not TypeOfExpressionSyntax typeofExpr)
@@ -86,12 +82,12 @@ public sealed class AlterColumnWithoutContractAnalyzer : GranitMigrationAnalyzer
         }
 
         // Type changed — require Contract annotation.
-        if (MigrationAnalyzerHelpers.HasContractAnnotation(result.Value.MigrationClass, cycleAttrType))
+        if (MigrationAnalyzerHelpers.HasContractAnnotation(migration.MigrationClass, cycleAttrType))
         {
             return;
         }
 
         context.ReportDiagnostic(
-            Diagnostic.Create(_rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
+            Diagnostic.Create(_rule, invocation.GetLocation(), migration.MigrationClass.Name));
     }
 }

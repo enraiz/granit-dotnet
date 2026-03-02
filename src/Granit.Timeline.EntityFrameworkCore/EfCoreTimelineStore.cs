@@ -3,6 +3,7 @@ using Granit.Guids;
 using Granit.Security;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.Domain;
+using Granit.Timeline.Internal;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,20 +32,9 @@ internal sealed class EfCoreTimelineStore(
         Guid? parentEntryId = null,
         CancellationToken ct = default)
     {
-        TimelineEntry entry = new()
-        {
-            Id = guidGenerator.Create(),
-            EntityType = entityType,
-            EntityId = entityId,
-            EntryType = entryType,
-            Body = body,
-            AuthorId = currentUser.UserId ?? string.Empty,
-            AuthorName = currentUser.UserName ?? string.Empty,
-            ParentEntryId = parentEntryId,
-            CreatedAt = clock.Now,
-            CreatedBy = currentUser.UserId ?? string.Empty,
-            TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
-        };
+        TimelineEntry entry = TimelineEntityFactory.CreateEntry(
+            entityType, entityId, entryType, body, parentEntryId,
+            guidGenerator, clock, currentUser, currentTenant);
 
         await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         db.TimelineEntries.Add(entry);
@@ -93,18 +83,9 @@ internal sealed class EfCoreTimelineStore(
             throw new KeyNotFoundException($"Timeline entry '{entryId}' not found.");
         }
 
-        TimelineAttachment attachment = new()
-        {
-            Id = guidGenerator.Create(),
-            EntryId = entryId,
-            BlobId = blobId,
-            FileName = fileName,
-            ContentType = contentType,
-            SizeBytes = sizeBytes,
-            CreatedAt = clock.Now,
-            CreatedBy = currentUser.UserId ?? string.Empty,
-            TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
-        };
+        TimelineAttachment attachment = TimelineEntityFactory.CreateAttachment(
+            entryId, blobId, fileName, contentType, sizeBytes,
+            guidGenerator, clock, currentUser, currentTenant);
 
         db.TimelineAttachments.Add(attachment);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);

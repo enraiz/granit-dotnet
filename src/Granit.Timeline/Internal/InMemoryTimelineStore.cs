@@ -29,20 +29,9 @@ internal sealed class InMemoryTimelineStore(
         Guid? parentEntryId = null,
         CancellationToken ct = default)
     {
-        TimelineEntry entry = new()
-        {
-            Id = guidGenerator.Create(),
-            EntityType = entityType,
-            EntityId = entityId,
-            EntryType = entryType,
-            Body = body,
-            AuthorId = currentUser.UserId ?? string.Empty,
-            AuthorName = currentUser.UserName ?? string.Empty,
-            ParentEntryId = parentEntryId,
-            CreatedAt = clock.Now,
-            CreatedBy = currentUser.UserId ?? string.Empty,
-            TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
-        };
+        TimelineEntry entry = TimelineEntityFactory.CreateEntry(
+            entityType, entityId, entryType, body, parentEntryId,
+            guidGenerator, clock, currentUser, currentTenant);
 
         Entries[entry.Id] = entry;
         return Task.FromResult(entry);
@@ -81,18 +70,9 @@ internal sealed class InMemoryTimelineStore(
             throw new KeyNotFoundException($"Timeline entry '{entryId}' not found.");
         }
 
-        TimelineAttachment attachment = new()
-        {
-            Id = guidGenerator.Create(),
-            EntryId = entryId,
-            BlobId = blobId,
-            FileName = fileName,
-            ContentType = contentType,
-            SizeBytes = sizeBytes,
-            CreatedAt = clock.Now,
-            CreatedBy = currentUser.UserId ?? string.Empty,
-            TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
-        };
+        TimelineAttachment attachment = TimelineEntityFactory.CreateAttachment(
+            entryId, blobId, fileName, contentType, sizeBytes,
+            guidGenerator, clock, currentUser, currentTenant);
 
         Attachments[attachment.Id] = attachment;
         return Task.FromResult(attachment);

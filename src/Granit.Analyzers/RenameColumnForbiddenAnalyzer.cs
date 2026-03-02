@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Granit.Analyzers;
@@ -38,18 +37,13 @@ public sealed class RenameColumnForbiddenAnalyzer : EfCoreMigrationAnalyzerBase
     protected override DiagnosticDescriptor Rule => _rule;
 
     /// <inheritdoc/>
-    protected override void AnalyzeNode(
-        SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol migrationBase)
-    {
-        (INamedTypeSymbol MigrationClass, IMethodSymbol Method)? result =
-            MigrationAnalyzerHelpers.TryGetMigrationInvocation(context, migrationBase, "RenameColumn");
-        if (result is null)
-        {
-            return;
-        }
+    protected override string TargetMethodName => "RenameColumn";
 
-        var invocation = (InvocationExpressionSyntax)context.Node;
-        context.ReportDiagnostic(Diagnostic.Create(_rule, invocation.GetLocation()));
+    /// <inheritdoc/>
+    protected override void AnalyzeMigrationInvocation(
+        SyntaxNodeAnalysisContext context,
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration)
+    {
+        context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation()));
     }
 }
