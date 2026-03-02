@@ -59,7 +59,7 @@ public static class TranslatableExtensions
         }
 
         // 2. Walk up the culture hierarchy (fr-BE → fr → invariant)
-        CultureInfo cultureInfo = CultureInfo.GetCultureInfo(culture);
+        var cultureInfo = CultureInfo.GetCultureInfo(culture);
         CultureInfo parent = cultureInfo.Parent;
         while (parent != CultureInfo.InvariantCulture)
         {

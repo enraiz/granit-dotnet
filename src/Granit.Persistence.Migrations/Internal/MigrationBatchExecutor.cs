@@ -38,7 +38,7 @@ internal sealed class MigrationBatchExecutor(
             return null;
         }
 
-        DbContext tenantContext =
+        var tenantContext =
             (DbContext)serviceProvider.GetRequiredService(registration.DbContextType);
 
         Guid? tenantId = command.TenantId == Guid.Empty ? null : command.TenantId;

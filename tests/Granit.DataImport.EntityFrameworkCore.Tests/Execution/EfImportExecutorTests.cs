@@ -113,7 +113,7 @@ public sealed class EfImportExecutorTests
     {
         // Arrange
         string dbName = NewDb();
-        Guid existingId = Guid.NewGuid();
+        var existingId = Guid.NewGuid();
 
         // Seed existing entity
         InMemoryAppContextFactory factory = new(dbName);

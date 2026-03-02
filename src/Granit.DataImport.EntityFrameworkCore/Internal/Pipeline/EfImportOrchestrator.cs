@@ -38,7 +38,7 @@ internal sealed class EfImportOrchestrator(
         job.ModifiedAt = clock.Now;
         await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
 
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
@@ -182,7 +182,7 @@ internal sealed class EfImportOrchestrator(
             .MakeGenericMethod(entityType);
 #pragma warning restore S3011
 
-        Task<ImportReport>? task = pipelineMethod.Invoke(
+        var task = pipelineMethod.Invoke(
             this,
             [parser, fileStream, parsingOptions, mappings, dryRun, ct]) as Task<ImportReport>;
 

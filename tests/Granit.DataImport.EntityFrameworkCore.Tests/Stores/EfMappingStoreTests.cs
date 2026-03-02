@@ -139,8 +139,8 @@ public sealed class EfMappingStoreTests
     {
         // Arrange
         string dbName = NewDb();
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         EfMappingStore storeA = CreateStore(dbName, tenant: CreateTenant(tenantA));
         EfMappingStore storeB = CreateStore(dbName, tenant: CreateTenant(tenantB));
 

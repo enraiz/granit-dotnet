@@ -49,7 +49,7 @@ public sealed class AlterColumnWithoutContractAnalyzer : GranitMigrationAnalyzer
             return;
         }
 
-        InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
+        var invocation = (InvocationExpressionSyntax)context.Node;
 
         // Find the oldClrType argument — if absent, this is a constraint-only change.
         ArgumentSyntax? oldClrTypeArg =

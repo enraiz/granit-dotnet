@@ -20,7 +20,7 @@ public sealed class TenantContextBehaviorTests
     [Fact]
     public void Before_WithValidTenantHeader_CallsChange()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.Change(tenantId).Returns(Substitute.For<IDisposable>());
 
@@ -63,7 +63,7 @@ public sealed class TenantContextBehaviorTests
     [Fact]
     public void After_WhenScopeWasSet_DisposesScope()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         IDisposable scope = Substitute.For<IDisposable>();
 
         ICurrentTenant tenant = Substitute.For<ICurrentTenant>();

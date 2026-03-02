@@ -66,7 +66,7 @@ public sealed class WebhookFanoutHandlerTests
         IEnumerable<SendWebhookCommand> result =
             await _handler.HandleAsync(BuildTrigger(), TestContext.Current.CancellationToken);
 
-        List<SendWebhookCommand> commands = result.ToList();
+        var commands = result.ToList();
         commands.Select(c => c.DeliveryId).Distinct().Count().ShouldBe(2);
     }
 
@@ -80,14 +80,14 @@ public sealed class WebhookFanoutHandlerTests
         WebhookTrigger trigger = BuildTrigger();
         IEnumerable<SendWebhookCommand> result = await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        List<SendWebhookCommand> commands = result.ToList();
+        var commands = result.ToList();
         commands.Select(c => c.Envelope.EventId).Distinct().ShouldHaveSingleItem().ShouldBe(trigger.EventId);
     }
 
     [Fact]
     public async Task HandleAsync_UsesAmbientTenant_WhenAvailable()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
 
@@ -104,7 +104,7 @@ public sealed class WebhookFanoutHandlerTests
     [Fact]
     public async Task HandleAsync_FallsBackToTriggerTenantId_WhenAmbientNotAvailable()
     {
-        Guid triggerTenantId = Guid.NewGuid();
+        var triggerTenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(false);
 
         _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), triggerTenantId, Arg.Any<CancellationToken>())

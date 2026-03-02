@@ -26,7 +26,7 @@ public sealed class WebhooksDbContextTests : IAsyncDisposable
     public async Task Can_add_and_retrieve_subscription()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         await using (WebhooksDbContext context = new(_options))
         {
             context.WebhookSubscriptions.Add(new WebhookSubscription
@@ -54,7 +54,7 @@ public sealed class WebhooksDbContextTests : IAsyncDisposable
     public async Task Can_add_and_retrieve_delivery_attempt()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         await using (WebhooksDbContext context = new(_options))
         {
             context.WebhookDeliveryAttempts.Add(new WebhookDeliveryAttempt

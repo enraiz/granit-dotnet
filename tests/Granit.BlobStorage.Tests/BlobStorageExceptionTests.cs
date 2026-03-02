@@ -22,7 +22,7 @@ public sealed class BlobStorageExceptionTests
     [Fact]
     public void BlobNotFoundException_Properties_AreCorrect()
     {
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         const string containerName = "avatars";
 
         BlobNotFoundException exception = new(blobId, containerName);
@@ -62,7 +62,7 @@ public sealed class BlobStorageExceptionTests
     [Fact]
     public void BlobNotValidException_Properties_AreCorrect()
     {
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         const BlobStatus currentStatus = BlobStatus.Pending;
 
         BlobNotValidException exception = new(blobId, currentStatus);

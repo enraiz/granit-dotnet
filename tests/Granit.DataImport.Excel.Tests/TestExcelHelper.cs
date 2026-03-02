@@ -17,7 +17,7 @@ internal static class TestExcelHelper
         MemoryStream stream = new();
         ExcelDataWriterOptions options = new() { OwnsStream = false };
 
-        using (ExcelDataWriter writer = ExcelDataWriter.Create(stream, ExcelWorkbookType.ExcelXml, options))
+        using (var writer = ExcelDataWriter.Create(stream, ExcelWorkbookType.ExcelXml, options))
         {
             using DataTableReader dataReader = new(table);
             writer.Write(dataReader, sheetName);
@@ -70,7 +70,7 @@ internal static class TestExcelHelper
         MemoryStream stream = new();
         ExcelDataWriterOptions options = new() { OwnsStream = false };
 
-        using (ExcelDataWriter writer = ExcelDataWriter.Create(stream, ExcelWorkbookType.ExcelXml, options))
+        using (var writer = ExcelDataWriter.Create(stream, ExcelWorkbookType.ExcelXml, options))
         {
             // Sheet 1
             DataTable sheet1 = new();

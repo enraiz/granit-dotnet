@@ -35,7 +35,7 @@ internal static class ImportDefinitionResolver
             .GetMethod(nameof(IMappingSuggestionService.SuggestMappingsAsync))!
             .MakeGenericMethod(entityType);
 
-        Task<IReadOnlyList<ColumnMapping>> task =
+        var task =
             (Task<IReadOnlyList<ColumnMapping>>)method.Invoke(mappingService, [headers, ct])!;
 
         return await task.ConfigureAwait(false);

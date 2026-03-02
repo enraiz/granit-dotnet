@@ -52,7 +52,7 @@ public sealed partial class VaultCredentialLeaseManager(
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            TimeSpan renewalDelay = TimeSpan.FromSeconds(
+            var renewalDelay = TimeSpan.FromSeconds(
                 _leaseDurationSeconds * _options.LeaseRenewalThreshold);
 
             LogNextRenewalIn(logger, renewalDelay);

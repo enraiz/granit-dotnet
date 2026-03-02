@@ -43,7 +43,7 @@ public sealed class TranslatableQueryExtensionsTests
             .ToListAsync(TestContext.Current.CancellationToken);
 
         results.Count.ShouldBe(2);
-        List<TestQueryDocTranslation> allTranslations = results.SelectMany(d => d.Translations).ToList();
+        var allTranslations = results.SelectMany(d => d.Translations).ToList();
         allTranslations.Count.ShouldBe(2, "only FR translations must be loaded");
         allTranslations.ShouldAllBe(t => t.Culture == "fr");
     }
@@ -128,8 +128,8 @@ public sealed class TranslatableQueryExtensionsTests
         TestQueryDbContext context = new(options);
         await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
-        Guid doc1Id = Guid.NewGuid();
-        Guid doc2Id = Guid.NewGuid();
+        var doc1Id = Guid.NewGuid();
+        var doc2Id = Guid.NewGuid();
 
         TestQueryDocument doc1 = new() { Id = doc1Id, InternalCode = "DOC-001" };
         doc1.Translations.Add(new TestQueryDocTranslation

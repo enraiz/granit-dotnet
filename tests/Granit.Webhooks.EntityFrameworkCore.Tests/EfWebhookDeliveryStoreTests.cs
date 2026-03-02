@@ -61,7 +61,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
     public async Task RecordSuccessAsync_resets_subscription_failure_count()
     {
         // Arrange
-        Guid subscriptionId = Guid.NewGuid();
+        var subscriptionId = Guid.NewGuid();
         await SeedSubscriptionAsync(subscriptionId, consecutiveFailures: 5);
         SendWebhookCommand command = BuildCommand(subscriptionId: subscriptionId);
 
@@ -112,7 +112,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
     public async Task RecordFailureAsync_increments_consecutive_failure_count()
     {
         // Arrange
-        Guid subscriptionId = Guid.NewGuid();
+        var subscriptionId = Guid.NewGuid();
         await SeedSubscriptionAsync(subscriptionId, consecutiveFailures: 2);
         SendWebhookCommand command = BuildCommand(subscriptionId: subscriptionId);
 
@@ -160,7 +160,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
     public async Task SuspendSubscriptionAsync_sets_status_and_audit_fields()
     {
         // Arrange
-        Guid subscriptionId = Guid.NewGuid();
+        var subscriptionId = Guid.NewGuid();
         await SeedSubscriptionAsync(subscriptionId);
 
         // Act

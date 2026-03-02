@@ -54,7 +54,7 @@ public sealed class EfCoreFeatureStoreTests
     public async Task GetOrNullAsync_ExistingOverride_ReturnsValue()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         await SeedAsync(db, tenantId, "Guava.MaxPatientsCount", "500",
             TestContext.Current.CancellationToken);
 
@@ -82,8 +82,8 @@ public sealed class EfCoreFeatureStoreTests
     public async Task GetOrNullAsync_DifferentTenant_ReturnsNull()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         await SeedAsync(db, tenantA, "Guava.MaxPatientsCount", "500",
             TestContext.Current.CancellationToken);
 
@@ -121,7 +121,7 @@ public sealed class EfCoreFeatureStoreTests
     public async Task SetAsync_NewOverride_PersistsValue()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         EfCoreFeatureStore store = CreateStore(db);
 
         await store.SetAsync(
@@ -139,7 +139,7 @@ public sealed class EfCoreFeatureStoreTests
     public async Task SetAsync_ExistingOverride_UpdatesValue()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         await SeedAsync(db, tenantId, "Guava.MaxPatientsCount", "200",
             TestContext.Current.CancellationToken);
 
@@ -159,7 +159,7 @@ public sealed class EfCoreFeatureStoreTests
     public async Task SetAsync_IsIdempotent_WhenCalledTwiceWithSameValue()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         EfCoreFeatureStore store = CreateStore(db);
 
         await store.SetAsync(
@@ -186,7 +186,7 @@ public sealed class EfCoreFeatureStoreTests
     public async Task DeleteAsync_ExistingOverride_RemovesRow()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         await SeedAsync(db, tenantId, "Guava.VideoConsultation", "true",
             TestContext.Current.CancellationToken);
 
@@ -218,8 +218,8 @@ public sealed class EfCoreFeatureStoreTests
     public async Task DeleteAsync_IsolatesTenants_DoesNotRemoveOtherTenantOverride()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         await SeedAsync(db, tenantA, "Guava.Feature", "true",
             TestContext.Current.CancellationToken);
         await SeedAsync(db, tenantB, "Guava.Feature", "true",

@@ -330,7 +330,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
             IStringLocalizer localizer = localizerFactory.Create(resourceType);
 
-            Dictionary<string, string> translations = localizer
+            var translations = localizer
                 .GetAllStrings(includeParentCultures: true)
                 .ToDictionary(s => s.Name, s => s.Value, StringComparer.Ordinal);
 

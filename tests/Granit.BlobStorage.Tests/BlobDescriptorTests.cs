@@ -21,9 +21,9 @@ public sealed class BlobDescriptorTests
     [Fact]
     public void Create_ShouldReturnPendingDescriptorWithCorrectFields()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
-        BlobDescriptor descriptor = BlobDescriptor.Create(
+        var descriptor = BlobDescriptor.Create(
             id: id,
             tenantId: "tenant-abc",
             containerName: "medical-images",

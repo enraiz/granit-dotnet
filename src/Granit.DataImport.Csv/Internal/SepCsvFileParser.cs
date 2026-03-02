@@ -98,7 +98,7 @@ internal sealed class SepCsvFileParser : IFileParser
 
         if (options.Encoding is not null)
         {
-            Encoding encoding = Encoding.GetEncoding(options.Encoding);
+            var encoding = Encoding.GetEncoding(options.Encoding);
             StreamReader textReader = new(stream, encoding, detectEncodingFromByteOrderMarks: false, leaveOpen: true);
             return readerOptions.From(textReader);
         }

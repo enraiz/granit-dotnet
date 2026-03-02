@@ -44,7 +44,7 @@ internal sealed class ScribanTemplateEngine : ITemplateEngine
         string cacheKey = descriptor.RevisionId?.ToString() ?? descriptor.Content;
         Template template = _templateCache.GetOrAdd(cacheKey, _ =>
         {
-            Template parsed = Template.Parse(descriptor.Content);
+            var parsed = Template.Parse(descriptor.Content);
             if (parsed.HasErrors)
             {
                 throw new TemplateParseException(parsed.Messages);

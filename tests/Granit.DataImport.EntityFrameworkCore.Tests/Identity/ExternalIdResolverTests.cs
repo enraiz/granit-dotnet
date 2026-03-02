@@ -68,7 +68,7 @@ public sealed class ExternalIdResolverTests
         // Arrange
         string importDbName = NewDb();
         string appDbName = NewDb();
-        Guid internalId = Guid.NewGuid();
+        var internalId = Guid.NewGuid();
 
         // Seed external ID mapping
         InMemoryDataImportContextFactory importFactory = new(importDbName);
@@ -117,7 +117,7 @@ public sealed class ExternalIdResolverTests
         // Arrange
         string importDbName = NewDb();
         string appDbName = NewDb();
-        Guid internalId = Guid.NewGuid();
+        var internalId = Guid.NewGuid();
 
         // Seed mapping but NOT the entity (simulating a deleted entity)
         InMemoryDataImportContextFactory importFactory = new(importDbName);

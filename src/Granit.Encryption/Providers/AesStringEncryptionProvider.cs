@@ -70,7 +70,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         byte[] iv = RandomNumberGenerator.GetBytes(IvSize);
         byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
 
-        using Aes aes = Aes.Create();
+        using var aes = Aes.Create();
         aes.Key = _aesKey;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;
@@ -131,7 +131,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         byte[] iv = input[..IvSize];
         byte[] cipherBytes = input[IvSize..^HmacSize];
 
-        using Aes aes = Aes.Create();
+        using var aes = Aes.Create();
         aes.Key = _aesKey;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;

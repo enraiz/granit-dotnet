@@ -112,7 +112,7 @@ public sealed class ScribanTemplateEngineTests
     [Fact]
     public async Task RenderAsync_PreservesRevisionId()
     {
-        Guid revisionId = Guid.NewGuid();
+        var revisionId = Guid.NewGuid();
         TemplateDescriptor descriptor = new()
         {
             Content = "ok",

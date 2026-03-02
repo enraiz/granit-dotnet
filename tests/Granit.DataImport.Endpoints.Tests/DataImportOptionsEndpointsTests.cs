@@ -36,7 +36,7 @@ public sealed class DataImportOptionsEndpointsTests
         using HttpClient adminClient = customApp.GetTestClient();
         adminClient.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "granit-data-import-admin");
 
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
 
         // Act
         HttpResponseMessage opsResponse = await opsClient.GetAsync(
@@ -54,7 +54,7 @@ public sealed class DataImportOptionsEndpointsTests
     {
         // Arrange — separate app with ApiPrefix, mock a job so GET returns 200
         IImportJobStore jobStore = Substitute.For<IImportJobStore>();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = new()
         {
             Id = jobId,

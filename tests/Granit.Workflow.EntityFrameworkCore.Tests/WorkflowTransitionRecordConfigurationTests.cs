@@ -112,7 +112,7 @@ public sealed class WorkflowTransitionRecordConfigurationTests
 
         // Assert
         index.ShouldNotBeNull();
-        List<string> propertyNames = index.Properties.Select(p => p.Name).ToList();
+        var propertyNames = index.Properties.Select(p => p.Name).ToList();
         propertyNames.ShouldContain("EntityType");
         propertyNames.ShouldContain("EntityId");
         propertyNames.ShouldContain("TransitionedAt");
@@ -126,7 +126,7 @@ public sealed class WorkflowTransitionRecordConfigurationTests
 
         // Assert
         index.ShouldNotBeNull();
-        List<string> propertyNames = index.Properties.Select(p => p.Name).ToList();
+        var propertyNames = index.Properties.Select(p => p.Name).ToList();
         propertyNames.ShouldContain("TenantId");
         propertyNames.ShouldContain("TransitionedAt");
     }
@@ -139,7 +139,7 @@ public sealed class WorkflowTransitionRecordConfigurationTests
 
         // Assert
         index.ShouldNotBeNull();
-        List<string> propertyNames = index.Properties.Select(p => p.Name).ToList();
+        var propertyNames = index.Properties.Select(p => p.Name).ToList();
         propertyNames.ShouldContain("TransitionedBy");
         propertyNames.ShouldContain("TransitionedAt");
     }
@@ -156,7 +156,7 @@ public sealed class WorkflowTransitionRecordConfigurationTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
-        Guid recordId = Guid.NewGuid();
+        var recordId = Guid.NewGuid();
         DateTimeOffset now = DateTimeOffset.UtcNow;
 
         await using ConfigTestDbContext context = new(options);
@@ -199,7 +199,7 @@ public sealed class WorkflowTransitionRecordConfigurationTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
-        Guid recordId = Guid.NewGuid();
+        var recordId = Guid.NewGuid();
 
         await using ConfigTestDbContext context = new(options);
         WorkflowTransitionRecord record = new()

@@ -132,7 +132,7 @@ public sealed class InMemoryTimelineStoreTests
             "Patient", "p-1", TimelineEntryType.Comment, "See attached",
             ct: TestContext.Current.CancellationToken);
 
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         TimelineAttachment attachment = await _store.AddAttachmentAsync(
             entry.Id, blobId, "report.pdf", "application/pdf", 1024,
             ct: TestContext.Current.CancellationToken);

@@ -126,7 +126,7 @@ internal sealed partial class WolverineOpenApiOperationTransformer : IOpenApiOpe
     private static List<int> GetExplicit2xxStatusCodes(IList<object> metadata)
     {
         // ProducesResponseTypeAttribute (MVC) — user-declared on Wolverine handler methods.
-        List<int> mvcCodes = metadata.OfType<ProducesResponseTypeAttribute>()
+        var mvcCodes = metadata.OfType<ProducesResponseTypeAttribute>()
             .Select(a => a.StatusCode)
             .Where(code => code is >= 200 and <= 299)
             .Distinct()

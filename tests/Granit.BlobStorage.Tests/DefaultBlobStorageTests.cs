@@ -45,7 +45,7 @@ public sealed class DefaultBlobStorageTests
     public async Task InitiateUploadAsync_ShouldSavePendingDescriptorAndReturnTicket()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         _guidGenerator.Create().Returns(blobId);
         _keyStrategy.BuildObjectKey("medical-images", blobId)
             .Returns($"{TenantId}/medical-images/2026/02/{blobId}");
@@ -79,7 +79,7 @@ public sealed class DefaultBlobStorageTests
     public async Task InitiateUploadAsync_ShouldSavePendingDescriptorWithCorrectFields()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         _guidGenerator.Create().Returns(blobId);
         string expectedKey = $"{TenantId}/medical-images/2026/02/{blobId}";
         _keyStrategy.BuildObjectKey("medical-images", blobId).Returns(expectedKey);
@@ -114,7 +114,7 @@ public sealed class DefaultBlobStorageTests
     public async Task InitiateUploadAsync_ShouldPassCorrectExpiryToUrlGenerator()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         _guidGenerator.Create().Returns(blobId);
         _keyStrategy.BuildObjectKey(Arg.Any<string>(), Arg.Any<Guid>()).Returns("key");
         _keyStrategy.ResolveBucketName(Arg.Any<string>()).Returns("bucket");
@@ -163,7 +163,7 @@ public sealed class DefaultBlobStorageTests
     public async Task CreateDownloadUrlAsync_WhenBlobIsValid_ShouldReturnPresignedUrl()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
@@ -184,7 +184,7 @@ public sealed class DefaultBlobStorageTests
     public async Task CreateDownloadUrlAsync_WhenBlobIsUploading_ShouldThrowBlobNotValidException()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildDescriptorInStatus(blobId, BlobStatus.Uploading);
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
 
@@ -199,7 +199,7 @@ public sealed class DefaultBlobStorageTests
     public async Task CreateDownloadUrlAsync_WhenBlobNotFound_ShouldThrowBlobNotFoundException()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
 
         // Act
@@ -215,7 +215,7 @@ public sealed class DefaultBlobStorageTests
     public async Task DeleteAsync_WhenBlobIsValid_ShouldDeleteS3ObjectAndTransitionToDeleted()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
@@ -238,7 +238,7 @@ public sealed class DefaultBlobStorageTests
     public async Task DeleteAsync_WhenBlobAlreadyDeleted_ShouldBeIdempotentAndNotCallS3()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildDescriptorInStatus(blobId, BlobStatus.Deleted);
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
 
@@ -254,7 +254,7 @@ public sealed class DefaultBlobStorageTests
     public async Task DeleteAsync_WhenBlobNotFound_ShouldThrowBlobNotFoundException()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
 
         // Act
@@ -269,7 +269,7 @@ public sealed class DefaultBlobStorageTests
     public async Task DeleteAsync_ShouldPreserveAuditRecord_AfterS3Delete()
     {
         // Arrange — validates the RGPD/HDS constraint: the DB row must survive deletion
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
         _keyStrategy.ResolveBucketName(Arg.Any<string>()).Returns("granit-blobs");
@@ -289,7 +289,7 @@ public sealed class DefaultBlobStorageTests
     public async Task GetDescriptorAsync_WhenBlobExists_ShouldReturnDescriptor()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
         _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
 
@@ -317,7 +317,7 @@ public sealed class DefaultBlobStorageTests
 
     private static BlobDescriptor BuildValidDescriptor(Guid blobId)
     {
-        BlobDescriptor descriptor = BlobDescriptor.Create(
+        var descriptor = BlobDescriptor.Create(
             id: blobId,
             tenantId: TenantId.ToString(),
             containerName: "medical-images",
@@ -331,7 +331,7 @@ public sealed class DefaultBlobStorageTests
 
     private static BlobDescriptor BuildDescriptorInStatus(Guid blobId, BlobStatus target)
     {
-        BlobDescriptor descriptor = BlobDescriptor.Create(
+        var descriptor = BlobDescriptor.Create(
             id: blobId,
             tenantId: TenantId.ToString(),
             containerName: "medical-images",

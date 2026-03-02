@@ -218,7 +218,7 @@ public sealed class MigrationBatchExecutorTests : IDisposable
     public async Task ExecuteBatchAsync_NonEmptyTenantId_CallsIsolator()
     {
         string cycleId = "tenant-isolation";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         StubDbContext stubContext = CreateStubContext();
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),

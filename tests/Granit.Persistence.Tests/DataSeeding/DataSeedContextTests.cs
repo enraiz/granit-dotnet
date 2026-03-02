@@ -29,7 +29,7 @@ public sealed class DataSeedContextTests
     public void Constructor_WithTenantId_StoresTenantId()
     {
         // Arrange
-        Guid tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
         // Act
         DataSeedContext context = new(tenantId);

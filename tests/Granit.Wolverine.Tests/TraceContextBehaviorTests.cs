@@ -69,7 +69,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         behavior.Before(envelope);
 
-        ActivityTraceId expectedTraceId = ActivityTraceId.CreateFromString("4bf92f3577b34da6a3ce929d0e0e4736");
+        var expectedTraceId = ActivityTraceId.CreateFromString("4bf92f3577b34da6a3ce929d0e0e4736");
         _capturedActivities[0].TraceId.ShouldBe(expectedTraceId);
 
         behavior.After();
@@ -78,7 +78,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
     [Fact]
     public void Before_WithValidTraceParent_SetsMessagingTags()
     {
-        Guid messageId = Guid.NewGuid();
+        var messageId = Guid.NewGuid();
         TraceContextBehavior behavior = new(_logger);
         Envelope envelope = new() { Id = messageId, MessageType = "MyApp.OrderPlaced" };
         envelope.Headers[OutgoingContextMiddleware.TraceParentHeader] = ValidTraceParent;

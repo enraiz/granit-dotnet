@@ -49,7 +49,7 @@ public sealed class DropColumnWithoutContractAnalyzer : GranitMigrationAnalyzerB
             return;
         }
 
-        InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
+        var invocation = (InvocationExpressionSyntax)context.Node;
         context.ReportDiagnostic(
             Diagnostic.Create(_rule, invocation.GetLocation(), result.Value.MigrationClass.Name));
     }

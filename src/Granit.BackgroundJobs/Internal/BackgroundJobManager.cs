@@ -170,7 +170,7 @@ internal sealed partial class BackgroundJobManager(
 
     private static object CreateMessage(string messageType, string jobName)
     {
-        Type? type = Type.GetType(messageType);
+        var type = Type.GetType(messageType);
         if (type is null)
         {
             throw new InvalidOperationException(

@@ -16,7 +16,7 @@ internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITime
         int take = 20,
         CancellationToken ct = default)
     {
-        List<TimelineEntry> entries = store.Entries.Values
+        var entries = store.Entries.Values
             .Where(e => e.EntityType == entityType
                         && e.EntityId == entityId
                         && !e.IsDeleted)
@@ -25,7 +25,7 @@ internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITime
 
         int totalCount = entries.Count;
 
-        List<TimelineStreamEntry> page = entries
+        var page = entries
             .Skip(skip)
             .Take(take)
             .Select(MapToStreamEntry)

@@ -30,7 +30,7 @@ public sealed class GranitWebhooksModuleTests
     [Fact]
     public void GranitWebhooksModule_DependsOn_WolverineModule()
     {
-        DependsOnAttribute[] attributes = (DependsOnAttribute[])
+        var attributes = (DependsOnAttribute[])
             typeof(GranitWebhooksModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
         attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));

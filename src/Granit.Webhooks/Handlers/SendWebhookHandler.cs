@@ -66,7 +66,7 @@ public sealed class SendWebhookHandler(
         request.Headers.TryAddWithoutValidation("x-granit-event-id", command.Envelope.EventId.ToString());
         request.Headers.TryAddWithoutValidation("x-granit-event-type", command.Envelope.EventType);
 
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         HttpResponseMessage response;
 
         try

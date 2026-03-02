@@ -37,8 +37,8 @@ public sealed class GdprExportSagaTests
         GdprExportSaga saga = new();
         IMessageContext context = Substitute.For<IMessageContext>();
         DataProviderRegistry registry = BuildRegistry("patients", "billing");
-        Guid requestId = Guid.NewGuid();
-        Guid userId = Guid.NewGuid();
+        var requestId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         PersonalDataRequestedEvent evt = new(requestId, userId, DateTimeOffset.UtcNow);
 
         await saga.StartAsync(evt, registry, DefaultOptions(), context);
@@ -56,7 +56,7 @@ public sealed class GdprExportSagaTests
         GdprExportSaga saga = new();
         IMessageContext context = Substitute.For<IMessageContext>();
         DataProviderRegistry registry = BuildRegistry("patients", "billing");
-        Guid requestId = Guid.NewGuid();
+        var requestId = Guid.NewGuid();
         PersonalDataRequestedEvent evt = new(requestId, Guid.NewGuid(), DateTimeOffset.UtcNow);
 
         await saga.StartAsync(evt, registry, DefaultOptions(), context);

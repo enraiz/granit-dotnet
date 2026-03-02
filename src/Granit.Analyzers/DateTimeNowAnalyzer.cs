@@ -49,7 +49,7 @@ public sealed class DateTimeNowAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
     {
-        MemberAccessExpressionSyntax memberAccess = (MemberAccessExpressionSyntax)context.Node;
+        var memberAccess = (MemberAccessExpressionSyntax)context.Node;
 
         string memberName = memberAccess.Name.Identifier.Text;
         if (memberName != "Now" && memberName != "UtcNow")

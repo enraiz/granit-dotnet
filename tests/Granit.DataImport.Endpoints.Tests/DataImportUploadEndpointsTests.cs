@@ -194,7 +194,7 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
     public async Task Preview_WhenJobExists_Returns200WithPreview()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Created);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -214,7 +214,7 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
     public async Task Preview_WhenJobNotFound_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
@@ -231,7 +231,7 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
     public async Task ConfirmMappings_WhenJobExists_Returns204()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Previewed);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -252,7 +252,7 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
     public async Task ConfirmMappings_WhenJobNotFound_Returns404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
         ConfirmMappingsRequest request = new([new ColumnMapping("Name", "Name", MappingConfidence.Manual)]);
 
@@ -268,7 +268,7 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
     public async Task ConfirmMappings_EmptyMappings_Returns400()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Previewed);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
         ConfirmMappingsRequest request = new([]);

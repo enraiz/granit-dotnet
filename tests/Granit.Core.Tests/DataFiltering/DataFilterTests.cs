@@ -193,14 +193,14 @@ public sealed class DataFilterTests
     {
         DataFilter filter = Create();
 
-        Task taskA = Task.Run(async () =>
+        var taskA = Task.Run(async () =>
         {
             using IDisposable scope = filter.Disable<IFilterA>();
             await Task.Delay(20, TestContext.Current.CancellationToken);
             filter.IsEnabled<IFilterA>().ShouldBeFalse("task A must see its own disabled state");
         }, TestContext.Current.CancellationToken);
 
-        Task taskB = Task.Run(async () =>
+        var taskB = Task.Run(async () =>
         {
             await Task.Delay(5, TestContext.Current.CancellationToken);
             // Task B never disabled IFilterA — must see the default state.

@@ -75,7 +75,7 @@ public sealed class WorkflowServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitWorkflow();
 
-        WorkflowDefinition<WorkflowLifecycleStatus> definition =
+        var definition =
             WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
                 .InitialState(WorkflowLifecycleStatus.Draft)
                 .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published));
@@ -99,7 +99,7 @@ public sealed class WorkflowServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.AddGranitWorkflow();
 
-        WorkflowDefinition<WorkflowLifecycleStatus> definition =
+        var definition =
             WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
                 .InitialState(WorkflowLifecycleStatus.Draft)
                 .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published));
@@ -121,7 +121,7 @@ public sealed class WorkflowServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
-        WorkflowDefinition<WorkflowLifecycleStatus> definition =
+        var definition =
             WorkflowDefinition<WorkflowLifecycleStatus>.Create(b => b
                 .InitialState(WorkflowLifecycleStatus.Draft)
                 .Transition(WorkflowLifecycleStatus.Draft, WorkflowLifecycleStatus.Published));

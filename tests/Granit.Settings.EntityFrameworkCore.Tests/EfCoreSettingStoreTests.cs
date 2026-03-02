@@ -109,7 +109,7 @@ public sealed class EfCoreSettingStoreTests
     public async Task GetOrNullAsync_FiltersBy_NameProviderNameProviderKey()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         await SeedAsync(db, "App.Theme", "G", null, "dark-global",
             TestContext.Current.CancellationToken);
         await SeedAsync(db, "App.Theme", "T", tenantId.ToString(), "light-tenant",
@@ -130,7 +130,7 @@ public sealed class EfCoreSettingStoreTests
     public async Task GetListAsync_ReturnsAllForProviderAndKey()
     {
         string db = Guid.NewGuid().ToString();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         await SeedAsync(db, "App.Theme", "T", tenantId.ToString(), "dark",
             TestContext.Current.CancellationToken);
         await SeedAsync(db, "App.Language", "T", tenantId.ToString(), "fr",

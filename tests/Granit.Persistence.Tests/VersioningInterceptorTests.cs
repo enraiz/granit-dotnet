@@ -52,7 +52,7 @@ public sealed class VersioningInterceptorTests
     public async Task SaveChanges_WhenBusinessIdIsSet_ShouldNotOverwrite()
     {
         // Arrange
-        Guid existingBusinessId = Guid.NewGuid();
+        var existingBusinessId = Guid.NewGuid();
         using TestDbContext context = CreateContext();
         TestVersionedEntity entity = new()
         {
@@ -96,7 +96,7 @@ public sealed class VersioningInterceptorTests
     public async Task SaveChanges_SecondVersion_ShouldSetVersionTo2()
     {
         // Arrange
-        Guid businessId = Guid.NewGuid();
+        var businessId = Guid.NewGuid();
         using TestDbContext context = CreateContext();
 
         // Add first version
@@ -130,7 +130,7 @@ public sealed class VersioningInterceptorTests
     public async Task SaveChanges_MultipleAddsForSameBusinessId_ShouldIncrementSequentially()
     {
         // Arrange — two entities added in the same SaveChanges batch
-        Guid businessId = Guid.NewGuid();
+        var businessId = Guid.NewGuid();
         using TestDbContext context = CreateContext();
 
         TestVersionedEntity v1 = new()

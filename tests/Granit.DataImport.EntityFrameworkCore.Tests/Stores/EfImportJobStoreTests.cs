@@ -111,7 +111,7 @@ public sealed class EfImportJobStoreTests
         // Arrange
         string dbName = NewDb();
         EfImportJobStore store = CreateStore(dbName);
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         ImportJob job = CreateJob();
         job.TenantId = tenantId;
         job.MappingsJson = "[{\"sourceColumn\":\"A\"}]";

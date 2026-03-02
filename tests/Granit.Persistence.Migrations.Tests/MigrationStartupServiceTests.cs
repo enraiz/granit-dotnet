@@ -237,8 +237,8 @@ public sealed class MigrationStartupServiceTests
     [Fact]
     public async Task StartAsync_TwoTenants_DispatchesTwoCommandsForOneCycle()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         IMigrationBatchDispatcher dispatcher = Substitute.For<IMigrationBatchDispatcher>();
         ITenantEnumerator enumerator = Substitute.For<ITenantEnumerator>();

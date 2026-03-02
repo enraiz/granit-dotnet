@@ -289,7 +289,7 @@ public sealed class AuditedEntityInterceptorTests
     public async Task SaveChangesAsync_MultiTenant_OnAdd_DoesNotOverwriteExistingTenantId()
     {
         // Arrange — TenantId déjà défini explicitement (migration, import)
-        Guid explicitTenant = Guid.NewGuid();
+        var explicitTenant = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns((Guid?)TenantId);
         await using TestDbContext context = CreateContext();

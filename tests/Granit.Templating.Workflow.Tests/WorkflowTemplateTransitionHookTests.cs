@@ -150,7 +150,7 @@ public sealed class WorkflowTemplateTransitionHookTests
     {
         string db = NewDb();
         WorkflowTemplateTransitionHook<TestWorkflowDbContext> hook = CreateHook(db);
-        Guid revisionId = Guid.NewGuid();
+        var revisionId = Guid.NewGuid();
 
         await hook.OnTransitionedAsync(
             revisionId, TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, "alice",
@@ -193,7 +193,7 @@ public sealed class WorkflowTemplateTransitionHookTests
     public async Task OnTransitionedAsync_IncludesTenantId_WhenAvailable()
     {
         string db = NewDb();
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(true);
         tenant.Id.Returns(tenantId);

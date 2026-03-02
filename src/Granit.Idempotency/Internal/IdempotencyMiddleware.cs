@@ -174,7 +174,7 @@ internal sealed partial class IdempotencyMiddleware(
         context.Response.Body = captureStream;
 
         using CancellationTokenSource timeoutCts = new(_opts.ExecutionTimeout);
-        using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
             originalAborted, timeoutCts.Token);
         context.RequestAborted = linkedCts.Token;
 
@@ -309,7 +309,7 @@ internal sealed partial class IdempotencyMiddleware(
     {
         context.Request.EnableBuffering();
 
-        using IncrementalHash sha256 = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        using var sha256 = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 
         // Incorporate: METHOD + routePattern + idempotencyKeyValue (key binding, not just body)
         AppendUtf8(sha256, context.Request.Method);

@@ -28,7 +28,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
     [Fact]
     public async Task GetActiveSubscriptionsAsync_ReturnsOnlyActiveMatchingSubscriptions()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         _store.Add(BuildSubscription("test.event", tenantId, WebhookSubscriptionStatus.Active));
         _store.Add(BuildSubscription("test.event", tenantId, WebhookSubscriptionStatus.Suspended));
         _store.Add(BuildSubscription("other.event", tenantId, WebhookSubscriptionStatus.Active));
@@ -42,7 +42,7 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
     [Fact]
     public async Task GetActiveSubscriptionsAsync_IncludesGlobalSubscriptions()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         _store.Add(BuildSubscription("test.event", tenantId: null, WebhookSubscriptionStatus.Active)); // global
         _store.Add(BuildSubscription("test.event", tenantId, WebhookSubscriptionStatus.Active));       // tenant-specific
 
@@ -55,8 +55,8 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
     [Fact]
     public async Task GetActiveSubscriptionsAsync_ExcludesOtherTenantsSubscriptions()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         _store.Add(BuildSubscription("test.event", tenantA, WebhookSubscriptionStatus.Active));
 
         IReadOnlyList<WebhookSubscription> result =

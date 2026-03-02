@@ -36,7 +36,7 @@ public sealed class PrefixBlobKeyStrategyTests
     public void BuildObjectKey_ShouldReturnTenantPrefixedKeyWithDateComponents()
     {
         // Arrange
-        Guid blobId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+        var blobId = Guid.Parse("22222222-2222-2222-2222-222222222222");
 
         // Act
         string key = _sut.BuildObjectKey("medical-images", blobId);
@@ -50,7 +50,7 @@ public sealed class PrefixBlobKeyStrategyTests
     {
         // Arrange
         _clock.Now.Returns(new DateTimeOffset(2026, 3, 1, 0, 0, 0, TimeSpan.Zero));
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
 
         // Act
         string key = _sut.BuildObjectKey("prescriptions", blobId);
@@ -63,8 +63,8 @@ public sealed class PrefixBlobKeyStrategyTests
     public void BuildObjectKey_TwoTenantsWithSameFileName_ShouldProduceDifferentKeys()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
-        Guid tenantB = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        var blobId = Guid.NewGuid();
+        var tenantB = Guid.Parse("33333333-3333-3333-3333-333333333333");
 
         PrefixBlobKeyStrategy strategyB = new(
             BuildTenantSubstitute(tenantB), _clock,
@@ -86,7 +86,7 @@ public sealed class PrefixBlobKeyStrategyTests
         // Arrange
         _currentTenant.IsAvailable.Returns(false);
         _currentTenant.Id.Returns((Guid?)null);
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
 
         // Act
         string key = _sut.BuildObjectKey("docs", blobId);
@@ -138,7 +138,7 @@ public sealed class PrefixBlobKeyStrategyTests
     public void TryExtractTenantId_WithKeyBuiltByStrategy_ShouldRoundtrip()
     {
         // Arrange
-        Guid blobId = Guid.NewGuid();
+        var blobId = Guid.NewGuid();
         string objectKey = _sut.BuildObjectKey("medical-images", blobId);
 
         // Act

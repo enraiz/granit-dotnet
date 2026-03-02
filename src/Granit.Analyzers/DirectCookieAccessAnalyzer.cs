@@ -70,7 +70,7 @@ public sealed class DirectCookieAccessAnalyzer : DiagnosticAnalyzer
         SyntaxNodeAnalysisContext context,
         INamedTypeSymbol responseCookiesInterface)
     {
-        InvocationExpressionSyntax invocation = (InvocationExpressionSyntax)context.Node;
+        var invocation = (InvocationExpressionSyntax)context.Node;
 
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
         {
