@@ -68,6 +68,14 @@ public abstract class ReferenceDataEntityTypeConfiguration<TEntity>
                .HasMaxLength(250)
                .IsRequired();
 
+        // Translation labels (6 supported locales besides English)
+        builder.Property(e => e.LabelFr).HasMaxLength(250);
+        builder.Property(e => e.LabelNl).HasMaxLength(250);
+        builder.Property(e => e.LabelDe).HasMaxLength(250);
+        builder.Property(e => e.LabelEs).HasMaxLength(250);
+        builder.Property(e => e.LabelIt).HasMaxLength(250);
+        builder.Property(e => e.LabelPt).HasMaxLength(250);
+
         // IsActive — indexed for global query filter performance
         builder.HasIndex(e => e.IsActive)
                .HasDatabaseName($"ix_{_tableName}_is_active");

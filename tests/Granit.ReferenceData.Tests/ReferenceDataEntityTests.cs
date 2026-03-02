@@ -1,3 +1,4 @@
+using System.Globalization;
 using Granit.Core.Domain;
 using Shouldly;
 using Xunit;
@@ -50,11 +51,88 @@ public sealed class ReferenceDataEntityTests
     }
 
     [Fact]
+    public void Default_TranslationLabels_Are_Empty()
+    {
+        TestEntity entity = new();
+
+        entity.LabelFr.ShouldBe(string.Empty);
+        entity.LabelNl.ShouldBe(string.Empty);
+        entity.LabelDe.ShouldBe(string.Empty);
+        entity.LabelEs.ShouldBe(string.Empty);
+        entity.LabelIt.ShouldBe(string.Empty);
+        entity.LabelPt.ShouldBe(string.Empty);
+    }
+
+    [Fact]
     public void Label_Returns_LabelEn_By_Default()
     {
         TestEntity entity = new() { LabelEn = "Belgium" };
 
         entity.Label.ShouldBe("Belgium");
+    }
+
+    [Fact]
+    public void Label_FrenchCulture_ReturnsLabelFr()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelFr = "Belgique" };
+
+        RunWithCulture("fr-BE", () => entity.Label.ShouldBe("Belgique"));
+    }
+
+    [Fact]
+    public void Label_DutchCulture_ReturnsLabelNl()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelNl = "België" };
+
+        RunWithCulture("nl-BE", () => entity.Label.ShouldBe("België"));
+    }
+
+    [Fact]
+    public void Label_GermanCulture_ReturnsLabelDe()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelDe = "Belgien" };
+
+        RunWithCulture("de-DE", () => entity.Label.ShouldBe("Belgien"));
+    }
+
+    [Fact]
+    public void Label_SpanishCulture_ReturnsLabelEs()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelEs = "Bélgica" };
+
+        RunWithCulture("es-ES", () => entity.Label.ShouldBe("Bélgica"));
+    }
+
+    [Fact]
+    public void Label_ItalianCulture_ReturnsLabelIt()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelIt = "Belgio" };
+
+        RunWithCulture("it-IT", () => entity.Label.ShouldBe("Belgio"));
+    }
+
+    [Fact]
+    public void Label_PortugueseCulture_ReturnsLabelPt()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelPt = "Bélgica" };
+
+        RunWithCulture("pt-PT", () => entity.Label.ShouldBe("Bélgica"));
+    }
+
+    [Fact]
+    public void Label_UnsupportedCulture_FallsBackToEnglish()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelFr = "Belgique" };
+
+        RunWithCulture("ja-JP", () => entity.Label.ShouldBe("Belgium"));
+    }
+
+    [Fact]
+    public void Label_EmptyTranslation_FallsBackToEnglish()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelFr = "" };
+
+        RunWithCulture("fr-FR", () => entity.Label.ShouldBe("Belgium"));
     }
 
     [Fact]
@@ -98,6 +176,12 @@ public sealed class ReferenceDataEntityTests
         {
             Code = "BE",
             LabelEn = "Belgium",
+            LabelFr = "Belgique",
+            LabelNl = "België",
+            LabelDe = "Belgien",
+            LabelEs = "Bélgica",
+            LabelIt = "Belgio",
+            LabelPt = "Bélgica",
             IsActive = false,
             SortOrder = 42,
             ValidFrom = now,
@@ -106,9 +190,29 @@ public sealed class ReferenceDataEntityTests
 
         entity.Code.ShouldBe("BE");
         entity.LabelEn.ShouldBe("Belgium");
+        entity.LabelFr.ShouldBe("Belgique");
+        entity.LabelNl.ShouldBe("België");
+        entity.LabelDe.ShouldBe("Belgien");
+        entity.LabelEs.ShouldBe("Bélgica");
+        entity.LabelIt.ShouldBe("Belgio");
+        entity.LabelPt.ShouldBe("Bélgica");
         entity.IsActive.ShouldBeFalse();
         entity.SortOrder.ShouldBe(42);
         entity.ValidFrom.ShouldBe(now);
         entity.ValidTo.ShouldBe(now.AddYears(1));
+    }
+
+    private static void RunWithCulture(string cultureName, Action action)
+    {
+        CultureInfo previous = CultureInfo.CurrentUICulture;
+        try
+        {
+            CultureInfo.CurrentUICulture = new CultureInfo(cultureName);
+            action();
+        }
+        finally
+        {
+            CultureInfo.CurrentUICulture = previous;
+        }
     }
 }

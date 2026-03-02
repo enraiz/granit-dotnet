@@ -139,6 +139,38 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     }
 
     [Fact]
+    public async Task Create_WithTranslationLabels_MapsAllLabels()
+    {
+        // Arrange
+        ReferenceDataCreateRequest request = new(
+            "BE", "Belgium",
+            LabelFr: "Belgique",
+            LabelNl: "België",
+            LabelDe: "Belgien",
+            LabelEs: "Bélgica",
+            LabelIt: "Belgio",
+            LabelPt: "Bélgica");
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            Prefix, request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        await _store.Received(1).CreateAsync(
+            Arg.Is<TestRefEntity>(e =>
+                e.Code == "BE" &&
+                e.LabelEn == "Belgium" &&
+                e.LabelFr == "Belgique" &&
+                e.LabelNl == "België" &&
+                e.LabelDe == "Belgien" &&
+                e.LabelEs == "Bélgica" &&
+                e.LabelIt == "Belgio" &&
+                e.LabelPt == "Bélgica"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Create_WithoutAuth_Returns401()
     {
         // Arrange
@@ -170,6 +202,33 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await _store.Received(1).UpdateAsync(
             Arg.Is<TestRefEntity>(e => e.LabelEn == "Kingdom of Belgium"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Update_WithTranslationLabels_MapsAllLabels()
+    {
+        // Arrange
+        TestRefEntity existing = new() { Code = "BE", LabelEn = "Belgium" };
+        _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
+        ReferenceDataUpdateRequest request = new(
+            "Kingdom of Belgium",
+            LabelFr: "Royaume de Belgique",
+            LabelNl: "Koninkrijk België",
+            LabelDe: "Königreich Belgien");
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PutAsJsonAsync(
+            $"{Prefix}/BE", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        await _store.Received(1).UpdateAsync(
+            Arg.Is<TestRefEntity>(e =>
+                e.LabelEn == "Kingdom of Belgium" &&
+                e.LabelFr == "Royaume de Belgique" &&
+                e.LabelNl == "Koninkrijk België" &&
+                e.LabelDe == "Königreich Belgien"),
             Arg.Any<CancellationToken>());
     }
 

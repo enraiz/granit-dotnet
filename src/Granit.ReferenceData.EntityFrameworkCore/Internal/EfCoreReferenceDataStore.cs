@@ -49,13 +49,19 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
             queryable = queryable.Where(e => e.IsActive);
         }
 
-        // Search filter (Code or LabelEn, case-insensitive)
+        // Search filter (Code or any label, case-insensitive)
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
         {
             string term = query.SearchTerm;
             queryable = queryable.Where(e =>
                 EF.Functions.Like(e.Code, $"%{term}%") ||
-                EF.Functions.Like(e.LabelEn, $"%{term}%"));
+                EF.Functions.Like(e.LabelEn, $"%{term}%") ||
+                EF.Functions.Like(e.LabelFr, $"%{term}%") ||
+                EF.Functions.Like(e.LabelNl, $"%{term}%") ||
+                EF.Functions.Like(e.LabelDe, $"%{term}%") ||
+                EF.Functions.Like(e.LabelEs, $"%{term}%") ||
+                EF.Functions.Like(e.LabelIt, $"%{term}%") ||
+                EF.Functions.Like(e.LabelPt, $"%{term}%"));
         }
 
         // Total count before pagination

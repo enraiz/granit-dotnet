@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 using Granit.Core.Domain;
 
@@ -11,10 +12,11 @@ namespace Granit.ReferenceData;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Each reference data entity has a unique <see cref="Code"/> (business key) and an English
-/// label (<see cref="LabelEn"/>). The virtual <see cref="Label"/> property returns <see cref="LabelEn"/>
-/// by default; derived entities can override it to resolve the label based on the current culture
-/// (e.g., returning LabelFr when <c>CultureInfo.CurrentUICulture</c> is "fr").
+/// Each reference data entity has a unique <see cref="Code"/> (business key) and labels
+/// for the 7 supported locales (en, fr, nl, de, es, it, pt). The virtual <see cref="Label"/>
+/// property resolves the appropriate label based on <see cref="CultureInfo.CurrentUICulture"/>,
+/// falling back to <see cref="LabelEn"/> when the requested locale has no value.
+/// Derived entities can override <see cref="Label"/> for custom resolution logic.
 /// </para>
 /// <para>
 /// Soft activation/deactivation is controlled by <see cref="IsActive"/>. Deactivated entries
@@ -30,22 +32,50 @@ public abstract class ReferenceDataEntity : AuditedEntity, IActive
     public string Code { get; set; } = string.Empty;
 
     /// <summary>
-    /// English display label. Persisted in the database. Applications needing translations
-    /// should add locale-specific properties (e.g., LabelFr, LabelNl) and override
-    /// <see cref="Label"/> to resolve based on the current culture.
+    /// English display label (fallback). Always persisted; used when no translation
+    /// is available for the requested culture.
     /// </summary>
     public string LabelEn { get; set; } = string.Empty;
 
+    /// <summary>French display label.</summary>
+    public string LabelFr { get; set; } = string.Empty;
+
+    /// <summary>Dutch display label.</summary>
+    public string LabelNl { get; set; } = string.Empty;
+
+    /// <summary>German display label.</summary>
+    public string LabelDe { get; set; } = string.Empty;
+
+    /// <summary>Spanish display label.</summary>
+    public string LabelEs { get; set; } = string.Empty;
+
+    /// <summary>Italian display label.</summary>
+    public string LabelIt { get; set; } = string.Empty;
+
+    /// <summary>Portuguese display label.</summary>
+    public string LabelPt { get; set; } = string.Empty;
+
     /// <summary>
-    /// Resolved display label for the current culture. Returns <see cref="LabelEn"/> by default.
-    /// Override in derived entities to provide culture-aware label resolution.
+    /// Resolved display label for the current UI culture. Returns the locale-specific
+    /// label when available, falling back to <see cref="LabelEn"/> when the translation
+    /// is empty or the culture is not in the supported set (fr, nl, de, es, it, pt).
     /// </summary>
     /// <remarks>
     /// This property is not mapped to the database. It is intended for use in application
     /// code and API responses where culture-specific labels are needed.
+    /// Override in derived entities to provide custom resolution logic.
     /// </remarks>
     [NotMapped]
-    public virtual string Label => LabelEn;
+    public virtual string Label => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
+    {
+        "fr" when LabelFr.Length > 0 => LabelFr,
+        "nl" when LabelNl.Length > 0 => LabelNl,
+        "de" when LabelDe.Length > 0 => LabelDe,
+        "es" when LabelEs.Length > 0 => LabelEs,
+        "it" when LabelIt.Length > 0 => LabelIt,
+        "pt" when LabelPt.Length > 0 => LabelPt,
+        _ => LabelEn,
+    };
 
     /// <inheritdoc/>
     public bool IsActive { get; set; } = true;
