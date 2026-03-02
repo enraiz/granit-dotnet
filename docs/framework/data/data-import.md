@@ -422,6 +422,88 @@ L'executor persiste les entités validées en batch :
 7. DryRun : rollback de la transaction
 8. Commit et retourne `ImportReport`
 
+## Endpoints REST (`Granit.DataImport.Endpoints`)
+
+Minimal API protégée par la permission `DataImport.Admin`. 9 endpoints répartis
+en 3 groupes : upload, exécution et rapport.
+
+### Installation
+
+```bash
+dotnet add package Granit.DataImport.Endpoints
+```
+
+### Enregistrement
+
+```csharp
+// Module (si module system utilisé)
+[DependsOn(typeof(GranitDataImportEndpointsModule))]
+
+// Routing (dans Program.cs ou Startup)
+app.MapDataImportEndpoints();
+
+// Avec options personnalisées
+app.MapDataImportEndpoints(opts =>
+{
+    opts.ApiPrefix = "api/v1";
+    opts.RoutePrefix = "imports";
+    opts.RequiredRole = "admin";
+});
+```
+
+### Routes
+
+#### Upload et mapping (Story #496)
+
+| Méthode | Route | Retour | Description |
+| --- | --- | --- | --- |
+| `POST` | `/` | 201 Created | Upload fichier + crée un ImportJob |
+| `POST` | `/{jobId}/preview` | 200 OK | Headers, preview rows, suggestions de mapping |
+| `PUT` | `/{jobId}/mappings` | 204 NoContent | Confirme les mappings choisis par l'utilisateur |
+
+#### Exécution (Story #497)
+
+| Méthode | Route | Retour | Description |
+| --- | --- | --- | --- |
+| `POST` | `/{jobId}/execute` | 202 Accepted | Dispatch asynchrone (Channel ou Wolverine) |
+| `POST` | `/{jobId}/dry-run` | 200 OK | Exécution synchrone dry-run → rapport |
+| `GET` | `/{jobId}` | 200 / 404 | Status du job |
+| `DELETE` | `/{jobId}` | 204 / 404 | Annule le job (si pas en cours) |
+
+#### Rapport (Story #498)
+
+| Méthode | Route | Retour | Description |
+| --- | --- | --- | --- |
+| `GET` | `/{jobId}/report` | 200 / 404 | Rapport JSON complet |
+| `GET` | `/{jobId}/correction-file` | File / 204 / 404 | Fichier de correction (lignes en erreur) |
+
+### Configuration
+
+```json
+{
+  "DataImportEndpoints": {
+    "ApiPrefix": "",
+    "RoutePrefix": "data-import",
+    "RequiredRole": "granit-data-import-admin",
+    "TagName": "Data Import"
+  }
+}
+```
+
+### Permissions
+
+Le module enregistre automatiquement la permission `DataImport.Admin` dans le
+système RBAC Granit. En production, attribuer cette permission au rôle Keycloak
+souhaité via `IPermissionManager.SetAsync()` ou `GranitAuthorizationOptions.AdminRoles`.
+
+### Dispatch asynchrone
+
+L'endpoint `POST /{jobId}/execute` utilise un `IImportCommandDispatcher` pour
+envoyer la commande en arrière-plan. L'implémentation par défaut utilise un
+`Channel<ExecuteImportCommand>` consommé par un `BackgroundService` interne.
+Les applications utilisant Wolverine peuvent remplacer le dispatcher pour
+bénéficier du Outbox.
+
 ## Voir aussi
 
 - [ADR-019 — Sep pour le parsing CSV](../../ADR/ADR-019-sep-parsing-csv.md)

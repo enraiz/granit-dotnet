@@ -1,5 +1,7 @@
+using System.Threading.Channels;
 using Granit.DataImport.Internal;
 using Granit.DataImport.Mapping;
+using Granit.DataImport.Messages;
 using Granit.DataImport.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -22,6 +24,7 @@ public static class ServiceCollectionExtensions
     ///   <item><see cref="IImportJobStore"/> (scoped) — null-object default.</item>
     ///   <item><see cref="IImportFileProvider"/> (scoped) — null-object default.</item>
     ///   <item><see cref="IImportOrchestrator"/> (scoped) — pipeline orchestrator.</item>
+    ///   <item><see cref="IImportCommandDispatcher"/> (singleton) — channel-based dispatch.</item>
     /// </list>
     /// <para>
     /// At least one <see cref="Parsing.IFileParser"/> must be registered separately.
@@ -43,6 +46,11 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<IImportFileProvider, NullImportFileProvider>();
         services.TryAddScoped<IImportOrchestrator, ImportOrchestrator>();
 
+        // Channel-based async dispatch (default). Replaced by Wolverine if installed.
+        services.TryAddSingleton(Channel.CreateUnbounded<ExecuteImportCommand>());
+        services.TryAddSingleton<IImportCommandDispatcher, ChannelImportCommandDispatcher>();
+        services.AddHostedService<ImportCommandWorker>();
+
         return services;
     }
 
@@ -56,8 +64,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddImportDefinition<TEntity, TDefinition>(
         this IServiceCollection services)
         where TEntity : class
-        where TDefinition : ImportDefinition<TEntity> =>
+        where TDefinition : ImportDefinition<TEntity>
+    {
         services.AddSingleton<ImportDefinition<TEntity>, TDefinition>();
+        services.AddSingleton<IImportDefinitionDescriptor>(sp =>
+            sp.GetRequiredService<ImportDefinition<TEntity>>());
+        return services;
+    }
 
     /// <summary>
     /// Replaces the default <see cref="ISemanticMappingService"/> with an AI-backed implementation.

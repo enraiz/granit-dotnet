@@ -28,7 +28,7 @@ namespace Granit.DataImport.Mapping;
 /// </code>
 /// </para>
 /// </remarks>
-public abstract class ImportDefinition<TEntity> where TEntity : class
+public abstract class ImportDefinition<TEntity> : IImportDefinitionDescriptor where TEntity : class
 {
     private ImportDefinitionBuilder<TEntity>? _builder;
 
