@@ -1,0 +1,7 @@
+{
+  "culture": "nl",
+  "texts": {
+    "Features:NotEnabled": "De functionaliteit '{0}' is niet ingeschakeld in uw huidige abonnement.",
+    "Features:LimitExceeded": "De limiet voor de functionaliteit '{0}' is bereikt ({1}/{2}). Upgrade uw abonnement om deze limiet te verhogen."
+  }
+}

@@ -54,6 +54,26 @@ dotnet format --verify-no-changes
 **Diacritics**: ALWAYS use correct French accents (é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
 in all French content (docs, issues, commits). Never in code.
 
+**Supported locales — 7 languages (MANDATORY)**:
+
+The framework must be localized in **all 7 languages** listed below. Every localization
+JSON file (`src/*/Localization/**/*.json`) must exist for all 7 cultures. When adding a
+new localization key or a new module with localization, create or update **all 7 files**.
+
+| Code | Language | Notes |
+| ---- | -------- | ----- |
+| `en` | English | Fallback / default |
+| `fr` | French | Primary user language (Belgium, France) |
+| `nl` | Dutch | Belgium (Flanders), Netherlands |
+| `de` | German | Belgium (Eupen), Germany, Austria, Switzerland |
+| `es` | Spanish | Spain, Latin America |
+| `it` | Italian | Italy, Switzerland |
+| `pt` | Portuguese | Portugal, Brazil |
+
+This list also applies to `ReferenceDataEntity` translations (`LabelEn`, `LabelFr`,
+`LabelNl`, `LabelDe`, `LabelEs`, `LabelIt`, `LabelPt`) and any future translatable
+entity fields.
+
 ## Code conventions
 
 **C#**: PascalCase for types and methods, camelCase for parameters and local variables,

@@ -1,0 +1,10 @@
+{
+  "culture": "nl",
+  "texts": {
+    "Granit:EntityNotFound": "Entiteit van type {0} met identificatie {1} werd niet gevonden.",
+    "Granit:ValidationError": "Validatiefout.",
+    "Granit:Unauthorized": "Ongeoorloofde toegang.",
+    "Granit:Forbidden": "Toegang geweigerd.",
+    "Granit:InternalError": "Er is een interne fout opgetreden."
+  }
+}

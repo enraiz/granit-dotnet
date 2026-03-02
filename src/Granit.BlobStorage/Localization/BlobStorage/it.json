@@ -1,0 +1,7 @@
+{
+  "culture": "it",
+  "texts": {
+    "BlobStorage:NotFound": "Il file richiesto non è stato trovato.",
+    "BlobStorage:NotValid": "Il file non è disponibile per il download."
+  }
+}
