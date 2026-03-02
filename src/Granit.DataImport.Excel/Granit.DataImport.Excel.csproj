@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.DataImport.Excel</PackageId>
+    <Description>Excel file parser for Granit.DataImport using Sylvan.Data.Excel (streaming, forward-only).</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.DataImport.Excel.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sylvan.Data.Excel" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.DataImport\Granit.DataImport.csproj" />
+  </ItemGroup>
+
+</Project>

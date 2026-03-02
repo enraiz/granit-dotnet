@@ -289,6 +289,70 @@ await foreach (RawImportRow row in parser.ParseAsync(stream, options))
 | `SkipRows` | `0` | Lignes à ignorer avant l'en-tête |
 | `HeaderRowIndex` | `0` | Index de la ligne d'en-tête (après `SkipRows`) |
 
+## Parseur Excel (`Granit.DataImport.Excel`)
+
+Implémente `IFileParser` via [Sylvan.Data.Excel](https://github.com/MarkPflug/Sylvan.Data.Excel)
+(MIT, zero-dep, streaming `DbDataReader`). Accepte les formats `.xlsx`, `.xls` et `.xlsb`
+via les MIME types correspondants.
+
+### Fonctionnalités
+
+- **Streaming** : `ParseAsync` retourne un `IAsyncEnumerable<RawImportRow>` via
+  `ExcelDataReader.ReadAsync()` — lecture progressive, une seule ligne en mémoire
+- **Multi-format** : `.xlsx` (Open XML), `.xls` (BIFF), `.xlsb` (Binary)
+- **Sélection de feuille** : `FileParsingOptions.SheetName` permet de cibler une
+  feuille spécifique (première feuille par défaut)
+- **Détection du format** : `FileParsingOptions.MimeType` détermine le
+  `ExcelWorkbookType` utilisé par Sylvan
+- **Valeurs vides** : les cellules vides sont retournées comme `null` dans
+  `RawImportRow.Values`
+
+### Exemple d'utilisation
+
+```csharp
+// Enregistrement DI
+services.AddGranitDataImportExcel();
+
+// Utilisation directe (tests, scripts)
+SylvanExcelFileParser parser = new();
+
+// Extraction des en-têtes
+using FileStream stream = File.OpenRead("patients.xlsx");
+FileParsingOptions options = new()
+{
+    MimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
+IReadOnlyList<string> headers = await parser.ExtractHeadersAsync(stream, options);
+// → ["NISS", "Prénom", "Nom", "Email"]
+
+// Preview (10 premières lignes)
+stream.Position = 0;
+IReadOnlyList<string[]> preview = await parser.ReadPreviewAsync(stream, options, maxRows: 10);
+
+// Parsing complet (streaming)
+stream.Position = 0;
+await foreach (RawImportRow row in parser.ParseAsync(stream, options))
+{
+    // row.RowNumber = 1, 2, 3...
+    // row.Values["NISS"] = "85073100145"
+}
+
+// Sélection d'une feuille spécifique
+FileParsingOptions sheetOptions = new()
+{
+    MimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    SheetName = "Patients",
+};
+```
+
+### MIME types supportés
+
+| MIME type | Format | Extension |
+| --- | --- | --- |
+| `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | Open XML | `.xlsx` |
+| `application/vnd.ms-excel` | BIFF (Excel 97–2003) | `.xls` |
+| `application/vnd.ms-excel.sheet.binary.macroenabled.12` | Binary | `.xlsb` |
+
 ## Voir aussi
 
 - [ADR-019 — Sep pour le parsing CSV](../../ADR/ADR-019-sep-parsing-csv.md)
