@@ -99,13 +99,19 @@ See [templates.md](templates.md) for structure per issue type.
 
 ## Personas (user stories)
 
-Use **exclusively** a canonical persona from
-`governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`.
+Two persona registries:
+
+- **Infrastructure & governance (15 personas)**: `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`
+- **Application-level (5 personas)**: `granit-dotnet/docs/guide/personas-applicatifs.md`
+
 NEVER invent a new persona.
 
-Allowed personas: SRE, Ingénieur DevOps, Développeur, Architecte, DBA, RSSI,
-DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
-Utilisateur, Professionnel de santé, Product Owner.
+**Infra/governance personas:** SRE, Ingénieur DevOps, Développeur, Architecte, DBA,
+RSSI, DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
+Utilisateur, Professionnel de santé, Product Owner
+
+**Application personas:** Visiteur, Utilisateur authentifié, Administrateur d'application,
+Approbateur, Gestionnaire de contenu
 
 NEVER use hybrid roles ("slash roles" like `SRE / DevOps`).
 Context (on-call, audit) goes in the story body, not in the persona.

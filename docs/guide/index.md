@@ -12,6 +12,8 @@ Cette section propose des tutoriels pas-à-pas pour prendre en main le framework
 
 | Tutoriel | Description |
 | --- | --- |
+| [Conventions de codage](conventions/index.md) | Conventions transversales (DoD, Git, sécurité, langues) et backend (.NET / C#) |
+| [Personas applicatifs](personas-applicatifs.md) | Rôles fonctionnels (Visiteur, Authentifié, Admin, Approbateur, Gestionnaire) et mapping Keycloak |
 | [Démarrage rapide](demarrage-rapide/index.md) | Construire une mini-API de gestion de tâches de A à Z avec Granit |
 
 ## Voir aussi

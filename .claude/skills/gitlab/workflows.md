@@ -45,7 +45,7 @@ glab mr create \
      --description "$(cat <<'EOF'
    ## User Story
 
-   - **En tant que** [SRE / DevOps / Développeur],
+   - **En tant que** [persona canonique],
    - **je souhaite** [action/fonctionnalité],
    - **afin de** [bénéfice/valeur].
 

@@ -8,21 +8,127 @@
 - **Compliance**: HDS + RGPD | Criticality: HIGH
 - **Publication**: GitLab Package Registry (NuGet)
 
+## GitLab repositories
+
+| ID | Repo | Path |
+| -- | ---- | ---- |
+| 5 | governance-compliance | `digital-dynamics/governance-compliance` |
+| 6 | **granit-dotnet** | `digital-dynamics/granit-dotnet` |
+| 9 | granit-front | `digital-dynamics/granit-front` |
+| 10 | guava-admin | `digital-dynamics/guava-platform/applications/guava-admin` |
+| 4 | guava-app-template | `digital-dynamics/guava-platform/applications/guava-app-template` |
+| 7 | guava-backend | `digital-dynamics/guava-platform/applications/guava-backend` |
+| 1 | guava-front | `digital-dynamics/guava-platform/applications/guava-front` |
+| 3 | gitops | `digital-dynamics/guava-platform/infrastructure/gitops` |
+| 2 | iac | `digital-dynamics/guava-platform/infrastructure/iac` |
+| 8 | project-governance | `digital-dynamics/guava-platform/project-governance` |
+
 ## Stack & versions
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
-## Packages
+## Packages (82 packages)
+
+### Core & utilities
 
 | Package | Role |
 | ------- | ---- |
 | `Granit.Core` | Module system (ABP-inspired), shared domain types |
 | `Granit.Timing` | IClock, ICurrentTimezoneProvider, TimeProvider |
 | `Granit.Guids` | IGuidGenerator, sequential GUIDs for clustered indexes |
-| `Granit.Security` | JWT Keycloak, ICurrentUserService, authorization policies |
-| `Granit.Persistence` | EF Core interceptors (HDS audit, RGPD soft delete) |
-| `Granit.Vault` | VaultSharp client, ITransitEncryptionService, dynamic credentials |
+| `Granit.Validation` | FluentValidation integration |
+| `Granit.Analyzers` / `.CodeFixes` | Custom Roslyn analyzers and code fixes |
+
+### Security & authentication
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.Security` | ICurrentUserService, shared security abstractions |
+| `Granit.Authentication.JwtBearer` | JWT Bearer authentication middleware |
+| `Granit.Authentication.Keycloak` | Keycloak claims transformation |
+| `Granit.Authorization` / `.EntityFrameworkCore` | Policy-based authorization, EF Core store |
+| `Granit.Vault` | VaultSharp, ITransitEncryptionService, dynamic credentials |
+| `Granit.Encryption` | Data encryption abstractions |
+| `Granit.Privacy` | RGPD privacy helpers |
+
+### Data & persistence
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.Persistence` / `.Migrations` / `.Migrations.Wolverine` | EF Core interceptors (HDS audit, soft delete), migrations |
+| `Granit.Caching` / `.Hybrid` / `.StackExchangeRedis` | Distributed caching (IDistributedCache, HybridCache, Redis) |
+| `Granit.MultiTenancy` | Tenant isolation, ICurrentTenant |
+| `Granit.Settings` / `.EntityFrameworkCore` | Application settings management |
+| `Granit.Features` / `.EntityFrameworkCore` | Feature management (Toggle/Numeric/Selection) |
+| `Granit.ReferenceData` / `.Endpoints` / `.EntityFrameworkCore` | Reference data (i18n labels, CRUD) |
+
+### API & web
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.ApiVersioning` | Asp.Versioning integration |
+| `Granit.ApiDocumentation` | Scalar OpenAPI documentation |
+| `Granit.ExceptionHandling` | RFC 7807 Problem Details |
+| `Granit.Idempotency` | Idempotency-Key middleware |
+| `Granit.Cors` | CORS policy configuration |
+| `Granit.Cookies` / `.Klaro` | Cookie consent management |
+
+### Messaging & events
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.Wolverine` / `.Postgresql` | Wolverine messaging, transactional outbox |
+| `Granit.Webhooks` / `.EntityFrameworkCore` | Webhook subscriptions and delivery |
+| `Granit.Notifications` / `.Endpoints` / `.EntityFrameworkCore` | Notification engine (fan-out, delivery tracking) |
+| `Granit.Notifications.Email` / `.Email.Smtp` / `.Brevo` | Email channels (SMTP, Brevo) |
+| `Granit.Notifications.Sms` / `.WhatsApp` / `.Push` | SMS, WhatsApp, Web Push channels |
+| `Granit.Notifications.SignalR` | Real-time SignalR channel |
+
+### Documents & templates
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.Templating` / `.Scriban` / `.EntityFrameworkCore` / `.Workflow` | Template engine (Scriban), EF store, workflow integration |
+| `Granit.DocumentGeneration` / `.Pdf` / `.Excel` | Document rendering (HTML→PDF, Excel) |
+
+### Data import (mini-ETL)
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.DataImport` / `.Csv` / `.Excel` / `.EntityFrameworkCore` / `.Endpoints` | Extract→Map→Validate→Execute pipeline (Sep, Sylvan) |
+
+### Workflow
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.Workflow` / `.Endpoints` / `.EntityFrameworkCore` / `.Notifications` | FSM engine, publication lifecycle |
+
+### Diagnostics & observability
+
+| Package | Role |
+| ------- | ---- |
 | `Granit.Observability` | Serilog + OpenTelemetry → OTLP → Loki/Tempo/Mimir |
+| `Granit.Diagnostics` | Health checks, readiness probes |
+| `Granit.Timeline` / `.Endpoints` / `.EntityFrameworkCore` / `.Notifications` | Audit timeline (HDS) |
+
+### Storage & imaging
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.BlobStorage` / `.S3` / `.EntityFrameworkCore` | Blob storage (S3-compatible), metadata EF store |
+| `Granit.Imaging` / `.MagickNet` | Image processing (WebP/AVIF, EXIF stripping) |
+
+### Scheduling & jobs
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.BackgroundJobs` / `.Endpoints` / `.EntityFrameworkCore` | Background job scheduling (Wolverine + Cronos) |
+
+### Localization
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.Localization` / `.Endpoints` / `.EntityFrameworkCore` / `.SourceGenerator` | i18n (7 languages), override store, source-generated keys |
 
 ## Commands
 
@@ -43,79 +149,33 @@ dotnet format --verify-no-changes
 
 ## Language
 
-| Content | Language |
-| ------- | -------- |
-| C# code — identifiers, XML docs (`/// <summary>`), inline comments (`//`) | **English** |
-| `docs/**/*.md` | **French** |
-| GitLab issues (title, description, comments) | **French** |
-| Commits (Conventional Commits messages) | **French** |
-| `CLAUDE.md`, skills | **English** |
+See [`docs/guide/conventions/langues.md`](docs/guide/conventions/langues.md) for full language and localization rules.
 
-**Diacritics**: ALWAYS use correct French accents (é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
-in all French content (docs, issues, commits). Never in code.
-
-**Supported locales — 7 languages (MANDATORY)**:
-
-The framework must be localized in **all 7 languages** listed below. Every localization
-JSON file (`src/*/Localization/**/*.json`) must exist for all 7 cultures. When adding a
-new localization key or a new module with localization, create or update **all 7 files**.
-
-| Code | Language | Notes |
-| ---- | -------- | ----- |
-| `en` | English | Fallback / default |
-| `fr` | French | Primary user language (Belgium, France) |
-| `nl` | Dutch | Belgium (Flanders), Netherlands |
-| `de` | German | Belgium (Eupen), Germany, Austria, Switzerland |
-| `es` | Spanish | Spain, Latin America |
-| `it` | Italian | Italy, Switzerland |
-| `pt` | Portuguese | Portugal, Brazil |
-
-This list also applies to `ReferenceDataEntity` translations (`LabelEn`, `LabelFr`,
-`LabelNl`, `LabelDe`, `LabelEs`, `LabelIt`, `LabelPt`) and any future translatable
-entity fields.
+- **Code** (identifiers, XML docs, comments): **English**
+- **Docs, issues, commits**: **French** (with correct diacritics: é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
+- **`CLAUDE.md`, skills**: **English**
+- **Localization**: **7 languages mandatory** (en, fr, nl, de, es, it, pt) — every
+  `src/*/Localization/**/*.json` must exist for all 7 cultures
+- `ReferenceDataEntity` translations: `LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`,
+  `LabelEs`, `LabelIt`, `LabelPt`
 
 ## Code conventions
 
-**C#**: PascalCase for types and methods, camelCase for parameters and local variables,
-`I` prefix for interfaces, `Async` suffix for async methods. Strict Roslyn rules:
+Full coding standards: [`docs/guide/conventions/`](docs/guide/conventions/index.md) (backend: style-et-nommage, architecture, implementation)
 
-- **IDE0008**: ALWAYS use explicit type instead of `var`
-  (e.g., `ServiceCollection services = new();` not `var services = new ServiceCollection();`)
-- **IDE0022**: Use expression body (`=>`) for single-statement methods
-- **ASP0025**: Use `AddAuthorizationBuilder()` instead of `AddAuthorization(Action<AuthorizationOptions>)`
+Key rules for quick reference:
 
-**Regex**: ALWAYS use `[GeneratedRegex]` (source-generated) instead of `new Regex(..., RegexOptions.Compiled)`.
-This compiles the pattern at build time (zero runtime cost, NativeAOT-compatible).
-For regex that match user input, always set a timeout (3rd parameter, in ms):
-
-```csharp
-[GeneratedRegex(@"^pattern$", RegexOptions.None, 100)]
-private static partial Regex MyRegex();
-```
-
-Never use `RegexOptions.Compiled` with `[GeneratedRegex]` — it is ignored by the source generator.
-
-**Projects**: one project = one NuGet package, namespace = project name, zero circular references
-
-**Extension method receiver — `IServiceCollection` vs `IHostApplicationBuilder`**:
-
-- Use `IServiceCollection` for composable library packages (the default). This keeps the
-  package usable from any DI setup and avoids coupling to the host.
-- Use `IHostApplicationBuilder` only when the package needs `Configuration` **and** registers
-  framework-level services (Wolverine, background jobs, Observability, Persistence.Migrations,
-  BlobStorage.S3, Webhooks) or calls `ValidateOnStart()`.
-- Preferred options-binding pattern for new code:
-
-  ```csharp
-  services.AddOptions<TOptions>()
-      .BindConfiguration(SectionName)
-      .ValidateDataAnnotations()
-      .ValidateOnStart();
-  ```
-
-**Core**: `Granit.Core` provides the module system and domain types.
-Each module is self-contained (interface + implementation in the same package).
-All Granit packages reference Core.
+- **IDE0008**: Use `var` when type is apparent; explicit type otherwise (Microsoft rule)
+- **IDE0022**: Expression body (`=>`) for single-statement methods
+- **ASP0025**: Use `AddAuthorizationBuilder()` instead of `AddAuthorization(Action<>)`
+- **Regex**: ALWAYS `[GeneratedRegex]`, never `new Regex(..., Compiled)`. Timeout on user input.
+- **Logging**: ALWAYS `[LoggerMessage]` source-generated, never string interpolation in log calls
+- **Time**: NEVER `DateTime.Now`/`UtcNow` — inject `TimeProvider` or `IClock`
+- **Async**: `ConfigureAwait(false)` in library code, `CancellationToken` as last param
+- **Guards**: Prefer `ArgumentNullException.ThrowIfNull()` over manual null checks
+- **Projects**: one project = one NuGet package, namespace = project name, zero circular refs
+- **Tests**: each package has `*.Tests` (xUnit + Shouldly + NSubstitute + Bogus). Part of DoD.
+- **Markdown**: all `.md` must pass `npx markdownlint-cli2 "file.md"` before committing
 
 **Multi-tenancy — soft dependency rule**: `ICurrentTenant` lives in `Granit.Core.MultiTenancy`
 and is available in every module without referencing `Granit.MultiTenancy`.
@@ -130,16 +190,12 @@ and is available in every module without referencing `Granit.MultiTenancy`.
 - Application modules (`GuavaHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
   as usual when multi-tenancy is required in the application.
 
-**Tests**: each package has a test project (`*.Tests`). xUnit + Shouldly +
-NSubstitute + Bogus. Tests are part of the DoD for every story.
-
-**Markdown**: all `.md` files must comply with markdownlint (config in `.markdownlint.json`).
-Verify with `npx markdownlint-cli2 "file.md"` before committing.
-
 ## Personas (user stories)
 
-Persona registry: `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`.
-15 canonical personas defined.
+Two persona registries:
+
+- **Infrastructure & governance (15 personas)**: `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`
+- **Application-level (5 personas)**: [`docs/guide/personas-applicatifs.md`](docs/guide/personas-applicatifs.md)
 
 **STRICT RULES:**
 
@@ -148,9 +204,12 @@ Persona registry: `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md
 - **NEVER** use hybrid roles (`SRE / DevOps`) — choose the primary persona
 - Context (on-call, audit, incident) belongs in the story body, not in the persona
 
-**Available personas:** SRE, Ingénieur DevOps, Développeur, Architecte, DBA, RSSI,
-DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
+**Infra/governance personas:** SRE, Ingénieur DevOps, Développeur, Architecte, DBA,
+RSSI, DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
 Utilisateur, Professionnel de santé, Product Owner
+
+**Application personas:** Visiteur, Utilisateur authentifié, Administrateur d'application,
+Approbateur, Gestionnaire de contenu
 
 ## GitLab issues
 
@@ -162,25 +221,19 @@ Before any GitLab operation, **invoke skill `/gitlab`** to load commands and con
 
 ## Definition of Done — mandatory before any push
 
-**NEVER push or create an MR without all of the following being complete:**
+See [`docs/guide/conventions/dod.md`](docs/guide/conventions/dod.md) for full details.
 
-1. **Unit tests**: every modified package has its `*.Tests` project updated or extended
-   to cover the new/changed behaviour. `dotnet test` passes with zero failures.
-2. **Documentation**: any public API change, new feature, or behaviour change is reflected
-   in `docs/**/*.md` (French). Create the file if it does not exist; update it otherwise.
-3. **Format**: `dotnet format --verify-no-changes` exits with code 0.
-4. **Markdownlint**: every modified `.md` file passes `npx markdownlint-cli2 "<file>"`.
-
+**NEVER push or create an MR** without: tests passing, docs updated, format clean, markdownlint clean.
 These four checks are **blocking**. If the user asks to push without them, remind them
 and refuse until the DoD is satisfied or the user explicitly overrides each item.
 
 ## Git workflow
 
-- **Branching**: GitFlow (main + develop + `feature/*` + `release/*` + `hotfix/*`)
+See [`docs/guide/conventions/workflow.md`](docs/guide/conventions/workflow.md) for branching and commit conventions.
+
 - **Direct push to `main` FORBIDDEN**
-- **Releases**: Semantic tags on main (vMAJOR.MINOR.PATCH), `release/*` branches for stabilization
-- **Commits**: Conventional Commits (feat:, fix:, docs:, chore:)
 - **MR**: 1 approval minimum for main
+- **Releases**: Semantic tags on main (vMAJOR.MINOR.PATCH)
 
 **MR target — STRICT RULE:**
 
@@ -196,11 +249,7 @@ requests it. When in doubt, ask before creating the MR.
 
 ## Security — strict rules
 
-**ALWAYS:**
-
-- No hardcoded secrets (not even in comments or examples)
-- `sensitive = true` on all secret variables
-- Logs must not expose secrets or PII
+See [`docs/guide/conventions/securite.md`](docs/guide/conventions/securite.md) for code-level security rules.
 
 **NEVER:**
 
