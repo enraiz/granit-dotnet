@@ -85,13 +85,30 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
     }
 
     /// <summary>
-    /// Replaces the host in the connection string when TESTCONTAINERS_HOST_OVERRIDE is set.
-    /// Workaround for Testcontainers .NET v4.x which ignores host.override in DinD environments,
-    /// returning the Docker bridge IP (172.17.0.x) instead of the DinD service hostname.
+    /// Replaces the host in the connection string for DinD environments where
+    /// Testcontainers .NET v4.x returns the Docker bridge IP (172.17.0.x)
+    /// instead of the DinD service hostname.
+    /// <para>
+    /// Resolution order:
+    /// 1. <c>TESTCONTAINERS_HOST_OVERRIDE</c> (explicit override)
+    /// 2. Hostname extracted from <c>DOCKER_HOST</c> (e.g. <c>tcp://docker:2375</c> → <c>docker</c>)
+    /// </para>
     /// </summary>
     private static string ApplyHostOverride(string connectionString)
     {
         string? hostOverride = Environment.GetEnvironmentVariable("TESTCONTAINERS_HOST_OVERRIDE");
+
+        // Fallback: extract hostname from DOCKER_HOST (e.g. "tcp://docker:2375" → "docker")
+        if (string.IsNullOrEmpty(hostOverride))
+        {
+            string? dockerHost = Environment.GetEnvironmentVariable("DOCKER_HOST");
+            if (!string.IsNullOrEmpty(dockerHost)
+                && Uri.TryCreate(dockerHost, UriKind.Absolute, out Uri? uri))
+            {
+                hostOverride = uri.Host;
+            }
+        }
+
         if (string.IsNullOrEmpty(hostOverride))
         {
             return connectionString;

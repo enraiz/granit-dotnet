@@ -6,7 +6,14 @@ using Microsoft.Extensions.Options;
 namespace Granit.Encryption.Providers;
 
 /// <summary>
-/// AES-256-CBC provider with PBKDF2 key derivation (Rfc2898DeriveBytes/SHA-256).
+/// AES-256-CBC + HMAC-SHA256 provider with PBKDF2 key derivation (encrypt-then-MAC).
+/// <para>
+/// Output format: <c>Base64(IV[16] || CipherText || HMAC-SHA256(IV || CipherText)[32])</c>.
+/// </para>
+/// <para>
+/// The HMAC tag guarantees ciphertext integrity and authenticity, preventing
+/// padding oracle attacks and silent data corruption (HDS requirement).
+/// </para>
 /// Designed for frequent operations (&lt; 1 ms after startup).
 /// </summary>
 public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
@@ -26,8 +33,10 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
 
     private const int KeyDerivationIterations = 100_000;
     private const int IvSize = 16;
+    private const int HmacSize = 32; // HMAC-SHA256
 
-    private readonly byte[] _key;
+    private readonly byte[] _aesKey;
+    private readonly byte[] _hmacKey;
 
     /// <inheritdoc/>
     public string ProviderName => StringEncryptionOptions.AesProviderName;
@@ -43,12 +52,16 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
                 "Configure via Vault config provider (never in plain text in appsettings).");
         }
 
-        _key = Rfc2898DeriveBytes.Pbkdf2(
+        int aesKeySize = opts.KeySize / 8;
+        byte[] derivedKey = Rfc2898DeriveBytes.Pbkdf2(
             opts.PassPhrase,
             KeyDerivationSalt,
             KeyDerivationIterations,
             HashAlgorithmName.SHA256,
-            opts.KeySize / 8);
+            aesKeySize + HmacSize);
+
+        _aesKey = derivedKey[..aesKeySize];
+        _hmacKey = derivedKey[aesKeySize..];
     }
 
     /// <inheritdoc/>
@@ -58,7 +71,7 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
 
         using Aes aes = Aes.Create();
-        aes.Key = _key;
+        aes.Key = _aesKey;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.PKCS7;
@@ -66,10 +79,17 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
         using ICryptoTransform encryptor = aes.CreateEncryptor();
         byte[] cipherBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
 
-        // Format : IV[16] || CipherText
-        byte[] output = new byte[IvSize + cipherBytes.Length];
-        Buffer.BlockCopy(iv, 0, output, 0, IvSize);
-        Buffer.BlockCopy(cipherBytes, 0, output, IvSize, cipherBytes.Length);
+        // Encrypt-then-MAC : HMAC-SHA256(IV || CipherText)
+        int dataLength = IvSize + cipherBytes.Length;
+        byte[] dataToMac = new byte[dataLength];
+        Buffer.BlockCopy(iv, 0, dataToMac, 0, IvSize);
+        Buffer.BlockCopy(cipherBytes, 0, dataToMac, IvSize, cipherBytes.Length);
+        byte[] hmac = HMACSHA256.HashData(_hmacKey, dataToMac);
+
+        // Format : IV[16] || CipherText || HMAC[32]
+        byte[] output = new byte[dataLength + HmacSize];
+        Buffer.BlockCopy(dataToMac, 0, output, 0, dataLength);
+        Buffer.BlockCopy(hmac, 0, output, dataLength, HmacSize);
 
         return Convert.ToBase64String(output);
     }
@@ -92,16 +112,27 @@ public sealed class AesStringEncryptionProvider : IStringEncryptionProvider
             return null;
         }
 
-        if (input.Length < IvSize + 1)
+        // Minimum: IV[16] + one AES block[16] + HMAC[32] = 64 bytes
+        if (input.Length < IvSize + 16 + HmacSize)
+        {
+            return null;
+        }
+
+        // Verify HMAC before decryption (encrypt-then-MAC: always verify first)
+        byte[] receivedHmac = input[^HmacSize..];
+        byte[] dataToMac = input[..^HmacSize];
+        byte[] computedHmac = HMACSHA256.HashData(_hmacKey, dataToMac);
+
+        if (!CryptographicOperations.FixedTimeEquals(computedHmac, receivedHmac))
         {
             return null;
         }
 
         byte[] iv = input[..IvSize];
-        byte[] cipherBytes = input[IvSize..];
+        byte[] cipherBytes = input[IvSize..^HmacSize];
 
         using Aes aes = Aes.Create();
-        aes.Key = _key;
+        aes.Key = _aesKey;
         aes.IV = iv;
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.PKCS7;
