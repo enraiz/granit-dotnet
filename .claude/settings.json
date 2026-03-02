@@ -12,6 +12,9 @@
       "Bash(git stash:*)",
       "Bash(python3:*)",
       "Bash(find:*)"
+    ],
+    "additionalDirectories": [
+      "/home/jf/dev/digital-dynamics/"
     ]
   }
 }
