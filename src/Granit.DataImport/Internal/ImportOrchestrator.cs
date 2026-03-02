@@ -19,4 +19,10 @@ internal sealed class ImportOrchestrator : IImportOrchestrator
         throw new NotImplementedException(
             "Import orchestration requires Granit.DataImport.EntityFrameworkCore. " +
             "Register a concrete IImportOrchestrator implementation.");
+
+    /// <inheritdoc/>
+    public Task<ImportReport> DryRunAsync(Guid importJobId, CancellationToken ct = default) =>
+        throw new NotImplementedException(
+            "Import orchestration requires Granit.DataImport.EntityFrameworkCore. " +
+            "Register a concrete IImportOrchestrator implementation.");
 }

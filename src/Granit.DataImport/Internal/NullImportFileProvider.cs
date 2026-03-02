@@ -13,4 +13,16 @@ internal sealed class NullImportFileProvider : IImportFileProvider
         throw new NotImplementedException(
             "No IImportFileProvider is registered. " +
             "The host application must register an implementation that retrieves files from blob storage.");
+
+    /// <inheritdoc/>
+    public Task<string> SaveAsync(string fileName, Stream content, CancellationToken ct = default) =>
+        throw new NotImplementedException(
+            "No IImportFileProvider is registered. " +
+            "The host application must register an implementation that stores files to blob storage.");
+
+    /// <inheritdoc/>
+    public Task DeleteAsync(string blobReference, CancellationToken ct = default) =>
+        throw new NotImplementedException(
+            "No IImportFileProvider is registered. " +
+            "The host application must register an implementation that deletes files from blob storage.");
 }
