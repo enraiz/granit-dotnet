@@ -283,6 +283,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Excel", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Excel.Tests", "tests\Granit.DataImport.Excel.Tests\Granit.DataImport.Excel.Tests.csproj", "{A963B664-3797-47F7-BF0F-2A1A63CC2121}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.EntityFrameworkCore", "src\Granit.DataImport.EntityFrameworkCore\Granit.DataImport.EntityFrameworkCore.csproj", "{4F767987-624B-41DD-B949-72D29EBEB78D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.EntityFrameworkCore.Tests", "tests\Granit.DataImport.EntityFrameworkCore.Tests\Granit.DataImport.EntityFrameworkCore.Tests.csproj", "{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1949,6 +1953,30 @@ Global
 		{A963B664-3797-47F7-BF0F-2A1A63CC2121}.Release|x64.Build.0 = Release|Any CPU
 		{A963B664-3797-47F7-BF0F-2A1A63CC2121}.Release|x86.ActiveCfg = Release|Any CPU
 		{A963B664-3797-47F7-BF0F-2A1A63CC2121}.Release|x86.Build.0 = Release|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Debug|x64.Build.0 = Debug|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Debug|x86.Build.0 = Debug|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Release|x64.ActiveCfg = Release|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Release|x64.Build.0 = Release|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Release|x86.ActiveCfg = Release|Any CPU
+		{4F767987-624B-41DD-B949-72D29EBEB78D}.Release|x86.Build.0 = Release|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Debug|x64.Build.0 = Debug|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Debug|x86.Build.0 = Debug|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Release|x64.ActiveCfg = Release|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Release|x64.Build.0 = Release|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Release|x86.ActiveCfg = Release|Any CPU
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2092,5 +2120,7 @@ Global
 		{559BAF93-4585-46A4-A414-B4251996438A} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{43E65A51-DD9E-4AE0-BF9E-8FBB0763F71C} = {A1B2C3D4-0001-0001-0001-000000000001}
 		{A963B664-3797-47F7-BF0F-2A1A63CC2121} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{4F767987-624B-41DD-B949-72D29EBEB78D} = {A1B2C3D4-0001-0001-0001-000000000001}
+		{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549} = {A1B2C3D4-0002-0002-0002-000000000002}
 	EndGlobalSection
 EndGlobal

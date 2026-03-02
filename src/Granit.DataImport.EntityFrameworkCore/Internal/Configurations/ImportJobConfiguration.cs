@@ -1,0 +1,43 @@
+using Granit.DataImport.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Granit.DataImport.EntityFrameworkCore.Internal.Configurations;
+
+/// <summary>
+/// EF Core configuration for <see cref="ImportJob"/>.
+/// </summary>
+internal sealed class ImportJobConfiguration : IEntityTypeConfiguration<ImportJob>
+{
+    public void Configure(EntityTypeBuilder<ImportJob> builder)
+    {
+        builder.ToTable("data_import_jobs");
+        builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.DefinitionName).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.EntityTypeName).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.OriginalFileName).HasMaxLength(500).IsRequired();
+        builder.Property(e => e.MimeType).HasMaxLength(127).IsRequired();
+        builder.Property(e => e.FileSizeBytes).IsRequired();
+        builder.Property(e => e.BlobReference).HasMaxLength(500).IsRequired();
+
+        builder.Property(e => e.Status)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        builder.Property(e => e.MappingsJson);
+        builder.Property(e => e.ReportJson);
+        builder.Property(e => e.CompletedAt);
+        builder.Property(e => e.TenantId);
+
+        // Audit trail (HDS)
+        builder.Property(e => e.CreatedAt).IsRequired();
+        builder.Property(e => e.CreatedBy).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.ModifiedAt);
+        builder.Property(e => e.ModifiedBy).HasMaxLength(200);
+
+        builder.HasIndex(e => new { e.DefinitionName, e.Status })
+            .HasDatabaseName("ix_data_import_jobs_definition_status");
+    }
+}
