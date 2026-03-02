@@ -23,13 +23,13 @@ internal static class WorkflowReadEndpoints
         return group;
     }
 
-    private static async Task<Ok<IReadOnlyList<TransitionHistoryDto>>> GetTransitionHistoryAsync(
+    private static async Task<Ok<IReadOnlyList<TransitionHistoryResponse>>> GetTransitionHistoryAsync(
         string entityType,
         string entityId,
         IWorkflowHistoryQuery historyQuery,
         CancellationToken ct)
     {
-        IReadOnlyList<TransitionHistoryDto> history = await historyQuery.GetHistoryAsync(
+        IReadOnlyList<TransitionHistoryResponse> history = await historyQuery.GetHistoryAsync(
             entityType, entityId, ct);
         return TypedResults.Ok(history);
     }

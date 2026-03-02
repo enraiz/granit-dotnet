@@ -1,0 +1,7 @@
+{
+  "culture": "pt",
+  "texts": {
+    "BlobStorage:NotFound": "O ficheiro solicitado não foi encontrado.",
+    "BlobStorage:NotValid": "O ficheiro não está disponível para transferência."
+  }
+}

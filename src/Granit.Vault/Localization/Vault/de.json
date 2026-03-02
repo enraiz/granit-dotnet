@@ -1,0 +1,7 @@
+{
+  "culture": "de",
+  "texts": {
+    "Vault:UnknownAuthMethod": "Unbekannte Vault-Authentifizierungsmethode: '{0}'. Zulässige Werte: 'Kubernetes', 'Token'.",
+    "Vault:TokenRequired": "Vault-Token ist für die Token-Authentifizierung erforderlich. Konfigurieren Sie Vault:Token in der Konfiguration."
+  }
+}

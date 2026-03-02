@@ -39,8 +39,14 @@ La classe de base configure automatiquement :
 - Index unique sur `Code` (`uq_{table}_code`)
 - Index sur `IsActive` (`ix_{table}_is_active`)
 - `Label` est ignoré (propriété virtuelle `[NotMapped]`)
-- Colonnes `Code` (50 car.), `LabelEn` (250 car.), `SortOrder` (défaut 0)
+- Colonnes `Code` (50 car.), `LabelEn` (250 car., obligatoire), `SortOrder` (défaut 0)
+- Colonnes de traduction : `LabelFr`, `LabelNl`, `LabelDe`, `LabelEs`, `LabelIt`,
+  `LabelPt` (250 car. chacune, optionnelles)
 - Colonnes d'audit HDS (`CreatedAt`, `CreatedBy`, `ModifiedAt`, `ModifiedBy`)
+
+> **Migration** : l'ajout des 6 colonnes de traduction nécessite une migration
+> EF Core pour chaque table référentielle existante. Les colonnes acceptent les
+> chaînes vides par défaut — aucune donnée existante n'est impactée.
 
 ### 2. Appliquer la configuration dans OnModelCreating
 

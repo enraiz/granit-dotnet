@@ -37,7 +37,7 @@ Exemple : `Country` → `/reference-data/country`.
 | Paramètre | Type | Par défaut | Description |
 | --- | --- | --- | --- |
 | `activeOnly` | `bool` | `true` | Filtrer les entrées actives uniquement |
-| `search` | `string?` | `null` | Recherche dans Code et LabelEn |
+| `search` | `string?` | `null` | Recherche dans Code et tous les libellés (en, fr, nl, de, es, it, pt) |
 | `sortBy` | `string?` | `SortOrder` | Propriété de tri (`Code`, `Label`, `SortOrder`) |
 | `descending` | `bool` | `false` | Tri descendant |
 | `skip` | `int?` | `null` | Nombre d'entrées à ignorer |
@@ -71,6 +71,12 @@ configurable (par défaut : `ReferenceData.Admin`, rôle `granit-reference-data-
 record ReferenceDataCreateRequest(
     string Code,
     string LabelEn,
+    string LabelFr = "",
+    string LabelNl = "",
+    string LabelDe = "",
+    string LabelEs = "",
+    string LabelIt = "",
+    string LabelPt = "",
     int SortOrder = 0,
     DateTimeOffset? ValidFrom = null,
     DateTimeOffset? ValidTo = null);
@@ -81,11 +87,20 @@ record ReferenceDataCreateRequest(
 ```csharp
 record ReferenceDataUpdateRequest(
     string LabelEn,
+    string LabelFr = "",
+    string LabelNl = "",
+    string LabelDe = "",
+    string LabelEs = "",
+    string LabelIt = "",
+    string LabelPt = "",
     int SortOrder = 0,
     bool IsActive = true,
     DateTimeOffset? ValidFrom = null,
     DateTimeOffset? ValidTo = null);
 ```
+
+Les libellés de traduction sont optionnels (valeur par défaut : chaîne vide).
+Seul `LabelEn` est obligatoire.
 
 ## Voir aussi
 

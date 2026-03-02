@@ -6,16 +6,16 @@ namespace Granit.Validation;
 /// <summary>
 /// FluentValidation extension methods for contact and communication identifiers.
 /// </summary>
-public static class ContactValidatorExtensions
+public static partial class ContactValidatorExtensions
 {
-    private static readonly Regex E164Regex = new(@"^\+[1-9]\d{6,14}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
-
-    // Practical RFC 5321 subset: local-part chars + @ + domain + dot + TLD (2+ letters).
+    // Practical RFC 5321 subset: local-part chars + @ + domain labels + dot + TLD (2+ letters).
     // Rejects null, empty, missing @, spaces, and missing TLD.
-    private static readonly Regex EmailRegex =
-        new(@"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$",
-            RegexOptions.Compiled,
-            TimeSpan.FromMilliseconds(100));
+    // Domain uses (label.)+ pattern to avoid backtracking (dot not in character class).
+    [GeneratedRegex(@"^[a-zA-Z0-9._%+\-]+@([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}$", RegexOptions.None, 100)]
+    private static partial Regex EmailRegex();
+
+    [GeneratedRegex(@"^\+[1-9]\d{6,14}$", RegexOptions.None, 100)]
+    private static partial Regex E164Regex();
 
     /// <summary>
     /// Validates an e-mail address against a practical RFC 5321 subset.
@@ -26,7 +26,7 @@ public static class ContactValidatorExtensions
     /// </remarks>
     public static IRuleBuilderOptions<T, string?> Email<T>(this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
-            .Must(value => value != null && EmailRegex.IsMatch(value))
+            .Must(value => value != null && EmailRegex().IsMatch(value))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidEmail");
 
     /// <summary>
@@ -37,6 +37,6 @@ public static class ContactValidatorExtensions
     /// </remarks>
     public static IRuleBuilderOptions<T, string?> E164Phone<T>(this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
-            .Must(value => value != null && E164Regex.IsMatch(value))
+            .Must(value => value != null && E164Regex().IsMatch(value))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidE164Phone");
 }

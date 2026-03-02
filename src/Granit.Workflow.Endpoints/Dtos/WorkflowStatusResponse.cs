@@ -6,6 +6,6 @@ namespace Granit.Workflow.Endpoints.Dtos;
 /// </summary>
 /// <param name="CurrentState">Current workflow state name.</param>
 /// <param name="AvailableTransitions">Transitions available to the current user.</param>
-public sealed record WorkflowStatusDto(
+public sealed record WorkflowStatusResponse(
     string CurrentState,
-    IReadOnlyList<TransitionDto> AvailableTransitions);
+    IReadOnlyList<TransitionResponse> AvailableTransitions);

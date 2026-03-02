@@ -54,6 +54,26 @@ dotnet format --verify-no-changes
 **Diacritics**: ALWAYS use correct French accents (é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
 in all French content (docs, issues, commits). Never in code.
 
+**Supported locales — 7 languages (MANDATORY)**:
+
+The framework must be localized in **all 7 languages** listed below. Every localization
+JSON file (`src/*/Localization/**/*.json`) must exist for all 7 cultures. When adding a
+new localization key or a new module with localization, create or update **all 7 files**.
+
+| Code | Language | Notes |
+| ---- | -------- | ----- |
+| `en` | English | Fallback / default |
+| `fr` | French | Primary user language (Belgium, France) |
+| `nl` | Dutch | Belgium (Flanders), Netherlands |
+| `de` | German | Belgium (Eupen), Germany, Austria, Switzerland |
+| `es` | Spanish | Spain, Latin America |
+| `it` | Italian | Italy, Switzerland |
+| `pt` | Portuguese | Portugal, Brazil |
+
+This list also applies to `ReferenceDataEntity` translations (`LabelEn`, `LabelFr`,
+`LabelNl`, `LabelDe`, `LabelEs`, `LabelIt`, `LabelPt`) and any future translatable
+entity fields.
+
 ## Code conventions
 
 **C#**: PascalCase for types and methods, camelCase for parameters and local variables,
@@ -63,6 +83,17 @@ in all French content (docs, issues, commits). Never in code.
   (e.g., `ServiceCollection services = new();` not `var services = new ServiceCollection();`)
 - **IDE0022**: Use expression body (`=>`) for single-statement methods
 - **ASP0025**: Use `AddAuthorizationBuilder()` instead of `AddAuthorization(Action<AuthorizationOptions>)`
+
+**Regex**: ALWAYS use `[GeneratedRegex]` (source-generated) instead of `new Regex(..., RegexOptions.Compiled)`.
+This compiles the pattern at build time (zero runtime cost, NativeAOT-compatible).
+For regex that match user input, always set a timeout (3rd parameter, in ms):
+
+```csharp
+[GeneratedRegex(@"^pattern$", RegexOptions.None, 100)]
+private static partial Regex MyRegex();
+```
+
+Never use `RegexOptions.Compiled` with `[GeneratedRegex]` — it is ignored by the source generator.
 
 **Projects**: one project = one NuGet package, namespace = project name, zero circular references
 

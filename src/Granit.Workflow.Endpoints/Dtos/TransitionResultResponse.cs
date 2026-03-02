@@ -11,7 +11,7 @@ namespace Granit.Workflow.Endpoints.Dtos;
 /// <param name="Outcome">
 /// Transition outcome: "Completed", "ApprovalRequested", "Denied", or "InvalidTransition".
 /// </param>
-public sealed record TransitionResultDto(
+public sealed record TransitionResultResponse(
     bool Succeeded,
     string ResultingState,
     string Outcome);

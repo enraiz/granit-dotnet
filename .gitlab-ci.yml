@@ -1,7 +1,12 @@
 # =============================================================================
 # GitLab CI/CD - Granit
 # =============================================================================
-# Pipeline : quality -> security -> analysis -> pack -> publish
+# Pipeline : build -> quality -> security -> analysis -> pack -> publish
+#
+# Le stage build valide la compilation et réchauffe le cache NuGet.
+# Les artifacts bin/obj sont trop volumineux (~20K fichiers, >500 MB)
+# pour être partagés via artifacts GitLab. Chaque job rebuild avec le
+# cache NuGet (restore rapide ~5-10s).
 #
 # Les packages NuGet sont publiés sur GitLab Package Registry.
 # Publication automatique sur tag vX.Y.Z sur main.
@@ -32,6 +37,7 @@ variables:
   NUGET_PACKAGES: '${CI_PROJECT_DIR}/.nuget/packages'
 
 stages:
+  - build
   - quality
   - gitlab-security
   - analysis
@@ -57,12 +63,31 @@ stages:
     policy: pull-push
 
 # ---------------------------------------------------------------------------
+# BUILD (validation + cache NuGet warm-up)
+# ---------------------------------------------------------------------------
+
+build:
+  extends: .dotnet
+  stage: build
+  script:
+    - dotnet restore
+    - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+
+# ---------------------------------------------------------------------------
 # QUALITY
 # ---------------------------------------------------------------------------
 
 format:
   extends: .dotnet
   stage: quality
+  needs:
+    - job: build
+      artifacts: false
   script:
     - dotnet restore
     - dotnet format --verify-no-changes --no-restore
@@ -71,31 +96,21 @@ format:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
 
-build:
-  extends: .dotnet
-  stage: quality
-  script:
-    - dotnet restore
-    - dotnet build -c $CONFIGURATION --no-restore
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
-
 test:
   extends: .dotnet
   stage: quality
+  needs:
+    - job: build
+      artifacts: false
   variables:
     VSTEST_CONNECTION_TIMEOUT: "300"
     XUNIT_LAUNCH_TIMEOUT: "300"
   script:
-    - dotnet build -c $CONFIGURATION
+    - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true
     - >
-      dotnet test -c $CONFIGURATION --no-build
+      dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage;Format=opencover,cobertura"
-      -- RunConfiguration.MaxCpuCount=2
   artifacts:
     when: always
     paths:
@@ -110,6 +125,41 @@ test:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+
+integration-test:
+  extends: .dotnet
+  stage: quality
+  needs:
+    - job: build
+      artifacts: false
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    TESTCONTAINERS_HOST_OVERRIDE: docker
+    TESTCONTAINERS_RYUK_DISABLED: "true"
+  script:
+    - dotnet build -c $CONFIGURATION
+    - >
+      dotnet test -c $CONFIGURATION --no-build
+      --filter "FullyQualifiedName~IntegrationTests"
+      --logger "junit;LogFilePath=TestResults/results.xml"
+      --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+  artifacts:
+    when: always
+    paths:
+      - "**/coverage.opencover.xml"
+    reports:
+      junit: "**/TestResults/results.xml"
+      coverage_report:
+        coverage_format: cobertura
+        path: "**/coverage.cobertura.xml"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
+  allow_failure: true
 
 # ---------------------------------------------------------------------------
 # SECURITY
@@ -144,6 +194,8 @@ sonarqube:
   stage: analysis
   timeout: 2h
   needs:
+    - job: build
+      artifacts: false
     - job: test
       artifacts: true
   variables:
@@ -184,6 +236,9 @@ sonarqube:
 audit:nuget:
   extends: .dotnet
   stage: analysis
+  needs:
+    - job: build
+      artifacts: false
   script:
     - dotnet restore
     - dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
@@ -206,6 +261,9 @@ audit:nuget:
 docfx:
   extends: .dotnet
   stage: docs
+  needs:
+    - job: build
+      artifacts: false
   script:
     - dotnet tool install -g docfx
     - export PATH="$PATH:$HOME/.dotnet/tools"
@@ -244,6 +302,9 @@ pages:
 pack:
   extends: .dotnet
   stage: pack
+  needs:
+    - job: build
+      artifacts: false
   script:
     - |
       if [ -n "$CI_COMMIT_TAG" ]; then

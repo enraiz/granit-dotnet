@@ -5,6 +5,6 @@ namespace Granit.Workflow.Endpoints.Dtos;
 /// </summary>
 /// <param name="TargetState">Target state name to transition to.</param>
 /// <param name="Comment">Optional regulatory comment or justification (HDS audit trail).</param>
-public sealed record TransitionRequestDto(
+public sealed record TransitionRequest(
     string TargetState,
     string? Comment);

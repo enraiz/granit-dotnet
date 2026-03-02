@@ -7,11 +7,11 @@ namespace Granit.Validation;
 /// <summary>
 /// FluentValidation extension methods for company and legal entity identifiers.
 /// </summary>
-public static class CompanyIdentifierValidatorExtensions
+public static partial class CompanyIdentifierValidatorExtensions
 {
     // NAF/APE code: 4 digits + 1 uppercase letter (e.g. 6201Z).
-    private static readonly Regex NafCodeRegex =
-        new(@"^\d{4}[A-Z]$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^\d{4}[A-Z]$", RegexOptions.None, 100)]
+    private static partial Regex NafCodeRegex();
 
     /// <summary>
     /// Validates a French SIREN number (Système d'Identification du Répertoire des ENtreprises).
@@ -58,6 +58,6 @@ public static class CompanyIdentifierValidatorExtensions
     /// </remarks>
     public static IRuleBuilderOptions<T, string?> FrenchNafCode<T>(this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
-            .Must(value => value != null && NafCodeRegex.IsMatch(value.Trim().ToUpperInvariant()))
+            .Must(value => value != null && NafCodeRegex().IsMatch(value.Trim().ToUpperInvariant()))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidFrenchNafCode");
 }

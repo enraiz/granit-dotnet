@@ -1,4 +1,4 @@
-namespace Granit.Localization.Endpoints.Dto;
+namespace Granit.Localization.Endpoints.Dtos;
 
 /// <summary>
 /// Response payload for <c>GET /api/granit/localization</c>.
@@ -10,7 +10,7 @@ namespace Granit.Localization.Endpoints.Dto;
 /// Each value is a flat dictionary of translation key → translated value.
 /// </param>
 /// <param name="Languages">Languages available in the application, for a language selector UI.</param>
-public sealed record ApplicationLocalizationDto(
+public sealed record ApplicationLocalizationResponse(
     string CultureName,
     IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Resources,
-    IReadOnlyList<LanguageInfoDto> Languages);
+    IReadOnlyList<LanguageInfoResponse> Languages);

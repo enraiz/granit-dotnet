@@ -39,12 +39,24 @@ public sealed class Country : ReferenceDataEntity
 
 - `Guid Id` — identifiant unique (hérité de `Entity`)
 - `string Code` — clé métier unique (ex : "BE", "EUR")
-- `string LabelEn` — libellé anglais (colonne DB)
-- `string Label` — propriété virtuelle `[NotMapped]`, retourne `LabelEn` par défaut ;
-  surcharger dans les entités dérivées pour résoudre selon la culture courante
+- `string LabelEn` — libellé anglais (fallback, toujours persisté)
+- `string LabelFr` — libellé français
+- `string LabelNl` — libellé néerlandais
+- `string LabelDe` — libellé allemand
+- `string LabelEs` — libellé espagnol
+- `string LabelIt` — libellé italien
+- `string LabelPt` — libellé portugais
+- `string Label` — propriété virtuelle `[NotMapped]`, résout automatiquement le
+  libellé selon `CultureInfo.CurrentUICulture` parmi les 7 langues supportées ;
+  retombe sur `LabelEn` si la traduction est vide ou la culture non supportée.
+  Surchargeable pour une logique de résolution personnalisée
 - `bool IsActive` — activation/désactivation logique
 - `int SortOrder` — ordre d'affichage
 - `DateTimeOffset? ValidFrom` / `ValidTo` — période de validité optionnelle
+
+> **Note** : les libellés de traduction sont optionnels. Une application n'utilisant
+> que 2 langues (ex : fr et en) peut laisser les autres libellés vides — la propriété
+> `Label` retombera automatiquement sur `LabelEn`.
 
 ## Configuration
 

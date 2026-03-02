@@ -6,20 +6,18 @@ namespace Granit.Validation;
 /// <summary>
 /// FluentValidation extension methods for locale and internationalisation identifiers.
 /// </summary>
-public static class LocaleValidatorExtensions
+public static partial class LocaleValidatorExtensions
 {
     // ISO 3166-1 alpha-2: exactly 2 uppercase letters after normalisation.
-    private static readonly Regex Iso3166Alpha2Regex =
-        new(@"^[A-Z]{2}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^[A-Z]{2}$", RegexOptions.None, 100)]
+    private static partial Regex Iso3166Alpha2Regex();
 
     // BCP 47 language tag (practical subset):
     //   language (2–3 chars) + optional script (4 chars) + optional region (2 chars).
     //   Examples: fr, en, nl, fr-FR, fr-BE, en-US, zh-Hans, zh-Hans-CN.
     //   Numeric region subtags (e.g. 419) and extension subtags are not supported.
-    private static readonly Regex Bcp47Regex =
-        new(@"^[a-z]{2,3}(-[a-z]{4})?(-[a-z]{2})?$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase,
-            TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^[a-z]{2,3}(-[a-z]{4})?(-[a-z]{2})?$", RegexOptions.IgnoreCase, 100)]
+    private static partial Regex Bcp47Regex();
 
     /// <summary>
     /// Validates an ISO 3166-1 alpha-2 country code (e.g. <c>BE</c>, <c>FR</c>).
@@ -32,7 +30,7 @@ public static class LocaleValidatorExtensions
         this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
             .Must(value => value != null
-                && Iso3166Alpha2Regex.IsMatch(value.Trim().ToUpperInvariant()))
+                && Iso3166Alpha2Regex().IsMatch(value.Trim().ToUpperInvariant()))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidIso3166Alpha2");
 
     /// <summary>
@@ -46,6 +44,6 @@ public static class LocaleValidatorExtensions
     public static IRuleBuilderOptions<T, string?> Bcp47LanguageTag<T>(
         this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder
-            .Must(value => value != null && Bcp47Regex.IsMatch(value.Trim()))
+            .Must(value => value != null && Bcp47Regex().IsMatch(value.Trim()))
             .WithErrorCodeAndMessage("Granit:Validation:InvalidBcp47LanguageTag");
 }

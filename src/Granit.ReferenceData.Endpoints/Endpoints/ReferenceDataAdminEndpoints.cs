@@ -52,6 +52,12 @@ internal static class ReferenceDataAdminEndpoints
             Id = Guid.NewGuid(),
             Code = request.Code,
             LabelEn = request.LabelEn,
+            LabelFr = request.LabelFr,
+            LabelNl = request.LabelNl,
+            LabelDe = request.LabelDe,
+            LabelEs = request.LabelEs,
+            LabelIt = request.LabelIt,
+            LabelPt = request.LabelPt,
             SortOrder = request.SortOrder,
             ValidFrom = request.ValidFrom,
             ValidTo = request.ValidTo,
@@ -77,6 +83,12 @@ internal static class ReferenceDataAdminEndpoints
         }
 
         existing.LabelEn = request.LabelEn;
+        existing.LabelFr = request.LabelFr;
+        existing.LabelNl = request.LabelNl;
+        existing.LabelDe = request.LabelDe;
+        existing.LabelEs = request.LabelEs;
+        existing.LabelIt = request.LabelIt;
+        existing.LabelPt = request.LabelPt;
         existing.SortOrder = request.SortOrder;
         existing.IsActive = request.IsActive;
         existing.ValidFrom = request.ValidFrom;
