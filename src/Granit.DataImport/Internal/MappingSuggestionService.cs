@@ -53,15 +53,13 @@ internal sealed class MappingSuggestionService(
             IReadOnlyList<SemanticMappingSuggestion> semanticSuggestions =
                 await semanticMappingService.SuggestSemanticMappingsAsync(unmappedHeaders, targetFields, ct);
 
-            foreach (SemanticMappingSuggestion suggestion in semanticSuggestions)
+            foreach (SemanticMappingSuggestion suggestion in semanticSuggestions
+                .Where(s => !suggestions.ContainsKey(s.SourceColumn) &&
+                             !matchedTargets.Contains(s.TargetProperty)))
             {
-                if (!suggestions.ContainsKey(suggestion.SourceColumn) &&
-                    !matchedTargets.Contains(suggestion.TargetProperty))
-                {
-                    suggestions[suggestion.SourceColumn] = new ColumnMapping(
-                        suggestion.SourceColumn, suggestion.TargetProperty, MappingConfidence.Semantic);
-                    matchedTargets.Add(suggestion.TargetProperty);
-                }
+                suggestions[suggestion.SourceColumn] = new ColumnMapping(
+                    suggestion.SourceColumn, suggestion.TargetProperty, MappingConfidence.Semantic);
+                matchedTargets.Add(suggestion.TargetProperty);
             }
         }
 
@@ -74,15 +72,13 @@ internal sealed class MappingSuggestionService(
         IReadOnlyList<string> headers,
         IReadOnlyList<ColumnMapping> saved)
     {
-        foreach (ColumnMapping mapping in saved)
+        foreach (ColumnMapping mapping in saved
+            .Where(m => m.TargetProperty is not null &&
+                        headers.Contains(m.SourceColumn, StringComparer.OrdinalIgnoreCase) &&
+                        !matchedTargets.Contains(m.TargetProperty)))
         {
-            if (mapping.TargetProperty is not null &&
-                headers.Contains(mapping.SourceColumn, StringComparer.OrdinalIgnoreCase) &&
-                !matchedTargets.Contains(mapping.TargetProperty))
-            {
-                suggestions[mapping.SourceColumn] = mapping with { Confidence = MappingConfidence.Saved };
-                matchedTargets.Add(mapping.TargetProperty);
-            }
+            suggestions[mapping.SourceColumn] = mapping with { Confidence = MappingConfidence.Saved };
+            matchedTargets.Add(mapping.TargetProperty!);
         }
     }
 

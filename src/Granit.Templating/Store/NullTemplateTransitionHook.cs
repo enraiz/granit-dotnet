@@ -17,7 +17,7 @@ internal sealed class NullTemplateTransitionHook : ITemplateTransitionHook
     public Task<bool> CanTransitionAsync(
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
-        CancellationToken ct) =>
+        CancellationToken ct = default) =>
         Task.FromResult((from, target) is
             (TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published) or
             (TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived) or
@@ -29,6 +29,6 @@ internal sealed class NullTemplateTransitionHook : ITemplateTransitionHook
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
         string userId,
-        CancellationToken ct) =>
+        CancellationToken ct = default) =>
         Task.CompletedTask;
 }

@@ -11,9 +11,7 @@
       "Bash(git pull:*)",
       "Bash(git stash:*)",
       "Bash(python3:*)",
-      "Bash(find:*)",
-      "Bash(git -C /home/jf/dev/digital-dynamics/granit-dotnet diff --stat)",
-      "Bash(git -C /home/jf/dev/digital-dynamics/granit-dotnet log --oneline -3)"
+      "Bash(find:*)"
     ]
   }
 }

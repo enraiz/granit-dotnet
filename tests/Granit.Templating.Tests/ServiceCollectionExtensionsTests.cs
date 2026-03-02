@@ -18,7 +18,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitTemplating_Registers_ITextTemplateRenderer_Scoped()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddGranitTemplating();
 
         services.ShouldContain(d =>
@@ -29,7 +29,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitTemplating_ITextTemplateRenderer_IsReplaceable_WithTryAdd()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddScoped<ITextTemplateRenderer>(_ => null!); // pre-register
         services.AddGranitTemplating();                         // TryAdd must not replace
 
@@ -40,7 +40,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitTemplating_Registers_ITemplateTransitionHook_Singleton()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddGranitTemplating();
 
         services.ShouldContain(d =>
@@ -52,7 +52,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitTemplating_ITemplateTransitionHook_IsReplaceable_WithTryAdd()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddSingleton<ITemplateTransitionHook>(_ => null!); // pre-register
         services.AddGranitTemplating();                              // TryAdd must not replace
 
@@ -63,7 +63,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitTemplating_ITemplateTransitionHook_CanBeReplaced()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddGranitTemplating();
         services.Replace(ServiceDescriptor.Singleton<ITemplateTransitionHook, FakeTransitionHook>());
 
@@ -80,7 +80,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddEmbeddedTemplates_Registers_ITemplateResolver_Singleton()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddEmbeddedTemplates(typeof(ServiceCollectionExtensionsTests).Assembly);
 
         services.ShouldContain(d =>
@@ -91,7 +91,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddEmbeddedTemplates_CalledTwice_RegistersBothResolvers()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddEmbeddedTemplates(typeof(ServiceCollectionExtensionsTests).Assembly);
         services.AddEmbeddedTemplates(typeof(object).Assembly);
 
@@ -106,7 +106,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddTemplateGlobalContext_Registers_As_Singleton()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddTemplateGlobalContext<FakeGlobalContext>();
 
         services.ShouldContain(d =>
@@ -122,7 +122,7 @@ public sealed class ServiceCollectionExtensionsTests
     [Fact]
     public void AddTemplateDataEnricher_Registers_As_Transient()
     {
-        ServiceCollection services = new();
+        ServiceCollection services = [];
         services.AddTemplateDataEnricher<string, FakeEnricher>();
 
         services.ShouldContain(d =>
