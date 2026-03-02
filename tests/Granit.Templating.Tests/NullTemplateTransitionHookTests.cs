@@ -33,12 +33,11 @@ public sealed class NullTemplateTransitionHookTests
     [Fact]
     public async Task OnTransitionedAsync_CompletesImmediately()
     {
-        // Should not throw — no-op implementation
-        await _hook.OnTransitionedAsync(
+        await Should.NotThrowAsync(() => _hook.OnTransitionedAsync(
             Guid.NewGuid(),
             TemplateLifecycleStatus.Draft,
             TemplateLifecycleStatus.Published,
             "alice",
-            TestContext.Current.CancellationToken);
+            TestContext.Current.CancellationToken));
     }
 }

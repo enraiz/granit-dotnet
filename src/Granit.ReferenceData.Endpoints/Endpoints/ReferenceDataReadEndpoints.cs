@@ -31,22 +31,17 @@ internal static class ReferenceDataReadEndpoints
 
     private static async Task<Ok<ReferenceDataListResponse<TEntity>>> GetAllAsync<TEntity>(
         IReferenceDataStore<TEntity> store,
-        bool activeOnly = true,
-        string? search = null,
-        string? sortBy = null,
-        bool descending = false,
-        int? skip = null,
-        int? take = null,
+        [AsParameters] ReferenceDataQueryParameters parameters,
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity
     {
         ReferenceDataQuery query = new(
-            ActiveOnly: activeOnly,
-            SearchTerm: search,
-            SortBy: sortBy,
-            Descending: descending,
-            Skip: skip,
-            Take: take);
+            ActiveOnly: parameters.ActiveOnly,
+            SearchTerm: parameters.Search,
+            SortBy: parameters.SortBy,
+            Descending: parameters.Descending,
+            Skip: parameters.Skip,
+            Take: parameters.Take);
 
         ReferenceDataResult<TEntity> result = await store.GetAllAsync(query, ct);
 

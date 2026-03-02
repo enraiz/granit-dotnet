@@ -60,7 +60,7 @@ public sealed class KeycloakApproverResolverTests : IDisposable
     public async Task ResolveApproversAsync_WithRolesAndUsers_ReturnsUserIds()
     {
         _permissionManager.GetGrantedRolesAsync("workflow.publish", null, Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "editor" });
+            .Returns((IReadOnlyList<string>)["editor"]);
 
         _handler.ResponseBody = """[{"id":"user-1"},{"id":"user-2"}]""";
 
@@ -76,7 +76,7 @@ public sealed class KeycloakApproverResolverTests : IDisposable
     public async Task ResolveApproversAsync_NoRolesGranted_ReturnsEmptyList()
     {
         _permissionManager.GetGrantedRolesAsync("workflow.publish", null, Arg.Any<CancellationToken>())
-            .Returns(new List<string>());
+            .Returns((IReadOnlyList<string>)[]);
 
         IReadOnlyList<string> result = await _resolver.ResolveApproversAsync(
             "workflow.publish", TestContext.Current.CancellationToken);
@@ -88,7 +88,7 @@ public sealed class KeycloakApproverResolverTests : IDisposable
     public async Task ResolveApproversAsync_RoleWithNoUsers_ReturnsEmptyList()
     {
         _permissionManager.GetGrantedRolesAsync("workflow.publish", null, Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "editor" });
+            .Returns((IReadOnlyList<string>)["editor"]);
 
         _handler.ResponseBody = "[]";
 
@@ -102,7 +102,7 @@ public sealed class KeycloakApproverResolverTests : IDisposable
     public async Task ResolveApproversAsync_KeycloakError_ReturnsEmptyList()
     {
         _permissionManager.GetGrantedRolesAsync("workflow.publish", null, Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "editor" });
+            .Returns((IReadOnlyList<string>)["editor"]);
 
         _handler.ResponseStatusCode = System.Net.HttpStatusCode.ServiceUnavailable;
         _handler.ResponseBody = string.Empty;
@@ -117,7 +117,7 @@ public sealed class KeycloakApproverResolverTests : IDisposable
     public async Task ResolveApproversAsync_DuplicateUsersAcrossRoles_ReturnsDeduplicatedList()
     {
         _permissionManager.GetGrantedRolesAsync("workflow.publish", null, Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "editor", "admin" });
+            .Returns((IReadOnlyList<string>)["editor", "admin"]);
 
         // Override handler to return different responses per call.
         MockSequenceHttpMessageHandler sequenceHandler = new(
@@ -155,7 +155,7 @@ public sealed class KeycloakApproverResolverTests : IDisposable
         _currentTenant.Id.Returns(tenantId);
 
         _permissionManager.GetGrantedRolesAsync("workflow.publish", tenantId, Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "editor" });
+            .Returns((IReadOnlyList<string>)["editor"]);
 
         _handler.ResponseBody = """[{"id":"user-1"}]""";
 

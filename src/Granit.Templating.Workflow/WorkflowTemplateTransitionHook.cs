@@ -34,7 +34,7 @@ internal sealed class WorkflowTemplateTransitionHook<TDbContext>(
     public async Task<bool> CanTransitionAsync(
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
-        CancellationToken ct)
+        CancellationToken ct = default)
     {
         WorkflowLifecycleStatus wFrom = ToWorkflow(from);
         WorkflowLifecycleStatus wTo = ToWorkflow(target);
@@ -49,7 +49,7 @@ internal sealed class WorkflowTemplateTransitionHook<TDbContext>(
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
         string userId,
-        CancellationToken ct)
+        CancellationToken ct = default)
     {
         await using TDbContext ctx = await contextFactory.CreateDbContextAsync(ct);
         ctx.WorkflowTransitionRecords.Add(new WorkflowTransitionRecord

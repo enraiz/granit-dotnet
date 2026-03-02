@@ -77,6 +77,8 @@ internal static class TimelineEntryEndpoints
     }
 
     private static async Task<Results<NoContent, NotFound>> DeleteEntryAsync(
+        string entityType,
+        string entityId,
         Guid entryId,
         ITimelineStore store,
         CancellationToken ct)
