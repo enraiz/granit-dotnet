@@ -3,6 +3,9 @@
 # =============================================================================
 # Pipeline : build -> quality -> security -> analysis -> pack -> publish
 #
+# Le stage build valide la compilation et réchauffe le cache NuGet.
+# Les jobs downstream bénéficient du cache NuGet partagé (restore rapide).
+#
 # Les packages NuGet sont publiés sur GitLab Package Registry.
 # Publication automatique sur tag vX.Y.Z sur main.
 #
@@ -58,7 +61,7 @@ stages:
     policy: pull-push
 
 # ---------------------------------------------------------------------------
-# BUILD (single compilation, shared via artifacts)
+# BUILD (validation + NuGet cache warm-up, pas d'artifacts binaires)
 # ---------------------------------------------------------------------------
 
 build:
@@ -67,13 +70,6 @@ build:
   script:
     - dotnet restore
     - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true
-  artifacts:
-    paths:
-      - "**/bin/"
-      - "**/obj/"
-    exclude:
-      - ".nuget/**"
-    expire_in: 1 hour
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -89,8 +85,9 @@ format:
   stage: quality
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
+    - dotnet restore
     - dotnet format --verify-no-changes --no-restore
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -102,11 +99,12 @@ test:
   stage: quality
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   variables:
     VSTEST_CONNECTION_TIMEOUT: "300"
     XUNIT_LAUNCH_TIMEOUT: "300"
   script:
+    - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true
     - >
       dotnet test -c $CONFIGURATION --no-build
       --logger "junit;LogFilePath=TestResults/results.xml"
@@ -129,6 +127,9 @@ test:
 integration-test:
   extends: .dotnet
   stage: quality
+  needs:
+    - job: build
+      artifacts: false
   services:
     - docker:27-dind
   variables:
@@ -191,7 +192,7 @@ sonarqube:
   timeout: 2h
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
     - job: test
       artifacts: true
   variables:
@@ -221,7 +222,7 @@ sonarqube:
       /d:sonar.issue.ignore.multicriteria.e2.ruleKey="external_roslyn:IDE0007"
       /d:sonar.issue.ignore.multicriteria.e2.resourceKey="**/*"
       /d:sonar.qualitygate.wait="true"
-    - dotnet build -c $CONFIGURATION --no-restore
+    - dotnet build -c $CONFIGURATION
     - dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $SONAR_HOST_URL && $SONAR_TOKEN
@@ -234,8 +235,9 @@ audit:nuget:
   stage: analysis
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
+    - dotnet restore
     - dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
     - '! grep -q "has the following vulnerable packages" vulnerability-report.txt'
   artifacts:
@@ -258,10 +260,11 @@ docfx:
   stage: docs
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
     - dotnet tool install -g docfx
     - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet restore
     - docfx metadata docfx.json
     - docfx build docfx.json
   artifacts:
@@ -298,7 +301,7 @@ pack:
   stage: pack
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
     - |
       if [ -n "$CI_COMMIT_TAG" ]; then
@@ -306,6 +309,7 @@ pack:
       else
         VERSION="0.1.0-dev.${CI_PIPELINE_IID}"
       fi
+    - dotnet build -c $CONFIGURATION
     - dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=$VERSION -o ./nupkgs
   artifacts:
     paths:
