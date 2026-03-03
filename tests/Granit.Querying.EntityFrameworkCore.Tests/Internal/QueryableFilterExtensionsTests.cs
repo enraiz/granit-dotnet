@@ -21,7 +21,7 @@ public sealed class ApplyFiltersTests
 
         List<FilterCriteria> criteria = [new("Name", FilterOperator.Eq, "Alice")];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyFilters(criteria, builder)
             .ToList();
 
@@ -39,7 +39,7 @@ public sealed class ApplyFiltersTests
         List<TestProduct> source = [new() { Name = "A", Price = 100 }];
         List<FilterCriteria> criteria = [new("Price", FilterOperator.Gt, "50")];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyFilters(criteria, builder)
             .ToList();
 
@@ -67,7 +67,7 @@ public sealed class ApplyFiltersTests
             new("Price", FilterOperator.Gte, "100"),
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyFilters(criteria, builder)
             .ToList();
 
@@ -82,7 +82,7 @@ public sealed class ApplyFiltersTests
         QueryDefinitionBuilder<TestProduct> builder = new();
         List<TestProduct> source = [new() { Name = "A" }, new() { Name = "B" }];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyFilters([], builder)
             .ToList();
 
@@ -104,7 +104,7 @@ public sealed class ApplyGlobalSearchTests
             new() { Name = "Bob Gadget" },
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyGlobalSearch("Widget", builder)
             .ToList();
 
@@ -120,7 +120,7 @@ public sealed class ApplyGlobalSearchTests
 
         List<TestProduct> source = [new() { Name = "A" }, new() { Name = "B" }];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyGlobalSearch("", builder)
             .ToList();
 
@@ -135,7 +135,7 @@ public sealed class ApplyGlobalSearchTests
 
         List<TestProduct> source = [new() { Name = "A" }];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyGlobalSearch(null!, builder)
             .ToList();
 
@@ -149,7 +149,7 @@ public sealed class ApplyGlobalSearchTests
 
         List<TestProduct> source = [new() { Name = "A" }];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyGlobalSearch("A", builder)
             .ToList();
 
@@ -173,7 +173,7 @@ public sealed class ApplyPresetsTests
             new() { Name = "B", Price = 50 },
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyPresets(null, builder)
             .ToList();
 
@@ -197,7 +197,7 @@ public sealed class ApplyPresetsTests
 
         Dictionary<string, string> presets = new() { ["Status"] = "Cheap" };
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyPresets(presets, builder)
             .ToList();
 
@@ -223,7 +223,7 @@ public sealed class ApplyPresetsTests
 
         Dictionary<string, string> presets = new() { ["Category"] = "Electronics,Books" };
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyPresets(presets, builder)
             .ToList();
 
@@ -253,7 +253,7 @@ public sealed class ApplyPresetsTests
             ["PriceRange"] = "Expensive",
         };
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyPresets(presets, builder)
             .ToList();
 
@@ -267,7 +267,7 @@ public sealed class ApplyPresetsTests
         QueryDefinitionBuilder<TestProduct> builder = new();
         List<TestProduct> source = [new() { Name = "A" }];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplyPresets(null, builder)
             .ToList();
 

@@ -18,7 +18,7 @@ public sealed class CursorEncoderTests
     [Fact]
     public void Roundtrip_guid_as_string()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         string encoded = CursorEncoder.Encode(id.ToString());
         string? decoded = CursorEncoder.Decode<string>(encoded);
 

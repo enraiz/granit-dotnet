@@ -228,7 +228,7 @@ public sealed class FilterExpressionBuilderTests
     [Fact]
     public void Eq_on_guid()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         FilterCriteria criteria = new("Id", FilterOperator.Eq, id.ToString());
 
         Expression<Func<TestProduct, bool>>? expr = FilterExpressionBuilder.Build<TestProduct>(criteria);

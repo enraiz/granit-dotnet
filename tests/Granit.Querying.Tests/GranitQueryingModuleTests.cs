@@ -15,8 +15,6 @@ public sealed class GranitQueryingModuleTests
     }
 
     [Fact]
-    public void Module_is_sealed()
-    {
+    public void Module_is_sealed() =>
         typeof(GranitQueryingModule).IsSealed.ShouldBeTrue();
-    }
 }

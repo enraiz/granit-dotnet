@@ -54,8 +54,8 @@ internal static class QueryableGroupByExtensions
 
         // Materialize groups with count
         // We need to project to a known type
-        List<GroupEntry<T>> groups = await MaterializeGroupsAsync(
-            groupedQuery, property, groupByField, builder, ct).ConfigureAwait(false);
+        List<GroupEntry<T>> groups = await MaterializeGroupsAsync<T>(
+            groupedQuery, property, groupByField, ct).ConfigureAwait(false);
 
         int totalCount = groups.Sum(g => g.Count);
 
@@ -66,15 +66,12 @@ internal static class QueryableGroupByExtensions
         object groupedQuery,
         PropertyInfo property,
         string fieldName,
-        QueryDefinitionBuilder<T> builder,
         CancellationToken ct)
         where T : class
     {
         // Use dynamic approach to handle different key types
         Type keyType = property.PropertyType;
         Type groupingType = typeof(IGrouping<,>).MakeGenericType(keyType, typeof(T));
-        Type enumerableOfGrouping = typeof(IQueryable<>).MakeGenericType(groupingType);
-
         // Select each group's key and count
         // Build: groups.Select(g => new { Key = g.Key, Count = g.Count() })
         ParameterExpression gParam = Expression.Parameter(groupingType, "g");
@@ -110,7 +107,7 @@ internal static class QueryableGroupByExtensions
 
         dynamic task = toListAsync.Invoke(null, [projected, ct])!;
         await task.ConfigureAwait(false);
-        System.Collections.IList materialized = (System.Collections.IList)task.Result;
+        var materialized = (System.Collections.IList)task.Result;
 
         List<GroupEntry<T>> entries = [];
         PropertyInfo keyProp = resultType.GetProperty("Key")!;
