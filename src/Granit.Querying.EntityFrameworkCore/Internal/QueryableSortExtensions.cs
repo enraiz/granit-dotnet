@@ -1,0 +1,93 @@
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace Granit.Querying.EntityFrameworkCore.Internal;
+
+/// <summary>
+/// Extension methods for applying dynamic sorting to an <see cref="IQueryable{T}"/>.
+/// </summary>
+internal static class QueryableSortExtensions
+{
+    /// <summary>
+    /// Parses a sort specification string and applies ordering.
+    /// Format: <c>"-createdAt,lastName"</c> (prefix <c>-</c> for descending).
+    /// Only whitelisted sortable columns are applied.
+    /// </summary>
+    public static IQueryable<TEntity> ApplySort<TEntity>(
+        this IQueryable<TEntity> source,
+        string? sort,
+        QueryDefinitionBuilder<TEntity> builder)
+        where TEntity : class
+    {
+        string effectiveSort = string.IsNullOrWhiteSpace(sort)
+            ? builder.DefaultSortValue ?? string.Empty
+            : sort;
+
+        if (string.IsNullOrWhiteSpace(effectiveSort))
+        {
+            return source;
+        }
+
+        HashSet<string> sortableFields = builder.Columns
+            .Where(c => c.IsSortable)
+            .Select(c => c.PropertyName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        string[] parts = effectiveSort.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        bool isFirst = true;
+
+        foreach (string part in parts)
+        {
+            bool descending = part.StartsWith('-');
+            string fieldName = descending ? part[1..] : part;
+
+            if (!sortableFields.Contains(fieldName))
+            {
+                continue;
+            }
+
+            PropertyInfo? property = typeof(TEntity).GetProperty(
+                fieldName,
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
+            if (property is null)
+            {
+                continue;
+            }
+
+            source = ApplyOrderBy(source, property, descending, isFirst);
+            isFirst = false;
+        }
+
+        return source;
+    }
+
+    private static IQueryable<TEntity> ApplyOrderBy<TEntity>(
+        IQueryable<TEntity> source,
+        PropertyInfo property,
+        bool descending,
+        bool isFirst)
+        where TEntity : class
+    {
+        ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "e");
+        MemberExpression member = Expression.Property(parameter, property);
+        LambdaExpression keySelector = Expression.Lambda(member, parameter);
+
+        string methodName = (isFirst, descending) switch
+        {
+            (true, false) => nameof(Queryable.OrderBy),
+            (true, true) => nameof(Queryable.OrderByDescending),
+            (false, false) => nameof(Queryable.ThenBy),
+            (false, true) => nameof(Queryable.ThenByDescending),
+        };
+
+        MethodCallExpression call = Expression.Call(
+            typeof(Queryable),
+            methodName,
+            [typeof(TEntity), property.PropertyType],
+            source.Expression,
+            Expression.Quote(keySelector));
+
+        return source.Provider.CreateQuery<TEntity>(call);
+    }
+}

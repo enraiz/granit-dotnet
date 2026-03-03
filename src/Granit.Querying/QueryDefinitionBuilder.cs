@@ -1,0 +1,239 @@
+using System.Linq.Expressions;
+using Granit.Querying.Filtering;
+
+namespace Granit.Querying;
+
+/// <summary>
+/// Fluent builder for declaring columns, filter groups, pagination, sorting, and global search
+/// within a <see cref="QueryDefinition{TEntity}"/>.
+/// </summary>
+/// <typeparam name="TEntity">The target entity type.</typeparam>
+public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
+{
+    internal List<ColumnDescriptor> Columns { get; } = [];
+    internal List<FilterGroupDescriptor> FilterGroups { get; } = [];
+    internal List<DateFilterDescriptor> DateFilters { get; } = [];
+    internal List<GroupByDescriptor> GroupByFields { get; } = [];
+    internal List<AggregateDescriptor> Aggregates { get; } = [];
+    internal List<string> GlobalSearchProperties { get; } = [];
+    internal int DefaultPageSizeValue { get; private set; } = 20;
+    internal int MaxPageSizeValue { get; private set; } = 100;
+    internal string? CursorPropertyName { get; private set; }
+    internal string? DefaultSortValue { get; private set; }
+
+    /// <summary>
+    /// Declares a column on the target entity. Only explicitly declared columns are
+    /// exposed to the frontend (whitelist-first).
+    /// </summary>
+    /// <typeparam name="TProp">The property type.</typeparam>
+    /// <param name="property">Expression selecting the property.</param>
+    /// <param name="configure">Optional fluent configuration.</param>
+    public QueryDefinitionBuilder<TEntity> Column<TProp>(
+        Expression<Func<TEntity, TProp>> property,
+        Action<ColumnBuilder<TEntity>>? configure = null)
+    {
+        string propertyName = GetPropertyName(property);
+        ColumnBuilder<TEntity> builder = new();
+        configure?.Invoke(builder);
+
+        Columns.Add(new ColumnDescriptor
+        {
+            PropertyName = propertyName,
+            ClrType = typeof(TProp),
+            Label = builder.LabelValue,
+            Order = builder.OrderValue,
+            IsSortable = builder.IsSortableValue,
+            IsFilterable = builder.IsFilterableValue,
+            IsVisible = builder.IsVisibleValue,
+            Format = builder.FormatValue,
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Declares properties to include in global free-text search.
+    /// </summary>
+    /// <param name="properties">Expressions selecting string properties.</param>
+    public QueryDefinitionBuilder<TEntity> GlobalSearch(
+        params Expression<Func<TEntity, string?>>[] properties)
+    {
+        foreach (Expression<Func<TEntity, string?>> property in properties)
+        {
+            GlobalSearchProperties.Add(GetPropertyName(property));
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Declares a filter group with named presets (Odoo-style).
+    /// Presets within a group use OR semantics; groups are combined with AND.
+    /// </summary>
+    /// <param name="name">Unique name of the filter group.</param>
+    /// <param name="configure">Builder for declaring presets.</param>
+    public QueryDefinitionBuilder<TEntity> FilterGroup(
+        string name,
+        Action<FilterGroupBuilder<TEntity>> configure)
+    {
+        FilterGroupBuilder<TEntity> builder = new();
+        configure(builder);
+
+        FilterGroups.Add(new FilterGroupDescriptor
+        {
+            Name = name,
+            Presets = builder.Presets.AsReadOnly(),
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Declares a filter group with a custom label and named presets.
+    /// </summary>
+    /// <param name="name">Unique name of the filter group.</param>
+    /// <param name="label">User-facing label.</param>
+    /// <param name="configure">Builder for declaring presets.</param>
+    public QueryDefinitionBuilder<TEntity> FilterGroup(
+        string name,
+        string label,
+        Action<FilterGroupBuilder<TEntity>> configure)
+    {
+        FilterGroupBuilder<TEntity> builder = new();
+        configure(builder);
+
+        FilterGroups.Add(new FilterGroupDescriptor
+        {
+            Name = name,
+            Label = label,
+            Presets = builder.Presets.AsReadOnly(),
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Declares a date filter with period shortcuts on a date property.
+    /// </summary>
+    /// <typeparam name="TProp">The date property type.</typeparam>
+    /// <param name="property">Expression selecting the date property.</param>
+    /// <param name="defaultPeriod">The default date period. Default is <see cref="DatePeriod.ThisMonth"/>.</param>
+    public QueryDefinitionBuilder<TEntity> DateFilter<TProp>(
+        Expression<Func<TEntity, TProp>> property,
+        DatePeriod defaultPeriod = DatePeriod.ThisMonth)
+    {
+        DateFilters.Add(new DateFilterDescriptor
+        {
+            PropertyName = GetPropertyName(property),
+            ClrType = typeof(TProp),
+            DefaultPeriod = defaultPeriod,
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Allows grouping by the specified property. Only explicitly declared
+    /// properties can be used for group-by (whitelist-first).
+    /// </summary>
+    /// <typeparam name="TProp">The property type.</typeparam>
+    /// <param name="property">Expression selecting the property.</param>
+    public QueryDefinitionBuilder<TEntity> AllowGroupBy<TProp>(
+        Expression<Func<TEntity, TProp>> property)
+    {
+        GroupByFields.Add(new GroupByDescriptor
+        {
+            PropertyName = GetPropertyName(property),
+            ClrType = typeof(TProp),
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Declares an aggregate computation for grouped queries.
+    /// </summary>
+    /// <typeparam name="TProp">The property type.</typeparam>
+    /// <param name="property">Expression selecting the property to aggregate.</param>
+    /// <param name="function">The aggregate function to apply.</param>
+    /// <param name="alias">Alias for the aggregate result in the response.</param>
+    public QueryDefinitionBuilder<TEntity> Aggregate<TProp>(
+        Expression<Func<TEntity, TProp>> property,
+        AggregateFunction function,
+        string alias)
+    {
+        Aggregates.Add(new AggregateDescriptor
+        {
+            PropertyName = GetPropertyName(property),
+            ClrType = typeof(TProp),
+            Function = function,
+            Alias = alias,
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the default page size. Default is <c>20</c>.
+    /// </summary>
+    /// <param name="size">The default page size.</param>
+    public QueryDefinitionBuilder<TEntity> DefaultPageSize(int size)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(size, 0);
+        DefaultPageSizeValue = size;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the maximum allowed page size. Default is <c>100</c>.
+    /// </summary>
+    /// <param name="size">The maximum page size.</param>
+    public QueryDefinitionBuilder<TEntity> MaxPageSize(int size)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(size, 0);
+        MaxPageSizeValue = size;
+        return this;
+    }
+
+    /// <summary>
+    /// Enables keyset/cursor pagination on the specified property.
+    /// The property must be unique and orderable (typically the primary key).
+    /// </summary>
+    /// <typeparam name="TProp">The property type.</typeparam>
+    /// <param name="property">Expression selecting the cursor property.</param>
+    public QueryDefinitionBuilder<TEntity> SupportsCursorPagination<TProp>(
+        Expression<Func<TEntity, TProp>> property)
+    {
+        CursorPropertyName = GetPropertyName(property);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the default sort specification (e.g. <c>"-createdAt"</c>).
+    /// </summary>
+    /// <param name="sort">The default sort string.</param>
+    public QueryDefinitionBuilder<TEntity> DefaultSort(string sort)
+    {
+        DefaultSortValue = sort;
+        return this;
+    }
+
+    internal static string GetPropertyName<TProp>(Expression<Func<TEntity, TProp>> expression)
+    {
+        MemberExpression? member = expression.Body switch
+        {
+            MemberExpression m => m,
+            UnaryExpression { Operand: MemberExpression m } => m,
+            _ => null,
+        };
+
+        if (member is null || member.Expression is not ParameterExpression)
+        {
+            throw new ArgumentException(
+                "Expression must be a simple property access (e.g. x => x.Name).",
+                nameof(expression));
+        }
+
+        return member.Member.Name;
+    }
+}

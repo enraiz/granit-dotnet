@@ -1,0 +1,210 @@
+using Granit.Querying.EntityFrameworkCore.Internal;
+using Granit.Querying.Filtering;
+using Granit.Querying.Meta;
+using Microsoft.EntityFrameworkCore;
+using Shouldly;
+using Xunit;
+
+namespace Granit.Querying.EntityFrameworkCore.Tests.Internal;
+
+public sealed class QueryEngineTests : IAsyncLifetime
+{
+    private TestDbContext _db = null!;
+
+    private sealed class ProductQueryDefinition : QueryDefinition<TestProduct>
+    {
+        public override string Name => "Test.Products";
+
+        protected override void Configure(QueryDefinitionBuilder<TestProduct> builder) =>
+            builder
+                .Column(p => p.Name, c => c.Label("Name").Sortable().Filterable())
+                .Column(p => p.Price, c => c.Label("Price").Sortable().Filterable())
+                .Column(p => p.Category, c => c.Label("Category").Filterable())
+                .GlobalSearch(p => p.Name)
+                .FilterGroup("Category", g => g
+                    .Preset("Electronics", p => p.Category == ProductCategory.Electronics, isDefault: true))
+                .AllowGroupBy(p => p.Category)
+                .Aggregate(p => p.Price, AggregateFunction.Sum, "totalPrice")
+                .DefaultPageSize(10)
+                .MaxPageSize(50)
+                .DefaultSort("-Price");
+    }
+
+    public async ValueTask InitializeAsync()
+    {
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+
+        _db = new TestDbContext(options);
+
+        _db.Products.AddRange(
+            new TestProduct { Id = Guid.NewGuid(), Name = "Laptop", Price = 1000, IsActive = true, Category = ProductCategory.Electronics },
+            new TestProduct { Id = Guid.NewGuid(), Name = "Novel", Price = 15, IsActive = true, Category = ProductCategory.Books },
+            new TestProduct { Id = Guid.NewGuid(), Name = "T-Shirt", Price = 25, IsActive = true, Category = ProductCategory.Clothing },
+            new TestProduct { Id = Guid.NewGuid(), Name = "Phone", Price = 800, IsActive = true, Category = ProductCategory.Electronics },
+            new TestProduct { Id = Guid.NewGuid(), Name = "Headset", Price = 200, IsActive = true, Category = ProductCategory.Electronics });
+
+        await _db.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _db.Dispose();
+        return ValueTask.CompletedTask;
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_returns_paged_result()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest(),
+            TestContext.Current.CancellationToken);
+
+        // Default preset filters to Electronics only (3 items)
+        result.TotalCount.ShouldBe(3);
+        result.Items.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_applies_filter()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest
+            {
+                Filter = new Dictionary<string, string> { ["Price.gte"] = "500" },
+                Presets = new Dictionary<string, string> { ["Category"] = "Electronics" },
+            },
+            TestContext.Current.CancellationToken);
+
+        result.Items.ShouldAllBe(p => p.Price >= 500);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_applies_search()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest
+            {
+                Search = "Laptop",
+                Presets = new Dictionary<string, string> { ["Category"] = "Electronics" },
+            },
+            TestContext.Current.CancellationToken);
+
+        result.Items.Count.ShouldBe(1);
+        result.Items[0].Name.ShouldBe("Laptop");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_applies_sort()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest
+            {
+                Sort = "Price",
+                Presets = new Dictionary<string, string> { ["Category"] = "Electronics" },
+            },
+            TestContext.Current.CancellationToken);
+
+        result.Items[0].Price.ShouldBeLessThanOrEqualTo(result.Items[1].Price);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_clamps_page_size()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest { PageSize = 1000 },
+            TestContext.Current.CancellationToken);
+
+        result.Items.Count.ShouldBeLessThanOrEqualTo(50);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_pages_correctly()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        PagedResult<TestProduct> page1 = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest
+            {
+                Page = 1,
+                PageSize = 2,
+                Presets = new Dictionary<string, string> { ["Category"] = "Electronics" },
+            },
+            TestContext.Current.CancellationToken);
+
+        PagedResult<TestProduct> page2 = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest
+            {
+                Page = 2,
+                PageSize = 2,
+                Presets = new Dictionary<string, string> { ["Category"] = "Electronics" },
+            },
+            TestContext.Current.CancellationToken);
+
+        page1.Items.Count.ShouldBe(2);
+        page2.Items.Count.ShouldBe(1);
+        page1.TotalCount.ShouldBe(3);
+    }
+
+    [Fact]
+    public void GetMetadata_returns_complete_metadata()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        QueryMetadata metadata = engine.GetMetadata();
+
+        metadata.Columns.Count.ShouldBe(3);
+        metadata.FilterableFields.Count.ShouldBe(3);
+        metadata.SortableFields.Count.ShouldBe(2);
+        metadata.PresetFilterGroups.Count.ShouldBe(1);
+        metadata.GroupByFields.Count.ShouldBe(1);
+        metadata.Pagination.DefaultPageSize.ShouldBe(10);
+        metadata.Pagination.MaxPageSize.ShouldBe(50);
+        metadata.Pagination.SupportsCursor.ShouldBeFalse();
+        metadata.DefaultSort.ShouldBe("-Price");
+    }
+
+    [Fact]
+    public void GetMetadata_includes_filter_operators_for_fields()
+    {
+        ProductQueryDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        QueryMetadata metadata = engine.GetMetadata();
+
+        FilterableFieldDto nameField = metadata.FilterableFields
+            .First(f => f.Name == "Name");
+        nameField.Operators.ShouldContain(FilterOperator.Contains);
+        nameField.Operators.ShouldContain(FilterOperator.Eq);
+
+        FilterableFieldDto priceField = metadata.FilterableFields
+            .First(f => f.Name == "Price");
+        priceField.Operators.ShouldContain(FilterOperator.Gt);
+        priceField.Operators.ShouldContain(FilterOperator.Between);
+    }
+}
