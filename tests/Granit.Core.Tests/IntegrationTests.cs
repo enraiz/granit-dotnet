@@ -68,17 +68,17 @@ public sealed class IntegrationTests
     public void AddGranit_RegistersGranitApplicationAsSingleton()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
         // Act
         builder.AddGranit<TestRootModule>();
-        using var app = builder.Build();
+        using WebApplication app = builder.Build();
 
         // Assert
-        var granitApp = app.Services.GetService<GranitApplication>();
+        GranitApplication? granitApp = app.Services.GetService<GranitApplication>();
         granitApp.ShouldNotBeNull();
 
-        var secondResolve = app.Services.GetService<GranitApplication>();
+        GranitApplication? secondResolve = app.Services.GetService<GranitApplication>();
         secondResolve.ShouldBeSameAs(granitApp);
     }
 
@@ -86,14 +86,14 @@ public sealed class IntegrationTests
     public void AddGranit_ModuleServicesAreRegistered()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
         // Act
         builder.AddGranit<TestRootModule>();
-        using var app = builder.Build();
+        using WebApplication app = builder.Build();
 
         // Assert - TestLeafModule enregistre ITestService
-        var service = app.Services.GetService<ITestService>();
+        ITestService? service = app.Services.GetService<ITestService>();
         service.ShouldNotBeNull();
     }
 
@@ -101,9 +101,9 @@ public sealed class IntegrationTests
     public void UseGranit_CallsOnApplicationInitialization()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.AddGranit<TestRootModule>();
-        using var app = builder.Build();
+        using WebApplication app = builder.Build();
 
         // Act
         app.UseGranit();
@@ -116,14 +116,14 @@ public sealed class IntegrationTests
     public void AddGranit_ModuleTypesAreInTopologicalOrder()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
         // Act
         builder.AddGranit<TestRootModule>();
-        using var app = builder.Build();
+        using WebApplication app = builder.Build();
 
         // Assert
-        var granitApp = app.Services.GetRequiredService<GranitApplication>();
+        GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
         granitApp.GetModuleTypes().ShouldBe(new[] { typeof(TestLeafModule),
             typeof(TestRootModule) });
     }
@@ -134,17 +134,17 @@ public sealed class IntegrationTests
     public async Task AddGranitAsync_RegistersGranitApplicationAsSingleton()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
         // Act
         await builder.AddGranitAsync<AsyncTestRootModule>();
-        await using var app = builder.Build();
+        await using WebApplication app = builder.Build();
 
         // Assert
-        var granitApp = app.Services.GetService<GranitApplication>();
+        GranitApplication? granitApp = app.Services.GetService<GranitApplication>();
         granitApp.ShouldNotBeNull();
 
-        var secondResolve = app.Services.GetService<GranitApplication>();
+        GranitApplication? secondResolve = app.Services.GetService<GranitApplication>();
         secondResolve.ShouldBeSameAs(granitApp);
     }
 
@@ -152,14 +152,14 @@ public sealed class IntegrationTests
     public async Task AddGranitAsync_ModuleServicesAreRegistered()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
         // Act
         await builder.AddGranitAsync<AsyncTestRootModule>();
-        await using var app = builder.Build();
+        await using WebApplication app = builder.Build();
 
         // Assert - AsyncTestLeafModule enregistre ITestService via ConfigureServicesAsync
-        var service = app.Services.GetService<ITestService>();
+        ITestService? service = app.Services.GetService<ITestService>();
         service.ShouldNotBeNull();
     }
 
@@ -167,9 +167,9 @@ public sealed class IntegrationTests
     public async Task UseGranitAsync_CallsOnApplicationInitializationAsync()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
         await builder.AddGranitAsync<AsyncTestRootModule>();
-        await using var app = builder.Build();
+        await using WebApplication app = builder.Build();
 
         // Act
         await app.UseGranitAsync();
@@ -182,14 +182,14 @@ public sealed class IntegrationTests
     public async Task AddGranitAsync_ModuleTypesAreInTopologicalOrder()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
         // Act
         await builder.AddGranitAsync<AsyncTestRootModule>();
-        await using var app = builder.Build();
+        await using WebApplication app = builder.Build();
 
         // Assert
-        var granitApp = app.Services.GetRequiredService<GranitApplication>();
+        GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
         granitApp.GetModuleTypes().ShouldBe(new[] { typeof(AsyncTestLeafModule),
             typeof(AsyncTestRootModule) });
     }

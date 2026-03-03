@@ -51,8 +51,8 @@ public sealed class AuditableEntityInterceptorTests
     public async Task SaveChangesAsync_OnAdd_SetsCreatedFields()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestEntity { Name = "Test" };
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new TestEntity { Name = "Test" };
         context.TestEntities.Add(entity);
 
         // Act
@@ -68,8 +68,8 @@ public sealed class AuditableEntityInterceptorTests
     public async Task SaveChangesAsync_OnModify_SetsModifiedFields()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestEntity
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new TestEntity
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -95,8 +95,8 @@ public sealed class AuditableEntityInterceptorTests
     public async Task SaveChangesAsync_OnModify_DoesNotOverwriteCreatedFields()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestEntity
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new TestEntity
         {
             Id = Guid.NewGuid(),
             Name = "Original"
@@ -105,7 +105,7 @@ public sealed class AuditableEntityInterceptorTests
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Capture the creation values set by the interceptor during Add
-        var originalCreatedAt = entity.CreatedAt;
+        DateTimeOffset originalCreatedAt = entity.CreatedAt;
         string originalCreatedBy = entity.CreatedBy;
 
         // Advance time for the Modify
@@ -130,8 +130,8 @@ public sealed class AuditableEntityInterceptorTests
     {
         // Arrange
         _currentUserService.UserId.Returns((string?)null);
-        await using var context = CreateContext();
-        var entity = new TestEntity { Name = "Test" };
+        await using TestDbContext context = CreateContext();
+        TestEntity entity = new TestEntity { Name = "Test" };
         context.TestEntities.Add(entity);
 
         // Act
@@ -143,8 +143,8 @@ public sealed class AuditableEntityInterceptorTests
 
     private TestDbContext CreateContext()
     {
-        var interceptor = new AuditedEntityInterceptor(_currentUserService, _clock, _guidGenerator, _currentTenant);
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        AuditedEntityInterceptor interceptor = new AuditedEntityInterceptor(_currentUserService, _clock, _guidGenerator, _currentTenant);
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(interceptor)
             .Options;
