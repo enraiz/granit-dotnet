@@ -35,14 +35,14 @@ public static class SettingsServiceCollectionExtensions
         // Default in-memory store (replaced by EfCoreSettingStore in production)
         services.TryAddSingleton<ISettingStore, InMemorySettingStore>();
 
-        // Providers (Singleton — no per-request state)
-        services.AddSingleton<ISettingValueProvider, UserSettingValueProvider>();
-        services.AddSingleton<ISettingValueProvider, TenantSettingValueProvider>();
-        services.AddSingleton<ISettingValueProvider, GlobalSettingValueProvider>();
-        services.AddSingleton<ISettingValueProvider, ConfigurationSettingValueProvider>();
-        services.AddSingleton<ISettingValueProvider, DefaultValueSettingValueProvider>();
+        // Providers (Scoped — UserSettingValueProvider depends on ICurrentUserService)
+        services.AddScoped<ISettingValueProvider, UserSettingValueProvider>();
+        services.AddScoped<ISettingValueProvider, TenantSettingValueProvider>();
+        services.AddScoped<ISettingValueProvider, GlobalSettingValueProvider>();
+        services.AddScoped<ISettingValueProvider, ConfigurationSettingValueProvider>();
+        services.AddScoped<ISettingValueProvider, DefaultValueSettingValueProvider>();
 
-        services.TryAddSingleton<SettingValueProviderManager>();
+        services.TryAddScoped<SettingValueProviderManager>();
 
         // Application services (Scoped — tenant/user context per request)
         services.TryAddScoped<ISettingProvider, SettingProvider>();

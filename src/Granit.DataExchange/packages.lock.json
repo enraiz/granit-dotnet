@@ -44,6 +44,12 @@
           "SmartFormat": "[3.*, )"
         }
       },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
       "granit.timing": {
         "type": "Project",
         "dependencies": {

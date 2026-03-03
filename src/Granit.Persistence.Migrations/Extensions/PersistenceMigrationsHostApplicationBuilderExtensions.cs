@@ -1,4 +1,6 @@
+using System.Threading.Channels;
 using Granit.Persistence.Migrations.Internal;
+using Granit.Persistence.Migrations.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -78,6 +80,12 @@ public static class PersistenceMigrationsHostApplicationBuilderExtensions
         // Default no-op enumerator. Applications using Tenant-per-Schema or Tenant-per-Database
         // must register their own ITenantEnumerator BEFORE calling this method.
         builder.Services.TryAddSingleton<ITenantEnumerator, NullTenantEnumerator>();
+
+        // Channel-based dispatch (default). Replaced by Granit.Persistence.Migrations.Wolverine if installed.
+        builder.Services.TryAddSingleton(Channel.CreateUnbounded<RunMigrationBatchCommand>());
+        builder.Services.TryAddSingleton<IMigrationBatchDispatcher, ChannelBatchDispatcher>();
+        builder.Services.AddScoped<MigrationBatchExecutor>();
+        builder.Services.AddHostedService<MigrationBatchWorker>();
 
         // Hosted service — resumes pending and in-progress cycles at startup.
         builder.Services.AddHostedService<MigrationStartupService>();

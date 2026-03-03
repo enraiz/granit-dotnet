@@ -130,6 +130,110 @@ public static class TaskEndpointRouteBuilderExtensions
 }
 ```
 
+### Qualité du document OpenAPI
+
+Le document OpenAPI est le **contrat** entre le backend et ses consommateurs (frontend,
+clients générés, portail développeur). Chaque endpoint doit produire une sortie OpenAPI
+complète et correcte. Les règles suivantes sont **obligatoires**.
+
+#### `TypedResults` obligatoire (pas `Results`)
+
+Les handlers Minimal API doivent retourner des types concrets (`TypedResults.*`) et non
+des interfaces (`Results.*`). ASP.NET déduit automatiquement les schémas et codes de
+retour à partir des types concrets, alors que `IResult` produit un 200 opaque sans
+schéma.
+
+```csharp
+// ✅ TypedResults — OpenAPI affiche 200 + schéma TaskDto
+private static async Task<Ok<TaskDto>> GetTaskAsync(
+    Guid id, ITaskStore store)
+{
+    TaskDto task = await store.GetAsync(id).ConfigureAwait(false);
+    return TypedResults.Ok(task);
+}
+
+// ❌ Results — OpenAPI affiche 200 sans schéma
+app.MapGet("/tasks/{id}", async (Guid id, ITaskStore store) =>
+    Results.Ok(await store.GetAsync(id)));
+```
+
+Pour les endpoints avec plusieurs codes de retour, utiliser `Results<T1, T2>` :
+
+```csharp
+private static async Task<Results<Ok<TaskDto>, NotFound>> GetTaskAsync(
+    Guid id, ITaskStore store)
+{
+    TaskDto? task = await store.FindAsync(id).ConfigureAwait(false);
+    return task is not null
+        ? TypedResults.Ok(task)
+        : TypedResults.NotFound();
+}
+```
+
+#### Types anonymes interdits
+
+Ne jamais retourner de type anonyme (`new { count }`) dans un handler. Créer un record
+typé pour que le schéma OpenAPI soit déterministe et nommé.
+
+```csharp
+// ✅ Record typé — OpenAPI affiche un schéma "UnreadCountResponse"
+public sealed record UnreadCountResponse(int Count);
+
+private static async Task<Ok<UnreadCountResponse>> GetUnreadCountAsync(...)
+    => TypedResults.Ok(new UnreadCountResponse(count));
+
+// ❌ Type anonyme — schéma OpenAPI non nommé et fragile
+app.MapGet("/unread-count", () => Results.Ok(new { count = 42 }));
+```
+
+#### `.Produces<T>()` en fallback
+
+Quand un handler ne peut pas utiliser `TypedResults` (logique de validation
+complexe retournant `IResult`), déclarer les métadonnées manuellement :
+
+```csharp
+group.MapGet("/localization", GetLocalizationAsync)
+    .Produces<ApplicationLocalizationResponse>();
+
+group.MapPut("/overrides/{key}", SetOverrideAsync)
+    .Produces(StatusCodes.Status204NoContent);
+```
+
+#### Codes HTTP sémantiques
+
+| Opération | Code | Retour |
+| --------- | ---- | ------ |
+| Lecture | 200 | `Ok<T>` |
+| Création | 201 | `Created` + header `Location` |
+| Traitement asynchrone | 202 | `Accepted` + identifiant de suivi |
+| Mise à jour / suppression sans body | 204 | `NoContent` |
+
+> Voir [réponses HTTP](../../framework/api/http-responses.md) pour le détail de chaque
+> code.
+
+#### Métadonnées obligatoires sur chaque endpoint
+
+| Méthode | Effet OpenAPI |
+| ------- | ------------- |
+| `.WithName("GetTask")` | `operationId` — utilisé par les clients générés |
+| `.WithSummary("Returns a task by ID.")` | Ligne de résumé dans l'UI Scalar |
+| `.WithTags("Tasks")` | Groupement par tag dans la documentation |
+
+Les handlers **doivent** être des méthodes nommées statiques (pas des lambdas inline).
+Cela améliore la lisibilité, permet l'inférence des types de retour par ASP.NET,
+et facilite les tests unitaires.
+
+```csharp
+// ✅ Méthode nommée statique
+group.MapGet("/{id:guid}", GetTaskAsync)
+    .WithName("GetTask")
+    .WithSummary("Returns a task by its unique identifier.");
+
+// ❌ Lambda inline — pas d'inférence de type, illisible
+group.MapGet("/{id:guid}", async (Guid id, ITaskStore store) =>
+    TypedResults.Ok(await store.GetAsync(id)));
+```
+
 > Voir aussi : [tutoriel endpoints](../demarrage-rapide/05-endpoints.md),
 > [versioning API](../../framework/api/api-versioning.md),
 > [réponses HTTP](../../framework/api/http-responses.md),

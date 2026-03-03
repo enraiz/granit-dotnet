@@ -5,14 +5,10 @@ namespace Granit.DataExchange.Export;
 /// Uses the Fluent API pattern — no attributes on the domain model.
 /// </summary>
 /// <typeparam name="TEntity">The source entity type.</typeparam>
-/// <typeparam name="TFilter">
-/// The filter type used to restrict exported data.
-/// Use <see cref="EmptyExportFilter"/> when no filtering is needed.
-/// </typeparam>
 /// <remarks>
 /// <para>
 /// Each export definition is registered as a singleton via
-/// <c>services.AddExportDefinition&lt;TEntity, TFilter, TDefinition&gt;()</c>.
+/// <c>services.AddExportDefinition&lt;TEntity, TDefinition&gt;()</c>.
 /// The <see cref="Configure"/> method is called once at startup.
 /// </para>
 /// <para>
@@ -20,11 +16,17 @@ namespace Granit.DataExchange.Export;
 /// declared in <see cref="Configure"/> are available for export (whitelist).
 /// </para>
 /// <para>
+/// When <see cref="QueryDefinitionName"/> is set, the export pipeline delegates
+/// filtering and sorting to <c>IQueryEngine&lt;TEntity&gt;</c> from Granit.Querying,
+/// reusing the same pipeline as the grid view.
+/// </para>
+/// <para>
 /// Example:
 /// <code>
-/// public sealed class PatientExportDefinition : ExportDefinition&lt;Patient, PatientExportFilter&gt;
+/// public sealed class PatientExportDefinition : ExportDefinition&lt;Patient&gt;
 /// {
 ///     public override string Name =&gt; "Guava.PatientExport";
+///     public override string? QueryDefinitionName =&gt; "Guava.Patients";
 ///     protected override void Configure(ExportDefinitionBuilder&lt;Patient&gt; builder)
 ///     {
 ///         builder
@@ -37,9 +39,8 @@ namespace Granit.DataExchange.Export;
 /// </code>
 /// </para>
 /// </remarks>
-public abstract class ExportDefinition<TEntity, TFilter> : IExportDefinitionDescriptor
+public abstract class ExportDefinition<TEntity> : IExportDefinitionDescriptor
     where TEntity : class
-    where TFilter : class
 {
     private ExportDefinitionBuilder<TEntity>? _builder;
 
@@ -51,8 +52,13 @@ public abstract class ExportDefinition<TEntity, TFilter> : IExportDefinitionDesc
     /// <inheritdoc/>
     public Type EntityType => typeof(TEntity);
 
-    /// <inheritdoc/>
-    public Type FilterType => typeof(TFilter);
+    /// <summary>
+    /// Name of the associated <c>QueryDefinition</c> for filtering and sorting.
+    /// When set, the export pipeline uses <c>IQueryEngine</c> to apply the same
+    /// filtering/sorting pipeline as the grid view.
+    /// When <c>null</c>, no filtering or sorting is applied (export all data).
+    /// </summary>
+    public virtual string? QueryDefinitionName => null;
 
     /// <summary>
     /// Supported output formats. Default: <c>["xlsx", "csv"]</c>.
@@ -95,10 +101,3 @@ public abstract class ExportDefinition<TEntity, TFilter> : IExportDefinitionDesc
     /// </summary>
     public bool GetIncludeBusinessKey() => GetBuilder().IncludeBusinessKeyFlag;
 }
-
-/// <summary>
-/// Convenience base class for export definitions that don't require filtering.
-/// </summary>
-/// <typeparam name="TEntity">The source entity type.</typeparam>
-public abstract class ExportDefinition<TEntity> : ExportDefinition<TEntity, EmptyExportFilter>
-    where TEntity : class;

@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Asp.Versioning;
 using Granit.ApiDocumentation.Options;
 using Granit.ApiDocumentation.Transformers;
@@ -59,6 +60,7 @@ public static class ApiDocumentationServiceCollectionExtensions
         services.AddTransient<TenantHeaderOperationTransformer>();
         services.AddTransient<WolverineOpenApiOperationTransformer>();
         services.AddTransient<ProblemDetailsResponseOperationTransformer>();
+        services.AddTransient<SecurityRequirementOperationTransformer>();
 
         foreach (int majorVersion in options.MajorVersions)
         {
@@ -78,6 +80,17 @@ public static class ApiDocumentationServiceCollectionExtensions
                             ? new OpenApiContact { Email = options.ContactEmail }
                             : null,
                     };
+
+                    if (!string.IsNullOrEmpty(options.LogoUrl))
+                    {
+                        doc.Info.Extensions ??= new Dictionary<string, IOpenApiExtension>();
+                        doc.Info.Extensions["x-logo"] = new JsonNodeExtension(new JsonObject
+                        {
+                            ["url"] = options.LogoUrl,
+                            ["altText"] = options.Title,
+                        });
+                    }
+
                     return Task.CompletedTask;
                 });
 
@@ -86,6 +99,7 @@ public static class ApiDocumentationServiceCollectionExtensions
                 openApiOptions.AddOperationTransformer<TenantHeaderOperationTransformer>();
                 openApiOptions.AddOperationTransformer<WolverineOpenApiOperationTransformer>();
                 openApiOptions.AddOperationTransformer<ProblemDetailsResponseOperationTransformer>();
+                openApiOptions.AddOperationTransformer<SecurityRequirementOperationTransformer>();
             });
         }
     }

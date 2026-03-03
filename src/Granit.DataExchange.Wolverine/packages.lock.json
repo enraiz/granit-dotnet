@@ -4,7 +4,7 @@
     "net10.0": {
       "WolverineFx": {
         "type": "Direct",
-        "requested": "[5.*, )",
+        "requested": "[5.17.*, )",
         "resolved": "5.17.0",
         "contentHash": "B7EWuzVBuyJaYoAsTEnKBKMjR+1DhjleopbHF9S2jzj0G7T3s/movynOgtq2CqlVi2EMRIyOrPhAlSm9wSPrtA==",
         "dependencies": {
@@ -488,6 +488,7 @@
         "type": "Project",
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )"
         }
@@ -506,6 +507,12 @@
           "Microsoft.Extensions.Localization": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "SmartFormat": "[3.*, )"
+        }
+      },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.security": {
@@ -536,8 +543,8 @@
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
-          "WolverineFx": "[5.*, )",
-          "WolverineFx.FluentValidation": "[5.*, )"
+          "WolverineFx": "[5.17.*, )",
+          "WolverineFx.FluentValidation": "[5.17.*, )"
         }
       },
       "FluentValidation": {
@@ -679,7 +686,7 @@
       },
       "WolverineFx.FluentValidation": {
         "type": "CentralTransitive",
-        "requested": "[5.*, )",
+        "requested": "[5.17.*, )",
         "resolved": "5.17.0",
         "contentHash": "554SLOp+oACJx5SelHLzWiURh599xQXBFdNw/cfdS+WfYQ4s7ofXJs+X+0lubkAMTLB32wXjxLmbbILzwtAcEA==",
         "dependencies": {

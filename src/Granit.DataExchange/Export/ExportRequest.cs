@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace Granit.DataExchange.Export;
 
 /// <summary>
@@ -15,14 +13,30 @@ namespace Granit.DataExchange.Export;
 /// Whether to include the entity ID column for roundtrip import
 /// (Odoo <c>"I want to update data"</c> pattern).
 /// </param>
-/// <param name="FilterJson">
-/// Serialized filter matching the definition's <c>TFilter</c> type.
-/// Deserialized by the orchestrator into the strongly-typed filter object.
+/// <param name="Sort">
+/// Comma-separated sort specification (e.g. <c>"-createdAt,lastName"</c>).
+/// Uses the same syntax as <c>QueryRequest.Sort</c>.
+/// <c>null</c> means no sorting (use default order).
+/// </param>
+/// <param name="Filter">
+/// Filter criteria using the <c>filter[field.op]=value</c> syntax.
+/// Same format as <c>QueryRequest.Filter</c>.
 /// <c>null</c> means no filtering (export all).
+/// </param>
+/// <param name="Presets">
+/// Active preset names, keyed by filter group name.
+/// Same format as <c>QueryRequest.Presets</c>.
+/// </param>
+/// <param name="Search">
+/// Free-text search applied to the definition's global search properties.
+/// Same as <c>QueryRequest.Search</c>.
 /// </param>
 public sealed record ExportRequest(
     string DefinitionName,
     string Format,
     IReadOnlyList<string>? SelectedFields,
     bool IncludeIdForImport,
-    JsonElement? FilterJson);
+    string? Sort,
+    IReadOnlyDictionary<string, string>? Filter,
+    IReadOnlyDictionary<string, string>? Presets,
+    string? Search);

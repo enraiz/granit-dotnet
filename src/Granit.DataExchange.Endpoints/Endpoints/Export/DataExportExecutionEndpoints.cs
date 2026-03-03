@@ -59,7 +59,10 @@ internal static class DataExportExecutionEndpoints
             request.Format,
             request.SelectedFields,
             request.IncludeIdForImport,
-            request.Filter);
+            request.Sort,
+            request.Filter,
+            request.Presets,
+            request.Search);
 
         ExportJobResult result = await orchestrator.ExportAsync(exportRequest, ct).ConfigureAwait(false);
 

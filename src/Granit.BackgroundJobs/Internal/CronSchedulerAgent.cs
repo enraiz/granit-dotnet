@@ -1,5 +1,6 @@
 using Cronos;
 using Granit.Timing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Wolverine;
 using Wolverine.Runtime.Agents;
@@ -27,7 +28,7 @@ namespace Granit.BackgroundJobs.Internal;
 /// </remarks>
 internal sealed partial class CronSchedulerAgent(
     IBackgroundJobStore store,
-    IMessageBus bus,
+    IServiceScopeFactory scopeFactory,
     IClock clock,
     ILogger<CronSchedulerAgent> logger) : SingularAgent("granit-background-jobs")
 {
@@ -52,6 +53,9 @@ internal sealed partial class CronSchedulerAgent(
             }
 
             object message = CreateMessage(job.MessageType, job.JobName);
+
+            await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
+            IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
             await bus.ScheduleAsync(message, next.Value).ConfigureAwait(false);
             await store.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken).ConfigureAwait(false);
             LogJobScheduled(logger, job.JobName, next.Value);

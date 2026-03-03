@@ -19,15 +19,20 @@ namespace Granit.Guids.Tests;
 public sealed class SequentialGuidGeneratorTests
 {
     private static SequentialGuidGenerator CreateGenerator(
-        SequentialGuidType? guidType = null)
+        SequentialGuidType? guidType = null,
+        IClock? clock = null)
     {
         IOptions<GuidGeneratorOptions> options = Substitute.For<IOptions<GuidGeneratorOptions>>();
         options.Value.Returns(new GuidGeneratorOptions
         {
             DefaultSequentialGuidType = guidType
         });
-        IClock clock = Substitute.For<IClock>();
-        clock.Now.Returns(_ => DateTimeOffset.UtcNow);
+        if (clock is null)
+        {
+            clock = Substitute.For<IClock>();
+            clock.Now.Returns(_ => DateTimeOffset.UtcNow);
+        }
+
         return new SequentialGuidGenerator(options, clock);
     }
 
@@ -62,17 +67,20 @@ public sealed class SequentialGuidGeneratorTests
     }
 
     [Fact]
-    public async Task Create_SequentialAsString_GeneratesOrderedGuids()
+    public void Create_SequentialAsString_GeneratesOrderedGuids()
     {
-        // Arrange
-        SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAsString);
+        // Arrange — horloge deterministe pour eviter le flaky timing sur CI
+        DateTimeOffset baseTime = DateTimeOffset.UtcNow;
+        int callCount = 0;
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(_ => baseTime.AddMilliseconds(callCount++));
+        SequentialGuidGenerator generator = CreateGenerator(SequentialGuidType.SequentialAsString, clock);
         List<string> guids = [];
 
-        // Act - delai entre chaque batch pour garantir des timestamps differents
+        // Act
         for (int i = 0; i < 5; i++)
         {
             guids.Add(generator.Create().ToString());
-            await Task.Delay(2, TestContext.Current.CancellationToken);
         }
 
         // Assert - les representations string doivent etre en ordre croissant
@@ -106,17 +114,20 @@ public sealed class SequentialGuidGeneratorTests
     }
 
     [Fact]
-    public async Task Create_DefaultsToSequentialAsString()
+    public void Create_DefaultsToSequentialAsString()
     {
-        // Arrange - pas de type specifie, le defaut doit etre SequentialAsString
-        SequentialGuidGenerator generator = CreateGenerator();
+        // Arrange — horloge deterministe, pas de type specifie (defaut = SequentialAsString)
+        DateTimeOffset baseTime = DateTimeOffset.UtcNow;
+        int callCount = 0;
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(_ => baseTime.AddMilliseconds(callCount++));
+        SequentialGuidGenerator generator = CreateGenerator(clock: clock);
         List<string> guids = [];
 
-        // Act - delai entre chaque batch pour garantir des timestamps differents
+        // Act
         for (int i = 0; i < 5; i++)
         {
             guids.Add(generator.Create().ToString());
-            await Task.Delay(2, TestContext.Current.CancellationToken);
         }
 
         // Assert - si le defaut est SequentialAsString, les strings sont ordonnees

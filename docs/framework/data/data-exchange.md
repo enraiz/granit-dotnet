@@ -1,14 +1,19 @@
 # Data Exchange
 
-`Granit.DataExchange` est le socle du pipeline d'import de données du framework Granit.
-Il fournit un mini-ETL intégré : **Extract → Map → Validate → Execute**, avec un moteur
-de suggestion de mapping intelligent à 4 niveaux et un support de roundtrip
-(INSERT vs UPDATE).
+`Granit.DataExchange` est le socle des pipelines d'import et d'export de données du
+framework Granit. Il fournit :
+
+- **Import** : un mini-ETL intégré **Extract → Map → Validate → Execute**, avec un
+  moteur de suggestion de mapping intelligent à 4 niveaux et un support de roundtrip
+  (INSERT vs UPDATE).
+- **Export** : un pipeline de génération de fichiers (CSV, Excel) avec définition
+  fluente, presets sauvegardables, intégration `QueryDefinition` pour le
+  filtrage/tri, et support de background jobs.
 
 ```text
-Granit.Core + Granit.Timing + Granit.Validation
+Granit.Core + Granit.Timing + Granit.Validation + Granit.Querying
                     │
-            Granit.DataExchange           ← socle (interfaces + pipeline)
+            Granit.DataExchange           ← socle (interfaces + pipelines)
             ┌───────┼────────┐
             │       │        │
      .Csv (Sep)  .Excel   .EntityFrameworkCore
@@ -39,8 +44,10 @@ dotnet add package Granit.DataExchange.Excel
 
 ## Enregistrement DI
 
+### Import
+
 ```csharp
-// Socle (interfaces, pipeline, options)
+// Socle import (interfaces, pipeline, options)
 services.AddGranitDataExchange();
 
 // Parseurs (au moins un requis)
@@ -52,6 +59,23 @@ services.AddImportDefinition<Patient, PatientImportDefinition>();
 
 // IA optionnelle (remplace le NullSemanticMappingService par défaut)
 services.AddSemanticMappingService<MistralSemanticMappingService>();
+```
+
+### Export
+
+```csharp
+// Socle export (orchestrateur, options, dispatch)
+services.AddGranitDataExport();
+
+// Définition d'export par entité
+services.AddExportDefinition<Patient, PatientExportDefinition>();
+
+// Data source (accès aux données + sécurité)
+services.AddScoped<IExportDataSource<Patient>, PatientExportDataSource>();
+
+// Writers (au moins un requis)
+services.AddSingleton<IExportWriter, CsvExportWriter>();
+services.AddSingleton<IExportWriter, ClosedXmlExportWriter>();
 ```
 
 ## Pipeline
@@ -504,7 +528,226 @@ envoyer la commande en arrière-plan. L'implémentation par défaut utilise un
 Les applications utilisant Wolverine peuvent remplacer le dispatcher pour
 bénéficier du Outbox.
 
+---
+
+## Export de données
+
+Le pipeline d'export génère des fichiers CSV ou Excel à partir d'une
+`ExportDefinition<TEntity>`. Il s'intègre avec `Granit.Querying` pour
+réutiliser le même filtrage/tri que la grille.
+
+```text
+ExportRequest (front-end)
+       │
+       ▼
+IExportOrchestrator.ExportAsync()
+       │  1. Résout ExportDefinition<T> par nom
+       │  2. Crée un ExportJob (Queued)
+       │  3. Dispatch ExecuteExportCommand
+       ▼
+IExportOrchestrator.ExecuteAsync()
+       │  1. Résout IExportDataSource<T> → IQueryable<T>
+       │  2. Si QueryDefinitionName → IQueryEngine<T>.ExecuteStreamAsync()
+       │     (applique Filter, Sort, Presets, Search — pas de pagination)
+       │  3. Sinon → itère le IQueryable directement
+       │  4. Projette chaque entité en dictionnaire (champs sélectionnés)
+       │  5. IExportWriter.WriteAsync() → Stream → Blob
+       ▼
+ExportJob (Completed) + fichier téléchargeable
+```
+
+### ExportDefinition (Fluent API)
+
+Chaque entité exportable est déclarée via une `ExportDefinition<TEntity>`.
+Seuls les champs déclarés dans `Configure()` sont disponibles à l'export (whitelist).
+
+```csharp
+public sealed class PatientExportDefinition : ExportDefinition<Patient>
+{
+    public override string Name => "Guava.PatientExport";
+
+    // Lien vers la QueryDefinition pour filtrage/tri (optionnel)
+    public override string? QueryDefinitionName => "Guava.Patients";
+
+    protected override void Configure(ExportDefinitionBuilder<Patient> builder)
+    {
+        builder
+            .IncludeBusinessKey()
+            .Field(p => p.LastName, f => f.Header("Nom"))
+            .Field(p => p.FirstName, f => f.Header("Prénom"))
+            .Field(p => p.Email)
+            .Field(p => p.BirthDate, f => f.Header("Date de naissance").Format("dd/MM/yyyy"))
+            .Field(p => p.Company, c => c.Name, f => f.Header("Société"));
+    }
+}
+```
+
+#### Fluent API
+
+| Méthode | Description |
+| --- | --- |
+| `Field(expr, config?)` | Champ simple (propriété directe) |
+| `Field(nav, prop, config?)` | Champ navigation (dot notation, ex. `Company.Name`) |
+| `IncludeId()` | Inclut l'ID pour export roundtrip |
+| `IncludeBusinessKey()` | Inclut la clé métier pour roundtrip |
+
+#### Configuration de champ (`ExportFieldBuilder`)
+
+| Méthode | Description |
+| --- | --- |
+| `Header(string)` | En-tête personnalisé (sinon nom de propriété) |
+| `Format(string)` | Format d'affichage (ex. `"dd/MM/yyyy"` pour les dates) |
+| `Order(int)` | Ordre explicite (sinon auto-incrémenté) |
+
+### IExportDataSource
+
+Le data source fournit le `IQueryable<T>` de base. C'est ici que s'appliquent
+l'isolation tenant, les ACL et les `Include()` pour les propriétés de navigation.
+
+```csharp
+public sealed class PatientExportDataSource : IExportDataSource<Patient>
+{
+    private readonly GuavaDbContext _db;
+    private readonly ICurrentTenant _tenant;
+
+    public PatientExportDataSource(GuavaDbContext db, ICurrentTenant tenant)
+    {
+        _db = db;
+        _tenant = tenant;
+    }
+
+    public IQueryable<Patient> GetQueryable() =>
+        _db.Patients
+            .Include(p => p.Company)
+            .Where(p => p.TenantId == _tenant.Id);
+}
+```
+
+> **Important** : le data source doit inclure les `Include()` pour toutes les
+> propriétés de navigation déclarées dans la définition d'export. Sans `Include()`,
+> la valeur exportée sera `null`.
+
+### Intégration QueryDefinition (filtrage et tri)
+
+Quand `QueryDefinitionName` est renseigné, le pipeline d'export utilise
+`IQueryEngine<TEntity>.ExecuteStreamAsync()` pour appliquer les mêmes filtres
+et tri que la grille. Les champs `Sort`, `Filter`, `Presets` et `Search` de
+`ExportRequest` sont mappés vers un `QueryRequest`.
+
+```text
+Front-end (grille)                    Front-end (export)
+       │                                     │
+       ▼                                     ▼
+QueryRequest                          ExportRequest
+  Sort, Filter, Presets, Search         Sort, Filter, Presets, Search
+       │                                     │
+       ▼                                     ▼
+IQueryEngine.ExecuteAsync()           IQueryEngine.ExecuteStreamAsync()
+  → PagedResult<T>                     → IAsyncEnumerable<T> (tout, sans pagination)
+```
+
+Si `QueryDefinitionName` est `null`, aucun filtrage/tri n'est appliqué :
+l'export streame toutes les entités retournées par `GetQueryable()`.
+
+### Export Presets
+
+Les presets sont des configurations d'export sauvegardables (pattern Odoo).
+Chaque preset stocke les champs sélectionnés, le format et l'option d'inclusion d'ID.
+
+```csharp
+ExportPreset preset = new(
+    DefinitionName: "Guava.PatientExport",
+    PresetName: "Export mensuel",
+    SelectedFields: ["LastName", "FirstName", "Email"],
+    Format: "xlsx",
+    IncludeIdForImport: false);
+```
+
+Les presets sont gérés par `IExportPresetStore`. Le store par défaut est un
+null-object ; `Granit.DataExchange.EntityFrameworkCore` fournit une
+implémentation EF Core persistée.
+
+### ExportJob et cycle de vie
+
+Chaque export crée un `ExportJob` qui suit un cycle de vie :
+
+```text
+Queued → Exporting → Completed
+                   → Failed (si erreur)
+```
+
+| Propriété | Description |
+| --- | --- |
+| `DefinitionName` | Nom de la définition d'export |
+| `Format` | Format de sortie (`csv`, `xlsx`) |
+| `Status` | État courant (`Queued`, `Exporting`, `Completed`, `Failed`) |
+| `RowCount` | Nombre de lignes exportées |
+| `FileName` | Nom du fichier généré |
+| `BlobReference` | Référence blob pour le téléchargement |
+| `ErrorMessage` | Message d'erreur (si `Failed`) |
+
+### Configuration export
+
+```json
+{
+  "DataExport": {
+    "BackgroundThreshold": 1000
+  }
+}
+```
+
+| Option | Défaut | Description |
+| --- | --- | --- |
+| `BackgroundThreshold` | 1000 | Seuil de lignes au-delà duquel l'export est dispatché en arrière-plan |
+
+### Dispatch asynchrone
+
+`ExportOrchestrator.ExportAsync()` crée le job puis dispatche via
+`IExportCommandDispatcher`. L'implémentation par défaut utilise un
+`Channel<ExecuteExportCommand>` consommé par un `BackgroundService`.
+Les applications utilisant Wolverine peuvent remplacer le dispatcher
+(`Granit.DataExchange.Wolverine`).
+
+### Endpoints REST export
+
+Les endpoints d'export sont enregistrés automatiquement par
+`app.MapDataExchangeEndpoints()` sous le préfixe `/data-import/export`.
+
+#### Définitions et introspection
+
+| Méthode | Route | Retour | Description |
+| --- | --- | --- | --- |
+| `GET` | `/export/definitions` | 200 OK | Liste les définitions d'export enregistrées |
+| `GET` | `/export/definitions/{name}/fields` | 200 / 404 | Champs disponibles pour une définition |
+
+#### Jobs (création, suivi, téléchargement)
+
+| Méthode | Route | Retour | Description |
+| --- | --- | --- | --- |
+| `POST` | `/export/jobs` | 201 Created | Crée et dispatche un export job |
+| `GET` | `/export/jobs/{jobId}` | 200 / 404 | Status d'un job |
+| `GET` | `/export/jobs/{jobId}/download` | File / 400 / 404 | Télécharge le fichier exporté |
+
+#### Presets
+
+| Méthode | Route | Retour | Description |
+| --- | --- | --- | --- |
+| `GET` | `/export/presets/{definitionName}` | 200 OK | Liste les presets pour une définition |
+| `POST` | `/export/presets` | 201 Created | Sauvegarde ou met à jour un preset |
+| `DELETE` | `/export/presets/{definitionName}/{presetName}` | 204 / 404 | Supprime un preset |
+
+### Roundtrip import/export
+
+L'export supporte le pattern roundtrip (inspiré Odoo « Je veux mettre à jour
+les données ») :
+
+1. **Export** avec `IncludeIdForImport = true` → le fichier contient la colonne `Id`
+2. L'utilisateur modifie le fichier (correction de données)
+3. **Import** du fichier modifié → `IRecordIdentityResolver` détecte les entités
+   existantes via l'ID et effectue un UPDATE au lieu d'un INSERT
+
 ## Voir aussi
 
 - [ADR-019 — Sep pour le parsing CSV](../../ADR/ADR-019-sep-parsing-csv.md)
 - [ADR-020 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-020-sylvan-data-excel-parsing.md)
+- [Querying](querying.md) — module de filtrage/tri/pagination utilisé par l'export

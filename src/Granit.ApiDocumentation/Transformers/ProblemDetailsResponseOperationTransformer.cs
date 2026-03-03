@@ -18,6 +18,22 @@ internal sealed class ProblemDetailsResponseOperationTransformer : IOpenApiOpera
 {
     private const string ProblemDetailsMediaType = "application/problem+json";
 
+    /// <summary>
+    /// RFC 7807 ProblemDetails schema shared across all error responses.
+    /// </summary>
+    private static OpenApiSchema ProblemDetailsSchema => new()
+    {
+        Type = JsonSchemaType.Object,
+        Properties = new Dictionary<string, IOpenApiSchema>
+        {
+            ["type"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A URI reference that identifies the problem type." },
+            ["title"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A short, human-readable summary of the problem type." },
+            ["status"] = new OpenApiSchema { Type = JsonSchemaType.Integer, Description = "The HTTP status code." },
+            ["detail"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A human-readable explanation specific to this occurrence." },
+            ["instance"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A URI reference that identifies the specific occurrence." },
+        },
+    };
+
     /// <inheritdoc/>
     public Task TransformAsync(
         OpenApiOperation operation,
@@ -73,7 +89,10 @@ internal sealed class ProblemDetailsResponseOperationTransformer : IOpenApiOpera
             Description = description,
             Content = new Dictionary<string, OpenApiMediaType>
             {
-                [ProblemDetailsMediaType] = new OpenApiMediaType(),
+                [ProblemDetailsMediaType] = new OpenApiMediaType
+                {
+                    Schema = ProblemDetailsSchema,
+                },
             },
         };
     }

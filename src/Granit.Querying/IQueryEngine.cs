@@ -35,6 +35,20 @@ public interface IQueryEngine<TEntity> where TEntity : class
         CancellationToken ct = default);
 
     /// <summary>
+    /// Executes a query and streams all matching entities without pagination.
+    /// Applies filtering and sorting from the <paramref name="request"/> but returns
+    /// every matching row as an async stream — used by the export pipeline.
+    /// </summary>
+    /// <param name="source">The base queryable (e.g. from DbContext).</param>
+    /// <param name="request">The query parameters (pagination fields are ignored).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>An async stream of all matching entities.</returns>
+    IAsyncEnumerable<TEntity> ExecuteStreamAsync(
+        IQueryable<TEntity> source,
+        QueryRequest request,
+        CancellationToken ct = default);
+
+    /// <summary>
     /// Generates query metadata from the definition for the <c>GET /meta</c> endpoint.
     /// </summary>
     /// <param name="savedViews">Optional saved views to include in the metadata.</param>

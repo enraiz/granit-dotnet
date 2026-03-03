@@ -49,7 +49,7 @@ public static class NotificationsHostApplicationBuilderExtensions
         builder.Services.AddSingleton<INotificationChannel, InAppNotificationChannel>();
 
         // Wolverine configuration
-        builder.UseWolverine(opts =>
+        builder.Services.ConfigureWolverine(opts =>
         {
             opts.LocalQueueFor<NotificationTrigger>()
                 .Named("notification-fanout");

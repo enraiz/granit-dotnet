@@ -161,8 +161,84 @@ public sealed class ExportDefinitionBuilderTests
 
         definition.Name.ShouldBe("Test.Export");
         definition.EntityType.ShouldBe(typeof(TestEntity));
-        definition.FilterType.ShouldBe(typeof(EmptyExportFilter));
+        definition.QueryDefinitionName.ShouldBeNull();
         definition.SupportedFormats.ShouldBe(["xlsx", "csv"]);
+    }
+
+    // ---- ExportDefinition GetIncludeId / GetIncludeBusinessKey --------
+
+    [Fact]
+    public void ExportDefinition_GetIncludeId_returns_false_by_default()
+    {
+        TestExportDefinition definition = new();
+
+        definition.GetIncludeId().ShouldBeFalse();
+    }
+
+    [Fact]
+    public void ExportDefinition_GetIncludeId_returns_true_when_configured()
+    {
+        ExportDefinitionWithId definition = new();
+
+        definition.GetIncludeId().ShouldBeTrue();
+    }
+
+    [Fact]
+    public void ExportDefinition_GetIncludeBusinessKey_returns_false_by_default()
+    {
+        TestExportDefinition definition = new();
+
+        definition.GetIncludeBusinessKey().ShouldBeFalse();
+    }
+
+    [Fact]
+    public void ExportDefinition_GetIncludeBusinessKey_returns_true_when_configured()
+    {
+        ExportDefinitionWithId definition = new();
+
+        definition.GetIncludeBusinessKey().ShouldBeTrue();
+    }
+
+    // ---- ExportDefinition QueryDefinitionName -----------------------
+
+    [Fact]
+    public void ExportDefinition_QueryDefinitionName_returns_value_when_set()
+    {
+        QueryExportDefinition definition = new();
+
+        definition.QueryDefinitionName.ShouldBe("Test.Entities");
+    }
+
+    [Fact]
+    public void ExportDefinition_SupportedFormats_can_be_overridden()
+    {
+        CustomFormatsDefinition definition = new();
+
+        definition.SupportedFormats.ShouldBe(["csv"]);
+    }
+
+    // ---- GetBuilder caching -----------------------------------------
+
+    [Fact]
+    public void GetBuilder_returns_same_instance_on_subsequent_calls()
+    {
+        TestExportDefinition definition = new();
+
+        IReadOnlyList<ExportFieldDescriptor> fields1 = definition.GetFields();
+        IReadOnlyList<ExportFieldDescriptor> fields2 = definition.GetFields();
+
+        fields1.Count.ShouldBe(fields2.Count);
+        fields1.ShouldBe(fields2);
+    }
+
+    // ---- Empty definition -------------------------------------------
+
+    [Fact]
+    public void ExportDefinition_with_no_fields_returns_empty_list()
+    {
+        EmptyExportDefinition definition = new();
+
+        definition.GetFields().ShouldBeEmpty();
     }
 
     // ---- Test helpers ------------------------------------------------
@@ -189,5 +265,44 @@ public sealed class ExportDefinitionBuilderTests
                 .Field(e => e.Name, f => f.Header("Nom"))
                 .Field(e => e.Email)
                 .Field(e => e.Company, c => c.Name, f => f.Header("Société"));
+    }
+
+    private sealed class ExportDefinitionWithId : ExportDefinition<TestEntity>
+    {
+        public override string Name => "Test.ExportWithId";
+
+        protected override void Configure(ExportDefinitionBuilder<TestEntity> builder) =>
+            builder
+                .IncludeId()
+                .IncludeBusinessKey()
+                .Field(e => e.Name);
+    }
+
+    private sealed class QueryExportDefinition : ExportDefinition<TestEntity>
+    {
+        public override string Name => "Test.QueryExport";
+        public override string? QueryDefinitionName => "Test.Entities";
+
+        protected override void Configure(ExportDefinitionBuilder<TestEntity> builder) =>
+            builder.Field(e => e.Name);
+    }
+
+    private sealed class CustomFormatsDefinition : ExportDefinition<TestEntity>
+    {
+        public override string Name => "Test.CsvOnly";
+        public override IReadOnlyList<string> SupportedFormats => ["csv"];
+
+        protected override void Configure(ExportDefinitionBuilder<TestEntity> builder) =>
+            builder.Field(e => e.Name);
+    }
+
+    private sealed class EmptyExportDefinition : ExportDefinition<TestEntity>
+    {
+        public override string Name => "Test.Empty";
+
+        protected override void Configure(ExportDefinitionBuilder<TestEntity> builder)
+        {
+            // No fields configured
+        }
     }
 }

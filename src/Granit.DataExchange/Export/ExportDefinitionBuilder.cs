@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 namespace Granit.DataExchange.Export;
 
 /// <summary>
-/// Fluent builder for declaring exportable fields within an <see cref="ExportDefinition{TEntity,TFilter}"/>.
+/// Fluent builder for declaring exportable fields within an <see cref="ExportDefinition{TEntity}"/>.
 /// </summary>
 /// <typeparam name="TEntity">The source entity type.</typeparam>
 /// <remarks>
@@ -14,7 +14,7 @@ namespace Granit.DataExchange.Export;
 /// <para>
 /// Navigation fields (<c>Field(e => e.Company, c => c.Name)</c>) use dot notation.
 /// The developer <b>must</b> call the necessary <c>Include()</c> in
-/// <see cref="IExportDataSource{TEntity,TFilter}"/>. No auto-include magic in V1.
+/// <see cref="IExportDataSource{TEntity}"/>. No auto-include magic in V1.
 /// </para>
 /// </remarks>
 public sealed class ExportDefinitionBuilder<TEntity> where TEntity : class
@@ -60,7 +60,7 @@ public sealed class ExportDefinitionBuilder<TEntity> where TEntity : class
     /// <param name="configure">Optional fluent configuration.</param>
     /// <remarks>
     /// The developer must ensure the corresponding <c>Include()</c> is present in
-    /// <see cref="IExportDataSource{TEntity,TFilter}"/>. If not, the value will be <c>null</c>.
+    /// <see cref="IExportDataSource{TEntity}"/>. If not, the value will be <c>null</c>.
     /// </remarks>
     public ExportDefinitionBuilder<TEntity> Field<TNav, TProp>(
         Expression<Func<TEntity, TNav?>> navigation,

@@ -20,7 +20,7 @@ public static class WhatsAppNotificationsServiceCollectionExtensions
             services.Configure(configure);
         }
 
-        services.AddSingleton<INotificationChannel, WhatsAppNotificationChannel>();
+        services.AddScoped<INotificationChannel, WhatsAppNotificationChannel>();
         return services;
     }
 }

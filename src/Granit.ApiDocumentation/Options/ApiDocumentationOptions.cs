@@ -25,6 +25,18 @@ public sealed class ApiDocumentationOptions
     public string? ContactEmail { get; set; }
 
     /// <summary>
+    /// URL to a logo image displayed in the Scalar UI sidebar and OpenAPI document.
+    /// Can be an absolute URL or a path served by the application (e.g. <c>"/logo.svg"</c>).
+    /// </summary>
+    public string? LogoUrl { get; set; }
+
+    /// <summary>
+    /// URL or path to a favicon for the Scalar documentation page.
+    /// Can be an absolute URL or a path served by the application (e.g. <c>"/favicon.svg"</c>).
+    /// </summary>
+    public string? FaviconUrl { get; set; }
+
+    /// <summary>
     /// When <c>true</c>, exposes the Scalar UI and OpenAPI JSON endpoints even in Production.
     /// Default: <c>false</c> — UI is enabled in Development only.
     /// </summary>

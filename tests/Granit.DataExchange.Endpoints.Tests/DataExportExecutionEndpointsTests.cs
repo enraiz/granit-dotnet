@@ -39,7 +39,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
         _descriptor = Substitute.For<IExportDefinitionDescriptor>();
         _descriptor.Name.Returns("Test.Export");
         _descriptor.EntityType.Returns(typeof(object));
-        _descriptor.FilterType.Returns(typeof(EmptyExportFilter));
+        _descriptor.QueryDefinitionName.Returns((string?)null);
         _descriptor.SupportedFormats.Returns(new[] { "xlsx", "csv" });
         _descriptor.GetFields().Returns([
             new ExportFieldDescriptor("Name", "String", "Nom", null, 0, false),
@@ -96,7 +96,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
                 Status = ExportJobStatus.Queued,
             });
 
-        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null);
+        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null, null, null, null);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
@@ -115,7 +115,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task CreateExportJob_unknown_definition_returns_400()
     {
         // Arrange
-        CreateExportJobRequest request = new("Unknown.Export", "csv", null, false, null);
+        CreateExportJobRequest request = new("Unknown.Export", "csv", null, false, null, null, null, null);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
@@ -129,7 +129,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task CreateExportJob_unsupported_format_returns_400()
     {
         // Arrange
-        CreateExportJobRequest request = new("Test.Export", "pdf", null, false, null);
+        CreateExportJobRequest request = new("Test.Export", "pdf", null, false, null, null, null, null);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
@@ -143,7 +143,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task CreateExportJob_without_auth_returns_401()
     {
         // Arrange
-        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null);
+        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null, null, null, null);
 
         // Act
         HttpResponseMessage response = await _anonClient.PostAsJsonAsync(
@@ -157,7 +157,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task CreateExportJob_wrong_role_returns_403()
     {
         // Arrange
-        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null);
+        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null, null, null, null);
 
         // Act
         HttpResponseMessage response = await _userClient.PostAsJsonAsync(

@@ -45,7 +45,7 @@ public static class WebhooksHostApplicationBuilderExtensions
             .ValidateOnStart();
         builder.Services.AddSingleton<IValidateOptions<WebhooksOptions>, WebhooksOptionsValidator>();
 
-        // Read options directly from IConfiguration — DI container not yet built inside UseWolverine().
+        // Read options directly from IConfiguration — DI container not yet built.
         WebhooksOptions options = new();
         builder.Configuration
             .GetSection(WebhooksOptions.SectionName)
@@ -68,7 +68,7 @@ public static class WebhooksHostApplicationBuilderExtensions
         // Application façade.
         builder.Services.AddScoped<IWebhookPublisher, WolverineWebhookPublisher>();
 
-        builder.UseWolverine(opts =>
+        builder.Services.ConfigureWolverine(opts =>
         {
             // Dedicated local queue for HTTP delivery — isolated from the main bus.
             opts.LocalQueueFor<SendWebhookCommand>()

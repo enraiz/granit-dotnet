@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Querying\Granit.Querying.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
     <ProjectReference Include="..\Granit.Validation\Granit.Validation.csproj" />
     <!-- Optional at runtime: ICurrentTenant resolved via GetService — no GranitMultiTenancyModule required -->

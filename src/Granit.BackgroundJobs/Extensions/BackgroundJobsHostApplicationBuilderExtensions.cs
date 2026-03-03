@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Wolverine;
 using Wolverine.Runtime.Handlers;
-using static Wolverine.HostBuilderExtensions;
 
 namespace Granit.BackgroundJobs.Extensions;
 
@@ -77,7 +76,7 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
         // [RecurringJobAttribute]. Uses the idiomatic IPolicies.AddMiddleware<T>(filter) API
         // so Wolverine resolves constructor parameters from DI and injects Before/AfterAsync
         // methods at code-generation time (zero overhead at runtime).
-        builder.UseWolverine(opts =>
+        builder.Services.ConfigureWolverine(opts =>
         {
             opts.Policies.AddMiddleware<RecurringJobSchedulingMiddleware>(
                 (HandlerChain chain) => chain.MessageType

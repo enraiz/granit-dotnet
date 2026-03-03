@@ -1,50 +1,33 @@
 namespace Granit.DataExchange.Export;
 
 /// <summary>
-/// Provides the data stream for an export operation,
-/// with typed filtering matching the grid's search logic.
+/// Provides the base queryable for an export operation.
 /// </summary>
 /// <typeparam name="TEntity">The source entity type.</typeparam>
-/// <typeparam name="TFilter">
-/// The typed filter matching the grid's parameters (search, status, selected IDs, etc.).
-/// </typeparam>
 /// <remarks>
 /// <para>
-/// The data source acts as a <b>security guard</b>: it receives a strongly-typed filter
-/// object (never raw JSON) and is responsible for applying tenant isolation, ACL,
-/// and any mandatory constraints.
-/// </para>
-/// <para>
-/// The data source builds the query (with filters, Includes, AsNoTracking) and returns
-/// an <see cref="IAsyncEnumerable{TEntity}"/>. This is the same query as the grid display,
-/// minus pagination (<c>Skip</c>/<c>Take</c>).
+/// The data source acts as a <b>security guard</b>: it builds the base queryable
+/// with tenant isolation, ACL, and any mandatory constraints.
+/// Filtering and sorting are delegated to <c>IQueryEngine</c> when the export
+/// definition references a <see cref="ExportDefinition{TEntity}.QueryDefinitionName"/>.
 /// </para>
 /// <para>
 /// <b>V1 — Explicit Include():</b> The data source must include all <c>Include()</c>
-/// calls for navigation fields declared in the <see cref="ExportDefinition{TEntity,TFilter}"/>.
+/// calls for navigation fields declared in the <see cref="ExportDefinition{TEntity}"/>.
 /// No auto-include magic. If a navigation field is declared but not included,
 /// the exported value will be <c>null</c>.
 /// </para>
 /// </remarks>
-public interface IExportDataSource<out TEntity, in TFilter>
+public interface IExportDataSource<out TEntity>
     where TEntity : class
-    where TFilter : class
 {
     /// <summary>
-    /// Streams the filtered entities for export.
+    /// Returns the base queryable for the export.
+    /// Must include <c>Include()</c> calls for navigation properties and apply
+    /// security constraints (tenant isolation, ACL).
     /// </summary>
-    /// <param name="filter">The typed filter from the frontend grid.</param>
-    /// <param name="ct">Cancellation token.</param>
     /// <returns>
-    /// An async stream of entities. The export pipeline extracts field values
-    /// via reflection based on the <see cref="ExportDefinition{TEntity,TFilter}"/> fields.
+    /// A queryable that the export pipeline will filter, sort, and stream.
     /// </returns>
-    IAsyncEnumerable<TEntity> GetDataAsync(TFilter filter, CancellationToken ct = default);
+    IQueryable<TEntity> GetQueryable();
 }
-
-/// <summary>
-/// Convenience interface for export data sources that don't require filtering.
-/// </summary>
-/// <typeparam name="TEntity">The source entity type.</typeparam>
-public interface IExportDataSource<TEntity> : IExportDataSource<TEntity, EmptyExportFilter>
-    where TEntity : class;
