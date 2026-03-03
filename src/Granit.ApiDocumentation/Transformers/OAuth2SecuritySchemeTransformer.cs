@@ -76,14 +76,14 @@ internal sealed class OAuth2SecuritySchemeTransformer(
                 [.. oauth2.Scopes],
         };
 
-        foreach (IOpenApiPathItem pathItem in document.Paths.Select(path => path.Value))
+        foreach (var operations in document.Paths.Select(path => path.Value.Operations))
         {
-            if (pathItem.Operations is null)
+            if (operations is null)
             {
                 continue;
             }
 
-            foreach (IList<OpenApiSecurityRequirement>? security in pathItem.Operations.Select(op => op.Value.Security))
+            foreach (IList<OpenApiSecurityRequirement>? security in operations.Select(op => op.Value.Security))
             {
                 if (security is null)
                 {
