@@ -91,11 +91,11 @@
 | `Granit.Templating` / `.Scriban` / `.EntityFrameworkCore` / `.Workflow` | Template engine (Scriban), EF store, workflow integration |
 | `Granit.DocumentGeneration` / `.Pdf` / `.Excel` | Document rendering (HTML→PDF, Excel) |
 
-### Data import (mini-ETL)
+### Data exchange (import/export)
 
 | Package | Role |
 | ------- | ---- |
-| `Granit.DataImport` / `.Csv` / `.Excel` / `.EntityFrameworkCore` / `.Endpoints` | Extract→Map→Validate→Execute pipeline (Sep, Sylvan) |
+| `Granit.DataExchange` / `.Csv` / `.Excel` / `.EntityFrameworkCore` / `.Endpoints` | Import: Extract→Map→Validate→Execute (Sep, Sylvan). Export: tabular Excel/CSV with presets and background jobs |
 
 ### Workflow
 

@@ -4,18 +4,18 @@
 - **Date** : 2026-03-01
 - **Issue** : [#475](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/475)
 - **Auteurs** : Équipe Digital Dynamics
-- **Portée** : granit-dotnet (Granit.DataImport.Csv)
+- **Portée** : granit-dotnet (Granit.DataExchange.Csv)
 
 ## Contexte
 
-Le module `Granit.DataImport.Csv` nécessite un parser CSV capable de traiter
+Le module `Granit.DataExchange.Csv` nécessite un parser CSV capable de traiter
 des fichiers de 100 000+ lignes en streaming, sans charger l'intégralité du
 fichier en mémoire. Les cas d'usage incluent : import de données patients,
 réimport roundtrip, chargement initial de référentiels.
 
 La bibliothèque doit supporter :
 
-- **Streaming** : `IAsyncEnumerable` natif pour le pipeline DataImport
+- **Streaming** : `IAsyncEnumerable` natif pour le pipeline DataExchange
 - **Performance** : fichiers volumineux sans dégradation
 - **Encodages** : UTF-8, UTF-8 BOM, Latin-1, Windows-1252
 - **RFC 4180** : champs quotés, séparateurs configurables
@@ -24,7 +24,7 @@ La bibliothèque doit supporter :
 
 ## Décision
 
-**Sep** (nietras) pour le parsing CSV dans `Granit.DataImport.Csv`.
+**Sep** (nietras) pour le parsing CSV dans `Granit.DataExchange.Csv`.
 
 ## Alternatives évaluées
 
@@ -94,7 +94,7 @@ voient jamais l'API Sep directement.
 - Parsing CSV le plus rapide de l'écosystème .NET (SIMD vectorisé)
 - Zero-allocation : pas de pression GC sur les imports volumineux
 - Target net10.0 explicite : optimisations du runtime exploitées
-- `IAsyncEnumerable` natif : intégration naturelle avec le pipeline DataImport
+- `IAsyncEnumerable` natif : intégration naturelle avec le pipeline DataExchange
 - MIT : aucun coût, compatible usage commercial
 - AOT-compatible : pas de réflexion à l'exécution
 

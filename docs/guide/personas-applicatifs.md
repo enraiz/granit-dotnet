@@ -56,8 +56,8 @@ de santé, Product Owner) sans les remplacer.
 | **Responsabilités** | Paramétrage, gestion des données de référence, feature flags, gestion des utilisateurs, imports de données |
 | **Authentification** | JWT Bearer (Keycloak) |
 | **Rôle Keycloak type** | `admin` (configurable via `GranitAuthorizationOptions.AdminRoles`) |
-| **Permissions Granit** | `ReferenceData.Manage`, `Settings.Manage`, `Features.Manage`, `DataImport.Admin`, `BackgroundJobs.Admin`, `Localization.Overrides.Manage` |
-| **Modules concernés** | `Granit.ReferenceData.Endpoints`, `Granit.Settings`, `Granit.Features`, `Granit.DataImport.Endpoints`, `Granit.BackgroundJobs.Endpoints`, `Granit.Localization.Endpoints` |
+| **Permissions Granit** | `ReferenceData.Manage`, `Settings.Manage`, `Features.Manage`, `DataExchange.Import`, `BackgroundJobs.Admin`, `Localization.Overrides.Manage` |
+| **Modules concernés** | `Granit.ReferenceData.Endpoints`, `Granit.Settings`, `Granit.Features`, `Granit.DataExchange.Endpoints`, `Granit.BackgroundJobs.Endpoints`, `Granit.Localization.Endpoints` |
 
 ## Approbateur
 
@@ -81,8 +81,8 @@ de santé, Product Owner) sans les remplacer.
 | **Responsabilités** | Rédaction de templates, génération de documents (PDF, Excel), gestion des modèles de notification, import de données |
 | **Authentification** | JWT Bearer (Keycloak) |
 | **Rôle Keycloak type** | `content-manager` |
-| **Permissions Granit** | `Template.Manage`, `Document.Generate`, `DataImport.Execute`, `Notification.Template.Manage` |
-| **Modules concernés** | `Granit.Templating`, `Granit.Templating.EntityFrameworkCore`, `Granit.DocumentGeneration`, `Granit.DataImport`, `Granit.Notifications` |
+| **Permissions Granit** | `Template.Manage`, `Document.Generate`, `DataExchange.Export`, `Notification.Template.Manage` |
+| **Modules concernés** | `Granit.Templating`, `Granit.Templating.EntityFrameworkCore`, `Granit.DocumentGeneration`, `Granit.DataExchange`, `Granit.Notifications` |
 | **Workflow** | Les contenus publiables passent par le workflow Draft → PendingReview → Published. Le gestionnaire de contenu crée le brouillon ; l'Approbateur valide la publication. |
 
 ## Matrice persona × module Granit
@@ -94,7 +94,7 @@ de santé, Product Owner) sans les remplacer.
 | ReferenceData | Lecture\* | Lecture | CRUD | — | Lecture |
 | Settings | — | — | CRUD | — | — |
 | Features | — | — | CRUD | — | — |
-| DataImport | — | — | Admin | Validation | Exécution |
+| DataExchange | — | — | Admin | Validation | Exécution |
 | BackgroundJobs | — | — | Admin | — | — |
 | Localization | — | — | Overrides | — | — |
 | Templating | — | — | — | — | CRUD |

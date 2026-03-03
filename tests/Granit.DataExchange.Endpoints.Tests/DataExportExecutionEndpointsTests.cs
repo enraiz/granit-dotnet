@@ -1,0 +1,297 @@
+using System.Net;
+using System.Net.Http.Json;
+using Granit.DataExchange.Endpoints.Dtos.Export;
+using Granit.DataExchange.Endpoints.Extensions;
+using Granit.DataExchange.Export;
+using Granit.DataExchange.Import.Domain;
+using Granit.DataExchange.Import.Mapping;
+using Granit.DataExchange.Import.Parsing;
+using Granit.DataExchange.Import.Pipeline;
+using Granit.Timing;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
+using Shouldly;
+using Xunit;
+
+namespace Granit.DataExchange.Endpoints.Tests;
+
+/// <summary>
+/// Integration tests for export job creation, status polling, and file download endpoints.
+/// </summary>
+public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
+{
+    private const string AdminRole = "granit-data-import-admin";
+    private const string ExportPrefix = "/data-import/export";
+
+    private readonly IExportOrchestrator _orchestrator = Substitute.For<IExportOrchestrator>();
+    private readonly IExportPresetStore _presetStore = Substitute.For<IExportPresetStore>();
+    private readonly IExportDefinitionDescriptor _descriptor;
+    private readonly WebApplication _app;
+    private readonly HttpClient _adminClient;
+    private readonly HttpClient _userClient;
+    private readonly HttpClient _anonClient;
+
+    public DataExportExecutionEndpointsTests()
+    {
+        _descriptor = Substitute.For<IExportDefinitionDescriptor>();
+        _descriptor.Name.Returns("Test.Export");
+        _descriptor.EntityType.Returns(typeof(object));
+        _descriptor.FilterType.Returns(typeof(EmptyExportFilter));
+        _descriptor.SupportedFormats.Returns(new[] { "xlsx", "csv" });
+        _descriptor.GetFields().Returns([
+            new ExportFieldDescriptor("Name", "String", "Nom", null, 0, false),
+        ]);
+
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        builder.Services
+            .AddAuthentication(TestAuthHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                TestAuthHandler.SchemeName, _ => { });
+
+        builder.Services.AddAuthorization();
+        builder.Services.AddSingleton(_orchestrator);
+        builder.Services.AddSingleton(_presetStore);
+        builder.Services.AddSingleton(_descriptor);
+
+        // Required by import endpoints (compiled at startup)
+        builder.Services.AddSingleton(Substitute.For<IImportJobStore>());
+        builder.Services.AddSingleton(Substitute.For<IImportFileProvider>());
+        builder.Services.AddSingleton(Substitute.For<IMappingSuggestionService>());
+        builder.Services.AddSingleton(Substitute.For<IClock>());
+        builder.Services.AddSingleton(Substitute.For<IImportDefinitionDescriptor>());
+        builder.Services.AddSingleton(Substitute.For<IFileParser>());
+
+        _app = builder.Build();
+        _app.MapDataExchangeEndpoints();
+        _app.StartAsync().GetAwaiter().GetResult();
+
+        _adminClient = BuildClient(AdminRole);
+        _userClient = BuildClient("regular-user");
+        _anonClient = _app.GetTestClient();
+    }
+
+    public async ValueTask DisposeAsync() => await _app.DisposeAsync();
+
+    // ── POST /export/jobs ───────────────────────────────────────────────
+
+    [Fact]
+    public async Task CreateExportJob_valid_request_returns_201()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        _orchestrator.ExportAsync(Arg.Any<ExportRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new ExportJobResult(jobId, ExportJobStatus.Queued));
+        _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
+            .Returns(new ExportJob
+            {
+                Id = jobId,
+                DefinitionName = "Test.Export",
+                Format = "csv",
+                RequestJson = "{}",
+                Status = ExportJobStatus.Queued,
+            });
+
+        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{ExportPrefix}/jobs", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        ExportJobResponse? result = await response.Content
+            .ReadFromJsonAsync<ExportJobResponse>(TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result!.Id.ShouldBe(jobId);
+        result.Status.ShouldBe(ExportJobStatus.Queued);
+    }
+
+    [Fact]
+    public async Task CreateExportJob_unknown_definition_returns_400()
+    {
+        // Arrange
+        CreateExportJobRequest request = new("Unknown.Export", "csv", null, false, null);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{ExportPrefix}/jobs", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task CreateExportJob_unsupported_format_returns_400()
+    {
+        // Arrange
+        CreateExportJobRequest request = new("Test.Export", "pdf", null, false, null);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{ExportPrefix}/jobs", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task CreateExportJob_without_auth_returns_401()
+    {
+        // Arrange
+        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null);
+
+        // Act
+        HttpResponseMessage response = await _anonClient.PostAsJsonAsync(
+            $"{ExportPrefix}/jobs", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task CreateExportJob_wrong_role_returns_403()
+    {
+        // Arrange
+        CreateExportJobRequest request = new("Test.Export", "csv", null, false, null);
+
+        // Act
+        HttpResponseMessage response = await _userClient.PostAsJsonAsync(
+            $"{ExportPrefix}/jobs", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    // ── GET /export/jobs/{jobId} ────────────────────────────────────────
+
+    [Fact]
+    public async Task GetJobStatus_existing_job_returns_200()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
+            .Returns(new ExportJob
+            {
+                Id = jobId,
+                DefinitionName = "Test.Export",
+                Format = "xlsx",
+                RequestJson = "{}",
+                Status = ExportJobStatus.Completed,
+                RowCount = 100,
+                FileName = "export.xlsx",
+            });
+
+        // Act
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{ExportPrefix}/jobs/{jobId}", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        ExportJobResponse? result = await response.Content
+            .ReadFromJsonAsync<ExportJobResponse>(TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result!.Status.ShouldBe(ExportJobStatus.Completed);
+        result.RowCount.ShouldBe(100);
+    }
+
+    [Fact]
+    public async Task GetJobStatus_unknown_job_returns_404()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
+            .Returns((ExportJob?)null);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{ExportPrefix}/jobs/{jobId}", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    // ── GET /export/jobs/{jobId}/download ────────────────────────────────
+
+    [Fact]
+    public async Task Download_completed_job_returns_file()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
+            .Returns(new ExportJob
+            {
+                Id = jobId,
+                DefinitionName = "Test.Export",
+                Format = "csv",
+                RequestJson = "{}",
+                Status = ExportJobStatus.Completed,
+                BlobReference = "blob-ref",
+                FileName = "export.csv",
+            });
+
+        byte[] fileContent = "Name;Email\nAlice;alice@test.com"u8.ToArray();
+        _orchestrator.GetDownloadAsync(jobId, Arg.Any<CancellationToken>())
+            .Returns(new ExportDownload(new MemoryStream(fileContent), "text/csv", "export.csv"));
+
+        // Act
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{ExportPrefix}/jobs/{jobId}/download", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.Content.Headers.ContentType!.MediaType.ShouldBe("text/csv");
+    }
+
+    [Fact]
+    public async Task Download_non_completed_job_returns_400()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
+            .Returns(new ExportJob
+            {
+                Id = jobId,
+                DefinitionName = "Test.Export",
+                Format = "csv",
+                RequestJson = "{}",
+                Status = ExportJobStatus.Exporting,
+            });
+
+        // Act
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{ExportPrefix}/jobs/{jobId}/download", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Download_unknown_job_returns_404()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
+            .Returns((ExportJob?)null);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{ExportPrefix}/jobs/{jobId}/download", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────
+
+    private HttpClient BuildClient(string role)
+    {
+        HttpClient client = _app.GetTestClient();
+        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, role);
+        return client;
+    }
+}

@@ -1,0 +1,237 @@
+using System.Net;
+using System.Net.Http.Json;
+using Granit.DataExchange.Endpoints.Dtos.Export;
+using Granit.DataExchange.Endpoints.Extensions;
+using Granit.DataExchange.Export;
+using Granit.DataExchange.Import.Domain;
+using Granit.DataExchange.Import.Mapping;
+using Granit.DataExchange.Import.Parsing;
+using Granit.DataExchange.Import.Pipeline;
+using Granit.Timing;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
+using Shouldly;
+using Xunit;
+
+namespace Granit.DataExchange.Endpoints.Tests;
+
+/// <summary>
+/// Integration tests for export preset CRUD endpoints.
+/// </summary>
+public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
+{
+    private const string AdminRole = "granit-data-import-admin";
+    private const string ExportPrefix = "/data-import/export";
+
+    private readonly IExportOrchestrator _orchestrator = Substitute.For<IExportOrchestrator>();
+    private readonly IExportPresetStore _presetStore = Substitute.For<IExportPresetStore>();
+    private readonly IExportDefinitionDescriptor _descriptor;
+    private readonly WebApplication _app;
+    private readonly HttpClient _adminClient;
+    private readonly HttpClient _anonClient;
+
+    public DataExportPresetEndpointsTests()
+    {
+        _descriptor = Substitute.For<IExportDefinitionDescriptor>();
+        _descriptor.Name.Returns("Test.Export");
+        _descriptor.EntityType.Returns(typeof(object));
+        _descriptor.FilterType.Returns(typeof(EmptyExportFilter));
+        _descriptor.SupportedFormats.Returns(new[] { "xlsx", "csv" });
+        _descriptor.GetFields().Returns([
+            new ExportFieldDescriptor("Name", "String", "Nom", null, 0, false),
+            new ExportFieldDescriptor("Email", "String", null, null, 1, false),
+        ]);
+
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        builder.Services
+            .AddAuthentication(TestAuthHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                TestAuthHandler.SchemeName, _ => { });
+
+        builder.Services.AddAuthorization();
+        builder.Services.AddSingleton(_orchestrator);
+        builder.Services.AddSingleton(_presetStore);
+        builder.Services.AddSingleton(_descriptor);
+
+        // Required by import endpoints (compiled at startup)
+        builder.Services.AddSingleton(Substitute.For<IImportJobStore>());
+        builder.Services.AddSingleton(Substitute.For<IImportFileProvider>());
+        builder.Services.AddSingleton(Substitute.For<IMappingSuggestionService>());
+        builder.Services.AddSingleton(Substitute.For<IClock>());
+        builder.Services.AddSingleton(Substitute.For<IImportDefinitionDescriptor>());
+        builder.Services.AddSingleton(Substitute.For<IFileParser>());
+
+        _app = builder.Build();
+        _app.MapDataExchangeEndpoints();
+        _app.StartAsync().GetAwaiter().GetResult();
+
+        _adminClient = BuildClient(AdminRole);
+        _anonClient = _app.GetTestClient();
+    }
+
+    public async ValueTask DisposeAsync() => await _app.DisposeAsync();
+
+    // ── GET /export/presets/{definitionName} ─────────────────────────────
+
+    [Fact]
+    public async Task ListPresets_returns_presets_for_definition()
+    {
+        // Arrange
+        _presetStore.ListAsync("Test.Export", Arg.Any<CancellationToken>())
+            .Returns([
+                new ExportPreset("Test.Export", "Monthly", ["Name", "Email"], "xlsx", false),
+                new ExportPreset("Test.Export", "Quick", ["Name"], "csv", true),
+            ]);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{ExportPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        ExportPresetResponse[]? presets = await response.Content
+            .ReadFromJsonAsync<ExportPresetResponse[]>(TestContext.Current.CancellationToken);
+        presets.ShouldNotBeNull();
+        presets!.Length.ShouldBe(2);
+        presets[0].PresetName.ShouldBe("Monthly");
+        presets[1].PresetName.ShouldBe("Quick");
+    }
+
+    [Fact]
+    public async Task ListPresets_empty_returns_empty_list()
+    {
+        // Arrange
+        _presetStore.ListAsync("Test.Export", Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<ExportPreset>());
+
+        // Act
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{ExportPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        ExportPresetResponse[]? presets = await response.Content
+            .ReadFromJsonAsync<ExportPresetResponse[]>(TestContext.Current.CancellationToken);
+        presets.ShouldNotBeNull();
+        presets!.Length.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task ListPresets_without_auth_returns_401()
+    {
+        // Act
+        HttpResponseMessage response = await _anonClient.GetAsync(
+            $"{ExportPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    // ── POST /export/presets ────────────────────────────────────────────
+
+    [Fact]
+    public async Task SavePreset_valid_request_returns_201()
+    {
+        // Arrange
+        SaveExportPresetRequest request = new("Test.Export", "Monthly", ["Name", "Email"], "xlsx", false);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        await _presetStore.Received(1).SaveAsync(
+            Arg.Is<ExportPreset>(p => p.PresetName == "Monthly" && p.DefinitionName == "Test.Export"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SavePreset_unknown_definition_returns_400()
+    {
+        // Arrange
+        SaveExportPresetRequest request = new("Unknown.Export", "Monthly", ["Name"], "xlsx", false);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task SavePreset_empty_preset_name_returns_400()
+    {
+        // Arrange
+        SaveExportPresetRequest request = new("Test.Export", "", ["Name"], "xlsx", false);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task SavePreset_empty_fields_returns_400()
+    {
+        // Arrange
+        SaveExportPresetRequest request = new("Test.Export", "Monthly", [], "xlsx", false);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    // ── DELETE /export/presets/{definitionName}/{presetName} ─────────────
+
+    [Fact]
+    public async Task DeletePreset_existing_returns_204()
+    {
+        // Arrange
+        _presetStore.GetAsync("Test.Export", "Monthly", Arg.Any<CancellationToken>())
+            .Returns(new ExportPreset("Test.Export", "Monthly", ["Name"], "xlsx", false));
+
+        // Act
+        HttpResponseMessage response = await _adminClient.DeleteAsync(
+            $"{ExportPrefix}/presets/Test.Export/Monthly", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        await _presetStore.Received(1).DeleteAsync("Test.Export", "Monthly", Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeletePreset_nonexistent_returns_404()
+    {
+        // Arrange
+        _presetStore.GetAsync("Test.Export", "NonExistent", Arg.Any<CancellationToken>())
+            .Returns((ExportPreset?)null);
+
+        // Act
+        HttpResponseMessage response = await _adminClient.DeleteAsync(
+            $"{ExportPrefix}/presets/Test.Export/NonExistent", TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────
+
+    private HttpClient BuildClient(string role)
+    {
+        HttpClient client = _app.GetTestClient();
+        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, role);
+        return client;
+    }
+}

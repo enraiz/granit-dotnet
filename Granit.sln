@@ -273,23 +273,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.ReferenceData.Endpoi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Workflow.Notifications.Tests", "tests\Granit.Workflow.Notifications.Tests\Granit.Workflow.Notifications.Tests.csproj", "{E73D34D6-49C7-4D9A-95C2-2D7AA9DD69D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Csv", "src\Granit.DataImport.Csv\Granit.DataImport.Csv.csproj", "{095096A6-D7A8-409B-833D-82B09EA7AF5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.Csv", "src\Granit.DataExchange.Csv\Granit.DataExchange.Csv.csproj", "{095096A6-D7A8-409B-833D-82B09EA7AF5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport", "src\Granit.DataImport\Granit.DataImport.csproj", "{DD5A9656-8588-4413-9D15-ECCE116DB729}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange", "src\Granit.DataExchange\Granit.DataExchange.csproj", "{DD5A9656-8588-4413-9D15-ECCE116DB729}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Csv.Tests", "tests\Granit.DataImport.Csv.Tests\Granit.DataImport.Csv.Tests.csproj", "{559BAF93-4585-46A4-A414-B4251996438A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.Csv.Tests", "tests\Granit.DataExchange.Csv.Tests\Granit.DataExchange.Csv.Tests.csproj", "{559BAF93-4585-46A4-A414-B4251996438A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Excel", "src\Granit.DataImport.Excel\Granit.DataImport.Excel.csproj", "{43E65A51-DD9E-4AE0-BF9E-8FBB0763F71C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.Excel", "src\Granit.DataExchange.Excel\Granit.DataExchange.Excel.csproj", "{43E65A51-DD9E-4AE0-BF9E-8FBB0763F71C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Excel.Tests", "tests\Granit.DataImport.Excel.Tests\Granit.DataImport.Excel.Tests.csproj", "{A963B664-3797-47F7-BF0F-2A1A63CC2121}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.Excel.Tests", "tests\Granit.DataExchange.Excel.Tests\Granit.DataExchange.Excel.Tests.csproj", "{A963B664-3797-47F7-BF0F-2A1A63CC2121}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.EntityFrameworkCore", "src\Granit.DataImport.EntityFrameworkCore\Granit.DataImport.EntityFrameworkCore.csproj", "{4F767987-624B-41DD-B949-72D29EBEB78D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.EntityFrameworkCore", "src\Granit.DataExchange.EntityFrameworkCore\Granit.DataExchange.EntityFrameworkCore.csproj", "{4F767987-624B-41DD-B949-72D29EBEB78D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.EntityFrameworkCore.Tests", "tests\Granit.DataImport.EntityFrameworkCore.Tests\Granit.DataImport.EntityFrameworkCore.Tests.csproj", "{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.EntityFrameworkCore.Tests", "tests\Granit.DataExchange.EntityFrameworkCore.Tests\Granit.DataExchange.EntityFrameworkCore.Tests.csproj", "{2F37BC3E-2EBB-4B7D-8B3E-BE54AE80E549}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Endpoints", "src\Granit.DataImport.Endpoints\Granit.DataImport.Endpoints.csproj", "{6B9FD4A7-0C1A-40B7-9840-D3E2FA9A78E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.Endpoints", "src\Granit.DataExchange.Endpoints\Granit.DataExchange.Endpoints.csproj", "{6B9FD4A7-0C1A-40B7-9840-D3E2FA9A78E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataImport.Endpoints.Tests", "tests\Granit.DataImport.Endpoints.Tests\Granit.DataImport.Endpoints.Tests.csproj", "{33376BD4-DDF8-46ED-8008-048B9EC1B7E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DataExchange.Endpoints.Tests", "tests\Granit.DataExchange.Endpoints.Tests\Granit.DataExchange.Endpoints.Tests.csproj", "{33376BD4-DDF8-46ED-8008-048B9EC1B7E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

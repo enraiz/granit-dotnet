@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.DataExchange</PackageId>
+    <Description>Socle d'import de données pour Granit. Pipeline streaming Extract → Map → Validate → Execute avec Fluent API (ImportDefinition), smart mapping 4-tier (Saved → Exact → Fuzzy → Semantic IA optionnelle RGPD-safe), résolution INSERT/UPDATE (roundtrip), rapport partiel, et fichier de correction.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.DataExchange.Tests" />
+    <InternalsVisibleTo Include="Granit.DataExchange.Csv" />
+    <InternalsVisibleTo Include="Granit.DataExchange.Excel" />
+    <InternalsVisibleTo Include="Granit.DataExchange.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.DataExchange.Endpoints" />
+    <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal types in tests -->
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
+    <ProjectReference Include="..\Granit.Validation\Granit.Validation.csproj" />
+    <!-- Optional at runtime: ICurrentTenant resolved via GetService — no GranitMultiTenancyModule required -->
+  </ItemGroup>
+
+</Project>
