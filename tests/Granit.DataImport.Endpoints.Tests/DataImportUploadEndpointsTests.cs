@@ -51,16 +51,15 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
         _descriptor.EntityType.Returns(typeof(object));
         _descriptor.MaxFileSizeMb.Returns(10);
         _descriptor.AllowedMimeTypes.Returns(new[] { "text/csv" });
-        _descriptor.GetFieldMetadata().Returns(new List<FieldMetadata>
-        {
-            new("Name", "String", "Name", null, true),
-        });
+        _descriptor.GetFieldMetadata().Returns([
+            new FieldMetadata("Name", "String", "Name", null, true),
+        ]);
 
         _parser.CanParse("text/csv").Returns(true);
         _parser.ExtractHeadersAsync(Arg.Any<Stream>(), Arg.Any<FileParsingOptions>(), Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "Name", "Email" });
+            .Returns(new[] { "Name", "Email" });
         _parser.ReadPreviewAsync(Arg.Any<Stream>(), Arg.Any<FileParsingOptions>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(new List<string[]> { new[] { "Alice", "alice@test.com" } });
+            .Returns(new[] { new[] { "Alice", "alice@test.com" } });
 
         _fileProvider.SaveAsync(Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<CancellationToken>())
             .Returns("blob-ref-1");

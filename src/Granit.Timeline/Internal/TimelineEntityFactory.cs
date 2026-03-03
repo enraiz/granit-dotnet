@@ -7,6 +7,15 @@ using Granit.Timing;
 namespace Granit.Timeline.Internal;
 
 /// <summary>
+/// Groups the infrastructure services required for audit-field initialization.
+/// </summary>
+internal sealed record AuditContext(
+    IGuidGenerator GuidGenerator,
+    IClock Clock,
+    ICurrentUserService CurrentUser,
+    ICurrentTenant CurrentTenant);
+
+/// <summary>
 /// Centralizes <see cref="TimelineEntry"/> and <see cref="TimelineAttachment"/> construction
 /// to avoid duplicating audit-field initialization across store implementations.
 /// </summary>
@@ -18,23 +27,20 @@ internal static class TimelineEntityFactory
         TimelineEntryType entryType,
         string body,
         Guid? parentEntryId,
-        IGuidGenerator guidGenerator,
-        IClock clock,
-        ICurrentUserService currentUser,
-        ICurrentTenant currentTenant) =>
+        AuditContext ctx) =>
         new()
         {
-            Id = guidGenerator.Create(),
+            Id = ctx.GuidGenerator.Create(),
             EntityType = entityType,
             EntityId = entityId,
             EntryType = entryType,
             Body = body,
-            AuthorId = currentUser.UserId ?? string.Empty,
-            AuthorName = currentUser.UserName ?? string.Empty,
+            AuthorId = ctx.CurrentUser.UserId ?? string.Empty,
+            AuthorName = ctx.CurrentUser.UserName ?? string.Empty,
             ParentEntryId = parentEntryId,
-            CreatedAt = clock.Now,
-            CreatedBy = currentUser.UserId ?? string.Empty,
-            TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
+            CreatedAt = ctx.Clock.Now,
+            CreatedBy = ctx.CurrentUser.UserId ?? string.Empty,
+            TenantId = ctx.CurrentTenant.IsAvailable ? ctx.CurrentTenant.Id : null,
         };
 
     internal static TimelineAttachment CreateAttachment(
@@ -43,20 +49,17 @@ internal static class TimelineEntityFactory
         string fileName,
         string contentType,
         long sizeBytes,
-        IGuidGenerator guidGenerator,
-        IClock clock,
-        ICurrentUserService currentUser,
-        ICurrentTenant currentTenant) =>
+        AuditContext ctx) =>
         new()
         {
-            Id = guidGenerator.Create(),
+            Id = ctx.GuidGenerator.Create(),
             EntryId = entryId,
             BlobId = blobId,
             FileName = fileName,
             ContentType = contentType,
             SizeBytes = sizeBytes,
-            CreatedAt = clock.Now,
-            CreatedBy = currentUser.UserId ?? string.Empty,
-            TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
+            CreatedAt = ctx.Clock.Now,
+            CreatedBy = ctx.CurrentUser.UserId ?? string.Empty,
+            TenantId = ctx.CurrentTenant.IsAvailable ? ctx.CurrentTenant.Id : null,
         };
 }

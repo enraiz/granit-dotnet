@@ -41,8 +41,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnDelete_ConvertToSoftDelete()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestSoftDeletableEntity
+        await using TestDbContext context = CreateContext();
+        TestSoftDeletableEntity entity = new TestSoftDeletableEntity
         {
             Id = Guid.NewGuid(),
             Name = "ToDelete",
@@ -72,8 +72,8 @@ public sealed class SoftDeleteInterceptorTests
     public async Task SaveChangesAsync_OnModify_DoesNotTriggerSoftDelete()
     {
         // Arrange
-        await using var context = CreateContext();
-        var entity = new TestSoftDeletableEntity
+        await using TestDbContext context = CreateContext();
+        TestSoftDeletableEntity entity = new TestSoftDeletableEntity
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -96,12 +96,12 @@ public sealed class SoftDeleteInterceptorTests
 
     private TestDbContext CreateContext()
     {
-        var guidGenerator = Substitute.For<IGuidGenerator>();
+        IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
         ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
         currentTenant.IsAvailable.Returns(false);
-        var auditInterceptor = new AuditedEntityInterceptor(_currentUserService, _clock, guidGenerator, currentTenant);
-        var softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        AuditedEntityInterceptor auditInterceptor = new AuditedEntityInterceptor(_currentUserService, _clock, guidGenerator, currentTenant);
+        SoftDeleteInterceptor softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(auditInterceptor, softDeleteInterceptor)
             .Options;

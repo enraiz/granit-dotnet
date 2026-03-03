@@ -17,6 +17,8 @@ internal sealed class InMemoryTimelineStore(
     IGuidGenerator guidGenerator,
     ICurrentTenant currentTenant) : ITimelineStore
 {
+    private readonly AuditContext _audit = new(guidGenerator, clock, currentUser, currentTenant);
+
     internal readonly ConcurrentDictionary<Guid, TimelineEntry> Entries = new();
     internal readonly ConcurrentDictionary<Guid, TimelineAttachment> Attachments = new();
 
@@ -30,8 +32,7 @@ internal sealed class InMemoryTimelineStore(
         CancellationToken ct = default)
     {
         TimelineEntry entry = TimelineEntityFactory.CreateEntry(
-            entityType, entityId, entryType, body, parentEntryId,
-            guidGenerator, clock, currentUser, currentTenant);
+            entityType, entityId, entryType, body, parentEntryId, _audit);
 
         Entries[entry.Id] = entry;
         return Task.FromResult(entry);
@@ -71,8 +72,7 @@ internal sealed class InMemoryTimelineStore(
         }
 
         TimelineAttachment attachment = TimelineEntityFactory.CreateAttachment(
-            entryId, blobId, fileName, contentType, sizeBytes,
-            guidGenerator, clock, currentUser, currentTenant);
+            entryId, blobId, fileName, contentType, sizeBytes, _audit);
 
         Attachments[attachment.Id] = attachment;
         return Task.FromResult(attachment);

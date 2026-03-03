@@ -42,8 +42,6 @@ public sealed class RenameColumnForbiddenAnalyzer : EfCoreMigrationAnalyzerBase
     /// <inheritdoc/>
     protected override void AnalyzeMigrationInvocation(
         SyntaxNodeAnalysisContext context,
-        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration)
-    {
+        (INamedTypeSymbol MigrationClass, IMethodSymbol Method) migration) =>
         context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation()));
-    }
 }

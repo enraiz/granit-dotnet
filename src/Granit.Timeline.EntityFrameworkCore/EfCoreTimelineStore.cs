@@ -23,6 +23,8 @@ internal sealed class EfCoreTimelineStore(
     IGuidGenerator guidGenerator,
     ICurrentTenant currentTenant) : ITimelineStore
 {
+    private readonly AuditContext _audit = new(guidGenerator, clock, currentUser, currentTenant);
+
     /// <inheritdoc/>
     public async Task<TimelineEntry> PostEntryAsync(
         string entityType,
@@ -33,8 +35,7 @@ internal sealed class EfCoreTimelineStore(
         CancellationToken ct = default)
     {
         TimelineEntry entry = TimelineEntityFactory.CreateEntry(
-            entityType, entityId, entryType, body, parentEntryId,
-            guidGenerator, clock, currentUser, currentTenant);
+            entityType, entityId, entryType, body, parentEntryId, _audit);
 
         await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         db.TimelineEntries.Add(entry);
@@ -84,8 +85,7 @@ internal sealed class EfCoreTimelineStore(
         }
 
         TimelineAttachment attachment = TimelineEntityFactory.CreateAttachment(
-            entryId, blobId, fileName, contentType, sizeBytes,
-            guidGenerator, clock, currentUser, currentTenant);
+            entryId, blobId, fileName, contentType, sizeBytes, _audit);
 
         db.TimelineAttachments.Add(attachment);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);

@@ -29,18 +29,18 @@ internal sealed partial class ImportCommandWorker(
     /// <inheritdoc/>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (ExecuteImportCommand command in channel.Reader.ReadAllAsync(stoppingToken))
+        await foreach (Guid importJobId in channel.Reader.ReadAllAsync(stoppingToken).Select(command => command.ImportJobId))
         {
             try
             {
                 await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
                 IImportOrchestrator orchestrator =
                     scope.ServiceProvider.GetRequiredService<IImportOrchestrator>();
-                await orchestrator.ExecuteAsync(command.ImportJobId, stoppingToken).ConfigureAwait(false);
+                await orchestrator.ExecuteAsync(importJobId, stoppingToken).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                LogExecutionFailed(command.ImportJobId, ex);
+                LogExecutionFailed(importJobId, ex);
             }
         }
     }
