@@ -54,7 +54,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<QueryDefinition<TEntity>>(sp =>
         {
             TDefinition definition = new();
-            QueryingOptions options = sp.GetRequiredService<QueryingOptions>();
+            QueryingOptions options = sp.GetService<QueryingOptions>() ?? new();
             definition.Initialize(options);
             return definition;
         });

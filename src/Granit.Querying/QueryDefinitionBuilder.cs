@@ -10,6 +10,11 @@ namespace Granit.Querying;
 /// <typeparam name="TEntity">The target entity type.</typeparam>
 public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
 {
+    /// <summary>
+    /// Initializes a new builder with default querying options.
+    /// </summary>
+    public QueryDefinitionBuilder() : this(new QueryingOptions()) { }
+
     internal QueryDefinitionBuilder(QueryingOptions options)
     {
         DefaultPageSizeValue = options.DefaultPageSize;
