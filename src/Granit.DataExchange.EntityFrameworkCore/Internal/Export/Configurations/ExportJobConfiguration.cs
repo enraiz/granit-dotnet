@@ -1,0 +1,40 @@
+using Granit.DataExchange.Export;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Granit.DataExchange.EntityFrameworkCore.Internal.Export.Configurations;
+
+/// <summary>
+/// EF Core configuration for <see cref="ExportJob"/>.
+/// </summary>
+internal sealed class ExportJobConfiguration : IEntityTypeConfiguration<ExportJob>
+{
+    public void Configure(EntityTypeBuilder<ExportJob> builder)
+    {
+        builder.ToTable("data_import_export_jobs");
+        builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.DefinitionName).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.Format).HasMaxLength(10).IsRequired();
+        builder.Property(e => e.RequestJson).IsRequired();
+        builder.Property(e => e.Status).IsRequired();
+        builder.Property(e => e.BlobReference).HasMaxLength(500);
+        builder.Property(e => e.FileName).HasMaxLength(500);
+        builder.Property(e => e.RowCount);
+        builder.Property(e => e.ErrorMessage).HasMaxLength(2000);
+        builder.Property(e => e.CompletedAt);
+        builder.Property(e => e.TenantId);
+
+        // Audit fields from AuditedEntity
+        builder.Property(e => e.CreatedAt).IsRequired();
+        builder.Property(e => e.CreatedBy).HasMaxLength(200);
+        builder.Property(e => e.ModifiedAt);
+        builder.Property(e => e.ModifiedBy).HasMaxLength(200);
+
+        builder.HasIndex(e => e.TenantId)
+            .HasDatabaseName("ix_export_jobs_tenant");
+
+        builder.HasIndex(e => e.Status)
+            .HasDatabaseName("ix_export_jobs_status");
+    }
+}
