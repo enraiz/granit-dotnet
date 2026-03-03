@@ -1,6 +1,6 @@
-# Data Import
+# Data Exchange
 
-`Granit.DataImport` est le socle du pipeline d'import de données du framework Granit.
+`Granit.DataExchange` est le socle du pipeline d'import de données du framework Granit.
 Il fournit un mini-ETL intégré : **Extract → Map → Validate → Execute**, avec un moteur
 de suggestion de mapping intelligent à 4 niveaux et un support de roundtrip
 (INSERT vs UPDATE).
@@ -8,7 +8,7 @@ de suggestion de mapping intelligent à 4 niveaux et un support de roundtrip
 ```text
 Granit.Core + Granit.Timing + Granit.Validation
                     │
-            Granit.DataImport           ← socle (interfaces + pipeline)
+            Granit.DataExchange           ← socle (interfaces + pipeline)
             ┌───────┼────────┐
             │       │        │
      .Csv (Sep)  .Excel   .EntityFrameworkCore
@@ -18,8 +18,8 @@ Granit.Core + Granit.Timing + Granit.Validation
                           (REST API, Wolverine)
 ```
 
-> **Packages de parsing** : `Granit.DataImport.Csv` utilise
-> [Sep](https://github.com/nietras/Sep) (MIT, SIMD) et `Granit.DataImport.Excel`
+> **Packages de parsing** : `Granit.DataExchange.Csv` utilise
+> [Sep](https://github.com/nietras/Sep) (MIT, SIMD) et `Granit.DataExchange.Excel`
 > utilise [Sylvan.Data.Excel](https://github.com/MarkPflug/Sylvan.Data.Excel)
 > (MIT, zero-dep). ClosedXML reste dédié à la **génération** dans
 > `Granit.DocumentGeneration.Excel`.
@@ -27,25 +27,25 @@ Granit.Core + Granit.Timing + Granit.Validation
 ## Installation
 
 ```bash
-dotnet add package Granit.DataImport
+dotnet add package Granit.DataExchange
 ```
 
 Puis ajouter un ou plusieurs parseurs :
 
 ```bash
-dotnet add package Granit.DataImport.Csv
-dotnet add package Granit.DataImport.Excel
+dotnet add package Granit.DataExchange.Csv
+dotnet add package Granit.DataExchange.Excel
 ```
 
 ## Enregistrement DI
 
 ```csharp
 // Socle (interfaces, pipeline, options)
-services.AddGranitDataImport();
+services.AddGranitDataExchange();
 
 // Parseurs (au moins un requis)
-services.AddGranitDataImportCsv();
-services.AddGranitDataImportExcel();
+services.AddGranitDataExchangeCsv();
+services.AddGranitDataExchangeExcel();
 
 // Définition d'import par entité
 services.AddImportDefinition<Patient, PatientImportDefinition>();
@@ -186,7 +186,7 @@ en mémoire.
 
 ```json
 {
-  "DataImport": {
+  "DataExchange": {
     "DefaultMaxFileSizeMb": 50,
     "DefaultBatchSize": 500,
     "FuzzyMatchThreshold": 0.8
@@ -228,12 +228,12 @@ foreach (ImportRowError error in report.RowErrors)
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.DataImport.Csv` | Parseur CSV via Sep (SIMD, zero-alloc) |
-| `Granit.DataImport.Excel` | Parseur Excel via Sylvan.Data.Excel (streaming) |
-| `Granit.DataImport.EntityFrameworkCore` | Executor EF Core, stores, identity resolvers |
-| `Granit.DataImport.Endpoints` | API REST + Wolverine (upload, preview, execute, rapport) |
+| `Granit.DataExchange.Csv` | Parseur CSV via Sep (SIMD, zero-alloc) |
+| `Granit.DataExchange.Excel` | Parseur Excel via Sylvan.Data.Excel (streaming) |
+| `Granit.DataExchange.EntityFrameworkCore` | Executor EF Core, stores, identity resolvers |
+| `Granit.DataExchange.Endpoints` | API REST + Wolverine (upload, preview, execute, rapport) |
 
-## Parseur CSV (`Granit.DataImport.Csv`)
+## Parseur CSV (`Granit.DataExchange.Csv`)
 
 Implémente `IFileParser` via [Sep](https://github.com/nietras/Sep) (MIT, SIMD
 AVX-512/NEON, zero-alloc). Accepte les MIME types `text/csv` et `application/csv`.
@@ -255,7 +255,7 @@ AVX-512/NEON, zero-alloc). Accepte les MIME types `text/csv` et `application/csv
 
 ```csharp
 // Enregistrement DI
-services.AddGranitDataImportCsv();
+services.AddGranitDataExchangeCsv();
 
 // Utilisation directe (tests, scripts)
 SepCsvFileParser parser = new();
@@ -289,7 +289,7 @@ await foreach (RawImportRow row in parser.ParseAsync(stream, options))
 | `SkipRows` | `0` | Lignes à ignorer avant l'en-tête |
 | `HeaderRowIndex` | `0` | Index de la ligne d'en-tête (après `SkipRows`) |
 
-## Parseur Excel (`Granit.DataImport.Excel`)
+## Parseur Excel (`Granit.DataExchange.Excel`)
 
 Implémente `IFileParser` via [Sylvan.Data.Excel](https://github.com/MarkPflug/Sylvan.Data.Excel)
 (MIT, zero-dep, streaming `DbDataReader`). Accepte les formats `.xlsx`, `.xls` et `.xlsb`
@@ -311,7 +311,7 @@ via les MIME types correspondants.
 
 ```csharp
 // Enregistrement DI
-services.AddGranitDataImportExcel();
+services.AddGranitDataExchangeExcel();
 
 // Utilisation directe (tests, scripts)
 SylvanExcelFileParser parser = new();
@@ -353,23 +353,23 @@ FileParsingOptions sheetOptions = new()
 | `application/vnd.ms-excel` | BIFF (Excel 97–2003) | `.xls` |
 | `application/vnd.ms-excel.sheet.binary.macroenabled.12` | Binary | `.xlsb` |
 
-## Persistance EF Core (`Granit.DataImport.EntityFrameworkCore`)
+## Persistance EF Core (`Granit.DataExchange.EntityFrameworkCore`)
 
-Couche de persistance EF Core pour le pipeline DataImport. Fournit un `DataImportDbContext`
+Couche de persistance EF Core pour le pipeline DataExchange. Fournit un `DataExchangeDbContext`
 isolé, les stores (mappings sauvegardés, import jobs), les identity resolvers (business key,
 composite key, external ID) et l'executor batché.
 
 ### Installation
 
 ```bash
-dotnet add package Granit.DataImport.EntityFrameworkCore
+dotnet add package Granit.DataExchange.EntityFrameworkCore
 ```
 
 ### Enregistrement DI
 
 ```csharp
-// Host builder — enregistre le DataImportDbContext isolé
-builder.AddGranitDataImportEntityFrameworkCore(opts =>
+// Host builder — enregistre le DataExchangeDbContext isolé
+builder.AddGranitDataExchangeEntityFrameworkCore(opts =>
     opts.UseNpgsql(connectionString));
 
 // Par entité — executor et identity resolver
@@ -385,7 +385,7 @@ services.AddBusinessKeyResolver<Patient, GuavaDbContext>();
 
 Le package manipule **deux** DbContexts distincts :
 
-1. **`DataImportDbContext`** (isolé, propriété du package) — stocke `ImportJob`,
+1. **`DataExchangeDbContext`** (isolé, propriété du package) — stocke `ImportJob`,
    `SavedMappingEntity`, `ExternalIdMappingEntity`. Utilisé via `IDbContextFactory<>`.
 2. **DbContext applicatif** (ex. `GuavaDbContext`) — contient les entités importées
    (ex. `Patient`). Fourni par l'application.
@@ -397,9 +397,9 @@ de type** : `<TEntity, TContext>` où `TContext : DbContext`.
 
 | Table | Entité | Rôle |
 | --- | --- | --- |
-| `data_import_jobs` | `ImportJob` | Suivi du cycle de vie des imports |
-| `data_import_saved_mappings` | `SavedMappingEntity` | Mappings sauvegardés par définition + tenant |
-| `data_import_external_id_mappings` | `ExternalIdMappingEntity` | Mapping ID externe → ID interne |
+| `data_exchange_jobs` | `ImportJob` | Suivi du cycle de vie des imports |
+| `data_exchange_saved_mappings` | `SavedMappingEntity` | Mappings sauvegardés par définition + tenant |
+| `data_exchange_external_id_mappings` | `ExternalIdMappingEntity` | Mapping ID externe → ID interne |
 
 ### Identity Resolvers
 
@@ -422,28 +422,28 @@ L'executor persiste les entités validées en batch :
 7. DryRun : rollback de la transaction
 8. Commit et retourne `ImportReport`
 
-## Endpoints REST (`Granit.DataImport.Endpoints`)
+## Endpoints REST (`Granit.DataExchange.Endpoints`)
 
-Minimal API protégée par la permission `DataImport.Admin`. 9 endpoints répartis
+Minimal API protégée par la permission `DataExchange.Import`. 9 endpoints répartis
 en 3 groupes : upload, exécution et rapport.
 
 ### Installation
 
 ```bash
-dotnet add package Granit.DataImport.Endpoints
+dotnet add package Granit.DataExchange.Endpoints
 ```
 
 ### Enregistrement
 
 ```csharp
 // Module (si module system utilisé)
-[DependsOn(typeof(GranitDataImportEndpointsModule))]
+[DependsOn(typeof(GranitDataExchangeEndpointsModule))]
 
 // Routing (dans Program.cs ou Startup)
-app.MapDataImportEndpoints();
+app.MapDataExchangeEndpoints();
 
 // Avec options personnalisées
-app.MapDataImportEndpoints(opts =>
+app.MapDataExchangeEndpoints(opts =>
 {
     opts.ApiPrefix = "api/v1";
     opts.RoutePrefix = "imports";
@@ -481,10 +481,10 @@ app.MapDataImportEndpoints(opts =>
 
 ```json
 {
-  "DataImportEndpoints": {
+  "DataExchangeEndpoints": {
     "ApiPrefix": "",
-    "RoutePrefix": "data-import",
-    "RequiredRole": "granit-data-import-admin",
+    "RoutePrefix": "data-exchange",
+    "RequiredRole": "granit-data-exchange-admin",
     "TagName": "Data Import"
   }
 }
@@ -492,7 +492,7 @@ app.MapDataImportEndpoints(opts =>
 
 ### Permissions
 
-Le module enregistre automatiquement la permission `DataImport.Admin` dans le
+Le module enregistre automatiquement la permission `DataExchange.Import` dans le
 système RBAC Granit. En production, attribuer cette permission au rôle Keycloak
 souhaité via `IPermissionManager.SetAsync()` ou `GranitAuthorizationOptions.AdminRoles`.
 

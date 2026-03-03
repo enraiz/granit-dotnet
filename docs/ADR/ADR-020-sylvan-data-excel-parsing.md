@@ -4,11 +4,11 @@
 - **Date** : 2026-03-01
 - **Issue** : [#476](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/476)
 - **Auteurs** : Équipe Digital Dynamics
-- **Portée** : granit-dotnet (Granit.DataImport.Excel)
+- **Portée** : granit-dotnet (Granit.DataExchange.Excel)
 
 ## Contexte
 
-Le module `Granit.DataImport.Excel` nécessite un parser Excel capable de lire
+Le module `Granit.DataExchange.Excel` nécessite un parser Excel capable de lire
 des fichiers `.xlsx`, `.xlsb` et `.xls` en streaming, sans charger l'intégralité
 du classeur en mémoire (modèle DOM). Les cas d'usage incluent : import de données
 patients, réimport roundtrip, chargement initial depuis des fichiers legacy `.xls`.
@@ -23,13 +23,13 @@ La bibliothèque doit supporter :
 - **Streaming** : lecture forward-only sans chargement DOM
 - **Formats** : `.xlsx`, `.xlsb`, `.xls` (fichiers legacy)
 - **Performance** : 100K+ lignes avec empreinte mémoire minimale
-- **Async** : support non-bloquant pour le pipeline DataImport
+- **Async** : support non-bloquant pour le pipeline DataExchange
 - **Licence** : compatible usage commercial sans coût récurrent
 - **Dépendances** : minimales (éviter les conflits avec ClosedXML)
 
 ## Décision
 
-**Sylvan.Data.Excel** pour la lecture de fichiers Excel dans `Granit.DataImport.Excel`.
+**Sylvan.Data.Excel** pour la lecture de fichiers Excel dans `Granit.DataExchange.Excel`.
 
 > ClosedXML reste pour la **génération** (`Granit.DocumentGeneration.Excel`).
 
