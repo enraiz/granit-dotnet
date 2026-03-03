@@ -291,6 +291,231 @@ public sealed class ExportOrchestratorTests
         job.RowCount.ShouldBe(2);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_with_empty_selected_fields_returns_all()
+    {
+        // Arrange — empty list (not null) should behave like null: return all fields
+        ExportOrchestrator sut = CreateOrchestrator();
+        Guid jobId = Guid.NewGuid();
+        ExportRequest request = new("Test.Export", "csv", [], false, null, null, null, null);
+        ExportJob job = new()
+        {
+            Id = jobId,
+            DefinitionName = "Test.Export",
+            Format = "csv",
+            RequestJson = JsonSerializer.Serialize(request),
+            Status = ExportJobStatus.Queued,
+        };
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        IReadOnlyList<ExportFieldDescriptor>? capturedFields = null;
+        IExportWriter capturedWriter = Substitute.For<IExportWriter>();
+        capturedWriter.CanWrite("csv").Returns(true);
+        capturedWriter.FileExtension.Returns(".csv");
+        capturedWriter.MimeType.Returns("text/csv");
+        capturedWriter.WriteAsync(
+            Arg.Any<Stream>(),
+            Arg.Any<IReadOnlyList<ExportFieldDescriptor>>(),
+            Arg.Any<IAsyncEnumerable<IReadOnlyDictionary<string, object?>>>(),
+            Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                capturedFields = call.Arg<IReadOnlyList<ExportFieldDescriptor>>();
+                return Task.CompletedTask;
+            });
+
+        ExportOrchestrator sutWithCapture = CreateOrchestrator(capturedWriter);
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        // Act
+        await sutWithCapture.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
+
+        // Assert — all 3 fields from TestExportDefinition
+        capturedFields.ShouldNotBeNull();
+        capturedFields!.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_with_selected_fields_preserves_user_order()
+    {
+        // Arrange — user asks for Email before Name
+        ExportOrchestrator sut = CreateOrchestrator();
+        Guid jobId = Guid.NewGuid();
+        ExportRequest request = new("Test.Export", "csv", ["Email", "Name"], false, null, null, null, null);
+        ExportJob job = new()
+        {
+            Id = jobId,
+            DefinitionName = "Test.Export",
+            Format = "csv",
+            RequestJson = JsonSerializer.Serialize(request),
+            Status = ExportJobStatus.Queued,
+        };
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        IReadOnlyList<ExportFieldDescriptor>? capturedFields = null;
+        IExportWriter capturedWriter = Substitute.For<IExportWriter>();
+        capturedWriter.CanWrite("csv").Returns(true);
+        capturedWriter.FileExtension.Returns(".csv");
+        capturedWriter.MimeType.Returns("text/csv");
+        capturedWriter.WriteAsync(
+            Arg.Any<Stream>(),
+            Arg.Any<IReadOnlyList<ExportFieldDescriptor>>(),
+            Arg.Any<IAsyncEnumerable<IReadOnlyDictionary<string, object?>>>(),
+            Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                capturedFields = call.Arg<IReadOnlyList<ExportFieldDescriptor>>();
+                return Task.CompletedTask;
+            });
+
+        ExportOrchestrator sutWithCapture = CreateOrchestrator(capturedWriter);
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        // Act
+        await sutWithCapture.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
+
+        // Assert — order preserved as user specified
+        capturedFields.ShouldNotBeNull();
+        capturedFields!.Count.ShouldBe(2);
+        capturedFields[0].PropertyPath.ShouldBe("Email");
+        capturedFields[1].PropertyPath.ShouldBe("Name");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_filename_contains_sanitized_definition_name()
+    {
+        // Arrange
+        ExportOrchestrator sut = CreateOrchestrator();
+        Guid jobId = Guid.NewGuid();
+        ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        // Act
+        await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
+
+        // Assert — definition name "Test.Export" becomes "Test_Export" in filename
+        job.FileName.ShouldNotBeNull();
+        job.FileName!.ShouldStartWith("Test_Export_");
+        job.FileName.ShouldEndWith(".csv");
+        // The dot in "Test.Export" should be sanitized to underscore
+        string nameWithoutExtension = Path.GetFileNameWithoutExtension(job.FileName);
+        nameWithoutExtension.ShouldNotContain(".");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithQueryDefinition_passes_filter_and_search()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        Dictionary<string, string> filter = new() { ["name.eq"] = "Alice" };
+        Dictionary<string, string> presets = new() { ["status"] = "Active" };
+        ExportRequest request = new("Test.QueryExport", "csv", null, false, "-Name", filter, presets, "test search");
+        ExportJob job = new()
+        {
+            Id = jobId,
+            DefinitionName = "Test.QueryExport",
+            Format = "csv",
+            RequestJson = JsonSerializer.Serialize(request),
+            Status = ExportJobStatus.Queued,
+        };
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        FakeQueryEngine queryEngine = new();
+        ExportOrchestrator sut = CreateOrchestratorWithQueryEngine(queryEngine);
+
+        // Act
+        await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
+
+        // Assert — all query params forwarded
+        queryEngine.StreamCalled.ShouldBeTrue();
+        queryEngine.CapturedRequest.ShouldNotBeNull();
+        queryEngine.CapturedRequest!.Sort.ShouldBe("-Name");
+        queryEngine.CapturedRequest.Search.ShouldBe("test search");
+        queryEngine.CapturedRequest.Filter.ShouldNotBeNull();
+        queryEngine.CapturedRequest.Filter!["name.eq"].ShouldBe("Alice");
+        queryEngine.CapturedRequest.Presets.ShouldNotBeNull();
+        queryEngine.CapturedRequest.Presets!["status"].ShouldBe("Active");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_OperationCanceledException_propagates_without_catch()
+    {
+        // Arrange — OperationCanceledException should NOT be caught by the error handler
+        Guid jobId = Guid.NewGuid();
+        ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        IExportWriter cancelWriter = Substitute.For<IExportWriter>();
+        cancelWriter.CanWrite("csv").Returns(true);
+        cancelWriter.FileExtension.Returns(".csv");
+        cancelWriter.MimeType.Returns("text/csv");
+        cancelWriter.WriteAsync(
+            Arg.Any<Stream>(),
+            Arg.Any<IReadOnlyList<ExportFieldDescriptor>>(),
+            Arg.Any<IAsyncEnumerable<IReadOnlyDictionary<string, object?>>>(),
+            Arg.Any<CancellationToken>())
+            .Returns<Task>(_ => throw new OperationCanceledException());
+
+        ExportOrchestrator sut = CreateOrchestrator(cancelWriter);
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        // Act & Assert — should propagate, NOT set job to Failed
+        await Should.ThrowAsync<OperationCanceledException>(
+            () => sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken));
+
+        job.Status.ShouldNotBe(ExportJobStatus.Failed);
+    }
+
+    [Fact]
+    public async Task GetDownloadAsync_completed_job_xlsx_returns_correct_mime_type()
+    {
+        // Arrange — xlsx format
+        ExportOrchestrator sut = CreateOrchestrator();
+        Guid jobId = Guid.NewGuid();
+        ExportJob job = new()
+        {
+            Id = jobId,
+            DefinitionName = "Test.Export",
+            Format = "xlsx",
+            RequestJson = "{}",
+            Status = ExportJobStatus.Completed,
+            BlobReference = "blob-ref-xlsx",
+            FileName = "test_export.xlsx",
+        };
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        IExportWriter xlsxWriter = Substitute.For<IExportWriter>();
+        xlsxWriter.CanWrite("xlsx").Returns(true);
+        xlsxWriter.MimeType.Returns("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        MemoryStream blobStream = new([1, 2, 3]);
+        _fileProvider.OpenAsync("blob-ref-xlsx", Arg.Any<CancellationToken>())
+            .Returns(blobStream);
+
+        ServiceCollection services = new();
+        services.AddSingleton<IExportDefinitionDescriptor>(new TestExportDefinition());
+        services.AddSingleton<IExportDataSource<TestEntity>>(new TestDataSource());
+        services.AddSingleton(Options.Create(new ExportOptions()));
+        ServiceProvider sp = services.BuildServiceProvider();
+
+        ExportOrchestrator sutXlsx = new(
+            sp,
+            [xlsxWriter],
+            _jobStore,
+            _dispatcher,
+            _fileProvider,
+            _clock,
+            NullLogger<ExportOrchestrator>.Instance);
+
+        // Act
+        ExportDownload? download = await sutXlsx.GetDownloadAsync(jobId, TestContext.Current.CancellationToken);
+
+        // Assert
+        download.ShouldNotBeNull();
+        download!.MimeType.ShouldBe("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        download.FileName.ShouldBe("test_export.xlsx");
+    }
+
     // ── GetJobAsync ─────────────────────────────────────────────────────
 
     [Fact]

@@ -1,3 +1,5 @@
+using Granit.DataExchange.Export;
+using Granit.DataExchange.Export.Internal;
 using Granit.DataExchange.Import.Internal;
 using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Pipeline;
@@ -113,6 +115,118 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceProvider provider = services.BuildServiceProvider();
         ISemanticMappingService service = provider.GetRequiredService<ISemanticMappingService>();
         service.ShouldBeOfType<FakeSemanticMappingService>();
+    }
+
+    // ---- Export registration ----------------------------------------
+
+    [Fact]
+    public void AddGranitDataExport_registers_export_orchestrator()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataExport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IExportOrchestrator) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitDataExport_registers_null_job_store()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataExport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IExportJobStore) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitDataExport_registers_null_preset_store()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataExport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IExportPresetStore) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitDataExport_registers_command_dispatcher()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataExport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IExportCommandDispatcher) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void AddGranitDataExport_returns_service_collection_for_chaining()
+    {
+        ServiceCollection services = new();
+
+        IServiceCollection result = services.AddGranitDataExport();
+
+        result.ShouldBeSameAs(services);
+    }
+
+    [Fact]
+    public void AddExportDefinition_registers_definition_as_singleton()
+    {
+        ServiceCollection services = new();
+
+        services.AddExportDefinition<TestExportEntity, TestExportEntityDefinition>();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(ExportDefinition<TestExportEntity>) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void AddExportDefinition_registers_descriptor_as_singleton()
+    {
+        ServiceCollection services = new();
+
+        services.AddExportDefinition<TestExportEntity, TestExportEntityDefinition>();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IExportDefinitionDescriptor) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void AddExportDefinition_descriptor_resolves_to_definition_instance()
+    {
+        ServiceCollection services = new();
+        services.AddExportDefinition<TestExportEntity, TestExportEntityDefinition>();
+        ServiceProvider provider = services.BuildServiceProvider();
+
+        IExportDefinitionDescriptor descriptor = provider.GetRequiredService<IExportDefinitionDescriptor>();
+
+        descriptor.Name.ShouldBe("Test.ExportEntity");
+        descriptor.EntityType.ShouldBe(typeof(TestExportEntity));
+    }
+
+    // ---- Test helpers ------------------------------------------------
+
+    private sealed class TestExportEntity
+    {
+        public string Name { get; set; } = string.Empty;
+    }
+
+    private sealed class TestExportEntityDefinition : ExportDefinition<TestExportEntity>
+    {
+        public override string Name => "Test.ExportEntity";
+
+        protected override void Configure(ExportDefinitionBuilder<TestExportEntity> builder) =>
+            builder.Field(e => e.Name);
     }
 
     private sealed class FakeSemanticMappingService : ISemanticMappingService
