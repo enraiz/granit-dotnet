@@ -10,6 +10,12 @@ namespace Granit.Querying;
 /// <typeparam name="TEntity">The target entity type.</typeparam>
 public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
 {
+    internal QueryDefinitionBuilder(QueryingOptions options)
+    {
+        DefaultPageSizeValue = options.DefaultPageSize;
+        MaxPageSizeValue = options.MaxPageSize;
+    }
+
     internal List<ColumnDescriptor> Columns { get; } = [];
     internal List<FilterGroupDescriptor> FilterGroups { get; } = [];
     internal List<DateFilterDescriptor> DateFilters { get; } = [];
@@ -17,8 +23,8 @@ public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
     internal List<AggregateDescriptor> Aggregates { get; } = [];
     internal List<QuickFilterDescriptor> QuickFilters { get; } = [];
     internal List<string> GlobalSearchProperties { get; } = [];
-    internal int DefaultPageSizeValue { get; private set; } = 20;
-    internal int MaxPageSizeValue { get; private set; } = 100;
+    internal int DefaultPageSizeValue { get; private set; }
+    internal int MaxPageSizeValue { get; private set; }
     internal string? CursorPropertyName { get; private set; }
     internal string? DefaultSortValue { get; private set; }
 

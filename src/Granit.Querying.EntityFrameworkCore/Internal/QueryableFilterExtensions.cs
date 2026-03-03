@@ -220,15 +220,12 @@ internal static class QueryableFilterExtensions
         }
 
         // Apply explicitly requested quick filters (AND semantics)
-        HashSet<string> active = activeQuickFilters
+        var active = activeQuickFilters
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        foreach (QuickFilterDescriptor filter in builder.QuickFilters)
+        foreach (var filter in builder.QuickFilters.Where(f => active.Contains(f.Name)))
         {
-            if (active.Contains(filter.Name))
-            {
-                query = query.Where((Expression<Func<TEntity, bool>>)filter.Predicate);
-            }
+            query = query.Where((Expression<Func<TEntity, bool>>)filter.Predicate);
         }
 
         return query;

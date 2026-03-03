@@ -33,6 +33,7 @@ namespace Granit.Querying;
 public abstract class QueryDefinition<TEntity> : IQueryDefinitionDescriptor where TEntity : class
 {
     private QueryDefinitionBuilder<TEntity>? _builder;
+    private QueryingOptions _options = new();
 
     /// <summary>
     /// Unique name identifying this query definition (e.g. <c>"Guava.Patients"</c>).
@@ -52,6 +53,17 @@ public abstract class QueryDefinition<TEntity> : IQueryDefinitionDescriptor wher
     protected abstract void Configure(QueryDefinitionBuilder<TEntity> builder);
 
     /// <summary>
+    /// Sets the global querying options. Called by the DI factory in
+    /// <see cref="ServiceCollectionExtensions.AddQueryDefinition{TEntity, TDefinition}"/>
+    /// before the builder is initialized.
+    /// </summary>
+    /// <param name="options">The global querying options.</param>
+    internal void Initialize(QueryingOptions options)
+    {
+        _options = options;
+    }
+
+    /// <summary>
     /// Gets the built definition metadata (lazily initialized).
     /// </summary>
     internal QueryDefinitionBuilder<TEntity> GetBuilder()
@@ -61,7 +73,7 @@ public abstract class QueryDefinition<TEntity> : IQueryDefinitionDescriptor wher
             return _builder;
         }
 
-        _builder = new QueryDefinitionBuilder<TEntity>();
+        _builder = new QueryDefinitionBuilder<TEntity>(_options);
         Configure(_builder);
         return _builder;
     }

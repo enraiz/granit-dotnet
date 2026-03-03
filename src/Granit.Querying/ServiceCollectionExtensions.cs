@@ -1,6 +1,7 @@
 using Granit.Querying.SavedViews;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Querying;
 
@@ -28,6 +29,13 @@ public static class ServiceCollectionExtensions
     {
         services.TryAddScoped<ISavedViewStore, NullSavedViewStore>();
 
+        // Register QueryingOptions with defaults from QueryingDefaults.
+        // Consuming applications can override via:
+        //   services.Configure<QueryingOptions>(config.GetSection("Querying"));
+        //   services.Configure<QueryingOptions>(o => o.DefaultPageSize = 50);
+        services.TryAddSingleton(sp =>
+            sp.GetRequiredService<IOptions<QueryingOptions>>().Value);
+
         return services;
     }
 
@@ -41,9 +49,15 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddQueryDefinition<TEntity, TDefinition>(
         this IServiceCollection services)
         where TEntity : class
-        where TDefinition : QueryDefinition<TEntity>
+        where TDefinition : QueryDefinition<TEntity>, new()
     {
-        services.AddSingleton<QueryDefinition<TEntity>, TDefinition>();
+        services.AddSingleton<QueryDefinition<TEntity>>(sp =>
+        {
+            TDefinition definition = new();
+            QueryingOptions options = sp.GetRequiredService<QueryingOptions>();
+            definition.Initialize(options);
+            return definition;
+        });
         services.AddSingleton<IQueryDefinitionDescriptor>(sp =>
             sp.GetRequiredService<QueryDefinition<TEntity>>());
         return services;
