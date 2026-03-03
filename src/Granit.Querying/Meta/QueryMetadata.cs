@@ -18,6 +18,9 @@ public sealed record QueryMetadata
     /// <summary>Preset filter groups (Odoo-style).</summary>
     public required IReadOnlyList<FilterGroupMetaDto> PresetFilterGroups { get; init; }
 
+    /// <summary>Independent toggleable filters (Odoo-style quick filters).</summary>
+    public required IReadOnlyList<QuickFilterMetaDto> QuickFilters { get; init; }
+
     /// <summary>Date filter shortcuts.</summary>
     public required IReadOnlyList<DateFilterMetaDto> DateFilters { get; init; }
 

@@ -15,6 +15,7 @@ public sealed class QueryMetadataTests
             FilterableFields = [new FilterableFieldDto("Name", "String", [Granit.Querying.Filtering.FilterOperator.Eq])],
             SortableFields = [new SortableFieldDto("Name")],
             PresetFilterGroups = [new FilterGroupMetaDto("Status", "Statut", [new PresetMetaDto("Active", "Actif", true)])],
+            QuickFilters = [new QuickFilterMetaDto("MyItems", "Mes éléments", true)],
             DateFilters = [new DateFilterMetaDto("CreatedAt", DatePeriod.ThisMonth, [DatePeriod.Today, DatePeriod.ThisMonth, DatePeriod.ThisYear])],
             GroupByFields = [new GroupByFieldDto("Status", "String")],
             Pagination = new PaginationMetaDto(20, 100, true),
@@ -94,6 +95,16 @@ public sealed class QueryMetadataTests
     }
 
     [Fact]
+    public void QuickFilterMetaDto_properties()
+    {
+        QuickFilterMetaDto filter = new("MyAppointments", "Mes rendez-vous", true);
+
+        filter.Name.ShouldBe("MyAppointments");
+        filter.Label.ShouldBe("Mes rendez-vous");
+        filter.IsDefault.ShouldBeTrue();
+    }
+
+    [Fact]
     public void DefaultSort_can_be_null()
     {
         QueryMetadata metadata = new()
@@ -102,6 +113,7 @@ public sealed class QueryMetadataTests
             FilterableFields = [],
             SortableFields = [],
             PresetFilterGroups = [],
+            QuickFilters = [],
             DateFilters = [],
             GroupByFields = [],
             Pagination = new PaginationMetaDto(20, 100, false),

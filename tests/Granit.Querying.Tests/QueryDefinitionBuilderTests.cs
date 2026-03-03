@@ -189,6 +189,46 @@ public sealed class QueryDefinitionBuilderTests
 
         builder.Columns[0].ClrType.ShouldBe(typeof(DateTimeOffset?));
     }
+
+    [Fact]
+    public void QuickFilter_registers_filter_without_label()
+    {
+        QueryDefinitionBuilder<TestEntity> builder = new();
+
+        builder.QuickFilter("MyItems", e => e.Name == "test");
+
+        builder.QuickFilters.Count.ShouldBe(1);
+        builder.QuickFilters[0].Name.ShouldBe("MyItems");
+        builder.QuickFilters[0].Label.ShouldBeNull();
+        builder.QuickFilters[0].IsDefault.ShouldBeFalse();
+        builder.QuickFilters[0].Predicate.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void QuickFilter_registers_filter_with_label_and_default()
+    {
+        QueryDefinitionBuilder<TestEntity> builder = new();
+
+        builder.QuickFilter("MyItems", "Mes éléments", e => e.Name == "test", isDefault: true);
+
+        builder.QuickFilters.Count.ShouldBe(1);
+        builder.QuickFilters[0].Name.ShouldBe("MyItems");
+        builder.QuickFilters[0].Label.ShouldBe("Mes éléments");
+        builder.QuickFilters[0].IsDefault.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void QuickFilter_chaining_returns_same_builder()
+    {
+        QueryDefinitionBuilder<TestEntity> builder = new();
+
+        QueryDefinitionBuilder<TestEntity> result = builder
+            .QuickFilter("A", e => e.Age > 18)
+            .QuickFilter("B", "Label B", e => e.Age < 65);
+
+        result.ShouldBeSameAs(builder);
+        builder.QuickFilters.Count.ShouldBe(2);
+    }
 }
 
 public sealed class TestEntity

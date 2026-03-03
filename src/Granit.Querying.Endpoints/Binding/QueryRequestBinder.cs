@@ -40,6 +40,7 @@ public static class QueryRequestBinder
 
         Dictionary<string, string>? filter = ParseBracketedParams(query, "filter");
         Dictionary<string, string>? presets = ParseBracketedParams(query, "presets");
+        List<string>? quickFilters = ParseCommaSeparatedList(query["quickFilters"]);
 
         QueryRequest request = new()
         {
@@ -50,6 +51,7 @@ public static class QueryRequestBinder
             Sort = sort,
             Filter = filter,
             Presets = presets,
+            QuickFilters = quickFilters,
             GroupBy = groupBy,
         };
 
@@ -58,6 +60,21 @@ public static class QueryRequestBinder
 
     private static int? TryParseInt(string? value) =>
         int.TryParse(value, out int result) ? result : null;
+
+    /// <summary>
+    /// Parses a comma-separated query string value into a list of strings.
+    /// For example, <c>quickFilters=MyAppointments,Unread</c> produces <c>["MyAppointments", "Unread"]</c>.
+    /// </summary>
+    private static List<string>? ParseCommaSeparatedList(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        string[] parts = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return parts.Length > 0 ? [.. parts] : null;
+    }
 
     /// <summary>
     /// Parses query string keys matching <c>prefix[key]=value</c> into a dictionary.

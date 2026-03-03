@@ -22,6 +22,7 @@ public sealed class QueryRequestBinderTests
         result.Sort.ShouldBeNull();
         result.Filter.ShouldBeNull();
         result.Presets.ShouldBeNull();
+        result.QuickFilters.ShouldBeNull();
         result.GroupBy.ShouldBeNull();
     }
 
@@ -119,6 +120,31 @@ public sealed class QueryRequestBinderTests
         result.Filter["Name.eq"].ShouldBe("Alice");
         result.Presets.ShouldNotBeNull();
         result.Presets["Status"].ShouldBe("active");
+    }
+
+    [Fact]
+    public async Task BindAsync_parses_quick_filters()
+    {
+        DefaultHttpContext context = CreateContext("?quickFilters=MyAppointments,Unread");
+
+        QueryRequest? result = await QueryRequestBinder.BindAsync(context, null!);
+
+        result.ShouldNotBeNull();
+        result.QuickFilters.ShouldNotBeNull();
+        result.QuickFilters.Count.ShouldBe(2);
+        result.QuickFilters[0].ShouldBe("MyAppointments");
+        result.QuickFilters[1].ShouldBe("Unread");
+    }
+
+    [Fact]
+    public async Task BindAsync_returns_null_quick_filters_when_absent()
+    {
+        DefaultHttpContext context = CreateContext("?page=1");
+
+        QueryRequest? result = await QueryRequestBinder.BindAsync(context, null!);
+
+        result.ShouldNotBeNull();
+        result.QuickFilters.ShouldBeNull();
     }
 
     [Fact]

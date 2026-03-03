@@ -10,14 +10,26 @@ namespace Granit.Querying;
 /// <typeparam name="TEntity">The target entity type.</typeparam>
 public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
 {
+    /// <summary>
+    /// Initializes a new builder with default querying options.
+    /// </summary>
+    public QueryDefinitionBuilder() : this(new QueryingOptions()) { }
+
+    internal QueryDefinitionBuilder(QueryingOptions options)
+    {
+        DefaultPageSizeValue = options.DefaultPageSize;
+        MaxPageSizeValue = options.MaxPageSize;
+    }
+
     internal List<ColumnDescriptor> Columns { get; } = [];
     internal List<FilterGroupDescriptor> FilterGroups { get; } = [];
     internal List<DateFilterDescriptor> DateFilters { get; } = [];
     internal List<GroupByDescriptor> GroupByFields { get; } = [];
     internal List<AggregateDescriptor> Aggregates { get; } = [];
+    internal List<QuickFilterDescriptor> QuickFilters { get; } = [];
     internal List<string> GlobalSearchProperties { get; } = [];
-    internal int DefaultPageSizeValue { get; private set; } = 20;
-    internal int MaxPageSizeValue { get; private set; } = 100;
+    internal int DefaultPageSizeValue { get; private set; }
+    internal int MaxPageSizeValue { get; private set; }
     internal string? CursorPropertyName { get; private set; }
     internal string? DefaultSortValue { get; private set; }
 
@@ -168,6 +180,53 @@ public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
             ClrType = typeof(TProp),
             Function = function,
             Alias = alias,
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Declares an independent toggleable filter (Odoo-style quick filter).
+    /// Unlike filter group presets which are mutually exclusive (OR within a group),
+    /// quick filters are independently activatable and combine with AND semantics.
+    /// </summary>
+    /// <param name="name">Unique name of the filter (e.g. <c>"MyAppointments"</c>).</param>
+    /// <param name="predicate">The predicate expression to apply when active.</param>
+    /// <param name="isDefault">Whether this filter is active by default.</param>
+    public QueryDefinitionBuilder<TEntity> QuickFilter(
+        string name,
+        Expression<Func<TEntity, bool>> predicate,
+        bool isDefault = false)
+    {
+        QuickFilters.Add(new QuickFilterDescriptor
+        {
+            Name = name,
+            Predicate = predicate,
+            IsDefault = isDefault,
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Declares an independent toggleable filter with a custom label.
+    /// </summary>
+    /// <param name="name">Unique name of the filter.</param>
+    /// <param name="label">User-facing label (e.g. <c>"Mes rendez-vous"</c>).</param>
+    /// <param name="predicate">The predicate expression to apply when active.</param>
+    /// <param name="isDefault">Whether this filter is active by default.</param>
+    public QueryDefinitionBuilder<TEntity> QuickFilter(
+        string name,
+        string label,
+        Expression<Func<TEntity, bool>> predicate,
+        bool isDefault = false)
+    {
+        QuickFilters.Add(new QuickFilterDescriptor
+        {
+            Name = name,
+            Label = label,
+            Predicate = predicate,
+            IsDefault = isDefault,
         });
 
         return this;

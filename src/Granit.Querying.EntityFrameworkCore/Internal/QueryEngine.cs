@@ -111,6 +111,10 @@ internal sealed class QueryEngine<TEntity>(
                     p.Name,
                     p.Label ?? p.Name,
                     p.IsDefault)).ToList())).ToList(),
+            QuickFilters = _builder.QuickFilters.Select(f => new QuickFilterMetaDto(
+                f.Name,
+                f.Label ?? f.Name,
+                f.IsDefault)).ToList(),
             DateFilters = _builder.DateFilters.Select(d => new DateFilterMetaDto(
                 d.PropertyName,
                 d.DefaultPeriod,
@@ -138,6 +142,9 @@ internal sealed class QueryEngine<TEntity>(
 
         // Apply presets
         query = query.ApplyPresets(request.Presets, _builder);
+
+        // Apply quick filters
+        query = query.ApplyQuickFilters(request.QuickFilters, _builder);
 
         // Apply global search
         if (!string.IsNullOrWhiteSpace(request.Search))

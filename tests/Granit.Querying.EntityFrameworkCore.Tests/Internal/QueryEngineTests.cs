@@ -190,6 +190,69 @@ public sealed class QueryEngineTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task ExecuteAsync_applies_quick_filter()
+    {
+        QuickFilterDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        // Explicitly activate "Expensive" quick filter
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest { QuickFilters = ["Expensive"] },
+            TestContext.Current.CancellationToken);
+
+        result.Items.ShouldAllBe(p => p.Price >= 500);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_applies_default_quick_filters_when_none_specified()
+    {
+        QuickFilterDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        // No quick filters specified → default "Active" filter applied
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest(),
+            TestContext.Current.CancellationToken);
+
+        result.Items.ShouldAllBe(p => p.IsActive);
+        result.TotalCount.ShouldBe(5); // All test products are active
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_combines_quick_filters_with_AND()
+    {
+        QuickFilterDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        // Activate both "Expensive" and "Active" → AND semantics
+        PagedResult<TestProduct> result = await engine.ExecuteAsync(
+            _db.Products.AsQueryable(),
+            new QueryRequest { QuickFilters = ["Expensive", "Active"] },
+            TestContext.Current.CancellationToken);
+
+        result.Items.ShouldAllBe(p => p.Price >= 500 && p.IsActive);
+    }
+
+    [Fact]
+    public void GetMetadata_includes_quick_filters()
+    {
+        QuickFilterDefinition definition = new();
+        QueryEngine<TestProduct> engine = new(definition);
+
+        QueryMetadata metadata = engine.GetMetadata();
+
+        metadata.QuickFilters.Count.ShouldBe(2);
+        metadata.QuickFilters[0].Name.ShouldBe("Active");
+        metadata.QuickFilters[0].Label.ShouldBe("Actifs uniquement");
+        metadata.QuickFilters[0].IsDefault.ShouldBeTrue();
+        metadata.QuickFilters[1].Name.ShouldBe("Expensive");
+        metadata.QuickFilters[1].Label.ShouldBe("Expensive");
+        metadata.QuickFilters[1].IsDefault.ShouldBeFalse();
+    }
+
+    [Fact]
     public void GetMetadata_includes_filter_operators_for_fields()
     {
         ProductQueryDefinition definition = new();
@@ -206,5 +269,19 @@ public sealed class QueryEngineTests : IAsyncLifetime
             .First(f => f.Name == "Price");
         priceField.Operators.ShouldContain(FilterOperator.Gt);
         priceField.Operators.ShouldContain(FilterOperator.Between);
+    }
+
+    private sealed class QuickFilterDefinition : QueryDefinition<TestProduct>
+    {
+        public override string Name => "Test.Products.QuickFilter";
+
+        protected override void Configure(QueryDefinitionBuilder<TestProduct> builder) =>
+            builder
+                .Column(p => p.Name, c => c.Label("Name").Sortable().Filterable())
+                .Column(p => p.Price, c => c.Label("Price").Sortable().Filterable())
+                .QuickFilter("Active", "Actifs uniquement", p => p.IsActive, isDefault: true)
+                .QuickFilter("Expensive", p => p.Price >= 500)
+                .DefaultPageSize(10)
+                .MaxPageSize(50);
     }
 }
