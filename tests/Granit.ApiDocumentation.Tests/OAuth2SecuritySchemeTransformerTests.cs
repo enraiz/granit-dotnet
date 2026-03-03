@@ -70,7 +70,7 @@ public sealed class OAuth2SecuritySchemeTransformerTests
 
         // Assert
         document.Components!.SecuritySchemes!.ShouldContainKey("OAuth2");
-        OpenApiSecurityScheme scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["OAuth2"];
+        var scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["OAuth2"];
         scheme.Type.ShouldBe(SecuritySchemeType.OAuth2);
     }
 
@@ -107,7 +107,7 @@ public sealed class OAuth2SecuritySchemeTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        OpenApiSecurityScheme scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["OAuth2"];
+        var scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["OAuth2"];
         OpenApiOAuthFlow flow = scheme.Flows!.AuthorizationCode!;
         flow.AuthorizationUrl.ShouldBe(new Uri(AuthorizationUrl));
         flow.TokenUrl.ShouldBe(new Uri(TokenUrl));
@@ -129,7 +129,7 @@ public sealed class OAuth2SecuritySchemeTransformerTests
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
         // Assert
-        OpenApiSecurityScheme scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["OAuth2"];
+        var scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["OAuth2"];
         OpenApiOAuthFlow flow = scheme.Flows!.AuthorizationCode!;
         flow.Scopes.ShouldNotBeNull();
         flow.Scopes!.ShouldContainKey("openid");
@@ -147,7 +147,7 @@ public sealed class OAuth2SecuritySchemeTransformerTests
         OpenApiOperation operation = new() { Summary = "Get items" };
         operation.Security = [new OpenApiSecurityRequirement
         {
-            [new OpenApiSecuritySchemeReference("Bearer", null, null)] = new List<string>(),
+            [new OpenApiSecuritySchemeReference("Bearer", null, null)] = [],
         }];
 
         OpenApiPathItem pathItem = new()

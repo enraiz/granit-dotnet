@@ -42,7 +42,7 @@ public sealed class SoftDeleteInterceptorTests
     {
         // Arrange
         await using TestDbContext context = CreateContext();
-        TestSoftDeletableEntity entity = new TestSoftDeletableEntity
+        var entity = new TestSoftDeletableEntity
         {
             Id = Guid.NewGuid(),
             Name = "ToDelete",
@@ -73,7 +73,7 @@ public sealed class SoftDeleteInterceptorTests
     {
         // Arrange
         await using TestDbContext context = CreateContext();
-        TestSoftDeletableEntity entity = new TestSoftDeletableEntity
+        var entity = new TestSoftDeletableEntity
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -99,9 +99,9 @@ public sealed class SoftDeleteInterceptorTests
         IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
         ICurrentTenant currentTenant = Substitute.For<ICurrentTenant>();
         currentTenant.IsAvailable.Returns(false);
-        AuditedEntityInterceptor auditInterceptor = new AuditedEntityInterceptor(_currentUserService, _clock, guidGenerator, currentTenant);
-        SoftDeleteInterceptor softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
-        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
+        var auditInterceptor = new AuditedEntityInterceptor(_currentUserService, _clock, guidGenerator, currentTenant);
+        var softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
+        var options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(auditInterceptor, softDeleteInterceptor)
             .Options;

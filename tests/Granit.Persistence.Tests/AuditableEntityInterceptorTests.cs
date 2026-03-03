@@ -52,7 +52,7 @@ public sealed class AuditableEntityInterceptorTests
     {
         // Arrange
         await using TestDbContext context = CreateContext();
-        TestEntity entity = new TestEntity { Name = "Test" };
+        var entity = new TestEntity { Name = "Test" };
         context.TestEntities.Add(entity);
 
         // Act
@@ -69,7 +69,7 @@ public sealed class AuditableEntityInterceptorTests
     {
         // Arrange
         await using TestDbContext context = CreateContext();
-        TestEntity entity = new TestEntity
+        var entity = new TestEntity
         {
             Id = Guid.NewGuid(),
             Name = "Original",
@@ -96,7 +96,7 @@ public sealed class AuditableEntityInterceptorTests
     {
         // Arrange
         await using TestDbContext context = CreateContext();
-        TestEntity entity = new TestEntity
+        var entity = new TestEntity
         {
             Id = Guid.NewGuid(),
             Name = "Original"
@@ -131,7 +131,7 @@ public sealed class AuditableEntityInterceptorTests
         // Arrange
         _currentUserService.UserId.Returns((string?)null);
         await using TestDbContext context = CreateContext();
-        TestEntity entity = new TestEntity { Name = "Test" };
+        var entity = new TestEntity { Name = "Test" };
         context.TestEntities.Add(entity);
 
         // Act
@@ -143,7 +143,7 @@ public sealed class AuditableEntityInterceptorTests
 
     private TestDbContext CreateContext()
     {
-        AuditedEntityInterceptor interceptor = new AuditedEntityInterceptor(_currentUserService, _clock, _guidGenerator, _currentTenant);
+        var interceptor = new AuditedEntityInterceptor(_currentUserService, _clock, _guidGenerator, _currentTenant);
         DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(interceptor)

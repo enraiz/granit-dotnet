@@ -34,7 +34,7 @@ public sealed class ClockTests
     public void Now_ReturnsUtcFromTimeProvider()
     {
         // Arrange
-        DateTimeOffset expected = new DateTimeOffset(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
+        var expected = new DateTimeOffset(2026, 6, 15, 10, 30, 0, TimeSpan.Zero);
         _fakeTimeProvider.SetUtcNow(expected);
 
         // Act
@@ -62,7 +62,7 @@ public sealed class ClockTests
     public void Normalize_ConvertsLocalOffsetToUtc()
     {
         // Arrange - DateTimeOffset with offset +02:00 (Europe/Brussels in summer)
-        DateTimeOffset localTime = new DateTimeOffset(2026, 6, 15, 14, 30, 0, TimeSpan.FromHours(2));
+        var localTime = new DateTimeOffset(2026, 6, 15, 14, 30, 0, TimeSpan.FromHours(2));
 
         // Act
         DateTimeOffset normalized = _clock.Normalize(localTime);
@@ -76,7 +76,7 @@ public sealed class ClockTests
     public void Normalize_KeepsUtcUnchanged()
     {
         // Arrange
-        DateTimeOffset utcTime = new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero);
+        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 30, 0, TimeSpan.Zero);
 
         // Act
         DateTimeOffset normalized = _clock.Normalize(utcTime);
@@ -89,7 +89,7 @@ public sealed class ClockTests
     public void Normalize_ConvertsNegativeOffsetToUtc()
     {
         // Arrange - DateTimeOffset with offset -05:00 (America/New_York)
-        DateTimeOffset localTime = new DateTimeOffset(2026, 6, 15, 7, 30, 0, TimeSpan.FromHours(-5));
+        var localTime = new DateTimeOffset(2026, 6, 15, 7, 30, 0, TimeSpan.FromHours(-5));
 
         // Act
         DateTimeOffset normalized = _clock.Normalize(localTime);
@@ -104,7 +104,7 @@ public sealed class ClockTests
     {
         // Arrange
         _timezoneProvider.Timezone.Returns("Europe/Brussels");
-        DateTimeOffset utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
         // Act
         DateTimeOffset userTime = _clock.ConvertToUserTime(utcTime);
@@ -120,7 +120,7 @@ public sealed class ClockTests
     {
         // Arrange
         _timezoneProvider.Timezone.Returns((string?)null);
-        DateTimeOffset utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
         // Act
         DateTimeOffset userTime = _clock.ConvertToUserTime(utcTime);
@@ -134,7 +134,7 @@ public sealed class ClockTests
     {
         // Arrange
         _timezoneProvider.Timezone.Returns("");
-        DateTimeOffset utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
         // Act
         DateTimeOffset userTime = _clock.ConvertToUserTime(utcTime);
@@ -147,7 +147,7 @@ public sealed class ClockTests
     public void ConvertToUtc_ConvertsToUtc()
     {
         // Arrange - DateTimeOffset with offset +02:00
-        DateTimeOffset localTime = new DateTimeOffset(2026, 6, 15, 14, 0, 0, TimeSpan.FromHours(2));
+        var localTime = new DateTimeOffset(2026, 6, 15, 14, 0, 0, TimeSpan.FromHours(2));
 
         // Act
         DateTimeOffset utcTime = _clock.ConvertToUtc(localTime);
@@ -161,7 +161,7 @@ public sealed class ClockTests
     public void ConvertToUtc_KeepsUtcUnchanged()
     {
         // Arrange
-        DateTimeOffset utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        var utcTime = new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
         // Act
         DateTimeOffset result = _clock.ConvertToUtc(utcTime);

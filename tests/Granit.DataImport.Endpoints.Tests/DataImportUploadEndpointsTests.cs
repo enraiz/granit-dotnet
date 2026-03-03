@@ -291,7 +291,7 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
 
     private static MultipartFormDataContent BuildMultipartContent(string fileName, string mimeType, string data)
     {
-        MultipartFormDataContent content = new();
+        MultipartFormDataContent content = [];
         ByteArrayContent fileContent = new(Encoding.UTF8.GetBytes(data));
         fileContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
         content.Add(fileContent, "file", fileName);

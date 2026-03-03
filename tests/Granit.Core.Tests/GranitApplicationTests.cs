@@ -82,11 +82,11 @@ public sealed class GranitApplicationTests
     {
         // Arrange
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        GranitApplication app = new GranitApplication(modules);
-        ServiceCollection services = new ServiceCollection();
+        var app = new GranitApplication(modules);
+        var services = new ServiceCollection();
         IConfigurationRoot config = new ConfigurationBuilder().Build();
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new ServiceConfigurationContext(services, config, builder);
+        var context = new ServiceConfigurationContext(services, config, builder);
 
         // Act
         app.ConfigureServices(context);
@@ -100,10 +100,10 @@ public sealed class GranitApplicationTests
     {
         // Arrange
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        GranitApplication app = new GranitApplication(modules);
-        ServiceCollection services = new ServiceCollection();
+        var app = new GranitApplication(modules);
+        var services = new ServiceCollection();
         ServiceProvider provider = services.BuildServiceProvider();
-        ApplicationInitializationContext context = new ApplicationInitializationContext(provider);
+        var context = new ApplicationInitializationContext(provider);
 
         // Act
         app.InitializeApplication(context);
@@ -117,9 +117,9 @@ public sealed class GranitApplicationTests
     {
         // Arrange
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<NoOpModule>();
-        GranitApplication app = new GranitApplication(modules);
+        var app = new GranitApplication(modules);
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new ServiceConfigurationContext(
+        var context = new ServiceConfigurationContext(
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
@@ -135,7 +135,7 @@ public sealed class GranitApplicationTests
     public void ModuleTypes_ReturnsOrderedModuleTypes()
     {
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        GranitApplication app = new GranitApplication(modules);
+        var app = new GranitApplication(modules);
 
         IReadOnlyList<Type> types = app.GetModuleTypes();
 
@@ -151,9 +151,9 @@ public sealed class GranitApplicationTests
     {
         // Arrange
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<AsyncTrackingModuleB>();
-        GranitApplication app = new GranitApplication(modules);
+        var app = new GranitApplication(modules);
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new ServiceConfigurationContext(
+        var context = new ServiceConfigurationContext(
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
@@ -170,9 +170,9 @@ public sealed class GranitApplicationTests
     {
         // Arrange
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<AsyncTrackingModuleB>();
-        GranitApplication app = new GranitApplication(modules);
+        var app = new GranitApplication(modules);
         ServiceProvider provider = new ServiceCollection().BuildServiceProvider();
-        ApplicationInitializationContext context = new ApplicationInitializationContext(provider);
+        var context = new ApplicationInitializationContext(provider);
 
         // Act
         await app.InitializeApplicationAsync(context);
@@ -187,9 +187,9 @@ public sealed class GranitApplicationTests
         // Arrange - TrackingModuleA overrides ConfigureServices (sync)
         // ConfigureServicesAsync by default calls the sync version
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModuleB>();
-        GranitApplication app = new GranitApplication(modules);
+        var app = new GranitApplication(modules);
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new ServiceConfigurationContext(
+        var context = new ServiceConfigurationContext(
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
@@ -206,9 +206,9 @@ public sealed class GranitApplicationTests
     {
         // Arrange
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<NoOpModule>();
-        GranitApplication app = new GranitApplication(modules);
+        var app = new GranitApplication(modules);
         HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
-        ServiceConfigurationContext context = new ServiceConfigurationContext(
+        var context = new ServiceConfigurationContext(
             new ServiceCollection(),
             new ConfigurationBuilder().Build(),
             builder);
