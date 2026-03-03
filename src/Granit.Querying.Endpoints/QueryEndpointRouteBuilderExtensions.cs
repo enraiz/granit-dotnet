@@ -1,0 +1,118 @@
+using Granit.Querying.Endpoints.Binding;
+using Granit.Querying.Endpoints.Internal;
+using Granit.Querying.Meta;
+using Granit.Querying.SavedViews;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Granit.Querying.Endpoints;
+
+/// <summary>
+/// Extension methods for registering query endpoints on <see cref="IEndpointRouteBuilder"/>.
+/// </summary>
+public static class QueryEndpointRouteBuilderExtensions
+{
+    /// <summary>
+    /// Maps query endpoints for <typeparamref name="TEntity"/> using the specified
+    /// <paramref name="sourceProvider"/> to resolve the base <see cref="IQueryable{T}"/>.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type to query.</typeparam>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="pattern">The route pattern (e.g. <c>"/api/products"</c>).</param>
+    /// <param name="sourceProvider">
+    /// Delegate that resolves the base <see cref="IQueryable{TEntity}"/> from the DI container.
+    /// Example: <c>sp => sp.GetRequiredService&lt;AppDbContext&gt;().Products.AsNoTracking()</c>.
+    /// </param>
+    /// <param name="configure">Optional delegate to customize <see cref="QueryEndpointOptions"/>.</param>
+    /// <returns>The <see cref="RouteGroupBuilder"/> for further chaining.</returns>
+    /// <remarks>
+    /// <para>Registers the following endpoints:</para>
+    /// <list type="bullet">
+    ///   <item><c>GET /</c> — paginated or grouped query</item>
+    ///   <item><c>GET /meta</c> — query metadata (columns, filters, sorts, etc.)</item>
+    ///   <item><c>GET /saved-views</c> — list saved views</item>
+    ///   <item><c>POST /saved-views</c> — create saved view</item>
+    ///   <item><c>PUT /saved-views/{id}</c> — update saved view</item>
+    ///   <item><c>DELETE /saved-views/{id}</c> — delete saved view</item>
+    ///   <item><c>POST /saved-views/{id}/set-default</c> — set default saved view</item>
+    /// </list>
+    /// </remarks>
+    public static RouteGroupBuilder MapQueryEndpoints<TEntity>(
+        this IEndpointRouteBuilder endpoints,
+        string pattern,
+        Func<IServiceProvider, IQueryable<TEntity>> sourceProvider,
+        Action<QueryEndpointOptions>? configure = null)
+        where TEntity : class
+    {
+        QueryEndpointOptions options = new();
+        configure?.Invoke(options);
+
+        string tag = options.TagName ?? typeof(TEntity).Name;
+        string entityName = typeof(TEntity).Name;
+
+        RouteGroupBuilder group = endpoints.MapGroup(pattern).WithTags(tag);
+
+        if (options.AuthorizationPolicy is not null)
+        {
+            group.RequireAuthorization(options.AuthorizationPolicy);
+        }
+
+        // GET / — paginated or grouped query
+        group.MapGet("/", async (
+            IQueryEngine<TEntity> engine,
+            BindableQueryRequest request,
+            HttpContext httpContext,
+            CancellationToken ct) =>
+        {
+            IQueryable<TEntity> source = sourceProvider(httpContext.RequestServices);
+
+            if (!string.IsNullOrWhiteSpace(request.Value.GroupBy))
+            {
+                GroupedResult<TEntity> grouped = await engine
+                    .ExecuteGroupedAsync(source, request.Value, ct)
+                    .ConfigureAwait(false);
+                return Results.Ok(grouped);
+            }
+
+            PagedResult<TEntity> paged = await engine
+                .ExecuteAsync(source, request.Value, ct)
+                .ConfigureAwait(false);
+            return Results.Ok(paged);
+        })
+        .WithName($"Query{entityName}")
+        .WithSummary($"Returns a filtered, sorted, and paginated list of {entityName} entries.");
+
+        // GET /meta — query metadata
+        if (options.IncludeMetaEndpoint)
+        {
+            group.MapGet("/meta", async (
+                IQueryEngine<TEntity> engine,
+                ISavedViewStore savedViewStore,
+                QueryDefinition<TEntity> definition,
+                Granit.Core.MultiTenancy.ICurrentTenant tenant,
+                System.Security.Claims.ClaimsPrincipal user,
+                CancellationToken ct) =>
+            {
+                return await QueryEndpointHandler.GetMetadataAsync(
+                    engine, savedViewStore, definition, tenant, user, ct)
+                    .ConfigureAwait(false);
+            })
+            .WithName($"Get{entityName}Meta")
+            .WithSummary($"Returns query metadata for {entityName} (columns, filters, sorts, presets).");
+        }
+
+        // Saved views CRUD
+        if (options.IncludeSavedViewEndpoints)
+        {
+            QueryDefinition<TEntity>? definition = endpoints.ServiceProvider
+                .GetService<QueryDefinition<TEntity>>();
+
+            string entityType = definition?.Name ?? entityName;
+            group.MapSavedViewEndpoints(entityType);
+        }
+
+        return group;
+    }
+}
