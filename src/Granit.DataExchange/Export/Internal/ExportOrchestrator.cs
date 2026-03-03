@@ -22,13 +22,12 @@ internal sealed partial class ExportOrchestrator(
     IExportCommandDispatcher dispatcher,
     IImportFileProvider fileProvider,
     IClock clock,
-    IOptions<ExportOptions> exportOptions,
     ILogger<ExportOrchestrator> logger) : IExportOrchestrator
 {
     /// <inheritdoc/>
     public async Task<ExportJobResult> ExportAsync(ExportRequest request, CancellationToken ct = default)
     {
-        _ = exportOptions.Value; // Validated early; will carry threshold logic in a future version.
+        _ = serviceProvider.GetRequiredService<IOptions<ExportOptions>>().Value; // Validated early; will carry threshold logic in a future version.
         // Validate early
         _ = ResolveDefinition(request.DefinitionName);
         _ = ResolveWriter(request.Format);
@@ -194,7 +193,7 @@ internal sealed partial class ExportOrchestrator(
 
         // Invoke IterateAsync<TEntity> via reflection to iterate the typed IAsyncEnumerable
         System.Reflection.MethodInfo iterateMethod = typeof(ExportOrchestrator)
-            .GetMethod(nameof(IterateAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!
+            .GetMethod(nameof(IterateAsync), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!
             .MakeGenericMethod(definition.EntityType);
         var typedIterator = (IAsyncEnumerable<object>)iterateMethod.Invoke(null, [asyncEnumerable, ct])!;
 
@@ -211,8 +210,9 @@ internal sealed partial class ExportOrchestrator(
     /// <summary>
     /// Iterates an <c>IAsyncEnumerable&lt;T&gt;</c>, yielding each element as <c>object</c>.
     /// Called via reflection from <see cref="GetProjectedRows"/> to bridge the generic gap.
+    /// Public on an internal class to avoid <c>BindingFlags.NonPublic</c> in reflection (S3011).
     /// </summary>
-    private static async IAsyncEnumerable<object> IterateAsync<T>(
+    public static async IAsyncEnumerable<object> IterateAsync<T>(
         IAsyncEnumerable<T> source,
         [EnumeratorCancellation] CancellationToken ct) where T : notnull
     {
@@ -227,9 +227,9 @@ internal sealed partial class ExportOrchestrator(
     {
         Dictionary<string, object?> row = new(fields.Count);
 
-        foreach (ExportFieldDescriptor field in fields)
+        foreach (string propertyPath in fields.Select(field => field.PropertyPath))
         {
-            row[field.PropertyPath] = ResolvePropertyValue(entity, field.PropertyPath);
+            row[propertyPath] = ResolvePropertyValue(entity, propertyPath);
         }
 
         return row;

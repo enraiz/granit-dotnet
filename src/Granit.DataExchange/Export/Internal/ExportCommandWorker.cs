@@ -28,18 +28,18 @@ internal sealed partial class ExportCommandWorker(
     /// <inheritdoc/>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (ExecuteExportCommand command in channel.Reader.ReadAllAsync(stoppingToken))
+        await foreach (Guid exportJobId in channel.Reader.ReadAllAsync(stoppingToken).Select(command => command.ExportJobId))
         {
             try
             {
                 await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
                 IExportOrchestrator orchestrator =
                     scope.ServiceProvider.GetRequiredService<IExportOrchestrator>();
-                await orchestrator.ExecuteAsync(command.ExportJobId, stoppingToken).ConfigureAwait(false);
+                await orchestrator.ExecuteAsync(exportJobId, stoppingToken).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                LogExecutionFailed(command.ExportJobId, ex);
+                LogExecutionFailed(exportJobId, ex);
             }
         }
     }
