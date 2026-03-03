@@ -371,7 +371,8 @@
         "dependencies": {
           "Granit.Persistence": "[0.1.0-dev, )",
           "Granit.Querying": "[0.1.0-dev, )",
-          "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
+          "Microsoft.EntityFrameworkCore.Relational": "[10.*, )",
+          "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )"
         }
       },
       "granit.security": {
