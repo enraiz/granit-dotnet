@@ -101,7 +101,7 @@ public sealed class SoftDeleteInterceptorTests
         currentTenant.IsAvailable.Returns(false);
         var auditInterceptor = new AuditedEntityInterceptor(_currentUserService, _clock, guidGenerator, currentTenant);
         var softDeleteInterceptor = new SoftDeleteInterceptor(_currentUserService, _clock);
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(auditInterceptor, softDeleteInterceptor)
             .Options;
