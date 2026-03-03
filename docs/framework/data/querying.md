@@ -1,8 +1,8 @@
 # Querying
 
 `Granit.Querying` est le socle déclaratif de requêtage du framework Granit.
-Il fournit un pipeline complet : **filtres typés → presets → recherche globale
-→ tri → pagination (offset + keyset) → groupement**, avec métadonnées auto-générées
+Il fournit un pipeline complet : **filtres typés → presets → quick filters
+→ recherche globale → tri → pagination (offset + keyset) → groupement**, avec métadonnées auto-générées
 pour le frontend et vues sauvegardées persistantes.
 
 ```text
@@ -92,6 +92,8 @@ Les requêtes contenant des champs non déclarés sont silencieusement ignorées
 | `DateFilter(expr, default?)` | Filtre de date avec période par défaut |
 | `AllowGroupBy(expr)` | Autorise le groupement par cette propriété |
 | `Aggregate(expr, fn, alias)` | Agrégat calculé dans les groupes (Sum, Avg, Min, Max, Count) |
+| `QuickFilter(name, pred, default?)` | Filtre indépendant toggleable (style Odoo) |
+| `QuickFilter(name, label, pred, default?)` | Idem avec libellé custom |
 | `DefaultSort(sort)` | Tri par défaut (ex. `"-createdAt,lastName"`) |
 | `DefaultPageSize(n)` | Taille de page par défaut |
 | `MaxPageSize(n)` | Taille de page maximale (clamped) |
@@ -124,6 +126,7 @@ public sealed record QueryRequest
     public string? Sort { get; init; }      // "-createdAt,lastName"
     public IReadOnlyDictionary<string, string>? Filter { get; init; }
     public IReadOnlyDictionary<string, string>? Presets { get; init; }
+    public IReadOnlyList<string>? QuickFilters { get; init; }
     public string? GroupBy { get; init; }
 }
 ```
@@ -166,6 +169,44 @@ builder
 Les presets marqués `isDefault: true` sont appliqués automatiquement quand aucun
 preset n'est spécifié pour le groupe.
 
+## Quick Filters (filtres indépendants)
+
+Les quick filters sont des filtres toggleables indépendants, inspirés des filtres
+Odoo comme « Mes rendez-vous », « Non lus », « Archivés ». Contrairement aux
+presets (mutuellement exclusifs dans un groupe), chaque quick filter est activable
+ou désactivable individuellement.
+
+| | **Presets (FilterGroups)** | **QuickFilters** |
+| --- | --- | --- |
+| UI | Radio buttons / sélection exclusive | Checkboxes indépendantes |
+| Sémantique intra-groupe | **OR** (un seul choix actif) | Pas de groupe |
+| Sémantique inter-éléments | **AND** entre groupes | **AND** entre filtres actifs |
+| Query string | `presets[status]=Active` | `quickFilters=MyItems,Unread` |
+
+### Déclaration
+
+```csharp
+builder
+    .QuickFilter("MyAppointments", "Mes rendez-vous",
+        p => p.AssignedTo == currentUserId, isDefault: true)
+    .QuickFilter("Unread", "Non lus",
+        p => !p.IsRead)
+    .QuickFilter("Archived", "Archivés",
+        p => p.IsArchived);
+```
+
+Les quick filters marqués `isDefault: true` sont appliqués automatiquement quand
+aucun quick filter n'est explicitement demandé.
+
+### Query string
+
+```text
+GET /api/appointments?quickFilters=MyAppointments,Unread
+```
+
+Les filtres sont combinés en **AND** : seuls les éléments satisfaisant tous les
+filtres actifs sont retournés.
+
 ## Pipeline d'exécution
 
 Le `QueryEngine<T>` orchestre le pipeline complet :
@@ -180,6 +221,8 @@ QueryRequest
     ▼ ApplyFilters (expression trees, AND)
     │
     ▼ ApplyPresets (OR dans un groupe, AND entre groupes)
+    │
+    ▼ ApplyQuickFilters (AND entre filtres actifs)
     │
     ▼ ApplyGlobalSearch (OR sur GlobalSearchProperties, LIKE)
     │
@@ -237,6 +280,7 @@ GET /api/patients?page=1&pageSize=20&search=Dupont
 | `sort` | `-` pour desc, séparés par `,` | `sort=-createdAt,name` |
 | `filter[field.op]` | opérateur après le `.` | `filter[age.gte]=18` |
 | `presets[group]` | nom du preset | `presets[status]=Active` |
+| `quickFilters` | noms séparés par `,` | `quickFilters=MyItems,Unread` |
 | `groupBy` | nom de propriété | `groupBy=category` |
 
 ## Metadata endpoint
@@ -263,6 +307,10 @@ et pagination.
         { "name": "Inactive", "label": "Inactive", "isDefault": false }
       ]
     }
+  ],
+  "quickFilters": [
+    { "name": "MyAppointments", "label": "Mes rendez-vous", "isDefault": true },
+    { "name": "Unread", "label": "Non lus", "isDefault": false }
   ],
   "dateFilters": [],
   "groupByFields": [{ "name": "Status", "type": "PatientStatus" }],
@@ -341,7 +389,7 @@ construits dynamiquement. Aucune dépendance à `System.Linq.Dynamic.Core`.
 | Classe interne | Rôle |
 | --- | --- |
 | `FilterExpressionBuilder` | Construit `Expression<Func<T, bool>>` depuis `FilterCriteria` |
-| `QueryableFilterExtensions` | ApplyFilters, ApplyGlobalSearch, ApplyPresets |
+| `QueryableFilterExtensions` | ApplyFilters, ApplyGlobalSearch, ApplyPresets, ApplyQuickFilters |
 | `QueryableSortExtensions` | OrderBy/ThenBy dynamique via expressions |
 | `QueryablePaginationExtensions` | Offset (Skip/Take) et keyset (cursor) |
 | `QueryableGroupByExtensions` | GroupBy dynamique + agrégats |

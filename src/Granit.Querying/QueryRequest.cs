@@ -56,6 +56,12 @@ public sealed record QueryRequest
     public IReadOnlyDictionary<string, string>? Presets { get; init; }
 
     /// <summary>
+    /// Active quick filter names. Quick filters are independent toggleable predicates
+    /// that combine with AND semantics (like Odoo's "My Appointments", "Unread" filters).
+    /// </summary>
+    public IReadOnlyList<string>? QuickFilters { get; init; }
+
+    /// <summary>
     /// Property name to group results by. When set, the query returns
     /// <see cref="GroupedResult{T}"/> instead of <see cref="PagedResult{T}"/>.
     /// </summary>

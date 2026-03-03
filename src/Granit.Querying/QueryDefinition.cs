@@ -97,6 +97,12 @@ public abstract class QueryDefinition<TEntity> : IQueryDefinitionDescriptor wher
         GetBuilder().Aggregates.AsReadOnly();
 
     /// <summary>
+    /// Gets the declared quick filters.
+    /// </summary>
+    public IReadOnlyList<Filtering.QuickFilterDescriptor> GetQuickFilters() =>
+        GetBuilder().QuickFilters.AsReadOnly();
+
+    /// <summary>
     /// Gets the global search property names.
     /// </summary>
     public IReadOnlyList<string> GetGlobalSearchProperties() =>

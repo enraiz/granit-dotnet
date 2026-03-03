@@ -188,6 +188,53 @@ internal static class QueryableFilterExtensions
     }
 
     /// <summary>
+    /// Applies quick filters to the queryable. Quick filters are independent toggleable predicates
+    /// that combine with AND semantics. When no quick filters are explicitly requested, default
+    /// quick filters (those with <c>IsDefault = true</c>) are applied.
+    /// </summary>
+    public static IQueryable<TEntity> ApplyQuickFilters<TEntity>(
+        this IQueryable<TEntity> source,
+        IReadOnlyList<string>? activeQuickFilters,
+        QueryDefinitionBuilder<TEntity> builder)
+        where TEntity : class
+    {
+        if (builder.QuickFilters.Count == 0)
+        {
+            return source;
+        }
+
+        IQueryable<TEntity> query = source;
+
+        if (activeQuickFilters is null || activeQuickFilters.Count == 0)
+        {
+            // Apply default quick filters
+            foreach (QuickFilterDescriptor filter in builder.QuickFilters)
+            {
+                if (filter.IsDefault)
+                {
+                    query = query.Where((Expression<Func<TEntity, bool>>)filter.Predicate);
+                }
+            }
+
+            return query;
+        }
+
+        // Apply explicitly requested quick filters (AND semantics)
+        HashSet<string> active = activeQuickFilters
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        foreach (QuickFilterDescriptor filter in builder.QuickFilters)
+        {
+            if (active.Contains(filter.Name))
+            {
+                query = query.Where((Expression<Func<TEntity, bool>>)filter.Predicate);
+            }
+        }
+
+        return query;
+    }
+
+    /// <summary>
     /// Replaces one parameter expression with another in an expression tree.
     /// </summary>
     private sealed class ParameterReplacer(ParameterExpression oldParam, ParameterExpression newParam)
