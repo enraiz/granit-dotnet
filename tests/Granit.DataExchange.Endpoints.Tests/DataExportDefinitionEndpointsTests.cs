@@ -38,7 +38,7 @@ public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
         _descriptor = Substitute.For<IExportDefinitionDescriptor>();
         _descriptor.Name.Returns("Test.Export");
         _descriptor.EntityType.Returns(typeof(object));
-        _descriptor.FilterType.Returns(typeof(EmptyExportFilter));
+        _descriptor.QueryDefinitionName.Returns((string?)null);
         _descriptor.SupportedFormats.Returns(new[] { "xlsx", "csv" });
         _descriptor.GetFields().Returns([
             new ExportFieldDescriptor("Name", "String", "Nom", null, 0, false),

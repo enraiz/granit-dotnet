@@ -1,6 +1,8 @@
+using System.Runtime.CompilerServices;
 using Granit.Querying.Filtering;
 using Granit.Querying.Meta;
 using Granit.Querying.SavedViews;
+using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Querying.EntityFrameworkCore.Internal;
 
@@ -61,6 +63,21 @@ internal sealed class QueryEngine<TEntity>(
 
         return await query.ApplyGroupByAsync(request.GroupBy, _builder, ct)
             .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async IAsyncEnumerable<TEntity> ExecuteStreamAsync(
+        IQueryable<TEntity> source,
+        QueryRequest request,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        IQueryable<TEntity> query = ApplyCommonFilters(source, request);
+        query = query.ApplySort(request.Sort, _builder);
+
+        await foreach (TEntity entity in query.AsAsyncEnumerable().WithCancellation(ct).ConfigureAwait(false))
+        {
+            yield return entity;
+        }
     }
 
     /// <inheritdoc/>

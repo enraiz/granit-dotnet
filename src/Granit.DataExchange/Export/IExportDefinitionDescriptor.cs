@@ -1,11 +1,11 @@
 namespace Granit.DataExchange.Export;
 
 /// <summary>
-/// Non-generic view of an <see cref="ExportDefinition{TEntity,TFilter}"/> for runtime resolution by name.
+/// Non-generic view of an <see cref="ExportDefinition{TEntity}"/> for runtime resolution by name.
 /// </summary>
 /// <remarks>
 /// Registered as a singleton alongside the generic definition by
-/// <see cref="ServiceCollectionExtensions.AddExportDefinition{TEntity,TFilter,TDefinition}"/>.
+/// <see cref="ServiceCollectionExtensions.AddExportDefinition{TEntity,TDefinition}"/>.
 /// Endpoints and other services can enumerate <c>IEnumerable&lt;IExportDefinitionDescriptor&gt;</c>
 /// to find a definition by name without compile-time knowledge of the entity type.
 /// </remarks>
@@ -22,9 +22,10 @@ public interface IExportDefinitionDescriptor
     Type EntityType { get; }
 
     /// <summary>
-    /// The filter CLR type (e.g. <c>PatientExportFilter</c>).
+    /// Name of the associated <c>QueryDefinition</c> for filtering and sorting.
+    /// <c>null</c> when no query-based filtering is needed.
     /// </summary>
-    Type FilterType { get; }
+    string? QueryDefinitionName { get; }
 
     /// <summary>
     /// Supported output formats (e.g. <c>["xlsx", "csv"]</c>).

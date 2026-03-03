@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace Granit.DataExchange.Endpoints.Dtos.Export;
 
 /// <summary>
@@ -11,12 +9,24 @@ namespace Granit.DataExchange.Endpoints.Dtos.Export;
 /// Ordered list of field property paths to include. <c>null</c> means all fields.
 /// </param>
 /// <param name="IncludeIdForImport">Whether to include the entity ID for roundtrip import.</param>
+/// <param name="Sort">
+/// Comma-separated sort specification (e.g. <c>"-createdAt,lastName"</c>).
+/// </param>
 /// <param name="Filter">
-/// Typed filter matching the definition's <c>TFilter</c> type (JSON, deserialized server-side).
+/// Filter criteria using the <c>filter[field.op]=value</c> syntax.
+/// </param>
+/// <param name="Presets">
+/// Active preset names, keyed by filter group name.
+/// </param>
+/// <param name="Search">
+/// Free-text search applied to the definition's global search properties.
 /// </param>
 public sealed record CreateExportJobRequest(
     string DefinitionName,
     string Format,
     IReadOnlyList<string>? SelectedFields,
     bool IncludeIdForImport,
-    JsonElement? Filter);
+    string? Sort,
+    IReadOnlyDictionary<string, string>? Filter,
+    IReadOnlyDictionary<string, string>? Presets,
+    string? Search);

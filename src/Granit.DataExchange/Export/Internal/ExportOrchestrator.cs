@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Granit.DataExchange.Export.Messages;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Querying;
 using Granit.Timing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,8 +13,8 @@ namespace Granit.DataExchange.Export.Internal;
 /// <summary>
 /// Default <see cref="IExportOrchestrator"/> implementation.
 /// Resolves the export definition, streams data via
-/// <see cref="IExportDataSource{TEntity,TFilter}"/>, extracts field values,
-/// and writes the output via the matching <see cref="IExportWriter"/>.
+/// <see cref="IExportDataSource{TEntity}"/> + optional <see cref="IQueryEngine{TEntity}"/>,
+/// extracts field values, and writes the output via the matching <see cref="IExportWriter"/>.
 /// </summary>
 internal sealed partial class ExportOrchestrator(
     IServiceProvider serviceProvider,
@@ -175,27 +176,52 @@ internal sealed partial class ExportOrchestrator(
         Action<int> setRowCount,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
-        // Resolve the data source dynamically
-        Type dataSourceType = typeof(IExportDataSource<,>)
-            .MakeGenericType(definition.EntityType, definition.FilterType);
+        // Resolve the data source dynamically (single type param)
+        Type dataSourceType = typeof(IExportDataSource<>)
+            .MakeGenericType(definition.EntityType);
         object dataSource = serviceProvider.GetRequiredService(dataSourceType);
 
-        // Deserialize the filter to the concrete TFilter type
-        object filter = request.FilterJson.HasValue
-            ? JsonSerializer.Deserialize(request.FilterJson.Value.GetRawText(), definition.FilterType)
-              ?? Activator.CreateInstance(definition.FilterType)!
-            : Activator.CreateInstance(definition.FilterType)!;
+        // Call GetQueryable() via reflection
+        System.Reflection.MethodInfo getQueryableMethod = dataSourceType
+            .GetMethod(nameof(IExportDataSource<object>.GetQueryable))!;
+        object queryable = getQueryableMethod.Invoke(dataSource, [])!;
 
-        // Call GetDataAsync via reflection
-        System.Reflection.MethodInfo getDataMethod = dataSourceType
-            .GetMethod(nameof(IExportDataSource<object, EmptyExportFilter>.GetDataAsync))!;
-        object asyncEnumerable = getDataMethod.Invoke(dataSource, [filter, ct])!;
+        IAsyncEnumerable<object> typedIterator;
 
-        // Invoke IterateAsync<TEntity> via reflection to iterate the typed IAsyncEnumerable
-        System.Reflection.MethodInfo iterateMethod = typeof(ExportOrchestrator)
-            .GetMethod(nameof(IterateAsync), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!
-            .MakeGenericMethod(definition.EntityType);
-        var typedIterator = (IAsyncEnumerable<object>)iterateMethod.Invoke(null, [asyncEnumerable, ct])!;
+        if (definition.QueryDefinitionName is not null)
+        {
+            // Use IQueryEngine for filtering and sorting
+            Type queryEngineType = typeof(IQueryEngine<>)
+                .MakeGenericType(definition.EntityType);
+            object queryEngine = serviceProvider.GetRequiredService(queryEngineType);
+
+            QueryRequest queryRequest = new()
+            {
+                Sort = request.Sort,
+                Filter = request.Filter,
+                Presets = request.Presets,
+                Search = request.Search,
+            };
+
+            // Call ExecuteStreamAsync(queryable, queryRequest, ct) via reflection
+            System.Reflection.MethodInfo streamMethod = queryEngineType
+                .GetMethod(nameof(IQueryEngine<object>.ExecuteStreamAsync))!;
+            object asyncEnumerable = streamMethod.Invoke(queryEngine, [queryable, queryRequest, ct])!;
+
+            // Bridge the generic gap via IterateAsync<TEntity>
+            System.Reflection.MethodInfo iterateMethod = typeof(ExportOrchestrator)
+                .GetMethod(nameof(IterateAsync), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!
+                .MakeGenericMethod(definition.EntityType);
+            typedIterator = (IAsyncEnumerable<object>)iterateMethod.Invoke(null, [asyncEnumerable, ct])!;
+        }
+        else
+        {
+            // No QueryDefinition — stream queryable directly (sync iteration)
+            System.Reflection.MethodInfo enumerateMethod = typeof(ExportOrchestrator)
+                .GetMethod(nameof(EnumerateQueryable), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!
+                .MakeGenericMethod(definition.EntityType);
+            typedIterator = (IAsyncEnumerable<object>)enumerateMethod.Invoke(null, [queryable, ct])!;
+        }
 
         int count = 0;
         await foreach (object entity in typedIterator.WithCancellation(ct).ConfigureAwait(false))
@@ -218,6 +244,23 @@ internal sealed partial class ExportOrchestrator(
     {
         await foreach (T item in source.WithCancellation(ct).ConfigureAwait(false))
         {
+            yield return item;
+        }
+    }
+
+    /// <summary>
+    /// Enumerates an <c>IQueryable&lt;T&gt;</c> synchronously, yielding each element as <c>object</c>.
+    /// Used when no <c>QueryDefinition</c> is associated with the export definition.
+    /// Public on an internal class to avoid <c>BindingFlags.NonPublic</c> in reflection (S3011).
+    /// </summary>
+    public static async IAsyncEnumerable<object> EnumerateQueryable<T>(
+        IQueryable<T> source,
+        [EnumeratorCancellation] CancellationToken ct) where T : notnull
+    {
+        await Task.CompletedTask.ConfigureAwait(false);
+        foreach (T item in source)
+        {
+            ct.ThrowIfCancellationRequested();
             yield return item;
         }
     }

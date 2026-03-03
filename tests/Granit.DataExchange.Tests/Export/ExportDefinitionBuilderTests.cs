@@ -161,7 +161,7 @@ public sealed class ExportDefinitionBuilderTests
 
         definition.Name.ShouldBe("Test.Export");
         definition.EntityType.ShouldBe(typeof(TestEntity));
-        definition.FilterType.ShouldBe(typeof(EmptyExportFilter));
+        definition.QueryDefinitionName.ShouldBeNull();
         definition.SupportedFormats.ShouldBe(["xlsx", "csv"]);
     }
 

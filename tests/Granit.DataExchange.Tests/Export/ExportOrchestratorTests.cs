@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Granit.DataExchange.Export;
 using Granit.DataExchange.Export.Internal;
@@ -40,7 +39,7 @@ public sealed class ExportOrchestratorTests
                     DefinitionName = "Test.Export",
                     Format = "csv",
                     RequestJson = JsonSerializer.Serialize(new ExportRequest(
-                        "Test.Export", "csv", null, false, null)),
+                        "Test.Export", "csv", null, false, null, null, null, null)),
                     Status = ExportJobStatus.Queued,
                 };
             });
@@ -53,7 +52,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        ExportRequest request = new("Test.Export", "csv", null, false, null);
+        ExportRequest request = new("Test.Export", "csv", null, false, null, null, null, null);
 
         // Act
         ExportJobResult result = await sut.ExportAsync(request, TestContext.Current.CancellationToken);
@@ -74,7 +73,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        ExportRequest request = new("Unknown.Export", "csv", null, false, null);
+        ExportRequest request = new("Unknown.Export", "csv", null, false, null, null, null, null);
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(
@@ -86,7 +85,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        ExportRequest request = new("Test.Export", "pdf", null, false, null);
+        ExportRequest request = new("Test.Export", "pdf", null, false, null, null, null, null);
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(
@@ -138,7 +137,7 @@ public sealed class ExportOrchestratorTests
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
         Guid jobId = Guid.NewGuid();
-        ExportRequest request = new("Test.Export", "csv", ["Name"], false, null);
+        ExportRequest request = new("Test.Export", "csv", ["Name"], false, null, null, null, null);
         ExportJob job = new()
         {
             Id = jobId,
@@ -184,7 +183,7 @@ public sealed class ExportOrchestratorTests
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
         Guid jobId = Guid.NewGuid();
-        ExportRequest request = new("Test.Export", "csv", ["Company.Name"], false, null);
+        ExportRequest request = new("Test.Export", "csv", ["Company.Name"], false, null, null, null, null);
         ExportJob job = new()
         {
             Id = jobId,
@@ -339,7 +338,8 @@ public sealed class ExportOrchestratorTests
     {
         ServiceCollection services = new();
         services.AddSingleton<IExportDefinitionDescriptor>(new TestExportDefinition());
-        services.AddSingleton<IExportDataSource<TestEntity, EmptyExportFilter>>(new TestDataSource());
+        services.AddSingleton<IExportDataSource<TestEntity>>(new TestDataSource());
+        services.AddSingleton(Options.Create(new ExportOptions()));
 
         IExportWriter writer = writerOverride ?? CreateCsvWriter();
         ServiceProvider sp = services.BuildServiceProvider();
@@ -351,7 +351,6 @@ public sealed class ExportOrchestratorTests
             _dispatcher,
             _fileProvider,
             _clock,
-            Options.Create(new ExportOptions()),
             NullLogger<ExportOrchestrator>.Instance);
     }
 
@@ -386,7 +385,7 @@ public sealed class ExportOrchestratorTests
             DefinitionName = "Test.Export",
             Format = "csv",
             RequestJson = JsonSerializer.Serialize(new ExportRequest(
-                "Test.Export", "csv", null, false, null)),
+                "Test.Export", "csv", null, false, null, null, null, null)),
             Status = status,
         };
 
@@ -415,25 +414,23 @@ public sealed class ExportOrchestratorTests
                 .Field(e => e.Company, c => c.Name, f => f.Header("Société"));
     }
 
-    private sealed class TestDataSource : IExportDataSource<TestEntity, EmptyExportFilter>
+    private sealed class TestDataSource : IExportDataSource<TestEntity>
     {
-        public async IAsyncEnumerable<TestEntity> GetDataAsync(
-            EmptyExportFilter filter,
-            [EnumeratorCancellation] CancellationToken ct = default)
-        {
-            await Task.CompletedTask;
-            yield return new TestEntity
+        public IQueryable<TestEntity> GetQueryable() =>
+            new List<TestEntity>
             {
-                Name = "Alice",
-                Email = "alice@test.com",
-                Company = new TestCompany { Name = "Acme Corp" },
-            };
-            yield return new TestEntity
-            {
-                Name = "Jane",
-                Email = "jane@test.com",
-                Company = null,
-            };
-        }
+                new()
+                {
+                    Name = "Alice",
+                    Email = "alice@test.com",
+                    Company = new TestCompany { Name = "Acme Corp" },
+                },
+                new()
+                {
+                    Name = "Jane",
+                    Email = "jane@test.com",
+                    Company = null,
+                },
+            }.AsQueryable();
     }
 }
