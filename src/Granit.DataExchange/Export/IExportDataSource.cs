@@ -18,7 +18,7 @@ namespace Granit.DataExchange.Export;
 /// the exported value will be <c>null</c>.
 /// </para>
 /// </remarks>
-public interface IExportDataSource<TEntity>
+public interface IExportDataSource<out TEntity>
     where TEntity : class
 {
     /// <summary>
