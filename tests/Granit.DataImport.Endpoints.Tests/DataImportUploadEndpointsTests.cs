@@ -8,6 +8,7 @@ using System.Text.Json;
 using Granit.DataImport.Domain;
 using Granit.DataImport.Endpoints.Dtos;
 using Granit.DataImport.Endpoints.Extensions;
+using Granit.DataImport.Export;
 using Granit.DataImport.Mapping;
 using Granit.DataImport.Parsing;
 using Granit.DataImport.Pipeline;
@@ -81,6 +82,10 @@ public sealed class DataImportUploadEndpointsTests : IAsyncDisposable
         builder.Services.AddSingleton(_clock);
         builder.Services.AddSingleton(_descriptor);
         builder.Services.AddSingleton<IFileParser>(_parser);
+
+        // Required by export endpoints (all endpoints are compiled at startup)
+        builder.Services.AddSingleton(Substitute.For<IExportOrchestrator>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetStore>());
 
         _app = builder.Build();
         _app.MapDataImportEndpoints();

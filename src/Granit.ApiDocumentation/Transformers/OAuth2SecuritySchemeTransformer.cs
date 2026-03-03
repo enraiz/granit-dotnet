@@ -76,7 +76,7 @@ internal sealed class OAuth2SecuritySchemeTransformer(
                 [.. oauth2.Scopes],
         };
 
-        foreach (var operations in document.Paths.Select(path => path.Value.Operations))
+        foreach (Dictionary<HttpMethod, OpenApiOperation>? operations in document.Paths.Select(path => path.Value.Operations))
         {
             if (operations is null)
             {

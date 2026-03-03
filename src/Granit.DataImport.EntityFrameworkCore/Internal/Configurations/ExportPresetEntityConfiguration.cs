@@ -1,0 +1,30 @@
+using Granit.DataImport.EntityFrameworkCore.Internal.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Granit.DataImport.EntityFrameworkCore.Internal.Configurations;
+
+/// <summary>
+/// EF Core configuration for <see cref="ExportPresetEntity"/>.
+/// </summary>
+internal sealed class ExportPresetEntityConfiguration : IEntityTypeConfiguration<ExportPresetEntity>
+{
+    public void Configure(EntityTypeBuilder<ExportPresetEntity> builder)
+    {
+        builder.ToTable("data_import_export_presets");
+        builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.DefinitionName).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.PresetName).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.TenantId);
+        builder.Property(e => e.FieldsJson).IsRequired();
+        builder.Property(e => e.Format).HasMaxLength(10).IsRequired();
+        builder.Property(e => e.IncludeIdForImport).IsRequired();
+        builder.Property(e => e.SavedAt).IsRequired();
+        builder.Property(e => e.SavedBy).HasMaxLength(200).IsRequired();
+
+        builder.HasIndex(e => new { e.DefinitionName, e.PresetName, e.TenantId })
+            .IsUnique()
+            .HasDatabaseName("ix_export_presets_def_name_tenant");
+    }
+}

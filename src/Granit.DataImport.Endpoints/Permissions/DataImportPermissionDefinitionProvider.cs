@@ -3,7 +3,7 @@ using Granit.Authorization.Abstractions;
 namespace Granit.DataImport.Endpoints.Permissions;
 
 /// <summary>
-/// Declares the <c>DataImport.Admin</c> permission in the Granit RBAC system.
+/// Declares the <c>DataImport.Admin</c> and <c>DataImport.Export</c> permissions in the Granit RBAC system.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -35,5 +35,9 @@ internal sealed class DataImportPermissionDefinitionProvider : IPermissionDefini
         group.AddPermission(
             DataImportPermissions.Admin.Default,
             "Administrer les imports de données (upload, mapping, exécution, rapports)");
+
+        group.AddPermission(
+            DataImportPermissions.Export.Default,
+            "Exporter des données (définitions, exécution, téléchargement, presets)");
     }
 }

@@ -19,4 +19,14 @@ public static class DataImportPermissions
         /// </summary>
         public const string Default = "DataImport.Admin";
     }
+
+    /// <summary>Permissions for the data export endpoints.</summary>
+    public static class Export
+    {
+        /// <summary>
+        /// Grants access to all data export endpoints
+        /// (definitions, field listing, export execution, download, presets).
+        /// </summary>
+        public const string Default = "DataImport.Export";
+    }
 }

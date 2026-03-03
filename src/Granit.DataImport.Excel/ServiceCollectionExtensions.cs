@@ -1,4 +1,5 @@
 using Granit.DataImport.Excel.Internal;
+using Granit.DataImport.Export;
 using Granit.DataImport.Parsing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,21 +11,27 @@ namespace Granit.DataImport.Excel;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers the Sylvan-based Excel file parser.
+    /// Registers the Sylvan-based Excel file parser (import) and the ClosedXML-based
+    /// Excel export writer.
     /// </summary>
     /// <remarks>
-    /// Registers the following service:
+    /// Registers the following services:
     /// <list type="bullet">
-    ///   <item><see cref="IFileParser"/> → <c>SylvanExcelFileParser</c> (singleton)</item>
+    ///   <item><see cref="IFileParser"/> → <c>SylvanExcelFileParser</c> (singleton) — import.</item>
+    ///   <item><see cref="IExportWriter"/> → <c>ClosedXmlExportWriter</c> (singleton) — export.</item>
     /// </list>
     /// <para>
-    /// Multiple <see cref="IFileParser"/> implementations can coexist (CSV + Excel).
-    /// The pipeline dispatches to the first parser whose <see cref="IFileParser.CanParse"/>
-    /// returns <c>true</c> for the uploaded file's MIME type.
+    /// Multiple <see cref="IFileParser"/> and <see cref="IExportWriter"/> implementations
+    /// can coexist (CSV + Excel). The pipeline dispatches based on MIME type (import)
+    /// or format name (export).
     /// </para>
     /// </remarks>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddGranitDataImportExcel(this IServiceCollection services) =>
+    public static IServiceCollection AddGranitDataImportExcel(this IServiceCollection services)
+    {
         services.AddSingleton<IFileParser, SylvanExcelFileParser>();
+        services.AddSingleton<IExportWriter, ClosedXmlExportWriter>();
+        return services;
+    }
 }

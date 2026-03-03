@@ -35,9 +35,16 @@ public static class DataImportEndpointRouteBuilderExtensions
     /// });
     /// </code>
     /// <para>
-    /// Exposes 9 endpoints: POST /, POST /{jobId}/preview, PUT /{jobId}/mappings,
+    /// Exposes 9 import endpoints: POST /, POST /{jobId}/preview, PUT /{jobId}/mappings,
     /// POST /{jobId}/execute, POST /{jobId}/dry-run, GET /{jobId},
     /// DELETE /{jobId}, GET /{jobId}/report, GET /{jobId}/correction-file.
+    /// </para>
+    /// <para>
+    /// Also exposes 6 export endpoints under <c>/export/</c>:
+    /// GET /export/definitions, GET /export/definitions/{name}/fields,
+    /// POST /export/jobs, GET /export/jobs/{id}, GET /export/jobs/{id}/download,
+    /// GET /export/presets/{definitionName}, POST /export/presets,
+    /// DELETE /export/presets/{definitionName}/{presetName}.
     /// </para>
     /// </remarks>
     /// <param name="endpoints">The endpoint route builder.</param>
@@ -54,7 +61,7 @@ public static class DataImportEndpointRouteBuilderExtensions
             ? options.RoutePrefix
             : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
 
-        // Register the named authorization policy so that endpoints can use
+        // Register the named authorization policies so that endpoints can use
         // RequireAuthorization(PolicyName). This is safe to call here because
         // IOptions<AuthorizationOptions> is a singleton and is evaluated lazily
         // (before the first policy lookup at request time).
@@ -62,6 +69,9 @@ public static class DataImportEndpointRouteBuilderExtensions
             endpoints.ServiceProvider.GetService<IOptions<AuthorizationOptions>>();
         authOptions?.Value.AddPolicy(
             DataImportAuthorizationPolicy.PolicyName,
+            policy => policy.RequireRole(options.RequiredRole));
+        authOptions?.Value.AddPolicy(
+            DataExportAuthorizationPolicy.PolicyName,
             policy => policy.RequireRole(options.RequiredRole));
 
         RouteGroupBuilder group = endpoints
@@ -72,6 +82,16 @@ public static class DataImportEndpointRouteBuilderExtensions
         group.MapUploadEndpoints();
         group.MapExecutionEndpoints();
         group.MapReportEndpoints();
+
+        // Export endpoints under /export/ sub-group with dedicated permission
+        RouteGroupBuilder exportGroup = group
+            .MapGroup("export")
+            .WithTags("Data Export")
+            .RequireAuthorization(DataExportAuthorizationPolicy.PolicyName);
+
+        exportGroup.MapExportDefinitionEndpoints();
+        exportGroup.MapExportExecutionEndpoints();
+        exportGroup.MapExportPresetEndpoints();
 
         return group;
     }

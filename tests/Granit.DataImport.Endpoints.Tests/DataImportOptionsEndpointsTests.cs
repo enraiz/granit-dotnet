@@ -1,6 +1,7 @@
 using System.Net;
 using Granit.DataImport.Domain;
 using Granit.DataImport.Endpoints.Extensions;
+using Granit.DataImport.Export;
 using Granit.DataImport.Mapping;
 using Granit.DataImport.Parsing;
 using Granit.DataImport.Pipeline;
@@ -108,6 +109,10 @@ public sealed class DataImportOptionsEndpointsTests
         builder.Services.AddSingleton(Substitute.For<IMappingSuggestionService>());
         builder.Services.AddSingleton(Substitute.For<IImportDefinitionDescriptor>());
         builder.Services.AddSingleton(Substitute.For<IFileParser>());
+
+        // Required by export endpoints (all endpoints are compiled at startup)
+        builder.Services.AddSingleton(Substitute.For<IExportOrchestrator>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetStore>());
 
         return builder.Build();
     }
