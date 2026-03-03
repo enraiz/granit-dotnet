@@ -4,7 +4,7 @@ Ce fichier répertorie les bibliothèques tierces utilisées par le projet
 **granit-dotnet** ainsi que leurs licences respectives. Il est mis à jour
 à chaque ajout ou modification de dépendance externe.
 
-Dernière mise à jour : 2026-03-02
+Dernière mise à jour : 2026-03-03
 
 ---
 
@@ -12,7 +12,7 @@ Dernière mise à jour : 2026-03-02
 
 | Licence      | Nombre de packages |
 | ------------ | ------------------ |
-| MIT          | 37                 |
+| MIT          | 49                 |
 | Apache-2.0   | 15                 |
 | BSD-3-Clause | 2                  |
 | BSD-2-Clause | 1                  |
@@ -53,12 +53,16 @@ Dernière mise à jour : 2026-03-02
 | Sylvan.Data.Excel | 0.5.2 | Copyright (c) Mark Pflug |
 | SmartFormat | 3.6.1 | Copyright 2011-2025 SmartFormat Project |
 | StackExchange.Redis | 2.11.8 | Copyright 2014-2026 Stack Exchange, Inc. |
-| System.Composition.AttributedModel | 10.0.3 | (c) Microsoft Corporation |
-| System.Text.Json | 10.0.3 | (c) Microsoft Corporation |
-| WolverineFx | 5.16.4 | JasperFx Contributors |
-| WolverineFx.EntityFrameworkCore | 5.16.4 | JasperFx Contributors |
-| WolverineFx.FluentValidation | 5.16.4 | JasperFx Contributors |
-| WolverineFx.Postgresql | 5.16.4 | JasperFx Contributors |
+| System.Composition.AttributedModel | 9.0.0 | (c) Microsoft Corporation |
+| System.Text.Json | 9.0.13 | (c) Microsoft Corporation |
+| MailKit | 4.12.0 | Copyright (c) 2013-2026 .NET Foundation and Contributors |
+| Microsoft.AspNetCore.SignalR.StackExchangeRedis | 10.0.3 | (c) Microsoft Corporation |
+| Microsoft.Extensions.Http | 10.0.3 | (c) Microsoft Corporation |
+| WolverineFx | 5.17.0 | JasperFx Contributors |
+| WolverineFx.EntityFrameworkCore | 5.17.0 | JasperFx Contributors |
+| WolverineFx.FluentValidation | 5.17.0 | JasperFx Contributors |
+| WolverineFx.Http.FluentValidation | 5.17.0 | JasperFx Contributors |
+| WolverineFx.Postgresql | 5.17.0 | JasperFx Contributors |
 
 ### Apache-2.0
 
@@ -104,6 +108,7 @@ Dernière mise à jour : 2026-03-02
 | Microsoft.CodeAnalysis.CSharp | 5.0.0 | (c) Microsoft Corporation |
 | Microsoft.CodeAnalysis.CSharp.Workspaces | 5.0.0 | (c) Microsoft Corporation |
 | Microsoft.EntityFrameworkCore.InMemory | 10.0.3 | (c) Microsoft Corporation |
+| Microsoft.EntityFrameworkCore.Sqlite | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.TimeProvider.Testing | 10.3.0 | (c) Microsoft Corporation |
 | Microsoft.NET.Test.Sdk | 18.3.0 | (c) Microsoft Corporation |
 | Testcontainers.PostgreSql | 4.10.0 | Copyright (c) 2019-2025 Andre Hofmeister |

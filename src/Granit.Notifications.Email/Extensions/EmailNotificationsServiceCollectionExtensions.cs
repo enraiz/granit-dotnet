@@ -20,7 +20,7 @@ public static class EmailNotificationsServiceCollectionExtensions
             services.Configure(configure);
         }
 
-        services.AddSingleton<INotificationChannel, EmailNotificationChannel>();
+        services.AddScoped<INotificationChannel, EmailNotificationChannel>();
         return services;
     }
 }

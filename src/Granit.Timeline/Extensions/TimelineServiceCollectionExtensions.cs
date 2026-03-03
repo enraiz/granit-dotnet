@@ -17,16 +17,17 @@ public static class TimelineServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddGranitTimeline(this IServiceCollection services)
     {
-        // Core stores (default: in-memory, replaced by EF Core package)
-        services.TryAddSingleton<InMemoryTimelineStore>();
-        services.TryAddSingleton<ITimelineStore>(sp => sp.GetRequiredService<InMemoryTimelineStore>());
-        services.TryAddSingleton<ITimelineQuery, InMemoryTimelineQuery>();
+        // Core stores (default: in-memory, replaced by EF Core package).
+        // Scoped: depends on ICurrentUserService (scoped per-request).
+        services.TryAddScoped<InMemoryTimelineStore>();
+        services.TryAddScoped<ITimelineStore>(sp => sp.GetRequiredService<InMemoryTimelineStore>());
+        services.TryAddScoped<ITimelineQuery, InMemoryTimelineQuery>();
 
         // Follower facade (standalone mode, replaced by Granit.Timeline.Notifications)
-        services.TryAddSingleton<ITimelineFollowerService, InMemoryTimelineFollowerService>();
+        services.TryAddScoped<ITimelineFollowerService, InMemoryTimelineFollowerService>();
 
         // Notifier facade (no-op, replaced by Granit.Timeline.Notifications)
-        services.TryAddSingleton<ITimelineNotifier, NullTimelineNotifier>();
+        services.TryAddScoped<ITimelineNotifier, NullTimelineNotifier>();
 
         return services;
     }

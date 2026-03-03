@@ -20,7 +20,7 @@ public static class SmsNotificationsServiceCollectionExtensions
             services.Configure(configure);
         }
 
-        services.AddSingleton<INotificationChannel, SmsNotificationChannel>();
+        services.AddScoped<INotificationChannel, SmsNotificationChannel>();
         return services;
     }
 }

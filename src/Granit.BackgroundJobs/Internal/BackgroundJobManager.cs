@@ -20,7 +20,7 @@ internal sealed partial class BackgroundJobManager(
     IClock clock,
     ICurrentUserService currentUserService,
     ILogger<BackgroundJobManager> logger,
-    IMessageStore messageStore) : IBackgroundJobManager
+    IMessageStore? messageStore = null) : IBackgroundJobManager
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default)
@@ -108,6 +108,11 @@ internal sealed partial class BackgroundJobManager(
     /// </summary>
     private async Task<Dictionary<string, long>> GetDlqCountsAsync(CancellationToken ct)
     {
+        if (messageStore is null)
+        {
+            return [];
+        }
+
         try
         {
             IReadOnlyList<DeadLetterQueueCount> counts =

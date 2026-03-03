@@ -23,9 +23,9 @@ public static class TimelineNotificationsServiceCollectionExtensions
         this IServiceCollection services)
     {
         services.Replace(
-            ServiceDescriptor.Singleton<ITimelineFollowerService, NotificationBackedFollowerService>());
+            ServiceDescriptor.Scoped<ITimelineFollowerService, NotificationBackedFollowerService>());
         services.Replace(
-            ServiceDescriptor.Singleton<ITimelineNotifier, NotificationBackedNotifier>());
+            ServiceDescriptor.Scoped<ITimelineNotifier, NotificationBackedNotifier>());
 
         return services;
     }

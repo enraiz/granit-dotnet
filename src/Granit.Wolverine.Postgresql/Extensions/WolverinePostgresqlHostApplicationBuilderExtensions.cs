@@ -59,13 +59,13 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
             WolverinePostgresqlOptionsValidator>();
 
         // Read options directly from IConfiguration: the DI container is not yet
-        // built at this point, so IOptions<> is not resolvable inside UseWolverine().
+        // built at this point, so IOptions<> is not resolvable inside ConfigureWolverine().
         WolverinePostgresqlOptions options = new();
         builder.Configuration
             .GetSection(WolverinePostgresqlOptions.SectionName)
             .Bind(options);
 
-        builder.UseWolverine(opts =>
+        builder.Services.ConfigureWolverine(opts =>
         {
             opts.PersistMessagesWithPostgresql(options.TransportConnectionString);
             opts.UseEntityFrameworkCoreTransactions(options.TransactionMode);
@@ -122,7 +122,7 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
             WolverinePostgresqlOptionsValidator>();
 
         // Read options directly from IConfiguration: the DI container is not yet
-        // built at this point, so IOptions<> is not resolvable inside UseWolverine().
+        // built at this point, so IOptions<> is not resolvable inside ConfigureWolverine().
         WolverinePostgresqlOptions options = new();
         builder.Configuration
             .GetSection(WolverinePostgresqlOptions.SectionName)
@@ -133,7 +133,7 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
         builder.Services.AddTenantPerDatabaseDbContext<TContext>(
             static (opts, connectionString) => opts.UseNpgsql(connectionString));
 
-        builder.UseWolverine(opts =>
+        builder.Services.ConfigureWolverine(opts =>
         {
             opts.PersistMessagesWithPostgresql(options.TransportConnectionString);
             opts.UseEntityFrameworkCoreTransactions(options.TransactionMode);

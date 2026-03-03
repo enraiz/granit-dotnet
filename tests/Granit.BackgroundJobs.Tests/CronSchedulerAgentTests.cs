@@ -1,5 +1,6 @@
 using Granit.BackgroundJobs.Internal;
 using Granit.Timing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Shouldly;
@@ -17,14 +18,22 @@ public sealed class CronSchedulerAgentTests
     private readonly IBackgroundJobStore _store = Substitute.For<IBackgroundJobStore>();
     private readonly IMessageBus _bus = Substitute.For<IMessageBus>();
     private readonly IClock _clock = Substitute.For<IClock>();
+    private readonly IServiceScopeFactory _scopeFactory;
 
     public CronSchedulerAgentTests()
     {
         _clock.Now.Returns(new DateTimeOffset(2026, 2, 20, 8, 0, 0, TimeSpan.Zero));
+
+        IServiceScope scope = Substitute.For<IServiceScope>();
+        IServiceProvider sp = Substitute.For<IServiceProvider>();
+        sp.GetService(typeof(IMessageBus)).Returns(_bus);
+        scope.ServiceProvider.Returns(sp);
+        _scopeFactory = Substitute.For<IServiceScopeFactory>();
+        _scopeFactory.CreateScope().Returns(scope);
     }
 
     private CronSchedulerAgent CreateAgent() =>
-        new(_store, _bus, _clock, NullLogger<CronSchedulerAgent>.Instance);
+        new(_store, _scopeFactory, _clock, NullLogger<CronSchedulerAgent>.Instance);
 
     private static BackgroundJobDefinition MakeJob(
         string jobName,
