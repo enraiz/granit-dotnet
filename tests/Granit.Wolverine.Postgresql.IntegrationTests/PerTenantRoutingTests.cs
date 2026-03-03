@@ -11,6 +11,7 @@
 // de démarrage (~3 s) sur l'ensemble des tests.
 // =============================================================================
 
+using System.Net;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence;
 using Granit.Persistence.MultiTenancy;
@@ -87,7 +88,8 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
     /// <summary>
     /// In DinD (Docker-in-Docker) CI environments, Testcontainers returns the internal
     /// bridge IP (172.17.0.x) which is not routable from the CI job container.
-    /// Replace the host with TESTCONTAINERS_HOST_OVERRIDE when set.
+    /// Replace the host with TESTCONTAINERS_HOST_OVERRIDE when set, resolved to an IP
+    /// address to avoid intermittent DNS failures in DinD networking.
     /// </summary>
     private static string ApplyHostOverride(string connectionString)
     {
@@ -95,6 +97,20 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
         if (string.IsNullOrEmpty(hostOverride))
         {
             return connectionString;
+        }
+
+        // Resolve hostname to IP to avoid transient DNS failures in DinD.
+        try
+        {
+            IPAddress[] addresses = Dns.GetHostAddresses(hostOverride);
+            if (addresses.Length > 0)
+            {
+                hostOverride = addresses[0].ToString();
+            }
+        }
+        catch
+        {
+            // Keep the hostname if resolution fails.
         }
 
         NpgsqlConnectionStringBuilder builder = new(connectionString) { Host = hostOverride };
@@ -108,8 +124,21 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
                 .UseNpgsql(connectionString)
                 .Options;
 
-        await using TenantIntegrationDbContext ctx = new(opts);
-        await ctx.Database.EnsureCreatedAsync();
+        // Retry to handle transient DinD networking delays after container startup.
+        const int maxAttempts = 5;
+        for (int attempt = 1; ; attempt++)
+        {
+            try
+            {
+                await using TenantIntegrationDbContext ctx = new(opts);
+                await ctx.Database.EnsureCreatedAsync().ConfigureAwait(false);
+                return;
+            }
+            catch when (attempt < maxAttempts)
+            {
+                await Task.Delay(attempt * 1_000).ConfigureAwait(false);
+            }
+        }
     }
 }
 
