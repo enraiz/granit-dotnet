@@ -1,8 +1,12 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Granit.DataExchange.Export;
 using Granit.DataExchange.Export.Internal;
 using Granit.DataExchange.Export.Messages;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Querying;
+using Granit.Querying.Meta;
+using Granit.Querying.SavedViews;
 using Granit.Timing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -257,6 +261,36 @@ public sealed class ExportOrchestratorTests
         job.CompletedAt.ShouldBe(_now);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_WithQueryDefinition_UsesQueryEngine()
+    {
+        // Arrange
+        Guid jobId = Guid.NewGuid();
+        ExportRequest request = new("Test.QueryExport", "csv", null, false, "-Name", null, null, null);
+        ExportJob job = new()
+        {
+            Id = jobId,
+            DefinitionName = "Test.QueryExport",
+            Format = "csv",
+            RequestJson = JsonSerializer.Serialize(request),
+            Status = ExportJobStatus.Queued,
+        };
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        FakeQueryEngine queryEngine = new();
+        ExportOrchestrator sut = CreateOrchestratorWithQueryEngine(queryEngine);
+
+        // Act
+        await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
+
+        // Assert — the query engine should have been called
+        queryEngine.StreamCalled.ShouldBeTrue();
+        queryEngine.CapturedRequest.ShouldNotBeNull();
+        queryEngine.CapturedRequest!.Sort.ShouldBe("-Name");
+        job.Status.ShouldBe(ExportJobStatus.Completed);
+        job.RowCount.ShouldBe(2);
+    }
+
     // ── GetJobAsync ─────────────────────────────────────────────────────
 
     [Fact]
@@ -354,6 +388,29 @@ public sealed class ExportOrchestratorTests
             NullLogger<ExportOrchestrator>.Instance);
     }
 
+    private ExportOrchestrator CreateOrchestratorWithQueryEngine(
+        IQueryEngine<TestEntity> queryEngine,
+        IExportWriter? writerOverride = null)
+    {
+        ServiceCollection services = new();
+        services.AddSingleton<IExportDefinitionDescriptor>(new TestQueryExportDefinition());
+        services.AddSingleton<IExportDataSource<TestEntity>>(new TestDataSource());
+        services.AddSingleton(queryEngine);
+        services.AddSingleton(Options.Create(new ExportOptions()));
+
+        IExportWriter writer = writerOverride ?? CreateCsvWriter();
+        ServiceProvider sp = services.BuildServiceProvider();
+
+        return new ExportOrchestrator(
+            sp,
+            [writer],
+            _jobStore,
+            _dispatcher,
+            _fileProvider,
+            _clock,
+            NullLogger<ExportOrchestrator>.Instance);
+    }
+
     private static IExportWriter CreateCsvWriter()
     {
         IExportWriter writer = Substitute.For<IExportWriter>();
@@ -412,6 +469,48 @@ public sealed class ExportOrchestratorTests
                 .Field(e => e.Name, f => f.Header("Nom"))
                 .Field(e => e.Email)
                 .Field(e => e.Company, c => c.Name, f => f.Header("Société"));
+    }
+
+    private sealed class TestQueryExportDefinition : ExportDefinition<TestEntity>
+    {
+        public override string Name => "Test.QueryExport";
+        public override string? QueryDefinitionName => "Test.Entities";
+
+        protected override void Configure(ExportDefinitionBuilder<TestEntity> builder) =>
+            builder
+                .Field(e => e.Name, f => f.Header("Nom"))
+                .Field(e => e.Email);
+    }
+
+    private sealed class FakeQueryEngine : IQueryEngine<TestEntity>
+    {
+        public bool StreamCalled { get; private set; }
+        public QueryRequest? CapturedRequest { get; private set; }
+
+        public async IAsyncEnumerable<TestEntity> ExecuteStreamAsync(
+            IQueryable<TestEntity> source,
+            QueryRequest request,
+            [EnumeratorCancellation] CancellationToken ct = default)
+        {
+            StreamCalled = true;
+            CapturedRequest = request;
+            await Task.CompletedTask.ConfigureAwait(false);
+            foreach (TestEntity item in source)
+            {
+                yield return item;
+            }
+        }
+
+        public Task<PagedResult<TestEntity>> ExecuteAsync(
+            IQueryable<TestEntity> source, QueryRequest request, CancellationToken ct = default) =>
+            throw new NotSupportedException();
+
+        public Task<GroupedResult<TestEntity>> ExecuteGroupedAsync(
+            IQueryable<TestEntity> source, QueryRequest request, CancellationToken ct = default) =>
+            throw new NotSupportedException();
+
+        public QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummaryDto>? savedViews = null) =>
+            throw new NotSupportedException();
     }
 
     private sealed class TestDataSource : IExportDataSource<TestEntity>
