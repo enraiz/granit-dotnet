@@ -266,7 +266,7 @@
       "granit.core": {
         "type": "Project"
       },
-      "granit.dataimport": {
+      "granit.dataexchange": {
         "type": "Project",
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )",
