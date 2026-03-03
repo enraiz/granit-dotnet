@@ -63,7 +63,8 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
             .AllowAnonymous()
             .WithName("GetGranitLocalization")
             .WithTags(options.TagName)
-            .WithSummary("Returns all localization resources for the requested culture.");
+            .WithSummary("Returns all localization resources for the requested culture.")
+            .Produces<ApplicationLocalizationResponse>();
 
         return endpoints;
     }
@@ -105,15 +106,18 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
         group.MapGet("", HandleGetOverridesAsync)
              .WithName("GetLocalizationOverrides")
-             .WithSummary("Returns all translation overrides for a resource and culture.");
+             .WithSummary("Returns all translation overrides for a resource and culture.")
+             .Produces<IReadOnlyDictionary<string, string>>();
 
         group.MapPut("/{resourceName}/{cultureName}/{key}", HandlePutOverrideAsync)
              .WithName("PutLocalizationOverride")
-             .WithSummary("Creates or updates a translation override.");
+             .WithSummary("Creates or updates a translation override.")
+             .Produces(StatusCodes.Status204NoContent);
 
         group.MapDelete("/{resourceName}/{cultureName}/{key}", HandleDeleteOverrideAsync)
              .WithName("DeleteLocalizationOverride")
-             .WithSummary("Removes a translation override.");
+             .WithSummary("Removes a translation override.")
+             .Produces(StatusCodes.Status204NoContent);
 
         return group;
     }

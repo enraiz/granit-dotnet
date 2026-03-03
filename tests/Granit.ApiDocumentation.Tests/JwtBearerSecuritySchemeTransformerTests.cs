@@ -63,10 +63,10 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         scheme.BearerFormat.ShouldBe("JWT");
     }
 
-    // --- Security requirement added to operations ---
+    // --- Global security requirement added ---
 
     [Fact]
-    public async Task TransformAsync_JwtBearerSchemeWithOperations_SecurityRequirementAddedToAllOperations()
+    public async Task TransformAsync_JwtBearerSchemeWithOperations_GlobalSecurityRequirementAdded()
     {
         // Arrange
         IAuthenticationSchemeProvider provider = BuildProviderWithBearer();
@@ -92,9 +92,10 @@ public sealed class JwtBearerSecuritySchemeTransformerTests
         // Act
         await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
 
-        // Assert
-        operation.Security.ShouldNotBeNull();
-        operation.Security!.ShouldNotBeEmpty();
+        // Assert — security is set at document level, not per-operation
+        document.Security.ShouldNotBeNull();
+        document.Security!.ShouldNotBeEmpty();
+        operation.Security.ShouldBeNull("per-operation security is handled by SecurityRequirementOperationTransformer");
     }
 
     // --- Paths with null operations do not throw ---

@@ -59,6 +59,7 @@ public static class ApiDocumentationServiceCollectionExtensions
         services.AddTransient<TenantHeaderOperationTransformer>();
         services.AddTransient<WolverineOpenApiOperationTransformer>();
         services.AddTransient<ProblemDetailsResponseOperationTransformer>();
+        services.AddTransient<SecurityRequirementOperationTransformer>();
 
         foreach (int majorVersion in options.MajorVersions)
         {
@@ -86,6 +87,7 @@ public static class ApiDocumentationServiceCollectionExtensions
                 openApiOptions.AddOperationTransformer<TenantHeaderOperationTransformer>();
                 openApiOptions.AddOperationTransformer<WolverineOpenApiOperationTransformer>();
                 openApiOptions.AddOperationTransformer<ProblemDetailsResponseOperationTransformer>();
+                openApiOptions.AddOperationTransformer<SecurityRequirementOperationTransformer>();
             });
         }
     }

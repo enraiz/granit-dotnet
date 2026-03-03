@@ -69,31 +69,13 @@ internal sealed class OAuth2SecuritySchemeTransformer(
             },
         };
 
-        // Replace security requirements on all operations
+        // Replace the global security requirement (set by JwtBearerSecuritySchemeTransformer)
         OpenApiSecurityRequirement oAuth2Requirement = new()
         {
             [new OpenApiSecuritySchemeReference(OAuth2SchemeId, null, null)] =
                 [.. oauth2.Scopes],
         };
 
-        foreach (Dictionary<HttpMethod, OpenApiOperation>? operations in document.Paths.Select(path => path.Value.Operations))
-        {
-            if (operations is null)
-            {
-                continue;
-            }
-
-            foreach (IList<OpenApiSecurityRequirement>? security in operations.Select(op => op.Value.Security))
-            {
-                if (security is null)
-                {
-                    continue;
-                }
-
-                // Replace all existing security requirements with OAuth2
-                security.Clear();
-                security.Add(oAuth2Requirement);
-            }
-        }
+        document.Security = [oAuth2Requirement];
     }
 }
