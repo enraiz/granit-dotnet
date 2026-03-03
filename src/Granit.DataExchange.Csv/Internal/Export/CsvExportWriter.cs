@@ -44,7 +44,7 @@ internal sealed class CsvExportWriter : IExportWriter
         {
             if (i > 0)
             {
-                writer.Write(Separator);
+                await writer.WriteAsync(Separator).ConfigureAwait(false);
             }
 
             WriteField(writer, fields[i].Header ?? fields[i].PropertyPath);
@@ -59,7 +59,7 @@ internal sealed class CsvExportWriter : IExportWriter
             {
                 if (i > 0)
                 {
-                    writer.Write(Separator);
+                    await writer.WriteAsync(Separator).ConfigureAwait(false);
                 }
 
                 object? value = data.GetValueOrDefault(fields[i].PropertyPath);

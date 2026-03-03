@@ -154,7 +154,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
 
         _savedViewStore.GetListAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<SavedView>());
+            .Returns([]);
 
         HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/meta", TestContext.Current.CancellationToken);
@@ -204,8 +204,8 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     {
         _savedViewStore.GetListAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<SavedView>
-            {
+            .Returns(
+            [
                 new()
                 {
                     Id = Guid.NewGuid(),
@@ -215,7 +215,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
                     CreatedAt = DateTimeOffset.UtcNow,
                     CreatedBy = "test-user-id",
                 },
-            });
+            ]);
 
         HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/saved-views", TestContext.Current.CancellationToken);
@@ -250,7 +250,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task SavedViews_Update_returns_204_when_found()
     {
-        Guid viewId = Guid.NewGuid();
+        var viewId = Guid.NewGuid();
         _savedViewStore.GetAsync(viewId, Arg.Any<CancellationToken>())
             .Returns(new SavedView
             {
@@ -281,7 +281,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task SavedViews_Update_returns_404_when_not_found()
     {
-        Guid viewId = Guid.NewGuid();
+        var viewId = Guid.NewGuid();
         _savedViewStore.GetAsync(viewId, Arg.Any<CancellationToken>())
             .Returns((SavedView?)null);
 
@@ -296,7 +296,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task SavedViews_Delete_returns_204()
     {
-        Guid viewId = Guid.NewGuid();
+        var viewId = Guid.NewGuid();
 
         HttpResponseMessage response = await _authClient.DeleteAsync(
             $"{Prefix}/saved-views/{viewId}", TestContext.Current.CancellationToken);
@@ -309,7 +309,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task SavedViews_SetDefault_returns_204()
     {
-        Guid viewId = Guid.NewGuid();
+        var viewId = Guid.NewGuid();
 
         HttpResponseMessage response = await _authClient.PostAsync(
             $"{Prefix}/saved-views/{viewId}/set-default", null, TestContext.Current.CancellationToken);

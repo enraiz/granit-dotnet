@@ -43,7 +43,7 @@ public sealed class SavedViewTests
     [Fact]
     public void Optional_properties_can_be_set()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         SavedView view = new()
         {
             EntityType = "Guava.Patients",
@@ -134,7 +134,7 @@ public sealed class SavedViewSummaryDtoTests
     [Fact]
     public void Properties_are_preserved()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         SavedViewSummaryDto dto = new(id, "My view", true, false);
 
         dto.Id.ShouldBe(id);

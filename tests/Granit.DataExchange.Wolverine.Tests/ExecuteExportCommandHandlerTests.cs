@@ -13,7 +13,7 @@ public sealed class ExecuteExportCommandHandlerTests
     {
         // Arrange
         IExportOrchestrator orchestrator = Substitute.For<IExportOrchestrator>();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExecuteExportCommand command = new(jobId);
         ExecuteExportCommandHandler handler = new(orchestrator);
 

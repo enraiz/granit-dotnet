@@ -19,7 +19,7 @@ public sealed class QueryableSortExtensionsTests
             new() { Name = "Bob" },
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplySort("Name", builder)
             .ToList();
 
@@ -41,7 +41,7 @@ public sealed class QueryableSortExtensionsTests
             new() { Name = "C", Price = 20 },
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplySort("-Price", builder)
             .ToList();
 
@@ -66,7 +66,7 @@ public sealed class QueryableSortExtensionsTests
             new() { Name = "C", Category = ProductCategory.Electronics },
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplySort("Category,Name", builder)
             .ToList();
 
@@ -88,7 +88,7 @@ public sealed class QueryableSortExtensionsTests
             new() { Name = "A", Price = 20 },
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplySort("Price,Name", builder)
             .ToList();
 
@@ -112,7 +112,7 @@ public sealed class QueryableSortExtensionsTests
             new() { Name = "Bob" },
         ];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplySort(null, builder)
             .ToList();
 
@@ -127,7 +127,7 @@ public sealed class QueryableSortExtensionsTests
         QueryDefinitionBuilder<TestProduct> builder = new();
         List<TestProduct> source = [new() { Name = "B" }, new() { Name = "A" }];
 
-        List<TestProduct> result = source.AsQueryable()
+        var result = source.AsQueryable()
             .ApplySort("", builder)
             .ToList();
 

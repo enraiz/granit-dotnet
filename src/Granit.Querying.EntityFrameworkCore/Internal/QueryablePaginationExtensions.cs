@@ -69,7 +69,7 @@ internal static class QueryablePaginationExtensions
                     MemberExpression member = Expression.Property(parameter, property);
                     ConstantExpression constant = Expression.Constant(converted, property.PropertyType);
                     BinaryExpression greaterThan = Expression.GreaterThan(member, constant);
-                    Expression<Func<T, bool>> predicate =
+                    var predicate =
                         Expression.Lambda<Func<T, bool>>(greaterThan, parameter);
                     query = query.Where(predicate);
                 }

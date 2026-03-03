@@ -14,7 +14,7 @@ public sealed class ExecuteImportCommandHandlerTests
     {
         // Arrange
         IImportOrchestrator orchestrator = Substitute.For<IImportOrchestrator>();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExecuteImportCommand command = new(jobId, "Test.Import");
         ExecuteImportCommandHandler handler = new(orchestrator);
 

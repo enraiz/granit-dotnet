@@ -18,7 +18,7 @@ internal static class QueryableFilterExtensions
         QueryDefinitionBuilder<TEntity> builder)
         where TEntity : class
     {
-        HashSet<string> filterableFields = builder.Columns
+        var filterableFields = builder.Columns
             .Where(c => c.IsFilterable)
             .Select(c => c.PropertyName)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -136,7 +136,7 @@ internal static class QueryableFilterExtensions
 
         foreach (FilterGroupDescriptor group in builder.FilterGroups)
         {
-            List<PresetDescriptor> defaults = group.Presets
+            var defaults = group.Presets
                 .Where(p => p.IsDefault)
                 .ToList();
 
@@ -145,7 +145,7 @@ internal static class QueryableFilterExtensions
                 continue;
             }
 
-            HashSet<string> defaultNames = defaults.Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var defaultNames = defaults.Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
             Expression<Func<TEntity, bool>>? predicate = BuildGroupPredicate<TEntity>(group, defaultNames);
             if (predicate is not null)
             {
@@ -172,7 +172,7 @@ internal static class QueryableFilterExtensions
             }
 
             // Rebind the preset predicate to use our parameter
-            Expression<Func<TEntity, bool>> typedPredicate = (Expression<Func<TEntity, bool>>)preset.Predicate;
+            var typedPredicate = (Expression<Func<TEntity, bool>>)preset.Predicate;
             Expression body = new ParameterReplacer(typedPredicate.Parameters[0], parameter)
                 .Visit(typedPredicate.Body);
 

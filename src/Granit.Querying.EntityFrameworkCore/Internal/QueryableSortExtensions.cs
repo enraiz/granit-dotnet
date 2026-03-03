@@ -28,7 +28,7 @@ internal static class QueryableSortExtensions
             return source;
         }
 
-        HashSet<string> sortableFields = builder.Columns
+        var sortableFields = builder.Columns
             .Where(c => c.IsSortable)
             .Select(c => c.PropertyName)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);

@@ -67,8 +67,8 @@ public sealed class EfCoreSavedViewStoreTests : IAsyncLifetime
     [Fact]
     public async Task GetListAsync_filters_by_tenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         SavedView viewA = CreateView("View A", tenantId: tenantA);
         SavedView viewB = CreateView("View B", tenantId: tenantB);
@@ -131,11 +131,8 @@ public sealed class EfCoreSavedViewStoreTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task DeleteAsync_does_nothing_for_unknown_id()
-    {
-        // Should not throw
-        await _store.DeleteAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
-    }
+    public async Task DeleteAsync_does_nothing_for_unknown_id() =>
+        await Should.NotThrowAsync(() => _store.DeleteAsync(Guid.NewGuid(), TestContext.Current.CancellationToken));
 
     [Fact]
     public async Task SetDefaultAsync_sets_default_and_unsets_previous()
@@ -156,11 +153,8 @@ public sealed class EfCoreSavedViewStoreTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task SetDefaultAsync_ignores_unknown_id()
-    {
-        // Should not throw
-        await _store.SetDefaultAsync(Guid.NewGuid(), "user-1", "Products", TestContext.Current.CancellationToken);
-    }
+    public async Task SetDefaultAsync_ignores_unknown_id() =>
+        await Should.NotThrowAsync(() => _store.SetDefaultAsync(Guid.NewGuid(), "user-1", "Products", TestContext.Current.CancellationToken));
 
     private static SavedView CreateView(
         string name,
