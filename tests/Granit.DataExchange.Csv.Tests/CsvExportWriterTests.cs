@@ -81,7 +81,7 @@ public sealed class CsvExportWriterTests
 
         // Act
         await Sut.WriteAsync(stream, fields,
-            ToAsyncEnumerable(new List<IReadOnlyDictionary<string, object?>>()),
+            ToAsyncEnumerable([]),
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -202,7 +202,7 @@ public sealed class CsvExportWriterTests
 
         // Act
         await Sut.WriteAsync(stream, fields,
-            ToAsyncEnumerable(new List<IReadOnlyDictionary<string, object?>>()),
+            ToAsyncEnumerable([]),
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -225,7 +225,7 @@ public sealed class CsvExportWriterTests
 
         // Act
         await Sut.WriteAsync(stream, fields,
-            ToAsyncEnumerable(new List<IReadOnlyDictionary<string, object?>>()),
+            ToAsyncEnumerable([]),
             TestContext.Current.CancellationToken);
 
         // Assert

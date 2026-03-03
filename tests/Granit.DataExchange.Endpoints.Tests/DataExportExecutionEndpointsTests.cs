@@ -83,7 +83,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task CreateExportJob_valid_request_returns_201()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _orchestrator.ExportAsync(Arg.Any<ExportRequest>(), Arg.Any<CancellationToken>())
             .Returns(new ExportJobResult(jobId, ExportJobStatus.Queued));
         _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
@@ -173,7 +173,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task GetJobStatus_existing_job_returns_200()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
             .Returns(new ExportJob
             {
@@ -203,7 +203,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task GetJobStatus_unknown_job_returns_404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
             .Returns((ExportJob?)null);
 
@@ -221,7 +221,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task Download_completed_job_returns_file()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
             .Returns(new ExportJob
             {
@@ -251,7 +251,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task Download_non_completed_job_returns_400()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
             .Returns(new ExportJob
             {
@@ -274,7 +274,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     public async Task Download_unknown_job_returns_404()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _orchestrator.GetJobAsync(jobId, Arg.Any<CancellationToken>())
             .Returns((ExportJob?)null);
 

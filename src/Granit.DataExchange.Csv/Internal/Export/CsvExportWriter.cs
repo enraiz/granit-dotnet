@@ -50,7 +50,7 @@ internal sealed class CsvExportWriter : IExportWriter
             WriteField(writer, fields[i].Header ?? fields[i].PropertyPath);
         }
 
-        await writer.WriteLineAsync().ConfigureAwait(false);
+        await writer.WriteLineAsync(ReadOnlyMemory<char>.Empty, ct).ConfigureAwait(false);
 
         // Data rows
         await foreach (IReadOnlyDictionary<string, object?> data in rows.WithCancellation(ct).ConfigureAwait(false))
@@ -66,7 +66,7 @@ internal sealed class CsvExportWriter : IExportWriter
                 WriteField(writer, FormatValue(value, fields[i]));
             }
 
-            await writer.WriteLineAsync().ConfigureAwait(false);
+            await writer.WriteLineAsync(ReadOnlyMemory<char>.Empty, ct).ConfigureAwait(false);
         }
 
         await writer.FlushAsync(ct).ConfigureAwait(false);

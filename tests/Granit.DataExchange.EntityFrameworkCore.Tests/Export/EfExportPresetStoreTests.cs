@@ -130,8 +130,13 @@ public sealed class EfExportPresetStoreTests
         string dbName = NewDb();
         EfExportPresetStore sut = CreateStore(dbName);
 
-        // Act & Assert — should not throw
+        // Act
         await sut.DeleteAsync("Test.Export", "NonExistent", TestContext.Current.CancellationToken);
+
+        // Assert — preset still absent
+        ExportPreset? result = await sut.GetAsync(
+            "Test.Export", "NonExistent", TestContext.Current.CancellationToken);
+        result.ShouldBeNull();
     }
 
     // ---- GetAsync with unknown preset --------------------------------
