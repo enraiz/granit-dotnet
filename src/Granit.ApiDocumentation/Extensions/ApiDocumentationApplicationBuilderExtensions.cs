@@ -44,6 +44,11 @@ public static class ApiDocumentationApplicationBuilderExtensions
             {
                 scalarOptions.WithTitle(options.Title);
 
+                if (!string.IsNullOrEmpty(options.FaviconUrl))
+                {
+                    scalarOptions.WithFavicon(options.FaviconUrl);
+                }
+
                 if (options.OAuth2.IsConfigured)
                 {
                     scalarOptions.AddAuthorizationCodeFlow("OAuth2", flow =>

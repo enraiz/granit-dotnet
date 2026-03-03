@@ -46,8 +46,6 @@ internal sealed class JwtBearerSecuritySchemeTransformer(
             Name = "Authorization",
         };
 
-        // Set global security requirement. Protected endpoints inherit this;
-        // anonymous endpoints override it via SecurityRequirementOperationTransformer.
         OpenApiSecurityRequirement securityRequirement = new()
         {
             [new OpenApiSecuritySchemeReference(BearerSchemeId, null, null)] = [],

@@ -34,7 +34,7 @@ internal sealed class SecurityRequirementOperationTransformer : IOpenApiOperatio
         {
             // Override global security: no auth required for this operation.
             // An empty OpenApiSecurityRequirement serializes as {} meaning "no specific scheme".
-            operation.Security = [new OpenApiSecurityRequirement()];
+            operation.Security = [new()];
         }
         else
         {

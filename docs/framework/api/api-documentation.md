@@ -42,10 +42,17 @@ app.Run();
     "MajorVersions": [1],
     "Description": "API clinique Guava — données de santé HDS",
     "ContactEmail": "api@digitaldynamics.be",
+    "LogoUrl": "/logo.svg",
+    "FaviconUrl": "/favicon.svg",
     "EnableInProduction": false
   }
 }
 ```
+
+Le logo est injecté dans le document OpenAPI via l'extension `x-logo` dans le bloc
+`info`, et affiché dans la barre latérale de l'UI Scalar. Le favicon est configuré
+via Scalar. Les deux acceptent une URL absolue ou un chemin relatif servi par
+l'application.
 
 | Option | Type | Défaut | Description |
 | ------ | ---- | ------ | ----------- |
@@ -57,6 +64,8 @@ app.Run();
 | `EnableTenantHeader` | `bool` | `false` | Ajoute le header tenant comme paramètre requis |
 | `TenantHeaderName` | `string` | `"X-Tenant-Id"` | Nom du header tenant dans la documentation |
 | `AuthorizationPolicy` | `string?` | `null` | Policy d'autorisation sur les endpoints doc (voir ci-dessous) |
+| `LogoUrl` | `string?` | `null` | URL du logo affiché dans la barre latérale Scalar et le bloc info OpenAPI (`x-logo`) |
+| `FaviconUrl` | `string?` | `null` | URL du favicon de la page Scalar |
 
 ### Enregistrement direct (sans modules)
 
@@ -210,6 +219,8 @@ des métadonnées de l'endpoint :
 | 422 | Opération avec un corps de requête | Erreur de validation |
 | 500 | Toujours | Erreur interne du serveur |
 
+Chaque réponse d'erreur inclut un schéma inline RFC 7807 (`type`, `title`,
+`status`, `detail`, `instance`) avec le content-type `application/problem+json`.
 Les réponses existantes ne sont pas écrasées. Si l'opération définit déjà une
 réponse 500 personnalisée, le transformer la conserve.
 
@@ -225,13 +236,30 @@ endpoints avec paramètre de route (où un 404 est légitime).
 Si `GranitJwtBearerModule` (ou tout schéma `JwtBearerDefaults.AuthenticationScheme`)
 est enregistré dans l'application, le transformer JWT ajoute automatiquement :
 
-- La définition de sécurité `Bearer` dans le document OpenAPI
-- L'exigence de sécurité Bearer sur toutes les opérations
+- La définition de sécurité `Bearer` dans les `securitySchemes` du document
+- Une **exigence de sécurité globale** au niveau du document (`document.Security`)
 
 Le bouton **Authorize** apparaît alors dans l'UI Scalar sans configuration supplémentaire.
 
 Si l'application n'utilise pas de JWT Bearer, aucune définition de sécurité n'est ajoutée.
 Le transformer vérifie dynamiquement la présence du schéma au démarrage.
+
+### Modèle de sécurité OpenAPI (global + override)
+
+La sécurité est gérée en deux niveaux, conformément à la spécification OpenAPI 3.1 :
+
+1. **Niveau document** (`JwtBearerSecuritySchemeTransformer`) : déclare une exigence
+   globale Bearer (ou OAuth2 si configuré). Toutes les opérations héritent de cette
+   exigence par défaut.
+2. **Niveau opération** (`SecurityRequirementOperationTransformer`) : ajuste chaque
+   endpoint individuellement :
+   - **`[AllowAnonymous]`** → `security: [{}]` (aucune authentification requise,
+     override explicite de la sécurité globale)
+   - **Endpoints protégés** → `security: null` (héritage de la sécurité globale)
+
+Sans ce mécanisme, ASP.NET Core génère `security: [{}]` sur toutes les opérations,
+ce qui signifie « pas d'authentification requise » dans OpenAPI, indépendamment des
+attributs `[Authorize]` réels.
 
 ## Intégration OAuth2
 
@@ -277,13 +305,17 @@ pas activé et le schéma Bearer reste en place (backward-compatible).
 
 ### Comportement des transformers
 
-Deux transformers s'exécutent séquentiellement :
+Trois transformers de sécurité s'exécutent dans cet ordre :
 
-1. `JwtBearerSecuritySchemeTransformer` — ajoute le schéma Bearer (toujours)
-2. `OAuth2SecuritySchemeTransformer` — remplace Bearer par OAuth2 (si configuré)
+| # | Transformer | Niveau | Rôle |
+| - | ----------- | ------ | ---- |
+| 1 | `JwtBearerSecuritySchemeTransformer` | Document | Ajoute le schéma Bearer + exigence globale |
+| 2 | `OAuth2SecuritySchemeTransformer` | Document | Remplace Bearer par OAuth2 (si configuré) |
+| 3 | `SecurityRequirementOperationTransformer` | Opération | Override par endpoint (`[AllowAnonymous]` → pas d'auth) |
 
-Si OAuth2 n'est pas configuré, le second transformer est un no-op et le schéma
-Bearer reste. Cela garantit la backward-compatibility.
+Si OAuth2 n'est pas configuré, le transformer 2 est un no-op et le schéma
+Bearer reste. Si JWT Bearer n'est pas enregistré, les transformers 1 et 2
+sont tous les deux des no-ops. Le transformer 3 s'exécute toujours.
 
 ### UI Scalar
 
