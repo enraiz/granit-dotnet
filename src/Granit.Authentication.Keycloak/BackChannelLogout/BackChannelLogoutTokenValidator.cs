@@ -82,15 +82,15 @@ internal partial class BackChannelLogoutTokenValidator
         }
 
         // Verify the "events" claim contains the back-channel logout event
-        if (!result.Claims.TryGetValue("events", out var eventsValue) || !ContainsBackChannelLogoutEvent(eventsValue))
+        if (!result.Claims.TryGetValue("events", out object? eventsValue) || !ContainsBackChannelLogoutEvent(eventsValue))
         {
             LogMissingBackChannelEvent(_logger);
             return new BackChannelLogoutResult(false, null, null, "Missing or invalid 'events' claim.");
         }
 
         // Extract sid (preferred) and/or sub
-        result.Claims.TryGetValue("sid", out var sidValue);
-        result.Claims.TryGetValue("sub", out var subValue);
+        result.Claims.TryGetValue("sid", out object? sidValue);
+        result.Claims.TryGetValue("sub", out object? subValue);
 
         string? sessionId = sidValue?.ToString();
         string? subjectId = subValue?.ToString();

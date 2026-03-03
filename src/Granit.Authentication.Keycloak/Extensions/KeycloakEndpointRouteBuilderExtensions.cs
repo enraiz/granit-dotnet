@@ -22,7 +22,7 @@ public static class KeycloakEndpointRouteBuilderExtensions
     /// <returns>The <paramref name="endpoints"/> for chaining.</returns>
     public static IEndpointRouteBuilder MapKeycloakBackChannelLogout(this IEndpointRouteBuilder endpoints)
     {
-        var options = endpoints.ServiceProvider
+        KeycloakOptions options = endpoints.ServiceProvider
             .GetRequiredService<IOptions<KeycloakOptions>>().Value;
 
         if (!options.BackChannelLogout.Enabled)

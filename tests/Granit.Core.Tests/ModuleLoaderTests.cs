@@ -79,7 +79,7 @@ public sealed class ModuleLoaderTests
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<ModuleC>();
 
         modules.Count.ShouldBe(3);
-        List<Type> types = modules.Select(m => m.ModuleType).ToList();
+        var types = modules.Select(m => m.ModuleType).ToList();
         types.IndexOf(typeof(ModuleA)).ShouldBeLessThan(types.IndexOf(typeof(ModuleB)));
         types.IndexOf(typeof(ModuleB)).ShouldBeLessThan(types.IndexOf(typeof(ModuleC)));
     }
@@ -97,7 +97,7 @@ public sealed class ModuleLoaderTests
         modules.Where(m => m.ModuleType == typeof(SharedModule)).Count().ShouldBe(1);
 
         // Shared must come before Left and Right
-        List<Type> types = modules.Select(m => m.ModuleType).ToList();
+        var types = modules.Select(m => m.ModuleType).ToList();
         types.IndexOf(typeof(SharedModule)).ShouldBeLessThan(types.IndexOf(typeof(LeftModule)));
         types.IndexOf(typeof(SharedModule)).ShouldBeLessThan(types.IndexOf(typeof(RightModule)));
 

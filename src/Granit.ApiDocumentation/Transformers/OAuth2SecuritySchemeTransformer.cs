@@ -76,23 +76,23 @@ internal sealed class OAuth2SecuritySchemeTransformer(
                 [.. oauth2.Scopes],
         };
 
-        foreach (KeyValuePair<string, IOpenApiPathItem> path in document.Paths)
+        foreach (IOpenApiPathItem pathItem in document.Paths.Select(path => path.Value))
         {
-            if (path.Value.Operations is null)
+            if (pathItem.Operations is null)
             {
                 continue;
             }
 
-            foreach (OpenApiOperation operation in path.Value.Operations.Select(op => op.Value))
+            foreach (IList<OpenApiSecurityRequirement>? security in pathItem.Operations.Select(op => op.Value.Security))
             {
-                if (operation.Security is null)
+                if (security is null)
                 {
                     continue;
                 }
 
                 // Replace all existing security requirements with OAuth2
-                operation.Security.Clear();
-                operation.Security.Add(oAuth2Requirement);
+                security.Clear();
+                security.Add(oAuth2Requirement);
             }
         }
     }
