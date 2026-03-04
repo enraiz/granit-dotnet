@@ -23,8 +23,8 @@ namespace Granit.DataExchange.Endpoints.Tests;
 /// </summary>
 public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
 {
-    private const string AdminRole = "granit-data-import-admin";
-    private const string ExportPrefix = "/data-import/export";
+    private const string AdminRole = "granit-data-exchange-admin";
+    private const string ExportPrefix = "/data-exchange/export";
 
     private readonly IExportOrchestrator _orchestrator = Substitute.For<IExportOrchestrator>();
     private readonly IExportPresetStore _presetStore = Substitute.For<IExportPresetStore>();

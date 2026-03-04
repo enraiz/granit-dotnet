@@ -105,8 +105,10 @@ public static class DataExchangeEndpointRouteBuilderExtensions
 
         metadataGroup.MapExportDefinitionEndpoints();
 
+        // Empty sub-group to isolate authorization without adding a route segment.
+        // Preset endpoints already include /presets/ in their individual paths.
         RouteGroupBuilder presetGroup = metadataGroup
-            .MapGroup("presets")
+            .MapGroup(string.Empty)
             .RequireAuthorization(DataExportAuthorizationPolicy.PolicyName);
 
         presetGroup.MapExportPresetEndpoints();
