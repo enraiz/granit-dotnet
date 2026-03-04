@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Granit.Core.MultiTenancy;
 using Granit.Querying.SavedViews;
+using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -40,7 +41,8 @@ internal static class SavedViewEndpoints
             CancellationToken ct) =>
             CreateAsync(request, store, entityType, tenant, user, ct))
             .WithName($"CreateSavedView_{entityType}")
-            .WithSummary("Creates a new saved view.");
+            .WithSummary("Creates a new saved view.")
+            .ValidateBody<CreateSavedViewRequest>();
 
         savedViews.MapPut("/{id:guid}", (
             Guid id,
@@ -49,7 +51,8 @@ internal static class SavedViewEndpoints
             CancellationToken ct) =>
             UpdateAsync(id, request, store, ct))
             .WithName($"UpdateSavedView_{entityType}")
-            .WithSummary("Updates an existing saved view.");
+            .WithSummary("Updates an existing saved view.")
+            .ValidateBody<UpdateSavedViewRequest>();
 
         savedViews.MapDelete("/{id:guid}", (
             Guid id,

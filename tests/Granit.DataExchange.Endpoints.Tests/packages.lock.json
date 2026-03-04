@@ -509,7 +509,8 @@
         "type": "Project",
         "dependencies": {
           "Granit.Authorization": "[0.1.0-dev, )",
-          "Granit.DataExchange": "[0.1.0-dev, )"
+          "Granit.DataExchange": "[0.1.0-dev, )",
+          "Granit.Validation": "[0.1.0-dev, )"
         }
       },
       "granit.exceptionhandling": {

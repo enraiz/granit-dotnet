@@ -3,6 +3,7 @@ using Granit.DataExchange.Endpoints.Dtos.Import;
 using Granit.DataExchange.Endpoints.Internal.Export;
 using Granit.DataExchange.Endpoints.Internal.Import;
 using Granit.DataExchange.Export;
+using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -22,7 +23,8 @@ internal static class DataExportExecutionEndpoints
     {
         group.MapPost("/jobs", CreateExportJobAsync)
             .WithName("CreateExportJob")
-            .WithSummary("Creates and dispatches an export job (sync or background).");
+            .WithSummary("Creates and dispatches an export job (sync or background).")
+            .ValidateBody<CreateExportJobRequest>();
 
         group.MapGet("/jobs/{jobId:guid}", GetJobStatusAsync)
             .WithName("GetExportJobStatus")

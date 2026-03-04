@@ -4,6 +4,7 @@
 Il expose deux couches complémentaires :
 
 - **`GranitValidator<T>`** — classe de base pour les validateurs applicatifs
+- **`FluentValidationEndpointFilter<T>`** — filtre Minimal API qui valide le body avant le handler
 - **Extensions FluentValidation** — règles métier prêtes à l'emploi pour les identifiants légaux
   belges et français, les numéros fiscaux européens, les instruments de paiement et les contacts
 
@@ -38,6 +39,9 @@ Granit.Validation
 ├── ContactValidatorExtensions.cs                 (Email, E164Phone)
 ├── AddressValidatorExtensions.cs                 (FrenchPostalCode, BelgianPostalCode, FrenchInseeCode)
 ├── LocaleValidatorExtensions.cs                  (Iso3166Alpha2CountryCode, Bcp47LanguageTag)
+├── AspNetCore/
+│   ├── FluentValidationEndpointFilter.cs        (IEndpointFilter → 422)
+│   └── ValidationEndpointConventionBuilderExtensions.cs (.ValidateBody<T>())
 ├── Extensions/
 │   └── ValidationServiceCollectionExtensions.cs (AddGranitValidation)
 ├── Internal/                                     (algorithmes — non exposés publiquement)
@@ -91,6 +95,9 @@ Il enregistre automatiquement :
 | `FluentValidationExceptionStatusCodeMapper` | Mappe `ValidationException` → HTTP 422 Unprocessable Entity dans `GranitExceptionHandler` |
 | Ressources de localisation | Clés `Granit:Validation:*` en français et anglais |
 
+> Le `FluentValidationEndpointFilter<T>` n'est pas un service DI — il est ajouté via
+> `.ValidateBody<T>()` directement sur le `RouteHandlerBuilder` de chaque endpoint.
+
 ### Enregistrement manuel (sans module)
 
 ```csharp
@@ -130,6 +137,61 @@ RuleFor(x => x.Email)
 
 > **Convention** : ne jamais appeler `ValidateAndThrow()` dans un handler Wolverine.
 > Le middleware FluentValidation est le seul point d'entrée de validation du bus.
+
+## Validation des endpoints Minimal API
+
+`FluentValidationEndpointFilter<T>` valide le body de la requête avant l'exécution du handler.
+Il se branche via l'extension `.ValidateBody<T>()` sur `RouteHandlerBuilder` :
+
+```csharp
+group.MapPost("/", HandleCreate)
+    .WithName("CreateResource")
+    .WithSummary("Creates a resource.")
+    .ValidateBody<CreateResourceRequest>();
+```
+
+### Comportement
+
+| `IValidator<T>` en DI ? | Requête valide | Requête invalide |
+| --- | --- | --- |
+| Oui (Wolverine auto-discovery ou enregistrement manuel) | Passe au handler | **422** `HttpValidationProblemDetails` avec codes `Granit:Validation:*` |
+| Non | Passe au handler | Passe au handler (filet de sécurité : la validation manuelle dans le handler s'applique) |
+
+Le filtre résout `IValidator<T>` depuis le DI. Si aucun validateur n'est enregistré, il passe
+silencieusement au handler suivant — cela permet une adoption progressive.
+
+### Enregistrement des validateurs en DI
+
+Les validateurs sont auto-découverts par Wolverine via
+`UseFluentValidation(RegistrationBehavior.DiscoverAndRegisterValidators)`. Si Wolverine n'est pas
+utilisé, enregistrez-les manuellement :
+
+```csharp
+builder.Services.AddScoped<IValidator<CreateResourceRequest>, CreateResourceRequestValidator>();
+```
+
+### Deux couches de validation
+
+La validation du body et la validation manuelle dans le handler coexistent :
+
+1. **Filtre `ValidateBody<T>`** — validation structurelle (NotEmpty, MaxLength, format).
+   Renvoie **422** avec codes structurés si `IValidator<T>` est en DI.
+2. **Validation manuelle dans le handler** — validation métier (existence d'une entité référencée,
+   droits, état). Renvoie **400** avec `ProblemDetails` textuel.
+
+Le filtre intercepte avant le handler. Les deux couches sont complémentaires : la première
+fournit une réponse structurée pour les formulaires SPA, la seconde couvre les règles métier
+qui dépendent du contexte d'exécution (base de données, services externes).
+
+### Validateurs intégrés dans les packages Granit
+
+| Package | Validateur | Règles |
+| --- | --- | --- |
+| `Granit.Localization.Endpoints` | `SetLocalizationOverrideRequestValidator` | `Value` NotEmpty, MaxLength(4000) |
+| `Granit.Querying.Endpoints` | `CreateSavedViewRequestValidator` | `Name` NotEmpty, MaxLength(200) |
+| `Granit.Querying.Endpoints` | `UpdateSavedViewRequestValidator` | `Name` NotEmpty, MaxLength(200) |
+| `Granit.DataExchange.Endpoints` | `CreateExportJobRequestValidator` | `DefinitionName`, `Format` NotEmpty |
+| `Granit.DataExchange.Endpoints` | `SaveExportPresetRequestValidator` | `DefinitionName`, `PresetName`, `SelectedFields`, `Format` NotEmpty |
 
 ## Référence des validateurs
 
@@ -307,9 +369,9 @@ Le calcul est effectué chiffre par chiffre (`remainder = (remainder * 10 + digi
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core`, `Granit.ExceptionHandling`, `Granit.Localization` |
-| **Utilisé par** | Module feuille (consommé par les applications) |
+| Direction       | Modules                                                                                                           |
+|-----------------|-------------------------------------------------------------------------------------------------------------------|
+| **Dépend de**   | `Granit.Core`, `Granit.ExceptionHandling`, `Granit.Localization`, `Microsoft.AspNetCore.App` (FrameworkReference) |
+| **Utilisé par** | Packages `.Endpoints` (filtre validation), applications Wolverine (auto-discovery)                                |
 
 > Voir le [graphe de dépendances complet](../../dependencies.md).
