@@ -173,6 +173,46 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
         options.OtlpEndpoint.ShouldBe("http://otel:4317");
     }
 
+    [Fact]
+    public void AddGranitObservability_RegistersSerilogDiagnosticContext()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+
+        builder.AddGranitObservability();
+
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+        Serilog.IDiagnosticContext? diagnosticContext = sp.GetService<Serilog.IDiagnosticContext>();
+        diagnosticContext.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitObservability_BothEnabled_RegistersTracerAndMeterProviders()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+        builder.Configuration["Observability:EnableTracing"] = "true";
+        builder.Configuration["Observability:EnableMetrics"] = "true";
+        builder.Configuration["Observability:OtlpEndpoint"] = "http://otel:4317";
+
+        builder.AddGranitObservability();
+
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+        sp.GetService<TracerProvider>().ShouldNotBeNull();
+        sp.GetService<MeterProvider>().ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitObservability_CustomOtlpEndpoint_BindsCorrectly()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+        builder.Configuration["Observability:OtlpEndpoint"] = "http://custom-collector:4317";
+
+        builder.AddGranitObservability();
+
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+        ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
+        options.OtlpEndpoint.ShouldBe("http://custom-collector:4317");
+    }
+
     /// <summary>
     /// Verifies the OTEL tracing filter: paths under /health/* must be excluded,
     /// while /healthcare/... and regular paths must be included.
