@@ -159,6 +159,34 @@ public sealed class AppointmentController : ControllerBase
 }
 ```
 
+### Application sur un endpoint Minimal API
+
+```csharp
+using Granit.ApiDocumentation.Attributes;
+
+group.MapPost("/internal/sync", async (SyncCommand command, ISyncService service) =>
+{
+    await service.SyncAsync(command);
+    return Results.NoContent();
+})
+.WithMetadata(new InternalApiAttribute());
+```
+
+L'attribut est ajouté aux métadonnées de l'endpoint via `.WithMetadata()`, ce qui est
+détecté automatiquement par le `InternalApiDocumentTransformer` (même mécanisme que
+pour les contrôleurs MVC et les endpoints Wolverine HTTP).
+
+> **Note** : pour exclure **tous** les endpoints d'un groupe, appliquer la métadonnée
+> sur le `RouteGroupBuilder` :
+>
+> ```csharp
+> RouteGroupBuilder internalGroup = group.MapGroup("/internal")
+>     .WithMetadata(new InternalApiAttribute());
+>
+> internalGroup.MapPost("/sync", SyncEndpoint.HandleAsync);
+> internalGroup.MapPost("/purge", PurgeEndpoint.HandleAsync);
+> ```
+
 ### Application sur un endpoint Wolverine HTTP
 
 ```csharp
