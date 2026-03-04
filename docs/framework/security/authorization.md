@@ -296,12 +296,141 @@ Le ou les rôles configurés dans `AdminRoles` bypasse le `PermissionChecker`
 **pas** être révoqués via `IPermissionManager.SetAsync` — ils sont définis dans
 la configuration et déployés hors du périmètre applicatif (Keycloak, Vault, etc.).
 
+## Endpoints REST — Granit.Authorization.Endpoints
+
+Le package `Granit.Authorization.Endpoints` expose les permissions via des Minimal API,
+permettant au frontend de vérifier les droits sans attendre un 403.
+
+### Installation
+
+```bash
+dotnet add package Granit.Authorization.Endpoints
+```
+
+### Enregistrement
+
+```csharp
+// Module
+[DependsOn(typeof(GranitAuthorizationEndpointsModule))]
+public sealed class AppModule : GranitModule { }
+
+// Program.cs
+app.MapAuthorizationEndpoints(opts => opts.ApiPrefix = "api/v1");
+```
+
+### Routes
+
+| Méthode | Route | Auth | Description |
+| --- | --- | --- | --- |
+| `GET` | `/auth/me` | Authentifié | Permissions de l'utilisateur courant |
+| `GET` | `/auth/definitions` | `Authorization.Definitions.Read` | Toutes les définitions (groupées) |
+| `GET` | `/auth/roles/{roleName}` | `Authorization.Grants.Manage` | Permissions accordées à un rôle |
+| `PUT` | `/auth/roles/{roleName}/{permissionName}` | `Authorization.Grants.Manage` | Accorder une permission |
+| `DELETE` | `/auth/roles/{roleName}/{permissionName}` | `Authorization.Grants.Manage` | Révoquer une permission |
+
+### GET /auth/me — Réponse
+
+```json
+{
+  "permissions": ["Invoices.Read", "Invoices.Create"]
+}
+```
+
+L'endpoint itère toutes les permissions définies dans `IPermissionDefinitionManager` et
+appelle `IPermissionChecker.IsGrantedAsync()` pour chaque. Seules les permissions
+accordées sont retournées.
+
+### GET /auth/definitions — Réponse
+
+```json
+[
+  {
+    "name": "Invoices",
+    "displayName": "Factures",
+    "permissions": [
+      { "name": "Invoices.Read", "displayName": "Consulter" },
+      { "name": "Invoices.Create", "displayName": "Créer" }
+    ]
+  }
+]
+```
+
+### Options
+
+| Paramètre | Type | Défaut | Description |
+| --- | --- | --- | --- |
+| `ApiPrefix` | `string` | `""` | Préfixe API global (ex : `api/v1`) |
+| `RoutePrefix` | `string` | `"auth"` | Préfixe de route pour les endpoints |
+| `TagName` | `string` | `"Authorization"` | Tag OpenAPI |
+
+### Permissions déclarées
+
+Le module enregistre automatiquement deux permissions pour protéger les endpoints admin :
+
+- `Authorization.Definitions.Read` — consulter les définitions
+- `Authorization.Grants.Manage` — consulter, accorder et révoquer les grants
+
+---
+
+## Intégration frontend — usePermissions()
+
+Le hook `usePermissions()` de `@granit/auth` appelle `GET /auth/me` et expose
+les permissions sous forme de `Set<string>` pour un lookup O(1).
+
+### Usage dans une application
+
+```typescript
+// src/features/auth/use-permissions.ts (wrapper app-level)
+import { usePermissions as useGranitPermissions } from '@granit/auth';
+import { api } from '@/lib/api';
+
+export function usePermissions() {
+  return useGranitPermissions({
+    client: api,
+    basePath: '/api/v1/auth',
+  });
+}
+```
+
+### Vérification dans un composant
+
+```tsx
+import { usePermissions, PermissionGuard } from '@/features/auth';
+
+// Hook direct
+const { hasPermission, isLoading } = usePermissions();
+if (!hasPermission('Invoices.Delete')) return null;
+
+// Composant garde (deny-by-default)
+<PermissionGuard permission="Invoices.Delete">
+  <DeleteButton />
+</PermissionGuard>
+```
+
+### API du hook
+
+| Propriété | Type | Description |
+| --- | --- | --- |
+| `permissions` | `ReadonlySet<string>` | Ensemble des permissions accordées |
+| `hasPermission(name)` | `(string) => boolean` | Vérifie une permission |
+| `hasAnyPermission(names)` | `(string[]) => boolean` | Au moins une accordée |
+| `hasAllPermissions(names)` | `(string[]) => boolean` | Toutes accordées |
+| `isLoading` | `boolean` | Chargement en cours |
+| `error` | `Error \| null` | Erreur éventuelle |
+| `refetch` | `() => void` | Force un rafraîchissement |
+
+Les permissions sont mises en cache pour la durée de la session (`staleTime: Infinity`).
+Appeler `refetch()` pour forcer un rafraîchissement après une modification de grants.
+
+---
+
 ## Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
+| --- | --- |
 | **Dépend de** | `Granit.Core`, `Granit.Security`, `Granit.Caching` |
-| **Utilisé par** | `Granit.Authorization.EntityFrameworkCore`, `Granit.BackgroundJobs.Endpoints`, `Granit.Localization.Endpoints` |
+| **Utilisé par** | `Granit.Authorization.EntityFrameworkCore`, `Granit.Authorization.Endpoints`, `Granit.BackgroundJobs.Endpoints`, `Granit.Localization.Endpoints` |
 | **Package EF Core** | `Granit.Authorization.EntityFrameworkCore` → ajoute `Granit.Persistence` |
+| **Package Endpoints** | `Granit.Authorization.Endpoints` → ajoute `Granit.Authorization`, `Granit.Authorization.EntityFrameworkCore` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).
