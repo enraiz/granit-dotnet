@@ -23,10 +23,8 @@ public sealed class GranitWorkflowNotificationsModuleTests
     }
 
     [Fact]
-    public void Module_IsSealed()
-    {
+    public void Module_IsSealed() =>
         typeof(GranitWorkflowNotificationsModule).IsSealed.ShouldBeTrue();
-    }
 
     [Fact]
     public void Module_InheritsFromGranitModule()

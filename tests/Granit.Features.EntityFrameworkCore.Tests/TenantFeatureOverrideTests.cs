@@ -67,14 +67,10 @@ public sealed class TenantFeatureOverrideTests
     }
 
     [Fact]
-    public void Class_IsSealed()
-    {
+    public void Class_IsSealed() =>
         typeof(TenantFeatureOverride).IsSealed.ShouldBeTrue();
-    }
 
     [Fact]
-    public void Class_IsInternal()
-    {
+    public void Class_IsInternal() =>
         typeof(TenantFeatureOverride).IsNotPublic.ShouldBeTrue();
-    }
 }
