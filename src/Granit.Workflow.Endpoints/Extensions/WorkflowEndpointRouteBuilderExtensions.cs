@@ -1,7 +1,11 @@
 using Granit.Workflow.Endpoints.Endpoints;
+using Granit.Workflow.Endpoints.Internal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Workflow.Endpoints.Extensions;
 
@@ -14,6 +18,11 @@ public static class WorkflowEndpointRouteBuilderExtensions
     /// Maps the workflow endpoints (transition history, status) onto the given route builder.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// Registers the <c>Workflow.History</c> authorization policy (see
+    /// <see cref="WorkflowAuthorizationPolicy.PolicyName"/>) requiring the role
+    /// configured via <see cref="WorkflowEndpointsOptions.RequiredRole"/>.
+    /// </para>
     /// <para>Registers the following routes:</para>
     /// <list type="bullet">
     ///   <item><c>GET /{entityType}/{entityId}/history</c> — HDS audit trail</item>
@@ -22,8 +31,12 @@ public static class WorkflowEndpointRouteBuilderExtensions
     /// <code>
     /// app.MapWorkflowEndpoints();
     ///
-    /// // With a custom prefix:
-    /// app.MapWorkflowEndpoints(opts =&gt; opts.RoutePrefix = "admin/workflow");
+    /// // With a custom prefix or role:
+    /// app.MapWorkflowEndpoints(opts =&gt;
+    /// {
+    ///     opts.RoutePrefix = "admin/workflow";
+    ///     opts.RequiredRole = "ops-team";
+    /// });
     /// </code>
     /// </remarks>
     /// <param name="endpoints">The endpoint route builder.</param>
@@ -40,9 +53,16 @@ public static class WorkflowEndpointRouteBuilderExtensions
             ? options.RoutePrefix
             : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
 
+        IOptions<AuthorizationOptions>? authOptions =
+            endpoints.ServiceProvider.GetService<IOptions<AuthorizationOptions>>();
+        authOptions?.Value.AddPolicy(
+            WorkflowAuthorizationPolicy.PolicyName,
+            policy => policy.RequireRole(options.RequiredRole));
+
         RouteGroupBuilder group = endpoints
             .MapGroup(prefix)
-            .WithTags(options.TagName);
+            .WithTags(options.TagName)
+            .RequireAuthorization(WorkflowAuthorizationPolicy.PolicyName);
 
         group.MapReadEndpoints();
 

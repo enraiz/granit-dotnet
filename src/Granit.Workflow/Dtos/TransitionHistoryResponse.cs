@@ -1,4 +1,4 @@
-namespace Granit.Workflow.Endpoints.Dtos;
+namespace Granit.Workflow.Dtos;
 
 /// <summary>
 /// Response payload for a single workflow transition history entry (HDS audit trail).

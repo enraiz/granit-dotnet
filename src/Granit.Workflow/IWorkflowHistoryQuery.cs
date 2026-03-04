@@ -1,6 +1,6 @@
-using Granit.Workflow.Endpoints.Dtos;
+using Granit.Workflow.Dtos;
 
-namespace Granit.Workflow.Endpoints;
+namespace Granit.Workflow;
 
 /// <summary>
 /// Query service for retrieving workflow transition history from the database.

@@ -140,8 +140,7 @@ flowchart LR
 
     CACHE["Caching"] --> CORE
     CACHE_REDIS["Caching.Redis"] --> CACHE
-    CACHE_HYB["Caching.Hybrid"] --> CACHE
-    CACHE_HYB --> CACHE_REDIS
+    CACHE_HYB["Caching.Hybrid"] --> CACHE_REDIS
     CACHE_HYB --> TIMING["Timing"]
 
     AUTHZ["Authorization"] --> SEC
@@ -149,19 +148,15 @@ flowchart LR
     AUTHZ_EF["Authorization.EF"] --> AUTHZ
     AUTHZ_EF --> PERS
 
-    PERS["Persistence"] --> CORE
-    PERS --> TIMING
-    PERS --> GUIDS["Guids"]
+    PERS["Persistence"] --> GUIDS["Guids"]
     PERS --> SEC
     PERS --> EXC["ExceptionHandling"]
 
     PERS_MIG["Persistence.Migrations"] --> PERS
-    PERS_MIG --> TIMING
 
     PERS_MIG_WOL["Persistence.Migrations<br/>.Wolverine"] --> PERS_MIG
     PERS_MIG_WOL --> WOL["Wolverine"]
 
-    WOL --> CORE
     WOL --> SEC
     WOL_PG["Wolverine.Postgresql"] --> WOL
     WOL_PG --> PERS
@@ -221,17 +216,14 @@ Pipeline de rendu : modèle → moteur → document.
 
 ```mermaid
 flowchart LR
-    TMPL["Templating"] --> CORE["Core"]
-    TMPL --> TIMING["Timing"]
+    TMPL["Templating"] --> TIMING["Timing"]
 
     TMPL_SCR["Templating.Scriban"] --> TMPL
-    TMPL_SCR --> TIMING
 
     TMPL_EF["Templating.EF"] --> TMPL
 
     TMPL_WF["Templating.Workflow"] --> TMPL
     TMPL_WF --> WF["Workflow"]
-    TMPL_WF --> WF_EF["Workflow.EF"]
 
     DOCGEN["DocumentGeneration"] --> TMPL
     DOCGEN_PDF["DocumentGeneration.Pdf"] --> DOCGEN
@@ -285,41 +277,48 @@ flowchart LR
     style DX_WOL fill:#27ae60,color:#fff
 ```
 
-### Workflow & Timeline
+### Workflow
 
-Cycle de vie (FSM, publication) et audit HDS.
+Cycle de vie (FSM, publication).
 
 ```mermaid
 flowchart LR
-    WF["Workflow"] --> CORE["Core"]
-    WF --> TIMING["Timing"]
+    WF["Workflow"] --> TIMING["Timing"]
 
     WF_EF["Workflow.EF"] --> WF
     WF_EF --> PERS["Persistence"]
 
     WF_EP["Workflow.Endpoints"] --> WF
-    WF_EP --> WF_EF
+    WF_EP --> AUTHZ["Authorization"]
 
     WF_NOTIF["Workflow.Notifications"] --> WF
     WF_NOTIF --> AUTHZ["Authorization"]
     WF_NOTIF --> IDENT["Identity"]
     WF_NOTIF --> NOTIF["Notifications"]
-    WF_NOTIF --> WOL["Wolverine"]
-
-    TL["Timeline"] --> GUIDS["Guids"]
-    TL --> SEC["Security"]
-    TL --> TIMING
-
-    TL_EP["Timeline.Endpoints"] --> TL
-    TL_EF["Timeline.EF"] --> TL
-
-    TL_NOTIF["Timeline.Notifications"] --> TL
-    TL_NOTIF --> NOTIF
 
     style WF fill:#f39c12,color:#fff
     style WF_EF fill:#f39c12,color:#fff
     style WF_EP fill:#f39c12,color:#fff
     style WF_NOTIF fill:#f39c12,color:#fff
+```
+
+### Timeline
+
+Audit trail HDS (flux d'activité, commentaires, suivi).
+
+```mermaid
+flowchart LR
+    TL["Timeline"] --> GUIDS["Guids"]
+    TL --> SEC["Security"]
+
+    TL_EP["Timeline.Endpoints"] --> TL
+    TL_EP --> AUTHZ["Authorization"]
+
+    TL_EF["Timeline.EF"] --> TL
+
+    TL_NOTIF["Timeline.Notifications"] --> TL
+    TL_NOTIF --> NOTIF["Notifications"]
+
     style TL fill:#d35400,color:#fff
     style TL_EP fill:#d35400,color:#fff
     style TL_EF fill:#d35400,color:#fff
@@ -334,17 +333,15 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 
 ### Utilitaires
 
-Tous dépendent uniquement de `Granit.Core`, sauf exceptions notées.
-
-| Package | Dépendances supplémentaires |
-| ------- | --------------------------- |
-| `Granit.Timing` | — |
-| `Granit.Security` | — |
-| `Granit.ExceptionHandling` | — |
-| `Granit.Observability` | — |
-| `Granit.MultiTenancy` | — |
-| `Granit.Privacy` | — |
-| `Granit.Cors` | — |
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.Timing` | `Core` |
+| `Granit.Security` | `Core` |
+| `Granit.ExceptionHandling` | `Core` |
+| `Granit.Observability` | `Core` |
+| `Granit.MultiTenancy` | `Core` |
+| `Granit.Privacy` | `Core` |
+| `Granit.Cors` | `Core` |
 | `Granit.Guids` | `Timing` |
 | `Granit.Diagnostics` | `Timing` |
 | `Granit.Validation` | `ExceptionHandling`, `Localization` |
@@ -374,9 +371,9 @@ Tous dépendent uniquement de `Granit.Core`, sauf exceptions notées.
 
 | Package | Dépend de |
 | ------- | --------- |
-| `Granit.BlobStorage` | `Guids`, `Timing` |
+| `Granit.BlobStorage` | `Guids` |
 | `Granit.BlobStorage.EntityFrameworkCore` | `BlobStorage` |
-| `Granit.BlobStorage.S3` | `BlobStorage`, `Timing` |
+| `Granit.BlobStorage.S3` | `BlobStorage` |
 | `Granit.Imaging` | `Core` |
 | `Granit.Imaging.MagickNet` | `Imaging` |
 
@@ -386,7 +383,7 @@ Tous dépendent uniquement de `Granit.Core`, sauf exceptions notées.
 | ------- | --------- |
 | `Granit.ApiVersioning` | `Core` |
 | `Granit.ApiDocumentation` | `ApiVersioning`, `Security` |
-| `Granit.Cookies` | `Core`, `Timing` |
+| `Granit.Cookies` | `Timing` |
 | `Granit.Cookies.Klaro` | `Cookies` |
 | `Granit.Idempotency` | `Caching`, `Security` |
 
@@ -394,11 +391,11 @@ Tous dépendent uniquement de `Granit.Core`, sauf exceptions notées.
 
 | Package | Dépend de |
 | ------- | --------- |
-| `Granit.BackgroundJobs` | `Security`, `Timing`, `Wolverine` |
+| `Granit.BackgroundJobs` | `Timing`, `Wolverine` |
 | `Granit.BackgroundJobs.EntityFrameworkCore` | `BackgroundJobs` |
 | `Granit.BackgroundJobs.Endpoints` | `BackgroundJobs`, `Authorization` |
 | `Granit.Webhooks` | `Timing`, `Wolverine` |
-| `Granit.Webhooks.EntityFrameworkCore` | `Webhooks`, `Timing` |
+| `Granit.Webhooks.EntityFrameworkCore` | `Webhooks` |
 
 ### Identity
 
@@ -454,8 +451,8 @@ Tous dépendent uniquement de `Granit.Core`, sauf exceptions notées.
 
 1. **Core ne dépend de rien** — c'est le fondement du framework
 2. **Les packages fonctionnels ne référencent jamais les packages
-   `*.EntityFrameworkCore`** — exception : `Workflow.Endpoints` et
-   `Templating.Workflow` qui référencent `Workflow.EntityFrameworkCore`
+   `*.EntityFrameworkCore`** — les abstractions sont dans le package de base,
+   les implémentations EF dans le package `*.EntityFrameworkCore`
 3. **`Granit.MultiTenancy` est une dépendance optionnelle** — les modules
    utilisent `ICurrentTenant` de `Granit.Core.MultiTenancy`
 4. **Les packages `*.Endpoints` dépendent de `Granit.Authorization`** pour
@@ -468,6 +465,59 @@ Tous dépendent uniquement de `Granit.Core`, sauf exceptions notées.
    en option via `Granit.Persistence.Migrations.Wolverine`)
 7. **Brevo est un agrégateur multi-canal** — il dépend de Email, Sms et
    WhatsApp pour fournir un fournisseur unifié
+
+## Choix architecturaux intentionnels
+
+Certains patterns dans le graphe de dépendances apparaissent comme des anomalies
+lors d'un audit mais sont des choix délibérés. Cette section documente chacun
+d'entre eux pour éviter de reproposer les mêmes « corrections ».
+
+### 1. Packages `*.EntityFrameworkCore` avec DbContext isolé (sans `Granit.Persistence`)
+
+7 packages EF utilisent un DbContext autonome via `IDbContextFactory<T>` au lieu
+du `DbContext` applicatif géré par `Granit.Persistence` :
+
+- `Granit.Authorization.EntityFrameworkCore`
+- `Granit.BackgroundJobs.EntityFrameworkCore`
+- `Granit.Localization.EntityFrameworkCore`
+- `Granit.Features.EntityFrameworkCore`
+- `Granit.Settings.EntityFrameworkCore`
+- `Granit.Webhooks.EntityFrameworkCore`
+- `Granit.BlobStorage.EntityFrameworkCore`
+
+**Justification** : ces modules sont INSERT-only (audit HDS) ou gèrent des
+données d'infrastructure, pas des entités métier. Ils utilisent
+`IDbContextFactory` pour la thread safety (handlers Wolverine parallèles) et
+n'ont besoin ni de `AuditedEntityInterceptor` ni de `SoftDeleteInterceptor`.
+
+### 2. `Caching.Hybrid` → `StackExchangeRedis`
+
+`HybridCache` (.NET 9+) nécessite un backend distribué L2 pour fonctionner en
+mode hybride (L1 MemoryCache + L2 distribué). Redis est le seul backend
+supporté par la stack Granit. Cette dépendance est donc structurelle.
+
+### 3. `DataExchange` → `Querying`
+
+Le couplage est export-only : `DataExchange` lit les `QueryDefinition` via
+réflexion pour générer les exports tabulaires (colonnes, filtres, tri). Le
+module import n'utilise aucun type Querying. Ce couplage minimal est préférable
+à la duplication des métadonnées de colonnes.
+
+### 4. `DocumentGeneration.Excel` → `Templating`
+
+Le package XLSX (ClosedXML) court-circuite le pipeline HTML → render car XLSX
+est un format binaire. `ClosedXmlTemplateEngine` retourne un
+`BinaryRenderedContent` qui saute l'étape `IDocumentRenderer`. La référence
+vers `Templating` est nécessaire pour `ITextTemplateRenderer` (rendu des
+cellules Scriban) et les types polymorphiques (`RenderedContent`).
+
+### 5. `Notifications.Endpoints` sans RBAC
+
+Tous les endpoints de `Granit.Notifications.Endpoints` sont des opérations
+per-user self-service : inbox, préférences, subscriptions, follow/unfollow.
+Chaque endpoint filtre par `GetUserId(user)` et ne peut accéder qu'aux données
+de l'utilisateur connecté. `.RequireAuthorization()` (authentifié, sans policy
+RBAC) est suffisant — aucune donnée admin n'est exposée.
 
 ## Voir aussi
 

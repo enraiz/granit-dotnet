@@ -4,6 +4,7 @@ using Granit.Querying.Meta;
 using Granit.Querying.SavedViews;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -61,7 +62,7 @@ public static class QueryEndpointRouteBuilderExtensions
 
         // GET / — paginated or grouped query
         group.MapGet("/", async (
-            IQueryEngine<TEntity> engine,
+            [FromServices] IQueryEngine<TEntity> engine,
             BindableQueryRequest request,
             HttpContext httpContext,
             CancellationToken ct) =>
@@ -88,9 +89,9 @@ public static class QueryEndpointRouteBuilderExtensions
         if (options.IncludeMetaEndpoint)
         {
             group.MapGet("/meta", async (
-                IQueryEngine<TEntity> engine,
-                ISavedViewStore savedViewStore,
-                QueryDefinition<TEntity> definition,
+                [FromServices] IQueryEngine<TEntity> engine,
+                [FromServices] ISavedViewStore savedViewStore,
+                [FromServices] QueryDefinition<TEntity> definition,
                 Granit.Core.MultiTenancy.ICurrentTenant tenant,
                 System.Security.Claims.ClaimsPrincipal user,
                 CancellationToken ct) =>

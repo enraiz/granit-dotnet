@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Granit.Templating\Granit.Templating.csproj" />
-    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
     <!-- Optional at runtime: ICurrentTenant resolved via GetService -->
   </ItemGroup>
 

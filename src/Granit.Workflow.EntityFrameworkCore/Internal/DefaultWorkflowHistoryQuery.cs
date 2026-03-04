@@ -1,12 +1,11 @@
-using Granit.Workflow.Endpoints.Dtos;
-using Granit.Workflow.EntityFrameworkCore;
+using Granit.Workflow.Dtos;
 using Microsoft.EntityFrameworkCore;
 
-namespace Granit.Workflow.Endpoints.Internal;
+namespace Granit.Workflow.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// Default implementation of <see cref="IWorkflowHistoryQuery"/> using EF Core.
-/// Queries <see cref="WorkflowTransitionRecord"/> entities from the host DbContext
+/// Queries <see cref="Domain.WorkflowTransitionRecord"/> entities from the host DbContext
 /// that implements <see cref="IWorkflowDbContext"/>.
 /// </summary>
 internal sealed class DefaultWorkflowHistoryQuery<TDbContext>(TDbContext dbContext)

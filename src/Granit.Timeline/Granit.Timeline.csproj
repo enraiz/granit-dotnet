@@ -14,8 +14,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
-    <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
     <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
     <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
   </ItemGroup>
