@@ -1,14 +1,14 @@
-using Shouldly;
+using Granit.Core.MultiTenancy;
 using Granit.Features.Checker;
 using Granit.Features.Definitions;
 using Granit.Features.Exceptions;
 using Granit.Features.Store;
 using Granit.Features.ValueProviders;
 using Granit.Features.ValueTypes;
-using Granit.Core.MultiTenancy;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.Checker;

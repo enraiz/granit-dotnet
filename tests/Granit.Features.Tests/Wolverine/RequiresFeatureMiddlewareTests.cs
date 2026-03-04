@@ -1,9 +1,9 @@
-using Shouldly;
 using Granit.Features.Checker;
 using Granit.Features.Exceptions;
 using Granit.Features.Wolverine;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.Wolverine;

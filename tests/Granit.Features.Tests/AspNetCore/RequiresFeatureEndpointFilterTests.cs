@@ -1,4 +1,3 @@
-using Shouldly;
 using Granit.Features.AspNetCore;
 using Granit.Features.Checker;
 using Granit.Features.Exceptions;
@@ -6,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.AspNetCore;

@@ -1,5 +1,5 @@
-using Shouldly;
 using Granit.Features.Store;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.Store;

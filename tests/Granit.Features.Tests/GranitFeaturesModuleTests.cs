@@ -1,4 +1,3 @@
-using Shouldly;
 using Granit.Caching;
 using Granit.Core.Modularity;
 using Granit.Features.Checker;
@@ -11,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests;

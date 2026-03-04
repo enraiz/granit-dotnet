@@ -1,10 +1,10 @@
-using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.Plans;
 using Granit.Features.ValueProviders;
 using Granit.Features.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.ValueProviders;
