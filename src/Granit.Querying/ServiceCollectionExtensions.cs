@@ -29,10 +29,6 @@ public static class ServiceCollectionExtensions
     {
         services.TryAddScoped<ISavedViewStore, NullSavedViewStore>();
 
-        // Register QueryingOptions with defaults from QueryingDefaults.
-        // Consuming applications can override via:
-        //   services.Configure<QueryingOptions>(config.GetSection("Querying"));
-        //   services.Configure<QueryingOptions>(o => o.DefaultPageSize = 50);
         services.TryAddSingleton(sp =>
             sp.GetRequiredService<IOptions<QueryingOptions>>().Value);
 

@@ -1,4 +1,4 @@
-using Granit.Workflow.Endpoints.Dtos;
+using Granit.Workflow.Dtos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

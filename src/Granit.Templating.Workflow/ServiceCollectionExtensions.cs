@@ -1,9 +1,6 @@
 using Granit.Templating.Store;
 using Granit.Workflow.Definitions;
-using Granit.Workflow.Domain;
-using Granit.Workflow.EntityFrameworkCore;
 using Granit.Workflow.Extensions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -18,19 +15,19 @@ public static class ServiceCollectionExtensions
     /// Replaces the default <see cref="NullTemplateTransitionHook"/> with a Workflow-aware
     /// implementation that provides FSM validation, approval routing, and unified HDS audit trail.
     /// </summary>
-    /// <typeparam name="TDbContext">
-    /// The host application's <see cref="DbContext"/> implementing <see cref="IWorkflowDbContext"/>.
-    /// Must be registered via <c>AddDbContextFactory</c>.
-    /// </typeparam>
+    /// <remarks>
+    /// <see cref="IWorkflowTransitionRecorder"/> must be registered separately,
+    /// typically via <c>AddGranitWorkflowEntityFrameworkCore&lt;TDbContext&gt;()</c>
+    /// from the <c>Granit.Workflow.EntityFrameworkCore</c> package.
+    /// </remarks>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddGranitTemplatingWorkflow<TDbContext>(
+    public static IServiceCollection AddGranitTemplatingWorkflow(
         this IServiceCollection services)
-        where TDbContext : DbContext, IWorkflowDbContext
     {
         services.AddGranitWorkflow();
         services.AddWorkflow(PublicationWorkflow.Default);
-        services.Replace(ServiceDescriptor.Scoped<ITemplateTransitionHook, WorkflowTemplateTransitionHook<TDbContext>>());
+        services.Replace(ServiceDescriptor.Scoped<ITemplateTransitionHook, WorkflowTemplateTransitionHook>());
         return services;
     }
 }

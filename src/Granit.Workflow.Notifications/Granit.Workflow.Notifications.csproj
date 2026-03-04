@@ -20,7 +20,6 @@
     <ProjectReference Include="..\Granit.Identity\Granit.Identity.csproj" />
     <ProjectReference Include="..\Granit.Workflow\Granit.Workflow.csproj" />
     <ProjectReference Include="..\Granit.Notifications\Granit.Notifications.csproj" />
-    <ProjectReference Include="..\Granit.Wolverine\Granit.Wolverine.csproj" />
   </ItemGroup>
 
 </Project>

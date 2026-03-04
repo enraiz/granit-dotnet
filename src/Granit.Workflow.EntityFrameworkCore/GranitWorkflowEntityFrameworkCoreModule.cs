@@ -17,8 +17,10 @@ namespace Granit.Workflow.EntityFrameworkCore;
 /// <para>
 /// Register via:
 /// <code>
-/// services.AddGranitWorkflowEntityFrameworkCore();
+/// services.AddGranitWorkflowEntityFrameworkCore&lt;AppDbContext&gt;();
 /// </code>
+/// The generic overload also registers <see cref="IWorkflowHistoryQuery"/>
+/// and <see cref="IWorkflowTransitionRecorder"/> implementations.
 /// </para>
 /// </remarks>
 [DependsOn(

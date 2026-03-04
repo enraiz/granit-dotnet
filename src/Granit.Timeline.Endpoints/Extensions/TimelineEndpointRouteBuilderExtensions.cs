@@ -1,7 +1,11 @@
 using Granit.Timeline.Endpoints.Endpoints;
+using Granit.Timeline.Endpoints.Internal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Timeline.Endpoints.Extensions;
 
@@ -14,6 +18,11 @@ public static class TimelineEndpointRouteBuilderExtensions
     /// Maps the timeline endpoints (stream, entries, followers) onto the given route builder.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// Registers the <c>Timeline.Read</c> authorization policy (see
+    /// <see cref="TimelineAuthorizationPolicy.PolicyName"/>) requiring the role
+    /// configured via <see cref="TimelineEndpointsOptions.RequiredRole"/>.
+    /// </para>
     /// <para>Registers the following routes:</para>
     /// <list type="bullet">
     ///   <item><c>GET /{entityType}/{entityId}</c> — paginated activity stream</item>
@@ -27,8 +36,12 @@ public static class TimelineEndpointRouteBuilderExtensions
     /// <code>
     /// app.MapTimelineEndpoints();
     ///
-    /// // With a custom prefix:
-    /// app.MapTimelineEndpoints(opts =&gt; opts.RoutePrefix = "admin/timeline");
+    /// // With a custom prefix or role:
+    /// app.MapTimelineEndpoints(opts =&gt;
+    /// {
+    ///     opts.RoutePrefix = "admin/timeline";
+    ///     opts.RequiredRole = "ops-team";
+    /// });
     /// </code>
     /// </remarks>
     /// <param name="endpoints">The endpoint route builder.</param>
@@ -45,9 +58,16 @@ public static class TimelineEndpointRouteBuilderExtensions
             ? options.RoutePrefix
             : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
 
+        IOptions<AuthorizationOptions>? authOptions =
+            endpoints.ServiceProvider.GetService<IOptions<AuthorizationOptions>>();
+        authOptions?.Value.AddPolicy(
+            TimelineAuthorizationPolicy.PolicyName,
+            policy => policy.RequireRole(options.RequiredRole));
+
         RouteGroupBuilder group = endpoints
             .MapGroup(prefix)
-            .WithTags(options.TagName);
+            .WithTags(options.TagName)
+            .RequireAuthorization(TimelineAuthorizationPolicy.PolicyName);
 
         group.MapStreamEndpoints();
         group.MapEntryEndpoints();

@@ -9,10 +9,8 @@ namespace Granit.Templating.Workflow;
 /// approval routing, and unified HDS audit trail.
 /// </summary>
 /// <remarks>
-/// This module does NOT register services automatically because it requires
-/// a generic <c>TDbContext</c> parameter. Call
-/// <see cref="ServiceCollectionExtensions.AddGranitTemplatingWorkflow{TDbContext}"/>
-/// explicitly from the host application.
+/// Register via <see cref="ServiceCollectionExtensions.AddGranitTemplatingWorkflow"/>
+/// from the host application.
 /// </remarks>
 [DependsOn(typeof(GranitTemplatingModule))]
 [DependsOn(typeof(GranitWorkflowModule))]

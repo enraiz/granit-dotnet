@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Granit.Authorization\Granit.Authorization.csproj" />
     <ProjectReference Include="..\Granit.Workflow\Granit.Workflow.csproj" />
-    <ProjectReference Include="..\Granit.Workflow.EntityFrameworkCore\Granit.Workflow.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

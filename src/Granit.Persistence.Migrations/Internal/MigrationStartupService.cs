@@ -52,6 +52,7 @@ internal sealed partial class MigrationStartupService(
     private async Task ResumeAsync(CancellationToken ct)
     {
         await using MigrationProgressDbContext db = await progressFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await db.Database.EnsureCreatedAsync(ct).ConfigureAwait(false);
 
         List<MigrationProgress> pending = await db.MigrationProgresses
             .Where(p => p.Status == MigrationStatus.Pending || p.Status == MigrationStatus.InProgress)

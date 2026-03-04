@@ -1,0 +1,30 @@
+namespace Granit.Authorization.Endpoints;
+
+/// <summary>
+/// Configuration options for the authorization management endpoints.
+/// Bind from <c>"AuthorizationEndpoints"</c> or pass an action to
+/// <see cref="Extensions.AuthorizationEndpointRouteBuilderExtensions.MapAuthorizationEndpoints"/>.
+/// </summary>
+public sealed class AuthorizationEndpointsOptions
+{
+    /// <summary>Configuration section name.</summary>
+    public const string SectionName = "AuthorizationEndpoints";
+
+    /// <summary>
+    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
+    /// (e.g., <c>"api/v1"</c>). Empty by default (no prefix).
+    /// </summary>
+    public string ApiPrefix { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Route prefix for all authorization endpoints.
+    /// Default: <c>"auth"</c>.
+    /// </summary>
+    public string RoutePrefix { get; set; } = "auth";
+
+    /// <summary>
+    /// OpenAPI tag name for grouping authorization endpoints in Swagger UI.
+    /// Default: <c>"Authorization"</c>.
+    /// </summary>
+    public string TagName { get; set; } = "Authorization";
+}

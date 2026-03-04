@@ -81,6 +81,9 @@ public sealed class FeatureDefinitionContextTests
         List<FeatureDefinition> definitions = context.GetAllDefinitions().ToList();
 
         definitions.Count.ShouldBe(3);
-        definitions.Select(d => d.Name).ShouldContain(["Guava.Video", "Guava.MaxPatients", "Billing.Invoices"]);
+        IEnumerable<string> names = definitions.Select(d => d.Name);
+        names.ShouldContain("Guava.Video");
+        names.ShouldContain("Guava.MaxPatients");
+        names.ShouldContain("Billing.Invoices");
     }
 }

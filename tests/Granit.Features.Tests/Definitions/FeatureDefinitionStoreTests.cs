@@ -81,7 +81,8 @@ public sealed class FeatureDefinitionStoreTests
         IReadOnlyList<FeatureDefinition> all = store.GetAll();
 
         all.Count.ShouldBe(2);
-        all.Select(d => d.Name).ShouldContain(["App.VideoConsultation", "App.MaxPatients"]);
+        all.Select(d => d.Name).ShouldContain("App.VideoConsultation");
+        all.Select(d => d.Name).ShouldContain("App.MaxPatients");
     }
 
     [Fact]

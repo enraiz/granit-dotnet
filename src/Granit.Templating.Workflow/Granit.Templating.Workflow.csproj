@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Granit.Templating\Granit.Templating.csproj" />
     <ProjectReference Include="..\Granit.Workflow\Granit.Workflow.csproj" />
-    <ProjectReference Include="..\Granit.Workflow.EntityFrameworkCore\Granit.Workflow.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

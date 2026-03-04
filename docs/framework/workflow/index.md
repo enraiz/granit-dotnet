@@ -163,8 +163,8 @@ using (dataFilter.Disable<IPublishable>())
 services.AddGranitWorkflow();
 services.AddWorkflow(PublicationWorkflow.Default);
 
-// Granit.Workflow.EntityFrameworkCore
-services.AddGranitWorkflowEntityFrameworkCore();
+// Granit.Workflow.EntityFrameworkCore (enregistre intercepteur + IWorkflowHistoryQuery + IWorkflowTransitionRecorder)
+services.AddGranitWorkflowEntityFrameworkCore<AppDbContext>();
 
 // Granit.Identity.Keycloak (fournisseur d'identité)
 services.AddGranitIdentityKeycloak();
@@ -179,7 +179,7 @@ services.AddIdentityApproverResolver();
 services.AddWorkflowApproverResolver<MyApproverResolver>();
 
 // Granit.Workflow.Endpoints
-services.AddGranitWorkflowEndpoints<AppDbContext>();
+services.AddGranitWorkflowEndpoints();
 app.MapWorkflowEndpoints();
 ```
 

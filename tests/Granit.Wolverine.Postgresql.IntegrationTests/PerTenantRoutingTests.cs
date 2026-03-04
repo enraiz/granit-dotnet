@@ -11,7 +11,6 @@
 // de démarrage (~3 s) sur l'ensemble des tests.
 // =============================================================================
 
-using System.Net;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence;
 using Granit.Persistence.MultiTenancy;
@@ -50,30 +49,54 @@ internal sealed class TenantIntegrationDbContext(
 
 public sealed class TwoPostgresContainersFixture : IAsyncLifetime
 {
-    private PostgreSqlContainer _containerA = null!;
-    private PostgreSqlContainer _containerB = null!;
+    private PostgreSqlContainer? _containerA;
+    private PostgreSqlContainer? _containerB;
 
     public string ConnectionStringA { get; private set; } = string.Empty;
     public string ConnectionStringB { get; private set; } = string.Empty;
 
     public async ValueTask InitializeAsync()
     {
-        _containerA = new PostgreSqlBuilder("postgres:16-alpine")
-            .WithDatabase("tenant_a")
-            .WithUsername("granit")
-            .WithPassword("granit_test")
-            .Build();
+        string? ciHost = Environment.GetEnvironmentVariable("POSTGRES_HOST");
 
-        _containerB = new PostgreSqlBuilder("postgres:16-alpine")
-            .WithDatabase("tenant_b")
-            .WithUsername("granit")
-            .WithPassword("granit_test")
-            .Build();
+        if (!string.IsNullOrEmpty(ciHost))
+        {
+            // CI mode: use the PostgreSQL service provided by GitLab CI.
+            // Create two separate databases on the same server.
+            string port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
+            string user = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "granit_test";
+            string password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "test_password";
+            string mainDb = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "granit_test";
 
-        await Task.WhenAll(_containerA.StartAsync(), _containerB.StartAsync());
+            string adminConnectionString =
+                $"Host={ciHost};Port={port};Database={mainDb};Username={user};Password={password}";
 
-        ConnectionStringA = ApplyHostOverride(_containerA.GetConnectionString());
-        ConnectionStringB = ApplyHostOverride(_containerB.GetConnectionString());
+            await CreateDatabaseAsync(adminConnectionString, "tenant_a");
+            await CreateDatabaseAsync(adminConnectionString, "tenant_b");
+
+            ConnectionStringA = $"Host={ciHost};Port={port};Database=tenant_a;Username={user};Password={password}";
+            ConnectionStringB = $"Host={ciHost};Port={port};Database=tenant_b;Username={user};Password={password}";
+        }
+        else
+        {
+            // Local mode: use Testcontainers (requires Docker).
+            _containerA = new PostgreSqlBuilder("postgres:16-alpine")
+                .WithDatabase("tenant_a")
+                .WithUsername("granit")
+                .WithPassword("granit_test")
+                .Build();
+
+            _containerB = new PostgreSqlBuilder("postgres:16-alpine")
+                .WithDatabase("tenant_b")
+                .WithUsername("granit")
+                .WithPassword("granit_test")
+                .Build();
+
+            await Task.WhenAll(_containerA.StartAsync(), _containerB.StartAsync());
+
+            ConnectionStringA = _containerA.GetConnectionString();
+            ConnectionStringB = _containerB.GetConnectionString();
+        }
 
         await MigrateAsync(ConnectionStringA);
         await MigrateAsync(ConnectionStringB);
@@ -81,40 +104,33 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _containerA.DisposeAsync();
-        await _containerB.DisposeAsync();
+        if (_containerA is not null)
+        {
+            await _containerA.DisposeAsync();
+        }
+
+        if (_containerB is not null)
+        {
+            await _containerB.DisposeAsync();
+        }
     }
 
-    /// <summary>
-    /// In DinD (Docker-in-Docker) CI environments, Testcontainers returns the internal
-    /// bridge IP (172.17.0.x) which is not routable from the CI job container.
-    /// Replace the host with TESTCONTAINERS_HOST_OVERRIDE when set, resolved to an IP
-    /// address to avoid intermittent DNS failures in DinD networking.
-    /// </summary>
-    private static string ApplyHostOverride(string connectionString)
+    private static async Task CreateDatabaseAsync(string adminConnectionString, string dbName)
     {
-        string? hostOverride = Environment.GetEnvironmentVariable("TESTCONTAINERS_HOST_OVERRIDE");
-        if (string.IsNullOrEmpty(hostOverride))
-        {
-            return connectionString;
-        }
+        await using NpgsqlConnection conn = new(adminConnectionString);
+        await conn.OpenAsync().ConfigureAwait(false);
 
-        // Resolve hostname to IP to avoid transient DNS failures in DinD.
-        try
-        {
-            IPAddress[] addresses = Dns.GetHostAddresses(hostOverride);
-            if (addresses.Length > 0)
-            {
-                hostOverride = addresses[0].ToString();
-            }
-        }
-        catch
-        {
-            // Keep the hostname if resolution fails.
-        }
+        // Check if the database already exists before creating.
+        await using NpgsqlCommand checkCmd = conn.CreateCommand();
+        checkCmd.CommandText = $"SELECT 1 FROM pg_database WHERE datname = '{dbName}'";
+        object? exists = await checkCmd.ExecuteScalarAsync().ConfigureAwait(false);
 
-        NpgsqlConnectionStringBuilder builder = new(connectionString) { Host = hostOverride };
-        return builder.ConnectionString;
+        if (exists is null)
+        {
+            await using NpgsqlCommand createCmd = conn.CreateCommand();
+            createCmd.CommandText = $"CREATE DATABASE {dbName}";
+            await createCmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+        }
     }
 
     private static async Task MigrateAsync(string connectionString)
@@ -124,7 +140,7 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
                 .UseNpgsql(connectionString)
                 .Options;
 
-        // Retry to handle transient DinD networking delays after container startup.
+        // Retry to handle transient networking delays after service startup.
         const int maxAttempts = 5;
         for (int attempt = 1; ; attempt++)
         {

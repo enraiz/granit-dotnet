@@ -223,7 +223,7 @@ internal static class QueryableFilterExtensions
         var active = activeQuickFilters
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var filter in builder.QuickFilters.Where(f => active.Contains(f.Name)))
+        foreach (QuickFilterDescriptor filter in builder.QuickFilters.Where(f => active.Contains(f.Name)))
         {
             query = query.Where((Expression<Func<TEntity, bool>>)filter.Predicate);
         }

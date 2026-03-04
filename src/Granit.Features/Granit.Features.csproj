@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
     <ProjectReference Include="..\Granit.Caching\Granit.Caching.csproj" />
     <ProjectReference Include="..\Granit.Localization\Granit.Localization.csproj" />
     <!-- Optional at runtime: ICurrentTenant resolved via GetService — no GranitMultiTenancyModule required -->

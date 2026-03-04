@@ -1,29 +1,19 @@
 using Granit.Core.MultiTenancy;
-using Granit.Guids;
 using Granit.Templating.Store;
-using Granit.Timing;
 using Granit.Workflow;
 using Granit.Workflow.Domain;
-using Granit.Workflow.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Templating.Workflow;
 
 /// <summary>
 /// Workflow-aware implementation of <see cref="ITemplateTransitionHook"/>.
 /// Delegates transition validation to <see cref="IWorkflowManager{TState}"/> and
-/// persists <see cref="WorkflowTransitionRecord"/> entries for unified HDS audit trail.
+/// persists transition records via <see cref="IWorkflowTransitionRecorder"/> for unified HDS audit trail.
 /// </summary>
-/// <typeparam name="TDbContext">
-/// The host application's <see cref="DbContext"/> implementing <see cref="IWorkflowDbContext"/>.
-/// </typeparam>
-internal sealed class WorkflowTemplateTransitionHook<TDbContext>(
+internal sealed class WorkflowTemplateTransitionHook(
     IWorkflowManager<WorkflowLifecycleStatus> workflowManager,
-    IDbContextFactory<TDbContext> contextFactory,
-    IClock clock,
-    IGuidGenerator guidGenerator,
+    IWorkflowTransitionRecorder transitionRecorder,
     ICurrentTenant currentTenant) : ITemplateTransitionHook
-    where TDbContext : DbContext, IWorkflowDbContext
 {
     private const string EntityTypeName = "TemplateRevision";
 
@@ -51,20 +41,18 @@ internal sealed class WorkflowTemplateTransitionHook<TDbContext>(
         string userId,
         CancellationToken ct = default)
     {
-        await using TDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        ctx.WorkflowTransitionRecords.Add(new WorkflowTransitionRecord
-        {
-            Id = guidGenerator.Create(),
-            EntityType = EntityTypeName,
-            EntityId = revisionId.ToString(),
-            PreviousState = from.ToString(),
-            NewState = target.ToString(),
-            TransitionedAt = clock.Now,
-            TransitionedBy = userId,
-            Comment = WorkflowTransitionContext.Current?.Comment,
-            TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
-        });
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await transitionRecorder.RecordTransitionAsync(
+            new RecordTransitionRequest
+            {
+                EntityType = EntityTypeName,
+                EntityId = revisionId.ToString(),
+                PreviousState = from.ToString(),
+                NewState = target.ToString(),
+                UserId = userId,
+                Comment = WorkflowTransitionContext.Current?.Comment,
+                TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
+            },
+            ct).ConfigureAwait(false);
     }
 
     private static WorkflowLifecycleStatus ToWorkflow(TemplateLifecycleStatus status) =>

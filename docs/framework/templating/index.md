@@ -259,7 +259,7 @@ builder.Services.AddTemplateGlobalContext<MyCustomContext>();
 builder.Services.AddGranitDocumentGeneration();
 
 // Pont Workflow (optionnel — FSM, approbation, piste d'audit unifiée)
-builder.Services.AddGranitTemplatingWorkflow<AppDbContext>();
+builder.Services.AddGranitTemplatingWorkflow();
 ```
 
 ### 3 — Ressources embarquées
@@ -402,7 +402,7 @@ IDocumentTemplateStore (EfDocumentTemplateStore — internal, scoped)
   ├── HybridCache                                  (L1 MemoryCache + L2 Redis optionnel)
   └── ITemplateTransitionHook
         ├── NullTemplateTransitionHook (défaut — transitions simples, pas de workflow)
-        └── WorkflowTemplateTransitionHook<TDbContext> (via Granit.Templating.Workflow)
+        └── WorkflowTemplateTransitionHook (via Granit.Templating.Workflow)
 
 IDocumentGenerator (DocumentGenerator — internal, scoped)
   ├── ITextTemplateRenderer        (rendu via pipeline ci-dessus)

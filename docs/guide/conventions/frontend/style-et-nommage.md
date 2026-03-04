@@ -219,6 +219,98 @@ cross-feature.
 - `src/lib/` pour les utilitaires (`cn`, `axios`, `queryClient`)
 - Évitez les barrel files (`index.ts`) internes — ils nuisent au tree shaking Vite
 
+## Structure des packages `@granit/*`
+
+Les packages du framework partagé (`granit-front`) suivent une organisation
+interne standardisée, distincte de la structure feature-based des applications.
+
+### Structure canonique
+
+```text
+packages/@granit/{package}/
+├── src/
+│   ├── types/                ← types, DTOs, enums (barrel index.ts)
+│   │   ├── index.ts          ← ré-exporte tous les fichiers du dossier
+│   │   ├── {domaine}.ts      ← types groupés par domaine
+│   │   └── {enum}.ts         ← const enum-like (`as const`) + type Value
+│   ├── api/                  ← fonctions HTTP (axios)
+│   │   └── {package}-api.ts
+│   ├── hooks/                ← hooks React custom
+│   │   └── use-{feature}.ts
+│   ├── components/           ← composants headless React
+│   │   └── {component}.tsx
+│   ├── providers/            ← Context providers + useConfig hooks
+│   │   └── {package}-provider.tsx
+│   ├── adapters/             ← adaptateurs CMP/tiers (cookies-klaro)
+│   ├── utils/                ← utilitaires internes (si nécessaire)
+│   ├── __tests__/            ← tous les tests centralisés
+│   │   ├── setup.ts
+│   │   └── {module}.test.ts(x)
+│   └── index.ts              ← point d'entrée public (ré-exports)
+├── package.json
+└── tsconfig.json
+```
+
+### Règles
+
+- **`types/`** est le seul dossier avec un barrel (`index.ts`). Les autres
+  dossiers (`hooks/`, `api/`, etc.) n'ont pas de barrel — `src/index.ts` importe
+  directement chaque fichier.
+- **Extensions `.js`** dans toutes les imports internes (convention ESM, résolu
+  par Vite vers `.ts`) :
+
+  ```tsx
+  // ✅ extension .js dans un package @granit/*
+  import { fetchStatus } from '../api/workflow-api.js';
+  import type { TransitionDto } from '../types/index.js';
+
+  // ❌ extension .ts
+  import { fetchStatus } from '../api/workflow-api.ts';
+  ```
+
+- **`import type`** pour les imports de types uniquement.
+- **Tests** dans `__tests__/` centralisé (pas de co-location dans les packages
+  framework — contrairement aux applications).
+- **Nommage kebab-case** pour tous les fichiers et dossiers.
+- **Enums TypeScript** : utiliser `as const` + type dérivé (pas d'`enum` natif) :
+
+  ```tsx
+  export const WorkflowLifecycleStatus = {
+    Draft: 0,
+    PendingReview: 1,
+    Published: 2,
+    Archived: 3,
+  } as const;
+
+  export type WorkflowLifecycleStatusValue =
+    (typeof WorkflowLifecycleStatus)[keyof typeof WorkflowLifecycleStatus];
+  ```
+
+- **`src/index.ts`** : unique point d'entrée, exporte l'API publique complète.
+  Les consumers (`guava-front`, `guava-admin`) importent uniquement depuis
+  `@granit/{package}`.
+- **Pas de dossiers vides** : n'inclure que les sous-dossiers pertinents
+  (`@granit/auth` n'a pas `api/` ni `components/`, `@granit/cookies-klaro`
+  utilise `adapters/` au lieu de `hooks/`).
+
+### Tableau récapitulatif des packages
+
+| Package | types/ | api/ | hooks/ | components/ | providers/ | adapters/ |
+| --- | --- | --- | --- | --- | --- | --- |
+| `@granit/querying` | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| `@granit/data-export` | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| `@granit/notifications` | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| `@granit/workflow` | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| `@granit/timeline` | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| `@granit/auth` | ✓ | — | ✓ | — | ✓ | — |
+| `@granit/cookies` | ✓ | — | ✓ | — | ✓ | — |
+| `@granit/cookies-klaro` | ✓ | — | — | — | — | ✓ |
+| `@granit/ui` | — | — | — | ✓ (flat) | — | — |
+| `@granit/ui-back` | — | — | — | ✓ (flat) | — | — |
+| `@granit/utils` | — | — | — | — | — | — |
+| `@granit/logger` | — | — | — | — | — | — |
+| `@granit/api-client` | — | — | — | — | — | — |
+
 ## Commentaires et documentation
 
 - Même règles que le backend : pas de `TODO` sans issue GitLab liée

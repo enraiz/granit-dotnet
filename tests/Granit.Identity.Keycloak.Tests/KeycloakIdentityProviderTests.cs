@@ -168,5 +168,192 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         result.ShouldBeEmpty();
     }
 
+    // --- Argument guard tests ---
+
+    [Fact]
+    public async Task GetUserAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.GetUserAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task GetRoleMembersAsync_NullRoleName_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.GetRoleMembersAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Pagination edge cases ---
+
+    [Fact]
+    public async Task GetUsersAsync_NoParams_CallsEndpointWithoutQueryString()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUsersAsync(
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldEndWith("/admin/realms/test-realm/users");
+        _handler.Requests[0].Url.ShouldNotContain("?");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WithOnlyFirst_IncludesFirstParam()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUsersAsync(
+            first: 20,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        _handler.Requests[0].Url.ShouldContain("first=20");
+        _handler.Requests[0].Url.ShouldNotContain("max=");
+        _handler.Requests[0].Url.ShouldNotContain("search=");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WithOnlyMax_IncludesMaxParam()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUsersAsync(
+            max: 50,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        _handler.Requests[0].Url.ShouldContain("max=50");
+        _handler.Requests[0].Url.ShouldNotContain("first=");
+        _handler.Requests[0].Url.ShouldNotContain("search=");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WithFirstZero_IncludesFirstParam()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUsersAsync(
+            first: 0, max: 10,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        _handler.Requests[0].Url.ShouldContain("first=0");
+        _handler.Requests[0].Url.ShouldContain("max=10");
+    }
+
+    // --- Bearer token tests ---
+
+    [Fact]
+    public async Task GetUsersAsync_SetsAuthorizationHeader()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUsersAsync(
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+    }
+
+    // --- Mapping tests ---
+
+    [Fact]
+    public async Task GetUserAsync_MapsAllFieldsCorrectly()
+    {
+        _handler.ResponseBody = """{"id":"user-1","username":"alice","email":"alice@test.com","firstName":"Alice","lastName":"Doe","enabled":true}""";
+
+        IdentityUser? result = await _provider.GetUserAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldNotBeNull();
+        result.Id.ShouldBe("user-1");
+        result.Username.ShouldBe("alice");
+        result.Email.ShouldBe("alice@test.com");
+        result.FirstName.ShouldBe("Alice");
+        result.LastName.ShouldBe("Doe");
+        result.Enabled.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task GetUserAsync_DisabledUser_MapsEnabledAsFalse()
+    {
+        _handler.ResponseBody = """{"id":"user-1","username":"bob","email":"bob@test.com","firstName":"Bob","lastName":"Smith","enabled":false}""";
+
+        IdentityUser? result = await _provider.GetUserAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldNotBeNull();
+        result.Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task GetRolesAsync_MapsDescriptionCorrectly()
+    {
+        _handler.ResponseBody = """[{"id":"role-1","name":"viewer","description":null}]""";
+
+        IReadOnlyList<IdentityRole> result = await _provider.GetRolesAsync(
+            TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(1);
+        result[0].Description.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetRolesAsync_EmptyResponse_ReturnsEmptyList()
+    {
+        _handler.ResponseBody = "[]";
+
+        IReadOnlyList<IdentityRole> result = await _provider.GetRolesAsync(
+            TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetRoleMembersAsync_CallsCorrectEndpointWithSpaceInRoleName()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetRoleMembersAsync(
+            "content editor", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        // Uri.ToString() may decode %20 back to a space, so check for the role name presence.
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/roles/content");
+        _handler.Requests[0].Url.ShouldContain("editor/users");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_KeycloakUnavailable_ReturnsEmptyList()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.ServiceUnavailable;
+        _handler.ResponseBody = string.Empty;
+
+        IReadOnlyList<IdentityUser> result = await _provider.GetUsersAsync(
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetUserAsync_CallsCorrectEndpoint()
+    {
+        _handler.ResponseBody = """{"id":"user-abc","username":"test","email":null,"firstName":null,"lastName":null,"enabled":true}""";
+
+        await _provider.GetUserAsync("user-abc", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-abc");
+    }
+
+    [Fact]
+    public async Task GetRolesAsync_CallsCorrectEndpoint()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetRolesAsync(TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/roles");
+    }
+
     public void Dispose() => _httpClient.Dispose();
 }

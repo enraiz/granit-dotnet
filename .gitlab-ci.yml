@@ -134,12 +134,20 @@ integration-test:
     - job: build
       artifacts: false
   services:
-    - docker:27-dind
+    - name: postgres:18
+      alias: postgres
+      variables:
+        POSTGRES_DB: granit_test
+        POSTGRES_USER: granit_test
+        POSTGRES_PASSWORD: test_password
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    TESTCONTAINERS_HOST_OVERRIDE: docker
-    TESTCONTAINERS_RYUK_DISABLED: "true"
+    # Variables utilisées par le fixture de test pour se connecter au service PostgreSQL
+    # au lieu de Testcontainers (pas de DinD nécessaire).
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: "5432"
+    POSTGRES_DB: granit_test
+    POSTGRES_USER: granit_test
+    POSTGRES_PASSWORD: test_password
   script:
     - dotnet build -c $CONFIGURATION
     - >
@@ -160,7 +168,6 @@ integration-test:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
-  allow_failure: true
 
 # ---------------------------------------------------------------------------
 # SECURITY

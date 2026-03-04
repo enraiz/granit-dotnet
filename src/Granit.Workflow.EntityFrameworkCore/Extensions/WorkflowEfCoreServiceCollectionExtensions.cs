@@ -1,4 +1,6 @@
 using Granit.Workflow.EntityFrameworkCore.Interceptors;
+using Granit.Workflow.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -12,6 +14,8 @@ public static class WorkflowEfCoreServiceCollectionExtensions
     /// <summary>
     /// Registers the <see cref="WorkflowTransitionInterceptor"/> as a scoped service
     /// for automatic HDS audit trail creation on workflow state transitions.
+    /// Also registers <see cref="IWorkflowHistoryQuery"/> and
+    /// <see cref="IWorkflowTransitionRecorder"/> backed by <typeparamref name="TDbContext"/>.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -23,6 +27,25 @@ public static class WorkflowEfCoreServiceCollectionExtensions
     /// <c>SoftDeleteInterceptor</c> in the interceptor chain.
     /// </para>
     /// </remarks>
+    /// <typeparam name="TDbContext">
+    /// The host application's DbContext implementing <see cref="IWorkflowDbContext"/>.
+    /// </typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddGranitWorkflowEntityFrameworkCore<TDbContext>(
+        this IServiceCollection services)
+        where TDbContext : DbContext, IWorkflowDbContext
+    {
+        services.TryAddScoped<WorkflowTransitionInterceptor>();
+        services.TryAddScoped<IWorkflowHistoryQuery, DefaultWorkflowHistoryQuery<TDbContext>>();
+        services.TryAddScoped<IWorkflowTransitionRecorder, EfWorkflowTransitionRecorder<TDbContext>>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the <see cref="WorkflowTransitionInterceptor"/> without the query/recorder services.
+    /// Use <see cref="AddGranitWorkflowEntityFrameworkCore{TDbContext}"/> instead when possible.
+    /// </summary>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddGranitWorkflowEntityFrameworkCore(

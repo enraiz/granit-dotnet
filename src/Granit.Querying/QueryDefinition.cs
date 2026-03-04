@@ -58,10 +58,8 @@ public abstract class QueryDefinition<TEntity> : IQueryDefinitionDescriptor wher
     /// before the builder is initialized.
     /// </summary>
     /// <param name="options">The global querying options.</param>
-    internal void Initialize(QueryingOptions options)
-    {
+    internal void Initialize(QueryingOptions options) =>
         _options = options;
-    }
 
     /// <summary>
     /// Gets the built definition metadata (lazily initialized).
