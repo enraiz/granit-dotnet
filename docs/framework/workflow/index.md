@@ -64,18 +64,23 @@ mais **sans** la permission requise :
 3. `Granit.Workflow.Notifications` notifie les approbateurs désignés
 4. Un approbateur (utilisateur avec la permission) peut ensuite valider
 
-#### Résolution des approbateurs Keycloak
+#### Résolution des approbateurs via `IIdentityProvider`
 
-Le résolveur intégré `KeycloakApproverResolver` suit le flux :
+Le résolveur intégré `IdentityApproverResolver` suit le flux :
 
 1. **Permission → rôles** : interroge `IPermissionManager.GetGrantedRolesAsync()`
    pour trouver les rôles ayant la permission requise (via la base de données
-   d'autorisation)
-2. **Rôles → utilisateurs** : pour chaque rôle, appelle l'API Admin Keycloak
-   (`GET /admin/realms/{realm}/roles/{role}/users`) pour obtenir les membres
+   d'autorisation `Granit.Authorization`)
+2. **Rôles → utilisateurs** : pour chaque rôle, interroge
+   `IIdentityProvider.GetRoleMembersAsync()` pour obtenir les membres
 3. Les identifiants utilisateurs sont dédupliqués et retournés
 
-Configuration requise (`appsettings.json`) :
+`IIdentityProvider` est une abstraction générique définie dans `Granit.Identity`.
+L'implémentation Keycloak (`Granit.Identity.Keycloak`) interroge l'API Admin Keycloak.
+D'autres fournisseurs (LDAP, Entra ID, etc.) peuvent être ajoutés en implémentant
+la même interface.
+
+Configuration requise pour Keycloak (`appsettings.json`) :
 
 ```json
 {
@@ -161,11 +166,14 @@ services.AddWorkflow(PublicationWorkflow.Default);
 // Granit.Workflow.EntityFrameworkCore
 services.AddGranitWorkflowEntityFrameworkCore();
 
+// Granit.Identity.Keycloak (fournisseur d'identité)
+services.AddGranitIdentityKeycloak();
+
 // Granit.Workflow.Notifications
 services.AddGranitWorkflowNotifications();
 
-// Option 1 : résolveur Keycloak intégré (permission → rôle → users via Admin API)
-services.AddKeycloakApproverResolver();
+// Option 1 : résolveur basé sur IIdentityProvider + IPermissionManager
+services.AddIdentityApproverResolver();
 
 // Option 2 : résolveur custom
 services.AddWorkflowApproverResolver<MyApproverResolver>();

@@ -1,11 +1,11 @@
-using Granit.Workflow.Notifications.Keycloak;
+using Granit.Identity.Keycloak.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Granit.Workflow.Notifications.Tests;
+namespace Granit.Identity.Keycloak.Tests;
 
 public sealed class KeycloakAdminTokenServiceTests : IDisposable
 {

@@ -2,189 +2,474 @@
 
 ## Vue d'ensemble
 
-Ce diagramme illustre les dépendances entre tous les packages Granit. Les
-flèches indiquent le sens de la dépendance : `A → B` signifie « A dépend
-de B ». Le package racine `Granit.Core` n'a aucune dépendance.
+Ce document illustre les dépendances entre les 89 packages source Granit.
+Les flèches indiquent le sens de la dépendance : `A → B` signifie « A
+dépend de B ». Le package racine `Granit.Core` n'a aucune dépendance.
 
-## Diagramme complet
+> **Conventions de lisibilité** :
+>
+> - Les dépendances transitives vers `Granit.Core` sont omises lorsqu'un
+>   package dépend déjà d'un autre module qui dépend de Core.
+> - Dans la vue synthétique, le pattern systématique `*.Endpoints →
+>   Authorization` est omis (mentionné dans les règles de couplage).
+
+## Vue synthétique
+
+Chaque nœud représente un domaine fonctionnel avec le nombre de packages
+entre parenthèses.
 
 ```mermaid
-flowchart BT
-    CORE["Granit.Core\n(Module system, Domain,\nMulti-Tenancy soft dep)"]
+flowchart TD
+    CORE["Core (1)"]
+
+    subgraph Fondation
+        UTILS["Utilitaires (9)"]
+        SEC["Sécurité (7)"]
+        CACHE["Caching (3)"]
+        IDENT["Identity (2)"]
+    end
+
+    subgraph Infrastructure
+        PERS["Persistence (3)"]
+        WOL["Wolverine (2)"]
+    end
+
+    subgraph Fonctionnel
+        LOC["Localization (4)"]
+        WEB["Web & API (5)"]
+        CONFIG["Configuration (7)"]
+        STORAGE["Stockage (5)"]
+    end
+
+    subgraph Métier
+        TMPL["Templating (7)"]
+        QRY["Querying (3)"]
+        DX["DataExchange (6)"]
+        WF["Workflow (4)"]
+        NOTIF["Notifications (10)"]
+        TL["Timeline (4)"]
+        JOBS["Jobs & Events (5)"]
+    end
+
+    ANLZ["Analyzers (2)"]
+
+    UTILS --> CORE
+    SEC --> CORE
+    SEC --> CACHE
+    CACHE --> CORE
+    IDENT --> CORE
+
+    PERS --> UTILS
+    PERS --> SEC
+    WOL --> SEC
+    WOL --> PERS
+
+    LOC --> CORE
+    LOC --> PERS
+    WEB --> SEC
+    WEB --> CACHE
+    CONFIG --> CACHE
+    CONFIG --> LOC
+    CONFIG --> PERS
+    STORAGE --> UTILS
+
+    TMPL --> UTILS
+    TMPL --> WF
+    QRY --> PERS
+    DX --> QRY
+    DX --> WOL
+    WF --> PERS
+    WF --> NOTIF
+    WF --> IDENT
+    NOTIF --> WOL
+    TL --> SEC
+    TL --> NOTIF
+    JOBS --> WOL
+    JOBS --> SEC
 
     style CORE fill:#2d5a27,color:#fff
-
-    %% Couche Utilitaires (dépend uniquement de Core)
-    TIMING["Granit.Timing"] --> CORE
-    GUIDS["Granit.Guids"] --> CORE
-    SEC["Granit.Security"] --> CORE
-    EXC["Granit.ExceptionHandling"] --> CORE
-    VALID["Granit.Validation"] --> CORE
-    CACHE["Granit.Caching"] --> CORE
-    ENCR["Granit.Encryption"] --> CORE
-    DIAG["Granit.Diagnostics"] --> CORE
-    OBS["Granit.Observability"] --> CORE
-    MT["Granit.MultiTenancy"] --> CORE
-
-    style TIMING fill:#4a9eff,color:#fff
-    style GUIDS fill:#4a9eff,color:#fff
-    style SEC fill:#4a9eff,color:#fff
-    style EXC fill:#4a9eff,color:#fff
-    style VALID fill:#4a9eff,color:#fff
+    style UTILS fill:#4a9eff,color:#fff
+    style SEC fill:#e84393,color:#fff
     style CACHE fill:#4a9eff,color:#fff
-    style ENCR fill:#4a9eff,color:#fff
-    style DIAG fill:#4a9eff,color:#fff
-    style OBS fill:#4a9eff,color:#fff
-    style MT fill:#4a9eff,color:#fff
-
-    %% Couche Caching avancée
-    CACHE_REDIS["Granit.Caching\n.StackExchangeRedis"] --> CACHE
-    CACHE_HYB["Granit.Caching.Hybrid"] --> CACHE
-
-    %% Couche Persistence
-    PERS["Granit.Persistence"] --> CORE
-    PERS --> TIMING
-    PERS --> GUIDS
-    PERS --> SEC
-    PERS --> EXC
-
-    PERS_MIG["Granit.Persistence\n.Migrations"] --> PERS
-
-    PERS_MIG_WOL["Granit.Persistence\n.Migrations.Wolverine"] --> PERS_MIG
-    PERS_MIG_WOL --> WOL
-
     style PERS fill:#ff6b6b,color:#fff
-
-    %% Couche Auth
-    JWT["Granit.Authentication\n.JwtBearer"] --> SEC
-    KC["Granit.Authentication\n.Keycloak"] --> JWT
-
-    AUTHZ["Granit.Authorization"] --> SEC
-    AUTHZ --> CACHE
-
-    AUTHZ_EF["Granit.Authorization\n.EntityFrameworkCore"] --> AUTHZ
-
-    %% Couche Messaging (Wolverine)
-    WOL["Granit.Wolverine"] --> CORE
-    WOL --> SEC
-
-    WOL_PG["Granit.Wolverine\n.Postgresql"] --> WOL
-
     style WOL fill:#9b59b6,color:#fff
+    style LOC fill:#4a9eff,color:#fff
+    style WEB fill:#4a9eff,color:#fff
+    style CONFIG fill:#4a9eff,color:#fff
+    style STORAGE fill:#e67e22,color:#fff
+    style TMPL fill:#16a085,color:#fff
+    style QRY fill:#2980b9,color:#fff
+    style DX fill:#27ae60,color:#fff
+    style WF fill:#f39c12,color:#fff
+    style NOTIF fill:#c0392b,color:#fff
+    style TL fill:#d35400,color:#fff
+    style JOBS fill:#9b59b6,color:#fff
+    style IDENT fill:#1abc9c,color:#fff
+    style ANLZ fill:#95a5a6,color:#fff
+```
 
-    %% Couche Localization
-    LOC["Granit.Localization"] --> CORE
-    LOC_EF["Granit.Localization\n.EntityFrameworkCore"] --> LOC
-    LOC_EP["Granit.Localization\n.Endpoints"] --> LOC
-    LOC_EP --> AUTHZ
-    LOC_SG["Granit.Localization\n.SourceGenerator"] --> LOC
+**Composition des domaines :**
 
-    %% Couche Fonctionnelle
-    FEAT["Granit.Features"] --> CORE
-    FEAT --> CACHE
-    FEAT --> LOC
+| Domaine | Packages |
+| ------- | -------- |
+| Utilitaires | Timing, Guids, Diagnostics, Validation, ExceptionHandling, Observability, MultiTenancy, Privacy, Cors |
+| Identity | Identity, Identity.Keycloak |
+| Sécurité | Security, Encryption, Vault, Auth.JwtBearer, Auth.Keycloak, Authorization, Authorization.EF |
+| Configuration | Settings (2), Features (2), ReferenceData (3) |
+| Web & API | ApiVersioning, ApiDocumentation, Cookies, Cookies.Klaro, Idempotency |
+| Stockage | BlobStorage (3), Imaging (2) |
+| Jobs & Events | BackgroundJobs (3), Webhooks (2) |
 
-    FEAT_EF["Granit.Features\n.EntityFrameworkCore"] --> FEAT
+---
 
-    BGJOBS["Granit.BackgroundJobs"] --> CORE
-    BGJOBS --> SEC
-    BGJOBS --> TIMING
-    BGJOBS --> WOL
+## Détails par domaine
 
-    BGJOBS_EF["Granit.BackgroundJobs\n.EntityFrameworkCore"] --> BGJOBS
-    BGJOBS_EP["Granit.BackgroundJobs\n.Endpoints"] --> BGJOBS
+### Sécurité, Caching & Persistence
 
-    BLOB["Granit.BlobStorage"] --> CORE
-    BLOB --> GUIDS
-    BLOB --> TIMING
+La colonne vertébrale du framework : sécurité, cache distribué et couche
+de données.
 
-    BLOB_EF["Granit.BlobStorage\n.EntityFrameworkCore"] --> BLOB
-    BLOB_S3["Granit.BlobStorage.S3"] --> BLOB
+```mermaid
+flowchart LR
+    SEC["Security"] --> CORE["Core"]
+    ENCR["Encryption"] --> CORE
+    VAULT["Vault"] --> ENCR
 
-    style BLOB fill:#e67e22,color:#fff
+    JWT["Auth.JwtBearer"] --> SEC
+    KC["Auth.Keycloak"] --> JWT
 
-    %% Couche Settings
-    SETT["Granit.Settings"] --> CORE
-    SETT --> CACHE
-    SETT --> ENCR
-    SETT --> SEC
+    CACHE["Caching"] --> CORE
+    CACHE_REDIS["Caching.Redis"] --> CACHE
+    CACHE_HYB["Caching.Hybrid"] --> CACHE
+    CACHE_HYB --> CACHE_REDIS
+    CACHE_HYB --> TIMING["Timing"]
 
-    SETT_EF["Granit.Settings\n.EntityFrameworkCore"] --> SETT
+    AUTHZ["Authorization"] --> SEC
+    AUTHZ --> CACHE
+    AUTHZ_EF["Authorization.EF"] --> AUTHZ
+    AUTHZ_EF --> PERS
 
-    %% Couche Webhooks
-    WH["Granit.Webhooks"] --> CORE
-    WH --> WOL
+    PERS["Persistence"] --> CORE
+    PERS --> TIMING
+    PERS --> GUIDS["Guids"]
+    PERS --> SEC
+    PERS --> EXC["ExceptionHandling"]
 
-    WH_EF["Granit.Webhooks\n.EntityFrameworkCore"] --> WH
+    PERS_MIG["Persistence.Migrations"] --> PERS
+    PERS_MIG --> TIMING
 
-    %% Couche Idempotency
-    IDEMP["Granit.Idempotency"] --> CORE
-    IDEMP --> CACHE
-    IDEMP --> SEC
+    PERS_MIG_WOL["Persistence.Migrations<br/>.Wolverine"] --> PERS_MIG
+    PERS_MIG_WOL --> WOL["Wolverine"]
 
-    %% Couche API
-    APIV["Granit.ApiVersioning"] --> CORE
-    APIDOC["Granit.ApiDocumentation"] --> CORE
-    APIDOC --> SEC
+    WOL --> CORE
+    WOL --> SEC
+    WOL_PG["Wolverine.Postgresql"] --> WOL
+    WOL_PG --> PERS
 
-    %% Couche Vault
-    VAULT["Granit.Vault"] --> CORE
-    VAULT --> ENCR
+    style CORE fill:#2d5a27,color:#fff
+    style PERS fill:#ff6b6b,color:#fff
+    style PERS_MIG fill:#ff6b6b,color:#fff
+    style PERS_MIG_WOL fill:#ff6b6b,color:#fff
+    style SEC fill:#e84393,color:#fff
+    style AUTHZ fill:#e84393,color:#fff
+    style AUTHZ_EF fill:#e84393,color:#fff
+    style JWT fill:#e84393,color:#fff
+    style KC fill:#e84393,color:#fff
+    style WOL fill:#9b59b6,color:#fff
+    style WOL_PG fill:#9b59b6,color:#fff
+```
 
-    %% Couche Templating
-    TMPL["Granit.Templating"] --> CORE
-    TMPL --> TIMING
+### Notifications
 
-    TMPL_SCR["Granit.Templating\n.Scriban"] --> TMPL
+Fan-out multi-canal avec agrégateur Brevo.
+
+```mermaid
+flowchart LR
+    NOTIF["Notifications"] --> TIMING["Timing"]
+    NOTIF --> WOL["Wolverine"]
+
+    NOTIF_EP["Notifications.Endpoints"] --> NOTIF
+    NOTIF_EF["Notifications.EF"] --> NOTIF
+
+    NOTIF_EMAIL["Notifications.Email"] --> NOTIF
+    NOTIF_SMTP["Notifications.Email.Smtp"] --> NOTIF_EMAIL
+
+    NOTIF_SMS["Notifications.Sms"] --> NOTIF
+    NOTIF_WA["Notifications.WhatsApp"] --> NOTIF
+    NOTIF_PUSH["Notifications.Push"] --> NOTIF
+    NOTIF_SR["Notifications.SignalR"] --> NOTIF
+
+    NOTIF_BREVO["Notifications.Brevo"] --> NOTIF_EMAIL
+    NOTIF_BREVO --> NOTIF_SMS
+    NOTIF_BREVO --> NOTIF_WA
+
+    style NOTIF fill:#c0392b,color:#fff
+    style NOTIF_EP fill:#c0392b,color:#fff
+    style NOTIF_EF fill:#c0392b,color:#fff
+    style NOTIF_EMAIL fill:#c0392b,color:#fff
+    style NOTIF_SMTP fill:#c0392b,color:#fff
+    style NOTIF_SMS fill:#c0392b,color:#fff
+    style NOTIF_WA fill:#c0392b,color:#fff
+    style NOTIF_PUSH fill:#c0392b,color:#fff
+    style NOTIF_SR fill:#c0392b,color:#fff
+    style NOTIF_BREVO fill:#c0392b,color:#fff
+```
+
+### Templating & DocumentGeneration
+
+Pipeline de rendu : modèle → moteur → document.
+
+```mermaid
+flowchart LR
+    TMPL["Templating"] --> CORE["Core"]
+    TMPL --> TIMING["Timing"]
+
+    TMPL_SCR["Templating.Scriban"] --> TMPL
     TMPL_SCR --> TIMING
 
-    TMPL_EF["Granit.Templating\n.EntityFrameworkCore"] --> TMPL
+    TMPL_EF["Templating.EF"] --> TMPL
 
-    DOCGEN["Granit.DocumentGeneration"] --> TMPL
+    TMPL_WF["Templating.Workflow"] --> TMPL
+    TMPL_WF --> WF["Workflow"]
+    TMPL_WF --> WF_EF["Workflow.EF"]
 
-    DOCGEN_PDF["Granit.DocumentGeneration\n.Pdf"] --> DOCGEN
+    DOCGEN["DocumentGeneration"] --> TMPL
+    DOCGEN_PDF["DocumentGeneration.Pdf"] --> DOCGEN
+    DOCGEN_XLS["DocumentGeneration.Excel"] --> TMPL
 
     style TMPL fill:#16a085,color:#fff
     style TMPL_SCR fill:#16a085,color:#fff
     style TMPL_EF fill:#16a085,color:#fff
+    style TMPL_WF fill:#16a085,color:#fff
     style DOCGEN fill:#16a085,color:#fff
     style DOCGEN_PDF fill:#16a085,color:#fff
-
-    %% Analyzers (pas de dépendance runtime)
-    ANLZ["Granit.Analyzers"]
-    ANLZ_CF["Granit.Analyzers\n.CodeFixes"]
-
-    style ANLZ fill:#95a5a6,color:#fff
-    style ANLZ_CF fill:#95a5a6,color:#fff
+    style DOCGEN_XLS fill:#16a085,color:#fff
 ```
 
-## Légende
+### Querying & DataExchange
+
+Pipeline de données : recherche/filtrage, import/export.
+
+```mermaid
+flowchart LR
+    QRY["Querying"] --> CORE["Core"]
+
+    QRY_EP["Querying.Endpoints"] --> QRY
+    QRY_EP --> AUTHZ["Authorization"]
+
+    QRY_EF["Querying.EF"] --> QRY
+    QRY_EF --> PERS["Persistence"]
+
+    DX["DataExchange"] --> QRY
+    DX --> TIMING["Timing"]
+    DX --> VALID["Validation"]
+
+    DX_CSV["DataExchange.Csv"] --> DX
+    DX_XLS["DataExchange.Excel"] --> DX
+    DX_EF["DataExchange.EF"] --> DX
+
+    DX_EP["DataExchange.Endpoints"] --> DX
+    DX_EP --> AUTHZ
+
+    DX_WOL["DataExchange.Wolverine"] --> DX
+    DX_WOL --> WOL["Wolverine"]
+
+    style QRY fill:#2980b9,color:#fff
+    style QRY_EP fill:#2980b9,color:#fff
+    style QRY_EF fill:#2980b9,color:#fff
+    style DX fill:#27ae60,color:#fff
+    style DX_CSV fill:#27ae60,color:#fff
+    style DX_XLS fill:#27ae60,color:#fff
+    style DX_EF fill:#27ae60,color:#fff
+    style DX_EP fill:#27ae60,color:#fff
+    style DX_WOL fill:#27ae60,color:#fff
+```
+
+### Workflow & Timeline
+
+Cycle de vie (FSM, publication) et audit HDS.
+
+```mermaid
+flowchart LR
+    WF["Workflow"] --> CORE["Core"]
+    WF --> TIMING["Timing"]
+
+    WF_EF["Workflow.EF"] --> WF
+    WF_EF --> PERS["Persistence"]
+
+    WF_EP["Workflow.Endpoints"] --> WF
+    WF_EP --> WF_EF
+
+    WF_NOTIF["Workflow.Notifications"] --> WF
+    WF_NOTIF --> AUTHZ["Authorization"]
+    WF_NOTIF --> IDENT["Identity"]
+    WF_NOTIF --> NOTIF["Notifications"]
+    WF_NOTIF --> WOL["Wolverine"]
+
+    TL["Timeline"] --> GUIDS["Guids"]
+    TL --> SEC["Security"]
+    TL --> TIMING
+
+    TL_EP["Timeline.Endpoints"] --> TL
+    TL_EF["Timeline.EF"] --> TL
+
+    TL_NOTIF["Timeline.Notifications"] --> TL
+    TL_NOTIF --> NOTIF
+
+    style WF fill:#f39c12,color:#fff
+    style WF_EF fill:#f39c12,color:#fff
+    style WF_EP fill:#f39c12,color:#fff
+    style WF_NOTIF fill:#f39c12,color:#fff
+    style TL fill:#d35400,color:#fff
+    style TL_EP fill:#d35400,color:#fff
+    style TL_EF fill:#d35400,color:#fff
+    style TL_NOTIF fill:#d35400,color:#fff
+```
+
+---
+
+## Domaines simples
+
+Packages dont la structure interne ne nécessite pas de diagramme dédié.
+
+### Utilitaires
+
+Tous dépendent uniquement de `Granit.Core`, sauf exceptions notées.
+
+| Package | Dépendances supplémentaires |
+| ------- | --------------------------- |
+| `Granit.Timing` | — |
+| `Granit.Security` | — |
+| `Granit.ExceptionHandling` | — |
+| `Granit.Observability` | — |
+| `Granit.MultiTenancy` | — |
+| `Granit.Privacy` | — |
+| `Granit.Cors` | — |
+| `Granit.Guids` | `Timing` |
+| `Granit.Diagnostics` | `Timing` |
+| `Granit.Validation` | `ExceptionHandling`, `Localization` |
+
+### Localization
+
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.Localization` | `Core` |
+| `Granit.Localization.EntityFrameworkCore` | `Localization`, `Persistence` |
+| `Granit.Localization.Endpoints` | `Localization`, `Authorization` |
+| `Granit.Localization.SourceGenerator` | aucune (source generator) |
+
+### Configuration (Settings, Features, ReferenceData)
+
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.Settings` | `Caching`, `Encryption`, `Security` |
+| `Granit.Settings.EntityFrameworkCore` | `Settings`, `Persistence` |
+| `Granit.Features` | `Caching`, `Localization` |
+| `Granit.Features.EntityFrameworkCore` | `Features`, `Persistence` |
+| `Granit.ReferenceData` | `Core` |
+| `Granit.ReferenceData.Endpoints` | `ReferenceData` |
+| `Granit.ReferenceData.EntityFrameworkCore` | `ReferenceData`, `Persistence` |
+
+### Stockage & Imaging
+
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.BlobStorage` | `Guids`, `Timing` |
+| `Granit.BlobStorage.EntityFrameworkCore` | `BlobStorage` |
+| `Granit.BlobStorage.S3` | `BlobStorage`, `Timing` |
+| `Granit.Imaging` | `Core` |
+| `Granit.Imaging.MagickNet` | `Imaging` |
+
+### Web & API
+
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.ApiVersioning` | `Core` |
+| `Granit.ApiDocumentation` | `ApiVersioning`, `Security` |
+| `Granit.Cookies` | `Core`, `Timing` |
+| `Granit.Cookies.Klaro` | `Cookies` |
+| `Granit.Idempotency` | `Caching`, `Security` |
+
+### Jobs & Events
+
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.BackgroundJobs` | `Security`, `Timing`, `Wolverine` |
+| `Granit.BackgroundJobs.EntityFrameworkCore` | `BackgroundJobs` |
+| `Granit.BackgroundJobs.Endpoints` | `BackgroundJobs`, `Authorization` |
+| `Granit.Webhooks` | `Timing`, `Wolverine` |
+| `Granit.Webhooks.EntityFrameworkCore` | `Webhooks`, `Timing` |
+
+### Identity
+
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.Identity` | `Core` |
+| `Granit.Identity.Keycloak` | `Identity` |
+
+### Analyzers
+
+| Package | Dépend de |
+| ------- | --------- |
+| `Granit.Analyzers` | aucune (Roslyn analyzer) |
+| `Granit.Analyzers.CodeFixes` | `Analyzers` |
+
+---
+
+## Légende des couleurs
 
 | Couleur | Signification |
-|---------|---------------|
-| Vert foncé | `Granit.Core` — racine sans dépendance |
-| Bleu | Couche utilitaires — dépend uniquement de Core |
+| ------- | ------------- |
+| Vert foncé | `Core` — racine sans dépendance |
+| Bleu | Utilitaires, Localization, Configuration, Web |
+| Rose | Sécurité & Authentification |
 | Rouge | Persistence — couche transversale critique |
 | Violet | Wolverine — messaging et Outbox |
 | Orange | BlobStorage — stockage objet |
-| Vert sarcelle | Templating — rendu et génération documentaire |
+| Orange foncé | Timeline — audit HDS |
+| Vert sarcelle | Templating & DocumentGeneration |
+| Rouge foncé | Notifications — fan-out multi-canal |
+| Bleu acier | Querying — recherche, filtrage, tri, pagination |
+| Vert | DataExchange — import/export (mini-ETL) |
+| Or | Workflow — FSM et cycle de vie publication |
+| Turquoise | Identity — fournisseurs d'identité |
+| Mauve | Imaging — traitement d'images |
 | Gris | Analyzers — pas de dépendance runtime |
 
 ## Propriétés du graphe
 
-- **Zéro dépendance circulaire** — le build de 92 projets passe avec 0 erreurs
-- **Profondeur maximale** : 4 niveaux (Core → Security → Wolverine → BackgroundJobs)
-- **Modules feuilles** : les packages `*.EntityFrameworkCore` et `*.S3` sont toujours des feuilles
-- **Soft dependency** : `ICurrentTenant` est dans `Granit.Core`, pas dans `Granit.MultiTenancy`
+- **175 projets** (89 sources + 86 tests), **zéro dépendance circulaire**
+- **Profondeur maximale** : 5 niveaux (ex. Core → Security → Wolverine →
+  Notifications → Email → Smtp, ou Core → Timing → Persistence →
+  Workflow.EF → Workflow.Endpoints)
+- **Modules feuilles** : les packages `*.EntityFrameworkCore` et `*.S3` sont
+  presque toujours des feuilles — exception : `Workflow.EntityFrameworkCore`
+  qui est référencé par `Workflow.Endpoints` et `Templating.Workflow`
+- **Racines sans dépendance** : `Granit.Core`, `Granit.Analyzers`,
+  `Granit.Localization.SourceGenerator`
+- **Soft dependency** : `ICurrentTenant` est dans `Granit.Core`, pas dans
+  `Granit.MultiTenancy`
 
 ## Règles de couplage
 
 1. **Core ne dépend de rien** — c'est le fondement du framework
-2. **Les packages fonctionnels ne référencent jamais les packages `*.EntityFrameworkCore`**
-3. **`Granit.MultiTenancy` est une dépendance optionnelle** — les modules utilisent
-   `ICurrentTenant` de `Granit.Core.MultiTenancy`
-4. **Les packages `*.Endpoints` dépendent de `Granit.Authorization`** pour la protection des routes
-5. **Wolverine est le seul bus de messages** — tous les modules asynchrones passent par lui
-6. **`Persistence.Migrations` est découplé de Wolverine** — le dispatch est abstrait par
-   `IMigrationBatchDispatcher` (Channel par défaut, Wolverine en option via
-   `Granit.Persistence.Migrations.Wolverine`)
+2. **Les packages fonctionnels ne référencent jamais les packages
+   `*.EntityFrameworkCore`** — exception : `Workflow.Endpoints` et
+   `Templating.Workflow` qui référencent `Workflow.EntityFrameworkCore`
+3. **`Granit.MultiTenancy` est une dépendance optionnelle** — les modules
+   utilisent `ICurrentTenant` de `Granit.Core.MultiTenancy`
+4. **Les packages `*.Endpoints` dépendent de `Granit.Authorization`** pour
+   la protection des routes (pattern systématique)
+5. **Wolverine est le seul bus de messages** — tous les modules asynchrones
+   passent par lui (Notifications, Webhooks, BackgroundJobs,
+   DataExchange.Wolverine, Persistence.Migrations.Wolverine)
+6. **`Persistence.Migrations` est découplé de Wolverine** — le dispatch est
+   abstrait par `IMigrationBatchDispatcher` (Channel par défaut, Wolverine
+   en option via `Granit.Persistence.Migrations.Wolverine`)
+7. **Brevo est un agrégateur multi-canal** — il dépend de Email, Sms et
+   WhatsApp pour fournir un fournisseur unifié
+
+## Voir aussi
+
+- [THIRD-PARTY-NOTICES.md](../../THIRD-PARTY-NOTICES.md) — licences des
+  dépendances externes (NuGet tiers)

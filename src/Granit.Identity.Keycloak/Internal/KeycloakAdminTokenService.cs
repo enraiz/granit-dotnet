@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Granit.Workflow.Notifications.Keycloak;
+namespace Granit.Identity.Keycloak.Internal;
 
 /// <summary>
 /// Singleton service that obtains and caches a Keycloak service account token
