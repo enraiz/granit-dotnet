@@ -42,7 +42,7 @@ public static class DataExchangeEndpointRouteBuilderExtensions
     /// DELETE /{jobId}, GET /{jobId}/report, GET /{jobId}/correction-file.
     /// </para>
     /// <para>
-    /// Also exposes 6 export endpoints under <c>/export/</c>:
+    /// Also exposes 8 export endpoints under <c>/export/</c>:
     /// GET /export/definitions, GET /export/definitions/{name}/fields,
     /// POST /export/jobs, GET /export/jobs/{id}, GET /export/jobs/{id}/download,
     /// GET /export/presets/{definitionName}, POST /export/presets,
@@ -88,7 +88,7 @@ public static class DataExchangeEndpointRouteBuilderExtensions
         // Export endpoints under /export/ sub-group with dedicated permission
         RouteGroupBuilder exportGroup = group
             .MapGroup("export")
-            .WithTags("Data Export")
+            .WithTags(options.TagName)
             .RequireAuthorization(DataExportAuthorizationPolicy.PolicyName);
 
         exportGroup.MapExportDefinitionEndpoints();
