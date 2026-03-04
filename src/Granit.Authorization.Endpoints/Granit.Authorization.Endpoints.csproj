@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Authorization.Endpoints</PackageId>
+    <Description>Minimal API endpoints for RBAC permission management. Exposes current-user permissions, permission definitions, and admin grant/revoke routes. Protected by the Granit.Authorization permission system.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Authorization.Endpoints.Tests" />
+    <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal interfaces in tests -->
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Authorization\Granit.Authorization.csproj" />
+    <ProjectReference Include="..\Granit.Authorization.EntityFrameworkCore\Granit.Authorization.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+</Project>
