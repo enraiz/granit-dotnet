@@ -1,6 +1,33 @@
 namespace Granit.Workflow;
 
 /// <summary>
+/// Request object for recording a workflow state transition (HDS audit trail).
+/// </summary>
+public sealed record RecordTransitionRequest
+{
+    /// <summary>Logical entity type name (e.g. <c>"TemplateRevision"</c>).</summary>
+    public required string EntityType { get; init; }
+
+    /// <summary>Entity identifier.</summary>
+    public required string EntityId { get; init; }
+
+    /// <summary>State before the transition.</summary>
+    public required string PreviousState { get; init; }
+
+    /// <summary>State after the transition.</summary>
+    public required string NewState { get; init; }
+
+    /// <summary>User who triggered the transition.</summary>
+    public required string UserId { get; init; }
+
+    /// <summary>Optional regulatory comment or justification.</summary>
+    public string? Comment { get; init; }
+
+    /// <summary>Optional tenant identifier.</summary>
+    public Guid? TenantId { get; init; }
+}
+
+/// <summary>
 /// Persists workflow transition records to the underlying store.
 /// Decouples functional packages from the EF Core implementation.
 /// </summary>
@@ -9,21 +36,9 @@ public interface IWorkflowTransitionRecorder
     /// <summary>
     /// Records a workflow state transition for auditing (HDS audit trail).
     /// </summary>
-    /// <param name="entityType">Logical entity type name (e.g. "TemplateRevision").</param>
-    /// <param name="entityId">Entity identifier.</param>
-    /// <param name="previousState">State before the transition.</param>
-    /// <param name="newState">State after the transition.</param>
-    /// <param name="userId">User who triggered the transition.</param>
-    /// <param name="comment">Optional regulatory comment or justification.</param>
-    /// <param name="tenantId">Optional tenant identifier.</param>
+    /// <param name="request">Transition data to record.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task RecordTransitionAsync(
-        string entityType,
-        string entityId,
-        string previousState,
-        string newState,
-        string userId,
-        string? comment,
-        Guid? tenantId,
+        RecordTransitionRequest request,
         CancellationToken cancellationToken = default);
 }

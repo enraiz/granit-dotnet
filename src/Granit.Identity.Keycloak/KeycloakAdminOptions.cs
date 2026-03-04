@@ -58,7 +58,7 @@ public sealed class KeycloakAdminOptions
     /// </summary>
     internal string GetUsersEndpoint(string? search = null, int? first = null, int? max = null)
     {
-        var baseUrl = $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users";
+        string baseUrl = $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users";
         List<string> queryParams = [];
 
         if (!string.IsNullOrEmpty(search))

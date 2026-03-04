@@ -17,27 +17,23 @@ internal sealed class EfWorkflowTransitionRecorder<TDbContext>(
 {
     /// <inheritdoc/>
     public async Task RecordTransitionAsync(
-        string entityType,
-        string entityId,
-        string previousState,
-        string newState,
-        string userId,
-        string? comment,
-        Guid? tenantId,
+        RecordTransitionRequest request,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         await using TDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         ctx.WorkflowTransitionRecords.Add(new WorkflowTransitionRecord
         {
             Id = guidGenerator.Create(),
-            EntityType = entityType,
-            EntityId = entityId,
-            PreviousState = previousState,
-            NewState = newState,
+            EntityType = request.EntityType,
+            EntityId = request.EntityId,
+            PreviousState = request.PreviousState,
+            NewState = request.NewState,
             TransitionedAt = clock.Now,
-            TransitionedBy = userId,
-            Comment = comment,
-            TenantId = tenantId,
+            TransitionedBy = request.UserId,
+            Comment = request.Comment,
+            TenantId = request.TenantId,
         });
         await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }

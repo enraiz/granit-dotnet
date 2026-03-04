@@ -41,16 +41,17 @@ internal sealed class WorkflowTemplateTransitionHook(
         string userId,
         CancellationToken ct = default)
     {
-        Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
-
         await transitionRecorder.RecordTransitionAsync(
-            EntityTypeName,
-            revisionId.ToString(),
-            from.ToString(),
-            target.ToString(),
-            userId,
-            WorkflowTransitionContext.Current?.Comment,
-            tenantId,
+            new RecordTransitionRequest
+            {
+                EntityType = EntityTypeName,
+                EntityId = revisionId.ToString(),
+                PreviousState = from.ToString(),
+                NewState = target.ToString(),
+                UserId = userId,
+                Comment = WorkflowTransitionContext.Current?.Comment,
+                TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
+            },
             ct).ConfigureAwait(false);
     }
 

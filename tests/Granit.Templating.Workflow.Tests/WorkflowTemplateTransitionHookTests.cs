@@ -114,13 +114,14 @@ public sealed class WorkflowTemplateTransitionHookTests
             TestContext.Current.CancellationToken);
 
         await recorder.Received(1).RecordTransitionAsync(
-            "TemplateRevision",
-            revisionId.ToString(),
-            "Draft",
-            "Published",
-            "alice",
-            null,
-            null,
+            Arg.Is<RecordTransitionRequest>(r =>
+                r.EntityType == "TemplateRevision" &&
+                r.EntityId == revisionId.ToString() &&
+                r.PreviousState == "Draft" &&
+                r.NewState == "Published" &&
+                r.UserId == "alice" &&
+                r.Comment == null &&
+                r.TenantId == null),
             TestContext.Current.CancellationToken);
     }
 
@@ -138,13 +139,8 @@ public sealed class WorkflowTemplateTransitionHookTests
         }
 
         await recorder.Received(1).RecordTransitionAsync(
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            "Validé par le directeur médical",
-            Arg.Any<Guid?>(),
+            Arg.Is<RecordTransitionRequest>(r =>
+                r.Comment == "Validé par le directeur médical"),
             Arg.Any<CancellationToken>());
     }
 
@@ -164,13 +160,8 @@ public sealed class WorkflowTemplateTransitionHookTests
             TestContext.Current.CancellationToken);
 
         await recorder.Received(1).RecordTransitionAsync(
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string?>(),
-            tenantId,
+            Arg.Is<RecordTransitionRequest>(r =>
+                r.TenantId == tenantId),
             Arg.Any<CancellationToken>());
     }
 
@@ -185,13 +176,8 @@ public sealed class WorkflowTemplateTransitionHookTests
             TestContext.Current.CancellationToken);
 
         await recorder.Received(1).RecordTransitionAsync(
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            Arg.Any<string?>(),
-            null,
+            Arg.Is<RecordTransitionRequest>(r =>
+                r.TenantId == null),
             Arg.Any<CancellationToken>());
     }
 }

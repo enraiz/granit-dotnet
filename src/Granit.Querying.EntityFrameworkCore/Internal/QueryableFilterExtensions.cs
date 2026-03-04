@@ -220,7 +220,7 @@ internal static class QueryableFilterExtensions
         }
 
         // Apply explicitly requested quick filters (AND semantics)
-        var active = activeQuickFilters
+        HashSet<string> active = activeQuickFilters
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         foreach (var filter in builder.QuickFilters.Where(f => active.Contains(f.Name)))
