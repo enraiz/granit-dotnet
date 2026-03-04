@@ -23,8 +23,8 @@ namespace Granit.DataExchange.Endpoints.Tests;
 /// </summary>
 public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
 {
-    private const string AdminRole = "granit-data-import-admin";
-    private const string ExportPrefix = "/data-import/export";
+    private const string AdminRole = "granit-data-exchange-admin";
+    private const string MetadataPrefix = "/data-exchange/metadata";
 
     private readonly IExportOrchestrator _orchestrator = Substitute.For<IExportOrchestrator>();
     private readonly IExportPresetStore _presetStore = Substitute.For<IExportPresetStore>();
@@ -84,7 +84,7 @@ public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
-            $"{ExportPrefix}/definitions", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/definitions", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -100,7 +100,7 @@ public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _anonClient.GetAsync(
-            $"{ExportPrefix}/definitions", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/definitions", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -113,7 +113,7 @@ public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
-            $"{ExportPrefix}/definitions/Test.Export/fields", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/definitions/Test.Export/fields", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -132,7 +132,7 @@ public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
-            $"{ExportPrefix}/definitions/Unknown.Export/fields", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/definitions/Unknown.Export/fields", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);

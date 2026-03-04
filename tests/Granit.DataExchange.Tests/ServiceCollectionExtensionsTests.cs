@@ -13,13 +13,13 @@ namespace Granit.DataExchange.Tests;
 public sealed class ServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddGranitDataExchange_registers_semantic_mapping_service()
+    public void AddGranitDataImport_registers_semantic_mapping_service()
     {
         // Arrange
         ServiceCollection services = new();
 
         // Act
-        services.AddGranitDataExchange();
+        services.AddGranitDataImport();
 
         // Assert
         ServiceProvider provider = services.BuildServiceProvider();
@@ -28,13 +28,13 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitDataExchange_registers_mapping_suggestion_service()
+    public void AddGranitDataImport_registers_mapping_suggestion_service()
     {
         // Arrange
         ServiceCollection services = new();
 
         // Act
-        services.AddGranitDataExchange();
+        services.AddGranitDataImport();
 
         // Assert
         services.ShouldContain(d =>
@@ -43,13 +43,13 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitDataExchange_registers_import_orchestrator()
+    public void AddGranitDataImport_registers_import_orchestrator()
     {
         // Arrange
         ServiceCollection services = new();
 
         // Act
-        services.AddGranitDataExchange();
+        services.AddGranitDataImport();
 
         // Assert
         services.ShouldContain(d =>
@@ -58,13 +58,13 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitDataExchange_returns_service_collection_for_chaining()
+    public void AddGranitDataImport_returns_service_collection_for_chaining()
     {
         // Arrange
         ServiceCollection services = new();
 
         // Act
-        IServiceCollection result = services.AddGranitDataExchange();
+        IServiceCollection result = services.AddGranitDataImport();
 
         // Assert
         result.ShouldBeSameAs(services);
@@ -90,7 +90,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         ServiceCollection services = new();
-        services.AddGranitDataExchange();
+        services.AddGranitDataImport();
 
         // Act
         services.AddSemanticMappingService<FakeSemanticMappingService>();
@@ -102,14 +102,14 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitDataExchange_does_not_replace_existing_semantic_service()
+    public void AddGranitDataImport_does_not_replace_existing_semantic_service()
     {
         // Arrange
         ServiceCollection services = new();
         services.AddSingleton<ISemanticMappingService, FakeSemanticMappingService>();
 
         // Act
-        services.AddGranitDataExchange();
+        services.AddGranitDataImport();
 
         // Assert
         ServiceProvider provider = services.BuildServiceProvider();

@@ -39,6 +39,84 @@ public sealed class MyApplicationModule : GranitModule { }
 
 Le template de route recommandé est `/api/v{version:apiVersion}/resource`.
 
+La version peut être spécifiée de deux façons par les clients :
+
+- **URL** (recommandé) : `GET /api/v1/patients`
+- **Query string** (fallback) : `GET /api/patients?api-version=1.0`
+
+Le header `X-Api-Version` n'est pas supporté intentionnellement : les headers sont souvent
+omis des access logs et ne garantissent pas la traçabilité dans les audits HDS.
+
+### Minimal API (recommandé)
+
+Le pattern standard Granit crée un `ApiVersionSet` au niveau de `Program.cs` et enregistre
+tous les endpoints sous un groupe versionné :
+
+```csharp
+// 1. Déclarer les versions supportées
+var apiVersionSet = app.NewApiVersionSet()
+    .HasApiVersion(new ApiVersion(1))
+    .ReportApiVersions()
+    .Build();
+
+// 2. Créer le groupe racine versionné
+var api = app.MapGroup("api/v{version:apiVersion}")
+    .WithApiVersionSet(apiVersionSet);
+
+// 3. Enregistrer les endpoints — ils héritent du versioning automatiquement
+api.MapBackgroundJobsEndpoints(opts => opts.ApiPrefix = "");
+api.MapTimelineEndpoints(opts => opts.ApiPrefix = "");
+```
+
+Tous les endpoints enregistrés sur le groupe `api` héritent automatiquement de la version.
+Aucun attribut `[ApiVersion]` n'est nécessaire.
+
+#### Plusieurs versions (v1 + v2)
+
+Pour exposer simultanément deux versions majeures :
+
+```csharp
+var apiVersionSet = app.NewApiVersionSet()
+    .HasApiVersion(new ApiVersion(1))
+    .HasApiVersion(new ApiVersion(2))
+    .ReportApiVersions()
+    .Build();
+
+var api = app.MapGroup("api/v{version:apiVersion}")
+    .WithApiVersionSet(apiVersionSet);
+
+// Endpoint disponible en v1 et v2 (comportement identique)
+api.MapGet("/patients", GetAllPatients);
+
+// Endpoint disponible uniquement en v2
+api.MapGet("/patients/summary", GetPatientsSummary)
+    .MapToApiVersion(2);
+
+// Deux implémentations différentes selon la version
+api.MapGet("/patients/{id}", GetPatientV1).MapToApiVersion(1);
+api.MapGet("/patients/{id}", GetPatientV2).MapToApiVersion(2);
+```
+
+`.MapToApiVersion()` restreint un endpoint à une version spécifique. Sans cet appel,
+l'endpoint est disponible sur toutes les versions déclarées dans le `ApiVersionSet`.
+
+#### Dépréciation d'une version
+
+```csharp
+var apiVersionSet = app.NewApiVersionSet()
+    .HasApiVersion(new ApiVersion(1))
+    .HasDeprecatedApiVersion(new ApiVersion(1))
+    .HasApiVersion(new ApiVersion(2))
+    .ReportApiVersions()
+    .Build();
+```
+
+`.HasDeprecatedApiVersion()` ajoute la version au header `api-deprecated-versions` dans
+la réponse. Les clients reçoivent un signal clair que la v1 est dépréciée et qu'ils
+doivent migrer vers la v2.
+
+### Contrôleur MVC
+
 ```csharp
 [ApiController]
 [Route("api/v{version:apiVersion}/patients")]
@@ -49,14 +127,6 @@ public sealed class PatientController : ControllerBase
     public IActionResult GetAll() => Ok();
 }
 ```
-
-La version peut être spécifiée de deux façons par les clients :
-
-- **URL** (recommandé) : `GET /api/v1/patients`
-- **Query string** (fallback) : `GET /api/patients?api-version=1.0`
-
-Le header `X-Api-Version` n'est pas supporté intentionnellement : les headers sont souvent
-omis des access logs et ne garantissent pas la traçabilité dans les audits HDS.
 
 ## Considérations HDS
 
@@ -69,9 +139,9 @@ contrairement aux headers HTTP souvent omis par les reverse proxies.
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core` |
-| **Utilisé par** | `Granit.ApiDocumentation` |
+| Direction       | Modules                    |
+| --------------- | -------------------------- |
+| **Dépend de**   | `Granit.Core`              |
+| **Utilisé par** | `Granit.ApiDocumentation`  |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

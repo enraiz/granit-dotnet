@@ -54,7 +54,7 @@
   <ItemGroup Label="Blob Storage">
     <PackageVersion Include="AWSSDK.S3" Version="3.*" />
   </ItemGroup>
-  <ItemGroup Label="DataImport">
+  <ItemGroup Label="DataExchange">
     <PackageVersion Include="Sep" Version="0.*" />
     <PackageVersion Include="Sylvan.Data.Excel" Version="0.5.*" />
   </ItemGroup>

@@ -23,8 +23,8 @@ namespace Granit.DataExchange.Endpoints.Tests;
 /// </summary>
 public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 {
-    private const string AdminRole = "granit-data-import-admin";
-    private const string ExportPrefix = "/data-import/export";
+    private const string AdminRole = "granit-data-exchange-admin";
+    private const string MetadataPrefix = "/data-exchange/metadata";
 
     private readonly IExportOrchestrator _orchestrator = Substitute.For<IExportOrchestrator>();
     private readonly IExportPresetStore _presetStore = Substitute.For<IExportPresetStore>();
@@ -90,7 +90,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
-            $"{ExportPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -111,7 +111,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
-            $"{ExportPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -126,7 +126,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
     {
         // Act
         HttpResponseMessage response = await _anonClient.GetAsync(
-            $"{ExportPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets/Test.Export", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -142,7 +142,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
-            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets", request, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -159,7 +159,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
-            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets", request, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -173,7 +173,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
-            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets", request, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -187,7 +187,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
-            $"{ExportPrefix}/presets", request, TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets", request, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -204,7 +204,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.DeleteAsync(
-            $"{ExportPrefix}/presets/Test.Export/Monthly", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets/Test.Export/Monthly", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -220,7 +220,7 @@ public sealed class DataExportPresetEndpointsTests : IAsyncDisposable
 
         // Act
         HttpResponseMessage response = await _adminClient.DeleteAsync(
-            $"{ExportPrefix}/presets/Test.Export/NonExistent", TestContext.Current.CancellationToken);
+            $"{MetadataPrefix}/presets/Test.Export/NonExistent", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);

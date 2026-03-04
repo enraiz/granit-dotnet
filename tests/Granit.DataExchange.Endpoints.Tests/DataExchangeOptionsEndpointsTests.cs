@@ -35,15 +35,15 @@ public sealed class ImportOptionsEndpointsTests
 
         // Client with default admin role (should be rejected)
         using HttpClient adminClient = customApp.GetTestClient();
-        adminClient.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "granit-data-import-admin");
+        adminClient.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "granit-data-exchange-admin");
 
         var jobId = Guid.NewGuid();
 
         // Act
         HttpResponseMessage opsResponse = await opsClient.GetAsync(
-            $"/data-import/{jobId}", TestContext.Current.CancellationToken);
+            $"/data-exchange/{jobId}", TestContext.Current.CancellationToken);
         HttpResponseMessage adminResponse = await adminClient.GetAsync(
-            $"/data-import/{jobId}", TestContext.Current.CancellationToken);
+            $"/data-exchange/{jobId}", TestContext.Current.CancellationToken);
 
         // Assert — ops client can access (even if 404), admin client is forbidden
         opsResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -75,15 +75,15 @@ public sealed class ImportOptionsEndpointsTests
         await prefixedApp.StartAsync(TestContext.Current.CancellationToken);
 
         using HttpClient client = prefixedApp.GetTestClient();
-        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "granit-data-import-admin");
+        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "granit-data-exchange-admin");
 
         // Act — default route must not be registered
         HttpResponseMessage notFound = await client.GetAsync(
-            $"/data-import/{jobId}", TestContext.Current.CancellationToken);
+            $"/data-exchange/{jobId}", TestContext.Current.CancellationToken);
 
         // Act — prefixed route must respond with 200
         HttpResponseMessage ok = await client.GetAsync(
-            $"/api/v1/data-import/{jobId}", TestContext.Current.CancellationToken);
+            $"/api/v1/data-exchange/{jobId}", TestContext.Current.CancellationToken);
 
         // Assert
         notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);

@@ -32,8 +32,8 @@ namespace Granit.DataExchange.Endpoints.Tests;
 /// </summary>
 public sealed class ImportUploadEndpointsTests : IAsyncDisposable
 {
-    private const string AdminRole = "granit-data-import-admin";
-    private const string Prefix = "/data-import";
+    private const string AdminRole = "granit-data-exchange-admin";
+    private const string Prefix = "/data-exchange";
 
     private readonly IImportJobStore _jobStore = Substitute.For<IImportJobStore>();
     private readonly IImportFileProvider _fileProvider = Substitute.For<IImportFileProvider>();

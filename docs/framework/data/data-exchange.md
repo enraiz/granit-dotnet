@@ -712,7 +712,7 @@ Les applications utilisant Wolverine peuvent remplacer le dispatcher
 ### Endpoints REST export
 
 Les endpoints d'export sont enregistrés automatiquement par
-`app.MapDataExchangeEndpoints()` sous le préfixe `/data-import/export`.
+`app.MapDataExchangeEndpoints()` sous le préfixe `/data-exchange/export`.
 
 #### Définitions et introspection
 

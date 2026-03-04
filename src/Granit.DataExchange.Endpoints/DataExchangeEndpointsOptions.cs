@@ -1,7 +1,7 @@
 namespace Granit.DataExchange.Endpoints;
 
 /// <summary>
-/// Configuration options for the data import endpoints.
+/// Configuration options for the data exchange endpoints (import + export).
 /// Bind from <c>"DataExchangeEndpoints"</c> or pass an action to
 /// <see cref="Extensions.DataExchangeEndpointRouteBuilderExtensions.MapDataExchangeEndpoints"/>.
 /// </summary>
@@ -17,16 +17,16 @@ public sealed class DataExchangeEndpointsOptions
     public string ApiPrefix { get; set; } = string.Empty;
 
     /// <summary>
-    /// Route prefix for all data import endpoints.
-    /// Default: <c>"data-import"</c>.
+    /// Route prefix for all data exchange endpoints.
+    /// Default: <c>"data-exchange"</c>.
     /// </summary>
-    public string RoutePrefix { get; set; } = "data-import";
+    public string RoutePrefix { get; set; } = "data-exchange";
 
     /// <summary>
-    /// Granit permission required to access the import endpoints.
-    /// Default: <c>"granit-data-import-admin"</c>.
+    /// Granit permission required to access the data exchange endpoints.
+    /// Default: <c>"granit-data-exchange-admin"</c>.
     /// </summary>
-    public string RequiredRole { get; set; } = "granit-data-import-admin";
+    public string RequiredRole { get; set; } = "granit-data-exchange-admin";
 
     /// <summary>
     /// OpenAPI tag name for grouping data import endpoints in Swagger UI.
