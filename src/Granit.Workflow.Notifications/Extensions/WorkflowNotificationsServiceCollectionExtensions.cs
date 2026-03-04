@@ -1,5 +1,4 @@
 using Granit.Workflow.Notifications.Internal;
-using Granit.Workflow.Notifications.Keycloak;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -17,8 +16,8 @@ public static class WorkflowNotificationsServiceCollectionExtensions
     /// <para>
     /// Registers a <see cref="NullApproverResolver"/> as the default
     /// <see cref="IApproverResolver"/>. The host application should replace this
-    /// with a real implementation that queries the user/role store, or call
-    /// <see cref="AddKeycloakApproverResolver"/> for the built-in Keycloak integration.
+    /// with a real implementation via <see cref="AddIdentityApproverResolver"/> or
+    /// <see cref="AddWorkflowApproverResolver{TResolver}"/>.
     /// </para>
     /// <para>
     /// The <see cref="Handlers.WorkflowApprovalRequestedHandler"/> is discovered
@@ -50,35 +49,21 @@ public static class WorkflowNotificationsServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers the built-in Keycloak Admin API approver resolver.
+    /// Registers the built-in identity-based approver resolver.
     /// Resolves approvers by: permission → roles (via <c>IPermissionManager</c>) →
-    /// Keycloak realm role members (via Admin API).
+    /// role members (via <see cref="Granit.Identity.IIdentityProvider"/>).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// Requires the <c>KeycloakAdmin</c> configuration section with:
-    /// <c>BaseUrl</c>, <c>Realm</c>, <c>ClientId</c>, <c>ClientSecret</c>.
-    /// The service account must have the <c>realm-management:view-users</c> role.
-    /// </para>
-    /// <para>
-    /// Also requires <c>Granit.Authorization</c> to be registered (provides
-    /// <c>IPermissionManager</c> for the permission → role lookup).
-    /// </para>
+    /// Requires both <c>Granit.Authorization</c> (for <c>IPermissionManager</c>) and an
+    /// <see cref="Granit.Identity.IIdentityProvider"/> implementation (e.g.
+    /// <c>Granit.Identity.Keycloak</c>) to be registered.
     /// </remarks>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddKeycloakApproverResolver(
+    public static IServiceCollection AddIdentityApproverResolver(
         this IServiceCollection services)
     {
-        services.AddOptions<KeycloakAdminOptions>()
-            .BindConfiguration(KeycloakAdminOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services.AddHttpClient("KeycloakAdmin");
-        services.TryAddSingleton<KeycloakAdminTokenService>();
-        services.AddWorkflowApproverResolver<KeycloakApproverResolver>();
-
+        services.AddWorkflowApproverResolver<IdentityApproverResolver>();
         return services;
     }
 }

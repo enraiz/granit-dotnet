@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Granit.Workflow.Notifications.Keycloak;
+namespace Granit.Identity.Keycloak;
 
 /// <summary>
 /// Configuration options for the Keycloak Admin API used by
-/// <see cref="KeycloakApproverResolver"/> to resolve approvers by role membership.
+/// <see cref="Internal.KeycloakIdentityProvider"/>.
 /// </summary>
 /// <remarks>
 /// Requires a Keycloak service account client with the
@@ -52,4 +52,44 @@ public sealed class KeycloakAdminOptions
     /// </summary>
     internal string GetRoleUsersEndpoint(string roleName) =>
         $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/roles/{Uri.EscapeDataString(roleName)}/users";
+
+    /// <summary>
+    /// Builds the Admin API URL for listing users with optional search and pagination.
+    /// </summary>
+    internal string GetUsersEndpoint(string? search = null, int? first = null, int? max = null)
+    {
+        var baseUrl = $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users";
+        List<string> queryParams = [];
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            queryParams.Add($"search={Uri.EscapeDataString(search)}");
+        }
+
+        if (first.HasValue)
+        {
+            queryParams.Add($"first={first.Value}");
+        }
+
+        if (max.HasValue)
+        {
+            queryParams.Add($"max={max.Value}");
+        }
+
+        return queryParams.Count > 0
+            ? $"{baseUrl}?{string.Join('&', queryParams)}"
+            : baseUrl;
+    }
+
+    /// <summary>
+    /// Builds the Admin API URL for getting a single user by ID.
+    /// </summary>
+    internal string GetUserEndpoint(string userId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users/{Uri.EscapeDataString(userId)}";
+
+    /// <summary>
+    /// Builds the Admin API URL for listing realm roles.
+    /// </summary>
+    internal string GetRolesEndpoint() =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/roles";
 }

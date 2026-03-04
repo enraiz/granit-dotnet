@@ -69,8 +69,8 @@ de santé, Product Owner) sans les remplacer.
 | **Authentification** | JWT Bearer (Keycloak) |
 | **Rôle Keycloak type** | Variable — tout rôle Keycloak possédant la permission requise par la transition (résolu dynamiquement par `IApproverResolver`) |
 | **Permissions Granit** | Dépend du workflow — ex. `document.publish`, `import.validate` |
-| **Modules concernés** | `Granit.Workflow`, `Granit.Workflow.Notifications` (`KeycloakApproverResolver`), `Granit.Notifications` (notification d'approbation en attente) |
-| **Résolution** | L'approbateur n'est pas un rôle Keycloak fixe. Le `KeycloakApproverResolver` interroge dynamiquement Keycloak pour trouver les utilisateurs dont le rôle possède la permission requise par la transition. |
+| **Modules concernés** | `Granit.Workflow`, `Granit.Workflow.Notifications` (`IdentityApproverResolver`), `Granit.Identity` (`IIdentityProvider`), `Granit.Notifications` (notification d'approbation en attente) |
+| **Résolution** | L'approbateur n'est pas un rôle fixe. Le `IdentityApproverResolver` interroge dynamiquement le fournisseur d'identité (via `IIdentityProvider`) pour trouver les utilisateurs dont le rôle possède la permission requise par la transition. L'implémentation Keycloak est fournie par `Granit.Identity.Keycloak`. |
 
 ## Gestionnaire de contenu
 

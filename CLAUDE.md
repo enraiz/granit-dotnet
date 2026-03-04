@@ -27,7 +27,7 @@
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
-## Packages (82 packages)
+## Packages (84 packages)
 
 ### Core & utilities
 
@@ -50,6 +50,13 @@
 | `Granit.Vault` | VaultSharp, ITransitEncryptionService, dynamic credentials |
 | `Granit.Encryption` | Data encryption abstractions |
 | `Granit.Privacy` | RGPD privacy helpers |
+
+### Identity
+
+| Package | Role |
+| ------- | ---- |
+| `Granit.Identity` | Identity provider abstractions (IIdentityProvider, models) |
+| `Granit.Identity.Keycloak` | Keycloak Admin API implementation of IIdentityProvider |
 
 ### Data & persistence
 

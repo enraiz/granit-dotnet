@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Granit.Workflow.Notifications.Tests;
+namespace Granit.Identity.Keycloak.Tests;
 
 /// <summary>
 /// Test double for <see cref="HttpMessageHandler"/> that captures outgoing requests
@@ -31,5 +31,23 @@ internal sealed class MockHttpMessageHandler : HttpMessageHandler
         {
             Content = new StringContent(ResponseBody, System.Text.Encoding.UTF8, "application/json"),
         };
+    }
+}
+
+/// <summary>
+/// Handler that returns different responses for sequential requests.
+/// </summary>
+internal sealed class MockSequenceHttpMessageHandler(IReadOnlyList<string> responses) : HttpMessageHandler
+{
+    private int _callIndex;
+
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        int index = Math.Min(_callIndex++, responses.Count - 1);
+        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(responses[index], System.Text.Encoding.UTF8, "application/json"),
+        });
     }
 }
