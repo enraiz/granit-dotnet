@@ -9,7 +9,7 @@ internal static class DataExportAuthorizationPolicy
 {
     /// <summary>
     /// Name of the authorization policy that guards all data export endpoints.
-    /// Equals <see cref="DataExchangePermissions.Export.Default"/> (<c>"DataExchange.Export"</c>).
+    /// Equals <see cref="DataExchangePermissions.Exports.Execute"/> (<c>"DataExchange.Exports.Execute"</c>).
     /// </summary>
-    public const string PolicyName = DataExchangePermissions.Export.Default;
+    public const string PolicyName = DataExchangePermissions.Exports.Execute;
 }

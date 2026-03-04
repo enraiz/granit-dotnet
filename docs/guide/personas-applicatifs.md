@@ -56,7 +56,7 @@ de santé, Product Owner) sans les remplacer.
 | **Responsabilités** | Paramétrage, gestion des données de référence, feature flags, gestion des utilisateurs, imports de données |
 | **Authentification** | JWT Bearer (Keycloak) |
 | **Rôle Keycloak type** | `admin` (configurable via `GranitAuthorizationOptions.AdminRoles`) |
-| **Permissions Granit** | `ReferenceData.Manage`, `Settings.Manage`, `Features.Manage`, `DataExchange.Import`, `BackgroundJobs.Admin`, `Localization.Overrides.Manage` |
+| **Permissions Granit** | `ReferenceData.Manage`, `Settings.Manage`, `Features.Manage`, `DataExchange.Imports.Execute`, `BackgroundJobs.Jobs.Manage`, `Localization.Overrides.Manage` |
 | **Modules concernés** | `Granit.ReferenceData.Endpoints`, `Granit.Settings`, `Granit.Features`, `Granit.DataExchange.Endpoints`, `Granit.BackgroundJobs.Endpoints`, `Granit.Localization.Endpoints` |
 
 ## Approbateur
@@ -81,7 +81,7 @@ de santé, Product Owner) sans les remplacer.
 | **Responsabilités** | Rédaction de templates, génération de documents (PDF, Excel), gestion des modèles de notification, import de données |
 | **Authentification** | JWT Bearer (Keycloak) |
 | **Rôle Keycloak type** | `content-manager` |
-| **Permissions Granit** | `Template.Manage`, `Document.Generate`, `DataExchange.Export`, `Notification.Template.Manage` |
+| **Permissions Granit** | `Template.Manage`, `Document.Generate`, `DataExchange.Exports.Execute`, `Notification.Template.Manage` |
 | **Modules concernés** | `Granit.Templating`, `Granit.Templating.EntityFrameworkCore`, `Granit.DocumentGeneration`, `Granit.DataExchange`, `Granit.Notifications` |
 | **Workflow** | Les contenus publiables passent par le workflow Draft → PendingReview → Published. Le gestionnaire de contenu crée le brouillon ; l'Approbateur valide la publication. |
 

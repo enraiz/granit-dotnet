@@ -3,7 +3,7 @@ using Granit.Authorization.Abstractions;
 namespace Granit.BackgroundJobs.Endpoints.Permissions;
 
 /// <summary>
-/// Declares the <c>BackgroundJobs.Admin</c> permission in the Granit RBAC system.
+/// Declares the <c>BackgroundJobs.Jobs.Manage</c> permission in the Granit RBAC system.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -20,7 +20,7 @@ namespace Granit.BackgroundJobs.Endpoints.Permissions;
 /// In production, grant the permission to the desired Keycloak role via one of:
 /// <list type="bullet">
 /// <item>Add the role to <c>GranitAuthorizationOptions.AdminRoles</c> in <c>appsettings.json</c></item>
-/// <item>Call <c>IPermissionManager.SetAsync("BackgroundJobs.Admin", "my-role", tenantId, true)</c></item>
+/// <item>Call <c>IPermissionManager.SetAsync("BackgroundJobs.Jobs.Manage", "my-role", tenantId, true)</c></item>
 /// </list>
 /// </para>
 /// </remarks>
@@ -33,7 +33,7 @@ internal sealed class BackgroundJobsPermissionDefinitionProvider : IPermissionDe
             BackgroundJobsPermissions.GroupName, "Background Jobs");
 
         group.AddPermission(
-            BackgroundJobsPermissions.Admin.Default,
+            BackgroundJobsPermissions.Jobs.Manage,
             "Administrer les background jobs (liste, pause, resume, déclenchement manuel)");
     }
 }

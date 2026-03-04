@@ -5,8 +5,8 @@
       "Scriban": {
         "type": "Direct",
         "requested": "[6.*, )",
-        "resolved": "6.5.3",
-        "contentHash": "0WuO/muuPnxn6OKR3cJeTJD/AiACsCz+lOh5k5bfZdZFPKVQ/4TIWd1VSJdiFbr7iyHBLbHpsF0WVWqu67KlUw=="
+        "resolved": "6.5.4",
+        "contentHash": "TiNtBPHjDz7GsABO79EZGkG36QCvsdfRe9v9B+Px9wPbxCdHGczoPoEiBfFNaTTcpHLBKwsf3x8TTY0NKUdM5g=="
       },
       "Microsoft.Extensions.Primitives": {
         "type": "Transitive",
@@ -19,7 +19,6 @@
       "granit.templating": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )"
         }
       },

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Granit.DataExchange.Endpoints.Permissions;
 
 /// <summary>
@@ -5,28 +7,29 @@ namespace Granit.DataExchange.Endpoints.Permissions;
 /// Use these names when granting permissions via <c>IPermissionManager.SetAsync()</c>
 /// or when checking access via <c>IPermissionChecker.IsGrantedAsync()</c>.
 /// </summary>
+[SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Permission resource names follow [Module].[Resource].[Action] convention")]
 public static class DataExchangePermissions
 {
     /// <summary>Permission group name used in <c>IPermissionDefinitionContext.AddGroup()</c>.</summary>
     public const string GroupName = "DataExchange";
 
-    /// <summary>Administration permissions for the data import endpoints.</summary>
-    public static class Admin
+    /// <summary>Permissions for the data import resource.</summary>
+    public static class Imports
     {
         /// <summary>
-        /// Grants access to all data import administration endpoints
+        /// Grants access to execute data imports
         /// (upload, preview, mappings, execute, dry-run, status, report, correction file).
         /// </summary>
-        public const string Default = "DataExchange.Import";
+        public const string Execute = "DataExchange.Imports.Execute";
     }
 
-    /// <summary>Permissions for the data export endpoints.</summary>
-    public static class Export
+    /// <summary>Permissions for the data export resource.</summary>
+    public static class Exports
     {
         /// <summary>
-        /// Grants access to all data export endpoints
+        /// Grants access to execute data exports
         /// (definitions, field listing, export execution, download, presets).
         /// </summary>
-        public const string Default = "DataExchange.Export";
+        public const string Execute = "DataExchange.Exports.Execute";
     }
 }

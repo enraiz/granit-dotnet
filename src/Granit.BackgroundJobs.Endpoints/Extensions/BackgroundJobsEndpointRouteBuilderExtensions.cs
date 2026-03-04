@@ -19,7 +19,7 @@ public static class BackgroundJobsEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers the <c>BackgroundJobs.Admin</c> authorization policy (see
+    /// Registers the <c>BackgroundJobs.Jobs.Manage</c> authorization policy (see
     /// <see cref="BackgroundJobsAuthorizationPolicy.PolicyName"/>) requiring the role
     /// configured via <see cref="BackgroundJobsEndpointsOptions.RequiredRole"/>.
     /// </para>

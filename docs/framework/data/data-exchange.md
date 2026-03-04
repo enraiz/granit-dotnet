@@ -448,7 +448,7 @@ L'executor persiste les entités validées en batch :
 
 ## Endpoints REST (`Granit.DataExchange.Endpoints`)
 
-Minimal API protégée par la permission `DataExchange.Import`. 9 endpoints répartis
+Minimal API protégée par la permission `DataExchange.Imports.Execute`. 9 endpoints répartis
 en 3 groupes : upload, exécution et rapport.
 
 ### Installation
@@ -516,9 +516,10 @@ app.MapDataExchangeEndpoints(opts =>
 
 ### Permissions
 
-Le module enregistre automatiquement la permission `DataExchange.Import` dans le
-système RBAC Granit. En production, attribuer cette permission au rôle Keycloak
-souhaité via `IPermissionManager.SetAsync()` ou `GranitAuthorizationOptions.AdminRoles`.
+Le module enregistre automatiquement les permissions `DataExchange.Imports.Execute`
+et `DataExchange.Exports.Execute` dans le système RBAC Granit. En production,
+attribuer ces permissions au rôle Keycloak souhaité via
+`IPermissionManager.SetAsync()` ou `GranitAuthorizationOptions.AdminRoles`.
 
 ### Dispatch asynchrone
 

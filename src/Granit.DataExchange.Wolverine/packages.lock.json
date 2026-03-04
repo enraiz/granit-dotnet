@@ -487,7 +487,6 @@
       "granit.dataexchange": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
           "Granit.Querying": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )"
@@ -533,7 +532,6 @@
         "type": "Project",
         "dependencies": {
           "FluentValidation": "[12.*, )",
-          "Granit.Core": "[0.1.0-dev, )",
           "Granit.ExceptionHandling": "[0.1.0-dev, )",
           "Granit.Localization": "[0.1.0-dev, )"
         }
@@ -541,7 +539,6 @@
       "granit.wolverine": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
           "WolverineFx": "[5.17.*, )",
           "WolverineFx.FluentValidation": "[5.17.*, )"

@@ -62,7 +62,6 @@
         "type": "Project",
         "dependencies": {
           "FluentValidation": "[12.*, )",
-          "Granit.Core": "[0.1.0-dev, )",
           "Granit.ExceptionHandling": "[0.1.0-dev, )",
           "Granit.Localization": "[0.1.0-dev, )"
         }

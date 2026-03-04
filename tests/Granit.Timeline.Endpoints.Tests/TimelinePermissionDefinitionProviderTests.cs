@@ -25,7 +25,7 @@ public sealed class TimelinePermissionDefinitionProviderTests
     }
 
     [Fact]
-    public void DefinePermissions_registers_Read_permission()
+    public void DefinePermissions_registers_Entries_Read_permission()
     {
         // Arrange
         FakePermissionDefinitionContext context = new();
@@ -36,11 +36,11 @@ public sealed class TimelinePermissionDefinitionProviderTests
 
         // Assert
         PermissionGroup group = context.Groups.Single(g => g.Name == TimelinePermissions.GroupName);
-        group.Permissions.ShouldContain(p => p.Name == TimelinePermissions.Read.Default);
+        group.Permissions.ShouldContain(p => p.Name == TimelinePermissions.Entries.Read);
     }
 
     [Fact]
-    public void DefinePermissions_registers_Write_permission()
+    public void DefinePermissions_registers_Entries_Create_permission()
     {
         // Arrange
         FakePermissionDefinitionContext context = new();
@@ -51,7 +51,7 @@ public sealed class TimelinePermissionDefinitionProviderTests
 
         // Assert
         PermissionGroup group = context.Groups.Single(g => g.Name == TimelinePermissions.GroupName);
-        group.Permissions.ShouldContain(p => p.Name == TimelinePermissions.Write.Default);
+        group.Permissions.ShouldContain(p => p.Name == TimelinePermissions.Entries.Create);
     }
 
     [Fact]

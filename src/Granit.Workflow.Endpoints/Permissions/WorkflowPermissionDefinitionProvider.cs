@@ -3,7 +3,7 @@ using Granit.Authorization.Abstractions;
 namespace Granit.Workflow.Endpoints.Permissions;
 
 /// <summary>
-/// Declares the <c>Workflow.History</c> permission in the Granit RBAC system.
+/// Declares the <c>Workflow.History.Read</c> permission in the Granit RBAC system.
 /// </summary>
 /// <remarks>
 /// Registered automatically by <see cref="GranitWorkflowEndpointsModule"/>.
@@ -19,7 +19,7 @@ internal sealed class WorkflowPermissionDefinitionProvider : IPermissionDefiniti
             WorkflowPermissions.GroupName, "Workflow");
 
         group.AddPermission(
-            WorkflowPermissions.History.Default,
+            WorkflowPermissions.History.Read,
             "Consulter l'historique des transitions workflow (piste d'audit HDS)");
     }
 }

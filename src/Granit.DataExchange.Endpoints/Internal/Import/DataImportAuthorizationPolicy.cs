@@ -9,7 +9,7 @@ public static class ImportAuthorizationPolicy
 {
     /// <summary>
     /// Name of the authorization policy that guards all data import endpoints.
-    /// Equals <see cref="DataExchangePermissions.Admin.Default"/> (<c>"DataExchange.Import"</c>).
+    /// Equals <see cref="DataExchangePermissions.Imports.Execute"/> (<c>"DataExchange.Imports.Execute"</c>).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -23,5 +23,5 @@ public static class ImportAuthorizationPolicy
     /// <see cref="Extensions.DataExchangeEndpointRouteBuilderExtensions.MapDataExchangeEndpoints"/>.
     /// </para>
     /// </remarks>
-    public const string PolicyName = DataExchangePermissions.Admin.Default;
+    public const string PolicyName = DataExchangePermissions.Imports.Execute;
 }
