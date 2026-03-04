@@ -9,30 +9,20 @@ namespace Granit.ApiDocumentation.Transformers;
 /// Adds RFC 7807 ProblemDetails error responses to OpenAPI operations based on endpoint metadata.
 /// <list type="bullet">
 ///   <item>401 + 403: added when <c>[Authorize]</c> is present (unless <c>[AllowAnonymous]</c>)</item>
-///   <item>422: added when the operation has a request body (validation errors)</item>
+///   <item>422: added when the operation has a request body and no existing 400 validation response</item>
+///   <item>404: enriched with ProblemDetails schema when present (route parameters) but lacks content</item>
 ///   <item>500: added on all operations</item>
 /// </list>
 /// Also removes phantom 404 responses added by Wolverine on endpoints without route parameters.
 /// </summary>
+/// <remarks>
+/// All error responses reference the shared <c>#/components/schemas/ProblemDetails</c> schema
+/// registered by <see cref="ProblemDetailsSchemaDocumentTransformer"/>.
+/// </remarks>
 internal sealed class ProblemDetailsResponseOperationTransformer : IOpenApiOperationTransformer
 {
-    private const string ProblemDetailsMediaType = "application/problem+json";
-
-    /// <summary>
-    /// RFC 7807 ProblemDetails schema shared across all error responses.
-    /// </summary>
-    private static OpenApiSchema ProblemDetailsSchema => new()
-    {
-        Type = JsonSchemaType.Object,
-        Properties = new Dictionary<string, IOpenApiSchema>
-        {
-            ["type"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A URI reference that identifies the problem type." },
-            ["title"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A short, human-readable summary of the problem type." },
-            ["status"] = new OpenApiSchema { Type = JsonSchemaType.Integer, Description = "The HTTP status code." },
-            ["detail"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A human-readable explanation specific to this occurrence." },
-            ["instance"] = new OpenApiSchema { Type = JsonSchemaType.String, Description = "A URI reference that identifies the specific occurrence." },
-        },
-    };
+    internal const string SchemaName = "ProblemDetails";
+    internal const string ProblemDetailsMediaType = "application/problem+json";
 
     /// <inheritdoc/>
     public Task TransformAsync(
@@ -64,10 +54,15 @@ internal sealed class ProblemDetailsResponseOperationTransformer : IOpenApiOpera
             EnsureResponse(responses, "403", "Forbidden");
         }
 
-        if (hasRequestBody)
+        // Add 422 only when there's a request body and no existing 400 (ASP.NET validation).
+        // When ASP.NET adds a 400 with HttpValidationProblemDetails, a separate 422 is redundant.
+        if (hasRequestBody && !responses.ContainsKey("400"))
         {
             EnsureResponse(responses, "422", "Unprocessable Entity");
         }
+
+        // Enrich existing 404 responses (from TypedResults.NotFound) with ProblemDetails schema.
+        EnrichResponseWithProblemDetails(responses, "404");
 
         EnsureResponse(responses, "500", "Internal Server Error");
 
@@ -87,13 +82,39 @@ internal sealed class ProblemDetailsResponseOperationTransformer : IOpenApiOpera
         responses[statusCode] = new OpenApiResponse
         {
             Description = description,
-            Content = new Dictionary<string, OpenApiMediaType>
-            {
-                [ProblemDetailsMediaType] = new OpenApiMediaType
-                {
-                    Schema = ProblemDetailsSchema,
-                },
-            },
+            Content = ProblemDetailsContent(),
         };
     }
+
+    /// <summary>
+    /// If the response exists but has no <c>application/problem+json</c> content, adds the schema.
+    /// </summary>
+    private static void EnrichResponseWithProblemDetails(
+        OpenApiResponses responses,
+        string statusCode)
+    {
+        if (!responses.TryGetValue(statusCode, out IOpenApiResponse? value) || value is not OpenApiResponse response)
+        {
+            return;
+        }
+
+        response.Content ??= new Dictionary<string, OpenApiMediaType>();
+
+        if (!response.Content.ContainsKey(ProblemDetailsMediaType))
+        {
+            response.Content[ProblemDetailsMediaType] = new OpenApiMediaType
+            {
+                Schema = new OpenApiSchemaReference(SchemaName, null),
+            };
+        }
+    }
+
+    private static Dictionary<string, OpenApiMediaType> ProblemDetailsContent() =>
+        new()
+        {
+            [ProblemDetailsMediaType] = new OpenApiMediaType
+            {
+                Schema = new OpenApiSchemaReference(SchemaName, null),
+            },
+        };
 }
