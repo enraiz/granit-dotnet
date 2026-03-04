@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
     /// </remarks>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddGranitDataExchange(this IServiceCollection services)
+    public static IServiceCollection AddGranitDataImport(this IServiceCollection services)
     {
         services.AddOptions<ImportOptions>()
             .BindConfiguration(ImportOptions.SectionName)

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.DataExchange.Endpoints</PackageId>
-    <Description>Minimal API endpoints for the Granit data import pipeline. Exposes upload, preview, mapping, execution (async + dry-run), status, report, and correction file endpoints. Protected by the DataImport.Admin permission policy.</Description>
+    <Description>Minimal API endpoints for the Granit data exchange pipeline (import and export). Exposes upload, preview, mapping, execution (async + dry-run), status, report, correction file, export jobs, definitions, and presets endpoints.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

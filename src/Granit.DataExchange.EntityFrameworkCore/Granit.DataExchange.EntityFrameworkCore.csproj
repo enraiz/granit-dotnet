@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.DataExchange.EntityFrameworkCore</PackageId>
-    <Description>EF Core persistence layer for Granit.DataExchange: isolated DataImportDbContext, mapping store, import job store, identity resolvers, and batched import executor.</Description>
+    <Description>EF Core persistence layer for Granit.DataExchange: isolated DataExchangeDbContext, mapping store, import/export job stores, identity resolvers, and batched import executor.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

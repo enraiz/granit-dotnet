@@ -32,6 +32,6 @@ public sealed class GranitDataExchangeModule : GranitModule
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context) =>
         context.Services
-            .AddGranitDataExchange()
+            .AddGranitDataImport()
             .AddGranitDataExport();
 }

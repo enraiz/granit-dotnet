@@ -1,7 +1,7 @@
 namespace Granit.DataExchange;
 
 /// <summary>
-/// Configuration options for the data import module.
+/// Configuration options for the data exchange import subsystem.
 /// </summary>
 public sealed class ImportOptions
 {
