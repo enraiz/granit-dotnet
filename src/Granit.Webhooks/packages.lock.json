@@ -516,7 +516,6 @@
       "granit.wolverine": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
           "WolverineFx": "[5.17.*, )",
           "WolverineFx.FluentValidation": "[5.17.*, )"
