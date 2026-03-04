@@ -3,6 +3,7 @@ using Granit.DataExchange.Endpoints.Dtos.Import;
 using Granit.DataExchange.Endpoints.Internal.Export;
 using Granit.DataExchange.Endpoints.Internal.Import;
 using Granit.DataExchange.Export;
+using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -27,7 +28,8 @@ internal static class DataExportPresetEndpoints
 
         group.MapPost("/presets", SavePresetAsync)
             .WithName("SaveExportPreset")
-            .WithSummary("Saves or updates an export preset.");
+            .WithSummary("Saves or updates an export preset.")
+            .ValidateBody<SaveExportPresetRequest>();
 
         group.MapDelete("/presets/{definitionName}/{presetName}", DeletePresetAsync)
             .WithName("DeleteExportPreset")

@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using Granit.Core.Localization;
 using Granit.Localization.Endpoints.Dtos;
 using Granit.Localization.Endpoints.Permissions;
+using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -112,7 +113,8 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         group.MapPut("/{resourceName}/{cultureName}/{key}", HandlePutOverrideAsync)
              .WithName("PutLocalizationOverride")
              .WithSummary("Creates or updates a translation override.")
-             .Produces(StatusCodes.Status204NoContent);
+             .Produces(StatusCodes.Status204NoContent)
+             .ValidateBody<Dtos.SetLocalizationOverrideRequest>();
 
         group.MapDelete("/{resourceName}/{cultureName}/{key}", HandleDeleteOverrideAsync)
              .WithName("DeleteLocalizationOverride")

@@ -24,6 +24,12 @@
       "granit.core": {
         "type": "Project"
       },
+      "granit.exceptionhandling": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
       "granit.localization": {
         "type": "Project",
         "dependencies": {
@@ -36,6 +42,20 @@
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )"
         }
+      },
+      "granit.validation": {
+        "type": "Project",
+        "dependencies": {
+          "FluentValidation": "[12.*, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Localization": "[0.1.0-dev, )"
+        }
+      },
+      "FluentValidation": {
+        "type": "CentralTransitive",
+        "requested": "[12.*, )",
+        "resolved": "12.1.1",
+        "contentHash": "EPpkIe1yh1a0OXyC100oOA8WMbZvqUu5plwhvYcb7oSELfyUZzfxV48BLhvs3kKo4NwG7MGLNgy1RJiYtT8Dpw=="
       },
       "Microsoft.Extensions.Caching.Hybrid": {
         "type": "CentralTransitive",
