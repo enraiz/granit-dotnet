@@ -159,7 +159,116 @@ public sealed class ProblemDetailsResponseOperationTransformerTests
         operation.Responses.ShouldContainKey("500", "500 is always added");
     }
 
+    // --- Error responses use $ref to shared ProblemDetails schema ---
+
+    [Fact]
+    public async Task TransformAsync_ErrorResponses_UseSchemaReference()
+    {
+        // Arrange
+        ProblemDetailsResponseOperationTransformer transformer = new();
+        OpenApiOperation operation = new() { Responses = [] };
+        OpenApiOperationTransformerContext context = BuildContext(new AuthorizeAttribute());
+
+        // Act
+        await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
+
+        // Assert — all added responses reference the shared ProblemDetails schema
+        AssertProblemDetailsRef(operation.Responses, "401");
+        AssertProblemDetailsRef(operation.Responses, "403");
+        AssertProblemDetailsRef(operation.Responses, "500");
+    }
+
+    // --- 404 without content gets enriched with ProblemDetails ---
+
+    [Fact]
+    public async Task TransformAsync_404WithoutContent_EnrichedWithProblemDetails()
+    {
+        // Arrange
+        ProblemDetailsResponseOperationTransformer transformer = new();
+        OpenApiOperation operation = new()
+        {
+            Parameters =
+            [
+                new OpenApiParameter { Name = "id", In = ParameterLocation.Path, Required = true },
+            ],
+            Responses = new OpenApiResponses
+            {
+                ["200"] = new OpenApiResponse { Description = "OK" },
+                ["404"] = new OpenApiResponse { Description = "Not Found" },
+            },
+        };
+        OpenApiOperationTransformerContext context = BuildContext();
+
+        // Act
+        await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
+
+        // Assert
+        AssertProblemDetailsRef(operation.Responses, "404");
+    }
+
+    // --- 422 skipped when 400 already exists (ASP.NET validation) ---
+
+    [Fact]
+    public async Task TransformAsync_RequestBodyWith400_Skips422()
+    {
+        // Arrange
+        ProblemDetailsResponseOperationTransformer transformer = new();
+        OpenApiOperation operation = new()
+        {
+            Responses = new OpenApiResponses
+            {
+                ["400"] = new OpenApiResponse { Description = "Bad Request" },
+            },
+            RequestBody = new OpenApiRequestBody(),
+        };
+        OpenApiOperationTransformerContext context = BuildContext(new AuthorizeAttribute());
+
+        // Act
+        await transformer.TransformAsync(operation, context, TestContext.Current.CancellationToken);
+
+        // Assert
+        operation.Responses.ShouldContainKey("400", "existing 400 is preserved");
+        operation.Responses.ShouldNotContainKey("422", "422 is redundant when 400 exists");
+    }
+
+    // --- Document transformer registers shared schema ---
+
+    [Fact]
+    public async Task ProblemDetailsSchemaDocumentTransformer_RegistersSharedSchema()
+    {
+        // Arrange
+        ProblemDetailsSchemaDocumentTransformer transformer = new();
+        OpenApiDocument document = new();
+
+        OpenApiDocumentTransformerContext context = new()
+        {
+            DocumentName = "v1",
+            DescriptionGroups = [],
+            ApplicationServices = Substitute.For<IServiceProvider>(),
+        };
+
+        // Act
+        await transformer.TransformAsync(document, context, TestContext.Current.CancellationToken);
+
+        // Assert
+        document.Components.ShouldNotBeNull();
+        document.Components.Schemas.ShouldNotBeNull();
+        document.Components.Schemas.ShouldContainKey("ProblemDetails");
+    }
+
     // --- Helpers ---
+
+    private static void AssertProblemDetailsRef(OpenApiResponses responses, string statusCode)
+    {
+        responses.ShouldContainKey(statusCode);
+        var response = responses[statusCode] as OpenApiResponse;
+        response.ShouldNotBeNull();
+        response.Content.ShouldNotBeNull();
+        response.Content.ShouldContainKey("application/problem+json");
+        response.Content["application/problem+json"].Schema
+            .ShouldBeOfType<OpenApiSchemaReference>()
+            .Reference.Id.ShouldBe("ProblemDetails");
+    }
 
     private static OpenApiOperationTransformerContext BuildContext(params object[] metadata)
     {

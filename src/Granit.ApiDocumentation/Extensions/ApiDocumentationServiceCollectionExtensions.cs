@@ -56,6 +56,7 @@ public static class ApiDocumentationServiceCollectionExtensions
     {
         // Transformers must be registered before AddOpenApi to be resolved via DI.
         services.AddTransient<JwtBearerSecuritySchemeTransformer>();
+        services.AddTransient<ProblemDetailsSchemaDocumentTransformer>();
         services.AddTransient<InternalApiDocumentTransformer>();
         services.AddTransient<TenantHeaderOperationTransformer>();
         services.AddTransient<WolverineOpenApiOperationTransformer>();
@@ -94,6 +95,7 @@ public static class ApiDocumentationServiceCollectionExtensions
                     return Task.CompletedTask;
                 });
 
+                openApiOptions.AddDocumentTransformer<ProblemDetailsSchemaDocumentTransformer>();
                 openApiOptions.AddDocumentTransformer<JwtBearerSecuritySchemeTransformer>();
                 openApiOptions.AddDocumentTransformer<InternalApiDocumentTransformer>();
                 openApiOptions.AddOperationTransformer<TenantHeaderOperationTransformer>();
