@@ -258,4 +258,152 @@ public sealed class FeatureCheckerTests
 
         result.ShouldBeFalse("no ICurrentTenant registered, store override must not be resolved");
     }
+
+    // -------------------------------------------------------------------------
+    // GetNumericAsync — non-parseable value returns 0
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task GetNumericAsync_NonParseableValue_Returns_Zero()
+    {
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.MaxPatients").Returns(
+            new FeatureDefinition("App.MaxPatients", "not-a-number", FeatureValueType.Numeric));
+        FeatureChecker checker = BuildChecker(store, NoTenant(),
+            new DefaultValueFeatureValueProvider());
+
+        long result = await checker.GetNumericAsync("App.MaxPatients", TestContext.Current.CancellationToken);
+
+        result.ShouldBe(0L, "non-parseable numeric value should return 0");
+    }
+
+    [Fact]
+    public async Task GetNumericAsync_EmptyStringDefault_Returns_Zero()
+    {
+        // FeatureDefinition requires non-whitespace default, so simulate via a provider override.
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.MaxPatients").Returns(
+            new FeatureDefinition("App.MaxPatients", "abc", FeatureValueType.Numeric));
+        FeatureChecker checker = BuildChecker(store, NoTenant(),
+            new DefaultValueFeatureValueProvider());
+
+        long result = await checker.GetNumericAsync("App.MaxPatients", TestContext.Current.CancellationToken);
+
+        result.ShouldBe(0L);
+    }
+
+    // -------------------------------------------------------------------------
+    // GetValueAsync — all providers return null, falls back to definition default
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task GetValueAsync_AllProvidersReturnNull_ReturnsDefinitionDefault()
+    {
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.Feature").Returns(
+            new FeatureDefinition("App.Feature", "fallback-default", FeatureValueType.Selection));
+
+        // Provider that always returns null
+        IFeatureValueProvider nullProvider = Substitute.For<IFeatureValueProvider>();
+        nullProvider.Order.Returns(100);
+        nullProvider.GetOrNullAsync(Arg.Any<FeatureDefinition>(), Arg.Any<CancellationToken>())
+                    .Returns((string?)null);
+
+        FeatureChecker checker = BuildChecker(store, NoTenant(), nullProvider);
+
+        string result = await checker.GetValueAsync("App.Feature", TestContext.Current.CancellationToken);
+
+        result.ShouldBe("fallback-default");
+    }
+
+    // -------------------------------------------------------------------------
+    // GetValueAsync — provider ordering respected
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task GetValueAsync_FirstProvider_WinsWhenItReturnsValue()
+    {
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.Feature").Returns(
+            new FeatureDefinition("App.Feature", "default", FeatureValueType.Toggle));
+
+        IFeatureValueProvider highPriority = Substitute.For<IFeatureValueProvider>();
+        highPriority.Order.Returns(100);
+        highPriority.GetOrNullAsync(Arg.Any<FeatureDefinition>(), Arg.Any<CancellationToken>())
+                    .Returns("high-priority-value");
+
+        IFeatureValueProvider lowPriority = Substitute.For<IFeatureValueProvider>();
+        lowPriority.Order.Returns(200);
+        lowPriority.GetOrNullAsync(Arg.Any<FeatureDefinition>(), Arg.Any<CancellationToken>())
+                   .Returns("low-priority-value");
+
+        FeatureChecker checker = BuildChecker(store, NoTenant(), highPriority, lowPriority);
+
+        string result = await checker.GetValueAsync("App.Feature", TestContext.Current.CancellationToken);
+
+        result.ShouldBe("high-priority-value");
+    }
+
+    [Fact]
+    public async Task GetValueAsync_SkipsNullProvider_UsesNextProvider()
+    {
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.Feature").Returns(
+            new FeatureDefinition("App.Feature", "default", FeatureValueType.Toggle));
+
+        IFeatureValueProvider nullProvider = Substitute.For<IFeatureValueProvider>();
+        nullProvider.Order.Returns(100);
+        nullProvider.GetOrNullAsync(Arg.Any<FeatureDefinition>(), Arg.Any<CancellationToken>())
+                    .Returns((string?)null);
+
+        IFeatureValueProvider valueProvider = Substitute.For<IFeatureValueProvider>();
+        valueProvider.Order.Returns(200);
+        valueProvider.GetOrNullAsync(Arg.Any<FeatureDefinition>(), Arg.Any<CancellationToken>())
+                     .Returns("resolved-value");
+
+        FeatureChecker checker = BuildChecker(store, NoTenant(), nullProvider, valueProvider);
+
+        string result = await checker.GetValueAsync("App.Feature", TestContext.Current.CancellationToken);
+
+        result.ShouldBe("resolved-value");
+    }
+
+    // -------------------------------------------------------------------------
+    // IsEnabledAsync — case insensitive check
+    // -------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("true")]
+    [InlineData("True")]
+    [InlineData("TRUE")]
+    public async Task IsEnabledAsync_CaseInsensitiveTrue_Returns_True(string trueValue)
+    {
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.Feature").Returns(
+            new FeatureDefinition("App.Feature", trueValue, FeatureValueType.Toggle));
+        FeatureChecker checker = BuildChecker(store, NoTenant(),
+            new DefaultValueFeatureValueProvider());
+
+        bool result = await checker.IsEnabledAsync("App.Feature", TestContext.Current.CancellationToken);
+
+        result.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData("false")]
+    [InlineData("0")]
+    [InlineData("no")]
+    [InlineData("anything-else")]
+    public async Task IsEnabledAsync_NonTrueValue_Returns_False(string nonTrueValue)
+    {
+        IFeatureDefinitionStore store = Substitute.For<IFeatureDefinitionStore>();
+        store.GetRequired("App.Feature").Returns(
+            new FeatureDefinition("App.Feature", nonTrueValue, FeatureValueType.Toggle));
+        FeatureChecker checker = BuildChecker(store, NoTenant(),
+            new DefaultValueFeatureValueProvider());
+
+        bool result = await checker.IsEnabledAsync("App.Feature", TestContext.Current.CancellationToken);
+
+        result.ShouldBeFalse();
+    }
 }

@@ -33,7 +33,7 @@ public sealed class FeatureGroupDefinitionTests
         FeatureGroupDefinition group = MakeGroup();
         group.AddToggle("Guava.VideoConsultation");
 
-        FeatureDefinition feature = group.Features.ShouldHaveSingleItem().Which;
+        FeatureDefinition feature = group.Features.ShouldHaveSingleItem();
         feature.Name.ShouldBe("Guava.VideoConsultation");
         feature.DefaultValue.ShouldBe("false");
         feature.ValueType.ShouldBe(FeatureValueType.Toggle);
@@ -102,5 +102,123 @@ public sealed class FeatureGroupDefinitionTests
 
         group.Name.ShouldBe("Guava");
         group.DisplayName.ShouldBe("Guava Platform");
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructor validation — null/whitespace name
+    // -------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Constructor_NullOrWhitespaceName_Throws(string? name)
+    {
+        // FeatureGroupDefinition constructor is internal — exercise via context.AddGroup
+        FeatureDefinitionContext context = new();
+
+        Action act = () => context.AddGroup(name!);
+
+        Should.Throw<ArgumentException>(act);
+    }
+
+    [Fact]
+    public void Constructor_DisplayName_NullIsAllowed()
+    {
+        FeatureGroupDefinition group = MakeGroup("Test", displayName: null);
+
+        group.DisplayName.ShouldBeNull();
+    }
+
+    // -------------------------------------------------------------------------
+    // Features — starts empty
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void Features_InitiallyEmpty()
+    {
+        FeatureGroupDefinition group = MakeGroup();
+
+        group.Features.ShouldBeEmpty();
+    }
+
+    // -------------------------------------------------------------------------
+    // AddNumeric — chaining
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void AddNumeric_IsChainable_ReturnsGroup()
+    {
+        FeatureGroupDefinition group = MakeGroup();
+
+        FeatureGroupDefinition returned = group
+            .AddNumeric("App.MaxA", 10)
+            .AddNumeric("App.MaxB", 20);
+
+        returned.ShouldBeSameAs(group);
+        group.Features.Count.ShouldBe(2);
+    }
+
+    // -------------------------------------------------------------------------
+    // AddSelection — chaining
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void AddSelection_IsChainable_ReturnsGroup()
+    {
+        FeatureGroupDefinition group = MakeGroup();
+
+        FeatureGroupDefinition returned = group
+            .AddSelection("App.TierA", "a", ["a", "b"])
+            .AddSelection("App.TierB", "x", ["x", "y"]);
+
+        returned.ShouldBeSameAs(group);
+        group.Features.Count.ShouldBe(2);
+    }
+
+    // -------------------------------------------------------------------------
+    // Mixed chaining
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void MixedChaining_AddsAllFeatureTypes()
+    {
+        FeatureGroupDefinition group = MakeGroup();
+
+        group.AddToggle("App.Toggle1")
+             .AddNumeric("App.Num1", 100)
+             .AddSelection("App.Sel1", "a", ["a", "b"]);
+
+        group.Features.Count.ShouldBe(3);
+    }
+
+    // -------------------------------------------------------------------------
+    // AddNumeric — default min/max
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void AddNumeric_DefaultMinIsZero_DefaultMaxIsLongMaxValue()
+    {
+        FeatureGroupDefinition group = MakeGroup();
+        group.AddNumeric("App.Count", 50);
+
+        FeatureDefinition feature = group.Features.Single();
+        feature.NumericConstraint.ShouldNotBeNull();
+        feature.NumericConstraint!.Min.ShouldBe(0);
+        feature.NumericConstraint.Max.ShouldBe(long.MaxValue);
+    }
+
+    // -------------------------------------------------------------------------
+    // AddToggle — displayName is null by default
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void AddToggle_DisplayName_NullByDefault()
+    {
+        FeatureGroupDefinition group = MakeGroup();
+        group.AddToggle("App.Feature");
+
+        FeatureDefinition feature = group.Features.Single();
+        feature.DisplayName.ShouldBeNull();
     }
 }

@@ -11,16 +11,12 @@
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="Shouldly" />
     <PackageReference Include="NSubstitute" />
-    <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="coverlet.collector" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.Localization.Endpoints\Granit.Localization.Endpoints.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="TestResources\Localization\**\*.json" />
+    <ProjectReference Include="..\..\src\Granit.Workflow.Endpoints\Granit.Workflow.Endpoints.csproj" />
   </ItemGroup>
 
 </Project>
