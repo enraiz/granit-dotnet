@@ -323,6 +323,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Authorization.Endpoi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Authorization.Endpoints.Tests", "tests\Granit.Authorization.Endpoints.Tests\Granit.Authorization.Endpoints.Tests.csproj", "{B983DE48-98B1-47EA-B760-969EC40DC820}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.SignalR", "src\Granit.Notifications.SignalR\Granit.Notifications.SignalR.csproj", "{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2229,6 +2231,18 @@ Global
 		{B983DE48-98B1-47EA-B760-969EC40DC820}.Release|x64.Build.0 = Release|Any CPU
 		{B983DE48-98B1-47EA-B760-969EC40DC820}.Release|x86.ActiveCfg = Release|Any CPU
 		{B983DE48-98B1-47EA-B760-969EC40DC820}.Release|x86.Build.0 = Release|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Debug|x64.Build.0 = Debug|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Debug|x86.Build.0 = Debug|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Release|x64.ActiveCfg = Release|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Release|x64.Build.0 = Release|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Release|x86.ActiveCfg = Release|Any CPU
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2392,5 +2406,6 @@ Global
 		{A19FCBB2-3624-4467-A2BD-183A70A6954C} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{792357B7-0D8E-4B2B-81D5-C62F3B489BB1} = {A1B2C3D4-0001-0001-0001-000000000001}
 		{B983DE48-98B1-47EA-B760-969EC40DC820} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{4C461D79-6C4D-46A5-A911-86D16A2E2C6E} = {A1B2C3D4-0001-0001-0001-000000000001}
 	EndGlobalSection
 EndGlobal
