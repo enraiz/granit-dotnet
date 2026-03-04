@@ -3,7 +3,7 @@ using Granit.Authorization.Abstractions;
 namespace Granit.DataExchange.Endpoints.Permissions;
 
 /// <summary>
-/// Declares the <c>DataExchange.Import</c> and <c>DataExchange.Export</c> permissions in the Granit RBAC system.
+/// Declares the <c>DataExchange.Imports.Execute</c> and <c>DataExchange.Exports.Execute</c> permissions in the Granit RBAC system.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -20,7 +20,7 @@ namespace Granit.DataExchange.Endpoints.Permissions;
 /// In production, grant the permission to the desired Keycloak role via one of:
 /// <list type="bullet">
 /// <item>Add the role to <c>GranitAuthorizationOptions.AdminRoles</c> in <c>appsettings.json</c></item>
-/// <item>Call <c>IPermissionManager.SetAsync("DataExchange.Import", "my-role", tenantId, true)</c></item>
+/// <item>Call <c>IPermissionManager.SetAsync("DataExchange.Imports.Execute", "my-role", tenantId, true)</c></item>
 /// </list>
 /// </para>
 /// </remarks>
@@ -33,11 +33,11 @@ internal sealed class DataExchangePermissionDefinitionProvider : IPermissionDefi
             DataExchangePermissions.GroupName, "Data Exchange");
 
         group.AddPermission(
-            DataExchangePermissions.Admin.Default,
-            "Administrer les imports de données (upload, mapping, exécution, rapports)");
+            DataExchangePermissions.Imports.Execute,
+            "Exécuter des imports de données (upload, mapping, exécution, rapports)");
 
         group.AddPermission(
-            DataExchangePermissions.Export.Default,
-            "Exporter des données (définitions, exécution, téléchargement, presets)");
+            DataExchangePermissions.Exports.Execute,
+            "Exécuter des exports de données (définitions, exécution, téléchargement, presets)");
     }
 }

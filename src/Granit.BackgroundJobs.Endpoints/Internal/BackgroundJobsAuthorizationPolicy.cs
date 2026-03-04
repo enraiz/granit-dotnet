@@ -9,7 +9,7 @@ public static class BackgroundJobsAuthorizationPolicy
 {
     /// <summary>
     /// Name of the authorization policy that guards all background jobs administration endpoints.
-    /// Equals <see cref="BackgroundJobsPermissions.Admin.Default"/> (<c>"BackgroundJobs.Admin"</c>).
+    /// Equals <see cref="BackgroundJobsPermissions.Jobs.Manage"/> (<c>"BackgroundJobs.Jobs.Manage"</c>).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -23,5 +23,5 @@ public static class BackgroundJobsAuthorizationPolicy
     /// <see cref="Extensions.BackgroundJobsEndpointRouteBuilderExtensions.MapBackgroundJobsEndpoints"/>.
     /// </para>
     /// </remarks>
-    public const string PolicyName = BackgroundJobsPermissions.Admin.Default;
+    public const string PolicyName = BackgroundJobsPermissions.Jobs.Manage;
 }

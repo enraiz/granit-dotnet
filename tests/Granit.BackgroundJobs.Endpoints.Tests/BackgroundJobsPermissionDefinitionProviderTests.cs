@@ -8,7 +8,7 @@ namespace Granit.BackgroundJobs.Endpoints.Tests;
 public sealed class BackgroundJobsPermissionDefinitionProviderTests
 {
     [Fact]
-    public void DefinePermissions_RegistersBackgroundJobsAdminPermission()
+    public void DefinePermissions_RegistersBackgroundJobsManagePermission()
     {
         // Arrange
         FakePermissionDefinitionContext context = new();
@@ -20,7 +20,7 @@ public sealed class BackgroundJobsPermissionDefinitionProviderTests
         // Assert — group and permission declared
         context.Groups.ShouldContain(g => g.Name == BackgroundJobsPermissions.GroupName);
         PermissionGroup group = context.Groups.Single();
-        group.Permissions.ShouldContain(p => p.Name == BackgroundJobsPermissions.Admin.Default);
+        group.Permissions.ShouldContain(p => p.Name == BackgroundJobsPermissions.Jobs.Manage);
     }
 
     [Fact]

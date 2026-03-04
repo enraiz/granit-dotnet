@@ -19,7 +19,7 @@ public static class TimelineEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers the <c>Timeline.Read</c> authorization policy (see
+    /// Registers the <c>Timeline.Entries.Read</c> authorization policy (see
     /// <see cref="TimelineAuthorizationPolicy.PolicyName"/>) requiring the role
     /// configured via <see cref="TimelineEndpointsOptions.RequiredRole"/>.
     /// </para>

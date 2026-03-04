@@ -30,7 +30,7 @@ public sealed class WorkflowPermissionDefinitionProviderTests
     }
 
     [Fact]
-    public void DefinePermissions_adds_History_Default_permission()
+    public void DefinePermissions_adds_History_Read_permission()
     {
         // Arrange
         PermissionGroup group = new(WorkflowPermissions.GroupName, "Workflow");
@@ -43,11 +43,11 @@ public sealed class WorkflowPermissionDefinitionProviderTests
         provider.DefinePermissions(context);
 
         // Assert
-        group.Permissions.ShouldContain(p => p.Name == WorkflowPermissions.History.Default);
+        group.Permissions.ShouldContain(p => p.Name == WorkflowPermissions.History.Read);
     }
 
     [Fact]
-    public void DefinePermissions_History_permission_has_display_name()
+    public void DefinePermissions_History_Read_permission_has_display_name()
     {
         // Arrange
         PermissionGroup group = new(WorkflowPermissions.GroupName, "Workflow");
@@ -61,7 +61,7 @@ public sealed class WorkflowPermissionDefinitionProviderTests
 
         // Assert
         PermissionDefinition historyPermission = group.Permissions
-            .Single(p => p.Name == WorkflowPermissions.History.Default);
+            .Single(p => p.Name == WorkflowPermissions.History.Read);
         historyPermission.DisplayName.ShouldNotBeNullOrWhiteSpace();
     }
 

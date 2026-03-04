@@ -10,13 +10,13 @@ public static class BackgroundJobsPermissions
     /// <summary>Permission group name used in <c>IPermissionDefinitionContext.AddGroup()</c>.</summary>
     public const string GroupName = "BackgroundJobs";
 
-    /// <summary>Administration permissions for the background jobs endpoints.</summary>
-    public static class Admin
+    /// <summary>Permissions for the background jobs resource.</summary>
+    public static class Jobs
     {
         /// <summary>
-        /// Grants access to all background jobs administration endpoints
+        /// Grants full management access to all background jobs endpoints
         /// (list, detail, pause, resume, trigger).
         /// </summary>
-        public const string Default = "BackgroundJobs.Admin";
+        public const string Manage = "BackgroundJobs.Jobs.Manage";
     }
 }

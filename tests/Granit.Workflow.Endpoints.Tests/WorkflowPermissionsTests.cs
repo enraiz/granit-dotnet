@@ -16,10 +16,10 @@ public sealed class WorkflowPermissionsTests
         WorkflowPermissions.GroupName.ShouldBe("Workflow");
 
     [Fact]
-    public void History_Default_is_Workflow_dot_History() =>
-        WorkflowPermissions.History.Default.ShouldBe("Workflow.History");
+    public void History_Read_is_Workflow_History_Read() =>
+        WorkflowPermissions.History.Read.ShouldBe("Workflow.History.Read");
 
     [Fact]
-    public void History_Default_starts_with_GroupName() =>
-        WorkflowPermissions.History.Default.ShouldStartWith(WorkflowPermissions.GroupName + ".");
+    public void History_Read_starts_with_GroupName() =>
+        WorkflowPermissions.History.Read.ShouldStartWith(WorkflowPermissions.GroupName + ".");
 }

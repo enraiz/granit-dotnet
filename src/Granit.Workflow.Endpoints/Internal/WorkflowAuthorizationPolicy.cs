@@ -9,7 +9,7 @@ public static class WorkflowAuthorizationPolicy
 {
     /// <summary>
     /// Name of the authorization policy that guards all workflow administration endpoints.
-    /// Equals <see cref="WorkflowPermissions.History.Default"/> (<c>"Workflow.History"</c>).
+    /// Equals <see cref="WorkflowPermissions.History.Read"/> (<c>"Workflow.History.Read"</c>).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -23,5 +23,5 @@ public static class WorkflowAuthorizationPolicy
     /// <see cref="Extensions.WorkflowEndpointRouteBuilderExtensions.MapWorkflowEndpoints"/>.
     /// </para>
     /// </remarks>
-    public const string PolicyName = WorkflowPermissions.History.Default;
+    public const string PolicyName = WorkflowPermissions.History.Read;
 }

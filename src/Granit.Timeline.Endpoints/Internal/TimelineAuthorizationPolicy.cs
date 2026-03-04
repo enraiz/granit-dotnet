@@ -9,7 +9,7 @@ public static class TimelineAuthorizationPolicy
 {
     /// <summary>
     /// Name of the authorization policy that guards all timeline endpoints.
-    /// Equals <see cref="TimelinePermissions.Read.Default"/> (<c>"Timeline.Read"</c>).
+    /// Equals <see cref="TimelinePermissions.Entries.Read"/> (<c>"Timeline.Entries.Read"</c>).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -23,5 +23,5 @@ public static class TimelineAuthorizationPolicy
     /// <see cref="Extensions.TimelineEndpointRouteBuilderExtensions.MapTimelineEndpoints"/>.
     /// </para>
     /// </remarks>
-    public const string PolicyName = TimelinePermissions.Read.Default;
+    public const string PolicyName = TimelinePermissions.Entries.Read;
 }

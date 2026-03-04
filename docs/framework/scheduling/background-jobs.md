@@ -8,7 +8,7 @@ sans aucun doublon possible en cluster multi-nœuds.
 | --- | --- |
 | `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager`, `IBackgroundJobStore` |
 | `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `scheduling_background_jobs` (SQL Server / PostgreSQL) |
-| `Granit.BackgroundJobs.Endpoints` | Administration HTTP : endpoints Minimal API, politique d'autorisation `BackgroundJobs.Admin` |
+| `Granit.BackgroundJobs.Endpoints` | Administration HTTP : endpoints Minimal API, politique d'autorisation `BackgroundJobs.Jobs.Manage` |
 
 ## Concepts clés
 
@@ -174,7 +174,7 @@ Il n'est jamais un identifiant nominatif (UserId de l'IdP, non PII direct).
 ## Endpoints d'administration
 
 Le package `Granit.BackgroundJobs.Endpoints` expose 5 routes Minimal API protégées
-par la politique `BackgroundJobs.Admin`.
+par la politique `BackgroundJobs.Jobs.Manage`.
 
 ### Enregistrement
 
@@ -221,19 +221,19 @@ les requêtes sans token valide (`401`).
 #### 2 — Autorisation (système de permissions Granit)
 
 `GranitBackgroundJobsEndpointsModule` enregistre `BackgroundJobsPermissionDefinitionProvider`,
-qui déclare la permission `BackgroundJobs.Admin` dans le registre de permissions Granit.
+qui déclare la permission `BackgroundJobs.Jobs.Manage` dans le registre de permissions Granit.
 
 Lorsque `GranitAuthorizationModule` est chargé (toujours le cas via `[DependsOn]`),
-`DynamicPermissionPolicyProvider` intercepte la politique `BackgroundJobs.Admin` et
+`DynamicPermissionPolicyProvider` intercepte la politique `BackgroundJobs.Jobs.Manage` et
 active le pipeline complet `IPermissionChecker` :
 
 ```text
-Requête → DynamicPermissionPolicyProvider → PermissionRequirement("BackgroundJobs.Admin")
-  → IPermissionChecker.IsGrantedAsync("BackgroundJobs.Admin")
+Requête → DynamicPermissionPolicyProvider → PermissionRequirement("BackgroundJobs.Jobs.Manage")
+  → IPermissionChecker.IsGrantedAsync("BackgroundJobs.Jobs.Manage")
       1. AlwaysAllow = true  → accordé  (dev/tests uniquement)
       2. AdminRoles bypass   → accordé  (root of trust, sans DB)
       3. Cache               → hit ou miss
-      4. IPermissionGrantStore.IsGrantedAsync(role, "BackgroundJobs.Admin")
+      4. IPermissionGrantStore.IsGrantedAsync(role, "BackgroundJobs.Jobs.Manage")
 ```
 
 #### 3 — Configurer l'accès en production
@@ -256,7 +256,7 @@ au démarrage (nécessite `Granit.Authorization.EntityFrameworkCore`) :
 ```csharp
 // Program.cs / hosted service
 await permissionManager.SetAsync(
-    "BackgroundJobs.Admin",
+    "BackgroundJobs.Jobs.Manage",
     "granit-background-jobs-admin",
     tenantId: null,   // null = toutes les tenants
     isGranted: true);
@@ -352,7 +352,7 @@ services.AddSingleton<IBackgroundJobStore, RedisBackgroundJobStore>();
 | #140 | ✅ Terminé | Scaffolding `Granit.BackgroundJobs.Endpoints` — module, options, `MapBackgroundJobsEndpoints()` |
 | #141 | ✅ Terminé | GET /background-jobs + GET /background-jobs/{name} (TypedResults, OpenAPI) |
 | #142 | ✅ Terminé | POST pause / resume / trigger (204, 202 Accepted, 404) |
-| #143 | ✅ Terminé | Policy `BackgroundJobs.Admin` — `RequiredRole` configurable via options |
+| #143 | ✅ Terminé | Policy `BackgroundJobs.Jobs.Manage` — `RequiredRole` configurable via options |
 | #144 | ✅ Terminé | 17 tests d'intégration — 401/403/404, désérialisation JSON, custom role |
 | #134 | ✅ Terminé | `DeadLetterCount` via `IMessageStore` — `BackgroundJobManager.GetAllAsync()` intègre les stats DLQ Wolverine (dégradation gracieuse si `IMessageStore` absent) |
 
@@ -368,7 +368,7 @@ services.AddSingleton<IBackgroundJobStore, RedisBackgroundJobStore>();
 ## Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
+| --- | --- |
 | **Dépend de** | `Granit.Core`, `Granit.Security`, `Granit.Timing`, `Granit.Wolverine` |
 | **Utilisé par** | `Granit.BackgroundJobs.EntityFrameworkCore`, `Granit.BackgroundJobs.Endpoints` |
 | **Package Endpoints** | `Granit.BackgroundJobs.Endpoints` → ajoute `Granit.Authorization` |

@@ -3,7 +3,7 @@ using Granit.Authorization.Abstractions;
 namespace Granit.Timeline.Endpoints.Permissions;
 
 /// <summary>
-/// Declares the <c>Timeline.Read</c> and <c>Timeline.Write</c> permissions
+/// Declares the <c>Timeline.Entries.Read</c> and <c>Timeline.Entries.Create</c> permissions
 /// in the Granit RBAC system.
 /// </summary>
 /// <remarks>
@@ -20,11 +20,11 @@ internal sealed class TimelinePermissionDefinitionProvider : IPermissionDefiniti
             TimelinePermissions.GroupName, "Timeline");
 
         group.AddPermission(
-            TimelinePermissions.Read.Default,
+            TimelinePermissions.Entries.Read,
             "Consulter les flux d'activité et l'historique d'audit");
 
         group.AddPermission(
-            TimelinePermissions.Write.Default,
-            "Poster des commentaires, gérer les entrées et suivre/ne plus suivre des entités");
+            TimelinePermissions.Entries.Create,
+            "Poster des commentaires et suivre/ne plus suivre des entités");
     }
 }

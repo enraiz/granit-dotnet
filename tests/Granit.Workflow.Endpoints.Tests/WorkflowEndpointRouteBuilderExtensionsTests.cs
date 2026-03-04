@@ -20,8 +20,8 @@ namespace Granit.Workflow.Endpoints.Tests;
 public sealed class WorkflowEndpointRouteBuilderExtensionsTests
 {
     [Fact]
-    public void PolicyName_equals_History_Default() =>
-        WorkflowAuthorizationPolicy.PolicyName.ShouldBe("Workflow.History");
+    public void PolicyName_equals_History_Read() =>
+        WorkflowAuthorizationPolicy.PolicyName.ShouldBe("Workflow.History.Read");
 
     [Fact]
     public async Task MapWorkflowEndpoints_with_custom_prefix_routes_correctly()

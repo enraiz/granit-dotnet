@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.BackgroundJobs.Endpoints</PackageId>
-    <Description>Minimal API endpoints for administering Granit recurring background jobs. Exposes GET/POST routes for listing, pausing, resuming, and triggering jobs. Protected by the BackgroundJobs.Admin permission policy.</Description>
+    <Description>Minimal API endpoints for administering Granit recurring background jobs. Exposes GET/POST routes for listing, pausing, resuming, and triggering jobs. Protected by the BackgroundJobs.Jobs.Manage permission policy.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

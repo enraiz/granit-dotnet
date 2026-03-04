@@ -14,10 +14,10 @@ public sealed class TimelinePermissionsTests
         TimelinePermissions.GroupName.ShouldBe("Timeline");
 
     [Fact]
-    public void Read_Default_is_Timeline_Read() =>
-        TimelinePermissions.Read.Default.ShouldBe("Timeline.Read");
+    public void Entries_Read_is_Timeline_Entries_Read() =>
+        TimelinePermissions.Entries.Read.ShouldBe("Timeline.Entries.Read");
 
     [Fact]
-    public void Write_Default_is_Timeline_Write() =>
-        TimelinePermissions.Write.Default.ShouldBe("Timeline.Write");
+    public void Entries_Create_is_Timeline_Entries_Create() =>
+        TimelinePermissions.Entries.Create.ShouldBe("Timeline.Entries.Create");
 }

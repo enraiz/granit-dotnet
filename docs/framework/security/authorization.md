@@ -120,6 +120,59 @@ Le `PermissionDefinitionManager` (Singleton) agrège tous les providers à la pr
 
 ---
 
+## Convention de nommage des permissions
+
+Chaque permission suit le format **`[Module].[Ressource].[Action]`** :
+
+| Segment | Description | Exemples |
+| --- | --- | --- |
+| **Module** | Le contexte fonctionnel (package Granit ou module métier) | `Authorization`, `DataExchange`, `Invoices` |
+| **Ressource** | L'entité ou le concept manipulé, au **pluriel** | `Grants`, `Imports`, `Entries`, `Patients` |
+| **Action** | Le verbe décrivant l'opération | `Read`, `Create`, `Update`, `Delete`, `Manage`, `Execute` |
+
+### Actions standardisées
+
+| Action | Signification | Quand l'utiliser |
+| --- | --- | --- |
+| `Read` | Consulter (liste + détail) | Accès en lecture seule |
+| `Create` | Créer une nouvelle entité | Création uniquement |
+| `Update` | Modifier une entité existante | Modification uniquement |
+| `Delete` | Supprimer (soft ou hard delete) | Suppression uniquement |
+| `Manage` | CRUD complet regroupé | Quand séparer les actions n'a pas de sens (ex : admin) |
+| `Execute` | Déclencher une action | Import, export, job, action non-CRUD |
+
+### Exemples
+
+```text
+# Permissions CRUD granulaires (module métier)
+Invoices.Invoices.Read
+Invoices.Invoices.Create
+Invoices.Invoices.Update
+Invoices.Invoices.Delete
+
+# Permissions Granit framework
+Authorization.Definitions.Read
+Authorization.Grants.Manage
+BackgroundJobs.Jobs.Manage
+DataExchange.Imports.Execute
+DataExchange.Exports.Execute
+Timeline.Entries.Read
+Timeline.Entries.Create
+Workflow.History.Read
+Localization.Overrides.Manage
+```
+
+### Règles
+
+- **Pluriel** pour la ressource (`Imports`, pas `Import`)
+- **Pas de `Write`** — utiliser `Create`, `Update` ou `Manage` selon le cas
+- **`Manage`** regroupe tout le CRUD — réservé aux cas admin où séparer n'apporte rien
+- **`Execute`** pour les actions non-CRUD (lancer un import, un export, un job)
+- La constante C# doit correspondre : `DataExchangePermissions.Imports.Execute`
+  renvoie `"DataExchange.Imports.Execute"`
+
+---
+
 ## Protéger les endpoints
 
 ### Attribut `[Permission]`

@@ -10,21 +10,17 @@ public static class TimelinePermissions
     /// <summary>Permission group name used in <c>IPermissionDefinitionContext.AddGroup()</c>.</summary>
     public const string GroupName = "Timeline";
 
-    /// <summary>Read permissions for timeline endpoints.</summary>
-    public static class Read
+    /// <summary>Permissions for the timeline entries resource.</summary>
+    public static class Entries
     {
         /// <summary>
         /// Grants read access to activity streams, followers, and timeline history.
         /// </summary>
-        public const string Default = "Timeline.Read";
-    }
+        public const string Read = "Timeline.Entries.Read";
 
-    /// <summary>Write permissions for timeline endpoints.</summary>
-    public static class Write
-    {
         /// <summary>
-        /// Grants write access to post comments, manage entries, and follow/unfollow entities.
+        /// Grants access to create timeline entries (post comments, follow/unfollow entities).
         /// </summary>
-        public const string Default = "Timeline.Write";
+        public const string Create = "Timeline.Entries.Create";
     }
 }
