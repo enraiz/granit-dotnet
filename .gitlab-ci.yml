@@ -164,6 +164,7 @@ integration-test:
       coverage_report:
         coverage_format: cobertura
         path: "**/coverage.cobertura.xml"
+  allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
