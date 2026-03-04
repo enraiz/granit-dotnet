@@ -42,11 +42,14 @@ public static class DataExchangeEndpointRouteBuilderExtensions
     /// DELETE /{jobId}, GET /{jobId}/report, GET /{jobId}/correction-file.
     /// </para>
     /// <para>
-    /// Also exposes 8 export endpoints under <c>/export/</c>:
-    /// GET /export/definitions, GET /export/definitions/{name}/fields,
-    /// POST /export/jobs, GET /export/jobs/{id}, GET /export/jobs/{id}/download,
-    /// GET /export/presets/{definitionName}, POST /export/presets,
-    /// DELETE /export/presets/{definitionName}/{presetName}.
+    /// Export job execution endpoints under <c>/export/</c>:
+    /// POST /jobs, GET /jobs/{id}, GET /jobs/{id}/download.
+    /// </para>
+    /// <para>
+    /// Shared metadata endpoints under <c>/metadata/</c>:
+    /// GET /definitions, GET /definitions/{name}/fields,
+    /// GET /presets/{definitionName}, POST /presets,
+    /// DELETE /presets/{definitionName}/{presetName}.
     /// </para>
     /// </remarks>
     /// <param name="endpoints">The endpoint route builder.</param>
@@ -78,22 +81,35 @@ public static class DataExchangeEndpointRouteBuilderExtensions
 
         RouteGroupBuilder group = endpoints
             .MapGroup(prefix)
-            .WithTags(options.TagName)
+            .WithTags(options.TagName);
+
+        // Import endpoints (upload, mappings, execution, reports)
+        RouteGroupBuilder importGroup = group
             .RequireAuthorization(ImportAuthorizationPolicy.PolicyName);
 
-        group.MapUploadEndpoints();
-        group.MapExecutionEndpoints();
-        group.MapReportEndpoints();
+        importGroup.MapUploadEndpoints();
+        importGroup.MapExecutionEndpoints();
+        importGroup.MapReportEndpoints();
 
-        // Export endpoints under /export/ sub-group with dedicated permission
+        // Export job execution endpoints under /export/ sub-group
         RouteGroupBuilder exportGroup = group
             .MapGroup("export")
-            .WithTags(options.TagName)
             .RequireAuthorization(DataExportAuthorizationPolicy.PolicyName);
 
-        exportGroup.MapExportDefinitionEndpoints();
         exportGroup.MapExportExecutionEndpoints();
-        exportGroup.MapExportPresetEndpoints();
+
+        // Shared metadata (definitions, presets) under /metadata/
+        // Export-specific write operations require DataExportAuthorizationPolicy
+        RouteGroupBuilder metadataGroup = group
+            .MapGroup("metadata");
+
+        metadataGroup.MapExportDefinitionEndpoints();
+
+        RouteGroupBuilder presetGroup = metadataGroup
+            .MapGroup("presets")
+            .RequireAuthorization(DataExportAuthorizationPolicy.PolicyName);
+
+        presetGroup.MapExportPresetEndpoints();
 
         return group;
     }
