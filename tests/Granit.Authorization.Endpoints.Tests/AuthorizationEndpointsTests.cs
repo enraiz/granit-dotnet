@@ -189,7 +189,7 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _permissionManager.GetGrantedPermissionsAsync("editor", null, Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "Invoices.Read", "Invoices.Create" });
+            .Returns(["Invoices.Read", "Invoices.Create"]);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -374,7 +374,7 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
         invoicesGroup.AddPermission("Invoices.Create", "Create invoices");
         invoicesGroup.AddPermission("Invoices.Delete", "Delete invoices");
 
-        _definitionManager.GetGroups().Returns(new List<PermissionGroup> { invoicesGroup });
+        _definitionManager.GetGroups().Returns([invoicesGroup]);
         _definitionManager.GetAll().Returns(invoicesGroup.Permissions);
         _definitionManager.Exists(Arg.Any<string>()).Returns(callInfo =>
         {

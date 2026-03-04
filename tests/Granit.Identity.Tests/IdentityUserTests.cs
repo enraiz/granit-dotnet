@@ -78,7 +78,7 @@ public sealed class IdentityUserTests
     {
         var original = new IdentityUser("id", "user", "e@test.com", "F", "L", true);
 
-        var modified = original with { Enabled = false };
+        IdentityUser modified = original with { Enabled = false };
 
         modified.Enabled.ShouldBeFalse();
         modified.Id.ShouldBe("id");

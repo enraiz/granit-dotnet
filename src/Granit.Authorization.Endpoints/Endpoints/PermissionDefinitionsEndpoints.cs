@@ -31,7 +31,7 @@ internal static class PermissionDefinitionsEndpoints
     {
         IReadOnlyList<PermissionGroup> groups = definitionManager.GetGroups();
 
-        List<PermissionGroupResponse> response = groups
+        var response = groups
             .Select(g => new PermissionGroupResponse(
                 g.Name,
                 g.DisplayName,

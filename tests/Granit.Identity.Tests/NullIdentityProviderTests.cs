@@ -84,8 +84,6 @@ public sealed class NullIdentityProviderTests
     }
 
     [Fact]
-    public void ImplementsIIdentityProvider()
-    {
+    public void ImplementsIIdentityProvider() =>
         _provider.ShouldBeAssignableTo<IIdentityProvider>();
-    }
 }

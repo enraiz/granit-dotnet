@@ -118,7 +118,7 @@ public sealed class TimelineFollowerEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _followerService.GetFollowerIdsAsync("Patient", "42", Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "user-1", "user-2" });
+            .Returns(["user-1", "user-2"]);
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -139,7 +139,7 @@ public sealed class TimelineFollowerEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _followerService.GetFollowerIdsAsync("Invoice", "99", Arg.Any<CancellationToken>())
-            .Returns(new List<string>());
+            .Returns([]);
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(

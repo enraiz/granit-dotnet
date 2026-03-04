@@ -33,11 +33,11 @@ internal static class MyPermissionsEndpoints
         IReadOnlyList<PermissionDefinition> allPermissions = definitionManager.GetAll();
         List<string> granted = [];
 
-        foreach (PermissionDefinition permission in allPermissions)
+        foreach (string permissionName in allPermissions.Select(permission => permission.Name))
         {
-            if (await permissionChecker.IsGrantedAsync(permission.Name, ct).ConfigureAwait(false))
+            if (await permissionChecker.IsGrantedAsync(permissionName, ct).ConfigureAwait(false))
             {
-                granted.Add(permission.Name);
+                granted.Add(permissionName);
             }
         }
 

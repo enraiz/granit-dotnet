@@ -65,7 +65,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task PostEntry_valid_comment_returns_201()
     {
         // Arrange
-        Guid entryId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
         TimelineEntry entry = new()
         {
             Id = entryId,
@@ -83,7 +83,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             .Returns(entry);
 
         _followerService.GetFollowerIdsAsync("Patient", "42", Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "user-1" });
+            .Returns(["user-1"]);
 
         PostTimelineEntryRequest request = new()
         {
@@ -109,7 +109,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task PostEntry_internal_note_returns_201_with_correct_type()
     {
         // Arrange
-        Guid entryId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
         TimelineEntry entry = new()
         {
             Id = entryId,
@@ -127,7 +127,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             .Returns(entry);
 
         _followerService.GetFollowerIdsAsync("Patient", "42", Arg.Any<CancellationToken>())
-            .Returns(new List<string>());
+            .Returns([]);
 
         PostTimelineEntryRequest request = new()
         {
@@ -151,8 +151,8 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task PostEntry_with_parent_id_delegates_correctly()
     {
         // Arrange
-        Guid parentId = Guid.NewGuid();
-        Guid entryId = Guid.NewGuid();
+        var parentId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
         TimelineEntry entry = new()
         {
             Id = entryId,
@@ -171,7 +171,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             .Returns(entry);
 
         _followerService.GetFollowerIdsAsync("Patient", "42", Arg.Any<CancellationToken>())
-            .Returns(new List<string>());
+            .Returns([]);
 
         PostTimelineEntryRequest request = new()
         {
@@ -196,9 +196,9 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task PostEntry_with_mentions_auto_subscribes_and_notifies()
     {
         // Arrange
-        Guid mentionedUserId = Guid.NewGuid();
+        var mentionedUserId = Guid.NewGuid();
         string mentionBody = $"Hey @[Bob](user:{mentionedUserId}), check this!";
-        Guid entryId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
         TimelineEntry entry = new()
         {
             Id = entryId,
@@ -216,7 +216,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             .Returns(entry);
 
         _followerService.GetFollowerIdsAsync("Patient", "42", Arg.Any<CancellationToken>())
-            .Returns(new List<string> { "user-1", mentionedUserId.ToString() });
+            .Returns(["user-1", mentionedUserId.ToString()]);
 
         PostTimelineEntryRequest request = new()
         {
@@ -248,7 +248,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task PostEntry_without_mentions_does_not_call_NotifyMentionedUsers()
     {
         // Arrange
-        Guid entryId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
         TimelineEntry entry = new()
         {
             Id = entryId,
@@ -266,7 +266,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             .Returns(entry);
 
         _followerService.GetFollowerIdsAsync("Patient", "42", Arg.Any<CancellationToken>())
-            .Returns(new List<string>());
+            .Returns([]);
 
         PostTimelineEntryRequest request = new()
         {
@@ -307,7 +307,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task DeleteEntry_existing_returns_204()
     {
         // Arrange
-        Guid entryId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
 
         // Act
         HttpResponseMessage response = await _authClient.DeleteAsync(
@@ -322,7 +322,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task DeleteEntry_nonexistent_returns_404()
     {
         // Arrange
-        Guid entryId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
         _store.DeleteEntryAsync(entryId, Arg.Any<CancellationToken>())
             .Throws(new KeyNotFoundException($"Timeline entry '{entryId}' not found."));
 
@@ -338,7 +338,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     public async Task DeleteEntry_without_auth_returns_401()
     {
         // Act
-        Guid entryId = Guid.NewGuid();
+        var entryId = Guid.NewGuid();
         HttpResponseMessage response = await _anonClient.DeleteAsync(
             $"{Prefix}/Patient/42/entries/{entryId}", TestContext.Current.CancellationToken);
 

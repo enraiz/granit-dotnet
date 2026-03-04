@@ -75,7 +75,7 @@ public sealed class IdentityRoleTests
     {
         var original = new IdentityRole("id", "admin", "Administrator");
 
-        var modified = original with { Description = "New description" };
+        IdentityRole modified = original with { Description = "New description" };
 
         modified.Description.ShouldBe("New description");
         modified.Id.ShouldBe("id");
