@@ -36,9 +36,9 @@ public sealed class NotificationDeliveryAttemptTests
     [Fact]
     public void Properties_CanBeSet()
     {
-        Guid deliveryId = Guid.NewGuid();
-        Guid notificationId = Guid.NewGuid();
-        Guid tenantId = Guid.NewGuid();
+        var deliveryId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DateTimeOffset now = DateTimeOffset.UtcNow;
 
         NotificationDeliveryAttempt attempt = new()

@@ -109,8 +109,8 @@ public sealed class NotificationTriggerTests
     [Fact]
     public void AllProperties_CanBeSetViaInitializers()
     {
-        Guid notificationId = Guid.NewGuid();
-        Guid tenantId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DateTimeOffset occurredAt = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
         EntityReference entity = new("Invoice", "inv-42");
         JsonElement data = JsonSerializer.SerializeToElement(new { orderId = "123" });

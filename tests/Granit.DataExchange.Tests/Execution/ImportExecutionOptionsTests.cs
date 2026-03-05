@@ -45,8 +45,6 @@ public sealed class ImportExecutionOptionsTests
     }
 
     [Fact]
-    public void ImportErrorBehavior_has_three_values()
-    {
+    public void ImportErrorBehavior_has_three_values() =>
         Enum.GetValues<ImportErrorBehavior>().Length.ShouldBe(3);
-    }
 }

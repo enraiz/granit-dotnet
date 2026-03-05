@@ -150,11 +150,12 @@ integration-test:
     POSTGRES_PASSWORD: test_password
   script:
     - dotnet build -c $CONFIGURATION
-    - >
-      dotnet test -c $CONFIGURATION --no-build
-      --filter "FullyQualifiedName~IntegrationTests"
-      --logger "junit;LogFilePath=TestResults/results.xml"
-      --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+    - |
+      for proj in tests/*.Tests.Integration/*.Tests.Integration.csproj; do
+        dotnet test "$proj" -c $CONFIGURATION --no-build \
+          --logger "junit;LogFilePath=TestResults/results.xml" \
+          --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+      done
   artifacts:
     when: always
     paths:
@@ -193,6 +194,34 @@ semgrep-sast:
     - docker
   before_script: []
   allow_failure: false
+
+# --- TRIVY DEPENDENCY SCAN (NuGet) ---
+trivy:fs:
+  stage: gitlab-security
+  image:
+    name: aquasec/trivy:0.69.1
+    entrypoint: ['']
+  tags:
+    - docker
+  before_script: []
+  cache:
+    key: trivy-db
+    paths:
+      - .trivy-cache/
+  variables:
+    TRIVY_CACHE_DIR: .trivy-cache
+  script:
+    # Génère le rapport pour l'interface GitLab
+    - trivy fs --format template --template "@/contrib/gitlab.tpl" --output gl-dependency-scanning-report.json .
+    # Affiche le résumé et échoue si HIGH ou CRITICAL trouvé
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --no-progress .
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
 # ANALYSIS (SonarQube - après les tests)

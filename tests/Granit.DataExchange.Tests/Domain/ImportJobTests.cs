@@ -8,10 +8,8 @@ namespace Granit.DataExchange.Tests.Domain;
 public sealed class ImportJobTests
 {
     [Fact]
-    public void ImportJob_inherits_AuditedEntity()
-    {
+    public void ImportJob_inherits_AuditedEntity() =>
         typeof(ImportJob).BaseType.ShouldBe(typeof(AuditedEntity));
-    }
 
     [Fact]
     public void Default_status_is_Created()
@@ -32,11 +30,9 @@ public sealed class ImportJobTests
     }
 
     [Fact]
-    public void ImportJobStatus_has_all_lifecycle_states()
-    {
+    public void ImportJobStatus_has_all_lifecycle_states() =>
         // Assert — 8 states covering the full lifecycle
         Enum.GetValues<ImportJobStatus>().Length.ShouldBe(8);
-    }
 
     [Fact]
     public void ImportJob_has_optional_tenant()

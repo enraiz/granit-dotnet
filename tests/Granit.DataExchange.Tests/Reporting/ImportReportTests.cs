@@ -58,9 +58,7 @@ public sealed class ImportReportTests
     }
 
     [Fact]
-    public void Report_row_error_kinds_cover_all_stages()
-    {
+    public void Report_row_error_kinds_cover_all_stages() =>
         // Assert — all error kinds exist
         Enum.GetValues<ImportRowErrorKind>().Length.ShouldBe(4);
-    }
 }

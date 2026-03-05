@@ -45,7 +45,7 @@ public sealed class FeatureCacheInvalidationHandlerTests
     [Fact]
     public async Task HandleAsync_TenantEvent_RemovesCorrectCacheKey()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         FeatureValueChangedEvent @event = new("App.VideoConsultation", tenantId);
         TrackingHybridCache cache = new();
 

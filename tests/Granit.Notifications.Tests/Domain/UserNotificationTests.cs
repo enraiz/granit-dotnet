@@ -41,8 +41,8 @@ public sealed class UserNotificationTests
     [Fact]
     public void Properties_CanBeSet()
     {
-        Guid notificationId = Guid.NewGuid();
-        Guid tenantId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DateTimeOffset now = DateTimeOffset.UtcNow;
         JsonElement data = JsonDocument.Parse("""{"key":"value"}""").RootElement;
 

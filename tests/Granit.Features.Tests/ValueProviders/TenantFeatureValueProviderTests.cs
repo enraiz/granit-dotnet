@@ -94,7 +94,7 @@ public sealed class TenantFeatureValueProviderTests
     [Fact]
     public async Task GetOrNullAsync_TenantActive_NoStoreEntry_ReturnsNull()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         TenantFeatureValueProvider provider = BuildProvider(
             currentTenant: WithTenant(tenantId),
             featureStore: new InMemoryFeatureStore());
@@ -108,7 +108,7 @@ public sealed class TenantFeatureValueProviderTests
     [Fact]
     public async Task GetOrNullAsync_TenantActive_StoreHasEntry_ReturnsValue()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         InMemoryFeatureStore featureStore = new();
         await featureStore.SetAsync("App.Feature", tenantId.ToString(), "true",
             TestContext.Current.CancellationToken);
@@ -126,8 +126,8 @@ public sealed class TenantFeatureValueProviderTests
     [Fact]
     public async Task GetOrNullAsync_DifferentTenant_DoesNotReturnOtherTenantValue()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         InMemoryFeatureStore featureStore = new();
         await featureStore.SetAsync("App.Feature", tenantA.ToString(), "true",
             TestContext.Current.CancellationToken);

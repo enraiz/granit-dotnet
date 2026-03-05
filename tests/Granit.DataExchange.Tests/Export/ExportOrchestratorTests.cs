@@ -103,7 +103,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -125,7 +125,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ExportJob?)null);
 
         // Act — should not throw
@@ -140,7 +140,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportRequest request = new("Test.Export", "csv", ["Name"], false, null, null, null, null);
         ExportJob job = new()
         {
@@ -186,7 +186,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportRequest request = new("Test.Export", "csv", ["Company.Name"], false, null, null, null, null);
         ExportJob job = new()
         {
@@ -234,7 +234,7 @@ public sealed class ExportOrchestratorTests
     public async Task ExecuteAsync_failure_sets_job_to_failed()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -265,7 +265,7 @@ public sealed class ExportOrchestratorTests
     public async Task ExecuteAsync_WithQueryDefinition_UsesQueryEngine()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportRequest request = new("Test.QueryExport", "csv", null, false, "-Name", null, null, null);
         ExportJob job = new()
         {
@@ -296,7 +296,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange — empty list (not null) should behave like null: return all fields
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportRequest request = new("Test.Export", "csv", [], false, null, null, null, null);
         ExportJob job = new()
         {
@@ -340,7 +340,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange — user asks for Email before Name
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportRequest request = new("Test.Export", "csv", ["Email", "Name"], false, null, null, null, null);
         ExportJob job = new()
         {
@@ -386,7 +386,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -406,7 +406,7 @@ public sealed class ExportOrchestratorTests
     public async Task ExecuteAsync_WithQueryDefinition_passes_filter_and_search()
     {
         // Arrange
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         Dictionary<string, string> filter = new() { ["name.eq"] = "Alice" };
         Dictionary<string, string> presets = new() { ["status"] = "Active" };
         ExportRequest request = new("Test.QueryExport", "csv", null, false, "-Name", filter, presets, "test search");
@@ -441,7 +441,7 @@ public sealed class ExportOrchestratorTests
     public async Task ExecuteAsync_OperationCanceledException_propagates_without_catch()
     {
         // Arrange — OperationCanceledException should NOT be caught by the error handler
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -471,7 +471,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange — xlsx format
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob job = new()
         {
             Id = jobId,
@@ -523,7 +523,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob expected = BuildJob(jobId, ExportJobStatus.Completed);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(expected);
 
@@ -541,7 +541,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Completed);
         job.BlobReference = "blob-ref-export";
         job.FileName = "test_export.csv";
@@ -565,7 +565,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Exporting);
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
@@ -581,7 +581,7 @@ public sealed class ExportOrchestratorTests
     {
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
-        Guid jobId = Guid.NewGuid();
+        var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ExportJob?)null);
 
         // Act

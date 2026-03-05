@@ -247,8 +247,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
     [Fact]
     public async Task GetSubscriberIdsAsync_IsolatesByTenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         await _store.SubscribeAsync("user-1", "order.created", tenantId: tenantA, TestContext.Current.CancellationToken);
         await _store.SubscribeAsync("user-2", "order.created", tenantId: tenantB, TestContext.Current.CancellationToken);
@@ -265,8 +265,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
     [Fact]
     public async Task GetEntityFollowerIdsAsync_IsolatesByTenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         await _store.FollowEntityAsync("user-1", "Order", "order-42", tenantId: tenantA, TestContext.Current.CancellationToken);
         await _store.FollowEntityAsync("user-2", "Order", "order-42", tenantId: tenantB, TestContext.Current.CancellationToken);
@@ -283,8 +283,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
     [Fact]
     public async Task SubscribeAsync_SameTopic_DifferentTenants_BothStored()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         await _store.SubscribeAsync("user-1", "order.created", tenantId: tenantA, TestContext.Current.CancellationToken);
         await _store.SubscribeAsync("user-1", "order.created", tenantId: tenantB, TestContext.Current.CancellationToken);
@@ -301,8 +301,8 @@ public sealed class InMemoryNotificationSubscriptionStoreTests
     [Fact]
     public async Task UnsubscribeAsync_OnlyAffectsCorrectTenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         await _store.SubscribeAsync("user-1", "order.created", tenantId: tenantA, TestContext.Current.CancellationToken);
         await _store.SubscribeAsync("user-1", "order.created", tenantId: tenantB, TestContext.Current.CancellationToken);

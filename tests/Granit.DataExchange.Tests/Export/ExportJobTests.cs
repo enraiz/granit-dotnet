@@ -46,7 +46,7 @@ public sealed class ExportJobTests
     public void Properties_CanBeSetAndRead()
     {
         var tenantId = Guid.NewGuid();
-        var now = DateTimeOffset.UtcNow;
+        DateTimeOffset now = DateTimeOffset.UtcNow;
 
         ExportJob job = new()
         {

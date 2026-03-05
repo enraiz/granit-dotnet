@@ -17,8 +17,8 @@ public sealed class DeliverNotificationCommandTests
     [Fact]
     public void RequiredProperties_AreSetCorrectly()
     {
-        Guid deliveryId = Guid.NewGuid();
-        Guid notificationId = Guid.NewGuid();
+        var deliveryId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
         DateTimeOffset occurredAt = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
         JsonElement data = JsonSerializer.SerializeToElement(new { key = "value" });
 
@@ -66,9 +66,9 @@ public sealed class DeliverNotificationCommandTests
     [Fact]
     public void AllProperties_CanBeSetViaInitializers()
     {
-        Guid deliveryId = Guid.NewGuid();
-        Guid notificationId = Guid.NewGuid();
-        Guid tenantId = Guid.NewGuid();
+        var deliveryId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DateTimeOffset occurredAt = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
         EntityReference entity = new("Document", "doc-99");
         JsonElement data = JsonSerializer.SerializeToElement(new { body = "hello" });
@@ -96,8 +96,8 @@ public sealed class DeliverNotificationCommandTests
     [Fact]
     public void Equality_SameValues_AreEqual()
     {
-        Guid deliveryId = Guid.NewGuid();
-        Guid notificationId = Guid.NewGuid();
+        var deliveryId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
         DateTimeOffset occurredAt = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
         JsonElement data = JsonSerializer.SerializeToElement(new { key = "value" });
 

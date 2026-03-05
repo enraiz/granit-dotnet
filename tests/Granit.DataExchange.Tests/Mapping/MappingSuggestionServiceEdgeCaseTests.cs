@@ -31,10 +31,10 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         // Arrange — saved mapping takes "Niss", so exact match on "Niss" should not duplicate
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns(new List<ColumnMapping>
-            {
+            .Returns<IReadOnlyList<ColumnMapping>>(
+            [
                 new("Niss", "Niss", MappingConfidence.Saved),
-            });
+            ]);
         _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
 
         List<string> headers = ["Niss", "FirstName"];
@@ -85,10 +85,10 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         // Arrange — saved mapping with null TargetProperty should be filtered out
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns(new List<ColumnMapping>
-            {
+            .Returns<IReadOnlyList<ColumnMapping>>(
+            [
                 new("Unmapped Column", null, MappingConfidence.Saved),
-            });
+            ]);
         _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
 
         List<string> headers = ["Unmapped Column"];
@@ -107,10 +107,10 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         // Arrange — saved mapping for a column not in headers
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns(new List<ColumnMapping>
-            {
+            .Returns<IReadOnlyList<ColumnMapping>>(
+            [
                 new("Ghost Column", "Niss", MappingConfidence.Saved),
-            });
+            ]);
         _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
 
         List<string> headers = ["FirstName"];
@@ -132,10 +132,10 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
                 Arg.Any<IReadOnlyList<string>>(),
                 Arg.Any<IReadOnlyList<FieldMetadata>>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new List<SemanticMappingSuggestion>
-            {
+            .Returns<IReadOnlyList<SemanticMappingSuggestion>>(
+            [
                 new("Custom Column", "Niss", 0.95),
-            });
+            ]);
 
         // "Niss" header will match exactly first, so AI suggestion for target "Niss" should be skipped
         List<string> headers = ["Niss", "Custom Column"];

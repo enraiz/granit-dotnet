@@ -78,7 +78,7 @@ public sealed class PuppeteerSharpRendererTests
 
         Func<Task> act = () => renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
 
-        var ex = await Should.ThrowAsync<InvalidOperationException>(act);
+        InvalidOperationException ex = await Should.ThrowAsync<InvalidOperationException>(act);
         ex.Message.ShouldContain("Chromium browser is not available");
     }
 

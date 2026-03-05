@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Granit.Querying.Endpoints.Tests;
+namespace Granit.Querying.Endpoints.Tests.Integration;
 
 internal sealed class TestAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,

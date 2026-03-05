@@ -119,10 +119,10 @@ public sealed class MappingSuggestionServiceTests
         // Arrange
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns(new List<ColumnMapping>
-            {
+            .Returns<IReadOnlyList<ColumnMapping>>(
+            [
                 new("My Custom Column", "Niss", MappingConfidence.Saved),
-            });
+            ]);
         _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
 
         List<string> headers = ["My Custom Column", "Niss"];
@@ -149,10 +149,10 @@ public sealed class MappingSuggestionServiceTests
                 Arg.Any<IReadOnlyList<string>>(),
                 Arg.Any<IReadOnlyList<FieldMetadata>>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new List<SemanticMappingSuggestion>
-            {
+            .Returns<IReadOnlyList<SemanticMappingSuggestion>>(
+            [
                 new("Adresse courriel", "Email", 0.95),
-            });
+            ]);
 
         List<string> headers = ["Niss", "Adresse courriel"];
 

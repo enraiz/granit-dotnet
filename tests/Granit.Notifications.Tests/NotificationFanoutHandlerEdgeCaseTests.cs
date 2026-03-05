@@ -44,7 +44,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         // Assert — defaults to InApp channel
-        List<DeliverNotificationCommand> commands = result.ToList();
+        var commands = result.ToList();
         commands.Count.ShouldBe(1);
         commands.Single().ChannelName.ShouldBe(NotificationChannels.InApp);
     }
@@ -89,7 +89,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         // Assert
-        List<DeliverNotificationCommand> commands = result.ToList();
+        var commands = result.ToList();
         commands.Single().Culture.ShouldBe("nl-BE");
     }
 
@@ -117,7 +117,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         // Assert
-        List<DeliverNotificationCommand> commands = result.ToList();
+        var commands = result.ToList();
         commands.Single().RelatedEntity.ShouldBe(entity);
     }
 
@@ -125,8 +125,8 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
     public async Task HandleAsync_command_tenant_id_uses_ambient_over_trigger()
     {
         // Arrange
-        Guid ambientTenantId = Guid.NewGuid();
-        Guid triggerTenantId = Guid.NewGuid();
+        var ambientTenantId = Guid.NewGuid();
+        var triggerTenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(ambientTenantId);
 
@@ -146,7 +146,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         // Assert — should use ambient, not trigger
-        List<DeliverNotificationCommand> commands = result.ToList();
+        var commands = result.ToList();
         commands.Single().TenantId.ShouldBe(ambientTenantId);
     }
 

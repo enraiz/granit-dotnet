@@ -6,10 +6,8 @@ namespace Granit.DataExchange.Tests;
 public sealed class ImportOptionsTests
 {
     [Fact]
-    public void SectionName_is_DataExchange()
-    {
+    public void SectionName_is_DataExchange() =>
         ImportOptions.SectionName.ShouldBe("DataExchange");
-    }
 
     [Fact]
     public void Default_max_file_size_is_50()

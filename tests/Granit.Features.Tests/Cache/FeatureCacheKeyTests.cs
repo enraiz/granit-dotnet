@@ -9,7 +9,7 @@ public sealed class FeatureCacheKeyTests
     [Fact]
     public void Build_WithTenantId_ReturnsTenantScopedKey()
     {
-        Guid tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
         string key = FeatureCacheKey.Build(tenantId, "App.Video");
 
@@ -27,8 +27,8 @@ public sealed class FeatureCacheKeyTests
     [Fact]
     public void Build_DifferentTenants_ProduceDifferentKeys()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         string keyA = FeatureCacheKey.Build(tenantA, "App.Feature");
         string keyB = FeatureCacheKey.Build(tenantB, "App.Feature");
@@ -39,7 +39,7 @@ public sealed class FeatureCacheKeyTests
     [Fact]
     public void Build_DifferentFeatures_ProduceDifferentKeys()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         string key1 = FeatureCacheKey.Build(tenantId, "App.Video");
         string key2 = FeatureCacheKey.Build(tenantId, "App.Export");

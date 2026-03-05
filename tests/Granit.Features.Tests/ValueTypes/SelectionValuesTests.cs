@@ -51,8 +51,6 @@ public sealed class SelectionValuesTests
     }
 
     [Fact]
-    public void AllowedValues_ArePreserved()
-    {
+    public void AllowedValues_ArePreserved() =>
         Tiers.AllowedValues.ShouldBe(new[] { "starter", "professional", "enterprise" });
-    }
 }

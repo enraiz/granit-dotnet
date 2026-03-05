@@ -111,6 +111,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.BackgroundJobs", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.BackgroundJobs.Tests", "tests\Granit.BackgroundJobs.Tests\Granit.BackgroundJobs.Tests.csproj", "{7CCA18F4-90AD-47FE-9C4B-DB9D9BAA655A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.BackgroundJobs.Tests.Integration", "tests\Granit.BackgroundJobs.Tests.Integration\Granit.BackgroundJobs.Tests.Integration.csproj", "{84A0E66B-8F28-410F-8A9C-98D2077249E8}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.BackgroundJobs.EntityFrameworkCore", "src\Granit.BackgroundJobs.EntityFrameworkCore\Granit.BackgroundJobs.EntityFrameworkCore.csproj", "{C90C5097-AD78-4A1B-955F-021104247D21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.BackgroundJobs.EntityFrameworkCore.Tests", "tests\Granit.BackgroundJobs.EntityFrameworkCore.Tests\Granit.BackgroundJobs.EntityFrameworkCore.Tests.csproj", "{9539D14C-1F13-4B69-A3EE-3EF4E01AA69A}"
@@ -145,7 +147,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Localization.EntityF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Localization.EntityFrameworkCore.Tests", "tests\Granit.Localization.EntityFrameworkCore.Tests\Granit.Localization.EntityFrameworkCore.Tests.csproj", "{0EA0B359-A53E-4EC8-9702-E2B8CA192F6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Wolverine.Postgresql.IntegrationTests", "tests\Granit.Wolverine.Postgresql.IntegrationTests\Granit.Wolverine.Postgresql.IntegrationTests.csproj", "{1909289C-DE85-4B9D-962E-22FB1180B2FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Wolverine.Postgresql.Tests.Integration", "tests\Granit.Wolverine.Postgresql.Tests.Integration\Granit.Wolverine.Postgresql.Tests.Integration.csproj", "{1909289C-DE85-4B9D-962E-22FB1180B2FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Validation", "src\Granit.Validation\Granit.Validation.csproj", "{C528A0EA-EB67-4EB5-B002-C124AC7FCA72}"
 EndProject
@@ -307,6 +309,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Querying.EntityFrame
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Querying.Endpoints.Tests", "tests\Granit.Querying.Endpoints.Tests\Granit.Querying.Endpoints.Tests.csproj", "{A6B46E91-62B5-4A60-9B6C-535B1CA5780F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Querying.Endpoints.Tests.Integration", "tests\Granit.Querying.Endpoints.Tests.Integration\Granit.Querying.Endpoints.Tests.Integration.csproj", "{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Identity", "src\Granit.Identity\Granit.Identity.csproj", "{22ECF93E-E411-4802-A198-4933C96CDA8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Identity.Keycloak", "src\Granit.Identity.Keycloak\Granit.Identity.Keycloak.csproj", "{83976677-3205-4156-8697-E8A5C55D8781}"
@@ -364,6 +368,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.Tests", "tests\Granit.Notifications.Tests\Granit.Notifications.Tests.csproj", "{F5620A22-00C0-4393-B71A-820CD2AD4544}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.WhatsApp.Tests", "tests\Granit.Notifications.WhatsApp.Tests\Granit.Notifications.WhatsApp.Tests.csproj", "{C3D17F27-530F-4F77-9A08-1AB5CCE2DE1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.Email.Smtp.Tests", "tests\Granit.Notifications.Email.Smtp.Tests\Granit.Notifications.Email.Smtp.Tests.csproj", "{8D07B11C-813B-48E3-B3EF-71FF70FF0557}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.Endpoints.Tests", "tests\Granit.Notifications.Endpoints.Tests\Granit.Notifications.Endpoints.Tests.csproj", "{7F7523B4-5D75-4FB8-814F-27C34C3033AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2523,6 +2531,54 @@ Global
 		{C3D17F27-530F-4F77-9A08-1AB5CCE2DE1E}.Release|x64.Build.0 = Release|Any CPU
 		{C3D17F27-530F-4F77-9A08-1AB5CCE2DE1E}.Release|x86.ActiveCfg = Release|Any CPU
 		{C3D17F27-530F-4F77-9A08-1AB5CCE2DE1E}.Release|x86.Build.0 = Release|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Debug|x64.Build.0 = Debug|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Debug|x86.Build.0 = Debug|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Release|x64.ActiveCfg = Release|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Release|x64.Build.0 = Release|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557}.Release|x86.Build.0 = Release|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Debug|x64.Build.0 = Debug|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Debug|x86.Build.0 = Debug|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Release|x64.Build.0 = Release|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF}.Release|x86.Build.0 = Release|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Debug|x64.Build.0 = Debug|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Debug|x86.Build.0 = Debug|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Release|x64.ActiveCfg = Release|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Release|x64.Build.0 = Release|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Release|x86.ActiveCfg = Release|Any CPU
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8}.Release|x86.Build.0 = Release|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Debug|x64.Build.0 = Debug|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Debug|x86.Build.0 = Debug|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Release|x64.ActiveCfg = Release|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Release|x64.Build.0 = Release|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Release|x86.ActiveCfg = Release|Any CPU
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2707,5 +2763,9 @@ Global
 		{99942821-FCAC-43B7-ABF4-330BAD8757A3} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{F5620A22-00C0-4393-B71A-820CD2AD4544} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{C3D17F27-530F-4F77-9A08-1AB5CCE2DE1E} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{8D07B11C-813B-48E3-B3EF-71FF70FF0557} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{7F7523B4-5D75-4FB8-814F-27C34C3033AF} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{84A0E66B-8F28-410F-8A9C-98D2077249E8} = {A1B2C3D4-0002-0002-0002-000000000002}
+		{17CFA79A-DC96-481A-8E20-9CD7064EDF8A} = {A1B2C3D4-0002-0002-0002-000000000002}
 	EndGlobalSection
 EndGlobal

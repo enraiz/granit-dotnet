@@ -78,7 +78,7 @@ public sealed class FeatureDefinitionContextTests
         FeatureGroupDefinition group2 = context.AddGroup("Billing");
         group2.AddToggle("Billing.Invoices");
 
-        List<FeatureDefinition> definitions = context.GetAllDefinitions().ToList();
+        var definitions = context.GetAllDefinitions().ToList();
 
         definitions.Count.ShouldBe(3);
         IEnumerable<string> names = definitions.Select(d => d.Name);

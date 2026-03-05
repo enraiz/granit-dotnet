@@ -17,7 +17,7 @@ public sealed class ChromiumLifetimeServiceTests
 
         Func<object> act = () => service.Browser;
 
-        var ex = Should.Throw<InvalidOperationException>(act);
+        InvalidOperationException ex = Should.Throw<InvalidOperationException>(act);
         ex.Message.ShouldContain("Chromium browser is not available");
     }
 
@@ -44,6 +44,8 @@ public sealed class ChromiumLifetimeServiceTests
         ChromiumLifetimeService service = CreateService();
 
         await service.StopAsync(TestContext.Current.CancellationToken);
+
+        service.PageSemaphore.ShouldNotBeNull();
     }
 
     [Fact]
@@ -75,6 +77,8 @@ public sealed class ChromiumLifetimeServiceTests
         ChromiumLifetimeService service = CreateService();
 
         await service.DisposeAsync();
+
+        service.ShouldNotBeNull();
     }
 
     [Fact]

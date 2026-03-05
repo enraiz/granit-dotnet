@@ -37,7 +37,7 @@ public sealed class NotificationSubscriptionTests
     [Fact]
     public void Properties_CanBeSet()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DateTimeOffset now = DateTimeOffset.UtcNow;
 
         NotificationSubscription subscription = new()

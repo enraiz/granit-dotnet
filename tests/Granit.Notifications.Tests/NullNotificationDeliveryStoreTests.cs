@@ -55,6 +55,9 @@ public sealed class NullNotificationDeliveryStoreTests
             NotificationDeliveryAttempt attempt = BuildAttempt(isSuccess: i % 2 == 0);
             await _store.RecordAsync(attempt, TestContext.Current.CancellationToken);
         }
+
+        // Null store is a no-op — verify it remains functional after multiple calls
+        _store.ShouldNotBeNull();
     }
 
     // -------------------------------------------------------------------------

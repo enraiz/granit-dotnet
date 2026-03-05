@@ -77,10 +77,10 @@ public sealed class EntityTrackingInterceptor(
             }
 
             string entityTypeName = (string)entityTypeNameProp.GetValue(null)!;
-            IReadOnlyDictionary<string, TrackedPropertyConfig> trackedProperties =
+            var trackedProperties =
                 (IReadOnlyDictionary<string, TrackedPropertyConfig>)trackedPropsProp.GetValue(null)!;
 
-            ITrackedEntity trackedEntity = (ITrackedEntity)entry.Entity;
+            var trackedEntity = (ITrackedEntity)entry.Entity;
             string entityId = trackedEntity.GetEntityId();
 
             foreach (PropertyEntry property in entry.Properties)

@@ -43,7 +43,7 @@ public sealed class EfCoreNotificationDeliveryStoreTests : IDisposable
     [Fact]
     public async Task RecordAsync_MultipleAttempts_AllPersisted()
     {
-        Guid notificationId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
         NotificationDeliveryAttempt attempt1 = BuildAttempt(notificationId: notificationId, channelName: "email", isSuccess: false, errorMessage: "SMTP timeout");
         NotificationDeliveryAttempt attempt2 = BuildAttempt(notificationId: notificationId, channelName: "email", isSuccess: true);
         NotificationDeliveryAttempt attempt3 = BuildAttempt(notificationId: notificationId, channelName: "sms", isSuccess: true);
