@@ -39,7 +39,7 @@ public sealed class NotificationPreferenceTests
     [Fact]
     public void Properties_CanBeSet()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DateTimeOffset now = DateTimeOffset.UtcNow;
 
         NotificationPreference preference = new()

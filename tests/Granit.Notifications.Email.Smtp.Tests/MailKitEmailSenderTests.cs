@@ -66,7 +66,7 @@ public sealed class MailKitEmailSenderTests
     [Fact]
     public void MailboxAddress_Parse_ValidEmail_Succeeds()
     {
-        MailboxAddress parsed = MailboxAddress.Parse("recipient@example.com");
+        var parsed = MailboxAddress.Parse("recipient@example.com");
         parsed.Address.ShouldBe("recipient@example.com");
     }
 

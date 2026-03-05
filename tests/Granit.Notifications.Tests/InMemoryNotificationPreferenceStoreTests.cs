@@ -141,8 +141,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
     [Fact]
     public async Task GetListAsync_IsolatesPreferencesByTenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         NotificationPreference prefTenantA = BuildPreference("user-1", "order.created", "email", tenantId: tenantA);
         NotificationPreference prefTenantB = BuildPreference("user-1", "order.created", "email", tenantId: tenantB);
@@ -162,8 +162,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
     [Fact]
     public async Task GetAsync_IsolatesPreferencesByTenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         NotificationPreference prefTenantA = BuildPreference("user-1", "order.created", "email", tenantId: tenantA, isEnabled: false);
         NotificationPreference prefTenantB = BuildPreference("user-1", "order.created", "email", tenantId: tenantB, isEnabled: true);
@@ -185,8 +185,8 @@ public sealed class InMemoryNotificationPreferenceStoreTests
     [Fact]
     public async Task IsChannelEnabledAsync_IsolatesByTenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         NotificationPreference prefTenantA = BuildPreference("user-1", "order.created", "email", tenantId: tenantA, isEnabled: false);
         await _store.SetAsync(prefTenantA, TestContext.Current.CancellationToken);

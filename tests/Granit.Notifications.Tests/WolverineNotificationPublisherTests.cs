@@ -104,7 +104,7 @@ public sealed class WolverineNotificationPublisherTests
     [Fact]
     public async Task PublishAsync_CapturesAmbientTenantId()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
 

@@ -124,7 +124,7 @@ public sealed class InAppNotificationChannelEdgeCaseTests
     public async Task SendAsync_sets_tenant_id_from_context()
     {
         // Arrange
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         UserNotification? captured = null;
         _userNotificationStore.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
@@ -154,8 +154,6 @@ public sealed class InAppNotificationChannelEdgeCaseTests
     }
 
     [Fact]
-    public void Channel_name_is_InApp()
-    {
+    public void Channel_name_is_InApp() =>
         _channel.Name.ShouldBe(NotificationChannels.InApp);
-    }
 }

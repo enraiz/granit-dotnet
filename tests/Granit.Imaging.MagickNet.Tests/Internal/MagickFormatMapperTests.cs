@@ -94,7 +94,7 @@ public sealed class MagickFormatMapperTests
     [InlineData(ImageFormat.Tiff)]
     public void RoundTrip_ImageFormat_ToMagick_AndBack(ImageFormat format)
     {
-        MagickFormat magick = MagickFormatMapper.ToMagickFormat(format);
+        var magick = MagickFormatMapper.ToMagickFormat(format);
         ImageFormat roundTripped = MagickFormatMapper.FromMagickFormat(magick);
 
         roundTripped.ShouldBe(format);

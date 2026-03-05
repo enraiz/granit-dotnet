@@ -43,7 +43,7 @@ public sealed class SmtpEmailServiceCollectionExtensionsTests
         });
 
         ServiceProvider sp = services.BuildServiceProvider();
-        var options = sp.GetRequiredService<IOptions<SmtpOptions>>().Value;
+        SmtpOptions options = sp.GetRequiredService<IOptions<SmtpOptions>>().Value;
 
         options.Host.ShouldBe("mail.example.com");
         options.Port.ShouldBe(465);

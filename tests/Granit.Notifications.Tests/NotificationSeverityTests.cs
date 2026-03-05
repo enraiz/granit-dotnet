@@ -30,8 +30,6 @@ public sealed class NotificationSeverityTests
     }
 
     [Fact]
-    public void Fatal_IsGreaterThan_Info()
-    {
+    public void Fatal_IsGreaterThan_Info() =>
         (NotificationSeverity.Fatal > NotificationSeverity.Info).ShouldBeTrue();
-    }
 }

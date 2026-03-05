@@ -16,8 +16,8 @@ public sealed class NotificationDeliveryContextTests
     [Fact]
     public void RequiredProperties_AreSetCorrectly()
     {
-        Guid notificationId = Guid.NewGuid();
-        Guid deliveryId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
+        var deliveryId = Guid.NewGuid();
         JsonElement data = JsonSerializer.SerializeToElement(new { key = "value" });
 
         NotificationDeliveryContext context = new()
@@ -77,7 +77,7 @@ public sealed class NotificationDeliveryContextTests
     [Fact]
     public void TenantId_CanBeSet()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         NotificationDeliveryContext context = new()
         {
@@ -132,8 +132,8 @@ public sealed class NotificationDeliveryContextTests
     [Fact]
     public void Equality_SameValues_AreEqual()
     {
-        Guid notificationId = Guid.NewGuid();
-        Guid deliveryId = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
+        var deliveryId = Guid.NewGuid();
         JsonElement data = JsonSerializer.SerializeToElement(new { key = "value" });
         DateTimeOffset occurredAt = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
 

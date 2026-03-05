@@ -21,22 +21,16 @@ public sealed class NotificationDefinitionTests
     }
 
     [Fact]
-    public void Constructor_NullName_ThrowsArgumentException()
-    {
+    public void Constructor_NullName_ThrowsArgumentException() =>
         Should.Throw<ArgumentException>(() => new NotificationDefinition(null!));
-    }
 
     [Fact]
-    public void Constructor_EmptyName_ThrowsArgumentException()
-    {
+    public void Constructor_EmptyName_ThrowsArgumentException() =>
         Should.Throw<ArgumentException>(() => new NotificationDefinition(""));
-    }
 
     [Fact]
-    public void Constructor_WhitespaceName_ThrowsArgumentException()
-    {
+    public void Constructor_WhitespaceName_ThrowsArgumentException() =>
         Should.Throw<ArgumentException>(() => new NotificationDefinition("   "));
-    }
 
     [Fact]
     public void DefaultSeverity_IsInfo()

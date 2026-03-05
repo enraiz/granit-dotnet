@@ -72,7 +72,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _userNotificationStore.GetListAsync("user-123", null, 0, 20, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<UserNotification>());
 
-        var response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
@@ -80,7 +80,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetNotifications_Unauthenticated_Returns401()
     {
-        var response = await _anonClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _anonClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
@@ -92,10 +92,10 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _userNotificationStore.GetUnreadCountAsync("user-123", null, Arg.Any<CancellationToken>())
             .Returns(7);
 
-        var response = await _authClient.GetAsync($"{Prefix}/unread/count", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _authClient.GetAsync($"{Prefix}/unread/count", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<UnreadCountResponse>(
+        UnreadCountResponse? result = await response.Content.ReadFromJsonAsync<UnreadCountResponse>(
             TestContext.Current.CancellationToken);
         result.ShouldNotBeNull();
         result!.Count.ShouldBe(7);
@@ -104,7 +104,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetUnreadCount_Unauthenticated_Returns401()
     {
-        var response = await _anonClient.GetAsync($"{Prefix}/unread/count", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _anonClient.GetAsync($"{Prefix}/unread/count", TestContext.Current.CancellationToken);
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
@@ -115,7 +115,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     {
         var id = Guid.NewGuid();
 
-        var response = await _authClient.PostAsync(
+        HttpResponseMessage response = await _authClient.PostAsync(
             $"{Prefix}/{id}/read", content: null, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -127,7 +127,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task MarkAllAsRead_Returns204()
     {
-        var response = await _authClient.PostAsync(
+        HttpResponseMessage response = await _authClient.PostAsync(
             $"{Prefix}/read-all", content: null, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -143,7 +143,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _userNotificationStore.GetByEntityAsync("Patient", "42", null, 0, 20, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<UserNotification>());
 
-        var response = await _authClient.GetAsync(
+        HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/entity/Patient/42", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -157,7 +157,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _preferenceStore.GetListAsync("user-123", null, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NotificationPreference>());
 
-        var response = await _authClient.GetAsync(
+        HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/preferences", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -175,7 +175,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             IsEnabled = true,
         };
 
-        var response = await _authClient.PutAsJsonAsync(
+        HttpResponseMessage response = await _authClient.PutAsJsonAsync(
             $"{Prefix}/preferences", request, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -195,7 +195,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     {
         _definitionStore.GetAll().Returns(Array.Empty<NotificationDefinition>());
 
-        var response = await _authClient.GetAsync(
+        HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/types", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -209,7 +209,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _subscriptionStore.GetUserSubscriptionsAsync("user-123", null, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NotificationSubscription>());
 
-        var response = await _authClient.GetAsync(
+        HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/subscriptions", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -220,7 +220,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task Subscribe_Returns204()
     {
-        var response = await _authClient.PostAsync(
+        HttpResponseMessage response = await _authClient.PostAsync(
             $"{Prefix}/subscriptions/Order.Shipped", content: null,
             TestContext.Current.CancellationToken);
 
@@ -234,7 +234,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task Unsubscribe_Returns204()
     {
-        var response = await _authClient.DeleteAsync(
+        HttpResponseMessage response = await _authClient.DeleteAsync(
             $"{Prefix}/subscriptions/Order.Shipped", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -247,7 +247,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task FollowEntity_Returns204()
     {
-        var response = await _authClient.PostAsync(
+        HttpResponseMessage response = await _authClient.PostAsync(
             $"{Prefix}/entity/Patient/42/follow", content: null,
             TestContext.Current.CancellationToken);
 
@@ -261,7 +261,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task UnfollowEntity_Returns204()
     {
-        var response = await _authClient.DeleteAsync(
+        HttpResponseMessage response = await _authClient.DeleteAsync(
             $"{Prefix}/entity/Patient/42/follow", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -277,7 +277,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _subscriptionStore.GetEntityFollowersAsync("Patient", "42", null, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NotificationSubscription>());
 
-        var response = await _authClient.GetAsync(
+        HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/entity/Patient/42/followers", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -294,7 +294,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _userNotificationStore.GetListAsync("user-123", tenantId, 0, 20, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<UserNotification>());
 
-        var response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await _userNotificationStore.Received(1).GetListAsync(
@@ -330,8 +330,8 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         using HttpClient client = prefixedApp.GetTestClient();
         client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "user-123");
 
-        var notFound = await client.GetAsync("/notifications", TestContext.Current.CancellationToken);
-        var ok = await client.GetAsync("/api/v1/notifications", TestContext.Current.CancellationToken);
+        HttpResponseMessage notFound = await client.GetAsync("/notifications", TestContext.Current.CancellationToken);
+        HttpResponseMessage ok = await client.GetAsync("/api/v1/notifications", TestContext.Current.CancellationToken);
 
         notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         ok.StatusCode.ShouldBe(HttpStatusCode.OK);
