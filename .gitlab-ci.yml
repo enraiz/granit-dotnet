@@ -195,6 +195,32 @@ semgrep-sast:
   before_script: []
   allow_failure: false
 
+# --- TRIVY DEPENDENCY SCAN (NuGet) ---
+trivy:fs:
+  stage: gitlab-security
+  image:
+    name: aquasec/trivy:0.69.1
+    entrypoint: ['']
+  tags:
+    - docker
+  before_script: []
+  cache:
+    key: trivy-db
+    paths:
+      - .trivy-cache/
+  variables:
+    TRIVY_CACHE_DIR: .trivy-cache
+  script:
+    # Génère le rapport pour l'interface GitLab
+    - trivy fs --format template --template "@/contrib/gitlab.tpl" --output gl-dependency-scanning-report.json .
+    # Affiche le résumé et échoue si HIGH ou CRITICAL trouvé
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --no-progress .
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
 # ---------------------------------------------------------------------------
 # ANALYSIS (SonarQube - après les tests)
 # ---------------------------------------------------------------------------
