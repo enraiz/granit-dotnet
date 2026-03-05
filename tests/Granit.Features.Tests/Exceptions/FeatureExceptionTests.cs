@@ -1,6 +1,6 @@
-using Shouldly;
 using Granit.Core.Exceptions;
 using Granit.Features.Exceptions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.Exceptions;

@@ -1,7 +1,7 @@
-using Shouldly;
 using Granit.Features.Cache;
 using Granit.Features.Events;
 using Microsoft.Extensions.Caching.Hybrid;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.Cache;

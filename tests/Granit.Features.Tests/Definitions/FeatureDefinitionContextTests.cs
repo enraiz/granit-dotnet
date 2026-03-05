@@ -1,5 +1,5 @@
-using Shouldly;
 using Granit.Features.Definitions;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.Definitions;

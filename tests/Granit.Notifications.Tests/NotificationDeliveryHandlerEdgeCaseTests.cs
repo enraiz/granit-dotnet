@@ -199,16 +199,16 @@ public sealed class NotificationDeliveryHandlerEdgeCaseTests
         string channelName = NotificationChannels.InApp,
         EntityReference? relatedEntity = null,
         string? culture = null) => new()
-    {
-        DeliveryId = Guid.NewGuid(),
-        NotificationId = Guid.NewGuid(),
-        NotificationTypeName = "test.notification",
-        RecipientUserId = "user-1",
-        ChannelName = channelName,
-        Severity = NotificationSeverity.Info,
-        Data = JsonSerializer.SerializeToElement(new { key = "value" }),
-        RelatedEntity = relatedEntity,
-        OccurredAt = DateTimeOffset.UtcNow,
-        Culture = culture,
-    };
+        {
+            DeliveryId = Guid.NewGuid(),
+            NotificationId = Guid.NewGuid(),
+            NotificationTypeName = "test.notification",
+            RecipientUserId = "user-1",
+            ChannelName = channelName,
+            Severity = NotificationSeverity.Info,
+            Data = JsonSerializer.SerializeToElement(new { key = "value" }),
+            RelatedEntity = relatedEntity,
+            OccurredAt = DateTimeOffset.UtcNow,
+            Culture = culture,
+        };
 }

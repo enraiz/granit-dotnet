@@ -1,7 +1,7 @@
-using Shouldly;
 using Granit.Features.Definitions;
 using Granit.Features.ValueProviders;
 using Granit.Features.ValueTypes;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests.ValueProviders;

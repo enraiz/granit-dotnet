@@ -188,14 +188,14 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
         EntityReference? relatedEntity = null,
         Guid? tenantId = null,
         string? culture = null) => new()
-    {
-        NotificationTypeName = notificationTypeName,
-        Severity = NotificationSeverity.Info,
-        Data = JsonSerializer.SerializeToElement(new { key = "value" }),
-        RecipientUserIds = recipientUserIds ?? ["user-1"],
-        RelatedEntity = relatedEntity,
-        TenantId = tenantId,
-        OccurredAt = DateTimeOffset.UtcNow,
-        Culture = culture,
-    };
+        {
+            NotificationTypeName = notificationTypeName,
+            Severity = NotificationSeverity.Info,
+            Data = JsonSerializer.SerializeToElement(new { key = "value" }),
+            RecipientUserIds = recipientUserIds ?? ["user-1"],
+            RelatedEntity = relatedEntity,
+            TenantId = tenantId,
+            OccurredAt = DateTimeOffset.UtcNow,
+            Culture = culture,
+        };
 }

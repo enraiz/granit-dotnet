@@ -1,9 +1,9 @@
-using Shouldly;
 using Granit.Features.AspNetCore;
 using Granit.Features.Checker;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Granit.Features.Tests;
