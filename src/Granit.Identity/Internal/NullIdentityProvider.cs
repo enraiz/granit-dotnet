@@ -4,8 +4,8 @@ namespace Granit.Identity.Internal;
 
 /// <summary>
 /// Null-object implementation of <see cref="IIdentityProvider"/>.
-/// Returns empty results for all queries. Registered by default when no
-/// provider package is installed.
+/// Returns empty results for all queries and no-ops for write operations.
+/// Registered by default when no provider package is installed.
 /// </summary>
 internal sealed class NullIdentityProvider : IIdentityProvider
 {
@@ -19,6 +19,26 @@ internal sealed class NullIdentityProvider : IIdentityProvider
     public Task<IdentityUser?> GetUserAsync(
         string userId, CancellationToken cancellationToken = default) =>
         Task.FromResult<IdentityUser?>(null);
+
+    /// <inheritdoc/>
+    public Task SetUserEnabledAsync(
+        string userId, bool enabled, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    /// <inheritdoc/>
+    public Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(
+        string userId, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<IdentitySession>>([]);
+
+    /// <inheritdoc/>
+    public Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(
+        string userId, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<IdentityDeviceActivity>>([]);
+
+    /// <inheritdoc/>
+    public Task<DateTimeOffset?> GetPasswordChangedAtAsync(
+        string userId, CancellationToken cancellationToken = default) =>
+        Task.FromResult<DateTimeOffset?>(null);
 
     /// <inheritdoc/>
     public Task<IReadOnlyList<IdentityRole>> GetRolesAsync(

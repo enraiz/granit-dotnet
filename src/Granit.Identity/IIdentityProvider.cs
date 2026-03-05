@@ -3,11 +3,11 @@ using Granit.Identity.Models;
 namespace Granit.Identity;
 
 /// <summary>
-/// Provides read access to identity users and roles from an external identity provider
+/// Provides read and write access to identity users and roles from an external identity provider
 /// (Keycloak, LDAP, Entra ID, etc.).
 /// </summary>
 /// <remarks>
-/// A <c>NullIdentityProvider</c> is registered by default (returns empty lists).
+/// A <c>NullIdentityProvider</c> is registered by default (returns empty lists / no-ops).
 /// Install a provider package (e.g. <c>Granit.Identity.Keycloak</c>) to connect
 /// to a real identity system.
 /// </remarks>
@@ -34,6 +34,56 @@ public interface IIdentityProvider
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The user, or <c>null</c> if not found.</returns>
     Task<IdentityUser?> GetUserAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Enables or disables a user account in the identity provider.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="enabled"><c>true</c> to enable the account; <c>false</c> to disable it.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task SetUserEnabledAsync(
+        string userId,
+        bool enabled,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists active SSO sessions for a user.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Active sessions, or an empty list if the user has no sessions or the provider is unavailable.</returns>
+    Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists device activity for a user, grouped by device.
+    /// </summary>
+    /// <remarks>
+    /// Device-level information (OS, browser, device type) is available only when the provider
+    /// supports it and is configured accordingly (e.g. Keycloak with token exchange enabled).
+    /// Falls back to session-level data when device details are unavailable.
+    /// </remarks>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Device activity entries, or an empty list if the provider is unavailable.</returns>
+    Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the date and time when the user last changed their password.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>
+    /// The UTC date of the last password change, or <c>null</c> if the user has no password
+    /// credential or the provider is unavailable.
+    /// </returns>
+    Task<DateTimeOffset?> GetPasswordChangedAtAsync(
         string userId,
         CancellationToken cancellationToken = default);
 
