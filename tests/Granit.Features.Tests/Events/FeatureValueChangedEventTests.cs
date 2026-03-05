@@ -9,7 +9,7 @@ public sealed class FeatureValueChangedEventTests
     [Fact]
     public void Constructor_WithTenantId_SetsProperties()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         FeatureValueChangedEvent @event = new("App.VideoConsultation", tenantId);
 
         @event.FeatureName.ShouldBe("App.VideoConsultation");
@@ -28,7 +28,7 @@ public sealed class FeatureValueChangedEventTests
     [Fact]
     public void Record_Equality_SameValues_AreEqual()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         FeatureValueChangedEvent a = new("App.Feature", tenantId);
         FeatureValueChangedEvent b = new("App.Feature", tenantId);
 
@@ -38,7 +38,7 @@ public sealed class FeatureValueChangedEventTests
     [Fact]
     public void Record_Equality_DifferentFeatureName_AreNotEqual()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         FeatureValueChangedEvent a = new("App.FeatureA", tenantId);
         FeatureValueChangedEvent b = new("App.FeatureB", tenantId);
 
@@ -66,7 +66,7 @@ public sealed class FeatureValueChangedEventTests
     [Fact]
     public void Record_With_CreatesNewInstance()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         FeatureValueChangedEvent original = new("App.Feature", tenantId);
         FeatureValueChangedEvent modified = original with { FeatureName = "App.Other" };
 
@@ -78,7 +78,7 @@ public sealed class FeatureValueChangedEventTests
     [Fact]
     public void ToString_ContainsFeatureNameAndTenantId()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         FeatureValueChangedEvent @event = new("App.Feature", tenantId);
 
         string text = @event.ToString();

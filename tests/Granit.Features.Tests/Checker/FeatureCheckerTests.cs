@@ -166,7 +166,7 @@ public sealed class FeatureCheckerTests
     [Fact]
     public async Task TenantOverride_Takes_Precedence_Over_Default()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         InMemoryFeatureStore featureStore = new();
         await featureStore.SetAsync("App.VideoConsultation", tenantId.ToString(), "true",
             TestContext.Current.CancellationToken);
@@ -237,7 +237,7 @@ public sealed class FeatureCheckerTests
     [Fact]
     public async Task NoCurrentTenant_Registered_TenantOverride_NotApplied()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         InMemoryFeatureStore featureStore = new();
         await featureStore.SetAsync("App.VideoConsultation", tenantId.ToString(), "true",
             TestContext.Current.CancellationToken);

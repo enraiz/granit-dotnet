@@ -29,7 +29,7 @@ public sealed class RequiresFeatureAttributeTests
     [Fact]
     public void AttributeUsage_AllowsMultiple()
     {
-        AttributeUsageAttribute? usage = (AttributeUsageAttribute?)Attribute.GetCustomAttribute(
+        var usage = (AttributeUsageAttribute?)Attribute.GetCustomAttribute(
             typeof(RequiresFeatureAttribute), typeof(AttributeUsageAttribute));
 
         usage.ShouldNotBeNull();
@@ -39,7 +39,7 @@ public sealed class RequiresFeatureAttributeTests
     [Fact]
     public void AttributeUsage_IsInherited()
     {
-        AttributeUsageAttribute? usage = (AttributeUsageAttribute?)Attribute.GetCustomAttribute(
+        var usage = (AttributeUsageAttribute?)Attribute.GetCustomAttribute(
             typeof(RequiresFeatureAttribute), typeof(AttributeUsageAttribute));
 
         usage.ShouldNotBeNull();
@@ -49,7 +49,7 @@ public sealed class RequiresFeatureAttributeTests
     [Fact]
     public void AttributeUsage_TargetsClassAndMethod()
     {
-        AttributeUsageAttribute? usage = (AttributeUsageAttribute?)Attribute.GetCustomAttribute(
+        var usage = (AttributeUsageAttribute?)Attribute.GetCustomAttribute(
             typeof(RequiresFeatureAttribute), typeof(AttributeUsageAttribute));
 
         usage.ShouldNotBeNull();

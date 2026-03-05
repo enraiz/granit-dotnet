@@ -22,7 +22,7 @@ public sealed class PropertyMappingTests
         };
 
         // Act
-        FieldMetadata metadata = mapping.ToFieldMetadata();
+        var metadata = mapping.ToFieldMetadata();
 
         // Assert
         metadata.PropertyPath.ShouldBe("Email");
@@ -43,7 +43,7 @@ public sealed class PropertyMappingTests
         };
 
         // Act
-        FieldMetadata metadata = mapping.ToFieldMetadata();
+        var metadata = mapping.ToFieldMetadata();
 
         // Assert
         metadata.DisplayName.ShouldBeNull();

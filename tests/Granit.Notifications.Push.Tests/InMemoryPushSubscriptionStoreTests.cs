@@ -65,8 +65,8 @@ public sealed class InMemoryPushSubscriptionStoreTests
     [Fact]
     public async Task Get_DifferentTenant_ReturnsEmpty()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
         PushSubscriptionInfo subscription = BuildSubscription("https://push.example.com/1");
         await _store.SaveSubscriptionAsync("user-1", subscription, tenantA, TestContext.Current.CancellationToken);
 

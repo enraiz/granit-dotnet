@@ -31,8 +31,8 @@ public sealed class PushNotificationChannelTests
 
     static PushNotificationChannelTests()
     {
-        using ECDsa ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-        ECParameters parameters = ecdsa.ExportParameters(includePrivateParameters: false);
+        using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var parameters = ecdsa.ExportParameters(includePrivateParameters: false);
         // Uncompressed P-256 public key: 0x04 || X || Y
         byte[] uncompressedKey = [0x04, .. parameters.Q.X!, .. parameters.Q.Y!];
         TestP256dh = Base64UrlEncode(uncompressedKey);
@@ -164,7 +164,7 @@ public sealed class PushNotificationChannelTests
     {
         MockHttpMessageHandler handler = new() { ResponseStatusCode = HttpStatusCode.Gone };
         PushNotificationChannel channel = BuildChannel(handler);
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         NotificationDeliveryContext context = new()
         {
             DeliveryId = Guid.NewGuid(),
@@ -224,7 +224,7 @@ public sealed class PushNotificationChannelTests
     {
         MockHttpMessageHandler handler = new();
         PushNotificationChannel channel = BuildChannel(handler);
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         NotificationDeliveryContext context = new()
         {
             DeliveryId = Guid.NewGuid(),
@@ -295,8 +295,8 @@ public sealed class PushNotificationChannelTests
 
     private static VapidAuthentication CreateTestVapidAuthentication()
     {
-        using ECDsa ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-        ECParameters parameters = ecdsa.ExportParameters(includePrivateParameters: true);
+        using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var parameters = ecdsa.ExportParameters(includePrivateParameters: true);
         string publicKey = Base64UrlEncode([0x04, .. parameters.Q.X!, .. parameters.Q.Y!]);
         string privateKey = Base64UrlEncode(parameters.D!);
         return new VapidAuthentication(publicKey, privateKey) { Subject = "mailto:test@test.com" };

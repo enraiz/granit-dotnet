@@ -84,8 +84,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
 
         _handler.Requests.Count.ShouldBe(1);
         string body = _handler.Requests[0].Body;
-        using JsonDocument doc = JsonDocument.Parse(body);
-        JsonElement root = doc.RootElement;
+        using var doc = JsonDocument.Parse(body);
+        var root = doc.RootElement;
         root.GetProperty("to")[0].GetProperty("email").GetString().ShouldBe("user@test.com");
         root.GetProperty("subject").GetString().ShouldBe("Test Subject");
         root.GetProperty("htmlContent").GetString().ShouldBe("<p>Hello</p>");
@@ -184,8 +184,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
 
         _handler.Requests.Count.ShouldBe(1);
         string body = _handler.Requests[0].Body;
-        using JsonDocument doc = JsonDocument.Parse(body);
-        JsonElement root = doc.RootElement;
+        using var doc = JsonDocument.Parse(body);
+        var root = doc.RootElement;
         root.GetProperty("recipient").GetString().ShouldBe("+32470000000");
         root.GetProperty("content").GetString().ShouldBe("Hello SMS");
         root.GetProperty("type").GetString().ShouldBe("transactional");
@@ -263,8 +263,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
 
         _handler.Requests.Count.ShouldBe(1);
         string body = _handler.Requests[0].Body;
-        using JsonDocument doc = JsonDocument.Parse(body);
-        JsonElement root = doc.RootElement;
+        using var doc = JsonDocument.Parse(body);
+        var root = doc.RootElement;
         root.GetProperty("contactNumbers")[0].GetString().ShouldBe("+32470000000");
         root.GetProperty("templateId").GetString().ShouldBe("welcome_template");
         root.GetProperty("params")[0].GetString().ShouldBe("Jean");

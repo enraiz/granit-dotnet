@@ -27,7 +27,7 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
     public async Task GetListAsync_ReturnsUserPreferences()
     {
         string userId = "user-prefs";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         NotificationPreference pref1 = BuildPreference(userId: userId, tenantId: tenantId, notificationTypeName: "type-a", channelName: "email");
         NotificationPreference pref2 = BuildPreference(userId: userId, tenantId: tenantId, notificationTypeName: "type-b", channelName: "sms");
@@ -47,7 +47,7 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
     public async Task SetAsync_InsertsNewPreference()
     {
         string userId = "user-insert";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         NotificationPreference preference = BuildPreference(userId: userId, tenantId: tenantId, isEnabled: false);
 
         await _store.SetAsync(preference, TestContext.Current.CancellationToken);
@@ -62,7 +62,7 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
     public async Task SetAsync_UpdatesExistingPreference()
     {
         string userId = "user-update";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         string typeName = "order.created";
         string channelName = "email";
 
@@ -93,7 +93,7 @@ public sealed class EfCoreNotificationPreferenceStoreTests : IDisposable
     public async Task IsChannelEnabledAsync_WithPreference_ReturnsStoredValue()
     {
         string userId = "user-channel-check";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         string typeName = "alert.critical";
         string channelName = "sms";
 

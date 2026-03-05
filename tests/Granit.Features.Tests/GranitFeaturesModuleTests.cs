@@ -24,7 +24,7 @@ public sealed class GranitFeaturesModuleTests
     [Fact]
     public void Module_DependsOn_GranitCachingModule()
     {
-        DependsOnAttribute[] attributes = (DependsOnAttribute[])Attribute.GetCustomAttributes(
+        var attributes = (DependsOnAttribute[])Attribute.GetCustomAttributes(
             typeof(GranitFeaturesModule), typeof(DependsOnAttribute));
 
         attributes.SelectMany(a => a.DependedTypes)
@@ -34,7 +34,7 @@ public sealed class GranitFeaturesModuleTests
     [Fact]
     public void Module_DependsOn_GranitLocalizationModule()
     {
-        DependsOnAttribute[] attributes = (DependsOnAttribute[])Attribute.GetCustomAttributes(
+        var attributes = (DependsOnAttribute[])Attribute.GetCustomAttributes(
             typeof(GranitFeaturesModule), typeof(DependsOnAttribute));
 
         attributes.SelectMany(a => a.DependedTypes)
@@ -42,16 +42,12 @@ public sealed class GranitFeaturesModuleTests
     }
 
     [Fact]
-    public void Module_IsSealed()
-    {
+    public void Module_IsSealed() =>
         typeof(GranitFeaturesModule).IsSealed.ShouldBeTrue();
-    }
 
     [Fact]
-    public void Module_InheritsFrom_GranitModule()
-    {
+    public void Module_InheritsFrom_GranitModule() =>
         typeof(GranitFeaturesModule).IsSubclassOf(typeof(GranitModule)).ShouldBeTrue();
-    }
 
     // -------------------------------------------------------------------------
     // ConfigureServices — registers feature infrastructure

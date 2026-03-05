@@ -10,7 +10,7 @@ public sealed class FeaturesLocalizationResourceTests
     [Fact]
     public void LocalizationResourceNameAttribute_HasName_Features()
     {
-        LocalizationResourceNameAttribute? attribute =
+        var attribute =
             (LocalizationResourceNameAttribute?)Attribute.GetCustomAttribute(
                 typeof(FeaturesLocalizationResource),
                 typeof(LocalizationResourceNameAttribute));
@@ -22,7 +22,7 @@ public sealed class FeaturesLocalizationResourceTests
     [Fact]
     public void InheritResourceAttribute_InheritsFrom_GranitLocalizationResource()
     {
-        InheritResourceAttribute? attribute =
+        var attribute =
             (InheritResourceAttribute?)Attribute.GetCustomAttribute(
                 typeof(FeaturesLocalizationResource),
                 typeof(InheritResourceAttribute));
@@ -32,8 +32,6 @@ public sealed class FeaturesLocalizationResourceTests
     }
 
     [Fact]
-    public void Class_IsSealed()
-    {
+    public void Class_IsSealed() =>
         typeof(FeaturesLocalizationResource).IsSealed.ShouldBeTrue();
-    }
 }

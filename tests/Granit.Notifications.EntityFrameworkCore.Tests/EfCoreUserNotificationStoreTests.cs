@@ -43,7 +43,7 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
     public async Task GetListAsync_ReturnsPaginatedResults_SortedByDate()
     {
         string userId = "user-paginated";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         DateTimeOffset baseTime = DateTimeOffset.UtcNow;
 
         // Insert 5 notifications with different timestamps
@@ -65,8 +65,8 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
     [Fact]
     public async Task GetListAsync_FiltersByRecipientAndTenant()
     {
-        Guid tenantA = Guid.NewGuid();
-        Guid tenantB = Guid.NewGuid();
+        var tenantA = Guid.NewGuid();
+        var tenantB = Guid.NewGuid();
 
         await _store.InsertAsync(BuildNotification(recipientUserId: "user-a", tenantId: tenantA), TestContext.Current.CancellationToken);
         await _store.InsertAsync(BuildNotification(recipientUserId: "user-a", tenantId: tenantB), TestContext.Current.CancellationToken);
@@ -83,7 +83,7 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
     public async Task GetUnreadCountAsync_ReturnsCorrectCount()
     {
         string userId = "user-unread-count";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         // Insert 3 unread notifications
         for (int i = 0; i < 3; i++)
@@ -121,7 +121,7 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
     public async Task MarkAllAsReadAsync_MarksAllUnreadAsRead()
     {
         string userId = "user-mark-all";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         // Insert 3 unread notifications
         for (int i = 0; i < 3; i++)
@@ -142,7 +142,7 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
     [Fact]
     public async Task GetByEntityAsync_FiltersCorrectly()
     {
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         string entityType = "Order";
         string entityId = "order-42";
 

@@ -24,14 +24,10 @@ public sealed class GranitDataExchangeModuleTests
     }
 
     [Fact]
-    public void Module_is_sealed()
-    {
+    public void Module_is_sealed() =>
         typeof(GranitDataExchangeModule).IsSealed.ShouldBeTrue();
-    }
 
     [Fact]
-    public void Module_inherits_from_GranitModule()
-    {
+    public void Module_inherits_from_GranitModule() =>
         typeof(GranitDataExchangeModule).BaseType.ShouldBe(typeof(GranitModule));
-    }
 }

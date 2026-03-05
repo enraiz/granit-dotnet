@@ -28,7 +28,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
     {
         string userId = "user-sub";
         string typeName = "order.created";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.SubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
 
@@ -41,7 +41,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
     {
         string userId = "user-dup";
         string typeName = "order.created";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.SubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
         await _store.SubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
@@ -55,7 +55,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
     {
         string userId = "user-unsub";
         string typeName = "order.created";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.SubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
         await _store.UnsubscribeAsync(userId, typeName, tenantId, TestContext.Current.CancellationToken);
@@ -68,7 +68,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
     public async Task GetSubscriberIdsAsync_ReturnsSubscribers()
     {
         string typeName = "invoice.paid";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.SubscribeAsync("user-a", typeName, tenantId, TestContext.Current.CancellationToken);
         await _store.SubscribeAsync("user-b", typeName, tenantId, TestContext.Current.CancellationToken);
@@ -87,7 +87,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         string userId = "user-follow";
         string entityType = "Order";
         string entityId = "order-42";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.FollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
 
@@ -101,7 +101,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         string userId = "user-dup-follow";
         string entityType = "Order";
         string entityId = "order-42";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.FollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
         await _store.FollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
@@ -116,7 +116,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
         string userId = "user-unfollow";
         string entityType = "Order";
         string entityId = "order-42";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.FollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
         await _store.UnfollowEntityAsync(userId, entityType, entityId, tenantId, TestContext.Current.CancellationToken);
@@ -130,7 +130,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
     {
         string entityType = "Project";
         string entityId = "proj-10";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.FollowEntityAsync("user-x", entityType, entityId, tenantId, TestContext.Current.CancellationToken);
         await _store.FollowEntityAsync("user-y", entityType, entityId, tenantId, TestContext.Current.CancellationToken);
@@ -148,7 +148,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
     {
         string entityType = "Task";
         string entityId = "task-5";
-        Guid tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
 
         await _store.FollowEntityAsync("user-1", entityType, entityId, tenantId, TestContext.Current.CancellationToken);
         await _store.FollowEntityAsync("user-2", entityType, entityId, tenantId, TestContext.Current.CancellationToken);
