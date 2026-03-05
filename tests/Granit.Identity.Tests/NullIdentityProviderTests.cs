@@ -59,8 +59,11 @@ public sealed class NullIdentityProviderTests
     [Fact]
     public async Task SetUserEnabledAsync_CompletesWithoutError()
     {
-        await _provider.SetUserEnabledAsync("user-1", true, TestContext.Current.CancellationToken);
-        await _provider.SetUserEnabledAsync("user-1", false, TestContext.Current.CancellationToken);
+        await Should.NotThrowAsync(async () =>
+        {
+            await _provider.SetUserEnabledAsync("user-1", true, TestContext.Current.CancellationToken);
+            await _provider.SetUserEnabledAsync("user-1", false, TestContext.Current.CancellationToken);
+        });
     }
 
     [Fact]
