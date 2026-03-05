@@ -23,14 +23,21 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
     };
 
     private readonly KeycloakAdminTokenService _tokenService;
+    private readonly KeycloakUserTokenExchangeService _tokenExchangeService;
     private readonly KeycloakIdentityProvider _provider;
+
+    // Separate handler for token exchange responses (Account API user tokens).
+    private readonly MockHttpMessageHandler _tokenExchangeHandler = new()
+    {
+        ResponseBody = """{"access_token":"user-token","expires_in":300}""",
+    };
 
     public KeycloakIdentityProviderTests()
     {
         _httpClient = new HttpClient(_handler) { BaseAddress = new Uri("https://keycloak.test/") };
         _httpClientFactory.CreateClient("KeycloakAdmin").Returns(_httpClient);
 
-        // Token service returns a fake token.
+        // Token service returns a fake admin token.
         MockHttpMessageHandler tokenHandler = new()
         {
             ResponseBody = """{"access_token":"fake-token","expires_in":300}""",
@@ -44,8 +51,19 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             Options.Create(_options),
             NullLogger<KeycloakAdminTokenService>.Instance);
 
+        // Token exchange service uses a dedicated factory that returns the user token.
+        HttpClient exchangeClient = new(_tokenExchangeHandler) { BaseAddress = new Uri("https://keycloak.test/") };
+        IHttpClientFactory exchangeFactory = Substitute.For<IHttpClientFactory>();
+        exchangeFactory.CreateClient("KeycloakAdmin").Returns(exchangeClient);
+
+        _tokenExchangeService = new KeycloakUserTokenExchangeService(
+            exchangeFactory,
+            Options.Create(_options),
+            NullLogger<KeycloakUserTokenExchangeService>.Instance);
+
         _provider = new KeycloakIdentityProvider(
             _tokenService,
+            _tokenExchangeService,
             _httpClientFactory,
             Options.Create(_options),
             NullLogger<KeycloakIdentityProvider>.Instance);
@@ -353,6 +371,266 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
 
         _handler.Requests.Count.ShouldBe(1);
         _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/roles");
+    }
+
+    // --- SetUserEnabledAsync tests ---
+
+    [Fact]
+    public async Task SetUserEnabledAsync_Enable_SendsPutWithEnabledTrue()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.SetUserEnabledAsync("user-1", true, TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Method.ShouldBe("PUT");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-1");
+        _handler.Requests[0].Body.ShouldContain("\"enabled\":true");
+    }
+
+    [Fact]
+    public async Task SetUserEnabledAsync_Disable_SendsEnabledFalse()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.SetUserEnabledAsync("user-1", false, TestContext.Current.CancellationToken);
+
+        _handler.Requests[0].Body.ShouldContain("\"enabled\":false");
+    }
+
+    [Fact]
+    public async Task SetUserEnabledAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.SetUserEnabledAsync(null!, true, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SetUserEnabledAsync_KeycloakError_PropagatesException()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.Forbidden;
+        _handler.ResponseBody = string.Empty;
+
+        await Should.ThrowAsync<HttpRequestException>(
+            () => _provider.SetUserEnabledAsync("user-1", true, TestContext.Current.CancellationToken));
+    }
+
+    // --- GetUserSessionsAsync tests ---
+
+    [Fact]
+    public async Task GetUserSessionsAsync_WithSessions_ReturnsIdentitySessions()
+    {
+        _handler.ResponseBody = """[{"id":"sess-1","ipAddress":"1.2.3.4","start":1700000000000,"lastAccess":1700001000000,"rememberMe":false,"clients":{"client-id":"guava-app"}},{"id":"sess-2","ipAddress":"5.6.7.8","start":1700002000000,"lastAccess":1700003000000,"rememberMe":true,"clients":{}}]""";
+
+        IReadOnlyList<IdentitySession> result = await _provider.GetUserSessionsAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(2);
+        result[0].SessionId.ShouldBe("sess-1");
+        result[0].IpAddress.ShouldBe("1.2.3.4");
+        result[0].StartedAt.ShouldBe(DateTimeOffset.FromUnixTimeMilliseconds(1700000000000));
+        result[0].LastAccess.ShouldBe(DateTimeOffset.FromUnixTimeMilliseconds(1700001000000));
+        result[0].RememberMe.ShouldBeFalse();
+        result[0].Clients.ShouldContain("guava-app");
+        result[1].SessionId.ShouldBe("sess-2");
+        result[1].RememberMe.ShouldBeTrue();
+        result[1].Clients.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetUserSessionsAsync_EmptyResponse_ReturnsEmptyList()
+    {
+        _handler.ResponseBody = "[]";
+
+        IReadOnlyList<IdentitySession> result = await _provider.GetUserSessionsAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetUserSessionsAsync_KeycloakError_ReturnsEmptyList()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.ServiceUnavailable;
+        _handler.ResponseBody = string.Empty;
+
+        IReadOnlyList<IdentitySession> result = await _provider.GetUserSessionsAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetUserSessionsAsync_CallsCorrectEndpoint()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUserSessionsAsync("user-abc", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-abc/sessions");
+    }
+
+    [Fact]
+    public async Task GetUserSessionsAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.GetUserSessionsAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- GetUserDeviceActivityAsync tests (admin sessions fallback) ---
+
+    [Fact]
+    public async Task GetUserDeviceActivityAsync_WithoutTokenExchange_UsesAdminSessions()
+    {
+        _handler.ResponseBody = """[{"id":"sess-1","ipAddress":"1.2.3.4","start":1700000000000,"lastAccess":1700001000000,"rememberMe":false,"clients":{"client-id":"guava-app"}}]""";
+
+        IReadOnlyList<IdentityDeviceActivity> result = await _provider.GetUserDeviceActivityAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(1);
+        result[0].IpAddress.ShouldBe("1.2.3.4");
+        result[0].LastAccess.ShouldBe(DateTimeOffset.FromUnixTimeMilliseconds(1700001000000));
+        result[0].Device.ShouldBeNull();
+        result[0].Os.ShouldBeNull();
+        result[0].Browser.ShouldBeNull();
+        result[0].Sessions.Count.ShouldBe(1);
+        result[0].Sessions[0].SessionId.ShouldBe("sess-1");
+    }
+
+    [Fact]
+    public async Task GetUserDeviceActivityAsync_WithTokenExchange_CallsAccountApi()
+    {
+        KeycloakAdminOptions opts = new()
+        {
+            BaseUrl = "https://keycloak.test",
+            Realm = "test-realm",
+            ClientId = "admin-service",
+            ClientSecret = "secret",
+            UseTokenExchangeForDeviceActivity = true,
+        };
+
+        // Sequence: call 1 = token exchange POST → user token; call 2 = GET /account/sessions/devices → devices.
+        MockSequenceHttpMessageHandler seqHandler = new(
+        [
+            """{"access_token":"user-token","expires_in":300}""",
+            """[{"ipAddress":"9.10.11.12","os":"Windows","osVersion":"10","browser":"Chrome/120.0","device":"Desktop","mobile":false,"current":true,"lastAccess":1700005000000,"sessions":[{"id":"sess-x","ipAddress":"9.10.11.12","start":1700004000000,"lastAccess":1700005000000,"rememberMe":false,"clients":{"app-id":"guava-app"}}]}]""",
+        ]);
+        HttpClient seqClient = new(seqHandler) { BaseAddress = new Uri("https://keycloak.test/") };
+        IHttpClientFactory seqFactory = Substitute.For<IHttpClientFactory>();
+        seqFactory.CreateClient("KeycloakAdmin").Returns(seqClient);
+
+        KeycloakUserTokenExchangeService exchangeSvc = new(
+            seqFactory,
+            Options.Create(opts),
+            NullLogger<KeycloakUserTokenExchangeService>.Instance);
+
+        KeycloakIdentityProvider provider = new(
+            _tokenService,
+            exchangeSvc,
+            seqFactory,
+            Options.Create(opts),
+            NullLogger<KeycloakIdentityProvider>.Instance);
+
+        IReadOnlyList<IdentityDeviceActivity> result = await provider.GetUserDeviceActivityAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(1);
+        result[0].Os.ShouldBe("Windows");
+        result[0].OsVersion.ShouldBe("10");
+        result[0].Browser.ShouldBe("Chrome/120.0");
+        result[0].Device.ShouldBe("Desktop");
+        result[0].Mobile.ShouldBeFalse();
+        result[0].Current.ShouldBeTrue();
+        result[0].Sessions.Count.ShouldBe(1);
+        result[0].Sessions[0].SessionId.ShouldBe("sess-x");
+    }
+
+    [Fact]
+    public async Task GetUserDeviceActivityAsync_KeycloakError_ReturnsEmptyList()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.ServiceUnavailable;
+        _handler.ResponseBody = string.Empty;
+
+        IReadOnlyList<IdentityDeviceActivity> result = await _provider.GetUserDeviceActivityAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetUserDeviceActivityAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.GetUserDeviceActivityAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- GetPasswordChangedAtAsync tests ---
+
+    [Fact]
+    public async Task GetPasswordChangedAtAsync_WithPasswordCredential_ReturnsDate()
+    {
+        _handler.ResponseBody = """[{"id":"cred-1","type":"password","createdDate":1699000000000},{"id":"cred-2","type":"otp","createdDate":1699100000000}]""";
+
+        DateTimeOffset? result = await _provider.GetPasswordChangedAtAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldNotBeNull();
+        result!.Value.ShouldBe(DateTimeOffset.FromUnixTimeMilliseconds(1699000000000));
+    }
+
+    [Fact]
+    public async Task GetPasswordChangedAtAsync_WithoutPasswordCredential_ReturnsNull()
+    {
+        _handler.ResponseBody = """[{"id":"cred-1","type":"otp","createdDate":1699100000000}]""";
+
+        DateTimeOffset? result = await _provider.GetPasswordChangedAtAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetPasswordChangedAtAsync_EmptyCredentials_ReturnsNull()
+    {
+        _handler.ResponseBody = "[]";
+
+        DateTimeOffset? result = await _provider.GetPasswordChangedAtAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetPasswordChangedAtAsync_KeycloakError_ReturnsNull()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.ServiceUnavailable;
+        _handler.ResponseBody = string.Empty;
+
+        DateTimeOffset? result = await _provider.GetPasswordChangedAtAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetPasswordChangedAtAsync_CallsCorrectEndpoint()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetPasswordChangedAtAsync("user-abc", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-abc/credentials");
+    }
+
+    [Fact]
+    public async Task GetPasswordChangedAtAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.GetPasswordChangedAtAsync(null!, TestContext.Current.CancellationToken));
     }
 
     public void Dispose() => _httpClient.Dispose();

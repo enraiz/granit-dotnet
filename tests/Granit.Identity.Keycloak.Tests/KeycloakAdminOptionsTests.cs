@@ -170,6 +170,37 @@ public sealed class KeycloakAdminOptionsTests
     }
 
     [Fact]
+    public void GetUserSessionsEndpoint_ReturnsCorrectUrl()
+    {
+        string endpoint = _options.GetUserSessionsEndpoint("user-123");
+
+        endpoint.ShouldBe(
+            "https://keycloak.example.com/admin/realms/test-realm/users/user-123/sessions");
+    }
+
+    [Fact]
+    public void GetUserCredentialsEndpoint_ReturnsCorrectUrl()
+    {
+        string endpoint = _options.GetUserCredentialsEndpoint("user-123");
+
+        endpoint.ShouldBe(
+            "https://keycloak.example.com/admin/realms/test-realm/users/user-123/credentials");
+    }
+
+    [Fact]
+    public void GetAccountSessionsDevicesEndpoint_ReturnsCorrectUrl()
+    {
+        string endpoint = _options.GetAccountSessionsDevicesEndpoint();
+
+        endpoint.ShouldBe(
+            "https://keycloak.example.com/realms/test-realm/account/sessions/devices");
+    }
+
+    [Fact]
+    public void UseTokenExchangeForDeviceActivity_DefaultsToFalse() =>
+        new KeycloakAdminOptions().UseTokenExchangeForDeviceActivity.ShouldBeFalse();
+
+    [Fact]
     public void DefaultValues_AreEmptyStrings()
     {
         var options = new KeycloakAdminOptions();

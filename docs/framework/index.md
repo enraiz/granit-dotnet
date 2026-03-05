@@ -39,6 +39,7 @@ Identité, droits d'accès et protection des secrets.
 | --- | --- |
 | [authentication.md](security/authentication.md) | JWT Bearer, intégration Keycloak |
 | [authorization.md](security/authorization.md) | Policies RBAC, ICurrentUserService |
+| [identity.md](security/identity.md) | `IIdentityProvider` — users, sessions, device activity, enable/disable, mot de passe |
 | [encryption.md](security/encryption.md) | Chiffrement Transit via Vault |
 | [vault.md](security/vault.md) | VaultSharp, credentials dynamiques PostgreSQL, leases |
 | [cors.md](security/cors.md) | Configuration CORS standardisée, validation HDS au démarrage |

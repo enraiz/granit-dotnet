@@ -57,6 +57,40 @@ public sealed class NullIdentityProviderTests
     }
 
     [Fact]
+    public async Task SetUserEnabledAsync_CompletesWithoutError()
+    {
+        await _provider.SetUserEnabledAsync("user-1", true, TestContext.Current.CancellationToken);
+        await _provider.SetUserEnabledAsync("user-1", false, TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    public async Task GetUserSessionsAsync_ReturnsEmptyList()
+    {
+        IReadOnlyList<IdentitySession> result = await _provider.GetUserSessionsAsync(
+            "any-user-id", TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetUserDeviceActivityAsync_ReturnsEmptyList()
+    {
+        IReadOnlyList<IdentityDeviceActivity> result = await _provider.GetUserDeviceActivityAsync(
+            "any-user-id", TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetPasswordChangedAtAsync_ReturnsNull()
+    {
+        DateTimeOffset? result = await _provider.GetPasswordChangedAtAsync(
+            "any-user-id", TestContext.Current.CancellationToken);
+
+        result.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task GetRolesAsync_ReturnsEmptyList()
     {
         IReadOnlyList<IdentityRole> result = await _provider.GetRolesAsync(
