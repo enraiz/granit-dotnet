@@ -117,19 +117,33 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
 
     private static async Task CreateDatabaseAsync(string adminConnectionString, string dbName)
     {
-        await using NpgsqlConnection conn = new(adminConnectionString);
-        await conn.OpenAsync().ConfigureAwait(false);
-
-        // Check if the database already exists before creating.
-        await using NpgsqlCommand checkCmd = conn.CreateCommand();
-        checkCmd.CommandText = $"SELECT 1 FROM pg_database WHERE datname = '{dbName}'";
-        object? exists = await checkCmd.ExecuteScalarAsync().ConfigureAwait(false);
-
-        if (exists is null)
+        // Retry to handle transient DNS/networking delays when the CI PostgreSQL service is starting.
+        const int maxAttempts = 5;
+        for (int attempt = 1; ; attempt++)
         {
-            await using NpgsqlCommand createCmd = conn.CreateCommand();
-            createCmd.CommandText = $"CREATE DATABASE {dbName}";
-            await createCmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+            try
+            {
+                await using NpgsqlConnection conn = new(adminConnectionString);
+                await conn.OpenAsync().ConfigureAwait(false);
+
+                // Check if the database already exists before creating.
+                await using NpgsqlCommand checkCmd = conn.CreateCommand();
+                checkCmd.CommandText = $"SELECT 1 FROM pg_database WHERE datname = '{dbName}'";
+                object? exists = await checkCmd.ExecuteScalarAsync().ConfigureAwait(false);
+
+                if (exists is null)
+                {
+                    await using NpgsqlCommand createCmd = conn.CreateCommand();
+                    createCmd.CommandText = $"CREATE DATABASE {dbName}";
+                    await createCmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                }
+
+                return;
+            }
+            catch when (attempt < maxAttempts)
+            {
+                await Task.Delay(attempt * 1_000).ConfigureAwait(false);
+            }
         }
     }
 
