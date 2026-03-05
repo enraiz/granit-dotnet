@@ -13,6 +13,13 @@ using Xunit;
 
 namespace Granit.BackgroundJobs.Tests.Integration;
 
+// Duplicated from Granit.BackgroundJobs.Tests to avoid cross-test-project references.
+[RecurringJob("0 8 * * *", "fake-daily-report")]
+public sealed class FakeDailyReportMessage;
+
+[RecurringJob("0 * * * *", "fake-hourly-cleanup")]
+public sealed class FakeHourlyCleanupMessage;
+
 /// <summary>
 /// Integration tests validating interactions between real components
 /// (InMemoryBackgroundJobStore + RecurringJobSchedulingMiddleware + BackgroundJobManager)
@@ -20,8 +27,7 @@ namespace Granit.BackgroundJobs.Tests.Integration;
 /// </summary>
 public sealed class BackgroundJobsIntegrationTests
 {
-    // Uses FakeDailyReportMessage from RecurringJobDiscoveryTests.cs (public, same assembly).
-    // [RecurringJob("0 8 * * *", "fake-daily-report")]
+    // FakeDailyReportMessage and FakeHourlyCleanupMessage are defined above in this file.
 
     private static RecurringJobRegistration DailyRegistration() =>
         new("fake-daily-report", "0 8 * * *",

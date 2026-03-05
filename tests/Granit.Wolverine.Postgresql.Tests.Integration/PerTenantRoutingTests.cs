@@ -22,7 +22,7 @@ using Shouldly;
 using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace Granit.Wolverine.Postgresql.IntegrationTests;
+namespace Granit.Wolverine.Postgresql.Tests.Integration;
 
 // ---------------------------------------------------------------------------
 // DbContext & entity used exclusively by integration tests

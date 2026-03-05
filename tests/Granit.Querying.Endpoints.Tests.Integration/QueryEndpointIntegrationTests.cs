@@ -12,7 +12,7 @@ using NSubstitute.ExceptionExtensions;
 using Shouldly;
 using Xunit;
 
-namespace Granit.Querying.Endpoints.Tests;
+namespace Granit.Querying.Endpoints.Tests.Integration;
 
 public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
 {

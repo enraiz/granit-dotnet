@@ -150,11 +150,12 @@ integration-test:
     POSTGRES_PASSWORD: test_password
   script:
     - dotnet build -c $CONFIGURATION
-    - >
-      dotnet test -c $CONFIGURATION --no-build
-      --filter "FullyQualifiedName~IntegrationTests"
-      --logger "junit;LogFilePath=TestResults/results.xml"
-      --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+    - |
+      for proj in tests/*.Tests.Integration/*.Tests.Integration.csproj; do
+        dotnet test "$proj" -c $CONFIGURATION --no-build \
+          --logger "junit;LogFilePath=TestResults/results.xml" \
+          --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+      done
   artifacts:
     when: always
     paths:
