@@ -87,6 +87,13 @@ public sealed class PatientPermissionDefinitionProvider : IPermissionDefinitionP
         group.AddPermission("Patients.Delete");
     }
 }
+```
+
+> Les `displayName` localisés sont optionnels dans cet exemple simplifié. Voir la
+> [documentation complète](../../framework/security/authorization.md#définir-les-permissions)
+> pour l'ajout de `LocalizableString`.
+
+```csharp
 
 // Protéger un endpoint
 app.MapPost("/api/patients", CreatePatientEndpoint.Handle)
