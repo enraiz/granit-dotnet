@@ -86,6 +86,57 @@ public sealed class NullableIntSchemaOperationTransformerTests
         operation.Parameters![0].Schema!.Type.ShouldBe(JsonSchemaType.String);
     }
 
+    // --- null|integer with pattern → pattern removed ---
+
+    [Fact]
+    public async Task TransformAsync_NullIntegerWithPattern_RemovesPattern()
+    {
+        // Arrange
+        NullableIntSchemaOperationTransformer transformer = new();
+        OpenApiOperation operation = new()
+        {
+            Parameters =
+            [
+                new OpenApiParameter
+                {
+                    Name = "skip",
+                    In = ParameterLocation.Query,
+                    Schema = new OpenApiSchema
+                    {
+                        Type = JsonSchemaType.Null | JsonSchemaType.Integer,
+                        Format = "int32",
+                        Pattern = @"^-?(?:0|[1-9]\d*)$",
+                    },
+                },
+            ],
+        };
+
+        // Act
+        await transformer.TransformAsync(operation, BuildContext(), TestContext.Current.CancellationToken);
+
+        // Assert
+        operation.Parameters![0].Schema!.Type.ShouldBe(JsonSchemaType.Null | JsonSchemaType.Integer);
+        operation.Parameters[0].Schema!.Pattern.ShouldBeNull();
+    }
+
+    // --- null|integer without pattern → unchanged ---
+
+    [Fact]
+    public async Task TransformAsync_NullIntegerWithoutPattern_Unchanged()
+    {
+        // Arrange
+        NullableIntSchemaOperationTransformer transformer = new();
+        OpenApiOperation operation = BuildOperation(
+            JsonSchemaType.Null | JsonSchemaType.Integer, "int32");
+
+        // Act
+        await transformer.TransformAsync(operation, BuildContext(), TestContext.Current.CancellationToken);
+
+        // Assert
+        operation.Parameters![0].Schema!.Type.ShouldBe(JsonSchemaType.Null | JsonSchemaType.Integer);
+        operation.Parameters[0].Schema!.Pattern.ShouldBeNull();
+    }
+
     // --- Null parameters → no crash ---
 
     [Fact]
