@@ -21,6 +21,12 @@ public sealed class CurrentUserService(IHttpContextAccessor httpContextAccessor)
     public string? Email => User?.FindFirstValue(ClaimTypes.Email)
                             ?? User?.FindFirstValue("email");
 
+    public string? FirstName => User?.FindFirstValue(ClaimTypes.GivenName)
+                                ?? User?.FindFirstValue("given_name");
+
+    public string? LastName => User?.FindFirstValue(ClaimTypes.Surname)
+                               ?? User?.FindFirstValue("family_name");
+
     public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
 
     public IReadOnlyList<string> GetRoles()
