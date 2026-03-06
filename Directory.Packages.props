@@ -72,7 +72,6 @@
 
   <ItemGroup Label="Notifications">
     <PackageVersion Include="MailKit" Version="4.*" />
-    <PackageVersion Include="MimeKit" Version="4.15.1" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.*" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.*" />
     <PackageVersion Include="Lib.Net.Http.WebPush" Version="3.*" />
