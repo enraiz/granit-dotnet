@@ -71,9 +71,9 @@ internal sealed partial class CachedUserLookupService(
         IReadOnlyList<UserCacheEntry> cached = await store.FindByExternalIdsAsync(userIds, tenantId, cancellationToken)
             .ConfigureAwait(false);
 
-        List<IdentityUser> result = new(userIds.Count);
-        Dictionary<string, UserCacheEntry> cachedDict = cached.ToDictionary(e => e.ExternalUserId);
-        List<string> toFetch = new();
+        var result = new List<IdentityUser>(userIds.Count);
+        var cachedDict = cached.ToDictionary(e => e.ExternalUserId);
+        List<string> toFetch = [];
 
         foreach (string id in userIds)
         {
@@ -186,7 +186,7 @@ internal sealed partial class CachedUserLookupService(
                 break;
             }
 
-            List<UserCacheEntry> entries = page.Select(ToCacheEntry).ToList();
+            var entries = page.Select(ToCacheEntry).ToList();
             await store.UpsertManyAsync(entries, cancellationToken).ConfigureAwait(false);
 
             synced += page.Count;

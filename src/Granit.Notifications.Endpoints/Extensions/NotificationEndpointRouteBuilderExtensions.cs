@@ -162,7 +162,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         IReadOnlyList<NotificationPreference> preferences = await store.GetListAsync(userId, tenantId).ConfigureAwait(false);
-        List<NotificationPreferenceResponse> result = preferences
+        var result = preferences
             .Select(p => new NotificationPreferenceResponse(p.Id, p.UserId, p.NotificationTypeName, p.ChannelName, p.IsEnabled))
             .ToList();
         return TypedResults.Ok(result);

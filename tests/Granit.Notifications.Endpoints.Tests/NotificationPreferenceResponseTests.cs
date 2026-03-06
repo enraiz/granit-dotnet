@@ -15,7 +15,7 @@ public sealed class NotificationPreferenceResponseTests
     public void Constructor_SetsAllProperties()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         // Act
         NotificationPreferenceResponse response = new(id, "user-1", "NewMessage", "Email", true);
@@ -31,7 +31,7 @@ public sealed class NotificationPreferenceResponseTests
     [Fact]
     public void Record_Equality_SameValues_AreEqual()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         new NotificationPreferenceResponse(id, "u", "T", "C", true)
             .ShouldBe(new NotificationPreferenceResponse(id, "u", "T", "C", true));
     }

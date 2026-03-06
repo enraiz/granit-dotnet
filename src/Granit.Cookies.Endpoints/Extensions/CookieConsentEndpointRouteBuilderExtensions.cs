@@ -43,7 +43,7 @@ public static class CookieConsentEndpointRouteBuilderExtensions
     {
         context.Response.Headers.CacheControl = "public, max-age=3600";
 
-        List<CookieDefinitionDto> cookies = cookieRegistry.GetAll()
+        var cookies = cookieRegistry.GetAll()
             .Select(c => new CookieDefinitionDto(
                 c.Name,
                 CategoryToSnakeCase(c.Category),
@@ -51,7 +51,7 @@ public static class CookieConsentEndpointRouteBuilderExtensions
                 c.Purpose))
             .ToList();
 
-        List<ThirdPartyServiceDto> services = serviceRegistry.GetAll()
+        var services = serviceRegistry.GetAll()
             .Select(s => new ThirdPartyServiceDto(
                 s.Name,
                 CategoryToSnakeCase(s.Category),

@@ -119,7 +119,7 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
             return;
         }
 
-        HashSet<string> externalIds = entries.Select(e => e.ExternalUserId).ToHashSet();
+        var externalIds = entries.Select(e => e.ExternalUserId).ToHashSet();
         Guid? tenantId = entries[0].TenantId;
 
         Dictionary<string, UserCacheEntry> existingEntries = await context.UserCacheEntries
