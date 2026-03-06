@@ -55,11 +55,11 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task FindByIdAsync_ReturnsFreshCacheEntry()
     {
-        var entry = CreateCacheEntry(lastSyncedAt: DateTimeOffset.UtcNow);
+        UserCacheEntry entry = CreateCacheEntry(lastSyncedAt: DateTimeOffset.UtcNow);
         _store.FindByExternalIdAsync("user-1", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(entry);
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IdentityUser? result = await service.FindByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         result.ShouldNotBeNull();
@@ -70,13 +70,13 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task FindByIdAsync_FetchesFromProvider_WhenStale()
     {
-        var staleEntry = CreateCacheEntry(lastSyncedAt: DateTimeOffset.UtcNow.AddDays(-2));
+        UserCacheEntry staleEntry = CreateCacheEntry(lastSyncedAt: DateTimeOffset.UtcNow.AddDays(-2));
         _store.FindByExternalIdAsync("user-1", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(staleEntry);
         _provider.GetUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(CreateUser());
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IdentityUser? result = await service.FindByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         result.ShouldNotBeNull();
@@ -87,13 +87,13 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task FindByIdAsync_ReturnsStaleCacheEntry_WhenProviderDown()
     {
-        var staleEntry = CreateCacheEntry(lastSyncedAt: DateTimeOffset.UtcNow.AddDays(-2));
+        UserCacheEntry staleEntry = CreateCacheEntry(lastSyncedAt: DateTimeOffset.UtcNow.AddDays(-2));
         _store.FindByExternalIdAsync("user-1", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(staleEntry);
         _provider.GetUserAsync("user-1", Arg.Any<CancellationToken>())
             .Throws(new HttpRequestException("Provider down"));
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IdentityUser? result = await service.FindByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         result.ShouldNotBeNull();
@@ -108,7 +108,7 @@ public sealed class CachedUserLookupServiceTests
         _provider.GetUserAsync("user-1", Arg.Any<CancellationToken>())
             .Throws(new HttpRequestException("Provider down"));
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IdentityUser? result = await service.FindByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
@@ -118,11 +118,11 @@ public sealed class CachedUserLookupServiceTests
     public async Task FindByIdAsync_UsesHostContextLookup_WhenNoTenant()
     {
         _tenant.IsAvailable.Returns(false);
-        var entry = CreateCacheEntry();
+        UserCacheEntry entry = CreateCacheEntry();
         _store.FindFirstByExternalIdAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(entry);
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IdentityUser? result = await service.FindByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         result.ShouldNotBeNull();
@@ -132,7 +132,7 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task FindByIdsAsync_ReturnsEmptyForEmptyInput()
     {
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IReadOnlyList<IdentityUser> result = await service.FindByIdsAsync(
             [], TestContext.Current.CancellationToken);
 
@@ -145,7 +145,7 @@ public sealed class CachedUserLookupServiceTests
         _provider.GetUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(CreateUser());
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IdentityUser? result = await service.RefreshByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         result.ShouldNotBeNull();
@@ -158,7 +158,7 @@ public sealed class CachedUserLookupServiceTests
         _provider.GetUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns((IdentityUser?)null);
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IdentityUser? result = await service.RefreshByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
@@ -168,15 +168,15 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task RefreshAllAsync_PaginatesThroughProvider()
     {
-        var page1 = Enumerable.Range(0, 100).Select(i => CreateUser($"user-{i}")).ToList();
-        var page2 = Enumerable.Range(100, 50).Select(i => CreateUser($"user-{i}")).ToList();
+        List<IdentityUser> page1 = Enumerable.Range(0, 100).Select(i => CreateUser($"user-{i}")).ToList();
+        List<IdentityUser> page2 = Enumerable.Range(100, 50).Select(i => CreateUser($"user-{i}")).ToList();
 
         _provider.GetUsersAsync(null, 0, 100, Arg.Any<CancellationToken>())
             .Returns(page1);
         _provider.GetUsersAsync(null, 100, 100, Arg.Any<CancellationToken>())
             .Returns(page2);
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         int synced = await service.RefreshAllAsync(TestContext.Current.CancellationToken);
 
         synced.ShouldBe(150);
@@ -186,7 +186,7 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task DeleteByIdAsync_DelegatesToStore()
     {
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         await service.DeleteByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         await _store.Received(1).DeleteByExternalIdAsync("user-1", Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
@@ -195,7 +195,7 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task PseudonymizeByIdAsync_DelegatesToStore()
     {
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         await service.PseudonymizeByIdAsync("user-1", TestContext.Current.CancellationToken);
 
         await _store.Received(1).PseudonymizeAsync("user-1", Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
@@ -205,9 +205,9 @@ public sealed class CachedUserLookupServiceTests
     public async Task SearchAsync_DelegatesToStore()
     {
         _store.SearchAsync("john", Arg.Any<Guid?>(), 20, Arg.Any<CancellationToken>())
-            .Returns(new List<UserCacheEntry> { CreateCacheEntry() });
+            .Returns([CreateCacheEntry()]);
 
-        var service = CreateService();
+        CachedUserLookupService service = CreateService();
         IReadOnlyList<IdentityUser> result = await service.SearchAsync(
             "john", 20, TestContext.Current.CancellationToken);
 

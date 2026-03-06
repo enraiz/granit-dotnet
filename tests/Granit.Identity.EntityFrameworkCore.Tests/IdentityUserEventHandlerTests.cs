@@ -32,7 +32,7 @@ public sealed class IdentityUserEventHandlerTests
         _provider.GetUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(user);
 
-        var handler = CreateHandler();
+        IdentityUserEventHandler handler = CreateHandler();
         await handler.HandleAsync(
             new IdentityUserUpdatedEvent("user-1"), TestContext.Current.CancellationToken);
 
@@ -47,7 +47,7 @@ public sealed class IdentityUserEventHandlerTests
         _provider.GetUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns((IdentityUser?)null);
 
-        var handler = CreateHandler();
+        IdentityUserEventHandler handler = CreateHandler();
         await handler.HandleAsync(
             new IdentityUserUpdatedEvent("user-1"), TestContext.Current.CancellationToken);
 
@@ -58,8 +58,8 @@ public sealed class IdentityUserEventHandlerTests
     [Fact]
     public async Task HandleDeleted_DeletesCacheEntry()
     {
-        Guid tenantId = Guid.NewGuid();
-        var handler = CreateHandler();
+        var tenantId = Guid.NewGuid();
+        IdentityUserEventHandler handler = CreateHandler();
 
         await handler.HandleAsync(
             new IdentityUserDeletedEvent("user-1", tenantId), TestContext.Current.CancellationToken);

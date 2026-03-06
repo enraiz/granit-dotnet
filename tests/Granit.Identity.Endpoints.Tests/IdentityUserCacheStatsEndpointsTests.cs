@@ -64,7 +64,7 @@ public sealed class IdentityUserCacheStatsEndpointsTests : IAsyncDisposable
             $"{Prefix}/stats", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var stats = await response.Content
+        IdentityUserCacheStatsResponse? stats = await response.Content
             .ReadFromJsonAsync<IdentityUserCacheStatsResponse>(TestContext.Current.CancellationToken);
         stats.ShouldNotBeNull();
         stats.TotalEntries.ShouldBe(100);
