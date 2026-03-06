@@ -5,8 +5,8 @@
       "Scriban": {
         "type": "Direct",
         "requested": "[6.*, )",
-        "resolved": "6.5.4",
-        "contentHash": "TiNtBPHjDz7GsABO79EZGkG36QCvsdfRe9v9B+Px9wPbxCdHGczoPoEiBfFNaTTcpHLBKwsf3x8TTY0NKUdM5g=="
+        "resolved": "6.5.5",
+        "contentHash": "TxsmDVQ9agPQaY+SvdTO+zntGpJOnL1QaO4dzACfc6gEKRYhoMpzCCFuVixEZXet291sRnjyym6lB69Cr/EXPQ=="
       },
       "Microsoft.Extensions.Primitives": {
         "type": "Transitive",

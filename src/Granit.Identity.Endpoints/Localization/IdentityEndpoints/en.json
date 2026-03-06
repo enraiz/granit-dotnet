@@ -1,0 +1,9 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:Identity": "Identity",
+    "Permission:Identity.UserCache.Read": "View the user cache (list, search, batch, stats)",
+    "Permission:Identity.UserCache.Sync": "Force user cache synchronization from the identity provider",
+    "Permission:Identity.UserCache.Delete": "Delete or pseudonymize user cache entries (GDPR)"
+  }
+}

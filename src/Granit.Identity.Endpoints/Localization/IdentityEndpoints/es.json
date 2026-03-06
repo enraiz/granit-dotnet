@@ -1,0 +1,9 @@
+{
+  "culture": "es",
+  "texts": {
+    "PermissionGroup:Identity": "Identidad",
+    "Permission:Identity.UserCache.Read": "Consultar la caché de usuarios (lista, búsqueda, lote, estadísticas)",
+    "Permission:Identity.UserCache.Sync": "Forzar la sincronización de la caché desde el proveedor de identidad",
+    "Permission:Identity.UserCache.Delete": "Eliminar o seudonimizar entradas de la caché de usuarios (RGPD)"
+  }
+}

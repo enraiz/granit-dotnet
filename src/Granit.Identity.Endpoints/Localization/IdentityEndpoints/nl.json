@@ -1,0 +1,9 @@
+{
+  "culture": "nl",
+  "texts": {
+    "PermissionGroup:Identity": "Identiteit",
+    "Permission:Identity.UserCache.Read": "Gebruikerscache raadplegen (lijst, zoeken, batch, statistieken)",
+    "Permission:Identity.UserCache.Sync": "Synchronisatie van de gebruikerscache forceren vanuit de identiteitsprovider",
+    "Permission:Identity.UserCache.Delete": "Gebruikerscache-items verwijderen of pseudonimiseren (AVG)"
+  }
+}

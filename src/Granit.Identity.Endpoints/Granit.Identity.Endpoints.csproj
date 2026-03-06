@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Granit.Identity\Granit.Identity.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\**\*.json" />
+  </ItemGroup>
+
 </Project>
