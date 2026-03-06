@@ -1,0 +1,9 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Identity": "Identität",
+    "Permission:Identity.UserCache.Read": "Benutzercache einsehen (Liste, Suche, Batch, Statistiken)",
+    "Permission:Identity.UserCache.Sync": "Synchronisierung des Benutzercaches vom Identitätsanbieter erzwingen",
+    "Permission:Identity.UserCache.Delete": "Benutzercache-Einträge löschen oder pseudonymisieren (DSGVO)"
+  }
+}

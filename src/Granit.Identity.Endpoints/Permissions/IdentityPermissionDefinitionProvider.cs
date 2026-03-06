@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.Identity.Endpoints.Permissions;
 
@@ -11,18 +12,23 @@ internal sealed class IdentityPermissionDefinitionProvider : IPermissionDefiniti
     public void DefinePermissions(IPermissionDefinitionContext context)
     {
         PermissionGroup group = context.AddGroup(
-            IdentityUserCachePermissions.GroupName, "Identity");
+            IdentityUserCachePermissions.GroupName,
+            LocalizableString.Create<IdentityEndpointsLocalizationResource>(
+                "PermissionGroup:Identity"));
 
         group.AddPermission(
             IdentityUserCachePermissions.UserCache.Read,
-            "Consulter le cache utilisateurs (liste, recherche, batch, stats)");
+            LocalizableString.Create<IdentityEndpointsLocalizationResource>(
+                "Permission:Identity.UserCache.Read"));
 
         group.AddPermission(
             IdentityUserCachePermissions.UserCache.Sync,
-            "Forcer la synchronisation du cache depuis le fournisseur d'identité");
+            LocalizableString.Create<IdentityEndpointsLocalizationResource>(
+                "Permission:Identity.UserCache.Sync"));
 
         group.AddPermission(
             IdentityUserCachePermissions.UserCache.Delete,
-            "Supprimer ou pseudonymiser des entrées du cache (RGPD)");
+            LocalizableString.Create<IdentityEndpointsLocalizationResource>(
+                "Permission:Identity.UserCache.Delete"));
     }
 }
