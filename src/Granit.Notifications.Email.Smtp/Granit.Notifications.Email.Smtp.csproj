@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <PackageReference Include="MailKit" />
+    <!-- Force MimeKit to patched version (GHSA-g7hc-96xr-gvvx) -->
+    <PackageReference Include="MimeKit" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
