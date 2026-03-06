@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Granit.Authorization.EntityFrameworkCore\Granit.Authorization.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\**\*.json" />
+  </ItemGroup>
+
 </Project>

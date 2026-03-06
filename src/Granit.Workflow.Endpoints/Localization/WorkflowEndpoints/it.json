@@ -1,0 +1,7 @@
+{
+  "culture": "it",
+  "texts": {
+    "PermissionGroup:Workflow": "Flusso di lavoro",
+    "Permission:Workflow.History.Read": "Visualizzare la cronologia delle transizioni del flusso di lavoro (pista di audit HDS)"
+  }
+}

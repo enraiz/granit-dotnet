@@ -11,23 +11,27 @@ un utilisateur peut être `admin` dans le tenant A mais simple `reader` dans le 
 ### Déclarer la permission
 
 ```csharp
-using Granit.Authorization;
+using Granit.Authorization.Abstractions;
 
 namespace MyApp.Authorization;
 
 public sealed class PatientPermissionDefinitionProvider : IPermissionDefinitionProvider
 {
-    public void Define(PermissionDefinitionContext context)
+    public void DefinePermissions(IPermissionDefinitionContext context)
     {
-        PermissionGroupDefinition group = context.AddGroup("Patients");
+        PermissionGroup group = context.AddGroup("Patients");
 
-        group.AddPermission("Patients.Create", "Create a patient record");
-        group.AddPermission("Patients.Read", "View patient records");
-        group.AddPermission("Patients.Update", "Update patient records");
-        group.AddPermission("Patients.Delete", "Delete patient records");
+        group.AddPermission("Patients.Create");
+        group.AddPermission("Patients.Read");
+        group.AddPermission("Patients.Update");
+        group.AddPermission("Patients.Delete");
     }
 }
 ```
+
+> Les `displayName` localisés sont optionnels. Voir la
+> [documentation complète](../framework/security/authorization.md#définir-les-permissions)
+> pour l'ajout de `LocalizableString`.
 
 ### Vérifier dans le endpoint
 

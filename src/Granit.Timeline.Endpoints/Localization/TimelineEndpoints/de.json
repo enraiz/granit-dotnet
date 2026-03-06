@@ -1,0 +1,8 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Timeline": "Zeitachse",
+    "Permission:Timeline.Entries.Read": "Aktivitätsfeeds und Prüfverlauf anzeigen",
+    "Permission:Timeline.Entries.Create": "Kommentare veröffentlichen und Entitäten folgen/entfolgen"
+  }
+}

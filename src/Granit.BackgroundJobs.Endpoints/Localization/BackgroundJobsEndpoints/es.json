@@ -1,0 +1,7 @@
+{
+  "culture": "es",
+  "texts": {
+    "PermissionGroup:BackgroundJobs": "Tareas en segundo plano",
+    "Permission:BackgroundJobs.Jobs.Manage": "Administrar tareas en segundo plano (lista, pausa, reanudación, ejecución manual)"
+  }
+}

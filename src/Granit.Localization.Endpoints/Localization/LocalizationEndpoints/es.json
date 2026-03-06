@@ -1,0 +1,7 @@
+{
+  "culture": "es",
+  "texts": {
+    "PermissionGroup:Localization": "Localización",
+    "Permission:Localization.Overrides.Manage": "Gestionar las sobrecargas de traducción (ver, crear, editar, eliminar)"
+  }
+}

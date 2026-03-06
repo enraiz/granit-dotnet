@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.Localization.Endpoints.Permissions;
 
@@ -30,10 +31,13 @@ internal sealed class LocalizationOverridesPermissionDefinitionProvider : IPermi
     public void DefinePermissions(IPermissionDefinitionContext context)
     {
         PermissionGroup group = context.AddGroup(
-            LocalizationOverridesPermissions.GroupName, "Localisation");
+            LocalizationOverridesPermissions.GroupName,
+            LocalizableString.Create<LocalizationEndpointsLocalizationResource>(
+                "PermissionGroup:Localization"));
 
         group.AddPermission(
             LocalizationOverridesPermissions.Manage,
-            "Gérer les surcharges de traduction (consulter, créer, modifier, supprimer)");
+            LocalizableString.Create<LocalizationEndpointsLocalizationResource>(
+                "Permission:Localization.Overrides.Manage"));
     }
 }

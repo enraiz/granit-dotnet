@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 using Granit.Workflow.Endpoints.Permissions;
 using NSubstitute;
 using Shouldly;
@@ -17,8 +18,8 @@ public sealed class WorkflowPermissionDefinitionProviderTests
     {
         // Arrange
         IPermissionDefinitionContext context = Substitute.For<IPermissionDefinitionContext>();
-        PermissionGroup group = new(WorkflowPermissions.GroupName, "Workflow");
-        context.AddGroup(WorkflowPermissions.GroupName, "Workflow").Returns(group);
+        PermissionGroup group = new(WorkflowPermissions.GroupName);
+        context.AddGroup(WorkflowPermissions.GroupName, Arg.Any<LocalizableString>()).Returns(group);
 
         WorkflowPermissionDefinitionProvider provider = new();
 
@@ -26,16 +27,16 @@ public sealed class WorkflowPermissionDefinitionProviderTests
         provider.DefinePermissions(context);
 
         // Assert
-        context.Received(1).AddGroup(WorkflowPermissions.GroupName, "Workflow");
+        context.Received(1).AddGroup(WorkflowPermissions.GroupName, Arg.Any<LocalizableString>());
     }
 
     [Fact]
     public void DefinePermissions_adds_History_Read_permission()
     {
         // Arrange
-        PermissionGroup group = new(WorkflowPermissions.GroupName, "Workflow");
+        PermissionGroup group = new(WorkflowPermissions.GroupName);
         IPermissionDefinitionContext context = Substitute.For<IPermissionDefinitionContext>();
-        context.AddGroup(WorkflowPermissions.GroupName, "Workflow").Returns(group);
+        context.AddGroup(WorkflowPermissions.GroupName, Arg.Any<LocalizableString>()).Returns(group);
 
         WorkflowPermissionDefinitionProvider provider = new();
 
@@ -50,9 +51,9 @@ public sealed class WorkflowPermissionDefinitionProviderTests
     public void DefinePermissions_History_Read_permission_has_display_name()
     {
         // Arrange
-        PermissionGroup group = new(WorkflowPermissions.GroupName, "Workflow");
+        PermissionGroup group = new(WorkflowPermissions.GroupName);
         IPermissionDefinitionContext context = Substitute.For<IPermissionDefinitionContext>();
-        context.AddGroup(WorkflowPermissions.GroupName, "Workflow").Returns(group);
+        context.AddGroup(WorkflowPermissions.GroupName, Arg.Any<LocalizableString>()).Returns(group);
 
         WorkflowPermissionDefinitionProvider provider = new();
 
@@ -62,16 +63,16 @@ public sealed class WorkflowPermissionDefinitionProviderTests
         // Assert
         PermissionDefinition historyPermission = group.Permissions
             .Single(p => p.Name == WorkflowPermissions.History.Read);
-        historyPermission.DisplayName.ShouldNotBeNullOrWhiteSpace();
+        historyPermission.DisplayName.ShouldNotBeNull();
     }
 
     [Fact]
     public void DefinePermissions_registers_exactly_one_permission()
     {
         // Arrange
-        PermissionGroup group = new(WorkflowPermissions.GroupName, "Workflow");
+        PermissionGroup group = new(WorkflowPermissions.GroupName);
         IPermissionDefinitionContext context = Substitute.For<IPermissionDefinitionContext>();
-        context.AddGroup(WorkflowPermissions.GroupName, "Workflow").Returns(group);
+        context.AddGroup(WorkflowPermissions.GroupName, Arg.Any<LocalizableString>()).Returns(group);
 
         WorkflowPermissionDefinitionProvider provider = new();
 

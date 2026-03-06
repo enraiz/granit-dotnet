@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 using Granit.Timeline.Endpoints.Permissions;
 using Shouldly;
 using Xunit;
@@ -93,7 +94,7 @@ public sealed class TimelinePermissionDefinitionProviderTests
 
         public IReadOnlyCollection<PermissionGroup> Groups => _groups.Values;
 
-        public PermissionGroup AddGroup(string name, string? displayName = null)
+        public PermissionGroup AddGroup(string name, LocalizableString? displayName = null)
         {
             if (_groups.TryGetValue(name, out PermissionGroup? existing))
             {

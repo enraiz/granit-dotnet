@@ -44,7 +44,7 @@ sequenceDiagram
 ### Couche Authentification
 
 | Composant | Fichier | Rôle |
-|-----------|---------|------|
+| --- | --- | --- |
 | `ICurrentUserService` | `src/Granit.Security/ICurrentUserService.cs` | `UserId`, `UserName`, `Email`, `GetRoles()`, `IsInRole()` |
 | `KeycloakClaimsTransformation` | `src/Granit.Authentication.Keycloak/Authentication/KeycloakClaimsTransformation.cs` | Extrait `realm_access.roles` du JWT Keycloak |
 | `WolverineCurrentUserService` | `src/Granit.Wolverine/Internal/WolverineCurrentUserService.cs` | Fallback `AsyncLocal` pour les handlers background |
@@ -52,7 +52,7 @@ sequenceDiagram
 ### Couche Autorisation
 
 | Composant | Fichier | Rôle |
-|-----------|---------|------|
+| --- | --- | --- |
 | `DynamicPermissionPolicyProvider` | `src/Granit.Authorization/Authorization/DynamicPermissionPolicyProvider.cs` | Crée des `AuthorizationPolicy` à la volée depuis les noms de permission |
 | `PermissionChecker` | `src/Granit.Authorization/Services/PermissionChecker.cs` | Évalue les permissions contre les grants de rôles |
 | `IPermissionDefinitionProvider` | `src/Granit.Authorization/Definitions/IPermissionDefinitionProvider.cs` | Déclaration des permissions (code-first) |
@@ -67,7 +67,7 @@ sequenceDiagram
 ## Justification
 
 | Problème | Solution |
-|----------|----------|
+| --- | --- |
 | Keycloak renvoie les rôles dans un format custom (`realm_access`) | `KeycloakClaimsTransformation` normalise en claims standard |
 | Les handlers background n'ont pas de `HttpContext` | `WolverineCurrentUserService` maintient le user via `AsyncLocal` |
 | Créer une policy par permission serait explosif | `DynamicPermissionPolicyProvider` crée les policies à la demande |
@@ -79,9 +79,9 @@ sequenceDiagram
 // Déclarer des permissions (code-first)
 public sealed class PatientPermissionDefinitionProvider : IPermissionDefinitionProvider
 {
-    public void Define(PermissionDefinitionContext context)
+    public void DefinePermissions(IPermissionDefinitionContext context)
     {
-        PermissionGroupDefinition group = context.AddGroup("Patients");
+        PermissionGroup group = context.AddGroup("Patients");
         group.AddPermission("Patients.Create");
         group.AddPermission("Patients.Read");
         group.AddPermission("Patients.Delete");

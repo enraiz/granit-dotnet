@@ -1,0 +1,8 @@
+{
+  "culture": "es",
+  "texts": {
+    "PermissionGroup:Timeline": "Línea de tiempo",
+    "Permission:Timeline.Entries.Read": "Ver flujos de actividad e historial de auditoría",
+    "Permission:Timeline.Entries.Create": "Publicar comentarios y seguir/dejar de seguir entidades"
+  }
+}

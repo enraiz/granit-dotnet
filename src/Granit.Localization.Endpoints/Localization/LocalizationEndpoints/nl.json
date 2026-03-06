@@ -1,0 +1,7 @@
+{
+  "culture": "nl",
+  "texts": {
+    "PermissionGroup:Localization": "Lokalisatie",
+    "Permission:Localization.Overrides.Manage": "Vertaaloverschrijvingen beheren (bekijken, aanmaken, bewerken, verwijderen)"
+  }
+}

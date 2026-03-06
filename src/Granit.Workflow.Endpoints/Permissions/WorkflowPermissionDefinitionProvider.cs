@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.Workflow.Endpoints.Permissions;
 
@@ -16,10 +17,13 @@ internal sealed class WorkflowPermissionDefinitionProvider : IPermissionDefiniti
     public void DefinePermissions(IPermissionDefinitionContext context)
     {
         PermissionGroup group = context.AddGroup(
-            WorkflowPermissions.GroupName, "Workflow");
+            WorkflowPermissions.GroupName,
+            LocalizableString.Create<WorkflowEndpointsLocalizationResource>(
+                "PermissionGroup:Workflow"));
 
         group.AddPermission(
             WorkflowPermissions.History.Read,
-            "Consulter l'historique des transitions workflow (piste d'audit HDS)");
+            LocalizableString.Create<WorkflowEndpointsLocalizationResource>(
+                "Permission:Workflow.History.Read"));
     }
 }

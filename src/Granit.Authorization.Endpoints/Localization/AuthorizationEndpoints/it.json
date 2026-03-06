@@ -1,0 +1,8 @@
+{
+  "culture": "it",
+  "texts": {
+    "PermissionGroup:Authorization": "Gestione delle autorizzazioni",
+    "Permission:Authorization.Definitions.Read": "Visualizzare tutte le definizioni e i gruppi di permessi registrati",
+    "Permission:Authorization.Grants.Manage": "Visualizzare, concedere e revocare i permessi per i ruoli"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "culture": "fr",
+  "texts": {
+    "PermissionGroup:BackgroundJobs": "Tâches en arrière-plan",
+    "Permission:BackgroundJobs.Jobs.Manage": "Administrer les tâches en arrière-plan (liste, pause, reprise, déclenchement manuel)"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Localization": "Lokalisierung",
+    "Permission:Localization.Overrides.Manage": "Übersetzungsüberschreibungen verwalten (anzeigen, erstellen, bearbeiten, löschen)"
+  }
+}

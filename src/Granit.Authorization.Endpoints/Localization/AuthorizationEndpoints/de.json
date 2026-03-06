@@ -1,0 +1,8 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Authorization": "Berechtigungsverwaltung",
+    "Permission:Authorization.Definitions.Read": "Alle registrierten Berechtigungsdefinitionen und Gruppen anzeigen",
+    "Permission:Authorization.Grants.Manage": "Berechtigungen für Rollen anzeigen, erteilen und widerrufen"
+  }
+}

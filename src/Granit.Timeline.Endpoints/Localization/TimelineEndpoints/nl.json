@@ -1,0 +1,8 @@
+{
+  "culture": "nl",
+  "texts": {
+    "PermissionGroup:Timeline": "Tijdlijn",
+    "Permission:Timeline.Entries.Read": "Activiteitsfeeds en auditgeschiedenis bekijken",
+    "Permission:Timeline.Entries.Create": "Reacties plaatsen en entiteiten volgen/ontvolgen"
+  }
+}

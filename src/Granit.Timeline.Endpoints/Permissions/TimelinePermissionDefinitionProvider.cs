@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.Timeline.Endpoints.Permissions;
 
@@ -17,14 +18,18 @@ internal sealed class TimelinePermissionDefinitionProvider : IPermissionDefiniti
     public void DefinePermissions(IPermissionDefinitionContext context)
     {
         PermissionGroup group = context.AddGroup(
-            TimelinePermissions.GroupName, "Timeline");
+            TimelinePermissions.GroupName,
+            LocalizableString.Create<TimelineEndpointsLocalizationResource>(
+                "PermissionGroup:Timeline"));
 
         group.AddPermission(
             TimelinePermissions.Entries.Read,
-            "Consulter les flux d'activité et l'historique d'audit");
+            LocalizableString.Create<TimelineEndpointsLocalizationResource>(
+                "Permission:Timeline.Entries.Read"));
 
         group.AddPermission(
             TimelinePermissions.Entries.Create,
-            "Poster des commentaires et suivre/ne plus suivre des entités");
+            LocalizableString.Create<TimelineEndpointsLocalizationResource>(
+                "Permission:Timeline.Entries.Create"));
     }
 }

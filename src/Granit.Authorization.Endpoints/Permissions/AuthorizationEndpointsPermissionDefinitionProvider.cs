@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.Authorization.Endpoints.Permissions;
 
@@ -12,14 +13,17 @@ internal sealed class AuthorizationEndpointsPermissionDefinitionProvider : IPerm
     {
         PermissionGroup group = context.AddGroup(
             AuthorizationEndpointsPermissions.GroupName,
-            "Authorization Management");
+            LocalizableString.Create<AuthorizationEndpointsLocalizationResource>(
+                "PermissionGroup:Authorization"));
 
         group.AddPermission(
             AuthorizationEndpointsPermissions.Definitions.Read,
-            "View all registered permission definitions and groups");
+            LocalizableString.Create<AuthorizationEndpointsLocalizationResource>(
+                "Permission:Authorization.Definitions.Read"));
 
         group.AddPermission(
             AuthorizationEndpointsPermissions.Grants.Manage,
-            "View, grant, and revoke permissions for roles");
+            LocalizableString.Create<AuthorizationEndpointsLocalizationResource>(
+                "Permission:Authorization.Grants.Manage"));
     }
 }

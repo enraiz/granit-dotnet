@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.DataExchange.Endpoints.Permissions;
 
@@ -30,14 +31,18 @@ internal sealed class DataExchangePermissionDefinitionProvider : IPermissionDefi
     public void DefinePermissions(IPermissionDefinitionContext context)
     {
         PermissionGroup group = context.AddGroup(
-            DataExchangePermissions.GroupName, "Data Exchange");
+            DataExchangePermissions.GroupName,
+            LocalizableString.Create<DataExchangeEndpointsLocalizationResource>(
+                "PermissionGroup:DataExchange"));
 
         group.AddPermission(
             DataExchangePermissions.Imports.Execute,
-            "Exécuter des imports de données (upload, mapping, exécution, rapports)");
+            LocalizableString.Create<DataExchangeEndpointsLocalizationResource>(
+                "Permission:DataExchange.Imports.Execute"));
 
         group.AddPermission(
             DataExchangePermissions.Exports.Execute,
-            "Exécuter des exports de données (définitions, exécution, téléchargement, presets)");
+            LocalizableString.Create<DataExchangeEndpointsLocalizationResource>(
+                "Permission:DataExchange.Exports.Execute"));
     }
 }

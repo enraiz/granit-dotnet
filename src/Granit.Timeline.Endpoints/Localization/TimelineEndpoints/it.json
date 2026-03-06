@@ -1,0 +1,8 @@
+{
+  "culture": "it",
+  "texts": {
+    "PermissionGroup:Timeline": "Cronologia",
+    "Permission:Timeline.Entries.Read": "Visualizzare i flussi di attività e la cronologia di audit",
+    "Permission:Timeline.Entries.Create": "Pubblicare commenti e seguire/smettere di seguire entità"
+  }
+}
