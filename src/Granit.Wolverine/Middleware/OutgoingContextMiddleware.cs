@@ -32,6 +32,8 @@ public sealed class OutgoingContextMiddleware(
 {
     internal const string TenantIdHeader = "X-Tenant-Id";
     internal const string UserIdHeader = "X-User-Id";
+    internal const string UserFirstNameHeader = "X-User-FirstName";
+    internal const string UserLastNameHeader = "X-User-LastName";
     internal const string TraceParentHeader = "traceparent";
 
     /// <summary>
@@ -48,6 +50,16 @@ public sealed class OutgoingContextMiddleware(
         if (currentUserService.IsAuthenticated && currentUserService.UserId is { Length: > 0 } userId)
         {
             envelope.Headers[UserIdHeader] = userId;
+
+            if (currentUserService.FirstName is { Length: > 0 } firstName)
+            {
+                envelope.Headers[UserFirstNameHeader] = firstName;
+            }
+
+            if (currentUserService.LastName is { Length: > 0 } lastName)
+            {
+                envelope.Headers[UserLastNameHeader] = lastName;
+            }
         }
 
         string? traceParent = Activity.Current?.Id;

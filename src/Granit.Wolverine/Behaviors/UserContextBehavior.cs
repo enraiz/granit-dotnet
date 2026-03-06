@@ -38,7 +38,9 @@ public sealed class UserContextBehavior(IWolverineUserContextSetter setter)
         if (envelope.Headers.TryGetValue(OutgoingContextMiddleware.UserIdHeader, out string? userId)
             && !string.IsNullOrEmpty(userId))
         {
-            _scope = setter.Change(userId);
+            envelope.Headers.TryGetValue(OutgoingContextMiddleware.UserFirstNameHeader, out string? firstName);
+            envelope.Headers.TryGetValue(OutgoingContextMiddleware.UserLastNameHeader, out string? lastName);
+            _scope = setter.Change(userId, firstName, lastName);
         }
     }
 

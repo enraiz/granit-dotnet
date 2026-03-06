@@ -27,7 +27,7 @@
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
-## Packages (84 packages)
+## Packages (86 packages)
 
 ### Core & utilities
 
@@ -55,8 +55,10 @@
 
 | Package | Role |
 | ------- | ---- |
-| `Granit.Identity` | Identity provider abstractions (IIdentityProvider, models) |
+| `Granit.Identity` | Identity provider abstractions (IIdentityProvider, IUserLookupService, models) |
 | `Granit.Identity.Keycloak` | Keycloak Admin API implementation of IIdentityProvider |
+| `Granit.Identity.EntityFrameworkCore` | EF Core user cache (cache-aside, login-time sync, RGPD) |
+| `Granit.Identity.Endpoints` | Minimal API endpoints for user cache (CRUD, sync, RGPD, webhook, stats) |
 
 ### Data & persistence
 

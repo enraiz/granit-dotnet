@@ -16,7 +16,7 @@ namespace Granit.Wolverine.Internal;
 /// causing <c>AuditedEntityInterceptor</c> to store <c>ModifiedBy = null</c>.
 /// </para>
 /// <para>
-/// This service resolves <c>UserId</c> by checking, in order:
+/// This service resolves properties by checking, in order:
 /// <list type="number">
 ///   <item>The <see cref="AsyncLocal{T}"/> override set by <see cref="Granit.Wolverine.Behaviors.UserContextBehavior"/>.</item>
 ///   <item>The <c>HttpContext</c> claims (standard HTTP request flow).</item>
@@ -33,13 +33,19 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
     : ICurrentUserService, IWolverineUserContextSetter
 {
     private static readonly AsyncLocal<string?> _overrideUserId = new();
+    private static readonly AsyncLocal<string?> _overrideFirstName = new();
+    private static readonly AsyncLocal<string?> _overrideLastName = new();
 
     /// <inheritdoc/>
-    public IDisposable Change(string? userId)
+    public IDisposable Change(string? userId, string? firstName = null, string? lastName = null)
     {
-        string? previous = _overrideUserId.Value;
+        string? previousUserId = _overrideUserId.Value;
+        string? previousFirstName = _overrideFirstName.Value;
+        string? previousLastName = _overrideLastName.Value;
         _overrideUserId.Value = userId;
-        return new UserScope(previous);
+        _overrideFirstName.Value = firstName;
+        _overrideLastName.Value = lastName;
+        return new UserScope(previousUserId, previousFirstName, previousLastName);
     }
 
     private ClaimsPrincipal? HttpUser => httpContextAccessor.HttpContext?.User;
@@ -65,6 +71,20 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
             : HttpUser?.FindFirstValue(ClaimTypes.Email) ?? HttpUser?.FindFirstValue("email");
 
     /// <inheritdoc/>
+    public string? FirstName =>
+        _overrideFirstName.Value
+        ?? (_overrideUserId.Value != null
+            ? null
+            : HttpUser?.FindFirstValue(ClaimTypes.GivenName) ?? HttpUser?.FindFirstValue("given_name"));
+
+    /// <inheritdoc/>
+    public string? LastName =>
+        _overrideLastName.Value
+        ?? (_overrideUserId.Value != null
+            ? null
+            : HttpUser?.FindFirstValue(ClaimTypes.Surname) ?? HttpUser?.FindFirstValue("family_name"));
+
+    /// <inheritdoc/>
     public IReadOnlyList<string> GetRoles() =>
         _overrideUserId.Value != null
             ? []
@@ -76,7 +96,10 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
     public bool IsInRole(string role) =>
         _overrideUserId.Value == null && (HttpUser?.IsInRole(role) ?? false);
 
-    private sealed class UserScope(string? previous) : IDisposable
+    private sealed class UserScope(
+        string? previousUserId,
+        string? previousFirstName,
+        string? previousLastName) : IDisposable
     {
         private bool _disposed;
 
@@ -85,7 +108,9 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
             if (!_disposed)
             {
                 _disposed = true;
-                _overrideUserId.Value = previous;
+                _overrideUserId.Value = previousUserId;
+                _overrideFirstName.Value = previousFirstName;
+                _overrideLastName.Value = previousLastName;
             }
         }
     }

@@ -38,6 +38,8 @@ public sealed class GranitSettingsModuleTests
         public string? UserId => null;
         public string? UserName => null;
         public string? Email => null;
+        public string? FirstName => null;
+        public string? LastName => null;
         public bool IsAuthenticated => false;
         public IReadOnlyList<string> GetRoles() => [];
         public bool IsInRole(string role) => false;

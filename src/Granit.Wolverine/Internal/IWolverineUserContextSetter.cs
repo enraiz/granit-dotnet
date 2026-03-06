@@ -7,8 +7,11 @@ namespace Granit.Wolverine.Internal;
 public interface IWolverineUserContextSetter
 {
     /// <summary>
-    /// Temporarily overrides the user ID for the current async flow.
-    /// Dispose the returned scope to restore the previous value.
+    /// Temporarily overrides the user context for the current async flow.
+    /// Dispose the returned scope to restore the previous values.
     /// </summary>
-    IDisposable Change(string? userId);
+    /// <param name="userId">The user ID to set.</param>
+    /// <param name="firstName">The user first name (optional).</param>
+    /// <param name="lastName">The user last name (optional).</param>
+    IDisposable Change(string? userId, string? firstName = null, string? lastName = null);
 }
