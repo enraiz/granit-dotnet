@@ -326,6 +326,36 @@ flowchart LR
     style TL_NOTIF fill:#d35400,color:#fff
 ```
 
+### Identity
+
+Cache local des utilisateurs identity provider. Le package de base
+(`Granit.Identity`) expose les abstractions provider-agnostic
+(`IIdentityProvider`, `IUserLookupService`, `IUserCacheStats`).
+`Granit.Identity.Keycloak` implémente `IIdentityProvider` via l'Admin
+API Keycloak. Le package EF Core fournit le cache-aside local
+(`UserCacheEntry`, staleness threshold, login-time sync, événements
+Wolverine) et les endpoints exposent CRUD, sync, RGPD
+(erasure/pseudonymisation), webhook HMAC et health check.
+
+```mermaid
+flowchart LR
+    IDENT["Identity"] --> CORE["Core"]
+
+    IDENT_KC["Identity.Keycloak"] --> IDENT
+
+    IDENT_EF["Identity.EF"] --> IDENT
+    IDENT_EF --> PERS["Persistence"]
+    IDENT_EF --> SEC["Security"]
+
+    IDENT_EP["Identity.Endpoints"] --> IDENT
+    IDENT_EP --> AUTHZ["Authorization"]
+
+    style IDENT fill:#1abc9c,color:#fff
+    style IDENT_KC fill:#1abc9c,color:#fff
+    style IDENT_EF fill:#1abc9c,color:#fff
+    style IDENT_EP fill:#1abc9c,color:#fff
+```
+
 ---
 
 ## Domaines simples
@@ -397,35 +427,6 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 | `Granit.BackgroundJobs.Endpoints` | `BackgroundJobs`, `Authorization` |
 | `Granit.Webhooks` | `Timing`, `Wolverine` |
 | `Granit.Webhooks.EntityFrameworkCore` | `Webhooks` |
-
-### Identity
-
-Cache local des utilisateurs identity provider (cache-aside EF Core).
-
-```mermaid
-flowchart LR
-    IDENT["Identity"] --> CORE["Core"]
-
-    IDENT_KC["Identity.Keycloak"] --> IDENT
-    IDENT_EF["Identity.EF"] --> IDENT
-    IDENT_EF --> PERS["Persistence"]
-    IDENT_EF --> SEC["Security"]
-
-    IDENT_EP["Identity.Endpoints"] --> IDENT
-    IDENT_EP --> AUTHZ["Authorization"]
-
-    style IDENT fill:#1abc9c,color:#fff
-    style IDENT_KC fill:#1abc9c,color:#fff
-    style IDENT_EF fill:#1abc9c,color:#fff
-    style IDENT_EP fill:#1abc9c,color:#fff
-```
-
-| Package | Dépend de |
-| ------- | --------- |
-| `Granit.Identity` | `Core` |
-| `Granit.Identity.Keycloak` | `Identity` |
-| `Granit.Identity.EntityFrameworkCore` | `Identity`, `Persistence`, `Security` |
-| `Granit.Identity.Endpoints` | `Identity`, `Authorization` |
 
 ### Analyzers
 
