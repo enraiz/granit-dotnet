@@ -151,29 +151,43 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
     public async Task DeleteByExternalIdAsync(
         string externalUserId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await context.UserCacheEntries
+        var entries = await context.UserCacheEntries
             .Where(e => e.TenantId == tenantId && e.ExternalUserId == externalUserId)
-            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        context.UserCacheEntries.RemoveRange(entries);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task DeleteAllByTenantAsync(Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await context.UserCacheEntries
+        var entries = await context.UserCacheEntries
             .Where(e => e.TenantId == tenantId)
-            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        context.UserCacheEntries.RemoveRange(entries);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task PseudonymizeAsync(
         string externalUserId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await context.UserCacheEntries
-            .Where(e => e.TenantId == tenantId && e.ExternalUserId == externalUserId)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(e => e.Username, "anonymized")
-                .SetProperty(e => e.Email, "anonymized@anonymized.local")
-                .SetProperty(e => e.FirstName, "Anonymized")
-                .SetProperty(e => e.LastName, "User")
-                .SetProperty(e => e.Enabled, false),
+        UserCacheEntry? entry = await context.UserCacheEntries
+            .FirstOrDefaultAsync(
+                e => e.TenantId == tenantId && e.ExternalUserId == externalUserId,
                 cancellationToken).ConfigureAwait(false);
+
+        if (entry is null)
+        {
+            return;
+        }
+
+        entry.Username = "anonymized";
+        entry.Email = "anonymized@anonymized.local";
+        entry.FirstName = "Anonymized";
+        entry.LastName = "User";
+        entry.Enabled = false;
+
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }
