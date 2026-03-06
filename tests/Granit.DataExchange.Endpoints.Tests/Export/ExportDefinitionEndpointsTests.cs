@@ -16,12 +16,12 @@ using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Granit.DataExchange.Endpoints.Tests;
+namespace Granit.DataExchange.Endpoints.Tests.Export;
 
 /// <summary>
 /// Integration tests for export definition listing and field introspection endpoints.
 /// </summary>
-public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
+public sealed class ExportDefinitionEndpointsTests : IAsyncDisposable
 {
     private const string AdminRole = "granit-data-exchange-admin";
     private const string MetadataPrefix = "/data-exchange/metadata";
@@ -33,7 +33,7 @@ public sealed class DataExportDefinitionEndpointsTests : IAsyncDisposable
     private readonly HttpClient _adminClient;
     private readonly HttpClient _anonClient;
 
-    public DataExportDefinitionEndpointsTests()
+    public ExportDefinitionEndpointsTests()
     {
         _descriptor = Substitute.For<IExportDefinitionDescriptor>();
         _descriptor.Name.Returns("Test.Export");

@@ -32,7 +32,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["Niss", "FirstName", "LastName"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -49,7 +49,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["NISS", "Prénom", "Nom"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -71,7 +71,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["Numéro national", "First Name", "Courriel"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -90,7 +90,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["Prenom"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -106,7 +106,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["XYZ123"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -119,7 +119,7 @@ public sealed class MappingSuggestionServiceTests
         // Arrange
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns<IReadOnlyList<ColumnMapping>>(
+            .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("My Custom Column", "Niss", MappingConfidence.Saved),
             ]);
@@ -128,7 +128,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["My Custom Column", "Niss"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -147,7 +147,7 @@ public sealed class MappingSuggestionServiceTests
         _semanticService.IsAvailable.Returns(true);
         _semanticService.SuggestSemanticMappingsAsync(
                 Arg.Any<IReadOnlyList<string>>(),
-                Arg.Any<IReadOnlyList<FieldMetadata>>(),
+                Arg.Any<IReadOnlyList<ImportFieldMetadata>>(),
                 Arg.Any<CancellationToken>())
             .Returns<IReadOnlyList<SemanticMappingSuggestion>>(
             [
@@ -157,7 +157,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["Niss", "Adresse courriel"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -174,13 +174,13 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["Unknown Column"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
         await _semanticService.DidNotReceive().SuggestSemanticMappingsAsync(
             Arg.Any<IReadOnlyList<string>>(),
-            Arg.Any<IReadOnlyList<FieldMetadata>>(),
+            Arg.Any<IReadOnlyList<ImportFieldMetadata>>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -191,7 +191,7 @@ public sealed class MappingSuggestionServiceTests
         List<string> headers = ["Email", "Mail"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert — only one mapping to "Email" target

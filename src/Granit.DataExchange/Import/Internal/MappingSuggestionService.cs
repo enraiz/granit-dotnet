@@ -18,21 +18,21 @@ internal sealed class MappingSuggestionService(
     IOptions<ImportOptions> options) : IMappingSuggestionService
 {
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<ColumnMapping>> SuggestMappingsAsync<TEntity>(
+    public async Task<IReadOnlyList<ImportColumnMapping>> SuggestMappingsAsync<TEntity>(
         IReadOnlyList<string> headers,
         CancellationToken ct = default) where TEntity : class
     {
         ImportDefinition<TEntity> definition = serviceProvider.GetRequiredService<ImportDefinition<TEntity>>();
         IReadOnlyList<PropertyMapping> properties = definition.GetProperties();
 
-        Dictionary<string, ColumnMapping> suggestions = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, ImportColumnMapping> suggestions = new(StringComparer.OrdinalIgnoreCase);
         HashSet<string> matchedTargets = new(StringComparer.OrdinalIgnoreCase);
 
         // Tier 1: Saved mappings
         IMappingStore? mappingStore = serviceProvider.GetService<IMappingStore>();
         if (mappingStore is not null)
         {
-            IReadOnlyList<ColumnMapping> saved = await mappingStore.LoadAsync(definition.Name, ct).ConfigureAwait(false);
+            IReadOnlyList<ImportColumnMapping> saved = await mappingStore.LoadAsync(definition.Name, ct).ConfigureAwait(false);
             ApplySuggestions(suggestions, matchedTargets, headers, saved);
         }
 
@@ -49,7 +49,7 @@ internal sealed class MappingSuggestionService(
 
         if (semanticMappingService.IsAvailable && unmappedHeaders.Count > 0)
         {
-            IReadOnlyList<FieldMetadata> targetFields = definition.GetFieldMetadata();
+            IReadOnlyList<ImportFieldMetadata> targetFields = definition.GetFieldMetadata();
             IReadOnlyList<SemanticMappingSuggestion> semanticSuggestions =
                 await semanticMappingService.SuggestSemanticMappingsAsync(unmappedHeaders, targetFields, ct).ConfigureAwait(false);
 
@@ -57,7 +57,7 @@ internal sealed class MappingSuggestionService(
                 .Where(s => !suggestions.ContainsKey(s.SourceColumn) &&
                              !matchedTargets.Contains(s.TargetProperty)))
             {
-                suggestions[suggestion.SourceColumn] = new ColumnMapping(
+                suggestions[suggestion.SourceColumn] = new ImportColumnMapping(
                     suggestion.SourceColumn, suggestion.TargetProperty, MappingConfidence.Semantic);
                 matchedTargets.Add(suggestion.TargetProperty);
             }
@@ -67,12 +67,12 @@ internal sealed class MappingSuggestionService(
     }
 
     private static void ApplySuggestions(
-        Dictionary<string, ColumnMapping> suggestions,
+        Dictionary<string, ImportColumnMapping> suggestions,
         HashSet<string> matchedTargets,
         IReadOnlyList<string> headers,
-        IReadOnlyList<ColumnMapping> saved)
+        IReadOnlyList<ImportColumnMapping> saved)
     {
-        foreach (ColumnMapping mapping in saved
+        foreach (ImportColumnMapping mapping in saved
             .Where(m => m.TargetProperty is not null &&
                         headers.Contains(m.SourceColumn, StringComparer.OrdinalIgnoreCase) &&
                         !matchedTargets.Contains(m.TargetProperty)))
@@ -83,7 +83,7 @@ internal sealed class MappingSuggestionService(
     }
 
     private static void ApplyExactMatches(
-        Dictionary<string, ColumnMapping> suggestions,
+        Dictionary<string, ImportColumnMapping> suggestions,
         HashSet<string> matchedTargets,
         IReadOnlyList<string> headers,
         IReadOnlyList<PropertyMapping> properties)
@@ -103,14 +103,14 @@ internal sealed class MappingSuggestionService(
 
             if (match is not null)
             {
-                suggestions[header] = new ColumnMapping(header, match.PropertyPath, MappingConfidence.Exact);
+                suggestions[header] = new ImportColumnMapping(header, match.PropertyPath, MappingConfidence.Exact);
                 matchedTargets.Add(match.PropertyPath);
             }
         }
     }
 
     private static void ApplyFuzzyMatches(
-        Dictionary<string, ColumnMapping> suggestions,
+        Dictionary<string, ImportColumnMapping> suggestions,
         HashSet<string> matchedTargets,
         IReadOnlyList<string> headers,
         IReadOnlyList<PropertyMapping> properties,
@@ -128,7 +128,7 @@ internal sealed class MappingSuggestionService(
 
             if (bestMatch is not null && bestScore >= threshold)
             {
-                suggestions[header] = new ColumnMapping(header, bestMatch.PropertyPath, MappingConfidence.Fuzzy);
+                suggestions[header] = new ImportColumnMapping(header, bestMatch.PropertyPath, MappingConfidence.Fuzzy);
                 matchedTargets.Add(bestMatch.PropertyPath);
             }
         }

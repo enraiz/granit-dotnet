@@ -56,7 +56,7 @@ internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITime
             ParentEntryId = entry.ParentEntryId,
             Attachments = store.Attachments.Values
                 .Where(a => a.EntryId == entry.Id)
-                .Select(a => new AttachmentInfo(a.Id, a.BlobId, a.FileName, a.ContentType, a.SizeBytes))
+                .Select(a => new TimelineAttachmentInfo(a.Id, a.BlobId, a.FileName, a.ContentType, a.SizeBytes))
                 .ToList(),
         };
 }

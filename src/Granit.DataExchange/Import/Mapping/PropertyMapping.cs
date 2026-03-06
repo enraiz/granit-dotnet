@@ -30,8 +30,8 @@ public sealed class PropertyMapping
     public bool IsChildCollection { get; init; }
 
     /// <summary>
-    /// Converts this mapping to a <see cref="FieldMetadata"/> for the mapping suggestion pipeline.
+    /// Converts this mapping to a <see cref="ImportFieldMetadata"/> for the mapping suggestion pipeline.
     /// </summary>
-    internal FieldMetadata ToFieldMetadata() =>
+    internal ImportFieldMetadata ToFieldMetadata() =>
         new(PropertyPath, ClrTypeName, DisplayName, Description, IsRequired);
 }

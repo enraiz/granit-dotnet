@@ -235,7 +235,7 @@ public sealed class ServiceCollectionExtensionsTests
 
         public Task<IReadOnlyList<SemanticMappingSuggestion>> SuggestSemanticMappingsAsync(
             IReadOnlyList<string> unmappedHeaders,
-            IReadOnlyList<FieldMetadata> targetFields,
+            IReadOnlyList<ImportFieldMetadata> targetFields,
             CancellationToken ct = default) =>
             Task.FromResult<IReadOnlyList<SemanticMappingSuggestion>>([]);
     }

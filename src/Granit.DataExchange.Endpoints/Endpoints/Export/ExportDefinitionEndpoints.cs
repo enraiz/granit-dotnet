@@ -14,7 +14,7 @@ namespace Granit.DataExchange.Endpoints.Endpoints.Export;
 /// <summary>
 /// Export definition listing and field introspection endpoints.
 /// </summary>
-internal static class DataExportDefinitionEndpoints
+internal static class ExportDefinitionEndpoints
 {
     /// <summary>
     /// Registers GET /definitions, GET /definitions/{name}/fields onto the given route group.

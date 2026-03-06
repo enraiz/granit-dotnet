@@ -76,7 +76,7 @@ public static class DataExchangeEndpointRouteBuilderExtensions
             ImportAuthorizationPolicy.PolicyName,
             policy => policy.RequireRole(options.RequiredRole));
         authOptions?.Value.AddPolicy(
-            DataExportAuthorizationPolicy.PolicyName,
+            ExportAuthorizationPolicy.PolicyName,
             policy => policy.RequireRole(options.RequiredRole));
 
         RouteGroupBuilder group = endpoints
@@ -94,12 +94,12 @@ public static class DataExchangeEndpointRouteBuilderExtensions
         // Export job execution endpoints under /export/ sub-group
         RouteGroupBuilder exportGroup = group
             .MapGroup("export")
-            .RequireAuthorization(DataExportAuthorizationPolicy.PolicyName);
+            .RequireAuthorization(ExportAuthorizationPolicy.PolicyName);
 
         exportGroup.MapExportExecutionEndpoints();
 
         // Shared metadata (definitions, presets) under /metadata/
-        // Export-specific write operations require DataExportAuthorizationPolicy
+        // Export-specific write operations require ExportAuthorizationPolicy
         RouteGroupBuilder metadataGroup = group
             .MapGroup("metadata");
 
@@ -109,7 +109,7 @@ public static class DataExchangeEndpointRouteBuilderExtensions
         // Preset endpoints already include /presets/ in their individual paths.
         RouteGroupBuilder presetGroup = metadataGroup
             .MapGroup(string.Empty)
-            .RequireAuthorization(DataExportAuthorizationPolicy.PolicyName);
+            .RequireAuthorization(ExportAuthorizationPolicy.PolicyName);
 
         presetGroup.MapExportPresetEndpoints();
 

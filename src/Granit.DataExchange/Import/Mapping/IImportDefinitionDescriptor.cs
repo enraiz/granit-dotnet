@@ -34,5 +34,5 @@ public interface IImportDefinitionDescriptor
     /// <summary>
     /// Gets field metadata for all declared properties (for the mapping suggestion pipeline).
     /// </summary>
-    IReadOnlyList<FieldMetadata> GetFieldMetadata();
+    IReadOnlyList<ImportFieldMetadata> GetFieldMetadata();
 }

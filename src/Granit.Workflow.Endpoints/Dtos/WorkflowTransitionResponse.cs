@@ -11,7 +11,7 @@ namespace Granit.Workflow.Endpoints.Dtos;
 /// When <c>true</c> and <paramref name="Allowed"/> is <c>false</c>, the UI should
 /// display "Demander l'approbation" instead of the transition name.
 /// </param>
-public sealed record TransitionResponse(
+public sealed record WorkflowTransitionResponse(
     string TargetState,
     string Name,
     bool Allowed,

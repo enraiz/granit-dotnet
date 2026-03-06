@@ -14,7 +14,7 @@ namespace Granit.DataExchange.Endpoints.Endpoints.Export;
 /// <summary>
 /// Export preset CRUD endpoints (Odoo export template pattern).
 /// </summary>
-internal static class DataExportPresetEndpoints
+internal static class ExportPresetEndpoints
 {
     /// <summary>
     /// Registers GET /presets/{definitionName}, POST /presets, DELETE /presets/{definitionName}/{presetName}

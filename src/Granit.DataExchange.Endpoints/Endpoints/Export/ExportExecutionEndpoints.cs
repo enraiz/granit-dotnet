@@ -14,7 +14,7 @@ namespace Granit.DataExchange.Endpoints.Endpoints.Export;
 /// <summary>
 /// Export job creation, status polling, and file download endpoints.
 /// </summary>
-internal static class DataExportExecutionEndpoints
+internal static class ExportExecutionEndpoints
 {
     /// <summary>
     /// Registers POST /jobs, GET /jobs/{jobId}, GET /jobs/{jobId}/download onto the given route group.

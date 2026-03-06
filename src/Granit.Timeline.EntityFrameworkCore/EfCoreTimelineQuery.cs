@@ -62,7 +62,7 @@ internal sealed class EfCoreTimelineQuery(
                 Body = e.Body,
                 ParentEntryId = e.ParentEntryId,
                 Attachments = attachmentLookup[e.Id]
-                    .Select(a => new AttachmentInfo(a.Id, a.BlobId, a.FileName, a.ContentType, a.SizeBytes))
+                    .Select(a => new TimelineAttachmentInfo(a.Id, a.BlobId, a.FileName, a.ContentType, a.SizeBytes))
                     .ToList(),
             })
             .ToList();

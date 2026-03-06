@@ -8,7 +8,7 @@ namespace Granit.DataExchange.Import.Mapping;
 /// Target property path on the entity (e.g. <c>"Email"</c>), or <c>null</c> if the column is unmapped.
 /// </param>
 /// <param name="Confidence">How the mapping was determined.</param>
-public sealed record ColumnMapping(
+public sealed record ImportColumnMapping(
     string SourceColumn,
     string? TargetProperty,
     MappingConfidence Confidence);

@@ -30,12 +30,12 @@ public sealed class ImportDefinitionTests
         TestPatientImportDefinition definition = new();
 
         // Act
-        IReadOnlyList<FieldMetadata> metadata = definition.GetFieldMetadata();
+        IReadOnlyList<ImportFieldMetadata> metadata = definition.GetFieldMetadata();
 
         // Assert
         metadata.Count.ShouldBe(4);
 
-        FieldMetadata nissField = metadata.First(f => f.PropertyPath == "Niss");
+        ImportFieldMetadata nissField = metadata.First(f => f.PropertyPath == "Niss");
         nissField.DisplayName.ShouldBe("NISS");
         nissField.IsRequired.ShouldBeTrue();
         nissField.ClrTypeName.ShouldBe("String");

@@ -25,7 +25,7 @@ public sealed record TimelineStreamEntry
     public string Body { get; init; } = string.Empty;
 
     /// <summary>Attachments (empty for non-comment entries).</summary>
-    public IReadOnlyList<AttachmentInfo> Attachments { get; init; } = [];
+    public IReadOnlyList<TimelineAttachmentInfo> Attachments { get; init; } = [];
 
     /// <summary>Parent entry ID for threaded replies.</summary>
     public Guid? ParentEntryId { get; init; }

@@ -23,7 +23,7 @@ public sealed class PropertyMappingBuilder
 
     /// <summary>
     /// Sets a description for this property.
-    /// Sent to the AI mapping service as <see cref="FieldMetadata.Description"/>.
+    /// Sent to the AI mapping service as <see cref="ImportFieldMetadata.Description"/>.
     /// </summary>
     public PropertyMappingBuilder Description(string description)
     {

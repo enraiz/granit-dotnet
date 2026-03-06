@@ -133,10 +133,10 @@ internal static class ImportUploadEndpoints
         await using Stream previewStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
         IReadOnlyList<string[]> previewRows = await parser.ReadPreviewAsync(previewStream, parsingOptions, ct: ct).ConfigureAwait(false);
 
-        IReadOnlyList<ColumnMapping> suggestions =
+        IReadOnlyList<ImportColumnMapping> suggestions =
             await ImportDefinitionResolver.SuggestMappingsAsync(mappingService, descriptor.EntityType, headers, ct).ConfigureAwait(false);
 
-        IReadOnlyList<FieldMetadata> fieldMetadata = descriptor.GetFieldMetadata();
+        IReadOnlyList<ImportFieldMetadata> fieldMetadata = descriptor.GetFieldMetadata();
 
         job.Status = ImportJobStatus.Previewed;
         await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);

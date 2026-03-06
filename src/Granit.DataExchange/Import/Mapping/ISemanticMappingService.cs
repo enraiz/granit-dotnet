@@ -6,7 +6,7 @@ namespace Granit.DataExchange.Import.Mapping;
 /// <remarks>
 /// <para>
 /// <b>RGPD/HDS compliance</b>: this interface receives <b>only</b> column header names
-/// and <see cref="FieldMetadata"/> (property names, CLR types, display names).
+/// and <see cref="ImportFieldMetadata"/> (property names, CLR types, display names).
 /// It <b>never</b> receives <c>RawImportRow.Values</c> or any business data.
 /// </para>
 /// <para>
@@ -30,6 +30,6 @@ public interface ISemanticMappingService
     /// <returns>A list of semantic mapping suggestions ordered by confidence score.</returns>
     Task<IReadOnlyList<SemanticMappingSuggestion>> SuggestSemanticMappingsAsync(
         IReadOnlyList<string> headers,
-        IReadOnlyList<FieldMetadata> targetFields,
+        IReadOnlyList<ImportFieldMetadata> targetFields,
         CancellationToken ct = default);
 }

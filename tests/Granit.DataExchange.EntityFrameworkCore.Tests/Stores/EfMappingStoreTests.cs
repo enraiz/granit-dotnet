@@ -47,7 +47,7 @@ public sealed class EfMappingStoreTests
         EfMappingStore store = CreateStore(NewDb());
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await store.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> result = await store.LoadAsync(
             "Test.Import", TestContext.Current.CancellationToken);
 
         // Assert
@@ -60,7 +60,7 @@ public sealed class EfMappingStoreTests
         // Arrange
         string dbName = NewDb();
         EfMappingStore store = CreateStore(dbName);
-        List<ColumnMapping> mappings =
+        List<ImportColumnMapping> mappings =
         [
             new("Nom", "Name", MappingConfidence.Exact),
             new("Courriel", "Email", MappingConfidence.Fuzzy),
@@ -68,7 +68,7 @@ public sealed class EfMappingStoreTests
         await store.SaveAsync("Test.Import", mappings, TestContext.Current.CancellationToken);
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await store.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> result = await store.LoadAsync(
             "Test.Import", TestContext.Current.CancellationToken);
 
         // Assert
@@ -84,11 +84,11 @@ public sealed class EfMappingStoreTests
         // Arrange
         string dbName = NewDb();
         EfMappingStore store = CreateStore(dbName);
-        List<ColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Exact)];
+        List<ImportColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Exact)];
         await store.SaveAsync("Def.A", mappings, TestContext.Current.CancellationToken);
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await store.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> result = await store.LoadAsync(
             "Def.B", TestContext.Current.CancellationToken);
 
         // Assert
@@ -103,7 +103,7 @@ public sealed class EfMappingStoreTests
         // Arrange
         string dbName = NewDb();
         EfMappingStore store = CreateStore(dbName);
-        List<ColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Saved)];
+        List<ImportColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Saved)];
 
         // Act
         await store.SaveAsync("Test.Import", mappings, TestContext.Current.CancellationToken);
@@ -120,15 +120,15 @@ public sealed class EfMappingStoreTests
         // Arrange
         string dbName = NewDb();
         EfMappingStore store = CreateStore(dbName);
-        List<ColumnMapping> first = [new("Col1", "Prop1", MappingConfidence.Exact)];
-        List<ColumnMapping> second = [new("Col2", "Prop2", MappingConfidence.Fuzzy)];
+        List<ImportColumnMapping> first = [new("Col1", "Prop1", MappingConfidence.Exact)];
+        List<ImportColumnMapping> second = [new("Col2", "Prop2", MappingConfidence.Fuzzy)];
 
         // Act
         await store.SaveAsync("Test.Import", first, TestContext.Current.CancellationToken);
         await store.SaveAsync("Test.Import", second, TestContext.Current.CancellationToken);
 
         // Assert
-        IReadOnlyList<ColumnMapping> result = await store.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> result = await store.LoadAsync(
             "Test.Import", TestContext.Current.CancellationToken);
         result.Count.ShouldBe(1);
         result[0].SourceColumn.ShouldBe("Col2");
@@ -146,15 +146,15 @@ public sealed class EfMappingStoreTests
         EfMappingStore storeA = CreateStore(dbName, tenant: CreateTenant(tenantA));
         EfMappingStore storeB = CreateStore(dbName, tenant: CreateTenant(tenantB));
 
-        List<ColumnMapping> mappingsA = [new("ColA", "PropA", MappingConfidence.Saved)];
-        List<ColumnMapping> mappingsB = [new("ColB", "PropB", MappingConfidence.Saved)];
+        List<ImportColumnMapping> mappingsA = [new("ColA", "PropA", MappingConfidence.Saved)];
+        List<ImportColumnMapping> mappingsB = [new("ColB", "PropB", MappingConfidence.Saved)];
         await storeA.SaveAsync("Test.Import", mappingsA, TestContext.Current.CancellationToken);
         await storeB.SaveAsync("Test.Import", mappingsB, TestContext.Current.CancellationToken);
 
         // Act
-        IReadOnlyList<ColumnMapping> resultA = await storeA.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> resultA = await storeA.LoadAsync(
             "Test.Import", TestContext.Current.CancellationToken);
-        IReadOnlyList<ColumnMapping> resultB = await storeB.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> resultB = await storeB.LoadAsync(
             "Test.Import", TestContext.Current.CancellationToken);
 
         // Assert
@@ -172,13 +172,13 @@ public sealed class EfMappingStoreTests
         EfMappingStore storeWithoutTenant = CreateStore(dbName, tenant: CreateTenant());
         EfMappingStore storeWithTenant = CreateStore(dbName, tenant: CreateTenant(Guid.NewGuid()));
 
-        List<ColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Exact)];
+        List<ImportColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Exact)];
         await storeWithoutTenant.SaveAsync("Test.Import", mappings, TestContext.Current.CancellationToken);
 
         // Act
-        IReadOnlyList<ColumnMapping> resultNoTenant = await storeWithoutTenant.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> resultNoTenant = await storeWithoutTenant.LoadAsync(
             "Test.Import", TestContext.Current.CancellationToken);
-        IReadOnlyList<ColumnMapping> resultWithTenant = await storeWithTenant.LoadAsync(
+        IReadOnlyList<ImportColumnMapping> resultWithTenant = await storeWithTenant.LoadAsync(
             "Test.Import", TestContext.Current.CancellationToken);
 
         // Assert
@@ -193,7 +193,7 @@ public sealed class EfMappingStoreTests
         string dbName = NewDb();
         DateTimeOffset fixedNow = new(2025, 6, 1, 12, 0, 0, TimeSpan.Zero);
         EfMappingStore store = CreateStore(dbName, clock: CreateClock(fixedNow));
-        List<ColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Exact)];
+        List<ImportColumnMapping> mappings = [new("Col1", "Prop1", MappingConfidence.Exact)];
 
         // Act
         await store.SaveAsync("Test.Import", mappings, TestContext.Current.CancellationToken);

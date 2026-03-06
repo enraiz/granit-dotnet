@@ -24,7 +24,7 @@ using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Granit.DataExchange.Endpoints.Tests;
+namespace Granit.DataExchange.Endpoints.Tests.Import;
 
 /// <summary>
 /// Integration tests for upload, preview, and mapping confirmation endpoints.
@@ -54,7 +54,7 @@ public sealed class ImportUploadEndpointsTests : IAsyncDisposable
         _descriptor.MaxFileSizeMb.Returns(10);
         _descriptor.AllowedMimeTypes.Returns(new[] { "text/csv" });
         _descriptor.GetFieldMetadata().Returns([
-            new FieldMetadata("Name", "String", "Name", null, true),
+            new ImportFieldMetadata("Name", "String", "Name", null, true),
         ]);
 
         _parser.CanParse("text/csv").Returns(true);
@@ -241,7 +241,7 @@ public sealed class ImportUploadEndpointsTests : IAsyncDisposable
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         ConfirmMappingsRequest request = new([
-            new ColumnMapping("Name", "Name", MappingConfidence.Manual),
+            new ImportColumnMapping("Name", "Name", MappingConfidence.Manual),
         ]);
 
         // Act
@@ -259,7 +259,7 @@ public sealed class ImportUploadEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
-        ConfirmMappingsRequest request = new([new ColumnMapping("Name", "Name", MappingConfidence.Manual)]);
+        ConfirmMappingsRequest request = new([new ImportColumnMapping("Name", "Name", MappingConfidence.Manual)]);
 
         // Act
         HttpResponseMessage response = await _adminClient.PutAsJsonAsync(
