@@ -37,6 +37,46 @@ types imbriqués dans ces DTOs) **doit** porter un préfixe identifiant son modu
 | `FieldMetadata` | `ImportFieldMetadata` | DataExchange |
 | `TransitionRequest` | `WorkflowTransitionRequest` | Workflow |
 
+### Suffixes obligatoires
+
+| Suffixe | Rôle | Exemple |
+| --- | --- | --- |
+| `Request` | Corps d'entrée (POST/PUT) | `CreateSavedViewRequest` |
+| `Response` | Retour de niveau top-level (GET, POST 201) | `UserNotificationResponse` |
+
+Le suffixe **`Dto` est interdit**. C'est un terme technique qui n'apporte aucune
+information sur le rôle du type. Utilisez `Request` ou `Response` selon le sens du flux.
+
+### Entités domaine et API — séparation obligatoire
+
+Les entités EF Core (`AuditedEntity`, `FullAuditedEntity`, etc.) ne doivent **jamais**
+être retournées directement par un endpoint. Créez un record `*Response` qui ne projette
+que les champs pertinents pour le consommateur.
+
+Pourquoi :
+
+- Les champs d'audit (`CreatedBy`, `ModifiedAt`, `TenantId`) n'ont pas leur place dans
+  l'API publique
+- Les types EF Core (`JsonElement`, navigations) polluent le schéma OpenAPI
+- Un changement de modèle de persistance ne doit pas casser le contrat API
+
+```csharp
+// ✅ Record Response dédié — schéma OpenAPI propre
+public sealed record SavedViewResponse
+{
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
+    public required string EntityType { get; init; }
+}
+
+// ❌ Entité EF retournée directement — fuite de champs internes
+group.MapGet("/", () => TypedResults.Ok(efEntities));
+```
+
+Types exemptés (records légers sans héritage d'entité) : `IdentityUser`,
+`NotificationDefinition`, `ColumnDefinition` — si le type est déjà un record
+immuable sans champ d'audit, il peut servir de réponse tel quel.
+
 ### Exceptions
 
 Les types **transversaux par design** (utilisés par plusieurs modules comme

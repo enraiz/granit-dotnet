@@ -72,7 +72,7 @@ internal static class SavedViewEndpoints
             .WithSummary("Sets a saved view as the default for the current user.");
     }
 
-    private static async Task<Ok<IReadOnlyList<SavedView>>> GetListAsync(
+    private static async Task<Ok<List<SavedViewResponse>>> GetListAsync(
         ISavedViewStore store,
         string entityType,
         ICurrentTenant tenant,
@@ -86,10 +86,10 @@ internal static class SavedViewEndpoints
             .GetListAsync(entityType, userId, tenantId, ct)
             .ConfigureAwait(false);
 
-        return TypedResults.Ok(views);
+        return TypedResults.Ok(views.Select(MapView).ToList());
     }
 
-    private static async Task<Created<SavedView>> CreateAsync(
+    private static async Task<Created<SavedViewResponse>> CreateAsync(
         CreateSavedViewRequest request,
         ISavedViewStore store,
         string entityType,
@@ -117,7 +117,7 @@ internal static class SavedViewEndpoints
         };
 
         await store.CreateAsync(view, ct).ConfigureAwait(false);
-        return TypedResults.Created($"/saved-views/{view.Id}", view);
+        return TypedResults.Created($"/saved-views/{view.Id}", MapView(view));
     }
 
     private static async Task<Results<NoContent, NotFound>> UpdateAsync(
@@ -164,6 +164,10 @@ internal static class SavedViewEndpoints
         await store.SetDefaultAsync(id, userId, entityType, ct).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
+
+    private static SavedViewResponse MapView(SavedView v) =>
+        new(v.Id, v.EntityType, v.Name, v.UserId, v.IsShared, v.IsDefault,
+            v.FilterJson, v.SortJson, v.GroupByJson, v.VisibleColumnsJson);
 
     private static string GetUserId(ClaimsPrincipal user) =>
         user.FindFirst(ClaimTypes.NameIdentifier)?.Value

@@ -56,13 +56,17 @@ public static class ApiDocumentationServiceCollectionExtensions
     {
         // Transformers must be registered before AddOpenApi to be resolved via DI.
         services.AddTransient<JwtBearerSecuritySchemeTransformer>();
+        services.AddTransient<OAuth2SecuritySchemeTransformer>();
         services.AddTransient<ProblemDetailsSchemaDocumentTransformer>();
+        services.AddTransient<InternalTypeSchemaDocumentTransformer>();
         services.AddTransient<InternalApiDocumentTransformer>();
         services.AddTransient<TenantHeaderOperationTransformer>();
         services.AddTransient<WolverineOpenApiOperationTransformer>();
         services.AddTransient<ProblemDetailsResponseOperationTransformer>();
         services.AddTransient<DictionarySchemaExampleOperationTransformer>();
         services.AddTransient<SecurityRequirementOperationTransformer>();
+        services.AddTransient<NullableIntSchemaOperationTransformer>();
+        services.AddTransient<ParameterDescriptionOperationTransformer>();
 
         foreach (int majorVersion in options.MajorVersions)
         {
@@ -98,12 +102,16 @@ public static class ApiDocumentationServiceCollectionExtensions
 
                 openApiOptions.AddDocumentTransformer<ProblemDetailsSchemaDocumentTransformer>();
                 openApiOptions.AddDocumentTransformer<JwtBearerSecuritySchemeTransformer>();
+                openApiOptions.AddDocumentTransformer<OAuth2SecuritySchemeTransformer>();
+                openApiOptions.AddDocumentTransformer<InternalTypeSchemaDocumentTransformer>();
                 openApiOptions.AddDocumentTransformer<InternalApiDocumentTransformer>();
                 openApiOptions.AddOperationTransformer<TenantHeaderOperationTransformer>();
                 openApiOptions.AddOperationTransformer<WolverineOpenApiOperationTransformer>();
                 openApiOptions.AddOperationTransformer<ProblemDetailsResponseOperationTransformer>();
                 openApiOptions.AddOperationTransformer<DictionarySchemaExampleOperationTransformer>();
                 openApiOptions.AddOperationTransformer<SecurityRequirementOperationTransformer>();
+                openApiOptions.AddOperationTransformer<NullableIntSchemaOperationTransformer>();
+                openApiOptions.AddOperationTransformer<ParameterDescriptionOperationTransformer>();
             });
         }
     }
