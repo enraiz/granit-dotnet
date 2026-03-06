@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Ce document illustre les dépendances entre les 89 packages source Granit.
+Ce document illustre les dépendances entre les 92 packages source Granit.
 Les flèches indiquent le sens de la dépendance : `A → B` signifie « A
 dépend de B ». Le package racine `Granit.Core` n'a aucune dépendance.
 
@@ -26,7 +26,7 @@ flowchart TD
         UTILS["Utilitaires (9)"]
         SEC["Sécurité (7)"]
         CACHE["Caching (3)"]
-        IDENT["Identity (2)"]
+        IDENT["Identity (4)"]
     end
 
     subgraph Infrastructure
@@ -58,6 +58,7 @@ flowchart TD
     SEC --> CACHE
     CACHE --> CORE
     IDENT --> CORE
+    IDENT --> PERS
 
     PERS --> UTILS
     PERS --> SEC
@@ -113,7 +114,7 @@ flowchart TD
 | Domaine | Packages |
 | ------- | -------- |
 | Utilitaires | Timing, Guids, Diagnostics, Validation, ExceptionHandling, Observability, MultiTenancy, Privacy, Cors |
-| Identity | Identity, Identity.Keycloak |
+| Identity | Identity, Identity.Keycloak, Identity.EntityFrameworkCore, Identity.Endpoints |
 | Sécurité | Security, Encryption, Vault, Auth.JwtBearer, Auth.Keycloak, Authorization, Authorization.EF |
 | Configuration | Settings (2), Features (2), ReferenceData (3) |
 | Web & API | ApiVersioning, ApiDocumentation, Cookies, Cookies.Klaro, Idempotency |
@@ -399,10 +400,32 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 
 ### Identity
 
+Cache local des utilisateurs identity provider (cache-aside EF Core).
+
+```mermaid
+flowchart LR
+    IDENT["Identity"] --> CORE["Core"]
+
+    IDENT_KC["Identity.Keycloak"] --> IDENT
+    IDENT_EF["Identity.EF"] --> IDENT
+    IDENT_EF --> PERS["Persistence"]
+    IDENT_EF --> SEC["Security"]
+
+    IDENT_EP["Identity.Endpoints"] --> IDENT
+    IDENT_EP --> AUTHZ["Authorization"]
+
+    style IDENT fill:#1abc9c,color:#fff
+    style IDENT_KC fill:#1abc9c,color:#fff
+    style IDENT_EF fill:#1abc9c,color:#fff
+    style IDENT_EP fill:#1abc9c,color:#fff
+```
+
 | Package | Dépend de |
 | ------- | --------- |
 | `Granit.Identity` | `Core` |
 | `Granit.Identity.Keycloak` | `Identity` |
+| `Granit.Identity.EntityFrameworkCore` | `Identity`, `Persistence`, `Security` |
+| `Granit.Identity.Endpoints` | `Identity`, `Authorization` |
 
 ### Analyzers
 
@@ -435,7 +458,7 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 
 ## Propriétés du graphe
 
-- **175 projets** (89 sources + 86 tests), **zéro dépendance circulaire**
+- **187 projets** (92 sources + 95 tests), **zéro dépendance circulaire**
 - **Profondeur maximale** : 5 niveaux (ex. Core → Security → Wolverine →
   Notifications → Email → Smtp, ou Core → Timing → Persistence →
   Workflow.EF → Workflow.Endpoints)
