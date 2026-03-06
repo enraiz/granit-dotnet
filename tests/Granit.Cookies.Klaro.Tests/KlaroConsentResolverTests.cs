@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -11,24 +12,56 @@ namespace Granit.Cookies.Klaro.Tests;
 
 public sealed class KlaroConsentResolverTests
 {
-    private readonly KlaroOptions _options = new()
-    {
-        CookieName = "klaro",
-        ServiceMappings = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["google-analytics"] = CookieCategory.Analytics,
-            ["matomo"] = CookieCategory.Analytics,
-            ["youtube"] = CookieCategory.Marketing,
-            ["theme-preference"] = CookieCategory.Preferences,
-        },
-    };
+    private readonly KlaroOptions _options = new() { CookieName = "klaro" };
 
-    private KlaroConsentResolver CreateResolver(KlaroOptions? options = null)
+    private readonly IThirdPartyServiceRegistry _serviceRegistry = CreateDefaultRegistry();
+
+    private static IThirdPartyServiceRegistry CreateDefaultRegistry()
+    {
+        List<ThirdPartyServiceDefinition> services =
+        [
+            new("google-analytics", CookieCategory.Analytics, []),
+            new("matomo", CookieCategory.Analytics, []),
+            new("youtube", CookieCategory.Marketing, []),
+            new("theme-preference", CookieCategory.Preferences, []),
+        ];
+
+        IThirdPartyServiceRegistry registry = Substitute.For<IThirdPartyServiceRegistry>();
+        registry.GetAll().Returns(services);
+        registry.GetByCategory(Arg.Any<CookieCategory>())
+            .Returns(callInfo =>
+            {
+                CookieCategory category = callInfo.Arg<CookieCategory>();
+                return services.Where(s => s.Category == category).ToList();
+            });
+
+        return registry;
+    }
+
+    private static IThirdPartyServiceRegistry CreateRegistry(
+        params ThirdPartyServiceDefinition[] services)
+    {
+        List<ThirdPartyServiceDefinition> list = [.. services];
+        IThirdPartyServiceRegistry registry = Substitute.For<IThirdPartyServiceRegistry>();
+        registry.GetAll().Returns(list);
+        registry.GetByCategory(Arg.Any<CookieCategory>())
+            .Returns(callInfo =>
+            {
+                CookieCategory category = callInfo.Arg<CookieCategory>();
+                return list.Where(s => s.Category == category).ToList();
+            });
+
+        return registry;
+    }
+
+    private KlaroConsentResolver CreateResolver(
+        KlaroOptions? options = null,
+        IThirdPartyServiceRegistry? registry = null)
     {
         KlaroOptions opts = options ?? _options;
         IOptions<KlaroOptions> wrappedOptions = Microsoft.Extensions.Options.Options.Create(opts);
         ILogger<KlaroConsentResolver> logger = NullLogger<KlaroConsentResolver>.Instance;
-        return new KlaroConsentResolver(wrappedOptions, logger);
+        return new KlaroConsentResolver(wrappedOptions, registry ?? _serviceRegistry, logger);
     }
 
     private static DefaultHttpContext CreateHttpContext(string cookieName, string cookieValue)
@@ -124,15 +157,10 @@ public sealed class KlaroConsentResolverTests
     [Fact]
     public async Task NoMappingsForCategory_ReturnsFalse()
     {
-        KlaroOptions options = new()
-        {
-            CookieName = "klaro",
-            ServiceMappings = new(StringComparer.OrdinalIgnoreCase)
-            {
-                ["google-analytics"] = CookieCategory.Analytics,
-            },
-        };
-        KlaroConsentResolver resolver = CreateResolver(options);
+        IThirdPartyServiceRegistry registry = CreateRegistry(
+            new ThirdPartyServiceDefinition("google-analytics", CookieCategory.Analytics, []));
+
+        KlaroConsentResolver resolver = CreateResolver(registry: registry);
         string json = JsonSerializer.Serialize(new Dictionary<string, bool>
         {
             ["google-analytics"] = true,
@@ -159,15 +187,11 @@ public sealed class KlaroConsentResolverTests
     [Fact]
     public async Task CustomCookieName_ReadsCookie()
     {
-        KlaroOptions options = new()
-        {
-            CookieName = "my-consent",
-            ServiceMappings = new(StringComparer.OrdinalIgnoreCase)
-            {
-                ["youtube"] = CookieCategory.Marketing,
-            },
-        };
-        KlaroConsentResolver resolver = CreateResolver(options);
+        IThirdPartyServiceRegistry registry = CreateRegistry(
+            new ThirdPartyServiceDefinition("youtube", CookieCategory.Marketing, []));
+
+        KlaroOptions options = new() { CookieName = "my-consent" };
+        KlaroConsentResolver resolver = CreateResolver(options, registry);
         string json = JsonSerializer.Serialize(new Dictionary<string, bool>
         {
             ["youtube"] = true,
