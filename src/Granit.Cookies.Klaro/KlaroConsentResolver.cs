@@ -15,13 +15,14 @@ namespace Granit.Cookies.Klaro;
 /// <list type="number">
 ///   <item>Read the Klaro cookie from the request (name configured in <see cref="KlaroOptions.CookieName"/>).</item>
 ///   <item>Parse it as a JSON object: <c>{"serviceName": true/false, ...}</c>.</item>
-///   <item>Find all service names mapped to the requested <see cref="CookieCategory"/>.</item>
+///   <item>Find all service names mapped to the requested <see cref="CookieCategory"/> via <see cref="IThirdPartyServiceRegistry"/>.</item>
 ///   <item>Return <c>true</c> only if <b>all</b> mapped services have consent granted.</item>
 ///   <item>If no services are mapped for the category, return <c>false</c> (fail-safe).</item>
 /// </list>
 /// </remarks>
 internal sealed class KlaroConsentResolver(
     IOptions<KlaroOptions> options,
+    IThirdPartyServiceRegistry serviceRegistry,
     ILogger<KlaroConsentResolver> logger) : IConsentResolver
 {
     /// <inheritdoc/>
@@ -40,15 +41,15 @@ internal sealed class KlaroConsentResolver(
             return Task.FromResult(false);
         }
 
-        var serviceNames = klaroOptions.ServiceMappings
-            .Where(kvp => kvp.Value == category)
-            .Select(kvp => kvp.Key)
+        List<string> serviceNames = serviceRegistry
+            .GetByCategory(category)
+            .Select(s => s.Name)
             .ToList();
 
         if (serviceNames.Count == 0)
         {
             logger.LogDebug(
-                "No Klaro services mapped to category {Category}; returning false (fail-safe)",
+                "No third-party services mapped to category {Category}; returning false (fail-safe)",
                 category);
             return Task.FromResult(false);
         }

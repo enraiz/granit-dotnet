@@ -1,5 +1,6 @@
 using Granit.Cookies.Internal;
 using Granit.Cookies.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -11,7 +12,7 @@ namespace Granit.Cookies.Extensions;
 public static class CookiesServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds Granit.Cookies services (ICookieRegistry, IGranitCookieManager)
+    /// Adds Granit.Cookies services (ICookieRegistry, IGranitCookieManager, IThirdPartyServiceRegistry)
     /// and registers cookie definitions declared in the builder.
     /// </summary>
     public static IServiceCollection AddGranitCookies(
@@ -36,6 +37,20 @@ public static class CookiesServiceCollectionExtensions
 
         services.TryAddSingleton<ICookieRegistry>(registry);
         services.TryAddScoped<IGranitCookieManager, GranitCookieManager>();
+
+        // Third-party service registry — populated from configuration
+        services.TryAddSingleton<IThirdPartyServiceRegistry>(sp =>
+        {
+            IConfiguration configuration = sp.GetRequiredService<IConfiguration>();
+            GranitCookiesOptions options = new();
+            configuration.GetSection(GranitCookiesOptions.SectionName).Bind(options);
+
+            List<ThirdPartyServiceDefinition> definitions = options.ThirdPartyServices
+                .Select(s => new ThirdPartyServiceDefinition(s.Name, s.Category, s.CookiePatterns))
+                .ToList();
+
+            return new ThirdPartyServiceRegistry(definitions);
+        });
 
         return services;
     }

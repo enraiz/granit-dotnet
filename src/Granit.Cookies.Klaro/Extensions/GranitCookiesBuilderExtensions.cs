@@ -11,7 +11,8 @@ public static class GranitCookiesBuilderExtensions
     /// and binds <see cref="Options.KlaroOptions"/> from the <c>Klaro</c> configuration section.
     /// </summary>
     /// <remarks>
-    /// Requires a <c>Klaro</c> section in configuration with <c>ServiceMappings</c>.
+    /// Requires a <c>Klaro</c> section in configuration with <c>CookieName</c>.
+    /// Third-party service mappings are read from <see cref="IThirdPartyServiceRegistry"/>.
     /// </remarks>
     public static GranitCookiesBuilder UseKlaro(this GranitCookiesBuilder builder)
     {
