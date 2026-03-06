@@ -31,7 +31,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         // Arrange — saved mapping takes "Niss", so exact match on "Niss" should not duplicate
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns<IReadOnlyList<ColumnMapping>>(
+            .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("Niss", "Niss", MappingConfidence.Saved),
             ]);
@@ -40,7 +40,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         List<string> headers = ["Niss", "FirstName"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert — "Niss" mapped by Saved, "FirstName" by Exact
@@ -55,7 +55,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         List<string> headers = ["FirstName", "Prenom"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert — "FirstName" exact, "Prenom" should NOT also map to FirstName
@@ -70,7 +70,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         List<string> headers = ["Mails"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -85,7 +85,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         // Arrange — saved mapping with null TargetProperty should be filtered out
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns<IReadOnlyList<ColumnMapping>>(
+            .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("Unmapped Column", null, MappingConfidence.Saved),
             ]);
@@ -94,7 +94,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         List<string> headers = ["Unmapped Column"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert — null-target saved mapping ignored
@@ -107,7 +107,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         // Arrange — saved mapping for a column not in headers
         IMappingStore store = Substitute.For<IMappingStore>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
-            .Returns<IReadOnlyList<ColumnMapping>>(
+            .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("Ghost Column", "Niss", MappingConfidence.Saved),
             ]);
@@ -116,7 +116,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         List<string> headers = ["FirstName"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert
@@ -130,7 +130,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         _semanticService.IsAvailable.Returns(true);
         _semanticService.SuggestSemanticMappingsAsync(
                 Arg.Any<IReadOnlyList<string>>(),
-                Arg.Any<IReadOnlyList<FieldMetadata>>(),
+                Arg.Any<IReadOnlyList<ImportFieldMetadata>>(),
                 Arg.Any<CancellationToken>())
             .Returns<IReadOnlyList<SemanticMappingSuggestion>>(
             [
@@ -141,7 +141,7 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
         List<string> headers = ["Niss", "Custom Column"];
 
         // Act
-        IReadOnlyList<ColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
+        IReadOnlyList<ImportColumnMapping> result = await _sut.SuggestMappingsAsync<TestPatient>(
             headers, TestContext.Current.CancellationToken);
 
         // Assert

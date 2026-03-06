@@ -19,7 +19,7 @@ public interface IDataMapper<TEntity> where TEntity : class
     /// <returns>A mapping result containing the entity or conversion errors.</returns>
     Task<MappingResult<TEntity>> MapAsync(
         RawImportRow row,
-        IReadOnlyList<ColumnMapping> mappings,
+        IReadOnlyList<ImportColumnMapping> mappings,
         ImportOptions options,
         CancellationToken ct = default);
 }

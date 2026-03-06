@@ -9,7 +9,7 @@ namespace Granit.DataExchange.Import.Mapping;
 /// <param name="DisplayName">User-facing display name, or <c>null</c> if not configured.</param>
 /// <param name="Description">Property description, or <c>null</c>.</param>
 /// <param name="IsRequired">Whether the property is required for import.</param>
-public sealed record FieldMetadata(
+public sealed record ImportFieldMetadata(
     string PropertyPath,
     string ClrTypeName,
     string? DisplayName,

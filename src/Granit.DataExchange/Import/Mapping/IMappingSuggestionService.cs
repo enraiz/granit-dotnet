@@ -20,7 +20,7 @@ public interface IMappingSuggestionService
     /// A list of mapping suggestions, one per header that could be matched.
     /// Unmatchable columns are excluded.
     /// </returns>
-    Task<IReadOnlyList<ColumnMapping>> SuggestMappingsAsync<TEntity>(
+    Task<IReadOnlyList<ImportColumnMapping>> SuggestMappingsAsync<TEntity>(
         IReadOnlyList<string> headers,
         CancellationToken ct = default) where TEntity : class;
 }

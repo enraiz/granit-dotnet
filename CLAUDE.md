@@ -183,6 +183,7 @@ Key rules for quick reference:
 - **Projects**: one project = one NuGet package, namespace = project name, zero circular refs
 - **Tests**: each package has `*.Tests` (xUnit + Shouldly + NSubstitute + Bogus). Part of DoD.
 - **Markdown**: all `.md` must pass `npx markdownlint-cli2 "file.md"` before committing
+- **Endpoint DTOs**: Module-specific DTOs must be prefixed with module context (`WorkflowTransitionRequest`, not `TransitionRequest`). OpenAPI flattens namespaces — generic names cause schema conflicts. Shared cross-cutting types (`PagedResult<T>`, `ProblemDetails`) are exempt.
 
 **Multi-tenancy — soft dependency rule**: `ICurrentTenant` lives in `Granit.Core.MultiTenancy`
 and is available in every module without referencing `Granit.MultiTenancy`.

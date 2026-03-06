@@ -18,6 +18,39 @@
 | Extensions DI | `Add*` / `Use*` | `AddGranitTiming()` |
 | Modules | suffixe `Module` | `GranitTimingModule` |
 | Enums | PascalCase, valeurs PascalCase | `SequentialGuidType.AtEnd` |
+| DTOs endpoint | `[Module][Concept][Suffixe]` | `WorkflowTransitionRequest` |
+
+## Nommage des DTOs exposés par les endpoints (OpenAPI)
+
+Dans un schéma OpenAPI, les namespaces C# sont aplatis : seul le **nom court** du
+type apparaît. Deux modules exposant un `AttachmentInfo` produisent un conflit.
+
+### Règle : préfixer par le contexte métier
+
+Tout type public utilisé comme paramètre ou retour d'un endpoint (y compris les
+types imbriqués dans ces DTOs) **doit** porter un préfixe identifiant son module.
+
+| ❌ Trop générique | ✅ Préfixé | Module |
+| --- | --- | --- |
+| `AttachmentInfo` | `TimelineAttachmentInfo` | Timeline |
+| `ColumnMapping` | `ImportColumnMapping` | DataExchange |
+| `FieldMetadata` | `ImportFieldMetadata` | DataExchange |
+| `TransitionRequest` | `WorkflowTransitionRequest` | Workflow |
+
+### Exceptions
+
+Les types **transversaux par design** (utilisés par plusieurs modules comme
+infrastructure partagée) n'ont pas besoin de préfixe module :
+
+- `PagedResult<T>` (Granit.Querying) — un seul type partagé, pas de conflit
+- `ProblemDetails` (framework ASP.NET) — standard RFC 7807
+
+### Quand appliquer
+
+- À la **création** de tout nouveau record/class dans un package `*.Endpoints`
+  ou dans un package de base dont les types remontent dans les endpoints
+- Lors d'une **revue de code** (MR) : vérifier que les noms de DTOs ne sont pas
+  ambigus hors de leur namespace
 
 ## Style de code
 

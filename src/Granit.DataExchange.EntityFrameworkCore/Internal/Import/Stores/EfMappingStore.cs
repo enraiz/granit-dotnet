@@ -18,7 +18,7 @@ internal sealed class EfMappingStore(
     ICurrentTenant currentTenant) : IMappingStore
 {
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<ColumnMapping>> LoadAsync(
+    public async Task<IReadOnlyList<ImportColumnMapping>> LoadAsync(
         string definitionName, CancellationToken ct = default)
     {
         await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
@@ -34,14 +34,14 @@ internal sealed class EfMappingStore(
             return [];
         }
 
-        List<ColumnMapping>? mappings = JsonSerializer.Deserialize<List<ColumnMapping>>(entity.MappingsJson);
-        return mappings?.AsReadOnly() ?? (IReadOnlyList<ColumnMapping>)[];
+        List<ImportColumnMapping>? mappings = JsonSerializer.Deserialize<List<ImportColumnMapping>>(entity.MappingsJson);
+        return mappings?.AsReadOnly() ?? (IReadOnlyList<ImportColumnMapping>)[];
     }
 
     /// <inheritdoc/>
     public async Task SaveAsync(
         string definitionName,
-        IReadOnlyList<ColumnMapping> mappings,
+        IReadOnlyList<ImportColumnMapping> mappings,
         CancellationToken ct = default)
     {
         await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);

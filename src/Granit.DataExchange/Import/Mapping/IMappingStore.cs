@@ -12,7 +12,7 @@ public interface IMappingStore
     /// <param name="definitionName">The import definition name (e.g. <c>"Guava.PatientImport"</c>).</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>Saved column mappings, or an empty list if none exist.</returns>
-    Task<IReadOnlyList<ColumnMapping>> LoadAsync(
+    Task<IReadOnlyList<ImportColumnMapping>> LoadAsync(
         string definitionName,
         CancellationToken ct = default);
 
@@ -24,6 +24,6 @@ public interface IMappingStore
     /// <param name="ct">Cancellation token.</param>
     Task SaveAsync(
         string definitionName,
-        IReadOnlyList<ColumnMapping> mappings,
+        IReadOnlyList<ImportColumnMapping> mappings,
         CancellationToken ct = default);
 }

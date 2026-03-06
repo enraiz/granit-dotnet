@@ -112,7 +112,7 @@ internal sealed class EfImportOrchestrator(
                 $"Import job '{job.Id}' has no confirmed mappings.");
         }
 
-        List<ColumnMapping>? mappings = JsonSerializer.Deserialize<List<ColumnMapping>>(job.MappingsJson);
+        List<ImportColumnMapping>? mappings = JsonSerializer.Deserialize<List<ImportColumnMapping>>(job.MappingsJson);
         if (mappings is null || mappings.Count == 0)
         {
             throw new InvalidOperationException(
@@ -172,7 +172,7 @@ internal sealed class EfImportOrchestrator(
         IFileParser parser,
         Stream fileStream,
         FileParsingOptions parsingOptions,
-        List<ColumnMapping> mappings,
+        List<ImportColumnMapping> mappings,
         bool dryRun,
         CancellationToken ct)
     {
@@ -193,7 +193,7 @@ internal sealed class EfImportOrchestrator(
         IFileParser parser,
         Stream fileStream,
         FileParsingOptions parsingOptions,
-        IReadOnlyList<ColumnMapping> mappings,
+        IReadOnlyList<ImportColumnMapping> mappings,
         bool dryRun,
         CancellationToken ct) where TEntity : class
     {
@@ -216,7 +216,7 @@ internal sealed class EfImportOrchestrator(
         IFileParser parser,
         Stream fileStream,
         FileParsingOptions parsingOptions,
-        IReadOnlyList<ColumnMapping> mappings,
+        IReadOnlyList<ImportColumnMapping> mappings,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct) where TEntity : class
     {
         IRecordIdentityResolver<TEntity>? identityResolver = serviceProvider.GetService<IRecordIdentityResolver<TEntity>>();

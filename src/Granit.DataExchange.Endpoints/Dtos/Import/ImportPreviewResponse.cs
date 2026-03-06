@@ -8,5 +8,5 @@ namespace Granit.DataExchange.Endpoints.Dtos.Import;
 public sealed record ImportPreviewResponse(
     IReadOnlyList<string> Headers,
     IReadOnlyList<string[]> PreviewRows,
-    IReadOnlyList<ColumnMapping> Suggestions,
-    IReadOnlyList<FieldMetadata> FieldMetadata);
+    IReadOnlyList<ImportColumnMapping> Suggestions,
+    IReadOnlyList<ImportFieldMetadata> FieldMetadata);

@@ -25,7 +25,7 @@ public sealed class NullSemanticMappingServiceTests
         // Act
         IReadOnlyList<SemanticMappingSuggestion> result = await sut.SuggestSemanticMappingsAsync(
             ["Col1", "Col2"],
-            [new FieldMetadata("Name", "String", null, null, false)],
+            [new ImportFieldMetadata("Name", "String", null, null, false)],
             TestContext.Current.CancellationToken);
 
         // Assert

@@ -25,7 +25,7 @@ internal static class ImportDefinitionResolver
     /// Invokes <see cref="IMappingSuggestionService.SuggestMappingsAsync{TEntity}"/> via reflection,
     /// using the entity type discovered at runtime from the definition descriptor.
     /// </summary>
-    internal static async Task<IReadOnlyList<ColumnMapping>> SuggestMappingsAsync(
+    internal static async Task<IReadOnlyList<ImportColumnMapping>> SuggestMappingsAsync(
         IMappingSuggestionService mappingService,
         Type entityType,
         IReadOnlyList<string> headers,
@@ -36,7 +36,7 @@ internal static class ImportDefinitionResolver
             .MakeGenericMethod(entityType);
 
         var task =
-            (Task<IReadOnlyList<ColumnMapping>>)method.Invoke(mappingService, [headers, ct])!;
+            (Task<IReadOnlyList<ImportColumnMapping>>)method.Invoke(mappingService, [headers, ct])!;
 
         return await task.ConfigureAwait(false);
     }

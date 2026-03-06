@@ -15,7 +15,7 @@ internal sealed class SavedMappingEntity
     /// <summary>Tenant identifier. <c>null</c> when multi-tenancy is not active.</summary>
     public Guid? TenantId { get; set; }
 
-    /// <summary>Serialized <c>ColumnMapping[]</c> as JSON.</summary>
+    /// <summary>Serialized <c>ImportColumnMapping[]</c> as JSON.</summary>
     public required string MappingsJson { get; set; }
 
     /// <summary>When the mappings were saved.</summary>

@@ -17,7 +17,7 @@ internal sealed class NullSemanticMappingService : ISemanticMappingService
     /// <inheritdoc/>
     public Task<IReadOnlyList<SemanticMappingSuggestion>> SuggestSemanticMappingsAsync(
         IReadOnlyList<string> headers,
-        IReadOnlyList<FieldMetadata> targetFields,
+        IReadOnlyList<ImportFieldMetadata> targetFields,
         CancellationToken ct = default) =>
         Task.FromResult<IReadOnlyList<SemanticMappingSuggestion>>([]);
 }
