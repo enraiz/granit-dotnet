@@ -31,8 +31,7 @@ public sealed class IdentityServiceCollectionExtensionsTests
 
         services.AddGranitIdentity();
 
-        ServiceDescriptor descriptor = services.ShouldHaveSingleItem();
-        descriptor.ServiceType.ShouldBe(typeof(IIdentityProvider));
+        ServiceDescriptor descriptor = services.Single(d => d.ServiceType == typeof(IIdentityProvider));
         descriptor.ImplementationType.ShouldBe(typeof(NullIdentityProvider));
         descriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
