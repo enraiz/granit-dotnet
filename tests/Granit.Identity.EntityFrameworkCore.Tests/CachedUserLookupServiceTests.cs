@@ -34,16 +34,16 @@ public sealed class CachedUserLookupServiceTests
     private static UserCacheEntry CreateCacheEntry(
         string externalUserId = "user-1",
         DateTimeOffset? lastSyncedAt = null) => new()
-    {
-        Id = Guid.NewGuid(),
-        ExternalUserId = externalUserId,
-        Username = "jdoe",
-        Email = "jdoe@test.com",
-        FirstName = "John",
-        LastName = "Doe",
-        Enabled = true,
-        LastSyncedAt = lastSyncedAt ?? DateTimeOffset.UtcNow
-    };
+        {
+            Id = Guid.NewGuid(),
+            ExternalUserId = externalUserId,
+            Username = "jdoe",
+            Email = "jdoe@test.com",
+            FirstName = "John",
+            LastName = "Doe",
+            Enabled = true,
+            LastSyncedAt = lastSyncedAt ?? DateTimeOffset.UtcNow
+        };
 
     public CachedUserLookupServiceTests()
     {

@@ -20,17 +20,17 @@ public sealed class EfCoreUserCacheStoreTests
         string? email = "jdoe@test.com",
         string? firstName = "John",
         string? lastName = "Doe") => new()
-    {
-        Id = Guid.NewGuid(),
-        ExternalUserId = externalUserId,
-        Username = username,
-        Email = email,
-        FirstName = firstName,
-        LastName = lastName,
-        Enabled = true,
-        LastSyncedAt = DateTimeOffset.UtcNow,
-        TenantId = tenantId
-    };
+        {
+            Id = Guid.NewGuid(),
+            ExternalUserId = externalUserId,
+            Username = username,
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName,
+            Enabled = true,
+            LastSyncedAt = DateTimeOffset.UtcNow,
+            TenantId = tenantId
+        };
 
     [Fact]
     public async Task FindByExternalIdAsync_ReturnsNull_WhenNotFound()
