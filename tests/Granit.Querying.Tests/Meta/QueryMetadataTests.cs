@@ -11,14 +11,14 @@ public sealed class QueryMetadataTests
     {
         QueryMetadata metadata = new()
         {
-            Columns = [new ColumnDefinitionDto("Name", "Nom", "String", 1, true, true, true, null)],
-            FilterableFields = [new FilterableFieldDto("Name", "String", [Granit.Querying.Filtering.FilterOperator.Eq])],
-            SortableFields = [new SortableFieldDto("Name")],
-            PresetFilterGroups = [new FilterGroupMetaDto("Status", "Statut", [new PresetMetaDto("Active", "Actif", true)])],
-            QuickFilters = [new QuickFilterMetaDto("MyItems", "Mes éléments", true)],
-            DateFilters = [new DateFilterMetaDto("CreatedAt", DatePeriod.ThisMonth, [DatePeriod.Today, DatePeriod.ThisMonth, DatePeriod.ThisYear])],
-            GroupByFields = [new GroupByFieldDto("Status", "String")],
-            Pagination = new PaginationMetaDto(20, 100, true),
+            Columns = [new ColumnDefinition("Name", "Nom", "String", 1, true, true, true, null)],
+            FilterableFields = [new FilterableField("Name", "String", [Granit.Querying.Filtering.FilterOperator.Eq])],
+            SortableFields = [new SortableField("Name")],
+            PresetFilterGroups = [new FilterGroupMeta("Status", "Statut", [new PresetMeta("Active", "Actif", true)])],
+            QuickFilters = [new QuickFilterMeta("MyItems", "Mes éléments", true)],
+            DateFilters = [new DateFilterMeta("CreatedAt", DatePeriod.ThisMonth, [DatePeriod.Today, DatePeriod.ThisMonth, DatePeriod.ThisYear])],
+            GroupByFields = [new GroupByField("Status", "String")],
+            Pagination = new PaginationMeta(20, 100, true),
             DefaultSort = "-createdAt",
         };
 
@@ -35,9 +35,9 @@ public sealed class QueryMetadataTests
     }
 
     [Fact]
-    public void ColumnDefinitionDto_properties()
+    public void ColumnDefinition_properties()
     {
-        ColumnDefinitionDto column = new("LastName", "Nom de famille", "String", 2, true, true, true, null);
+        ColumnDefinition column = new("LastName", "Nom de famille", "String", 2, true, true, true, null);
 
         column.Name.ShouldBe("LastName");
         column.Label.ShouldBe("Nom de famille");
@@ -50,9 +50,9 @@ public sealed class QueryMetadataTests
     }
 
     [Fact]
-    public void FilterableFieldDto_properties()
+    public void FilterableField_properties()
     {
-        FilterableFieldDto field = new("Age", "Int32",
+        FilterableField field = new("Age", "Int32",
             [Granit.Querying.Filtering.FilterOperator.Eq, Granit.Querying.Filtering.FilterOperator.Gt, Granit.Querying.Filtering.FilterOperator.Lt]);
 
         field.Name.ShouldBe("Age");
@@ -61,10 +61,10 @@ public sealed class QueryMetadataTests
     }
 
     [Fact]
-    public void FilterGroupMetaDto_with_presets()
+    public void FilterGroupMeta_with_presets()
     {
-        FilterGroupMetaDto group = new("Status", "Statut",
-            [new PresetMetaDto("Active", "Actif", true), new PresetMetaDto("Archived", "Archivé", false)]);
+        FilterGroupMeta group = new("Status", "Statut",
+            [new PresetMeta("Active", "Actif", true), new PresetMeta("Archived", "Archivé", false)]);
 
         group.Name.ShouldBe("Status");
         group.Label.ShouldBe("Statut");
@@ -74,9 +74,9 @@ public sealed class QueryMetadataTests
     }
 
     [Fact]
-    public void DateFilterMetaDto_properties()
+    public void DateFilterMeta_properties()
     {
-        DateFilterMetaDto filter = new("CreatedAt", DatePeriod.ThisMonth,
+        DateFilterMeta filter = new("CreatedAt", DatePeriod.ThisMonth,
             [DatePeriod.Today, DatePeriod.ThisWeek, DatePeriod.ThisMonth]);
 
         filter.Name.ShouldBe("CreatedAt");
@@ -85,9 +85,9 @@ public sealed class QueryMetadataTests
     }
 
     [Fact]
-    public void PaginationMetaDto_properties()
+    public void PaginationMeta_properties()
     {
-        PaginationMetaDto pagination = new(25, 200, false);
+        PaginationMeta pagination = new(25, 200, false);
 
         pagination.DefaultPageSize.ShouldBe(25);
         pagination.MaxPageSize.ShouldBe(200);
@@ -95,9 +95,9 @@ public sealed class QueryMetadataTests
     }
 
     [Fact]
-    public void QuickFilterMetaDto_properties()
+    public void QuickFilterMeta_properties()
     {
-        QuickFilterMetaDto filter = new("MyAppointments", "Mes rendez-vous", true);
+        QuickFilterMeta filter = new("MyAppointments", "Mes rendez-vous", true);
 
         filter.Name.ShouldBe("MyAppointments");
         filter.Label.ShouldBe("Mes rendez-vous");
@@ -116,7 +116,7 @@ public sealed class QueryMetadataTests
             QuickFilters = [],
             DateFilters = [],
             GroupByFields = [],
-            Pagination = new PaginationMetaDto(20, 100, false),
+            Pagination = new PaginationMeta(20, 100, false),
         };
 
         metadata.DefaultSort.ShouldBeNull();

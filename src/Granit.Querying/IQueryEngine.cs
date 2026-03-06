@@ -53,5 +53,5 @@ public interface IQueryEngine<TEntity> where TEntity : class
     /// </summary>
     /// <param name="savedViews">Optional saved views to include in the metadata.</param>
     /// <returns>The query metadata.</returns>
-    QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummaryDto>? savedViews = null);
+    QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummary>? savedViews = null);
 }

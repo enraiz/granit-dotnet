@@ -7,7 +7,7 @@ namespace Granit.Querying.SavedViews;
 /// <param name="Name">User-facing name.</param>
 /// <param name="IsShared">Whether this view is shared.</param>
 /// <param name="IsDefault">Whether this is the user's default view.</param>
-public sealed record SavedViewSummaryDto(
+public sealed record SavedViewSummary(
     Guid Id,
     string Name,
     bool IsShared,

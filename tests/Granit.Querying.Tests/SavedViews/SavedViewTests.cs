@@ -129,13 +129,13 @@ public sealed class NullSavedViewStoreTests
     }
 }
 
-public sealed class SavedViewSummaryDtoTests
+public sealed class SavedViewSummaryTests
 {
     [Fact]
     public void Properties_are_preserved()
     {
         var id = Guid.NewGuid();
-        SavedViewSummaryDto dto = new(id, "My view", true, false);
+        SavedViewSummary dto = new(id, "My view", true, false);
 
         dto.Id.ShouldBe(id);
         dto.Name.ShouldBe("My view");

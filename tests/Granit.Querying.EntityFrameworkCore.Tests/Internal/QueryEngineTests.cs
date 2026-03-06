@@ -260,12 +260,12 @@ public sealed class QueryEngineTests : IAsyncLifetime
 
         QueryMetadata metadata = engine.GetMetadata();
 
-        FilterableFieldDto nameField = metadata.FilterableFields
+        FilterableField nameField = metadata.FilterableFields
             .First(f => f.Name == "Name");
         nameField.Operators.ShouldContain(FilterOperator.Contains);
         nameField.Operators.ShouldContain(FilterOperator.Eq);
 
-        FilterableFieldDto priceField = metadata.FilterableFields
+        FilterableField priceField = metadata.FilterableFields
             .First(f => f.Name == "Price");
         priceField.Operators.ShouldContain(FilterOperator.Gt);
         priceField.Operators.ShouldContain(FilterOperator.Between);

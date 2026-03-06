@@ -139,18 +139,18 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     {
         QueryMetadata metadata = new()
         {
-            Columns = [new ColumnDefinitionDto("Name", "Name", "String", 0, true, true, true, null)],
+            Columns = [new ColumnDefinition("Name", "Name", "String", 0, true, true, true, null)],
             FilterableFields = [],
             SortableFields = [],
             PresetFilterGroups = [],
             QuickFilters = [],
             DateFilters = [],
             GroupByFields = [],
-            Pagination = new PaginationMetaDto(20, 100, false),
+            Pagination = new PaginationMeta(20, 100, false),
             DefaultSort = "-Price",
         };
 
-        _engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummaryDto>?>())
+        _engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>())
             .Returns(metadata);
 
         _savedViewStore.GetListAsync(
@@ -182,11 +182,11 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
             QuickFilters = [],
             DateFilters = [],
             GroupByFields = [],
-            Pagination = new PaginationMetaDto(20, 100, false),
+            Pagination = new PaginationMeta(20, 100, false),
             DefaultSort = null,
         };
 
-        _engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummaryDto>?>())
+        _engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>())
             .Returns(metadata);
 
         _savedViewStore.GetListAsync(

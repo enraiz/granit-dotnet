@@ -5,7 +5,8 @@ namespace Granit.ApiDocumentation.Transformers;
 
 /// <summary>
 /// Normalizes nullable integer query parameters that ASP.NET Core generates as
-/// <c>type: ["integer", "string"]</c> back to <c>type: "integer"</c>.
+/// <c>type: ["integer", "string"]</c> or <c>type: ["null", "integer"]</c> with a
+/// spurious regex pattern, back to a clean <c>type: ["integer", "null"]</c>.
 /// This is an artifact of model binding from query strings where <c>int?</c> parameters
 /// accept both integer and string representations.
 /// </summary>
@@ -22,17 +23,26 @@ internal sealed class NullableIntSchemaOperationTransformer : IOpenApiOperationT
             return Task.CompletedTask;
         }
 
-        foreach (var parameter in operation.Parameters)
+        foreach (OpenApiParameter parameter in operation.Parameters)
         {
             if (parameter.Schema is not OpenApiSchema schema)
             {
                 continue;
             }
 
+            // Case 1: type: [integer, string] with int format → normalize to [integer, null]
             if (schema.Type == (JsonSchemaType.Integer | JsonSchemaType.String)
                 && schema.Format is "int32" or "int64")
             {
                 schema.Type = JsonSchemaType.Integer | JsonSchemaType.Null;
+            }
+
+            // Case 2: type: [null, integer] with regex pattern → remove spurious pattern
+            if (schema.Type == (JsonSchemaType.Null | JsonSchemaType.Integer)
+                && schema.Format is "int32" or "int64"
+                && schema.Pattern is not null)
+            {
+                schema.Pattern = null;
             }
         }
 

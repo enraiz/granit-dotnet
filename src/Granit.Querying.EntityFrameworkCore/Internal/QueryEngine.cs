@@ -81,10 +81,10 @@ internal sealed class QueryEngine<TEntity>(
     }
 
     /// <inheritdoc/>
-    public QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummaryDto>? savedViews = null) =>
+    public QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummary>? savedViews = null) =>
         new()
         {
-            Columns = _builder.Columns.Select(c => new ColumnDefinitionDto(
+            Columns = _builder.Columns.Select(c => new ColumnDefinition(
                 c.PropertyName,
                 c.Label ?? c.PropertyName,
                 c.ClrType.Name,
@@ -95,34 +95,34 @@ internal sealed class QueryEngine<TEntity>(
                 c.Format)).ToList(),
             FilterableFields = _builder.Columns
                 .Where(c => c.IsFilterable)
-                .Select(c => new FilterableFieldDto(
+                .Select(c => new FilterableField(
                     c.PropertyName,
                     c.ClrType.Name,
                     FilterOperatorInference.GetOperators(c.ClrType)))
                 .ToList(),
             SortableFields = _builder.Columns
                 .Where(c => c.IsSortable)
-                .Select(c => new SortableFieldDto(c.PropertyName))
+                .Select(c => new SortableField(c.PropertyName))
                 .ToList(),
-            PresetFilterGroups = _builder.FilterGroups.Select(g => new FilterGroupMetaDto(
+            PresetFilterGroups = _builder.FilterGroups.Select(g => new FilterGroupMeta(
                 g.Name,
                 g.Label ?? g.Name,
-                g.Presets.Select(p => new PresetMetaDto(
+                g.Presets.Select(p => new PresetMeta(
                     p.Name,
                     p.Label ?? p.Name,
                     p.IsDefault)).ToList())).ToList(),
-            QuickFilters = _builder.QuickFilters.Select(f => new QuickFilterMetaDto(
+            QuickFilters = _builder.QuickFilters.Select(f => new QuickFilterMeta(
                 f.Name,
                 f.Label ?? f.Name,
                 f.IsDefault)).ToList(),
-            DateFilters = _builder.DateFilters.Select(d => new DateFilterMetaDto(
+            DateFilters = _builder.DateFilters.Select(d => new DateFilterMeta(
                 d.PropertyName,
                 d.DefaultPeriod,
                 Enum.GetValues<DatePeriod>().ToList())).ToList(),
-            GroupByFields = _builder.GroupByFields.Select(g => new GroupByFieldDto(
+            GroupByFields = _builder.GroupByFields.Select(g => new GroupByField(
                 g.PropertyName,
                 g.ClrType.Name)).ToList(),
-            Pagination = new PaginationMetaDto(
+            Pagination = new PaginationMeta(
                 _builder.DefaultPageSizeValue,
                 _builder.MaxPageSizeValue,
                 _builder.CursorPropertyName is not null),

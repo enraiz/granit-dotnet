@@ -143,14 +143,12 @@ public static class ApiDocumentationServiceCollectionExtensions
                 continue;
             }
 
-            foreach (Type type in types)
+            foreach (Type type in types.Where(t =>
+                         t is { IsAbstract: false, IsInterface: false }
+                         && interfaceType.IsAssignableFrom(t)))
             {
-                if (type is { IsAbstract: false, IsInterface: false }
-                    && interfaceType.IsAssignableFrom(type))
-                {
-                    services.TryAddEnumerable(
-                        ServiceDescriptor.Singleton(interfaceType, type));
-                }
+                services.TryAddEnumerable(
+                    ServiceDescriptor.Singleton(interfaceType, type));
             }
         }
     }

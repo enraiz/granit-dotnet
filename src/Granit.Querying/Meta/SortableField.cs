@@ -4,4 +4,4 @@ namespace Granit.Querying.Meta;
 /// Sortable field metadata for frontend auto-configuration.
 /// </summary>
 /// <param name="Name">Property name.</param>
-public sealed record SortableFieldDto(string Name);
+public sealed record SortableField(string Name);
