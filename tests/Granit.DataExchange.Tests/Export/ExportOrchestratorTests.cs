@@ -734,7 +734,7 @@ public sealed class ExportOrchestratorTests
             IQueryable<TestEntity> source, QueryRequest request, CancellationToken ct = default) =>
             throw new NotSupportedException();
 
-        public QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummaryDto>? savedViews = null) =>
+        public QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummary>? savedViews = null) =>
             throw new NotSupportedException();
     }
 

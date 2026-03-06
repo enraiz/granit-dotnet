@@ -7,29 +7,29 @@ namespace Granit.Cookies.Endpoints.Dtos;
 /// <param name="Cookies">Internal cookies registered by the application.</param>
 /// <param name="Services">Third-party services that set cookies on the client.</param>
 public sealed record CookieConsentConfigResponse(
-    IReadOnlyList<CookieDefinitionDto> Cookies,
-    IReadOnlyList<ThirdPartyServiceDto> Services);
+    IReadOnlyList<CookieDefinitionResponse> Cookies,
+    IReadOnlyList<ThirdPartyServiceResponse> Services);
 
 /// <summary>
-/// DTO for an internal cookie definition.
+/// API response for an internal cookie definition.
 /// </summary>
 /// <param name="Name">Cookie name.</param>
 /// <param name="Category">RGPD consent category (snake_case).</param>
 /// <param name="RetentionDays">Maximum retention period in days.</param>
 /// <param name="Purpose">Human-readable purpose description.</param>
-public sealed record CookieDefinitionDto(
+public sealed record CookieDefinitionResponse(
     string Name,
     string Category,
     int RetentionDays,
     string Purpose);
 
 /// <summary>
-/// DTO for a third-party service that sets cookies.
+/// API response for a third-party service that sets cookies.
 /// </summary>
 /// <param name="Name">Service identifier (e.g. "matomo", "hubspot").</param>
 /// <param name="Category">RGPD consent category (snake_case).</param>
 /// <param name="CookiePatterns">Regex patterns matching cookies set by this service.</param>
-public sealed record ThirdPartyServiceDto(
+public sealed record ThirdPartyServiceResponse(
     string Name,
     string Category,
     IReadOnlyList<string> CookiePatterns);

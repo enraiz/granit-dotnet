@@ -11,7 +11,7 @@ namespace Granit.Querying.Meta;
 /// <param name="IsFilterable">Whether filtering is allowed.</param>
 /// <param name="IsVisible">Whether the column is visible by default.</param>
 /// <param name="Format">Display format hint, or <c>null</c>.</param>
-public sealed record ColumnDefinitionDto(
+public sealed record ColumnDefinition(
     string Name,
     string Label,
     string Type,

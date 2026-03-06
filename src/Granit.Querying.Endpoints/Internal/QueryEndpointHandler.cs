@@ -55,14 +55,14 @@ internal static class QueryEndpointHandler
 
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
 
-        IReadOnlyList<SavedViewSummaryDto> savedViews;
+        IReadOnlyList<SavedViewSummary> savedViews;
         try
         {
             IReadOnlyList<SavedView> views = await savedViewStore
                 .GetListAsync(definition.Name, userId, tenantId, ct)
                 .ConfigureAwait(false);
 
-            savedViews = views.Select(v => new SavedViewSummaryDto(
+            savedViews = views.Select(v => new SavedViewSummary(
                 v.Id, v.Name, v.IsShared, v.IsDefault)).ToList();
         }
         catch (NotImplementedException)

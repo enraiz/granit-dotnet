@@ -377,7 +377,7 @@ public interface IQueryEngine<TEntity> where TEntity : class
         IQueryable<TEntity> source, QueryRequest request, CancellationToken ct);
     Task<GroupedResult<TEntity>> ExecuteGroupedAsync(
         IQueryable<TEntity> source, QueryRequest request, CancellationToken ct);
-    QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummaryDto>? savedViews = null);
+    QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummary>? savedViews = null);
 }
 ```
 

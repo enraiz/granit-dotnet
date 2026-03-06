@@ -9,6 +9,9 @@ namespace Granit.ReferenceData.Endpoints;
 /// </summary>
 internal sealed class ReferenceDataSchemaExampleProvider : ISchemaExampleProvider
 {
+    private const string ExampleBelgique = "Belgique";
+    private const string ExampleBelgica = "Bélgica";
+
     /// <inheritdoc/>
     public IReadOnlyDictionary<Type, JsonNode> GetExamples() =>
         new Dictionary<Type, JsonNode>
@@ -17,23 +20,23 @@ internal sealed class ReferenceDataSchemaExampleProvider : ISchemaExampleProvide
             {
                 ["code"] = "BE",
                 ["labelEn"] = "Belgium",
-                ["labelFr"] = "Belgique",
+                ["labelFr"] = ExampleBelgique,
                 ["labelNl"] = "België",
                 ["labelDe"] = "Belgien",
-                ["labelEs"] = "Bélgica",
+                ["labelEs"] = ExampleBelgica,
                 ["labelIt"] = "Belgio",
-                ["labelPt"] = "Bélgica",
+                ["labelPt"] = ExampleBelgica,
                 ["sortOrder"] = 56,
             },
             [typeof(ReferenceDataUpdateRequest)] = new JsonObject
             {
                 ["labelEn"] = "Belgium",
-                ["labelFr"] = "Belgique",
+                ["labelFr"] = ExampleBelgique,
                 ["labelNl"] = "België",
                 ["labelDe"] = "Belgien",
-                ["labelEs"] = "Bélgica",
+                ["labelEs"] = ExampleBelgica,
                 ["labelIt"] = "Belgio",
-                ["labelPt"] = "Bélgica",
+                ["labelPt"] = ExampleBelgica,
                 ["sortOrder"] = 56,
                 ["isActive"] = true,
             },

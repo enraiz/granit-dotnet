@@ -6,7 +6,7 @@ namespace Granit.Querying.Meta;
 /// <param name="DefaultPageSize">The default page size.</param>
 /// <param name="MaxPageSize">The maximum allowed page size.</param>
 /// <param name="SupportsCursor">Whether keyset/cursor pagination is supported.</param>
-public sealed record PaginationMetaDto(
+public sealed record PaginationMeta(
     int DefaultPageSize,
     int MaxPageSize,
     bool SupportsCursor);

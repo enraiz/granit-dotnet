@@ -7,7 +7,7 @@ namespace Granit.Querying.Meta;
 /// <param name="Name">Filter name (used in query string).</param>
 /// <param name="Label">User-facing label.</param>
 /// <param name="IsDefault">Whether this filter is active by default.</param>
-public sealed record QuickFilterMetaDto(
+public sealed record QuickFilterMeta(
     string Name,
     string Label,
     bool IsDefault);
