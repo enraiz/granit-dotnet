@@ -70,7 +70,7 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
     public async Task<(DateTimeOffset? Oldest, DateTimeOffset? Newest)> GetSyncRangeAsync(
         Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        var query = context.UserCacheEntries
+        IQueryable<UserCacheEntry> query = context.UserCacheEntries
             .AsNoTracking()
             .Where(e => e.TenantId == tenantId);
 
@@ -79,8 +79,8 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
             return (null, null);
         }
 
-        var oldest = await query.MinAsync(e => e.LastSyncedAt, cancellationToken).ConfigureAwait(false);
-        var newest = await query.MaxAsync(e => e.LastSyncedAt, cancellationToken).ConfigureAwait(false);
+        DateTimeOffset oldest = await query.MinAsync(e => e.LastSyncedAt, cancellationToken).ConfigureAwait(false);
+        DateTimeOffset newest = await query.MaxAsync(e => e.LastSyncedAt, cancellationToken).ConfigureAwait(false);
 
         return (oldest, newest);
     }
@@ -119,16 +119,16 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
             return;
         }
 
-        var externalIds = entries.Select(e => e.ExternalUserId).ToHashSet();
+        HashSet<string> externalIds = entries.Select(e => e.ExternalUserId).ToHashSet();
         Guid? tenantId = entries[0].TenantId;
 
-        var existingEntries = await context.UserCacheEntries
+        Dictionary<string, UserCacheEntry> existingEntries = await context.UserCacheEntries
             .Where(e => e.TenantId == tenantId && externalIds.Contains(e.ExternalUserId))
             .ToDictionaryAsync(e => e.ExternalUserId, cancellationToken).ConfigureAwait(false);
 
-        foreach (var entry in entries)
+        foreach (UserCacheEntry entry in entries)
         {
-            if (existingEntries.TryGetValue(entry.ExternalUserId, out var existing))
+            if (existingEntries.TryGetValue(entry.ExternalUserId, out UserCacheEntry? existing))
             {
                 existing.Username = entry.Username;
                 existing.Email = entry.Email;
@@ -151,7 +151,7 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
     public async Task DeleteByExternalIdAsync(
         string externalUserId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        var entries = await context.UserCacheEntries
+        List<UserCacheEntry> entries = await context.UserCacheEntries
             .Where(e => e.TenantId == tenantId && e.ExternalUserId == externalUserId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
@@ -161,7 +161,7 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
 
     public async Task DeleteAllByTenantAsync(Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        var entries = await context.UserCacheEntries
+        List<UserCacheEntry> entries = await context.UserCacheEntries
             .Where(e => e.TenantId == tenantId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 

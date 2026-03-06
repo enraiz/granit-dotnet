@@ -43,7 +43,7 @@ internal sealed partial class CachedUserLookupService(
 
             if (providerUser is not null)
             {
-                var cacheEntry = ToCacheEntry(providerUser);
+                UserCacheEntry cacheEntry = ToCacheEntry(providerUser);
                 await store.UpsertAsync(cacheEntry, cancellationToken).ConfigureAwait(false);
                 return providerUser;
             }
@@ -71,13 +71,13 @@ internal sealed partial class CachedUserLookupService(
         IReadOnlyList<UserCacheEntry> cached = await store.FindByExternalIdsAsync(userIds, tenantId, cancellationToken)
             .ConfigureAwait(false);
 
-        var result = new List<IdentityUser>(userIds.Count);
-        var cachedDict = cached.ToDictionary(e => e.ExternalUserId);
-        var toFetch = new List<string>();
+        List<IdentityUser> result = new(userIds.Count);
+        Dictionary<string, UserCacheEntry> cachedDict = cached.ToDictionary(e => e.ExternalUserId);
+        List<string> toFetch = new();
 
         foreach (string id in userIds)
         {
-            if (cachedDict.TryGetValue(id, out var entry) && IsFresh(entry))
+            if (cachedDict.TryGetValue(id, out UserCacheEntry? entry) && IsFresh(entry))
             {
                 result.Add(ToIdentityUser(entry));
             }
@@ -87,12 +87,20 @@ internal sealed partial class CachedUserLookupService(
             }
         }
 
-        if (toFetch.Count == 0)
+        if (toFetch.Count > 0)
         {
-            return result;
+            await FetchMissingUsersAsync(toFetch, cachedDict, result, cancellationToken).ConfigureAwait(false);
         }
 
-        // Fetch missing/stale from provider
+        return result;
+    }
+
+    private async Task FetchMissingUsersAsync(
+        List<string> toFetch,
+        Dictionary<string, UserCacheEntry> cachedDict,
+        List<IdentityUser> result,
+        CancellationToken cancellationToken)
+    {
         try
         {
             foreach (string id in toFetch)
@@ -102,11 +110,11 @@ internal sealed partial class CachedUserLookupService(
 
                 if (providerUser is not null)
                 {
-                    var cacheEntry = ToCacheEntry(providerUser);
+                    UserCacheEntry cacheEntry = ToCacheEntry(providerUser);
                     await store.UpsertAsync(cacheEntry, cancellationToken).ConfigureAwait(false);
                     result.Add(providerUser);
                 }
-                else if (cachedDict.TryGetValue(id, out var staleEntry))
+                else if (cachedDict.TryGetValue(id, out UserCacheEntry? staleEntry))
                 {
                     result.Add(ToIdentityUser(staleEntry));
                 }
@@ -115,18 +123,23 @@ internal sealed partial class CachedUserLookupService(
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             LogProviderBatchError(ex, toFetch.Count);
-            // Return stale entries for remaining IDs
-            foreach (string id in toFetch)
+            AddStaleEntries(toFetch, cachedDict, result);
+        }
+    }
+
+    private static void AddStaleEntries(
+        List<string> ids,
+        Dictionary<string, UserCacheEntry> cachedDict,
+        List<IdentityUser> result)
+    {
+        foreach (string id in ids)
+        {
+            if (cachedDict.TryGetValue(id, out UserCacheEntry? staleEntry)
+                && !result.Any(u => u.Id == id))
             {
-                if (cachedDict.TryGetValue(id, out var staleEntry)
-                    && !result.Any(u => u.Id == id))
-                {
-                    result.Add(ToIdentityUser(staleEntry));
-                }
+                result.Add(ToIdentityUser(staleEntry));
             }
         }
-
-        return result;
     }
 
     public async Task<IReadOnlyList<IdentityUser>> SearchAsync(
@@ -152,7 +165,7 @@ internal sealed partial class CachedUserLookupService(
             return null;
         }
 
-        var cacheEntry = ToCacheEntry(providerUser);
+        UserCacheEntry cacheEntry = ToCacheEntry(providerUser);
         await store.UpsertAsync(cacheEntry, cancellationToken).ConfigureAwait(false);
         return providerUser;
     }
@@ -173,7 +186,7 @@ internal sealed partial class CachedUserLookupService(
                 break;
             }
 
-            var entries = page.Select(ToCacheEntry).ToList();
+            List<UserCacheEntry> entries = page.Select(ToCacheEntry).ToList();
             await store.UpsertManyAsync(entries, cancellationToken).ConfigureAwait(false);
 
             synced += page.Count;

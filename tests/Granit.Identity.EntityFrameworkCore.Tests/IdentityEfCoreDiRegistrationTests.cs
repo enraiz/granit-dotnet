@@ -36,15 +36,15 @@ public sealed class IdentityEfCoreDiRegistrationTests
         ServiceProvider provider = services.BuildServiceProvider();
 
         // IUserLookupService should be CachedUserLookupService, not NullUserLookupService
-        var lookupService = provider.GetRequiredService<IUserLookupService>();
+        IUserLookupService lookupService = provider.GetRequiredService<IUserLookupService>();
         lookupService.ShouldBeOfType<CachedUserLookupService>();
 
         // IUserCacheStats should be EfCoreUserCacheStats, not NullUserCacheStats
-        var stats = provider.GetRequiredService<IUserCacheStats>();
+        IUserCacheStats stats = provider.GetRequiredService<IUserCacheStats>();
         stats.ShouldBeOfType<EfCoreUserCacheStats>();
 
         // IUserCacheStore should be registered
-        var store = provider.GetRequiredService<IUserCacheStore>();
+        IUserCacheStore store = provider.GetRequiredService<IUserCacheStore>();
         store.ShouldBeOfType<EfCoreUserCacheStore<TestDbContext>>();
     }
 }

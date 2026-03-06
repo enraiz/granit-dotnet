@@ -68,7 +68,7 @@ public sealed class IdentityUserCacheSyncEndpointsTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var users = await response.Content
+        List<IdentityUser>? users = await response.Content
             .ReadFromJsonAsync<List<IdentityUser>>(TestContext.Current.CancellationToken);
         users.ShouldNotBeNull();
         users.Count.ShouldBe(1);

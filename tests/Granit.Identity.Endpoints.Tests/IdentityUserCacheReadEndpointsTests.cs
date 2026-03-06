@@ -58,16 +58,13 @@ public sealed class IdentityUserCacheReadEndpointsTests : IAsyncDisposable
     public async Task Search_returns_200_with_results()
     {
         _lookupService.SearchAsync("john", 20, Arg.Any<CancellationToken>())
-            .Returns(new List<IdentityUser>
-            {
-                new("user-1", "jdoe", "jdoe@test.com", "John", "Doe", true),
-            });
+            .Returns([new("user-1", "jdoe", "jdoe@test.com", "John", "Doe", true)]);
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}?search=john", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var users = await response.Content
+        List<IdentityUser>? users = await response.Content
             .ReadFromJsonAsync<List<IdentityUser>>(TestContext.Current.CancellationToken);
         users.ShouldNotBeNull();
         users.Count.ShouldBe(1);
@@ -95,7 +92,7 @@ public sealed class IdentityUserCacheReadEndpointsTests : IAsyncDisposable
             $"{Prefix}/user-1", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var user = await response.Content
+        IdentityUser? user = await response.Content
             .ReadFromJsonAsync<IdentityUser>(TestContext.Current.CancellationToken);
         user.ShouldNotBeNull();
         user.Id.ShouldBe("user-1");
@@ -119,11 +116,10 @@ public sealed class IdentityUserCacheReadEndpointsTests : IAsyncDisposable
     public async Task BatchResolve_returns_200_with_results()
     {
         _lookupService.FindByIdsAsync(Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new List<IdentityUser>
-            {
+            .Returns([
                 new("user-1", "jdoe", "jdoe@test.com", "John", "Doe", true),
                 new("user-2", "jane", "jane@test.com", "Jane", "Smith", true),
-            });
+            ]);
 
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
             $"{Prefix}/batch",
@@ -131,7 +127,7 @@ public sealed class IdentityUserCacheReadEndpointsTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var users = await response.Content
+        List<IdentityUser>? users = await response.Content
             .ReadFromJsonAsync<List<IdentityUser>>(TestContext.Current.CancellationToken);
         users.ShouldNotBeNull();
         users.Count.ShouldBe(2);

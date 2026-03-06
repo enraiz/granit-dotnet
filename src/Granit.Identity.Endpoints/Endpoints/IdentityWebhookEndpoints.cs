@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Identity.Endpoints.Endpoints;
@@ -45,7 +44,6 @@ internal static class IdentityWebhookEndpoints
         WebhookSignatureValidator signatureValidator,
         IOptions<IdentityWebhookOptions> webhookOptions,
         IUserLookupService lookupService,
-        ILogger<WebhookSignatureValidator> logger,
         CancellationToken ct)
     {
         // Read raw body for signature validation
