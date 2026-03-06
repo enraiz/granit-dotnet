@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Granit.ApiDocumentation\Granit.ApiDocumentation.csproj" />
     <ProjectReference Include="..\Granit.Notifications\Granit.Notifications.csproj" />
   </ItemGroup>
 
