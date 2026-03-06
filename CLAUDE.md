@@ -186,6 +186,8 @@ Key rules for quick reference:
 - **Tests**: each package has `*.Tests` (xUnit + Shouldly + NSubstitute + Bogus). Part of DoD.
 - **Markdown**: all `.md` must pass `npx markdownlint-cli2 "file.md"` before committing
 - **Endpoint DTOs**: Module-specific DTOs must be prefixed with module context (`WorkflowTransitionRequest`, not `TransitionRequest`). OpenAPI flattens namespaces — generic names cause schema conflicts. Shared cross-cutting types (`PagedResult<T>`, `ProblemDetails`) are exempt.
+- **DTO suffixes**: `Request` for input bodies, `Response` for top-level returns. NEVER use `Dto` suffix. EF Core entities must NOT be returned directly — create a `*Response` record.
+- **Error responses**: Always `TypedResults.Problem(detail, statusCode)` (RFC 7807), never `TypedResults.BadRequest<string>()`. Return type: `ProblemHttpResult`.
 
 **Multi-tenancy — soft dependency rule**: `ICurrentTenant` lives in `Granit.Core.MultiTenancy`
 and is available in every module without referencing `Granit.MultiTenancy`.

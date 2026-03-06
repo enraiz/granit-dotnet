@@ -199,6 +199,29 @@ group.MapPut("/overrides/{key}", SetOverrideAsync)
     .Produces(StatusCodes.Status204NoContent);
 ```
 
+#### Réponses d'erreur — `ProblemDetails` obligatoire
+
+Toutes les réponses d'erreur doivent utiliser `TypedResults.Problem()` (RFC 7807),
+jamais `TypedResults.BadRequest<string>()` ou `TypedResults.BadRequest("message")`.
+Retourner une chaîne brute produit un schéma `string` au lieu d'un `ProblemDetails`
+structuré.
+
+```csharp
+// ✅ ProblemDetails structuré — schéma OpenAPI cohérent
+return TypedResults.Problem(
+    detail: "Invalid webhook payload.",
+    statusCode: StatusCodes.Status400BadRequest);
+
+// ❌ Chaîne brute — schéma string, pas de structure d'erreur standardisée
+return TypedResults.BadRequest("Invalid webhook payload.");
+```
+
+Le type de retour du handler doit refléter `ProblemHttpResult` (pas `BadRequest<string>`) :
+
+```csharp
+private static Task<Results<Ok, ProblemHttpResult>> HandleWebhookAsync(...)
+```
+
 #### Codes HTTP sémantiques
 
 | Opération | Code | Retour |
@@ -233,6 +256,29 @@ group.MapGet("/{id:guid}", GetTaskAsync)
 group.MapGet("/{id:guid}", async (Guid id, ITaskStore store) =>
     TypedResults.Ok(await store.GetAsync(id)));
 ```
+
+#### Transformers OpenAPI centralisés (`Granit.ApiDocumentation`)
+
+`Granit.ApiDocumentation` enregistre automatiquement des transformers qui améliorent
+le document OpenAPI généré. Ils s'appliquent à **tous** les endpoints sans annotation
+manuelle.
+
+| Transformer | Rôle |
+| --- | --- |
+| `JwtBearerSecuritySchemeTransformer` | Ajoute le schéma Bearer si JWT est configuré |
+| `OAuth2SecuritySchemeTransformer` | Ajoute le schéma OAuth2 Authorization Code (Scalar UI) |
+| `SecurityRequirementOperationTransformer` | `[AllowAnonymous]` → `security: [{}]`, protégé → schéma global |
+| `ProblemDetailsSchemaDocumentTransformer` | Schéma `ProblemDetails` dans `components/schemas` |
+| `ProblemDetailsResponseOperationTransformer` | Ajoute les réponses 4xx/5xx `ProblemDetails` |
+| `InternalTypeSchemaDocumentTransformer` | Supprime `IFormFile`, `JsonElement` des schémas |
+| `NullableIntSchemaOperationTransformer` | Corrige `type: [integer, string]` → `[integer, null]` |
+| `ParameterDescriptionOperationTransformer` | Descriptions centralisées des paramètres well-known |
+| `TenantHeaderOperationTransformer` | Header `X-Tenant-Id` sur les routes multi-tenant |
+| `InternalApiDocumentTransformer` | Filtre les routes internes |
+
+Pour ajouter une description de paramètre à un nouveau nom well-known, éditez
+`ParameterDescriptionOperationTransformer.s_descriptions` — pas besoin d'annoter
+chaque endpoint individuellement.
 
 > Voir aussi : [tutoriel endpoints](../demarrage-rapide/05-endpoints.md),
 > [versioning API](../../framework/api/api-versioning.md),

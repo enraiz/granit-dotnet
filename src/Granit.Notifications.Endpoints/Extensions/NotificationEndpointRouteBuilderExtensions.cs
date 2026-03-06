@@ -68,7 +68,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             .WithSummary("Marks all notifications as read for the current user.");
     }
 
-    private static async Task<Ok<IReadOnlyList<UserNotification>>> GetNotificationsAsync(
+    private static async Task<Ok<List<UserNotificationResponse>>> GetNotificationsAsync(
         IUserNotificationStore store,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
@@ -77,7 +77,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         IReadOnlyList<UserNotification> notifications = await store.GetListAsync(userId, tenantId, skip, take).ConfigureAwait(false);
-        return TypedResults.Ok(notifications);
+        return TypedResults.Ok(MapNotifications(notifications));
     }
 
     private static async Task<Ok<UnreadCountResponse>> GetUnreadCountAsync(
@@ -123,7 +123,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             .WithSummary("Returns the activity feed for a specific entity.");
     }
 
-    private static async Task<Ok<IReadOnlyList<UserNotification>>> GetEntityActivityFeedAsync(
+    private static async Task<Ok<List<UserNotificationResponse>>> GetEntityActivityFeedAsync(
         string entityType,
         string entityId,
         IUserNotificationStore store,
@@ -132,7 +132,7 @@ public static class NotificationEndpointRouteBuilderExtensions
     {
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         IReadOnlyList<UserNotification> notifications = await store.GetByEntityAsync(entityType, entityId, tenantId, skip, take).ConfigureAwait(false);
-        return TypedResults.Ok(notifications);
+        return TypedResults.Ok(MapNotifications(notifications));
     }
 
     // -------------------------------------------------------------------------
@@ -154,7 +154,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             .WithSummary("Returns all registered notification type definitions.");
     }
 
-    private static async Task<Ok<IReadOnlyList<NotificationPreference>>> GetPreferencesAsync(
+    private static async Task<Ok<List<NotificationPreferenceResponse>>> GetPreferencesAsync(
         INotificationPreferenceStore store,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
@@ -162,7 +162,10 @@ public static class NotificationEndpointRouteBuilderExtensions
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         IReadOnlyList<NotificationPreference> preferences = await store.GetListAsync(userId, tenantId).ConfigureAwait(false);
-        return TypedResults.Ok(preferences);
+        List<NotificationPreferenceResponse> result = preferences
+            .Select(p => new NotificationPreferenceResponse(p.Id, p.UserId, p.NotificationTypeName, p.ChannelName, p.IsEnabled))
+            .ToList();
+        return TypedResults.Ok(result);
     }
 
     private static async Task<NoContent> UpdatePreferenceAsync(
@@ -217,7 +220,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             .WithSummary("Unsubscribes the current user from a notification type.");
     }
 
-    private static async Task<Ok<IReadOnlyList<NotificationSubscription>>> GetSubscriptionsAsync(
+    private static async Task<Ok<List<NotificationSubscriptionResponse>>> GetSubscriptionsAsync(
         INotificationSubscriptionStore store,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
@@ -225,7 +228,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         IReadOnlyList<NotificationSubscription> subscriptions = await store.GetUserSubscriptionsAsync(userId, tenantId).ConfigureAwait(false);
-        return TypedResults.Ok(subscriptions);
+        return TypedResults.Ok(MapSubscriptions(subscriptions));
     }
 
     private static async Task<NoContent> SubscribeAsync(
@@ -297,7 +300,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         return TypedResults.NoContent();
     }
 
-    private static async Task<Ok<IReadOnlyList<NotificationSubscription>>> GetEntityFollowersAsync(
+    private static async Task<Ok<List<NotificationSubscriptionResponse>>> GetEntityFollowersAsync(
         string entityType,
         string entityId,
         INotificationSubscriptionStore store,
@@ -305,12 +308,24 @@ public static class NotificationEndpointRouteBuilderExtensions
     {
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         IReadOnlyList<NotificationSubscription> followers = await store.GetEntityFollowersAsync(entityType, entityId, tenantId).ConfigureAwait(false);
-        return TypedResults.Ok(followers);
+        return TypedResults.Ok(MapSubscriptions(followers));
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    private static List<UserNotificationResponse> MapNotifications(
+        IReadOnlyList<UserNotification> notifications) =>
+        notifications.Select(n => new UserNotificationResponse(
+            n.Id, n.NotificationId, n.NotificationTypeName, n.Severity,
+            n.RecipientUserId, n.Data.ValueKind == System.Text.Json.JsonValueKind.Undefined ? null : n.Data,
+            n.State, n.CreatedAt, n.ReadAt, n.RelatedEntityType, n.RelatedEntityId)).ToList();
+
+    private static List<NotificationSubscriptionResponse> MapSubscriptions(
+        IReadOnlyList<NotificationSubscription> subscriptions) =>
+        subscriptions.Select(s => new NotificationSubscriptionResponse(
+            s.Id, s.UserId, s.NotificationTypeName, s.EntityType, s.EntityId)).ToList();
 
     private static string GetUserId(ClaimsPrincipal user) =>
         user.FindFirstValue(ClaimTypes.NameIdentifier)
