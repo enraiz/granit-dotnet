@@ -25,6 +25,7 @@ public static class IdentityEfCoreServiceCollectionExtensions
         where TContext : Microsoft.EntityFrameworkCore.DbContext, IUserCacheDbContext
     {
         services.Replace(ServiceDescriptor.Scoped<IUserLookupService, CachedUserLookupService>());
+        services.Replace(ServiceDescriptor.Scoped<IUserCacheStats, EfCoreUserCacheStats>());
         services.TryAddScoped<IUserCacheStore, EfCoreUserCacheStore<TContext>>();
         services.AddOptions<UserCacheOptions>()
             .BindConfiguration(UserCacheOptions.SectionName);

@@ -1,0 +1,90 @@
+using Granit.Identity.Endpoints.Endpoints;
+using Granit.Identity.Endpoints.Internal;
+using Granit.Identity.Endpoints.Options;
+using Granit.Identity.Endpoints.Permissions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+namespace Granit.Identity.Endpoints.Extensions;
+
+/// <summary>
+/// Extension methods for registering identity user cache endpoints.
+/// </summary>
+public static class IdentityEndpointRouteBuilderExtensions
+{
+    /// <summary>
+    /// Maps the identity user cache endpoints onto the given route builder.
+    /// </summary>
+    /// <remarks>
+    /// <para>Registers endpoints for:</para>
+    /// <list type="bullet">
+    /// <item>Search, get by ID, batch resolve (<c>Identity.UserCache.Read</c> permission)</item>
+    /// <item>Sync, sync-all (<c>Identity.UserCache.Sync</c> permission)</item>
+    /// <item>RGPD erase, pseudonymize (<c>Identity.UserCache.Delete</c> permission)</item>
+    /// <item>Stats (<c>Identity.UserCache.Read</c> permission)</item>
+    /// <item>Webhook (signature-validated, no user authentication required)</item>
+    /// </list>
+    /// </remarks>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="configure">Optional delegate to customize <see cref="IdentityEndpointsOptions"/>.</param>
+    /// <returns>The <see cref="RouteGroupBuilder"/> for further chaining.</returns>
+    public static RouteGroupBuilder MapIdentityUserCacheEndpoints(
+        this IEndpointRouteBuilder endpoints,
+        Action<IdentityEndpointsOptions>? configure = null)
+    {
+        IdentityEndpointsOptions options = new();
+        configure?.Invoke(options);
+
+        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
+            ? options.RoutePrefix
+            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
+
+        // Register fallback authorization policies
+        IOptions<AuthorizationOptions>? authOptions =
+            endpoints.ServiceProvider.GetService<IOptions<AuthorizationOptions>>();
+
+        authOptions?.Value.AddPolicy(
+            IdentityUserCachePermissions.UserCache.Read,
+            policy => policy.RequireRole(options.RequiredRole));
+        authOptions?.Value.AddPolicy(
+            IdentityUserCachePermissions.UserCache.Sync,
+            policy => policy.RequireRole(options.RequiredRole));
+        authOptions?.Value.AddPolicy(
+            IdentityUserCachePermissions.UserCache.Delete,
+            policy => policy.RequireRole(options.RequiredRole));
+
+        RouteGroupBuilder group = endpoints
+            .MapGroup(prefix)
+            .WithTags(options.TagName);
+
+        // Read endpoints (list, get, batch)
+        group
+            .RequireAuthorization(IdentityUserCachePermissions.UserCache.Read)
+            .MapReadEndpoints();
+
+        // Stats endpoint
+        group
+            .RequireAuthorization(IdentityUserCachePermissions.UserCache.Read)
+            .MapStatsEndpoints();
+
+        // Sync endpoints
+        group
+            .RequireAuthorization(IdentityUserCachePermissions.UserCache.Sync)
+            .MapSyncEndpoints();
+
+        // RGPD endpoints
+        group
+            .RequireAuthorization(IdentityUserCachePermissions.UserCache.Delete)
+            .MapRgpdEndpoints();
+
+        // Webhook endpoint (outside the authorized group — uses signature validation)
+        endpoints.MapWebhookEndpoint(
+            string.IsNullOrEmpty(options.ApiPrefix) ? "" : options.ApiPrefix);
+
+        return group;
+    }
+}

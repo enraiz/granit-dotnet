@@ -20,6 +20,7 @@ public static class IdentityServiceCollectionExtensions
     {
         services.TryAddScoped<IIdentityProvider, NullIdentityProvider>();
         services.TryAddScoped<IUserLookupService, NullUserLookupService>();
+        services.TryAddScoped<IUserCacheStats, NullUserCacheStats>();
         return services;
     }
 
