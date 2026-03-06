@@ -24,7 +24,7 @@ using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Granit.DataExchange.Endpoints.Tests;
+namespace Granit.DataExchange.Endpoints.Tests.Import;
 
 /// <summary>
 /// Integration tests for upload, preview, and mapping confirmation endpoints.

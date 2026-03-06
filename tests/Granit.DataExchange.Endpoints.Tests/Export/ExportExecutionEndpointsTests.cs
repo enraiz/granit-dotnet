@@ -16,12 +16,12 @@ using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Granit.DataExchange.Endpoints.Tests;
+namespace Granit.DataExchange.Endpoints.Tests.Export;
 
 /// <summary>
 /// Integration tests for export job creation, status polling, and file download endpoints.
 /// </summary>
-public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
+public sealed class ExportExecutionEndpointsTests : IAsyncDisposable
 {
     private const string AdminRole = "granit-data-exchange-admin";
     private const string ExportPrefix = "/data-exchange/export";
@@ -34,7 +34,7 @@ public sealed class DataExportExecutionEndpointsTests : IAsyncDisposable
     private readonly HttpClient _userClient;
     private readonly HttpClient _anonClient;
 
-    public DataExportExecutionEndpointsTests()
+    public ExportExecutionEndpointsTests()
     {
         _descriptor = Substitute.For<IExportDefinitionDescriptor>();
         _descriptor.Name.Returns("Test.Export");

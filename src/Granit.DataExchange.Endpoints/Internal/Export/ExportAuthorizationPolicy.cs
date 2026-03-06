@@ -5,7 +5,7 @@ namespace Granit.DataExchange.Endpoints.Internal.Export;
 /// <summary>
 /// Authorization policy constants for data export endpoints.
 /// </summary>
-internal static class DataExportAuthorizationPolicy
+internal static class ExportAuthorizationPolicy
 {
     /// <summary>
     /// Name of the authorization policy that guards all data export endpoints.
