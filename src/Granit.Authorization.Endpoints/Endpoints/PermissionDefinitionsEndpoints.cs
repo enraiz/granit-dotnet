@@ -5,11 +5,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 
 namespace Granit.Authorization.Endpoints.Endpoints;
 
 /// <summary>
 /// GET endpoint returning all registered permission definitions grouped by category.
+/// Display names are resolved via <see cref="IStringLocalizerFactory"/> when available,
+/// returning localized strings based on the current request culture.
 /// </summary>
 internal static class PermissionDefinitionsEndpoints
 {
@@ -27,16 +31,22 @@ internal static class PermissionDefinitionsEndpoints
     }
 
     private static Ok<IReadOnlyList<PermissionGroupResponse>> GetDefinitions(
-        IPermissionDefinitionManager definitionManager)
+        IPermissionDefinitionManager definitionManager,
+        HttpContext httpContext)
     {
+        IStringLocalizerFactory? localizerFactory =
+            httpContext.RequestServices.GetService<IStringLocalizerFactory>();
+
         IReadOnlyList<PermissionGroup> groups = definitionManager.GetGroups();
 
         var response = groups
             .Select(g => new PermissionGroupResponse(
                 g.Name,
-                g.DisplayName,
+                g.DisplayName?.Localize(localizerFactory),
                 g.Permissions
-                    .Select(p => new PermissionDefinitionResponse(p.Name, p.DisplayName))
+                    .Select(p => new PermissionDefinitionResponse(
+                        p.Name,
+                        p.DisplayName?.Localize(localizerFactory)))
                     .ToList()))
             .ToList();
 

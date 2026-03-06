@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:Workflow": "Workflow",
+    "Permission:Workflow.History.Read": "View workflow transition history (HDS audit trail)"
+  }
+}

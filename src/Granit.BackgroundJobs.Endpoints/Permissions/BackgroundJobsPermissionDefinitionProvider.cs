@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.BackgroundJobs.Endpoints.Permissions;
 
@@ -30,10 +31,13 @@ internal sealed class BackgroundJobsPermissionDefinitionProvider : IPermissionDe
     public void DefinePermissions(IPermissionDefinitionContext context)
     {
         PermissionGroup group = context.AddGroup(
-            BackgroundJobsPermissions.GroupName, "Background Jobs");
+            BackgroundJobsPermissions.GroupName,
+            LocalizableString.Create<BackgroundJobsEndpointsLocalizationResource>(
+                "PermissionGroup:BackgroundJobs"));
 
         group.AddPermission(
             BackgroundJobsPermissions.Jobs.Manage,
-            "Administrer les background jobs (liste, pause, resume, déclenchement manuel)");
+            LocalizableString.Create<BackgroundJobsEndpointsLocalizationResource>(
+                "Permission:BackgroundJobs.Jobs.Manage"));
     }
 }

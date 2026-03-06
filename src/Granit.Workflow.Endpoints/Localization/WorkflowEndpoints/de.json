@@ -1,0 +1,7 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Workflow": "Workflow",
+    "Permission:Workflow.History.Read": "Workflow-Übergangsverlauf anzeigen (HDS-Prüfpfad)"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:Authorization": "Authorization Management",
+    "Permission:Authorization.Definitions.Read": "View all registered permission definitions and groups",
+    "Permission:Authorization.Grants.Manage": "View, grant, and revoke permissions for roles"
+  }
+}

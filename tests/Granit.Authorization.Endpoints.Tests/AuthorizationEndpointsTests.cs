@@ -6,6 +6,7 @@ using Granit.Authorization.Abstractions;
 using Granit.Authorization.Endpoints.Dtos;
 using Granit.Authorization.Endpoints.Extensions;
 using Granit.Authorization.Endpoints.Permissions;
+using Granit.Core.Localization;
 using Granit.Core.MultiTenancy;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -369,10 +370,10 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
 
     private void SetupDefaultDefinitions()
     {
-        PermissionGroup invoicesGroup = new("Invoices", "Invoice Management");
-        invoicesGroup.AddPermission("Invoices.Read", "Read invoices");
-        invoicesGroup.AddPermission("Invoices.Create", "Create invoices");
-        invoicesGroup.AddPermission("Invoices.Delete", "Delete invoices");
+        PermissionGroup invoicesGroup = new("Invoices", LocalizableString.Fixed("Invoice Management"));
+        invoicesGroup.AddPermission("Invoices.Read", LocalizableString.Fixed("Read invoices"));
+        invoicesGroup.AddPermission("Invoices.Create", LocalizableString.Fixed("Create invoices"));
+        invoicesGroup.AddPermission("Invoices.Delete", LocalizableString.Fixed("Delete invoices"));
 
         _definitionManager.GetGroups().Returns([invoicesGroup]);
         _definitionManager.GetAll().Returns(invoicesGroup.Permissions);

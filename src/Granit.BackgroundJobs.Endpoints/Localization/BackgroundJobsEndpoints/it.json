@@ -1,0 +1,7 @@
+{
+  "culture": "it",
+  "texts": {
+    "PermissionGroup:BackgroundJobs": "Attività in background",
+    "Permission:BackgroundJobs.Jobs.Manage": "Gestire le attività in background (elenco, pausa, ripresa, avvio manuale)"
+  }
+}

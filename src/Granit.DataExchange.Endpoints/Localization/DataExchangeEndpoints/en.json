@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:DataExchange": "Data Exchange",
+    "Permission:DataExchange.Imports.Execute": "Execute data imports (upload, mapping, execution, reports)",
+    "Permission:DataExchange.Exports.Execute": "Execute data exports (definitions, execution, download, presets)"
+  }
+}

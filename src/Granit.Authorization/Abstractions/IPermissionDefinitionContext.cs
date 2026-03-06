@@ -1,3 +1,5 @@
+using Granit.Core.Localization;
+
 namespace Granit.Authorization.Abstractions;
 
 /// <summary>
@@ -10,5 +12,5 @@ public interface IPermissionDefinitionContext
     /// Returns the group if it already exists, or creates and registers a new one.
     /// The first provider to declare a group sets its DisplayName.
     /// </summary>
-    PermissionGroup AddGroup(string name, string? displayName = null);
+    PermissionGroup AddGroup(string name, LocalizableString? displayName = null);
 }

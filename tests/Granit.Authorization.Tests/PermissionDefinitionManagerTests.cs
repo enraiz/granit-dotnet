@@ -9,6 +9,7 @@
 
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Services;
+using Granit.Core.Localization;
 using Shouldly;
 using Xunit;
 
@@ -116,7 +117,7 @@ public sealed class PermissionDefinitionManagerTests
     {
         public void DefinePermissions(IPermissionDefinitionContext context)
         {
-            PermissionGroup group = context.AddGroup("Invoices", "Factures");
+            PermissionGroup group = context.AddGroup("Invoices", LocalizableString.Fixed("Factures"));
             group.AddPermission("Invoices.Read");
             group.AddPermission("Invoices.Create");
             group.AddPermission("Invoices.Delete");

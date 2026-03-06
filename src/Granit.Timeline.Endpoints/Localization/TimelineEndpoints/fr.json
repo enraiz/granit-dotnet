@@ -1,0 +1,8 @@
+{
+  "culture": "fr",
+  "texts": {
+    "PermissionGroup:Timeline": "Fil d'activité",
+    "Permission:Timeline.Entries.Read": "Consulter les flux d'activité et l'historique d'audit",
+    "Permission:Timeline.Entries.Create": "Poster des commentaires et suivre/ne plus suivre des entités"
+  }
+}

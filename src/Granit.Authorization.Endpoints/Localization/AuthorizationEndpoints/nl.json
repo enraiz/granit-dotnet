@@ -1,0 +1,8 @@
+{
+  "culture": "nl",
+  "texts": {
+    "PermissionGroup:Authorization": "Autorisatiebeheer",
+    "Permission:Authorization.Definitions.Read": "Alle geregistreerde machtigingsdefinities en groepen bekijken",
+    "Permission:Authorization.Grants.Manage": "Machtigingen voor rollen bekijken, toekennen en intrekken"
+  }
+}

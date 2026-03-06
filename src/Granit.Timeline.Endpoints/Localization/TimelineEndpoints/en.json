@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:Timeline": "Timeline",
+    "Permission:Timeline.Entries.Read": "View activity feeds and audit history",
+    "Permission:Timeline.Entries.Create": "Post comments and follow/unfollow entities"
+  }
+}

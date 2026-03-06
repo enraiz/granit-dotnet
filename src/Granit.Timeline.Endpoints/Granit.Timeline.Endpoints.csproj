@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Granit.Timeline\Granit.Timeline.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\**\*.json" />
+  </ItemGroup>
+
 </Project>

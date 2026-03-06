@@ -1,0 +1,7 @@
+{
+  "culture": "it",
+  "texts": {
+    "PermissionGroup:Localization": "Localizzazione",
+    "Permission:Localization.Overrides.Manage": "Gestire le sovrascritture di traduzione (visualizzare, creare, modificare, eliminare)"
+  }
+}

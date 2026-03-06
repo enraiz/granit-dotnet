@@ -103,18 +103,56 @@ public sealed class AppModule : GranitModule
 Chaque module métier déclare ses permissions via `IPermissionDefinitionProvider`.
 Plusieurs modules peuvent ajouter des permissions au même groupe (pattern GetOrAdd).
 
+Les `DisplayName` des groupes et permissions sont des `LocalizableString` : ils sont
+résolus à la volée par `IStringLocalizerFactory` selon la culture de la requête HTTP.
+Chaque module fournit ses propres fichiers JSON de localisation (7 langues obligatoires).
+
 ```csharp
+// 1. Marker class pour la localisation (auto-discovery par convention)
+[LocalizationResourceName("InvoicesEndpoints")]
+internal sealed class InvoicesEndpointsLocalizationResource;
+
+// 2. Provider de permissions
 public sealed class InvoicesPermissionProvider : IPermissionDefinitionProvider
 {
     public void DefinePermissions(IPermissionDefinitionContext context)
     {
-        PermissionGroup group = context.AddGroup("Invoices", "Factures");
-        group.AddPermission("Invoices.Read",   "Consulter les factures");
-        group.AddPermission("Invoices.Create", "Créer des factures");
-        group.AddPermission("Invoices.Delete", "Supprimer des factures");
+        PermissionGroup group = context.AddGroup("Invoices",
+            LocalizableString.Create<InvoicesEndpointsLocalizationResource>(
+                "PermissionGroup:Invoices"));
+
+        group.AddPermission("Invoices.Read",
+            LocalizableString.Create<InvoicesEndpointsLocalizationResource>(
+                "Permission:Invoices.Read"));
+
+        group.AddPermission("Invoices.Create",
+            LocalizableString.Create<InvoicesEndpointsLocalizationResource>(
+                "Permission:Invoices.Create"));
+
+        group.AddPermission("Invoices.Delete",
+            LocalizableString.Create<InvoicesEndpointsLocalizationResource>(
+                "Permission:Invoices.Delete"));
     }
 }
 ```
+
+Fichiers JSON (7 cultures : `en`, `fr`, `nl`, `de`, `es`, `it`, `pt`) sous
+`Localization/InvoicesEndpoints/{culture}.json`, déclarés en `<EmbeddedResource>` :
+
+```json
+{
+  "culture": "fr",
+  "texts": {
+    "PermissionGroup:Invoices": "Factures",
+    "Permission:Invoices.Read": "Consulter les factures",
+    "Permission:Invoices.Create": "Créer des factures",
+    "Permission:Invoices.Delete": "Supprimer des factures"
+  }
+}
+```
+
+Pour les tests ou un usage sans localisation, `LocalizableString.Fixed("texte")`
+retourne une valeur fixe sans résolution i18n.
 
 Le `PermissionDefinitionManager` (Singleton) agrège tous les providers à la première utilisation.
 
@@ -395,14 +433,18 @@ accordées sont retournées.
 
 ### GET /auth/definitions — Réponse
 
+Les `displayName` sont résolus dans la langue de la requête HTTP (header
+`Accept-Language` ou culture configurée). Si `IStringLocalizerFactory` n'est pas
+enregistré, les clés de localisation sont retournées telles quelles.
+
 ```json
 [
   {
     "name": "Invoices",
     "displayName": "Factures",
     "permissions": [
-      { "name": "Invoices.Read", "displayName": "Consulter" },
-      { "name": "Invoices.Create", "displayName": "Créer" }
+      { "name": "Invoices.Read", "displayName": "Consulter les factures" },
+      { "name": "Invoices.Create", "displayName": "Créer des factures" }
     ]
   }
 ]

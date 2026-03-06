@@ -1,0 +1,7 @@
+{
+  "culture": "pt",
+  "texts": {
+    "PermissionGroup:Localization": "Localização",
+    "Permission:Localization.Overrides.Manage": "Gerir substituições de tradução (ver, criar, editar, eliminar)"
+  }
+}

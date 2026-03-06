@@ -1,5 +1,6 @@
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Endpoints.Permissions;
+using Granit.Core.Localization;
 using Shouldly;
 using Xunit;
 
@@ -75,7 +76,7 @@ public sealed class AuthorizationEndpointsPermissionDefinitionProviderTests
 
         public IReadOnlyCollection<PermissionGroup> Groups => _groups.Values;
 
-        public PermissionGroup AddGroup(string name, string? displayName = null)
+        public PermissionGroup AddGroup(string name, LocalizableString? displayName = null)
         {
             if (_groups.TryGetValue(name, out PermissionGroup? existing))
             {

@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.Core.Localization;
 
 namespace Granit.Authorization.Services;
 
@@ -12,7 +13,7 @@ internal sealed class PermissionDefinitionContext : IPermissionDefinitionContext
     private readonly Dictionary<string, PermissionGroup> _groups = new(StringComparer.Ordinal);
 
     /// <inheritdoc />
-    public PermissionGroup AddGroup(string name, string? displayName = null)
+    public PermissionGroup AddGroup(string name, LocalizableString? displayName = null)
     {
         if (_groups.TryGetValue(name, out PermissionGroup? existingGroup))
         {
