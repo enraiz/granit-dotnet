@@ -41,7 +41,7 @@ internal sealed class KlaroConsentResolver(
             return Task.FromResult(false);
         }
 
-        List<string> serviceNames = serviceRegistry
+        var serviceNames = serviceRegistry
             .GetByCategory(category)
             .Select(s => s.Name)
             .ToList();

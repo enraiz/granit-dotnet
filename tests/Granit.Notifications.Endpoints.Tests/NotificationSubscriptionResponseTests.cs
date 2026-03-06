@@ -15,7 +15,7 @@ public sealed class NotificationSubscriptionResponseTests
     public void Constructor_SetsAllProperties()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         // Act
         NotificationSubscriptionResponse response = new(id, "user-1", "NewMessage", "Guava.Patients", "p-42");
@@ -31,7 +31,7 @@ public sealed class NotificationSubscriptionResponseTests
     [Fact]
     public void Constructor_NullOptionalFields()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         NotificationSubscriptionResponse response = new(id, "user-1", "TopicSub", null, null);
 
         response.EntityType.ShouldBeNull();

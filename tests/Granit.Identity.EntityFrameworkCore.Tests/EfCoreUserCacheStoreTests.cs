@@ -142,11 +142,11 @@ public sealed class EfCoreUserCacheStoreTests
         await store.UpsertAsync(CreateEntry("user-1"), TestContext.Current.CancellationToken);
 
         // Batch with update + new insert
-        List<UserCacheEntry> entries = new()
-        {
+        List<UserCacheEntry> entries =
+        [
             CreateEntry("user-1", username: "updated"),
             CreateEntry("user-2", username: "new-user")
-        };
+        ];
 
         await store.UpsertManyAsync(entries, TestContext.Current.CancellationToken);
 

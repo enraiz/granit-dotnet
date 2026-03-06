@@ -41,11 +41,11 @@ public static class CookiesServiceCollectionExtensions
         // Third-party service registry — populated from configuration
         services.TryAddSingleton<IThirdPartyServiceRegistry>(sp =>
         {
-            IConfiguration configuration = sp.GetRequiredService<IConfiguration>();
+            var configuration = sp.GetRequiredService<IConfiguration>();
             GranitCookiesOptions options = new();
             configuration.GetSection(GranitCookiesOptions.SectionName).Bind(options);
 
-            List<ThirdPartyServiceDefinition> definitions = options.ThirdPartyServices
+            var definitions = options.ThirdPartyServices
                 .Select(s => new ThirdPartyServiceDefinition(s.Name, s.Category, s.CookiePatterns))
                 .ToList();
 

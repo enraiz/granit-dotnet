@@ -168,8 +168,8 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task RefreshAllAsync_PaginatesThroughProvider()
     {
-        List<IdentityUser> page1 = Enumerable.Range(0, 100).Select(i => CreateUser($"user-{i}")).ToList();
-        List<IdentityUser> page2 = Enumerable.Range(100, 50).Select(i => CreateUser($"user-{i}")).ToList();
+        var page1 = Enumerable.Range(0, 100).Select(i => CreateUser($"user-{i}")).ToList();
+        var page2 = Enumerable.Range(100, 50).Select(i => CreateUser($"user-{i}")).ToList();
 
         _provider.GetUsersAsync(null, 0, 100, Arg.Any<CancellationToken>())
             .Returns(page1);

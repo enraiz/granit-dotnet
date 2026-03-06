@@ -15,7 +15,7 @@ public sealed class SavedViewResponseTests
     public void Constructor_SetsAllProperties()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         // Act
         SavedViewResponse response = new(
@@ -38,7 +38,7 @@ public sealed class SavedViewResponseTests
     [Fact]
     public void Record_Equality_SameValues_AreEqual()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         new SavedViewResponse(id, "E", "N", "U", false, false, null, null, null, null)
             .ShouldBe(new SavedViewResponse(id, "E", "N", "U", false, false, null, null, null, null));
     }

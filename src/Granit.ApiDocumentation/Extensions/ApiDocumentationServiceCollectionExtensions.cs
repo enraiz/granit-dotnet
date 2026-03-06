@@ -1,9 +1,11 @@
+using System.Reflection;
 using System.Text.Json.Nodes;
 using Asp.Versioning;
 using Granit.ApiDocumentation.Options;
 using Granit.ApiDocumentation.Transformers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 
@@ -67,6 +69,9 @@ public static class ApiDocumentationServiceCollectionExtensions
         services.AddTransient<SecurityRequirementOperationTransformer>();
         services.AddTransient<NullableIntSchemaOperationTransformer>();
         services.AddTransient<ParameterDescriptionOperationTransformer>();
+        services.AddTransient<SchemaExampleSchemaTransformer>();
+
+        DiscoverSchemaExampleProviders(services);
 
         foreach (int majorVersion in options.MajorVersions)
         {
@@ -112,7 +117,41 @@ public static class ApiDocumentationServiceCollectionExtensions
                 openApiOptions.AddOperationTransformer<SecurityRequirementOperationTransformer>();
                 openApiOptions.AddOperationTransformer<NullableIntSchemaOperationTransformer>();
                 openApiOptions.AddOperationTransformer<ParameterDescriptionOperationTransformer>();
+                openApiOptions.AddSchemaTransformer<SchemaExampleSchemaTransformer>();
             });
+        }
+    }
+
+    private static void DiscoverSchemaExampleProviders(IServiceCollection services)
+    {
+        Type interfaceType = typeof(ISchemaExampleProvider);
+
+        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            if (assembly.IsDynamic)
+            {
+                continue;
+            }
+
+            Type[] types;
+            try
+            {
+                types = assembly.GetExportedTypes();
+            }
+            catch (ReflectionTypeLoadException)
+            {
+                continue;
+            }
+
+            foreach (Type type in types)
+            {
+                if (type is { IsAbstract: false, IsInterface: false }
+                    && interfaceType.IsAssignableFrom(type))
+                {
+                    services.TryAddEnumerable(
+                        ServiceDescriptor.Singleton(interfaceType, type));
+                }
+            }
         }
     }
 }
