@@ -64,6 +64,12 @@
   <ItemGroup Label="Vault">
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
   </ItemGroup>
+  <!-- Security patches: transitive dependency version overrides -->
+  <!-- MimeKit 4.15.0 is vulnerable to GHSA-g7hc-96xr-gvvx (Moderate) -->
+  <ItemGroup Label="Security overrides">
+    <PackageVersion Include="MimeKit" Version="4.15.1" />
+  </ItemGroup>
+
   <ItemGroup Label="Notifications">
     <PackageVersion Include="MailKit" Version="4.*" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.*" />
