@@ -1,5 +1,6 @@
 using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Querying;
 
 namespace Granit.DataExchange.Import.Internal;
 
@@ -15,6 +16,11 @@ internal sealed class NullImportJobStore : IImportJobStore
 
     /// <inheritdoc/>
     public Task<ImportJob?> GetAsync(Guid id, CancellationToken ct = default) =>
+        throw new NotImplementedException(Message);
+
+    /// <inheritdoc/>
+    public Task<PagedResult<ImportJob>> ListAsync(
+        ImportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken ct = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
