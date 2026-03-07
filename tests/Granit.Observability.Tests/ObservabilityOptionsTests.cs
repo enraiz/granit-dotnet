@@ -24,7 +24,7 @@ public sealed class ObservabilityOptionsTests
         options.ServiceName.ShouldBe("unknown-service");
         options.ServiceVersion.ShouldBe("0.0.0");
         options.OtlpEndpoint.ShouldBe("http://localhost:4317");
-        options.ServiceNamespace.ShouldBe("test-company");
+        options.ServiceNamespace.ShouldBe("my-company");
         options.Environment.ShouldBe("development");
         options.EnableTracing.ShouldBeTrue();
         options.EnableMetrics.ShouldBeTrue();

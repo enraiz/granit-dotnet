@@ -18,7 +18,7 @@ public sealed class ObservabilityOptions
     public string OtlpEndpoint { get; set; } = "http://localhost:4317";
 
     /// <summary>Service namespace (e.g. "my-company").</summary>
-    public string ServiceNamespace { get; set; } = "unknown-namespace";
+    public string ServiceNamespace { get; set; } = "my-company";
 
     /// <summary>Deployment environment (e.g. "production", "staging", "development").</summary>
     public string Environment { get; set; } = "development";
