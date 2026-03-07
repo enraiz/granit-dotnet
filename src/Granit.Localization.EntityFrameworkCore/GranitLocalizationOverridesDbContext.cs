@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Granit.Localization.EntityFrameworkCore.Internal;
+using Granit.Localization.EntityFrameworkCore.Internal;
+
+namespace Granit.Localization.EntityFrameworkCore;
 
 /// <summary>
 /// Dedicated EF Core DbContext for Granit localization overrides.
@@ -15,7 +17,7 @@ namespace Granit.Localization.EntityFrameworkCore.Internal;
 /// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, HDS compliant).
 /// </para>
 /// </remarks>
-internal sealed class GranitLocalizationOverridesDbContext(
+public sealed class GranitLocalizationOverridesDbContext(
     DbContextOptions<GranitLocalizationOverridesDbContext> options)
     : DbContext(options)
 {
