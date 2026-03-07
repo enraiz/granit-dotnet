@@ -1,5 +1,5 @@
-using Granit.Authentication.Keycloak.BackChannelLogout;
-using Granit.Authentication.Keycloak.Options;
+using Granit.Authentication.JwtBearer.BackChannelLogout;
+using Granit.Authentication.JwtBearer.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
@@ -15,15 +15,15 @@ public sealed class BackChannelLogoutEndpointTests
 {
     private readonly BackChannelLogoutTokenValidator _validator;
     private readonly IRevokedSessionStore _store = Substitute.For<IRevokedSessionStore>();
-    private readonly IOptions<KeycloakOptions> _options;
+    private readonly IOptions<JwtBearerAuthOptions> _options;
     private readonly ILogger<BackChannelLogoutTokenValidator> _logger;
 
     public BackChannelLogoutEndpointTests()
     {
-        KeycloakOptions keycloakOptions = new()
+        JwtBearerAuthOptions authOptions = new()
         {
             Authority = "https://keycloak.test/realms/test",
-            ClientId = "test-client",
+            Audience = "test-client",
             RequireHttpsMetadata = false,
             BackChannelLogout = new BackChannelLogoutOptions
             {
@@ -31,7 +31,7 @@ public sealed class BackChannelLogoutEndpointTests
                 SessionRevocationTtl = TimeSpan.FromHours(1),
             },
         };
-        _options = Microsoft.Extensions.Options.Options.Create(keycloakOptions);
+        _options = Microsoft.Extensions.Options.Options.Create(authOptions);
         _logger = Substitute.For<ILogger<BackChannelLogoutTokenValidator>>();
         _logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         _validator = Substitute.ForPartsOf<BackChannelLogoutTokenValidator>(_options, _logger);

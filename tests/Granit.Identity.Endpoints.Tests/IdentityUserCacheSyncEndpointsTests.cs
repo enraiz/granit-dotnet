@@ -101,6 +101,31 @@ public sealed class IdentityUserCacheSyncEndpointsTests : IAsyncDisposable
         body.ShouldContain("150");
     }
 
+    // -- POST /sync-stale --
+
+    [Fact]
+    public async Task SyncStale_returns_200_with_refreshed_count()
+    {
+        _lookupService.RefreshStaleAsync(Arg.Any<CancellationToken>())
+            .Returns(25);
+
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/sync-stale", null, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        string body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        body.ShouldContain("25");
+    }
+
+    [Fact]
+    public async Task SyncStale_wrong_role_returns_403()
+    {
+        HttpResponseMessage response = await _userClient.PostAsync(
+            $"{Prefix}/sync-stale", null, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
     private HttpClient BuildClient(string role)
     {
         HttpClient client = _app.GetTestClient();

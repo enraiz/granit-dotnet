@@ -104,4 +104,145 @@ public interface IIdentityProvider
     Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(
         string roleName,
         CancellationToken cancellationToken = default);
+
+    // ──── Feature 1: User role management ────
+
+    /// <summary>
+    /// Lists realm-level roles assigned to a user.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Roles assigned to the user, or an empty list if the provider is unavailable.</returns>
+    Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Assigns a realm-level role to a user.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="roleName">The role name to assign.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task AssignRoleAsync(
+        string userId,
+        string roleName,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes a realm-level role from a user.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="roleName">The role name to remove.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task RemoveRoleAsync(
+        string userId,
+        string roleName,
+        CancellationToken cancellationToken = default);
+
+    // ──── Feature 2: Session termination ────
+
+    /// <summary>
+    /// Terminates a specific SSO session.
+    /// </summary>
+    /// <param name="userId">The user ID (used for logging/validation).</param>
+    /// <param name="sessionId">The session ID to terminate.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task TerminateSessionAsync(
+        string userId,
+        string sessionId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Terminates all active SSO sessions for a user (logs the user out everywhere).
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task TerminateAllSessionsAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
+
+    // ──── Feature 3: Password reset ────
+
+    /// <summary>
+    /// Sends a password reset email to the user via the identity provider.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task SendPasswordResetEmailAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sets a temporary password for the user. The user will be required to change it at next login.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="temporaryPassword">The temporary password to set.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task SetTemporaryPasswordAsync(
+        string userId,
+        string temporaryPassword,
+        CancellationToken cancellationToken = default);
+
+    // ──── Feature 4: User creation ────
+
+    /// <summary>
+    /// Creates a new user in the identity provider.
+    /// </summary>
+    /// <param name="user">The user data for creation.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The created user with its provider-assigned ID.</returns>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task<IdentityUser> CreateUserAsync(
+        IdentityUserCreate user,
+        CancellationToken cancellationToken = default);
+
+    // ──── Feature 5: Group management ────
+
+    /// <summary>
+    /// Lists all groups defined in the identity provider.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>All groups, or an empty list if the provider is unavailable.</returns>
+    Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists groups that a user belongs to.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Groups the user is a member of, or an empty list if the provider is unavailable.</returns>
+    Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Adds a user to a group.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="groupId">The group ID to add the user to.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task AddUserToGroupAsync(
+        string userId,
+        string groupId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes a user from a group.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="groupId">The group ID to remove the user from.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task RemoveUserFromGroupAsync(
+        string userId,
+        string groupId,
+        CancellationToken cancellationToken = default);
 }

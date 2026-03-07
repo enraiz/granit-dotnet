@@ -1,5 +1,5 @@
+using Granit.Authentication.JwtBearer.BackChannelLogout;
 using Granit.Authentication.JwtBearer.Extensions;
-using Granit.Authentication.Keycloak.BackChannelLogout;
 using Granit.Authentication.Keycloak.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -16,25 +16,28 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
         new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
+                ["Authentication:Authority"] = "https://keycloak.test/realms/test",
+                ["Authentication:Audience"] = "test-client",
+                ["Authentication:RequireHttpsMetadata"] = "false",
+                ["Authentication:BackChannelLogout:Enabled"] = backChannelEnabled.ToString(),
+                ["Authentication:BackChannelLogout:EndpointPath"] = "/auth/back-channel-logout",
+                ["Authentication:BackChannelLogout:SessionRevocationTtl"] = "01:00:00",
                 ["Keycloak:Authority"] = "https://keycloak.test/realms/test",
                 ["Keycloak:ClientId"] = "test-client",
                 ["Keycloak:RequireHttpsMetadata"] = "false",
-                ["Keycloak:BackChannelLogout:Enabled"] = backChannelEnabled.ToString(),
-                ["Keycloak:BackChannelLogout:EndpointPath"] = "/auth/back-channel-logout",
-                ["Keycloak:BackChannelLogout:SessionRevocationTtl"] = "01:00:00",
             })
             .Build();
 
     [Fact]
-    public void AddGranitKeycloak_BackChannelEnabled_RegistersRevokedSessionStore()
+    public void AddGranitJwtBearer_BackChannelEnabled_RegistersRevokedSessionStore()
     {
         // Arrange
         ServiceCollection services = new();
         services.AddSingleton<IConfiguration>(CreateConfiguration(backChannelEnabled: true));
         services.AddLogging();
-        services.AddGranitJwtBearer();
 
         // Act
+        services.AddGranitJwtBearer();
         services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -46,15 +49,15 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
     }
 
     [Fact]
-    public void AddGranitKeycloak_BackChannelEnabled_WiresOnTokenValidated()
+    public void AddGranitJwtBearer_BackChannelEnabled_WiresOnTokenValidated()
     {
         // Arrange
         ServiceCollection services = new();
         services.AddSingleton<IConfiguration>(CreateConfiguration(backChannelEnabled: true));
         services.AddLogging();
-        services.AddGranitJwtBearer();
 
         // Act
+        services.AddGranitJwtBearer();
         services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -68,15 +71,15 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
     }
 
     [Fact]
-    public void AddGranitKeycloak_BackChannelEnabled_OnTokenValidatedDiffersFromDefault()
+    public void AddGranitJwtBearer_BackChannelEnabled_OnTokenValidatedDiffersFromDefault()
     {
         // Arrange
         ServiceCollection services = new();
         services.AddSingleton<IConfiguration>(CreateConfiguration(backChannelEnabled: true));
         services.AddLogging();
-        services.AddGranitJwtBearer();
 
         // Act
+        services.AddGranitJwtBearer();
         services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -92,15 +95,15 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
     }
 
     [Fact]
-    public void AddGranitKeycloak_AlwaysRegistersStore_EvenWhenDisabled()
+    public void AddGranitJwtBearer_AlwaysRegistersStore_EvenWhenDisabled()
     {
         // Arrange
         ServiceCollection services = new();
         services.AddSingleton<IConfiguration>(CreateConfiguration(backChannelEnabled: false));
         services.AddLogging();
-        services.AddGranitJwtBearer();
 
         // Act
+        services.AddGranitJwtBearer();
         services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();

@@ -35,6 +35,10 @@ internal sealed class NullUserLookupService : IUserLookupService
         Task.FromResult(0);
 
     /// <inheritdoc/>
+    public Task<int> RefreshStaleAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(0);
+
+    /// <inheritdoc/>
     public Task DeleteByIdAsync(string userId, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 

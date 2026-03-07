@@ -9,10 +9,16 @@ namespace Granit.Identity.Models;
 /// <param name="FirstName">First name.</param>
 /// <param name="LastName">Last name.</param>
 /// <param name="Enabled">Whether the user account is active.</param>
+/// <param name="Attributes">
+/// Custom attributes from the identity provider (e.g. Keycloak user attributes).
+/// Each entry maps an attribute name to its first value. <c>null</c> when the provider
+/// does not return attributes or the user has none.
+/// </param>
 public sealed record IdentityUser(
     string Id,
     string? Username,
     string? Email,
     string? FirstName,
     string? LastName,
-    bool Enabled);
+    bool Enabled,
+    IReadOnlyDictionary<string, string>? Attributes = null);

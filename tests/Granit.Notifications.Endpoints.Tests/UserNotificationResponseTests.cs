@@ -17,9 +17,9 @@ public sealed class UserNotificationResponseTests
     public void Constructor_SetsAllProperties()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
-        Guid notificationId = Guid.NewGuid();
-        DateTimeOffset createdAt = DateTimeOffset.UtcNow;
+        var id = Guid.NewGuid();
+        var notificationId = Guid.NewGuid();
+        var createdAt = DateTimeOffset.UtcNow;
 
         // Act
         UserNotificationResponse response = new(
@@ -44,9 +44,9 @@ public sealed class UserNotificationResponseTests
     [Fact]
     public void Record_Equality_SameValues_AreEqual()
     {
-        Guid id = Guid.NewGuid();
-        Guid nid = Guid.NewGuid();
-        DateTimeOffset now = DateTimeOffset.UtcNow;
+        var id = Guid.NewGuid();
+        var nid = Guid.NewGuid();
+        var now = DateTimeOffset.UtcNow;
 
         UserNotificationResponse a = new(id, nid, "T", NotificationSeverity.Info, "u", null, UserNotificationState.Unread, now, null, null, null);
         UserNotificationResponse b = new(id, nid, "T", NotificationSeverity.Info, "u", null, UserNotificationState.Unread, now, null, null, null);

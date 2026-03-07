@@ -151,6 +151,7 @@ public sealed class JwtBearerAuthOptions
     public string Audience { get; set; } = string.Empty;
     public bool RequireHttpsMetadata { get; set; } = true;
     public string NameClaimType { get; set; } = "sub";  // RFC 7519
+    public BackChannelLogoutOptions BackChannelLogout { get; set; } = new();
 }
 ```
 
@@ -160,6 +161,8 @@ public sealed class JwtBearerAuthOptions
 | --- | --- | --- |
 | `ICurrentUserService` | `CurrentUserService` | Scoped |
 | `IHttpContextAccessor` | Framework | Singleton |
+| `IRevokedSessionStore` | `DistributedCacheRevokedSessionStore` | Singleton (toujours enregistré) |
+| `BackChannelLogoutTokenValidator` | — | Scoped (si back-channel activé) |
 
 ### Policy enregistrée
 
@@ -231,9 +234,10 @@ public sealed class KeycloakOptions
     public string ClientId { get; set; } = string.Empty;
     public string ClientSecret { get; set; } = string.Empty;
     public bool RequireHttpsMetadata { get; set; } = true;
-    public string? Audience { get; set; }              // Défaut : ClientId
+    public string? Audience { get; set; }                // Défaut : ClientId
     public string AdminRole { get; set; } = "admin";
     public string RoleClaimsSource { get; set; } = "realm_access";
+    // BackChannelLogout a été déplacé dans JwtBearerAuthOptions (provider-agnostic)
 }
 ```
 
@@ -277,12 +281,16 @@ standard .NET, permettant `[Authorize(Roles = "admin")]` et `User.IsInRole("admi
 
 ---
 
-## Back-channel logout Keycloak
+## Back-channel logout (OIDC générique)
 
-Le back-channel logout permet à Keycloak de révoquer les sessions côté serveur
-sans intervention de l'utilisateur. Quand un administrateur révoque une session
-dans Keycloak (ou qu'un `logout` est déclenché sur un autre client), Keycloak
-envoie un `logout_token` (JWT signé) au backend.
+Le back-channel logout (spécification OIDC Back-Channel Logout 1.0) permet à
+n'importe quel IDP compatible (Keycloak, Auth0, Entra ID…) de révoquer les sessions
+côté serveur. Quand un administrateur révoque une session ou qu'un `logout` est
+déclenché sur un autre client, l'IDP envoie un `logout_token` (JWT signé) au backend.
+
+> **Note :** cette fonctionnalité est implémentée dans `Granit.Authentication.JwtBearer`
+> (provider-agnostic). `Granit.Authentication.Keycloak` expose un helper
+> `MapKeycloakBackChannelLogout()` qui délègue à `MapBackChannelLogout()`.
 
 ### Architecture du back-channel logout
 
@@ -307,11 +315,13 @@ Requête ──JWT──► JwtBearerEvents.OnTokenValidated
 
 ### Configuration du back-channel logout
 
+La configuration se fait dans la section `Authentication` (pas dans `Keycloak`) :
+
 ```json
 {
-  "Keycloak": {
-    "Authority": "https://keycloak.example.com/realms/my-realm",
-    "ClientId": "my-backend",
+  "Authentication": {
+    "Authority": "https://idp.example.com/realms/my-realm",
+    "Audience": "my-backend",
     "BackChannelLogout": {
       "Enabled": true,
       "EndpointPath": "/auth/back-channel-logout",
@@ -330,17 +340,19 @@ Requête ──JWT──► JwtBearerEvents.OnTokenValidated
 ### Activation dans Program.cs
 
 ```csharp
-// Les services sont enregistrés automatiquement par AddGranitKeycloak()
+// Les services sont enregistrés automatiquement par AddGranitJwtBearer()
 builder.Services.AddGranitJwtBearer();
-builder.Services.AddGranitKeycloak();
 
 WebApplication app = builder.Build();
 
-// Mapper l'endpoint de back-channel logout
-app.MapKeycloakBackChannelLogout();
+// Mapper l'endpoint de back-channel logout (provider-agnostic)
+app.MapBackChannelLogout();
+
+// OU via le helper Keycloak (même effet, délègue à MapBackChannelLogout)
+// app.MapKeycloakBackChannelLogout();
 ```
 
-`MapKeycloakBackChannelLogout()` ne mappe l'endpoint que si
+`MapBackChannelLogout()` ne mappe l'endpoint que si
 `BackChannelLogout.Enabled == true`. Si désactivé, l'appel est un no-op.
 
 ### Configuration Keycloak Admin
@@ -401,23 +413,24 @@ Granit.Security
 
 Granit.Authentication.JwtBearer
 ├── Options/JwtBearerAuthOptions.cs
-├── Authentication/CurrentUserService.cs
-├── Extensions/JwtBearerServiceCollectionExtensions.cs   (AddGranitJwtBearer)
-└── GranitJwtBearerModule.cs                         [DependsOn(Security)]
-
-Granit.Authentication.Keycloak
-├── Options/KeycloakOptions.cs
 ├── Options/BackChannelLogoutOptions.cs
-├── Authentication/KeycloakClaimsTransformation.cs
+├── Authentication/CurrentUserService.cs
 ├── BackChannelLogout/
 │   ├── IRevokedSessionStore.cs
 │   ├── DistributedCacheRevokedSessionStore.cs
 │   ├── BackChannelLogoutTokenValidator.cs
 │   ├── BackChannelLogoutResult.cs
 │   └── BackChannelLogoutEndpoint.cs
-├── Extensions/KeycloakServiceCollectionExtensions.cs    (AddGranitKeycloak)
-├── Extensions/KeycloakEndpointRouteBuilderExtensions.cs (MapKeycloakBackChannelLogout)
-└── GranitAuthenticationKeycloakModule.cs            [DependsOn(JwtBearer)]
+├── Extensions/JwtBearerServiceCollectionExtensions.cs       (AddGranitJwtBearer)
+├── Extensions/JwtBearerEndpointRouteBuilderExtensions.cs    (MapBackChannelLogout)
+└── GranitJwtBearerModule.cs                             [DependsOn(Security)]
+
+Granit.Authentication.Keycloak
+├── Options/KeycloakOptions.cs
+├── Authentication/KeycloakClaimsTransformation.cs
+├── Extensions/KeycloakServiceCollectionExtensions.cs        (AddGranitKeycloak)
+├── Extensions/KeycloakEndpointRouteBuilderExtensions.cs     (MapKeycloakBackChannelLogout → délègue)
+└── GranitAuthenticationKeycloakModule.cs                [DependsOn(JwtBearer)]
 ```
 
 ## Validation du token

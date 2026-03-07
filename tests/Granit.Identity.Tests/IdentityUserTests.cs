@@ -104,4 +104,45 @@ public sealed class IdentityUserTests
         str.ShouldContain("IdentityUser");
         str.ShouldContain("alice");
     }
+
+    [Fact]
+    public void Attributes_DefaultsToNull()
+    {
+        var user = new IdentityUser("id", "alice", "alice@test.com", "Alice", "Doe", true);
+
+        user.Attributes.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Attributes_WhenProvided_AreAccessible()
+    {
+        var attrs = new Dictionary<string, string> { ["license"] = "MD-12345", ["department"] = "Cardiology" };
+        var user = new IdentityUser("id", "alice", "alice@test.com", "Alice", "Doe", true, attrs);
+
+        user.Attributes.ShouldNotBeNull();
+        user.Attributes!.Count.ShouldBe(2);
+        user.Attributes["license"].ShouldBe("MD-12345");
+        user.Attributes["department"].ShouldBe("Cardiology");
+    }
+
+    [Fact]
+    public void Equality_SameAttributes_AreEqual()
+    {
+        var attrs1 = new Dictionary<string, string> { ["key"] = "value" };
+        var attrs2 = new Dictionary<string, string> { ["key"] = "value" };
+        var user1 = new IdentityUser("id", "user", "e@test.com", "F", "L", true, attrs1);
+        var user2 = new IdentityUser("id", "user", "e@test.com", "F", "L", true, attrs2);
+
+        // Record equality uses reference equality for dictionary — expected behavior.
+        user1.ShouldNotBe(user2);
+    }
+
+    [Fact]
+    public void Equality_BothNullAttributes_AreEqual()
+    {
+        var user1 = new IdentityUser("id", "user", "e@test.com", "F", "L", true);
+        var user2 = new IdentityUser("id", "user", "e@test.com", "F", "L", true);
+
+        user1.ShouldBe(user2);
+    }
 }

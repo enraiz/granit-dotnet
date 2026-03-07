@@ -39,4 +39,53 @@ internal sealed class FakeIdentityProvider : IIdentityProvider
     public Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(
         string roleName, CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<IdentityUser>>([]);
+
+    public Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(
+        string userId, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<IdentityRole>>([]);
+
+    public Task AssignRoleAsync(
+        string userId, string roleName, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task RemoveRoleAsync(
+        string userId, string roleName, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task TerminateSessionAsync(
+        string userId, string sessionId, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task TerminateAllSessionsAsync(
+        string userId, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task SendPasswordResetEmailAsync(
+        string userId, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task SetTemporaryPasswordAsync(
+        string userId, string temporaryPassword, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task<IdentityUser> CreateUserAsync(
+        IdentityUserCreate user, CancellationToken cancellationToken = default) =>
+        Task.FromResult(new IdentityUser(string.Empty, user.Username, user.Email,
+            user.FirstName, user.LastName, user.Enabled));
+
+    public Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<IdentityGroup>>([]);
+
+    public Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(
+        string userId, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<IdentityGroup>>([]);
+
+    public Task AddUserToGroupAsync(
+        string userId, string groupId, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task RemoveUserFromGroupAsync(
+        string userId, string groupId, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
 }

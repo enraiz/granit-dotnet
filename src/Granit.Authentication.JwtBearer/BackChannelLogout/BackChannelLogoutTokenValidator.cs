@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Granit.Authentication.Keycloak.Options;
+using Granit.Authentication.JwtBearer.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -7,11 +7,13 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Granit.Authentication.Keycloak.BackChannelLogout;
+namespace Granit.Authentication.JwtBearer.BackChannelLogout;
 
 /// <summary>
-/// Validates Keycloak back-channel <c>logout_token</c> JWTs per the
+/// Validates OIDC back-channel <c>logout_token</c> JWTs per the
 /// OIDC Back-Channel Logout 1.0 specification.
+/// Provider-agnostic: works with any OIDC-compliant identity provider
+/// (Keycloak, Entra ID, Auth0, etc.).
 /// Not sealed — virtual method required for test substitution (NSubstitute).
 /// </summary>
 #pragma warning disable CA1852
@@ -20,13 +22,13 @@ internal partial class BackChannelLogoutTokenValidator
 {
     private const string BackChannelLogoutEvent = "http://schemas.openid.net/event/backchannel-logout";
 
-    private readonly IOptions<KeycloakOptions> _options;
+    private readonly IOptions<JwtBearerAuthOptions> _options;
     private readonly JsonWebTokenHandler _tokenHandler;
     private readonly ILogger<BackChannelLogoutTokenValidator> _logger;
     private readonly ConfigurationManager<OpenIdConnectConfiguration> _configurationManager;
 
     public BackChannelLogoutTokenValidator(
-        IOptions<KeycloakOptions> options,
+        IOptions<JwtBearerAuthOptions> options,
         ILogger<BackChannelLogoutTokenValidator> logger)
     {
         _options = options;
@@ -49,8 +51,7 @@ internal partial class BackChannelLogoutTokenValidator
     /// <returns>A <see cref="BackChannelLogoutResult"/> indicating success or failure.</returns>
     public virtual async Task<BackChannelLogoutResult> ValidateAsync(string logoutToken, CancellationToken cancellationToken = default)
     {
-        KeycloakOptions keycloakOptions = _options.Value;
-        string audience = keycloakOptions.Audience ?? keycloakOptions.ClientId;
+        JwtBearerAuthOptions authOptions = _options.Value;
 
         OpenIdConnectConfiguration config;
         try
@@ -65,8 +66,8 @@ internal partial class BackChannelLogoutTokenValidator
 
         TokenValidationParameters validationParameters = new()
         {
-            ValidIssuer = keycloakOptions.Authority,
-            ValidAudience = audience,
+            ValidIssuer = authOptions.Authority,
+            ValidAudience = authOptions.Audience,
             IssuerSigningKeys = config.SigningKeys,
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -107,7 +108,6 @@ internal partial class BackChannelLogoutTokenValidator
 
     private static bool ContainsBackChannelLogoutEvent(object eventsValue)
     {
-        // The events claim can be a JSON string (from JWT parsing) or a JsonElement
         if (eventsValue is string eventsString)
         {
             return eventsString.Contains(BackChannelLogoutEvent, StringComparison.Ordinal);

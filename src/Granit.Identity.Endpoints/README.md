@@ -1,7 +1,8 @@
 # Granit.Identity.Endpoints
 
 Minimal API endpoints for identity user cache management. Provides list, search, batch resolve,
-sync, RGPD erasure/pseudonymization, webhook reception, stats, and health check endpoints.
+full sync, incremental stale sync, RGPD erasure/pseudonymization, webhook reception, stats,
+and health check endpoints.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

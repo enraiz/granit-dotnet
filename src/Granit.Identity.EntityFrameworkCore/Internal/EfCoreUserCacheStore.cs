@@ -67,6 +67,16 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
             .AsNoTracking()
             .CountAsync(e => e.TenantId == tenantId && e.LastSyncedAt < threshold, cancellationToken);
 
+    public async Task<IReadOnlyList<string>> FindStaleExternalIdsAsync(
+        Guid? tenantId, DateTimeOffset threshold, int batchSize, CancellationToken cancellationToken = default) =>
+        await context.UserCacheEntries
+            .AsNoTracking()
+            .Where(e => e.TenantId == tenantId && e.LastSyncedAt < threshold)
+            .OrderBy(e => e.LastSyncedAt)
+            .Take(batchSize)
+            .Select(e => e.ExternalUserId)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
     public async Task<(DateTimeOffset? Oldest, DateTimeOffset? Newest)> GetSyncRangeAsync(
         Guid? tenantId, CancellationToken cancellationToken = default)
     {

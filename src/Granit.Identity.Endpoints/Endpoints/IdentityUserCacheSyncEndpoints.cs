@@ -22,6 +22,10 @@ internal static class IdentityUserCacheSyncEndpoints
             .WithName("SyncAllIdentityUsers")
             .WithSummary("Full sync — fetches all users from the identity provider and upserts the cache.");
 
+        group.MapPost("/sync-stale", SyncStaleAsync)
+            .WithName("SyncStaleIdentityUsers")
+            .WithSummary("Incremental sync — refreshes only stale cache entries.");
+
         return group;
     }
 
@@ -53,8 +57,20 @@ internal static class IdentityUserCacheSyncEndpoints
         int synced = await lookupService.RefreshAllAsync(ct).ConfigureAwait(false);
         return TypedResults.Ok(new IdentityUserCacheSyncAllResponse(synced));
     }
+
+    private static async Task<Ok<IdentityUserCacheSyncStaleResponse>> SyncStaleAsync(
+        IUserLookupService lookupService,
+        CancellationToken ct)
+    {
+        int refreshed = await lookupService.RefreshStaleAsync(ct).ConfigureAwait(false);
+        return TypedResults.Ok(new IdentityUserCacheSyncStaleResponse(refreshed));
+    }
 }
 
 /// <summary>Response for the sync-all endpoint.</summary>
 /// <param name="SyncedCount">Number of users synchronized.</param>
 internal sealed record IdentityUserCacheSyncAllResponse(int SyncedCount);
+
+/// <summary>Response for the sync-stale endpoint.</summary>
+/// <param name="RefreshedCount">Number of stale entries refreshed.</param>
+internal sealed record IdentityUserCacheSyncStaleResponse(int RefreshedCount);

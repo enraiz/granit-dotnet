@@ -22,4 +22,11 @@ public sealed class JwtBearerAuthOptions
     /// Default: <c>"sub"</c> (RFC 7519 — mandatory claim, always present in a valid JWT).
     /// </summary>
     public string NameClaimType { get; set; } = "sub";
+
+    /// <summary>
+    /// Back-channel logout configuration. Opt-in — disabled by default.
+    /// When enabled, the identity provider can revoke sessions server-to-server
+    /// via the OIDC Back-Channel Logout 1.0 specification.
+    /// </summary>
+    public BackChannelLogoutOptions BackChannelLogout { get; set; } = new();
 }

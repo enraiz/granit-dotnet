@@ -21,4 +21,10 @@ public sealed class UserCacheOptions
     /// from claims on each request if the cached entry is stale or missing. Default: <c>true</c>.
     /// </summary>
     public bool EnableLoginTimeSync { get; set; } = true;
+
+    /// <summary>
+    /// Maximum number of stale entries to refresh per incremental sync batch.
+    /// Used by <see cref="Internal.CachedUserLookupService.RefreshStaleAsync"/>. Default: 50.
+    /// </summary>
+    public int IncrementalSyncBatchSize { get; set; } = 50;
 }
