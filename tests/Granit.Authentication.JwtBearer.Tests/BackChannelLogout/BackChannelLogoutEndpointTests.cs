@@ -9,7 +9,7 @@ using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Granit.Authentication.Keycloak.Tests.BackChannelLogout;
+namespace Granit.Authentication.JwtBearer.Tests.BackChannelLogout;
 
 public sealed class BackChannelLogoutEndpointTests
 {
