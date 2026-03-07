@@ -1,6 +1,5 @@
 using Granit.Authentication.JwtBearer.BackChannelLogout;
 using Granit.Authentication.JwtBearer.Extensions;
-using Granit.Authentication.Keycloak.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,23 +7,20 @@ using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;
 
-namespace Granit.Authentication.Keycloak.Tests.BackChannelLogout;
+namespace Granit.Authentication.JwtBearer.Tests.BackChannelLogout;
 
-public sealed class KeycloakBackChannelLogoutRegistrationTests
+public sealed class BackChannelLogoutRegistrationTests
 {
     private static IConfiguration CreateConfiguration(bool backChannelEnabled) =>
         new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Authentication:Authority"] = "https://keycloak.test/realms/test",
+                ["Authentication:Authority"] = "https://idp.test/realms/test",
                 ["Authentication:Audience"] = "test-client",
                 ["Authentication:RequireHttpsMetadata"] = "false",
                 ["Authentication:BackChannelLogout:Enabled"] = backChannelEnabled.ToString(),
                 ["Authentication:BackChannelLogout:EndpointPath"] = "/auth/back-channel-logout",
                 ["Authentication:BackChannelLogout:SessionRevocationTtl"] = "01:00:00",
-                ["Keycloak:Authority"] = "https://keycloak.test/realms/test",
-                ["Keycloak:ClientId"] = "test-client",
-                ["Keycloak:RequireHttpsMetadata"] = "false",
             })
             .Build();
 
@@ -38,7 +34,6 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
 
         // Act
         services.AddGranitJwtBearer();
-        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -58,7 +53,6 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
 
         // Act
         services.AddGranitJwtBearer();
-        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -80,7 +74,6 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
 
         // Act
         services.AddGranitJwtBearer();
-        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 
@@ -104,7 +97,6 @@ public sealed class KeycloakBackChannelLogoutRegistrationTests
 
         // Act
         services.AddGranitJwtBearer();
-        services.AddGranitKeycloak();
 
         using ServiceProvider sp = services.BuildServiceProvider();
 

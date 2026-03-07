@@ -288,9 +288,8 @@ n'importe quel IDP compatible (Keycloak, Auth0, Entra ID…) de révoquer les se
 côté serveur. Quand un administrateur révoque une session ou qu'un `logout` est
 déclenché sur un autre client, l'IDP envoie un `logout_token` (JWT signé) au backend.
 
-> **Note :** cette fonctionnalité est implémentée dans `Granit.Authentication.JwtBearer`
-> (provider-agnostic). `Granit.Authentication.Keycloak` expose un helper
-> `MapKeycloakBackChannelLogout()` qui délègue à `MapBackChannelLogout()`.
+> **Note :** cette fonctionnalité est entièrement implémentée dans
+> `Granit.Authentication.JwtBearer` (provider-agnostic, standard OIDC).
 
 ### Architecture du back-channel logout
 
@@ -347,9 +346,6 @@ WebApplication app = builder.Build();
 
 // Mapper l'endpoint de back-channel logout (provider-agnostic)
 app.MapBackChannelLogout();
-
-// OU via le helper Keycloak (même effet, délègue à MapBackChannelLogout)
-// app.MapKeycloakBackChannelLogout();
 ```
 
 `MapBackChannelLogout()` ne mappe l'endpoint que si
@@ -429,7 +425,6 @@ Granit.Authentication.Keycloak
 ├── Options/KeycloakOptions.cs
 ├── Authentication/KeycloakClaimsTransformation.cs
 ├── Extensions/KeycloakServiceCollectionExtensions.cs        (AddGranitKeycloak)
-├── Extensions/KeycloakEndpointRouteBuilderExtensions.cs     (MapKeycloakBackChannelLogout → délègue)
 └── GranitAuthenticationKeycloakModule.cs                [DependsOn(JwtBearer)]
 ```
 
