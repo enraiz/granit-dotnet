@@ -630,6 +630,106 @@ Propriétés enregistrées :
 - L'infrastructure doit rester **en Europe** (OVHcloud FR) — jamais sur AWS/Azure/GCP
 - Conservation des `NotificationDeliveryAttempt` : **3 ans minimum** (politique de purge applicative)
 
+## Câblage des événements lifecycle
+
+Le framework fournit des packages de câblage qui connectent automatiquement les événements
+de cycle de vie des autres modules au système de notification. Ce découplage permet à chaque
+module de rester indépendant tout en bénéficiant de notifications automatiques.
+
+### Granit.Workflow.Notifications
+
+Le package `Granit.Workflow.Notifications` connecte les transitions de workflow au système
+de notification. Lorsqu'un workflow change d'état, les **followers de l'entité** sont notifiés
+automatiquement.
+
+```text
+WorkflowStateChangedEvent (IDomainEvent)
+      │
+WorkflowStateChangedHandler (Wolverine)
+      │
+INotificationPublisher.PublishToEntityFollowersAsync(...)
+      │
+NotificationFanoutHandler → N livraisons (InApp, SignalR, ...)
+```
+
+**Événement source** : `WorkflowStateChangedEvent` — événement domaine non-générique
+(les états sont sérialisés en `string` pour permettre un handler Wolverine unique).
+
+**Type de notification** : `WorkflowStateChangedNotificationType` — singleton framework
+(`workflow.state_changed`), canaux par défaut : InApp + SignalR.
+
+**Données** : `WorkflowStateChangedNotificationData` — contient `EntityType`, `EntityId`,
+`PreviousState`, `NewState`, `TransitionedBy`.
+
+**Résolution des destinataires** : via `PublishToEntityFollowersAsync` — seuls les
+utilisateurs qui suivent l'entité concernée reçoivent la notification (style Odoo chatter).
+
+Installation :
+
+```csharp
+[DependsOn(typeof(GranitWorkflowNotificationsModule))]
+public sealed class MyAppModule : GranitModule { }
+```
+
+> **HDS** : le payload ne contient pas de PII — uniquement des identifiants techniques
+> (`EntityId`, `TransitionedBy` sous forme d'ID utilisateur).
+
+### Câblage applicatif (niveau Guava)
+
+Les événements suivants sont câblés **au niveau applicatif** (guava-backend) car les
+définitions de notification et les données métier sont spécifiques à l'application.
+
+#### RGPD — Suppression de données personnelles
+
+Deux événements `IIntegrationEvent` du module Privacy sont connectés aux notifications :
+
+```text
+PersonalDataDeletionRequestedEvent          PersonalDataDeletedEvent
+      │                                           │
+PersonalDataDeletionRequestedHandler        PersonalDataDeletedHandler
+      │                                           │
+PublishAsync(recipientUserIds: [userId])     PublishToSubscribersAsync(...)
+      │                                           │
+Notification au demandeur                   Notification aux admins/DPO
+```
+
+- **`PersonalDataDeletionRequestedEvent`** → notifie l'utilisateur qui a fait la demande
+  (Art. 17 RGPD). Canal : InApp + Email. `AllowUserOptOut = false`.
+- **`PersonalDataDeletedEvent`** → notifie les administrateurs/DPO abonnés que la
+  suppression a été traitée par un fournisseur. Canal : InApp + Email. `AllowUserOptOut = false`.
+
+> **RGPD** : les données de notification ne contiennent aucune PII — uniquement des
+> identifiants (`RequestId`, `ProviderName`, `AffectedRecords`).
+
+#### Sécurité — Suppression d'utilisateur
+
+```text
+IdentityUserDeletedEvent (IIntegrationEvent)
+      │
+IdentityUserDeletedNotificationHandler (Wolverine)
+      │
+PublishToSubscribersAsync(...)
+      │
+Notification aux admins abonnés
+```
+
+- **`IdentityUserDeletedEvent`** → notifie les administrateurs abonnés qu'un utilisateur
+  a été supprimé du fournisseur d'identité. Canal : InApp + Email. `AllowUserOptOut = false`.
+
+> **HDS** : notification obligatoire pour la piste d'audit. Le payload ne contient que
+> l'identifiant technique (`UserId`), jamais de données nominatives.
+
+### Tableau récapitulatif
+
+| Événement | Package / Module | Destinataires | Canaux | Opt-out |
+| --- | --- | --- | --- | --- |
+| `WorkflowStateChangedEvent` | `Granit.Workflow.Notifications` | Entity followers | InApp, SignalR | Oui |
+| `ImportJobCompletedEvent` | Guava.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
+| `ExportJobCompletedEvent` | Guava.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
+| `PersonalDataDeletionRequestedEvent` | Guava.Modules.Security | Demandeur | InApp, Email | Non |
+| `PersonalDataDeletedEvent` | Guava.Modules.Security | Abonnés (admins/DPO) | InApp, Email | Non |
+| `IdentityUserDeletedEvent` | Guava.Modules.Security | Abonnés (admins) | InApp, Email | Non |
+
 ## Dépendances Granit
 
 | Direction | Modules |
