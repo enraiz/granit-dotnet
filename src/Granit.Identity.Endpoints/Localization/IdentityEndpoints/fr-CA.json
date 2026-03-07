@@ -1,0 +1,6 @@
+{
+  "culture": "fr-CA",
+  "texts": {
+    "Permission:Identity.UserCache.Delete": "Supprimer ou pseudonymiser des entrées de la cache (LPRPDE)"
+  }
+}

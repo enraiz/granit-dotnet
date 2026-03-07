@@ -1,0 +1,8 @@
+{
+  "culture": "fr-CA",
+  "texts": {
+    "Granit:Validation:InvalidEmail": "'{PropertyName}' n'est pas une adresse courriel valide.",
+    "Granit:Validation:EmailValidator": "'{PropertyName}' n'est pas une adresse courriel valide.",
+    "Granit:Validation:CreditCardValidator": "'{PropertyName}' n'est pas un numéro de carte de crédit valide."
+  }
+}

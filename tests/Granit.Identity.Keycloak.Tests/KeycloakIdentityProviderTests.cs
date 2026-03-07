@@ -1104,7 +1104,8 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
 
         await provider.UpdateUserAsync("user-1", update, TestContext.Current.CancellationToken);
 
-        // No exception = success. The sequence handler consumed all responses.
+        // 3 calls: token request, GET user, PUT updated user
+        seqHandler.CallCount.ShouldBe(3);
     }
 
     [Fact]

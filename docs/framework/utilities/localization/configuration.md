@@ -101,10 +101,22 @@ sont équivalentes :
 src/MyApp/
 └── Localization/
     └── MyApp/
-        ├── fr.json
-        ├── en.json
-        └── fr-BE.json
+        ├── en.json         # English (US) — base
+        ├── en-GB.json      # English (UK) — overrides only
+        ├── fr.json         # Français (France) — base
+        ├── fr-CA.json      # Français (Canada) — overrides only
+        ├── nl.json
+        ├── de.json
+        ├── es.json
+        ├── it.json
+        └── pt.json
 ```
+
+Les fichiers de variantes régionales (`fr-CA.json`, `en-GB.json`) ne contiennent
+que les clés qui **diffèrent** de la langue de base. Le fallback natif .NET
+(`CultureInfo.Parent`) résout automatiquement : `fr-CA` → `fr` → culture par
+défaut de la ressource. Pas besoin de fichier `en-US.json` puisque `en.json`
+est déjà l'anglais américain (fallback natif : `en-US` → `en`).
 
 Le fichier `.csproj` doit inclure les fichiers comme ressources embarquées :
 
@@ -213,9 +225,10 @@ Utilisé pour peupler un sélecteur de langue en interface utilisateur.
 
 - `IsDefault` : indique la langue pré-sélectionnée dans le sélecteur. Si aucune
   langue n'est marquée par défaut, le frontend utilise sa propre logique.
-- `GranitLocalizationModule` enregistre `fr` et `en` par défaut (avec `en`
-  comme langue par défaut). Les modules applicatifs peuvent les remplacer ou
-  les compléter via `Configure<GranitLocalizationOptions>`.
+- `GranitLocalizationModule` enregistre 4 langues par défaut : `fr` (Français —
+  France), `fr-CA` (Français — Canada), `en` (English — United States, défaut),
+  `en-GB` (English — United Kingdom). Les modules applicatifs peuvent les remplacer
+  ou les compléter via `Configure<GranitLocalizationOptions>`.
 
 ## Ressource Granit intégrée
 

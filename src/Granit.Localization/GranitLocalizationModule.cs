@@ -6,7 +6,7 @@ namespace Granit.Localization;
 
 /// <summary>
 /// Granit module for modular JSON localization.
-/// Registers IStringLocalizerFactory and the default Granit resource (fr/en).
+/// Registers IStringLocalizerFactory and the default Granit resource.
 /// </summary>
 public sealed class GranitLocalizationModule : GranitModule
 {
@@ -24,8 +24,10 @@ public sealed class GranitLocalizationModule : GranitModule
                     typeof(GranitLocalizationResource).Assembly,
                     "Granit.Localization.Localization.Granit");
 
-            options.Languages.Add(new LanguageInfo("fr", "Français", "fr"));
-            options.Languages.Add(new LanguageInfo("en", "English", "gb", isDefault: true));
+            options.Languages.Add(new LanguageInfo("fr", "Français (France)", "fr"));
+            options.Languages.Add(new LanguageInfo("fr-CA", "Français (Canada)", "ca"));
+            options.Languages.Add(new LanguageInfo("en", "English (United States)", "us", isDefault: true));
+            options.Languages.Add(new LanguageInfo("en-GB", "English (United Kingdom)", "gb"));
         });
     }
 }

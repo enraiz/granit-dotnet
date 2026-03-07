@@ -3,6 +3,7 @@ using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;
 
@@ -110,6 +111,32 @@ public sealed class GranitLocalizationModuleTests : IDisposable
         result.Value.ShouldContain("Patient");
         result.Value.ShouldContain("123");
         result.Value.ShouldContain("Entity");
+    }
+
+    [Fact]
+    public void ConfigureServices_RegistersRegionalLanguageVariants()
+    {
+        // Arrange
+        GranitLocalizationModule module = new();
+        HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(null);
+        ServiceConfigurationContext context = new(
+            builder.Services,
+            builder.Configuration,
+            builder);
+
+        module.ConfigureServices(context);
+        using ServiceProvider sp = builder.Services.BuildServiceProvider();
+
+        // Act
+        GranitLocalizationOptions options =
+            sp.GetRequiredService<IOptions<GranitLocalizationOptions>>().Value;
+
+        // Assert — 4 languages: fr, fr-CA, en, en-GB
+        options.Languages.Count.ShouldBe(4);
+        options.Languages.ShouldContain(l => l.CultureName == "fr" && l.DisplayName == "Français (France)");
+        options.Languages.ShouldContain(l => l.CultureName == "fr-CA" && l.DisplayName == "Français (Canada)");
+        options.Languages.ShouldContain(l => l.CultureName == "en" && l.DisplayName == "English (United States)" && l.IsDefault);
+        options.Languages.ShouldContain(l => l.CultureName == "en-GB" && l.DisplayName == "English (United Kingdom)");
     }
 
     [Fact]
