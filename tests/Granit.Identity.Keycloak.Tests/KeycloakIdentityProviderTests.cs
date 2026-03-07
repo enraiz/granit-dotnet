@@ -1135,6 +1135,106 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             () => _provider.UpdateUserAsync("user-1", update, TestContext.Current.CancellationToken));
     }
 
+    // --- VerifyUserCredentialsAsync tests ---
+
+    [Fact]
+    public async Task VerifyUserCredentialsAsync_ValidCredentials_ReturnsTrue()
+    {
+        KeycloakAdminOptions optionsWithDirect = new()
+        {
+            BaseUrl = "https://keycloak.test",
+            Realm = "test-realm",
+            ClientId = "admin-service",
+            ClientSecret = "secret",
+            DirectAccessClientId = "guava-frontend",
+        };
+
+        MockHttpMessageHandler handler = new()
+        {
+            ResponseBody = """{"access_token":"user-token","expires_in":300}""",
+        };
+
+        HttpClient client = new(handler) { BaseAddress = new Uri("https://keycloak.test/") };
+        IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
+        factory.CreateClient("KeycloakAdmin").Returns(client);
+
+        KeycloakIdentityProvider provider = new(
+            _tokenService,
+            _tokenExchangeService,
+            factory,
+            Options.Create(optionsWithDirect),
+            NullLogger<KeycloakIdentityProvider>.Instance);
+
+        bool result = await provider.VerifyUserCredentialsAsync("admin", "password123",
+            TestContext.Current.CancellationToken);
+
+        result.ShouldBeTrue();
+        handler.Requests.Count.ShouldBe(1);
+        handler.Requests[0].Url.ShouldContain("/realms/test-realm/protocol/openid-connect/token");
+        handler.Requests[0].Body.ShouldContain("grant_type=password");
+        handler.Requests[0].Body.ShouldContain("client_id=guava-frontend");
+        handler.Requests[0].Body.ShouldContain("username=admin");
+    }
+
+    [Fact]
+    public async Task VerifyUserCredentialsAsync_InvalidCredentials_ReturnsFalse()
+    {
+        KeycloakAdminOptions optionsWithDirect = new()
+        {
+            BaseUrl = "https://keycloak.test",
+            Realm = "test-realm",
+            ClientId = "admin-service",
+            ClientSecret = "secret",
+            DirectAccessClientId = "guava-frontend",
+        };
+
+        MockHttpMessageHandler handler = new()
+        {
+            ResponseStatusCode = HttpStatusCode.Unauthorized,
+            ResponseBody = """{"error":"invalid_grant"}""",
+        };
+
+        HttpClient client = new(handler) { BaseAddress = new Uri("https://keycloak.test/") };
+        IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
+        factory.CreateClient("KeycloakAdmin").Returns(client);
+
+        KeycloakIdentityProvider provider = new(
+            _tokenService,
+            _tokenExchangeService,
+            factory,
+            Options.Create(optionsWithDirect),
+            NullLogger<KeycloakIdentityProvider>.Instance);
+
+        bool result = await provider.VerifyUserCredentialsAsync("admin", "wrong-password",
+            TestContext.Current.CancellationToken);
+
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task VerifyUserCredentialsAsync_NoDirectAccessClientId_ThrowsInvalidOperation()
+    {
+        await Should.ThrowAsync<InvalidOperationException>(
+            () => _provider.VerifyUserCredentialsAsync("admin", "pass",
+                TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task VerifyUserCredentialsAsync_NullUsername_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.VerifyUserCredentialsAsync(null!, "pass",
+                TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task VerifyUserCredentialsAsync_NullPassword_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.VerifyUserCredentialsAsync("admin", null!,
+                TestContext.Current.CancellationToken));
+    }
+
     public void Dispose() => _httpClient.Dispose();
 }
 

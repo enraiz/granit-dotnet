@@ -60,6 +60,7 @@ public interface IIdentityProvider
     Task<DateTimeOffset?> GetPasswordChangedAtAsync(string userId, CancellationToken ct = default);
     Task SendPasswordResetEmailAsync(string userId, CancellationToken ct = default);
     Task SetTemporaryPasswordAsync(string userId, string temporaryPassword, CancellationToken ct = default);
+    Task<bool> VerifyUserCredentialsAsync(string username, string password, CancellationToken ct = default);
 
     // --- Rôles ---
     Task<IReadOnlyList<IdentityRole>> GetRolesAsync(CancellationToken ct = default);
@@ -169,6 +170,7 @@ builder.Services.AddGranitIdentityKeycloak();
 | `ClientId` | `string` | ✅ | Client ID du service account |
 | `ClientSecret` | `string` | ✅ | Secret du service account — **charger depuis Vault** |
 | `UseTokenExchangeForDeviceActivity` | `bool` | ❌ | Active l'Account API via token exchange pour les infos device (défaut : `false`) |
+| `DirectAccessClientId` | `string?` | ❌ | Client ID public avec *Direct Access Grants* activé, utilisé par `VerifyUserCredentialsAsync` (ROPC grant) |
 
 > `ClientSecret` ne doit **jamais** être stocké en clair.
 > Utiliser [Granit.Vault](vault.md) pour injecter le secret dynamiquement.
@@ -206,6 +208,37 @@ builder.Services.AddGranitIdentityKeycloak();
 | `GetUserGroupsAsync` | `GET /admin/realms/{realm}/users/{id}/groups` |
 | `AddUserToGroupAsync` | `PUT /admin/realms/{realm}/users/{id}/groups/{groupId}` |
 | `RemoveUserFromGroupAsync` | `DELETE /admin/realms/{realm}/users/{id}/groups/{groupId}` |
+| `VerifyUserCredentialsAsync` | `POST /realms/{realm}/protocol/openid-connect/token` (Resource Owner Password Grant via `DirectAccessClientId`) |
+
+### Vérification de credentials (ROPC)
+
+`VerifyUserCredentialsAsync` permet de ré-authentifier un utilisateur avant une
+opération sensible (ex. définir un mot de passe temporaire). La vérification utilise
+le **Resource Owner Password Credentials** (ROPC) grant :
+
+```text
+POST /realms/{realm}/protocol/openid-connect/token
+    grant_type=password
+    client_id={DirectAccessClientId}
+    username={username}
+    password={password}
+```
+
+**Prérequis Keycloak :**
+
+- Un client **public** avec *Direct Access Grants Enabled* (ex. `guava-frontend`)
+- Configurer `DirectAccessClientId` dans `KeycloakAdmin`
+
+```json
+{
+  "KeycloakAdmin": {
+    "DirectAccessClientId": "guava-frontend"
+  }
+}
+```
+
+Si `DirectAccessClientId` n'est pas configuré, l'appel lève une
+`InvalidOperationException`.
 
 ### Device activity — mode token exchange
 
@@ -384,6 +417,7 @@ internal sealed class MockSequenceHttpMessageHandler(IReadOnlyList<string> respo
 | `GetUserGroupsAsync` | Groupes de l'utilisateur, liste vide, Keycloak 503 (graceful) |
 | `AddUserToGroupAsync` | PUT membership, guard null |
 | `RemoveUserFromGroupAsync` | DELETE membership, guard null |
+| `VerifyUserCredentialsAsync` | Credentials valides (true), invalides (false), `DirectAccessClientId` absent (exception), guards null |
 
 #### Token exchange dans les tests
 

@@ -265,4 +265,19 @@ public interface IIdentityProvider
         string userId,
         string groupId,
         CancellationToken cancellationToken = default);
+
+    // ──── Credential verification ────
+
+    /// <summary>
+    /// Verifies a user's credentials (username + password) against the identity provider.
+    /// Used for re-authentication before sensitive operations (e.g. setting a temporary password).
+    /// </summary>
+    /// <param name="username">The username to verify.</param>
+    /// <param name="password">The password to verify.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns><c>true</c> if the credentials are valid; <c>false</c> otherwise.</returns>
+    Task<bool> VerifyUserCredentialsAsync(
+        string username,
+        string password,
+        CancellationToken cancellationToken = default);
 }

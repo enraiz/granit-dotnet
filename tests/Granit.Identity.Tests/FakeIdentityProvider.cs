@@ -92,4 +92,8 @@ internal sealed class FakeIdentityProvider : IIdentityProvider
     public Task RemoveUserFromGroupAsync(
         string userId, string groupId, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
+
+    public Task<bool> VerifyUserCredentialsAsync(
+        string username, string password, CancellationToken cancellationToken = default) =>
+        Task.FromResult(false);
 }
