@@ -35,5 +35,9 @@ public sealed class GranitDataExchangeWolverineModule : GranitModule
             .Singleton<IImportCommandDispatcher, WolverineImportCommandDispatcher>());
         context.Services.Replace(ServiceDescriptor
             .Singleton<IExportCommandDispatcher, WolverineExportCommandDispatcher>());
+
+        // Replace the no-op event publisher with Wolverine's IMessageBus for durable delivery.
+        context.Services.Replace(ServiceDescriptor
+            .Singleton<IDataExchangeEventPublisher, WolverineDataExchangeEventPublisher>());
     }
 }

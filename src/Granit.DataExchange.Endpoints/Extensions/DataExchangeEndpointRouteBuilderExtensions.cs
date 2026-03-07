@@ -12,12 +12,12 @@ using Microsoft.Extensions.Options;
 namespace Granit.DataExchange.Endpoints.Extensions;
 
 /// <summary>
-/// Extension methods for registering data import endpoints.
+/// Extension methods for registering data exchange endpoints.
 /// </summary>
 public static class DataExchangeEndpointRouteBuilderExtensions
 {
     /// <summary>
-    /// Maps the data import endpoints onto the given route builder.
+    /// Maps the data exchange endpoints onto the given route builder.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -37,13 +37,13 @@ public static class DataExchangeEndpointRouteBuilderExtensions
     /// });
     /// </code>
     /// <para>
-    /// Exposes 9 import endpoints: POST /, POST /{jobId}/preview, PUT /{jobId}/mappings,
-    /// POST /{jobId}/execute, POST /{jobId}/dry-run, GET /{jobId},
-    /// DELETE /{jobId}, GET /{jobId}/report, GET /{jobId}/correction-file.
+    /// Exposes 10 import endpoints: GET /jobs, POST /, POST /{jobId}/preview,
+    /// PUT /{jobId}/mappings, POST /{jobId}/execute, POST /{jobId}/dry-run,
+    /// GET /{jobId}, DELETE /{jobId}, GET /{jobId}/report, GET /{jobId}/correction-file.
     /// </para>
     /// <para>
-    /// Export job execution endpoints under <c>/export/</c>:
-    /// POST /jobs, GET /jobs/{id}, GET /jobs/{id}/download.
+    /// Export job endpoints under <c>/export/</c>:
+    /// GET /jobs, POST /jobs, GET /jobs/{id}, GET /jobs/{id}/download.
     /// </para>
     /// <para>
     /// Shared metadata endpoints under <c>/metadata/</c>:
@@ -83,19 +83,21 @@ public static class DataExchangeEndpointRouteBuilderExtensions
             .MapGroup(prefix)
             .WithTags(options.TagName);
 
-        // Import endpoints (upload, mappings, execution, reports)
+        // Import endpoints (listing, upload, mappings, execution, reports)
         RouteGroupBuilder importGroup = group
             .RequireAuthorization(ImportAuthorizationPolicy.PolicyName);
 
+        importGroup.MapImportJobListEndpoints();
         importGroup.MapUploadEndpoints();
         importGroup.MapExecutionEndpoints();
         importGroup.MapReportEndpoints();
 
-        // Export job execution endpoints under /export/ sub-group
+        // Export job endpoints under /export/ sub-group
         RouteGroupBuilder exportGroup = group
             .MapGroup("export")
             .RequireAuthorization(ExportAuthorizationPolicy.PolicyName);
 
+        exportGroup.MapExportJobListEndpoints();
         exportGroup.MapExportExecutionEndpoints();
 
         // Shared metadata (definitions, presets) under /metadata/

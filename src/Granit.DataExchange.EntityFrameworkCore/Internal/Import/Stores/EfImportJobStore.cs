@@ -1,5 +1,6 @@
 using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Querying;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.DataExchange.EntityFrameworkCore.Internal.Import.Stores;
@@ -18,6 +19,31 @@ internal sealed class EfImportJobStore(
         return await context.ImportJobs
             .AsNoTracking()
             .FirstOrDefaultAsync(j => j.Id == id, ct).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<PagedResult<ImportJob>> ListAsync(
+        ImportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken ct = default)
+    {
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+
+        IQueryable<ImportJob> query = context.ImportJobs.AsNoTracking();
+
+        if (status.HasValue)
+        {
+            query = query.Where(j => j.Status == status.Value);
+        }
+
+        int totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+
+        List<ImportJob> items = await query
+            .OrderByDescending(j => j.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct)
+            .ConfigureAwait(false);
+
+        return new PagedResult<ImportJob>(items, totalCount);
     }
 
     /// <inheritdoc/>

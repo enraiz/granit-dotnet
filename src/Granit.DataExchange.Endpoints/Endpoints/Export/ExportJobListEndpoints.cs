@@ -1,0 +1,49 @@
+using Granit.DataExchange.Endpoints.Dtos.Export;
+using Granit.DataExchange.Export;
+using Granit.Querying;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+
+namespace Granit.DataExchange.Endpoints.Endpoints.Export;
+
+/// <summary>
+/// Export job listing endpoint for admin views.
+/// </summary>
+internal static class ExportJobListEndpoints
+{
+    /// <summary>
+    /// Registers GET /jobs onto the given route group.
+    /// </summary>
+    internal static RouteGroupBuilder MapExportJobListEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/jobs", ListAsync)
+            .WithName("ListExportJobs")
+            .WithSummary("Lists export jobs with optional status filter and pagination.");
+
+        return group;
+    }
+
+    private static async Task<Ok<PagedResult<ExportJobResponse>>> ListAsync(
+        [FromServices] IExportJobStore jobStore,
+        [FromQuery] ExportJobStatus? status = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
+    {
+        int clampedPageSize = Math.Clamp(pageSize, 1, 100);
+        int clampedPage = Math.Max(page, 1);
+
+        PagedResult<ExportJob> result = await jobStore
+            .ListAsync(status, clampedPage, clampedPageSize, ct)
+            .ConfigureAwait(false);
+
+        PagedResult<ExportJobResponse> response = new(
+            result.Items.Select(ExportJobResponse.FromJob).ToList(),
+            result.TotalCount);
+
+        return TypedResults.Ok(response);
+    }
+}

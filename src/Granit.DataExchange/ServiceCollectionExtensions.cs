@@ -6,6 +6,7 @@ using Granit.DataExchange.Import.Internal;
 using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Messages;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.DataExchange.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -48,6 +49,9 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<IImportJobStore, NullImportJobStore>();
         services.TryAddScoped<IImportFileProvider, NullImportFileProvider>();
         services.TryAddScoped<IImportOrchestrator, ImportOrchestrator>();
+
+        // No-op event publisher (default). Replaced by Wolverine if installed.
+        services.TryAddSingleton<IDataExchangeEventPublisher, NullDataExchangeEventPublisher>();
 
         // Channel-based async dispatch (default). Replaced by Wolverine if installed.
         services.TryAddSingleton(Channel.CreateUnbounded<ExecuteImportCommand>());
@@ -103,6 +107,9 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<IExportOrchestrator, ExportOrchestrator>();
         services.TryAddScoped<IExportJobStore, NullExportJobStore>();
         services.TryAddScoped<IExportPresetStore, NullExportPresetStore>();
+
+        // No-op event publisher (default). Replaced by Wolverine if installed.
+        services.TryAddSingleton<IDataExchangeEventPublisher, NullDataExchangeEventPublisher>();
 
         // Channel-based async dispatch (default). Replaced by Wolverine if installed.
         services.TryAddSingleton(Channel.CreateUnbounded<ExecuteExportCommand>());

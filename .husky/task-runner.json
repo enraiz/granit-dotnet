@@ -1,0 +1,11 @@
+{
+   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+   "tasks": [
+      {
+         "name": "dotnet-format",
+         "command": "dotnet",
+         "args": ["format", "--no-restore", "--include", "${staged}"],
+         "include": ["**/*.cs"]
+      }
+   ]
+}

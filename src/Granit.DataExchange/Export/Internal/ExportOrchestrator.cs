@@ -23,6 +23,7 @@ internal sealed partial class ExportOrchestrator(
     IExportCommandDispatcher dispatcher,
     IImportFileProvider fileProvider,
     IClock clock,
+    IDataExchangeEventPublisher eventPublisher,
     ILogger<ExportOrchestrator> logger) : IExportOrchestrator
 {
     /// <inheritdoc/>
@@ -93,6 +94,10 @@ internal sealed partial class ExportOrchestrator(
             job.CompletedAt = clock.Now;
             await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
 
+            await eventPublisher.PublishAsync(new ExportJobCompletedEvent(
+                jobId, request.DefinitionName, ExportJobStatus.Completed,
+                job.CreatedBy, rowCount, ErrorMessage: null), ct).ConfigureAwait(false);
+
             LogExportCompleted(jobId, request.DefinitionName, rowCount);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -101,6 +106,10 @@ internal sealed partial class ExportOrchestrator(
             job.ErrorMessage = ex.Message;
             job.CompletedAt = clock.Now;
             await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+
+            await eventPublisher.PublishAsync(new ExportJobCompletedEvent(
+                jobId, job.DefinitionName, ExportJobStatus.Failed,
+                job.CreatedBy, RowCount: null, ex.Message), ct).ConfigureAwait(false);
 
             LogExportFailed(jobId, ex);
             throw;

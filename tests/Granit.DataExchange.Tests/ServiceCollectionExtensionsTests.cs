@@ -117,6 +117,18 @@ public sealed class ServiceCollectionExtensionsTests
         service.ShouldBeOfType<FakeSemanticMappingService>();
     }
 
+    [Fact]
+    public void AddGranitDataImport_registers_event_publisher()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataImport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IDataExchangeEventPublisher) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
     // ---- Export registration ----------------------------------------
 
     [Fact]
@@ -153,6 +165,18 @@ public sealed class ServiceCollectionExtensionsTests
         services.ShouldContain(d =>
             d.ServiceType == typeof(IExportPresetStore) &&
             d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitDataExport_registers_event_publisher()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataExport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IDataExchangeEventPublisher) &&
+            d.Lifetime == ServiceLifetime.Singleton);
     }
 
     [Fact]
