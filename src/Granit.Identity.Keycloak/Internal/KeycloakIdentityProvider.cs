@@ -98,6 +98,44 @@ internal sealed class KeycloakIdentityProvider(
     }
 
     /// <inheritdoc/>
+    public async Task UpdateUserAsync(
+        string userId,
+        IdentityUserUpdate update,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(update);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetUserEndpoint(userId);
+
+        // Keycloak PUT /admin/realms/{realm}/users/{id} expects the full UserRepresentation.
+        // We first GET the current representation, patch the requested fields, then PUT back.
+        KeycloakUserRepresentation? current = await client
+            .GetFromJsonAsync<KeycloakUserRepresentation>(endpoint, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (current is null)
+        {
+            throw new HttpRequestException($"User {userId} not found in Keycloak.");
+        }
+
+        KeycloakUserRepresentation updated = current with
+        {
+            Email = update.Email ?? current.Email,
+            FirstName = update.FirstName ?? current.FirstName,
+            LastName = update.LastName ?? current.LastName,
+        };
+
+        using HttpResponseMessage response = await client.PutAsJsonAsync(
+            endpoint, updated, cancellationToken).ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("User {UserId} profile updated in Keycloak", userId);
+    }
+
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(
         string userId,
         CancellationToken cancellationToken = default)
