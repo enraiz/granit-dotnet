@@ -170,6 +170,8 @@ See [`docs/guide/conventions/langues.md`](docs/guide/conventions/langues.md) for
 - `ReferenceDataEntity` translations: `LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`,
   `LabelEs`, `LabelIt`, `LabelPt` (7 properties — regional variants use
   `TwoLetterISOLanguageName` fallback: fr-CA → LabelFr, en-GB → LabelEn)
+- **Governance**: [`docs/framework/utilities/localization/gouvernance.md`](docs/framework/utilities/localization/gouvernance.md) (framework)
+  and [`docs/guide/gouvernance-traductions.md`](docs/guide/gouvernance-traductions.md) (application)
 
 ## Code conventions
 
