@@ -1,4 +1,4 @@
-using Granit.Authentication.Keycloak.BackChannelLogout;
+using Granit.Authentication.JwtBearer.BackChannelLogout;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

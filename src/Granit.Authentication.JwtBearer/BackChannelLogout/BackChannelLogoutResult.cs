@@ -1,7 +1,7 @@
-namespace Granit.Authentication.Keycloak.BackChannelLogout;
+namespace Granit.Authentication.JwtBearer.BackChannelLogout;
 
 /// <summary>
-/// Result of validating a Keycloak back-channel <c>logout_token</c>.
+/// Result of validating an OIDC back-channel <c>logout_token</c>.
 /// </summary>
 /// <param name="Success">Whether the token is valid.</param>
 /// <param name="SessionId">The <c>sid</c> claim (session-specific revocation). May be <c>null</c> if only <c>sub</c> is present.</param>

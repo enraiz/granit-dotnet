@@ -222,6 +222,312 @@ internal sealed class KeycloakIdentityProvider(
         }
     }
 
+    // ──── Feature 1: User role management ────
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        try
+        {
+            HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+            string endpoint = options.Value.GetUserRealmRoleMappingsEndpoint(userId);
+
+            List<KeycloakRoleRepresentation>? roles = await client
+                .GetFromJsonAsync<List<KeycloakRoleRepresentation>>(endpoint, cancellationToken)
+                .ConfigureAwait(false);
+
+            return roles?.ConvertAll(r => new IdentityRole(r.Id, r.Name, r.Description)) ?? [];
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            logger.LogWarning(ex, "Failed to get roles for user {UserId} from Keycloak. Returning empty list", userId);
+            return [];
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task AssignRoleAsync(
+        string userId,
+        string roleName,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(roleName);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+
+        KeycloakRoleRepresentation role = await GetRoleByNameAsync(client, roleName, cancellationToken).ConfigureAwait(false);
+
+        string endpoint = options.Value.GetUserRealmRoleMappingsEndpoint(userId);
+        using HttpResponseMessage response = await client
+            .PostAsJsonAsync(endpoint, new[] { role }, cancellationToken)
+            .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Role {RoleName} assigned to user {UserId} in Keycloak", roleName, userId);
+    }
+
+    /// <inheritdoc/>
+    public async Task RemoveRoleAsync(
+        string userId,
+        string roleName,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(roleName);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+
+        KeycloakRoleRepresentation role = await GetRoleByNameAsync(client, roleName, cancellationToken).ConfigureAwait(false);
+
+        string endpoint = options.Value.GetUserRealmRoleMappingsEndpoint(userId);
+
+        using HttpRequestMessage request = new(HttpMethod.Delete, endpoint)
+        {
+            Content = JsonContent.Create(new[] { role })
+        };
+
+        using HttpResponseMessage response = await client
+            .SendAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Role {RoleName} removed from user {UserId} in Keycloak", roleName, userId);
+    }
+
+    // ──── Feature 2: Session termination ────
+
+    /// <inheritdoc/>
+    public async Task TerminateSessionAsync(
+        string userId,
+        string sessionId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(sessionId);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetSessionEndpoint(sessionId);
+
+        using HttpResponseMessage response = await client
+            .DeleteAsync(endpoint, cancellationToken)
+            .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Session {SessionId} terminated for user {UserId} in Keycloak", sessionId, userId);
+    }
+
+    /// <inheritdoc/>
+    public async Task TerminateAllSessionsAsync(
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetUserLogoutEndpoint(userId);
+
+        using HttpResponseMessage response = await client
+            .PostAsync(endpoint, content: null, cancellationToken)
+            .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("All sessions terminated for user {UserId} in Keycloak", userId);
+    }
+
+    // ──── Feature 3: Password reset ────
+
+    /// <inheritdoc/>
+    public async Task SendPasswordResetEmailAsync(
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetExecuteActionsEmailEndpoint(userId);
+
+        using HttpResponseMessage response = await client
+            .PutAsJsonAsync(endpoint, new[] { "UPDATE_PASSWORD" }, cancellationToken)
+            .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Password reset email sent for user {UserId} via Keycloak", userId);
+    }
+
+    /// <inheritdoc/>
+    public async Task SetTemporaryPasswordAsync(
+        string userId,
+        string temporaryPassword,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(temporaryPassword);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetResetPasswordEndpoint(userId);
+
+        using HttpResponseMessage response = await client.PutAsJsonAsync(
+            endpoint,
+            new { type = "password", value = temporaryPassword, temporary = true },
+            cancellationToken).ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Temporary password set for user {UserId} in Keycloak", userId);
+    }
+
+    // ──── Feature 4: User creation ────
+
+    /// <inheritdoc/>
+    public async Task<IdentityUser> CreateUserAsync(
+        IdentityUserCreate user,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetUsersEndpoint();
+
+        var payload = new
+        {
+            username = user.Username,
+            email = user.Email,
+            firstName = user.FirstName,
+            lastName = user.LastName,
+            enabled = user.Enabled
+        };
+
+        using HttpResponseMessage createResponse = await client
+            .PostAsJsonAsync(endpoint, payload, cancellationToken)
+            .ConfigureAwait(false);
+
+        createResponse.EnsureSuccessStatusCode();
+
+        // Extract the created user ID from the Location header
+        string locationHeader = createResponse.Headers.Location?.AbsolutePath
+            ?? throw new InvalidOperationException("Keycloak did not return a Location header after user creation.");
+
+        string createdUserId = locationHeader[(locationHeader.LastIndexOf('/') + 1)..];
+
+        // Set temporary password if provided
+        if (!string.IsNullOrEmpty(user.TemporaryPassword))
+        {
+            await SetTemporaryPasswordAsync(createdUserId, user.TemporaryPassword, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        logger.LogInformation("User {Username} created with ID {UserId} in Keycloak", user.Username, createdUserId);
+
+        return new IdentityUser(
+            createdUserId,
+            user.Username,
+            user.Email,
+            user.FirstName,
+            user.LastName,
+            user.Enabled);
+    }
+
+    // ──── Feature 5: Group management ────
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+            string endpoint = options.Value.GetGroupsEndpoint();
+
+            List<KeycloakGroupRepresentation>? groups = await client
+                .GetFromJsonAsync<List<KeycloakGroupRepresentation>>(endpoint, cancellationToken)
+                .ConfigureAwait(false);
+
+            return groups?.ConvertAll(ToIdentityGroup) ?? [];
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            logger.LogWarning(ex, "Failed to get groups from Keycloak. Returning empty list");
+            return [];
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        try
+        {
+            HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+            string endpoint = options.Value.GetUserGroupsEndpoint(userId);
+
+            List<KeycloakGroupRepresentation>? groups = await client
+                .GetFromJsonAsync<List<KeycloakGroupRepresentation>>(endpoint, cancellationToken)
+                .ConfigureAwait(false);
+
+            return groups?.ConvertAll(ToIdentityGroup) ?? [];
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            logger.LogWarning(ex, "Failed to get groups for user {UserId} from Keycloak. Returning empty list", userId);
+            return [];
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task AddUserToGroupAsync(
+        string userId,
+        string groupId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(groupId);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetUserGroupMembershipEndpoint(userId, groupId);
+
+        using HttpResponseMessage response = await client
+            .PutAsync(endpoint, content: null, cancellationToken)
+            .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("User {UserId} added to group {GroupId} in Keycloak", userId, groupId);
+    }
+
+    /// <inheritdoc/>
+    public async Task RemoveUserFromGroupAsync(
+        string userId,
+        string groupId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(groupId);
+
+        HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
+        string endpoint = options.Value.GetUserGroupMembershipEndpoint(userId, groupId);
+
+        using HttpResponseMessage response = await client
+            .DeleteAsync(endpoint, cancellationToken)
+            .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("User {UserId} removed from group {GroupId} in Keycloak", userId, groupId);
+    }
+
     private async Task<IReadOnlyList<IdentityDeviceActivity>> GetDeviceActivityViaAccountApiAsync(
         string userId, CancellationToken cancellationToken)
     {
@@ -271,7 +577,28 @@ internal sealed class KeycloakIdentityProvider(
     }
 
     private static IdentityUser ToIdentityUser(KeycloakUserRepresentation user) =>
-        new(user.Id, user.Username, user.Email, user.FirstName, user.LastName, user.Enabled);
+        new(user.Id, user.Username, user.Email, user.FirstName, user.LastName, user.Enabled,
+            FlattenAttributes(user.Attributes));
+
+    private static Dictionary<string, string>? FlattenAttributes(
+        Dictionary<string, List<string>>? attributes)
+    {
+        if (attributes is not { Count: > 0 })
+        {
+            return null;
+        }
+
+        Dictionary<string, string> result = new(attributes.Count, StringComparer.Ordinal);
+        foreach (KeyValuePair<string, List<string>> kvp in attributes)
+        {
+            if (kvp.Value is [var first, ..])
+            {
+                result[kvp.Key] = first;
+            }
+        }
+
+        return result.Count > 0 ? result : null;
+    }
 
     private static IdentitySession ToIdentitySession(KeycloakSessionRepresentation session) =>
         new(
@@ -295,4 +622,22 @@ internal sealed class KeycloakIdentityProvider(
             Mobile: device.Mobile,
             Current: device.Current,
             Sessions: device.Sessions?.ConvertAll(ToIdentitySession) ?? []);
+
+    private async Task<KeycloakRoleRepresentation> GetRoleByNameAsync(
+        HttpClient client, string roleName, CancellationToken cancellationToken)
+    {
+        string endpoint = options.Value.GetRoleByNameEndpoint(roleName);
+
+        return await client
+            .GetFromJsonAsync<KeycloakRoleRepresentation>(endpoint, cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Role '{roleName}' not found in Keycloak.");
+    }
+
+    private static IdentityGroup ToIdentityGroup(KeycloakGroupRepresentation group) =>
+        new(
+            Id: group.Id,
+            Name: group.Name,
+            Path: group.Path,
+            SubGroups: group.SubGroups?.ConvertAll(ToIdentityGroup) ?? []);
 }

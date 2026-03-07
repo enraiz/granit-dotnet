@@ -633,5 +633,470 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             () => _provider.GetPasswordChangedAtAsync(null!, TestContext.Current.CancellationToken));
     }
 
+    // --- Attributes mapping tests ---
+
+    [Fact]
+    public async Task GetUserAsync_WithAttributes_MapsAttributes()
+    {
+        _handler.ResponseBody = """{"id":"user-1","username":"alice","email":"alice@test.com","firstName":"Alice","lastName":"Doe","enabled":true,"attributes":{"license":["MD-12345"],"department":["Cardiology"]}}""";
+
+        IdentityUser? result = await _provider.GetUserAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldNotBeNull();
+        result.Attributes.ShouldNotBeNull();
+        result.Attributes!.Count.ShouldBe(2);
+        result.Attributes["license"].ShouldBe("MD-12345");
+        result.Attributes["department"].ShouldBe("Cardiology");
+    }
+
+    [Fact]
+    public async Task GetUserAsync_WithMultiValueAttributes_TakesFirstValue()
+    {
+        _handler.ResponseBody = """{"id":"user-1","username":"alice","email":"alice@test.com","firstName":"Alice","lastName":"Doe","enabled":true,"attributes":{"roles":["admin","user"]}}""";
+
+        IdentityUser? result = await _provider.GetUserAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldNotBeNull();
+        result.Attributes.ShouldNotBeNull();
+        result.Attributes!["roles"].ShouldBe("admin");
+    }
+
+    [Fact]
+    public async Task GetUserAsync_WithoutAttributes_AttributesAreNull()
+    {
+        _handler.ResponseBody = """{"id":"user-1","username":"alice","email":"alice@test.com","firstName":"Alice","lastName":"Doe","enabled":true}""";
+
+        IdentityUser? result = await _provider.GetUserAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldNotBeNull();
+        result.Attributes.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetUserAsync_WithEmptyAttributes_AttributesAreNull()
+    {
+        _handler.ResponseBody = """{"id":"user-1","username":"alice","email":"alice@test.com","firstName":"Alice","lastName":"Doe","enabled":true,"attributes":{}}""";
+
+        IdentityUser? result = await _provider.GetUserAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldNotBeNull();
+        result.Attributes.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WithAttributes_MapsAttributesForAllUsers()
+    {
+        _handler.ResponseBody = """[{"id":"user-1","username":"alice","email":"alice@test.com","firstName":"Alice","lastName":"Doe","enabled":true,"attributes":{"dept":["IT"]}},{"id":"user-2","username":"bob","email":null,"firstName":null,"lastName":null,"enabled":true}]""";
+
+        IReadOnlyList<IdentityUser> result = await _provider.GetUsersAsync(
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(2);
+        result[0].Attributes.ShouldNotBeNull();
+        result[0].Attributes!["dept"].ShouldBe("IT");
+        result[1].Attributes.ShouldBeNull();
+    }
+
+    // --- Feature 1: GetUserRolesAsync tests ---
+
+    [Fact]
+    public async Task GetUserRolesAsync_WithRoles_ReturnsIdentityRoles()
+    {
+        _handler.ResponseBody = """[{"id":"role-1","name":"editor","description":"Content editor"},{"id":"role-2","name":"viewer","description":null}]""";
+
+        IReadOnlyList<IdentityRole> result = await _provider.GetUserRolesAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(2);
+        result[0].Id.ShouldBe("role-1");
+        result[0].Name.ShouldBe("editor");
+        result[1].Name.ShouldBe("viewer");
+    }
+
+    [Fact]
+    public async Task GetUserRolesAsync_CallsCorrectEndpoint()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUserRolesAsync("user-abc", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-abc/role-mappings/realm");
+    }
+
+    [Fact]
+    public async Task GetUserRolesAsync_KeycloakError_ReturnsEmptyList()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.ServiceUnavailable;
+        _handler.ResponseBody = string.Empty;
+
+        IReadOnlyList<IdentityRole> result = await _provider.GetUserRolesAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetUserRolesAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.GetUserRolesAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 1: AssignRoleAsync tests ---
+
+    [Fact]
+    public async Task AssignRoleAsync_SendsPostWithRoleRepresentation()
+    {
+        _handler.ResponseBody = """{"id":"role-1","name":"editor","description":"Content editor"}""";
+
+        await _provider.AssignRoleAsync("user-1", "editor", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(2);
+        _handler.Requests[0].Method.ShouldBe("GET");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/roles/editor");
+        _handler.Requests[1].Method.ShouldBe("POST");
+        _handler.Requests[1].Url.ShouldContain("/admin/realms/test-realm/users/user-1/role-mappings/realm");
+        _handler.Requests[1].Body.ShouldContain("\"id\":\"role-1\"");
+    }
+
+    [Fact]
+    public async Task AssignRoleAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.AssignRoleAsync(null!, "editor", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task AssignRoleAsync_NullRoleName_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.AssignRoleAsync("user-1", null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 1: RemoveRoleAsync tests ---
+
+    [Fact]
+    public async Task RemoveRoleAsync_SendsDeleteWithRoleRepresentation()
+    {
+        _handler.ResponseBody = """{"id":"role-1","name":"editor","description":"Content editor"}""";
+
+        await _provider.RemoveRoleAsync("user-1", "editor", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(2);
+        _handler.Requests[0].Method.ShouldBe("GET");
+        _handler.Requests[1].Method.ShouldBe("DELETE");
+        _handler.Requests[1].Url.ShouldContain("/admin/realms/test-realm/users/user-1/role-mappings/realm");
+        _handler.Requests[1].Body.ShouldContain("\"id\":\"role-1\"");
+    }
+
+    // --- Feature 2: TerminateSessionAsync tests ---
+
+    [Fact]
+    public async Task TerminateSessionAsync_SendsDeleteToCorrectEndpoint()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.TerminateSessionAsync("user-1", "sess-abc", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Method.ShouldBe("DELETE");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/sessions/sess-abc");
+    }
+
+    [Fact]
+    public async Task TerminateSessionAsync_KeycloakError_PropagatesException()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NotFound;
+        _handler.ResponseBody = string.Empty;
+
+        await Should.ThrowAsync<HttpRequestException>(
+            () => _provider.TerminateSessionAsync("user-1", "sess-abc", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task TerminateSessionAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.TerminateSessionAsync(null!, "sess-1", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task TerminateSessionAsync_NullSessionId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.TerminateSessionAsync("user-1", null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 2: TerminateAllSessionsAsync tests ---
+
+    [Fact]
+    public async Task TerminateAllSessionsAsync_SendsPostToLogoutEndpoint()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.TerminateAllSessionsAsync("user-1", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Method.ShouldBe("POST");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-1/logout");
+    }
+
+    [Fact]
+    public async Task TerminateAllSessionsAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.TerminateAllSessionsAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 3: SendPasswordResetEmailAsync tests ---
+
+    [Fact]
+    public async Task SendPasswordResetEmailAsync_SendsPutWithUpdatePasswordAction()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.SendPasswordResetEmailAsync("user-1", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Method.ShouldBe("PUT");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-1/execute-actions-email");
+        _handler.Requests[0].Body.ShouldContain("UPDATE_PASSWORD");
+    }
+
+    [Fact]
+    public async Task SendPasswordResetEmailAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.SendPasswordResetEmailAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 3: SetTemporaryPasswordAsync tests ---
+
+    [Fact]
+    public async Task SetTemporaryPasswordAsync_SendsPutWithTemporaryPassword()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.SetTemporaryPasswordAsync("user-1", "TempPass123!", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Method.ShouldBe("PUT");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-1/reset-password");
+        _handler.Requests[0].Body.ShouldContain("\"type\":\"password\"");
+        _handler.Requests[0].Body.ShouldContain("\"value\":\"TempPass123!\"");
+        _handler.Requests[0].Body.ShouldContain("\"temporary\":true");
+    }
+
+    [Fact]
+    public async Task SetTemporaryPasswordAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.SetTemporaryPasswordAsync(null!, "pass", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SetTemporaryPasswordAsync_NullPassword_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.SetTemporaryPasswordAsync("user-1", null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 4: CreateUserAsync tests ---
+
+    [Fact]
+    public async Task CreateUserAsync_SendsPostAndReturnsCreatedUser()
+    {
+        MockHttpMessageHandlerWithLocation locationHandler = new()
+        {
+            LocationPath = "/admin/realms/test-realm/users/new-user-id",
+        };
+
+        HttpClient locationClient = new(locationHandler) { BaseAddress = new Uri("https://keycloak.test/") };
+        IHttpClientFactory locationFactory = Substitute.For<IHttpClientFactory>();
+        locationFactory.CreateClient("KeycloakAdmin").Returns(locationClient);
+
+        KeycloakIdentityProvider provider = new(
+            _tokenService,
+            _tokenExchangeService,
+            locationFactory,
+            Options.Create(_options),
+            NullLogger<KeycloakIdentityProvider>.Instance);
+
+        IdentityUserCreate newUser = new("alice", "alice@test.com", "Alice", "Doe");
+
+        IdentityUser result = await provider.CreateUserAsync(newUser, TestContext.Current.CancellationToken);
+
+        result.Id.ShouldBe("new-user-id");
+        result.Username.ShouldBe("alice");
+        result.Email.ShouldBe("alice@test.com");
+        result.FirstName.ShouldBe("Alice");
+        result.LastName.ShouldBe("Doe");
+        result.Enabled.ShouldBeTrue();
+
+        locationHandler.Requests.Count.ShouldBe(1);
+        locationHandler.Requests[0].Method.ShouldBe("POST");
+        locationHandler.Requests[0].Body.ShouldContain("\"username\":\"alice\"");
+    }
+
+    [Fact]
+    public async Task CreateUserAsync_NullUser_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.CreateUserAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 5: GetGroupsAsync tests ---
+
+    [Fact]
+    public async Task GetGroupsAsync_WithGroups_ReturnsIdentityGroups()
+    {
+        _handler.ResponseBody = """[{"id":"grp-1","name":"Developers","path":"/Developers","subGroups":[]},{"id":"grp-2","name":"Admins","path":"/Admins","subGroups":[{"id":"grp-3","name":"Super Admins","path":"/Admins/Super Admins","subGroups":[]}]}]""";
+
+        IReadOnlyList<IdentityGroup> result = await _provider.GetGroupsAsync(
+            TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(2);
+        result[0].Id.ShouldBe("grp-1");
+        result[0].Name.ShouldBe("Developers");
+        result[0].Path.ShouldBe("/Developers");
+        result[0].SubGroups.ShouldBeEmpty();
+        result[1].SubGroups.Count.ShouldBe(1);
+        result[1].SubGroups[0].Name.ShouldBe("Super Admins");
+    }
+
+    [Fact]
+    public async Task GetGroupsAsync_CallsCorrectEndpoint()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetGroupsAsync(TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/groups");
+    }
+
+    [Fact]
+    public async Task GetGroupsAsync_KeycloakError_ReturnsEmptyList()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.ServiceUnavailable;
+        _handler.ResponseBody = string.Empty;
+
+        IReadOnlyList<IdentityGroup> result = await _provider.GetGroupsAsync(
+            TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    // --- Feature 5: GetUserGroupsAsync tests ---
+
+    [Fact]
+    public async Task GetUserGroupsAsync_WithGroups_ReturnsIdentityGroups()
+    {
+        _handler.ResponseBody = """[{"id":"grp-1","name":"Developers","path":"/Developers","subGroups":[]}]""";
+
+        IReadOnlyList<IdentityGroup> result = await _provider.GetUserGroupsAsync(
+            "user-1", TestContext.Current.CancellationToken);
+
+        result.Count.ShouldBe(1);
+        result[0].Name.ShouldBe("Developers");
+    }
+
+    [Fact]
+    public async Task GetUserGroupsAsync_CallsCorrectEndpoint()
+    {
+        _handler.ResponseBody = "[]";
+
+        await _provider.GetUserGroupsAsync("user-abc", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-abc/groups");
+    }
+
+    [Fact]
+    public async Task GetUserGroupsAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.GetUserGroupsAsync(null!, TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 5: AddUserToGroupAsync tests ---
+
+    [Fact]
+    public async Task AddUserToGroupAsync_SendsPutToCorrectEndpoint()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.AddUserToGroupAsync("user-1", "grp-1", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Method.ShouldBe("PUT");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-1/groups/grp-1");
+    }
+
+    [Fact]
+    public async Task AddUserToGroupAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.AddUserToGroupAsync(null!, "grp-1", TestContext.Current.CancellationToken));
+    }
+
+    // --- Feature 5: RemoveUserFromGroupAsync tests ---
+
+    [Fact]
+    public async Task RemoveUserFromGroupAsync_SendsDeleteToCorrectEndpoint()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.RemoveUserFromGroupAsync("user-1", "grp-1", TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        _handler.Requests[0].Method.ShouldBe("DELETE");
+        _handler.Requests[0].Url.ShouldContain("/admin/realms/test-realm/users/user-1/groups/grp-1");
+    }
+
+    [Fact]
+    public async Task RemoveUserFromGroupAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.RemoveUserFromGroupAsync(null!, "grp-1", TestContext.Current.CancellationToken));
+    }
+
     public void Dispose() => _httpClient.Dispose();
+}
+
+/// <summary>
+/// Mock handler that returns a Location header on 201 Created responses (for user creation tests).
+/// </summary>
+internal sealed class MockHttpMessageHandlerWithLocation : HttpMessageHandler
+{
+    public List<(string Method, string Url, string Body)> Requests { get; } = [];
+    public string LocationPath { get; set; } = string.Empty;
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        string body = request.Content is not null
+            ? await request.Content.ReadAsStringAsync(cancellationToken)
+            : string.Empty;
+
+        Requests.Add((request.Method.Method, request.RequestUri?.ToString() ?? "", body));
+
+        HttpResponseMessage response = new(HttpStatusCode.Created)
+        {
+            Content = new StringContent(string.Empty),
+        };
+        response.Headers.Location = new Uri($"https://keycloak.test{LocationPath}");
+        return response;
+    }
 }

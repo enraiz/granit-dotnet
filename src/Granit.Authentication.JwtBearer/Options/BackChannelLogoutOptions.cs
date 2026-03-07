@@ -1,8 +1,8 @@
-namespace Granit.Authentication.Keycloak.Options;
+namespace Granit.Authentication.JwtBearer.Options;
 
 /// <summary>
-/// Configuration options for Keycloak back-channel logout (OIDC Back-Channel Logout 1.0).
-/// Nested under <see cref="KeycloakOptions.BackChannelLogout"/>.
+/// Configuration options for OIDC back-channel logout (OIDC Back-Channel Logout 1.0).
+/// Nested under <see cref="JwtBearerAuthOptions.BackChannelLogout"/>.
 /// </summary>
 public sealed class BackChannelLogoutOptions
 {

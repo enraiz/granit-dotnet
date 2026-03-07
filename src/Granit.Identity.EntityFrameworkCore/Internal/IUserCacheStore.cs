@@ -34,6 +34,10 @@ internal interface IUserCacheStore
     /// <summary>Returns the number of stale entries (LastSyncedAt older than threshold).</summary>
     Task<int> GetStaleCountAsync(Guid? tenantId, DateTimeOffset threshold, CancellationToken cancellationToken = default);
 
+    /// <summary>Returns external user IDs of stale entries (LastSyncedAt older than threshold), batched.</summary>
+    Task<IReadOnlyList<string>> FindStaleExternalIdsAsync(
+        Guid? tenantId, DateTimeOffset threshold, int batchSize, CancellationToken cancellationToken = default);
+
     /// <summary>Returns the oldest and newest sync timestamps for a tenant.</summary>
     Task<(DateTimeOffset? Oldest, DateTimeOffset? Newest)> GetSyncRangeAsync(
         Guid? tenantId, CancellationToken cancellationToken = default);

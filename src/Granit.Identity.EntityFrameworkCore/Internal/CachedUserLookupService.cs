@@ -202,6 +202,33 @@ internal sealed partial class CachedUserLookupService(
         return synced;
     }
 
+    public async Task<int> RefreshStaleAsync(CancellationToken cancellationToken = default)
+    {
+        Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
+        DateTimeOffset threshold = timeProvider.GetUtcNow() - _options.StalenessThreshold;
+
+        IReadOnlyList<string> staleIds = await store.FindStaleExternalIdsAsync(
+            tenantId, threshold, _options.IncrementalSyncBatchSize, cancellationToken).ConfigureAwait(false);
+
+        int refreshed = 0;
+
+        foreach (string userId in staleIds)
+        {
+            IdentityUser? providerUser = await identityProvider.GetUserAsync(userId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (providerUser is not null)
+            {
+                UserCacheEntry cacheEntry = ToCacheEntry(providerUser);
+                await store.UpsertAsync(cacheEntry, cancellationToken).ConfigureAwait(false);
+                refreshed++;
+            }
+        }
+
+        LogRefreshStaleCompleted(refreshed, staleIds.Count);
+        return refreshed;
+    }
+
     // -- RGPD --
 
     public async Task DeleteByIdAsync(string userId, CancellationToken cancellationToken = default)
@@ -253,6 +280,9 @@ internal sealed partial class CachedUserLookupService(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "[AUDIT] Full user cache refresh completed: {Count} users synchronized")]
     private partial void LogRefreshAllCompleted(int count);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "[AUDIT] Incremental user cache refresh completed: {Refreshed}/{Total} stale entries refreshed")]
+    private partial void LogRefreshStaleCompleted(int refreshed, int total);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "[AUDIT] RGPD erasure: user cache entry deleted for user {UserId}")]
     private partial void LogRgpdDelete(string userId);

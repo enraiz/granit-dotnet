@@ -35,9 +35,4 @@ public sealed class KeycloakOptions
     /// </summary>
     public string RoleClaimsSource { get; set; } = "realm_access";
 
-    /// <summary>
-    /// Back-channel logout configuration. Opt-in — disabled by default.
-    /// When enabled, Keycloak can revoke sessions server-to-server.
-    /// </summary>
-    public BackChannelLogoutOptions BackChannelLogout { get; set; } = new();
 }

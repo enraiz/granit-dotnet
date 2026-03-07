@@ -69,6 +69,14 @@ public interface IUserLookupService
     /// <returns>The number of users synchronized.</returns>
     Task<int> RefreshAllAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Refreshes only stale cache entries (those older than the staleness threshold).
+    /// More efficient than <see cref="RefreshAllAsync"/> for large user bases.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The number of users refreshed.</returns>
+    Task<int> RefreshStaleAsync(CancellationToken cancellationToken = default);
+
     // -- RGPD --
 
     /// <summary>

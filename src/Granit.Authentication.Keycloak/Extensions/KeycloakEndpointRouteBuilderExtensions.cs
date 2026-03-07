@@ -1,10 +1,5 @@
-using Granit.Authentication.Keycloak.BackChannelLogout;
-using Granit.Authentication.Keycloak.Options;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+using Granit.Authentication.JwtBearer.Extensions;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Granit.Authentication.Keycloak.Extensions;
 
@@ -14,27 +9,11 @@ namespace Granit.Authentication.Keycloak.Extensions;
 public static class KeycloakEndpointRouteBuilderExtensions
 {
     /// <summary>
-    /// Maps the Keycloak back-channel logout endpoint when
-    /// <see cref="BackChannelLogoutOptions.Enabled"/> is <c>true</c>.
-    /// The endpoint accepts anonymous POST requests (Keycloak calls it server-to-server).
+    /// Maps the OIDC back-channel logout endpoint when back-channel logout is enabled.
+    /// Delegates to <see cref="JwtBearerEndpointRouteBuilderExtensions.MapBackChannelLogout"/>.
     /// </summary>
     /// <param name="endpoints">The endpoint route builder.</param>
     /// <returns>The <paramref name="endpoints"/> for chaining.</returns>
-    public static IEndpointRouteBuilder MapKeycloakBackChannelLogout(this IEndpointRouteBuilder endpoints)
-    {
-        KeycloakOptions options = endpoints.ServiceProvider
-            .GetRequiredService<IOptions<KeycloakOptions>>().Value;
-
-        if (!options.BackChannelLogout.Enabled)
-        {
-            return endpoints;
-        }
-
-        endpoints
-            .MapPost(options.BackChannelLogout.EndpointPath, BackChannelLogoutEndpoint.HandleAsync)
-            .AllowAnonymous()
-            .ExcludeFromDescription();
-
-        return endpoints;
-    }
+    public static IEndpointRouteBuilder MapKeycloakBackChannelLogout(this IEndpointRouteBuilder endpoints) =>
+        endpoints.MapBackChannelLogout();
 }

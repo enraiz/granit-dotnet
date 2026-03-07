@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
-namespace Granit.Authentication.Keycloak.BackChannelLogout;
+namespace Granit.Authentication.JwtBearer.BackChannelLogout;
 
 /// <summary>
 /// <see cref="IRevokedSessionStore"/> backed by <see cref="IDistributedCache"/>.

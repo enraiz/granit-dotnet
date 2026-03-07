@@ -12,4 +12,5 @@ internal sealed record KeycloakUserRepresentation(
     [property: JsonPropertyName("email")] string? Email,
     [property: JsonPropertyName("firstName")] string? FirstName,
     [property: JsonPropertyName("lastName")] string? LastName,
-    [property: JsonPropertyName("enabled")] bool Enabled);
+    [property: JsonPropertyName("enabled")] bool Enabled,
+    [property: JsonPropertyName("attributes")] Dictionary<string, List<string>>? Attributes = null);

@@ -1,8 +1,9 @@
 # Granit.Identity.Keycloak
 
 Keycloak Admin REST API implementation of `IIdentityProvider` for Granit. Supports
-users, roles, sessions, device activity (via OAuth 2.0 token exchange + Account API),
-password change date and enable/disable operations.
+user CRUD, role management (assign/remove realm roles), session termination, group
+membership, password reset, device activity (via OAuth 2.0 token exchange + Account API),
+and custom user attributes.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

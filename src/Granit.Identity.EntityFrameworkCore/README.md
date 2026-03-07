@@ -1,8 +1,8 @@
 # Granit.Identity.EntityFrameworkCore
 
 EF Core persistence for Granit.Identity user cache. Provides `UserCacheEntry` entity, `IUserCacheDbContext`,
-`CachedUserLookupService` with cache-aside strategy, login-time sync middleware, and Wolverine event handlers
-for real-time identity provider sync.
+`CachedUserLookupService` with cache-aside strategy (including incremental stale refresh), login-time sync
+middleware, and Wolverine event handlers for real-time identity provider sync.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

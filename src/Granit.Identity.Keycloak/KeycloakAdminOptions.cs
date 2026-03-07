@@ -13,7 +13,7 @@ namespace Granit.Identity.Keycloak;
 /// <para>
 /// Additional roles depending on features used:
 /// <list type="bullet">
-///   <item><description><c>realm-management:manage-users</c> — required for <c>SetUserEnabledAsync</c>.</description></item>
+///   <item><description><c>realm-management:manage-users</c> — required for write operations (enable/disable, roles, sessions, password, creation, groups).</description></item>
 ///   <item><description><c>realm-management:impersonation</c> + feature <c>admin-fine-grained-authz</c> — required when <see cref="UseTokenExchangeForDeviceActivity"/> is <c>true</c>.</description></item>
 /// </list>
 /// </para>
@@ -137,4 +137,68 @@ public sealed class KeycloakAdminOptions
     /// </summary>
     internal string GetAccountSessionsDevicesEndpoint() =>
         $"{BaseUrl.TrimEnd('/')}/realms/{Realm}/account/sessions/devices";
+
+    // ──── Feature 1: User role management ────
+
+    /// <summary>
+    /// Builds the Admin API URL for listing/managing realm-level role mappings for a user.
+    /// Used for GET (list), POST (assign), DELETE (remove) operations.
+    /// </summary>
+    internal string GetUserRealmRoleMappingsEndpoint(string userId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users/{Uri.EscapeDataString(userId)}/role-mappings/realm";
+
+    /// <summary>
+    /// Builds the Admin API URL for getting a single role by name.
+    /// </summary>
+    internal string GetRoleByNameEndpoint(string roleName) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/roles/{Uri.EscapeDataString(roleName)}";
+
+    // ──── Feature 2: Session termination ────
+
+    /// <summary>
+    /// Builds the Admin API URL for deleting a specific session.
+    /// </summary>
+    internal string GetSessionEndpoint(string sessionId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/sessions/{Uri.EscapeDataString(sessionId)}";
+
+    /// <summary>
+    /// Builds the Admin API URL for logging out all sessions of a user.
+    /// </summary>
+    internal string GetUserLogoutEndpoint(string userId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users/{Uri.EscapeDataString(userId)}/logout";
+
+    // ──── Feature 3: Password reset ────
+
+    /// <summary>
+    /// Builds the Admin API URL for sending required action emails to a user (e.g. UPDATE_PASSWORD).
+    /// </summary>
+    internal string GetExecuteActionsEmailEndpoint(string userId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users/{Uri.EscapeDataString(userId)}/execute-actions-email";
+
+    /// <summary>
+    /// Builds the Admin API URL for resetting a user's password.
+    /// </summary>
+    internal string GetResetPasswordEndpoint(string userId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users/{Uri.EscapeDataString(userId)}/reset-password";
+
+    // ──── Feature 5: Group management ────
+
+    /// <summary>
+    /// Builds the Admin API URL for listing all groups.
+    /// </summary>
+    internal string GetGroupsEndpoint() =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/groups";
+
+    /// <summary>
+    /// Builds the Admin API URL for listing groups of a user.
+    /// </summary>
+    internal string GetUserGroupsEndpoint(string userId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users/{Uri.EscapeDataString(userId)}/groups";
+
+    /// <summary>
+    /// Builds the Admin API URL for managing a user's membership in a specific group.
+    /// Used for PUT (add) and DELETE (remove) operations.
+    /// </summary>
+    internal string GetUserGroupMembershipEndpoint(string userId, string groupId) =>
+        $"{BaseUrl.TrimEnd('/')}/admin/realms/{Realm}/users/{Uri.EscapeDataString(userId)}/groups/{Uri.EscapeDataString(groupId)}";
 }

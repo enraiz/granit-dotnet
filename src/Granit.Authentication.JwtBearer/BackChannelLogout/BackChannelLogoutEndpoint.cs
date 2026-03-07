@@ -1,25 +1,25 @@
-using Granit.Authentication.Keycloak.Options;
+using Granit.Authentication.JwtBearer.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Granit.Authentication.Keycloak.BackChannelLogout;
+namespace Granit.Authentication.JwtBearer.BackChannelLogout;
 
 /// <summary>
-/// Minimal API handler for the Keycloak back-channel logout endpoint.
+/// Minimal API handler for the OIDC back-channel logout endpoint.
 /// Receives a <c>logout_token</c> via <c>application/x-www-form-urlencoded</c> POST
 /// and revokes the session in the distributed cache.
 /// </summary>
 internal static partial class BackChannelLogoutEndpoint
 {
     /// <summary>
-    /// Handles the back-channel logout POST request from Keycloak.
+    /// Handles the back-channel logout POST request from the identity provider.
     /// </summary>
     public static async Task<IResult> HandleAsync(
         HttpRequest request,
         BackChannelLogoutTokenValidator validator,
         IRevokedSessionStore store,
-        IOptions<KeycloakOptions> options,
+        IOptions<JwtBearerAuthOptions> options,
         ILogger<BackChannelLogoutTokenValidator> logger,
         CancellationToken cancellationToken)
     {

@@ -1,6 +1,8 @@
 # Granit.Authentication.JwtBearer
 
-Generic JWT Bearer authentication (OIDC) for Granit applications. Provides ICurrentUserService, JwtBearerAuthOptions, and the Authenticated policy.
+Generic JWT Bearer authentication (OIDC) for Granit applications. Provides `ICurrentUserService`,
+`JwtBearerAuthOptions`, the `Authenticated` policy, and provider-agnostic OIDC Back-Channel Logout
+support (`IRevokedSessionStore`, `BackChannelLogoutTokenValidator`, `MapBackChannelLogout`).
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 
