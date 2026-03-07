@@ -1,6 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-
 using Granit.Localization.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Localization.EntityFrameworkCore;
 
