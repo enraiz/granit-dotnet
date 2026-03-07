@@ -1,5 +1,11 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-dotnet husky run
+# dotnet format on staged .cs files only
+STAGED_CS=$(git diff --cached --name-only --diff-filter=ACMR -- '*.cs')
+if [ -n "$STAGED_CS" ]; then
+    dotnet format --no-restore --include $STAGED_CS
+    echo "$STAGED_CS" | xargs -r git add
+fi
+
 gitleaks git --pre-commit --staged --no-banner
