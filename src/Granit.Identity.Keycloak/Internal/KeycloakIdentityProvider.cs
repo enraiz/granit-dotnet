@@ -672,6 +672,51 @@ internal sealed class KeycloakIdentityProvider(
             ?? throw new InvalidOperationException($"Role '{roleName}' not found in Keycloak.");
     }
 
+    // ──── Credential verification ────
+
+    /// <inheritdoc/>
+    public async Task<bool> VerifyUserCredentialsAsync(
+        string username,
+        string password,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(username);
+        ArgumentNullException.ThrowIfNull(password);
+
+        KeycloakAdminOptions opts = options.Value;
+
+        if (string.IsNullOrEmpty(opts.DirectAccessClientId))
+        {
+            throw new InvalidOperationException(
+                $"{nameof(KeycloakAdminOptions)}.{nameof(KeycloakAdminOptions.DirectAccessClientId)} " +
+                "must be configured to use credential verification.");
+        }
+
+        HttpClient client = httpClientFactory.CreateClient("KeycloakAdmin");
+
+        using FormUrlEncodedContent content = new(
+        [
+            new KeyValuePair<string, string>("grant_type", "password"),
+            new KeyValuePair<string, string>("client_id", opts.DirectAccessClientId),
+            new KeyValuePair<string, string>("username", username),
+            new KeyValuePair<string, string>("password", password),
+        ]);
+
+        using HttpResponseMessage response = await client
+            .PostAsync(opts.GetTokenEndpoint(), content, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode)
+        {
+            logger.LogDebug("Credential verification succeeded for user {Username}", username);
+            return true;
+        }
+
+        logger.LogDebug("Credential verification failed for user {Username} (HTTP {StatusCode})",
+            username, (int)response.StatusCode);
+        return false;
+    }
+
     private static IdentityGroup ToIdentityGroup(KeycloakGroupRepresentation group) =>
         new(
             Id: group.Id,

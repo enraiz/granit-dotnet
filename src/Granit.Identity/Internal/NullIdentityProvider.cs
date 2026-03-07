@@ -115,4 +115,9 @@ internal sealed class NullIdentityProvider : IIdentityProvider
     public Task RemoveUserFromGroupAsync(
         string userId, string groupId, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
+
+    /// <inheritdoc/>
+    public Task<bool> VerifyUserCredentialsAsync(
+        string username, string password, CancellationToken cancellationToken = default) =>
+        Task.FromResult(false);
 }

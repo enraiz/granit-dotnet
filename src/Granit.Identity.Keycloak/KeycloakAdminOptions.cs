@@ -68,6 +68,18 @@ public sealed class KeycloakAdminOptions
     public bool UseTokenExchangeForDeviceActivity { get; set; }
 
     /// <summary>
+    /// Public Keycloak client ID with <c>Direct Access Grants</c> enabled,
+    /// used to verify user credentials via the Resource Owner Password Grant.
+    /// Required for <see cref="IIdentityProvider.VerifyUserCredentialsAsync"/>.
+    /// </summary>
+    /// <remarks>
+    /// This is typically a public client (e.g. <c>guava-frontend</c>) — not the confidential
+    /// service account client. It must have the <c>Direct Access Grants Enabled</c> flag turned on
+    /// in Keycloak.
+    /// </remarks>
+    public string? DirectAccessClientId { get; set; }
+
+    /// <summary>
     /// Builds the token endpoint URL for the <c>client_credentials</c> flow.
     /// </summary>
     internal string GetTokenEndpoint() =>
