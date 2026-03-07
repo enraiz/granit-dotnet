@@ -7,9 +7,16 @@ namespace Granit.Identity;
 /// (Keycloak, LDAP, Entra ID, etc.).
 /// </summary>
 /// <remarks>
+/// <para>
 /// A <c>NullIdentityProvider</c> is registered by default (returns empty lists / no-ops).
 /// Install a provider package (e.g. <c>Granit.Identity.Keycloak</c>) to connect
 /// to a real identity system.
+/// </para>
+/// <para>
+/// Write operations (<see cref="SetUserEnabledAsync"/>, <see cref="UpdateUserAsync"/>)
+/// propagate exceptions on failure. For Keycloak, the service account must hold the
+/// <c>realm-management:manage-users</c> role to perform write operations.
+/// </para>
 /// </remarks>
 public interface IIdentityProvider
 {
@@ -85,6 +92,19 @@ public interface IIdentityProvider
     /// </returns>
     Task<DateTimeOffset?> GetPasswordChangedAtAsync(
         string userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates a user's profile in the identity provider.
+    /// Only non-null fields in <paramref name="update"/> are applied.
+    /// </summary>
+    /// <param name="userId">The user ID in the identity provider.</param>
+    /// <param name="update">The fields to update.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="HttpRequestException">Thrown if the identity provider returns an error.</exception>
+    Task UpdateUserAsync(
+        string userId,
+        IdentityUserUpdate update,
         CancellationToken cancellationToken = default);
 
     /// <summary>

@@ -41,6 +41,11 @@ internal sealed class NullIdentityProvider : IIdentityProvider
         Task.FromResult<DateTimeOffset?>(null);
 
     /// <inheritdoc/>
+    public Task UpdateUserAsync(
+        string userId, IdentityUserUpdate update, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    /// <inheritdoc/>
     public Task<IReadOnlyList<IdentityRole>> GetRolesAsync(
         CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<IdentityRole>>([]);

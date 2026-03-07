@@ -32,6 +32,10 @@ internal sealed class FakeIdentityProvider : IIdentityProvider
         string userId, CancellationToken cancellationToken = default) =>
         Task.FromResult<DateTimeOffset?>(null);
 
+    public Task UpdateUserAsync(
+        string userId, IdentityUserUpdate update, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
     public Task<IReadOnlyList<IdentityRole>> GetRolesAsync(
         CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<IdentityRole>>([]);

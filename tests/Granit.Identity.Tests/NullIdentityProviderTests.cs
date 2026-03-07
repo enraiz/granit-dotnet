@@ -121,6 +121,16 @@ public sealed class NullIdentityProviderTests
     }
 
     [Fact]
+    public async Task UpdateUserAsync_CompletesWithoutError()
+    {
+        await Should.NotThrowAsync(async () =>
+        {
+            IdentityUserUpdate update = new("new@test.com", "Alice", "Doe");
+            await _provider.UpdateUserAsync("user-1", update, TestContext.Current.CancellationToken);
+        });
+    }
+
+    [Fact]
     public void ImplementsIIdentityProvider() =>
         _provider.ShouldBeAssignableTo<IIdentityProvider>();
 }

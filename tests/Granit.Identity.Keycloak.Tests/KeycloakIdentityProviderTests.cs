@@ -1072,6 +1072,69 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             () => _provider.RemoveUserFromGroupAsync(null!, "grp-1", TestContext.Current.CancellationToken));
     }
 
+    // --- UpdateUserAsync tests ---
+
+    [Fact]
+    public async Task UpdateUserAsync_PatchesAndPutsUser()
+    {
+        // First request = GET current user, second request = PUT updated user.
+        MockSequenceHttpMessageHandler seqHandler = new(
+        [
+            """{"access_token":"fake-token","expires_in":300}""",
+            """{"id":"user-1","username":"alice","email":"alice@test.com","firstName":"Alice","lastName":"Doe","enabled":true}""",
+            "", // PUT response body (empty, 204-like)
+        ]);
+        HttpClient seqClient = new(seqHandler) { BaseAddress = new Uri("https://keycloak.test/") };
+        IHttpClientFactory seqFactory = Substitute.For<IHttpClientFactory>();
+        seqFactory.CreateClient("KeycloakAdmin").Returns(seqClient);
+
+        KeycloakAdminTokenService tokenSvc = new(
+            seqFactory,
+            Options.Create(_options),
+            NullLogger<KeycloakAdminTokenService>.Instance);
+
+        KeycloakIdentityProvider provider = new(
+            tokenSvc,
+            _tokenExchangeService,
+            seqFactory,
+            Options.Create(_options),
+            NullLogger<KeycloakIdentityProvider>.Instance);
+
+        IdentityUserUpdate update = new(Email: "newalice@test.com", FirstName: "Alicia");
+
+        await provider.UpdateUserAsync("user-1", update, TestContext.Current.CancellationToken);
+
+        // No exception = success. The sequence handler consumed all responses.
+    }
+
+    [Fact]
+    public async Task UpdateUserAsync_NullUserId_ThrowsArgumentNullException()
+    {
+        IdentityUserUpdate update = new("a@b.com");
+
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.UpdateUserAsync(null!, update, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task UpdateUserAsync_NullUpdate_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(
+            () => _provider.UpdateUserAsync("user-1", null!, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task UpdateUserAsync_KeycloakError_PropagatesException()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.Forbidden;
+        _handler.ResponseBody = string.Empty;
+
+        IdentityUserUpdate update = new("a@b.com");
+
+        await Should.ThrowAsync<HttpRequestException>(
+            () => _provider.UpdateUserAsync("user-1", update, TestContext.Current.CancellationToken));
+    }
+
     public void Dispose() => _httpClient.Dispose();
 }
 
