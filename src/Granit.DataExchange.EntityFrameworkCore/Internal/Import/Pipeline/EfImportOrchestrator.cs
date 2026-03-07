@@ -4,6 +4,7 @@ using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Execution;
 using Granit.DataExchange.Import.Identity;
 using Granit.DataExchange.Import.Mapping;
+using Granit.DataExchange.Import.Messages;
 using Granit.DataExchange.Import.Parsing;
 using Granit.DataExchange.Import.Pipeline;
 using Granit.DataExchange.Import.Reporting;
@@ -23,6 +24,7 @@ internal sealed class EfImportOrchestrator(
     IImportFileProvider fileProvider,
     IServiceProvider serviceProvider,
     IClock clock,
+    IDataExchangeEventPublisher eventPublisher,
     IOptions<ImportOptions> options) : IImportOrchestrator
 {
     /// <inheritdoc/>
@@ -51,6 +53,11 @@ internal sealed class EfImportOrchestrator(
             job.ModifiedAt = clock.Now;
             await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
 
+            await eventPublisher.PublishAsync(new ImportJobCompletedEvent(
+                importJobId, job.DefinitionName, report.FinalStatus, job.CreatedBy,
+                report.TotalRows, report.SucceededRows, report.FailedRows,
+                report.InsertedRows, report.UpdatedRows, report.SkippedRows), ct).ConfigureAwait(false);
+
             return report;
         }
         catch (Exception ex)
@@ -77,6 +84,11 @@ internal sealed class EfImportOrchestrator(
             job.ReportJson = JsonSerializer.Serialize(errorReport);
             job.ModifiedAt = clock.Now;
             await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+
+            await eventPublisher.PublishAsync(new ImportJobCompletedEvent(
+                importJobId, job.DefinitionName, ImportJobStatus.Failed, job.CreatedBy,
+                errorReport.TotalRows, errorReport.SucceededRows, errorReport.FailedRows,
+                errorReport.InsertedRows, errorReport.UpdatedRows, errorReport.SkippedRows), ct).ConfigureAwait(false);
 
             return errorReport;
         }

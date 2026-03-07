@@ -23,6 +23,7 @@ public sealed class ExportOrchestratorTests
     private readonly IExportCommandDispatcher _dispatcher = Substitute.For<IExportCommandDispatcher>();
     private readonly IImportFileProvider _fileProvider = Substitute.For<IImportFileProvider>();
     private readonly IClock _clock = Substitute.For<IClock>();
+    private readonly IDataExchangeEventPublisher _eventPublisher = Substitute.For<IDataExchangeEventPublisher>();
     private readonly DateTimeOffset _now = new(2026, 3, 3, 10, 0, 0, TimeSpan.Zero);
 
     public ExportOrchestratorTests()
@@ -438,6 +439,68 @@ public sealed class ExportOrchestratorTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_completed_publishes_ExportJobCompletedEvent()
+    {
+        // Arrange
+        ExportOrchestrator sut = CreateOrchestrator();
+        var jobId = Guid.NewGuid();
+        ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
+        job.CreatedBy = "user-42";
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        // Act
+        await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
+
+        // Assert
+        await _eventPublisher.Received(1).PublishAsync(
+            Arg.Is<ExportJobCompletedEvent>(e =>
+                e.ExportJobId == jobId &&
+                e.DefinitionName == "Test.Export" &&
+                e.Status == ExportJobStatus.Completed &&
+                e.UserId == "user-42" &&
+                e.RowCount == 2 &&
+                e.ErrorMessage == null),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_failed_publishes_ExportJobCompletedEvent_with_error()
+    {
+        // Arrange
+        var jobId = Guid.NewGuid();
+        ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
+        job.CreatedBy = "user-99";
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        IExportWriter failingWriter = Substitute.For<IExportWriter>();
+        failingWriter.CanWrite("csv").Returns(true);
+        failingWriter.FileExtension.Returns(".csv");
+        failingWriter.MimeType.Returns("text/csv");
+        failingWriter.WriteAsync(
+            Arg.Any<Stream>(),
+            Arg.Any<IReadOnlyList<ExportFieldDescriptor>>(),
+            Arg.Any<IAsyncEnumerable<IReadOnlyDictionary<string, object?>>>(),
+            Arg.Any<CancellationToken>())
+            .Returns<Task>(_ => throw new IOException("Disk full"));
+
+        ExportOrchestrator sut = CreateOrchestrator(failingWriter);
+        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+
+        // Act & Assert
+        await Should.ThrowAsync<IOException>(
+            () => sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken));
+
+        await _eventPublisher.Received(1).PublishAsync(
+            Arg.Is<ExportJobCompletedEvent>(e =>
+                e.ExportJobId == jobId &&
+                e.Status == ExportJobStatus.Failed &&
+                e.UserId == "user-99" &&
+                e.RowCount == null &&
+                e.ErrorMessage == "Disk full"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task ExecuteAsync_OperationCanceledException_propagates_without_catch()
     {
         // Arrange — OperationCanceledException should NOT be caught by the error handler
@@ -505,6 +568,7 @@ public sealed class ExportOrchestratorTests
             _dispatcher,
             _fileProvider,
             _clock,
+            _eventPublisher,
             NullLogger<ExportOrchestrator>.Instance);
 
         // Act
@@ -610,6 +674,7 @@ public sealed class ExportOrchestratorTests
             _dispatcher,
             _fileProvider,
             _clock,
+            _eventPublisher,
             NullLogger<ExportOrchestrator>.Instance);
     }
 
@@ -633,6 +698,7 @@ public sealed class ExportOrchestratorTests
             _dispatcher,
             _fileProvider,
             _clock,
+            _eventPublisher,
             NullLogger<ExportOrchestrator>.Instance);
     }
 

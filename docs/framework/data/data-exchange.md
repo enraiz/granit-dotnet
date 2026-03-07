@@ -10,17 +10,22 @@ framework Granit. Il fournit :
   fluente, presets sauvegardables, intégration `QueryDefinition` pour le
   filtrage/tri, et support de background jobs.
 
-```text
-Granit.Core + Granit.Timing + Granit.Validation + Granit.Querying
-                    │
-            Granit.DataExchange           ← socle (interfaces + pipelines)
-            ┌───────┼────────┐
-            │       │        │
-     .Csv (Sep)  .Excel   .EntityFrameworkCore
-                (Sylvan)    (EF executor + stores)
-                                  │
-                           .Endpoints
-                          (REST API, Wolverine)
+```mermaid
+graph TD
+    Core["Granit.Core + Timing + Validation + Querying"]
+    DX["Granit.DataExchange<br/><i>socle (interfaces + pipelines)</i>"]
+    CSV[".Csv<br/>(Sep, SIMD)"]
+    Excel[".Excel<br/>(Sylvan)"]
+    EF[".EntityFrameworkCore<br/>(EF executor + stores)"]
+    W[".Wolverine<br/>(Outbox events + dispatch)"]
+    EP[".Endpoints<br/>(REST API)"]
+
+    Core --> DX
+    DX --> CSV
+    DX --> Excel
+    DX --> EF
+    DX --> W
+    EF --> EP
 ```
 
 > **Packages de parsing** : `Granit.DataExchange.Csv` utilise
@@ -82,35 +87,30 @@ services.AddSingleton<IExportWriter, ClosedXmlExportWriter>();
 
 Le pipeline complet est exécuté en arrière-plan (Wolverine) :
 
-```text
-Upload (fichier) → Preview (headers + suggestions) → Confirm mappings → Execute
+```mermaid
+flowchart LR
+    A[Upload fichier] --> B[Preview<br/>headers + suggestions]
+    B --> C[Confirm mappings]
+    C --> D[Execute]
 ```
 
 ### Étapes d'exécution
 
-```text
-IFileParser.ParseAsync()
-  → IAsyncEnumerable<RawImportRow>        1 ligne à la fois (streaming)
-          │
-          ▼  (optionnel, si GroupBy déclaré)
-IRowGrouper.GroupAsync()
-  → IAsyncEnumerable<GroupedRows>         1 groupe = 1 entité agrégée
-          │
-          ▼
-IDataMapper<TEntity>.MapAsync()
-  → MappingResult<TEntity>                conversion string → CLR
-          │
-          ▼  (si conversion OK)
-IRowValidator<TEntity>.ValidateAsync()
-  → RowValidationResult                   FluentValidation
-          │
-          ▼  (si valide)
-IRecordIdentityResolver<TEntity>.ResolveAsync()
-  → RecordIdentity (Insert | Update)      roundtrip
-          │
-          ▼  (par batch, 500 par défaut)
-IImportExecutor<TEntity>.ExecuteAsync()
-  → ImportReport                          stats + erreurs uniquement
+```mermaid
+flowchart TD
+    A["IFileParser.ParseAsync()<br/>→ IAsyncEnumerable&lt;RawImportRow&gt;"]
+    B["IRowGrouper.GroupAsync()<br/>→ IAsyncEnumerable&lt;GroupedRows&gt;"]
+    C["IDataMapper&lt;T&gt;.MapAsync()<br/>→ MappingResult&lt;T&gt;"]
+    D["IRowValidator&lt;T&gt;.ValidateAsync()<br/>→ RowValidationResult"]
+    E["IRecordIdentityResolver&lt;T&gt;.ResolveAsync()<br/>→ RecordIdentity (Insert | Update)"]
+    F["IImportExecutor&lt;T&gt;.ExecuteAsync()<br/>→ ImportReport"]
+
+    A -->|"streaming 1 ligne"| B
+    B -->|"optionnel, si GroupBy"| C
+    A -->|"si pas de GroupBy"| C
+    C -->|"si conversion OK"| D
+    D -->|"si valide"| E
+    E -->|"par batch (500)"| F
 ```
 
 Tout le pipeline est en streaming via `IAsyncEnumerable`. Seul le batch courant
@@ -448,8 +448,8 @@ L'executor persiste les entités validées en batch :
 
 ## Endpoints REST (`Granit.DataExchange.Endpoints`)
 
-Minimal API protégée par la permission `DataExchange.Imports.Execute`. 9 endpoints répartis
-en 3 groupes : upload, exécution et rapport.
+Minimal API protégée par la permission `DataExchange.Imports.Execute`. 10 endpoints répartis
+en 4 groupes : listing, upload, exécution et rapport.
 
 ### Installation
 
@@ -476,6 +476,12 @@ app.MapDataExchangeEndpoints(opts =>
 ```
 
 ### Routes
+
+#### Listing (admin)
+
+| Méthode | Route | Retour | Description |
+| --- | --- | --- | --- |
+| `GET` | `/jobs` | 200 OK | Liste paginée des import jobs (filtre par `status`, `page`, `pageSize`) |
 
 #### Upload et mapping (Story #496)
 
@@ -537,24 +543,31 @@ Le pipeline d'export génère des fichiers CSV ou Excel à partir d'une
 `ExportDefinition<TEntity>`. Il s'intègre avec `Granit.Querying` pour
 réutiliser le même filtrage/tri que la grille.
 
-```text
-ExportRequest (front-end)
-       │
-       ▼
-IExportOrchestrator.ExportAsync()
-       │  1. Résout ExportDefinition<T> par nom
-       │  2. Crée un ExportJob (Queued)
-       │  3. Dispatch ExecuteExportCommand
-       ▼
-IExportOrchestrator.ExecuteAsync()
-       │  1. Résout IExportDataSource<T> → IQueryable<T>
-       │  2. Si QueryDefinitionName → IQueryEngine<T>.ExecuteStreamAsync()
-       │     (applique Filter, Sort, Presets, Search — pas de pagination)
-       │  3. Sinon → itère le IQueryable directement
-       │  4. Projette chaque entité en dictionnaire (champs sélectionnés)
-       │  5. IExportWriter.WriteAsync() → Stream → Blob
-       ▼
-ExportJob (Completed) + fichier téléchargeable
+```mermaid
+sequenceDiagram
+    participant FE as Front-end
+    participant O as ExportOrchestrator
+    participant D as IExportCommandDispatcher
+    participant DS as IExportDataSource
+    participant QE as IQueryEngine
+    participant W as IExportWriter
+    participant EP as IDataExchangeEventPublisher
+
+    FE->>O: ExportAsync(ExportRequest)
+    O->>O: Résout ExportDefinition par nom
+    O->>O: Crée ExportJob (Queued)
+    O->>D: DispatchAsync(ExecuteExportCommand)
+    O-->>FE: ExportJobResult (Queued)
+
+    Note over O: Background execution
+    D->>O: ExecuteAsync(jobId)
+    O->>DS: GetQueryable() → IQueryable
+    alt QueryDefinitionName défini
+        O->>QE: ExecuteStreamAsync(queryable, request)
+    end
+    O->>W: WriteAsync(stream, fields, rows)
+    O->>O: ExportJob → Completed
+    O->>EP: PublishAsync(ExportJobCompletedEvent)
 ```
 
 ### ExportDefinition (Fluent API)
@@ -635,16 +648,18 @@ Quand `QueryDefinitionName` est renseigné, le pipeline d'export utilise
 et tri que la grille. Les champs `Sort`, `Filter`, `Presets` et `Search` de
 `ExportRequest` sont mappés vers un `QueryRequest`.
 
-```text
-Front-end (grille)                    Front-end (export)
-       │                                     │
-       ▼                                     ▼
-QueryRequest                          ExportRequest
-  Sort, Filter, Presets, Search         Sort, Filter, Presets, Search
-       │                                     │
-       ▼                                     ▼
-IQueryEngine.ExecuteAsync()           IQueryEngine.ExecuteStreamAsync()
-  → PagedResult<T>                     → IAsyncEnumerable<T> (tout, sans pagination)
+```mermaid
+flowchart LR
+    subgraph Grille
+        A[QueryRequest<br/>Sort, Filter, Presets, Search]
+        B["IQueryEngine.ExecuteAsync()<br/>→ PagedResult&lt;T&gt;"]
+        A --> B
+    end
+    subgraph Export
+        C[ExportRequest<br/>Sort, Filter, Presets, Search]
+        D["IQueryEngine.ExecuteStreamAsync()<br/>→ IAsyncEnumerable&lt;T&gt; (sans pagination)"]
+        C --> D
+    end
 ```
 
 Si `QueryDefinitionName` est `null`, aucun filtrage/tri n'est appliqué :
@@ -672,9 +687,12 @@ implémentation EF Core persistée.
 
 Chaque export crée un `ExportJob` qui suit un cycle de vie :
 
-```text
-Queued → Exporting → Completed
-                   → Failed (si erreur)
+```mermaid
+stateDiagram-v2
+    [*] --> Queued
+    Queued --> Exporting
+    Exporting --> Completed
+    Exporting --> Failed
 ```
 
 | Propriété | Description |
@@ -721,10 +739,11 @@ Les endpoints d'export sont enregistrés automatiquement par
 | `GET` | `/export/definitions` | 200 OK | Liste les définitions d'export enregistrées |
 | `GET` | `/export/definitions/{name}/fields` | 200 / 404 | Champs disponibles pour une définition |
 
-#### Jobs (création, suivi, téléchargement)
+#### Jobs (listing, création, suivi, téléchargement)
 
 | Méthode | Route | Retour | Description |
 | --- | --- | --- | --- |
+| `GET` | `/export/jobs` | 200 OK | Liste paginée des export jobs (filtre par `status`, `page`, `pageSize`) |
 | `POST` | `/export/jobs` | 201 Created | Crée et dispatche un export job |
 | `GET` | `/export/jobs/{jobId}` | 200 / 404 | Status d'un job |
 | `GET` | `/export/jobs/{jobId}/download` | File / 400 / 404 | Télécharge le fichier exporté |
@@ -746,6 +765,67 @@ les données ») :
 2. L'utilisateur modifie le fichier (correction de données)
 3. **Import** du fichier modifié → `IRecordIdentityResolver` détecte les entités
    existantes via l'ID et effectue un UPDATE au lieu d'un INSERT
+
+## Événements lifecycle
+
+Les orchestrateurs publient des événements quand un job atteint un état terminal.
+Ces événements permettent de câbler des notifications, de l'audit ou toute autre
+logique réactive côté applicatif.
+
+### Événements
+
+| Événement | Publié quand | Champs clés |
+| --- | --- | --- |
+| `ImportJobCompletedEvent` | Import terminé (Completed, PartiallyCompleted, Failed) | `ImportJobId`, `DefinitionName`, `Status`, `UserId`, compteurs (Total/Succeeded/Failed/Inserted/Updated/Skipped) |
+| `ExportJobCompletedEvent` | Export terminé (Completed, Failed) | `ExportJobId`, `DefinitionName`, `Status`, `UserId`, `RowCount`, `ErrorMessage` |
+
+Aucune donnée personnelle (PII) n'est incluse dans les événements (HDS-compliant).
+
+### Publication
+
+Les événements sont publiés via `IDataExchangeEventPublisher`, une abstraction
+suivant le même pattern que `IImportCommandDispatcher` :
+
+- **Par défaut** : `NullDataExchangeEventPublisher` (no-op, singleton)
+- **Avec Wolverine** : `WolverineDataExchangeEventPublisher` publié via
+  `IMessageBus.PublishAsync()` (Outbox durable, garantie de livraison)
+
+L'enregistrement est automatique :
+
+```csharp
+// Le no-op est enregistré par AddGranitDataImport() / AddGranitDataExport()
+// Le Wolverine publisher remplace automatiquement quand GranitDataExchangeWolverineModule est chargé
+```
+
+### Consommation (côté applicatif)
+
+Créer un handler Wolverine pour réagir aux événements. Exemple avec
+`INotificationPublisher` (pattern identique à `ExportCompletedHandler` dans
+guava-backend pour la RGPD) :
+
+```csharp
+public static class ImportJobCompletedHandler
+{
+    public static async Task Handle(
+        ImportJobCompletedEvent evt,
+        INotificationPublisher notificationPublisher,
+        CancellationToken ct)
+    {
+        await notificationPublisher.PublishAsync(
+            AppNotifications.ImportCompleted,
+            new ImportCompletedData
+            {
+                JobId = evt.ImportJobId,
+                DefinitionName = evt.DefinitionName,
+                Status = evt.Status.ToString(),
+                TotalRows = evt.TotalRows,
+                FailedRows = evt.FailedRows,
+            },
+            recipientUserIds: [evt.UserId],
+            ct).ConfigureAwait(false);
+    }
+}
+```
 
 ## Voir aussi
 
