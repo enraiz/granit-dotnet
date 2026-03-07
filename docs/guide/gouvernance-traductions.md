@@ -206,38 +206,39 @@ des fichiers React. Quand un fichier local est vide, il est supprimé.
 
 ## Vérification en CI
 
-Trois checks automatisés recommandés dans le pipeline CI :
+Le script `scripts/check-translations.sh` (dans le backend applicatif)
+exécute 4 vérifications automatiques dans le stage `quality` du pipeline :
 
-### 1. Clés orphelines
+| Check | Niveau | Description |
+| --- | --- | --- |
+| Fichiers de base | Bloquant | Les 7 langues (en, fr, nl, de, es, it, pt) doivent exister par resource |
+| Cohérence inter-langues | Bloquant | Toutes les langues de base doivent contenir les mêmes clés |
+| Doublons sémantiques | Warning | Deux clés avec la même valeur dans une langue |
+| Clés orphelines | Warning | Clés non référencées dans les fichiers `.cs` |
 
-Clés présentes dans les JSON mais jamais référencées dans le code source
-(`.cs`, `.tsx`, `.ts`). Extraction des usages :
-
-```bash
-# Backend (.cs)
-grep -rhoP '"\w+:\w+[:.]\w+"' src/ --include="*.cs" | sort -u
-
-# Frontend (.tsx/.ts)
-grep -rhoP "t\(['\"]([^'\"]+)['\"]\)" src/ --include="*.tsx" \
-  --include="*.ts" | sort -u
-```
-
-Comparaison avec les clés déclarées dans les JSON. Les orphelines sont
-signalées dans le rapport CI (non bloquant).
-
-### 2. Doublons sémantiques
-
-Deux clés avec exactement la même valeur dans la même langue. Signe qu'une
-clé `Common:*` devrait être utilisée à la place.
+### Exécution locale
 
 ```bash
-jq -r '.texts | to_entries[] | .value' fr.json | sort | uniq -d
+# Vérification standard (warnings non bloquants)
+bash scripts/check-translations.sh
+
+# Mode strict (warnings = erreurs, utile pour un nettoyage ponctuel)
+bash scripts/check-translations.sh --strict
 ```
 
-### 3. Clés manquantes
+### Déclenchement CI
 
-Clé utilisée dans le code mais absente d'un ou plusieurs fichiers JSON.
-Bloquant en CI pour éviter les textes non traduits en production.
+Le job `translations` se déclenche :
+
+- sur les MR **si des fichiers `Localization/**/*.json` ont changé**
+- systématiquement sur `develop` et `main`
+
+### Limitations connues
+
+- Les clés utilisées uniquement côté frontend (React) ne sont pas détectées
+  par le check orphelines (qui analyse les `.cs`)
+- Les doublons sémantiques sont souvent légitimes (ex: "Cancel" dans
+  plusieurs contextes) — le check est informatif
 
 ## Calendrier de migration
 
