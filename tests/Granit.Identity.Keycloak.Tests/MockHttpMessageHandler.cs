@@ -41,6 +41,9 @@ internal sealed class MockSequenceHttpMessageHandler(IReadOnlyList<string> respo
 {
     private int _callIndex;
 
+    /// <summary>Number of HTTP calls made through this handler.</summary>
+    public int CallCount => _callIndex;
+
     protected override Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request, CancellationToken cancellationToken)
     {

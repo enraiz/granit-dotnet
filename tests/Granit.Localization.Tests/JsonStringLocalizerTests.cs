@@ -65,13 +65,88 @@ public sealed class JsonStringLocalizerTests : IDisposable
     }
 
     [Fact]
-    public void Indexer_FallsBackToParentCulture()
+    public void Indexer_ReturnsRegionalOverride_WhenKeyExistsInRegionalFile()
     {
         // Arrange
         IStringLocalizer localizer = CreateTestLocalizer();
         CultureInfo.CurrentUICulture = new CultureInfo("fr-CA");
 
-        // Act — fr-CA n'existe pas, doit fallback sur fr
+        // Act — fr-CA.json has "Allô" override for Test:Hello
+        LocalizedString result = localizer["Test:Hello"];
+
+        // Assert
+        result.Value.ShouldBe("Allô");
+        result.ResourceNotFound.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Indexer_FallsBackToParentCulture_WhenKeyNotInRegionalFile()
+    {
+        // Arrange
+        IStringLocalizer localizer = CreateTestLocalizer();
+        CultureInfo.CurrentUICulture = new CultureInfo("fr-CA");
+
+        // Act — fr-CA.json does not have Test:Goodbye, must fallback to fr.json
+        LocalizedString result = localizer["Test:Goodbye"];
+
+        // Assert
+        result.Value.ShouldBe("Au revoir");
+        result.ResourceNotFound.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Indexer_ReturnsEnGbOverride_WhenKeyExistsInRegionalFile()
+    {
+        // Arrange
+        IStringLocalizer localizer = CreateTestLocalizer();
+        CultureInfo.CurrentUICulture = new CultureInfo("en-GB");
+
+        // Act — en-GB.json has "Hiya" override for Test:Hello
+        LocalizedString result = localizer["Test:Hello"];
+
+        // Assert
+        result.Value.ShouldBe("Hiya");
+        result.ResourceNotFound.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Indexer_EnGb_FallsBackToEn_WhenKeyNotInRegionalFile()
+    {
+        // Arrange
+        IStringLocalizer localizer = CreateTestLocalizer();
+        CultureInfo.CurrentUICulture = new CultureInfo("en-GB");
+
+        // Act — en-GB.json does not have Test:Goodbye, must fallback to en.json
+        LocalizedString result = localizer["Test:Goodbye"];
+
+        // Assert
+        result.Value.ShouldBe("Goodbye");
+        result.ResourceNotFound.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Indexer_EnUs_FallsBackToEn_WhenNoRegionalFileExists()
+    {
+        // Arrange
+        IStringLocalizer localizer = CreateTestLocalizer();
+        CultureInfo.CurrentUICulture = new CultureInfo("en-US");
+
+        // Act — no en-US.json file, must fallback to en.json via CultureInfo.Parent
+        LocalizedString result = localizer["Test:Hello"];
+
+        // Assert
+        result.Value.ShouldBe("Hello");
+        result.ResourceNotFound.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Indexer_FallsBackToParentCulture_WhenNoRegionalFileExists()
+    {
+        // Arrange
+        IStringLocalizer localizer = CreateTestLocalizer();
+        CultureInfo.CurrentUICulture = new CultureInfo("fr-BE");
+
+        // Act — fr-BE.json does not exist, must fallback to fr.json
         LocalizedString result = localizer["Test:Hello"];
 
         // Assert
