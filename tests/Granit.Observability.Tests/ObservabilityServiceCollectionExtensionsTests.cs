@@ -156,7 +156,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
     public void AddGranitObservability_CustomServiceProperties_BindsCorrectly()
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
-        builder.Configuration["Observability:ServiceName"] = "guava-api";
+        builder.Configuration["Observability:ServiceName"] = "test-api";
         builder.Configuration["Observability:ServiceVersion"] = "2.0.0";
         builder.Configuration["Observability:ServiceNamespace"] = "digital-dynamics";
         builder.Configuration["Observability:Environment"] = "staging";
@@ -166,7 +166,7 @@ public sealed class ObservabilityServiceCollectionExtensionsTests
 
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ObservabilityOptions options = sp.GetRequiredService<IOptions<ObservabilityOptions>>().Value;
-        options.ServiceName.ShouldBe("guava-api");
+        options.ServiceName.ShouldBe("test-api");
         options.ServiceVersion.ShouldBe("2.0.0");
         options.ServiceNamespace.ShouldBe("digital-dynamics");
         options.Environment.ShouldBe("staging");

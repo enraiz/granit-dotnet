@@ -422,7 +422,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
     [Fact]
     public async Task GetUserSessionsAsync_WithSessions_ReturnsIdentitySessions()
     {
-        _handler.ResponseBody = """[{"id":"sess-1","ipAddress":"1.2.3.4","start":1700000000000,"lastAccess":1700001000000,"rememberMe":false,"clients":{"client-id":"guava-app"}},{"id":"sess-2","ipAddress":"5.6.7.8","start":1700002000000,"lastAccess":1700003000000,"rememberMe":true,"clients":{}}]""";
+        _handler.ResponseBody = """[{"id":"sess-1","ipAddress":"1.2.3.4","start":1700000000000,"lastAccess":1700001000000,"rememberMe":false,"clients":{"client-id":"test-app"}},{"id":"sess-2","ipAddress":"5.6.7.8","start":1700002000000,"lastAccess":1700003000000,"rememberMe":true,"clients":{}}]""";
 
         IReadOnlyList<IdentitySession> result = await _provider.GetUserSessionsAsync(
             "user-1", TestContext.Current.CancellationToken);
@@ -433,7 +433,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         result[0].StartedAt.ShouldBe(DateTimeOffset.FromUnixTimeMilliseconds(1700000000000));
         result[0].LastAccess.ShouldBe(DateTimeOffset.FromUnixTimeMilliseconds(1700001000000));
         result[0].RememberMe.ShouldBeFalse();
-        result[0].Clients.ShouldContain("guava-app");
+        result[0].Clients.ShouldContain("test-app");
         result[1].SessionId.ShouldBe("sess-2");
         result[1].RememberMe.ShouldBeTrue();
         result[1].Clients.ShouldBeEmpty();
@@ -485,7 +485,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
     [Fact]
     public async Task GetUserDeviceActivityAsync_WithoutTokenExchange_UsesAdminSessions()
     {
-        _handler.ResponseBody = """[{"id":"sess-1","ipAddress":"1.2.3.4","start":1700000000000,"lastAccess":1700001000000,"rememberMe":false,"clients":{"client-id":"guava-app"}}]""";
+        _handler.ResponseBody = """[{"id":"sess-1","ipAddress":"1.2.3.4","start":1700000000000,"lastAccess":1700001000000,"rememberMe":false,"clients":{"client-id":"test-app"}}]""";
 
         IReadOnlyList<IdentityDeviceActivity> result = await _provider.GetUserDeviceActivityAsync(
             "user-1", TestContext.Current.CancellationToken);
@@ -516,7 +516,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         MockSequenceHttpMessageHandler seqHandler = new(
         [
             """{"access_token":"user-token","expires_in":300}""",
-            """[{"ipAddress":"9.10.11.12","os":"Windows","osVersion":"10","browser":"Chrome/120.0","device":"Desktop","mobile":false,"current":true,"lastAccess":1700005000000,"sessions":[{"id":"sess-x","ipAddress":"9.10.11.12","start":1700004000000,"lastAccess":1700005000000,"rememberMe":false,"clients":{"app-id":"guava-app"}}]}]""",
+            """[{"ipAddress":"9.10.11.12","os":"Windows","osVersion":"10","browser":"Chrome/120.0","device":"Desktop","mobile":false,"current":true,"lastAccess":1700005000000,"sessions":[{"id":"sess-x","ipAddress":"9.10.11.12","start":1700004000000,"lastAccess":1700005000000,"rememberMe":false,"clients":{"app-id":"test-app"}}]}]""",
         ]);
         HttpClient seqClient = new(seqHandler) { BaseAddress = new Uri("https://keycloak.test/") };
         IHttpClientFactory seqFactory = Substitute.For<IHttpClientFactory>();
@@ -1146,7 +1146,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             Realm = "test-realm",
             ClientId = "admin-service",
             ClientSecret = "secret",
-            DirectAccessClientId = "guava-frontend",
+            DirectAccessClientId = "test-frontend",
         };
 
         MockHttpMessageHandler handler = new()
@@ -1172,7 +1172,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         handler.Requests.Count.ShouldBe(1);
         handler.Requests[0].Url.ShouldContain("/realms/test-realm/protocol/openid-connect/token");
         handler.Requests[0].Body.ShouldContain("grant_type=password");
-        handler.Requests[0].Body.ShouldContain("client_id=guava-frontend");
+        handler.Requests[0].Body.ShouldContain("client_id=test-frontend");
         handler.Requests[0].Body.ShouldContain("username=admin");
     }
 
@@ -1185,7 +1185,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             Realm = "test-realm",
             ClientId = "admin-service",
             ClientSecret = "secret",
-            DirectAccessClientId = "guava-frontend",
+            DirectAccessClientId = "test-frontend",
         };
 
         MockHttpMessageHandler handler = new()

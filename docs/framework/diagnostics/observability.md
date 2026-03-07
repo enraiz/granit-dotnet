@@ -17,10 +17,10 @@ dotnet add package Granit.Observability
 ```json
 {
   "Observability": {
-    "ServiceName": "guava-backend",
+    "ServiceName": "my-backend",
     "ServiceVersion": "1.0.0",
     "OtlpEndpoint": "http://otel-collector:4317",
-    "ServiceNamespace": "guava-health",
+    "ServiceNamespace": "my-company",
     "Environment": "production",
     "EnableTracing": true,
     "EnableMetrics": true
@@ -51,7 +51,7 @@ public sealed class ObservabilityOptions
     public string ServiceName { get; set; } = "unknown-service";
     public string ServiceVersion { get; set; } = "0.0.0";
     public string OtlpEndpoint { get; set; } = "http://localhost:4317";
-    public string ServiceNamespace { get; set; } = "guava-health";
+    public string ServiceNamespace { get; set; } = "my-company";
     public string Environment { get; set; } = "development";
     public bool EnableTracing { get; set; } = true;
     public bool EnableMetrics { get; set; } = true;
@@ -69,7 +69,7 @@ Serilog est configuré avec :
 Format console :
 
 ```text
-[10:30:45 INF] Guava.Modules.Auth.Handlers.SyncUserProfileHandler Profil synchronisé
+[10:30:45 INF] MyApp.Modules.Auth.Handlers.SyncUserProfileHandler Profil synchronisé
 ```
 
 ### Configuration avancée

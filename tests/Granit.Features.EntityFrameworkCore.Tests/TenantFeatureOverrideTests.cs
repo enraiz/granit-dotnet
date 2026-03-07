@@ -43,13 +43,13 @@ public sealed class TenantFeatureOverrideTests
         {
             Id = id,
             TenantId = tenantId,
-            FeatureName = "Guava.MaxPatientsCount",
+            FeatureName = "Acme.MaxUsersCount",
             Value = "5000",
         };
 
         entity.Id.ShouldBe(id);
         entity.TenantId.ShouldBe(tenantId);
-        entity.FeatureName.ShouldBe("Guava.MaxPatientsCount");
+        entity.FeatureName.ShouldBe("Acme.MaxUsersCount");
         entity.Value.ShouldBe("5000");
     }
 

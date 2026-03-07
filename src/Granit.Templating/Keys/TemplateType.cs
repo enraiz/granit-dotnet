@@ -16,7 +16,7 @@ namespace Granit.Templating.Keys;
 ///
 /// private sealed class WelcomeEmailTemplateType : TextTemplateType&lt;WelcomeEmailData&gt;
 /// {
-///     public override string Name => "Guava.WelcomeEmail";
+///     public override string Name => "Acme.WelcomeEmail";
 /// }
 /// </code>
 /// </remarks>

@@ -9,7 +9,7 @@ internal sealed class ExportPresetEntity
     /// <summary>Unique identifier.</summary>
     public Guid Id { get; set; }
 
-    /// <summary>The export definition name (e.g. <c>"Guava.PatientExport"</c>).</summary>
+    /// <summary>The export definition name (e.g. <c>"Acme.PatientExport"</c>).</summary>
     public required string DefinitionName { get; set; }
 
     /// <summary>User-facing preset name (e.g. <c>"Export mensuel"</c>).</summary>

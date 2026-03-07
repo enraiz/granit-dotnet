@@ -7,7 +7,7 @@ namespace Granit.Features.Tests.Definitions;
 
 public sealed class FeatureGroupDefinitionTests
 {
-    private static FeatureGroupDefinition MakeGroup(string name = "Guava", string? displayName = null)
+    private static FeatureGroupDefinition MakeGroup(string name = "TestApp", string? displayName = null)
     {
         // FeatureGroupDefinition constructor is internal — use IFeatureDefinitionContext
         // AddGroup returns the group directly, so capture it via a closure.
@@ -31,10 +31,10 @@ public sealed class FeatureGroupDefinitionTests
     public void AddToggle_DefaultFalse_AddsDefinitionWithFalseDefault()
     {
         FeatureGroupDefinition group = MakeGroup();
-        group.AddToggle("Guava.VideoConsultation");
+        group.AddToggle("Acme.VideoConference");
 
         FeatureDefinition feature = group.Features.ShouldHaveSingleItem();
-        feature.Name.ShouldBe("Guava.VideoConsultation");
+        feature.Name.ShouldBe("Acme.VideoConference");
         feature.DefaultValue.ShouldBe("false");
         feature.ValueType.ShouldBe(FeatureValueType.Toggle);
     }
@@ -43,7 +43,7 @@ public sealed class FeatureGroupDefinitionTests
     public void AddToggle_DefaultTrue_AddsDefinitionWithTrueDefault()
     {
         FeatureGroupDefinition group = MakeGroup();
-        group.AddToggle("Guava.VideoConsultation", defaultValue: true, displayName: "Video");
+        group.AddToggle("Acme.VideoConference", defaultValue: true, displayName: "Video");
 
         FeatureDefinition feature = group.Features.Single();
         feature.DefaultValue.ShouldBe("true");
@@ -54,7 +54,7 @@ public sealed class FeatureGroupDefinitionTests
     public void AddNumeric_AddsDefinitionWithNumericConstraint()
     {
         FeatureGroupDefinition group = MakeGroup();
-        group.AddNumeric("Guava.MaxPatients", defaultValue: 200, min: 0, max: 10000);
+        group.AddNumeric("Acme.MaxUsers", defaultValue: 200, min: 0, max: 10000);
 
         FeatureDefinition feature = group.Features.Single();
         feature.DefaultValue.ShouldBe("200");
@@ -69,7 +69,7 @@ public sealed class FeatureGroupDefinitionTests
     {
         FeatureGroupDefinition group = MakeGroup();
         group.AddSelection(
-            "Guava.StorageTier",
+            "Acme.StorageTier",
             defaultValue: "standard",
             allowedValues: ["standard", "premium"],
             displayName: "Storage");
@@ -88,8 +88,8 @@ public sealed class FeatureGroupDefinitionTests
         FeatureGroupDefinition group = MakeGroup();
 
         FeatureGroupDefinition returned = group
-            .AddToggle("Guava.FeatureA")
-            .AddToggle("Guava.FeatureB");
+            .AddToggle("Acme.FeatureA")
+            .AddToggle("Acme.FeatureB");
 
         returned.ShouldBeSameAs(group);
         group.Features.Count.ShouldBe(2);
@@ -98,10 +98,10 @@ public sealed class FeatureGroupDefinitionTests
     [Fact]
     public void Group_DisplayName_IsPreserved()
     {
-        FeatureGroupDefinition group = MakeGroup("Guava", "Guava Platform");
+        FeatureGroupDefinition group = MakeGroup("TestApp", "Acme Platform");
 
-        group.Name.ShouldBe("Guava");
-        group.DisplayName.ShouldBe("Guava Platform");
+        group.Name.ShouldBe("TestApp");
+        group.DisplayName.ShouldBe("Acme Platform");
     }
 
     // -------------------------------------------------------------------------

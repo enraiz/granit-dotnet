@@ -20,7 +20,7 @@ internal sealed class LocalizationOverride : AuditedEntity, IMultiTenant
     /// <summary>Tenant scope. <c>null</c> = host-level override (applies to all tenants).</summary>
     public Guid? TenantId { get; set; }
 
-    /// <summary>Logical name of the localization resource (e.g. <c>"Guava"</c>). Max 200 characters.</summary>
+    /// <summary>Logical name of the localization resource (e.g. <c>"Acme"</c>). Max 200 characters.</summary>
     public string ResourceName { get; set; } = string.Empty;
 
     /// <summary>BCP 47 culture tag (e.g. <c>"fr"</c>, <c>"en-US"</c>). Max 20 characters.</summary>

@@ -11,7 +11,7 @@ public sealed class KeycloakOptions
     /// <summary>OIDC authority URL (e.g. https://keycloak.example.com/realms/my-realm).</summary>
     public string Authority { get; set; } = string.Empty;
 
-    /// <summary>Keycloak client ID (e.g. guava-backend).</summary>
+    /// <summary>Keycloak client ID (e.g. my-backend).</summary>
     public string ClientId { get; set; } = string.Empty;
 
     /// <summary>Client secret (confidential — load from Vault, never in plain text).</summary>

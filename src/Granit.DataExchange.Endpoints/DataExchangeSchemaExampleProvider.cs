@@ -28,7 +28,7 @@ internal sealed class DataExchangeSchemaExampleProvider : ISchemaExampleProvider
             },
             [typeof(CreateExportJobRequest)] = new JsonObject
             {
-                ["definitionName"] = "Guava.PatientExport",
+                ["definitionName"] = "Acme.PatientExport",
                 ["format"] = "xlsx",
                 ["selectedFields"] = new JsonArray { "LastName", "FirstName", "Email" },
                 ["includeIdForImport"] = false,
@@ -36,7 +36,7 @@ internal sealed class DataExchangeSchemaExampleProvider : ISchemaExampleProvider
             },
             [typeof(SaveExportPresetRequest)] = new JsonObject
             {
-                ["definitionName"] = "Guava.PatientExport",
+                ["definitionName"] = "Acme.PatientExport",
                 ["presetName"] = "Contact details",
                 ["selectedFields"] = new JsonArray { "LastName", "FirstName", "Email", "Phone" },
                 ["format"] = "xlsx",

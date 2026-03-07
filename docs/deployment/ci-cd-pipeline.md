@@ -149,7 +149,7 @@ Aucune — le pipeline utilise le `CI_JOB_TOKEN` natif de GitLab.
 
 ## Consommation des packages Granit
 
-Les applications consommatrices (ex. Guava Backend) ajoutent le GitLab Package
+Les applications consommatrices ajoutent le GitLab Package
 Registry comme source NuGet dans leur CI :
 
 ```xml

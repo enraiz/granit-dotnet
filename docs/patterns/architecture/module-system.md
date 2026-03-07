@@ -57,7 +57,7 @@ Un module peut surcharger l'un ou l'autre sans obligation d'implémenter les deu
 [DependsOn(typeof(GranitPersistenceModule))]
 [DependsOn(typeof(GranitWolverineModule))]
 [DependsOn(typeof(GranitFeaturesModule))]
-public sealed class GuavaHostModule : GranitModule
+public sealed class MyAppHostModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -74,7 +74,7 @@ public sealed class GuavaHostModule : GranitModule
 
 // Point d'entrée — une seule ligne
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-builder.AddGranit<GuavaHostModule>();
+builder.AddGranit<MyAppHostModule>();
 
 WebApplication app = builder.Build();
 await app.UseGranitAsync();

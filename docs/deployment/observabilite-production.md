@@ -26,7 +26,7 @@ flowchart LR
 ```json
 {
   "Observability": {
-    "ServiceName": "guava-backend",
+    "ServiceName": "my-backend",
     "ServiceVersion": "1.2.0",
     "OtlpEndpoint": "http://otel-collector.monitoring:4317",
     "OtlpProtocol": "grpc"
@@ -47,19 +47,19 @@ flowchart LR
 
 ```logql
 # Erreurs du dernier jour pour un service
-{service_name="guava-backend"} | json | Level = "Error"
+{service_name="my-backend"} | json | Level = "Error"
 
 # Requêtes lentes (> 500ms)
-{service_name="guava-backend"} | json | RequestDuration > 500
+{service_name="my-backend"} | json | RequestDuration > 500
 
 # Activité d'un tenant spécifique
-{service_name="guava-backend"} | json | TenantId = "tenant-123"
+{service_name="my-backend"} | json | TenantId = "tenant-123"
 
 # Erreurs d'un utilisateur spécifique (audit HDS)
-{service_name="guava-backend"} | json | UserId = "john.doe" | Level = "Error"
+{service_name="my-backend"} | json | UserId = "john.doe" | Level = "Error"
 
 # Corrélation avec un TraceId
-{service_name="guava-backend"} | json | TraceId = "abc123def456"
+{service_name="my-backend"} | json | TraceId = "abc123def456"
 ```
 
 ### Enrichissement automatique

@@ -99,7 +99,7 @@ public sealed class GranitFeaturesDbContextTests
         {
             Id = Guid.NewGuid(),
             TenantId = tenantId,
-            FeatureName = "Guava.MaxPatientsCount",
+            FeatureName = "Acme.MaxUsersCount",
             Value = "5000",
             CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
             CreatedBy = "admin@digitaldynamics.be",
@@ -114,7 +114,7 @@ public sealed class GranitFeaturesDbContextTests
 
         loaded.ShouldNotBeNull();
         loaded!.TenantId.ShouldBe(tenantId);
-        loaded.FeatureName.ShouldBe("Guava.MaxPatientsCount");
+        loaded.FeatureName.ShouldBe("Acme.MaxUsersCount");
         loaded.Value.ShouldBe("5000");
         loaded.CreatedBy.ShouldBe("admin@digitaldynamics.be");
         loaded.CreatedAt.ShouldBe(entity.CreatedAt);

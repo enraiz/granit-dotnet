@@ -76,7 +76,7 @@ public static async Task<PatientCreated> Handle(
 ### Dans un module Granit
 
 ```csharp
-public class GuavaAuthModule : GranitModule
+public class MyAppAuthModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -88,9 +88,9 @@ public class GuavaAuthModule : GranitModule
         ApplicationInitializationContext context)
     {
         var logger = context.ServiceProvider
-            .GetRequiredService<ILogger<GuavaAuthModule>>();
+            .GetRequiredService<ILogger<MyAppAuthModule>>();
 
-        logger.LogInformation("GuavaAuthModule initialized");
+        logger.LogInformation("MyAppAuthModule initialized");
     }
 }
 ```
@@ -146,7 +146,7 @@ Les propriétés apparaissent dans Loki comme labels ou champs JSON :
   "MessageTemplate": "Consent recorded: patient={PatientId} type={ConsentType}",
   "PatientId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "ConsentType": "FHIR_SHARE",
-  "SourceContext": "Guava.Modules.Auth.Handlers.RecordConsentHandler",
+  "SourceContext": "MyApp.Modules.Auth.Handlers.RecordConsentHandler",
   "TraceId": "abc123def456",
   "SpanId": "789xyz"
 }
@@ -158,7 +158,7 @@ Les propriétés apparaissent dans Loki comme labels ou champs JSON :
 
 | Propriété | Source | Description |
 | --- | --- | --- |
-| `ServiceName` | `ObservabilityOptions.ServiceName` | Nom du service (ex: `"guava-backend"`) |
+| `ServiceName` | `ObservabilityOptions.ServiceName` | Nom du service (ex: `"my-backend"`) |
 | `ServiceVersion` | `ObservabilityOptions.ServiceVersion` | Version du service |
 | `Environment` | `ObservabilityOptions.Environment` | Environnement de déploiement |
 | `TraceId` | OpenTelemetry | Identifiant de trace distribué (corrélation) |

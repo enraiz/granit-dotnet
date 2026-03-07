@@ -13,7 +13,7 @@ namespace Granit.Features.Definitions;
 /// </remarks>
 public sealed class FeatureGroupDefinition
 {
-    /// <summary>Group name (e.g. <c>"Guava"</c>).</summary>
+    /// <summary>Group name (e.g. <c>"Acme"</c>).</summary>
     public string Name { get; }
 
     /// <summary>Display label (for admin UI).</summary>
@@ -34,7 +34,7 @@ public sealed class FeatureGroupDefinition
     /// <summary>
     /// Declares a boolean feature with a <c>"true"</c>/<c>"false"</c> default.
     /// </summary>
-    /// <param name="name">Unique feature name (e.g. <c>"Guava.VideoConsultation"</c>).</param>
+    /// <param name="name">Unique feature name (e.g. <c>"Acme.VideoConference"</c>).</param>
     /// <param name="defaultValue">Default value.</param>
     /// <param name="displayName">Optional display label.</param>
     /// <returns>This group for chaining.</returns>
@@ -56,7 +56,7 @@ public sealed class FeatureGroupDefinition
     /// <summary>
     /// Declares an integer feature with optional min/max bounds.
     /// </summary>
-    /// <param name="name">Unique feature name (e.g. <c>"Guava.MaxPatientsCount"</c>).</param>
+    /// <param name="name">Unique feature name (e.g. <c>"Acme.MaxUsersCount"</c>).</param>
     /// <param name="defaultValue">Default integer value.</param>
     /// <param name="min">Minimum allowed value (inclusive, default 0).</param>
     /// <param name="max">Maximum allowed value (inclusive, default <see cref="long.MaxValue"/>).</param>

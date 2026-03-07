@@ -92,7 +92,7 @@ Colonnes de la table `i18n_localization_overrides` :
 | --- | --- | --- |
 | `id` | `uuid` | PK |
 | `tenant_id` | `uuid?` | `null` = global (tous tenants) |
-| `resource_name` | `varchar(200)` | Ex. `"Guava"` |
+| `resource_name` | `varchar(200)` | Ex. `"Acme"` |
 | `culture_name` | `varchar(20)` | BCP 47 : `"fr"`, `"en-US"` |
 | `key` | `varchar(500)` | Clé de traduction |
 | `value` | `varchar(4000)` | Valeur de remplacement |
@@ -111,10 +111,10 @@ Injecter `ILocalizationOverrideStore` dans un service :
 public sealed class TranslationAdminService(ILocalizationOverrideStore store)
 {
     public Task SetAsync(string key, string value, CancellationToken ct) =>
-        store.SetOverrideAsync("Guava", "fr", key, value, ct);
+        store.SetOverrideAsync("Acme", "fr", key, value, ct);
 
     public Task RemoveAsync(string key, CancellationToken ct) =>
-        store.RemoveOverrideAsync("Guava", "fr", key, ct);
+        store.RemoveOverrideAsync("Acme", "fr", key, ct);
 }
 ```
 
@@ -136,7 +136,7 @@ app.MapGranitLocalizationOverrides();
 Retourne toutes les surcharges d'une ressource pour une culture :
 
 ```http
-GET /api/granit/localization/overrides?resourceName=Guava&cultureName=fr
+GET /api/granit/localization/overrides?resourceName=Acme&cultureName=fr
 Authorization: Bearer <token>
 ```
 
@@ -152,7 +152,7 @@ Authorization: Bearer <token>
 Crée ou met à jour une surcharge (upsert) :
 
 ```http
-PUT /api/granit/localization/overrides/Guava/fr/Patient.Title
+PUT /api/granit/localization/overrides/Acme/fr/Patient.Title
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -166,7 +166,7 @@ Réponse : `204 No Content`.
 Supprime une surcharge (no-op si la clé n'existe pas) :
 
 ```http
-DELETE /api/granit/localization/overrides/Guava/fr/Patient.Title
+DELETE /api/granit/localization/overrides/Acme/fr/Patient.Title
 Authorization: Bearer <token>
 ```
 

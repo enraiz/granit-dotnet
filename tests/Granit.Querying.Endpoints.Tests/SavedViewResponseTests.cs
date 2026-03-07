@@ -19,12 +19,12 @@ public sealed class SavedViewResponseTests
 
         // Act
         SavedViewResponse response = new(
-            id, "Guava.Patients", "Active patients", "user-1",
+            id, "Acme.Patients", "Active patients", "user-1",
             true, false, "{}", "[]", null, "[\"Name\",\"Email\"]");
 
         // Assert
         response.Id.ShouldBe(id);
-        response.EntityType.ShouldBe("Guava.Patients");
+        response.EntityType.ShouldBe("Acme.Patients");
         response.Name.ShouldBe("Active patients");
         response.UserId.ShouldBe("user-1");
         response.IsShared.ShouldBeTrue();

@@ -9,7 +9,7 @@ namespace Granit.Querying.SavedViews;
 public sealed class SavedView : AuditedEntity
 {
     /// <summary>
-    /// The entity type this view applies to (e.g. <c>"Guava.Patients"</c>).
+    /// The entity type this view applies to (e.g. <c>"Acme.Patients"</c>).
     /// Maps to <see cref="IQueryDefinitionDescriptor.Name"/>.
     /// </summary>
     public required string EntityType { get; set; }

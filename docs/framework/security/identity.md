@@ -226,13 +226,13 @@ POST /realms/{realm}/protocol/openid-connect/token
 
 **Prérequis Keycloak :**
 
-- Un client **public** avec *Direct Access Grants Enabled* (ex. `guava-frontend`)
+- Un client **public** avec *Direct Access Grants Enabled* (ex. `my-frontend`)
 - Configurer `DirectAccessClientId` dans `KeycloakAdmin`
 
 ```json
 {
   "KeycloakAdmin": {
-    "DirectAccessClientId": "guava-frontend"
+    "DirectAccessClientId": "my-frontend"
   }
 }
 ```

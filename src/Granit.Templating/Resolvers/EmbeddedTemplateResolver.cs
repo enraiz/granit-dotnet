@@ -28,7 +28,7 @@ namespace Granit.Templating.Resolvers;
 /// <para>
 /// Register via:
 /// <code>
-/// services.AddEmbeddedTemplates(typeof(GuavaTemplates).Assembly);
+/// services.AddEmbeddedTemplates(typeof(AcmeTemplates).Assembly);
 /// </code>
 /// Multiple assemblies can be registered by calling <c>AddEmbeddedTemplates</c> multiple times.
 /// </para>

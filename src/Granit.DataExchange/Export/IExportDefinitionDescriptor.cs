@@ -12,7 +12,7 @@ namespace Granit.DataExchange.Export;
 public interface IExportDefinitionDescriptor
 {
     /// <summary>
-    /// The definition name (e.g. <c>"Guava.PatientExport"</c>).
+    /// The definition name (e.g. <c>"Acme.PatientExport"</c>).
     /// </summary>
     string Name { get; }
 

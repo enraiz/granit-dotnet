@@ -122,7 +122,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         IConfiguration configuration = BuildConfiguration(new Dictionary<string, string?>
         {
             ["Cache:Redis:Configuration"] = "redis-service:6379",
-            ["Cache:Redis:InstanceName"] = "guava:",
+            ["Cache:Redis:InstanceName"] = "test:",
         });
 
         ServiceCollection services = new();
@@ -135,7 +135,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
 
         // Assert
         opts.Configuration.ShouldBe("redis-service:6379");
-        opts.InstanceName.ShouldBe("guava:");
+        opts.InstanceName.ShouldBe("test:");
     }
 
     [Fact]

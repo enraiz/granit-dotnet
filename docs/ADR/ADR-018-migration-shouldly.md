@@ -4,18 +4,18 @@
 - **Date** : 2026-02-28
 - **Issue** : [#426](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/426)
 - **Auteurs** : Équipe Digital Dynamics
-- **Portée** : granit-dotnet, guava-backend
+- **Portée** : granit-dotnet, applications consommatrices
 
 ## Contexte
 
 FluentAssertions est la bibliothèque d'assertions utilisée dans tous les projets de
-test (`*.Tests`) de granit-dotnet et guava-backend.
+test (`*.Tests`) de granit-dotnet et des applications consommatrices.
 
 À partir de la **version 7.x**, FluentAssertions a été acquis par **Xceed Software**
 et a changé de licence : passage de **MIT** à la **Xceed Community License Agreement**.
 Cette nouvelle licence **interdit l'usage commercial** sans achat d'une licence payante.
 
-La plateforme Guava est un produit commercial (santé, certification HDS). L'utilisation
+La plateforme est un produit commercial (santé, certification HDS). L'utilisation
 de FluentAssertions 8.x dans ce contexte constitue une **non-conformité de licence**.
 
 ## Décision
@@ -129,7 +129,7 @@ Shouldly offre le meilleur rapport conformité / effort de migration / pérennit
 
 ## Plan d'exécution
 
-1. Ajouter `Shouldly` dans `Directory.Packages.props` (granit-dotnet + guava-backend)
+1. Ajouter `Shouldly` dans `Directory.Packages.props` (granit-dotnet + applications consommatrices)
 2. Remplacer les assertions dans chaque projet `*.Tests`
 3. Supprimer `FluentAssertions` de `Directory.Packages.props`
 4. Mettre à jour `THIRD-PARTY-NOTICES.md`

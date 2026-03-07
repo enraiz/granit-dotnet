@@ -60,7 +60,7 @@ public sealed class AppModule : GranitModule { }
 ```json
 {
   "Cache": {
-    "KeyPrefix": "guava"
+    "KeyPrefix": "myapp"
   }
 }
 ```
@@ -70,7 +70,7 @@ public sealed class AppModule : GranitModule { }
 ```json
 {
   "Cache": {
-    "KeyPrefix": "guava",
+    "KeyPrefix": "myapp",
     "DefaultAbsoluteExpirationRelativeToNow": "01:00:00",
     "DefaultSlidingExpiration": "00:20:00",
     "EncryptValues": true,
@@ -80,7 +80,7 @@ public sealed class AppModule : GranitModule { }
     "Redis": {
       "IsEnabled": true,
       "Configuration": "redis-service:6379",
-      "InstanceName": "guava:"
+      "InstanceName": "myapp:"
     }
   }
 }
@@ -91,7 +91,7 @@ public sealed class AppModule : GranitModule { }
 ```json
 {
   "Cache": {
-    "KeyPrefix": "guava",
+    "KeyPrefix": "myapp",
     "EncryptValues": true,
     "Encryption": {
       "Key": "<base64-aes256-key-from-vault>"
@@ -99,7 +99,7 @@ public sealed class AppModule : GranitModule { }
     "Redis": {
       "IsEnabled": true,
       "Configuration": "redis-service:6379",
-      "InstanceName": "guava:"
+      "InstanceName": "myapp:"
     },
     "Hybrid": {
       "LocalCacheExpiration": "00:00:30"
@@ -153,8 +153,8 @@ Exemples :
 
 | `KeyPrefix` | `TCacheItem` | `userKey` | Clé finale |
 | --- | --- | --- | --- |
-| `guava` | `UserCacheItem` | `d4e5f6` | `guava:User:d4e5f6` |
-| `guava` | `PatientCacheItem` | `p-001` | `guava:Patient:p-001` |
+| `myapp` | `UserCacheItem` | `d4e5f6` | `myapp:User:d4e5f6` |
+| `myapp` | `PatientCacheItem` | `p-001` | `myapp:Patient:p-001` |
 | `dd` | `[CacheName("Session")]SessionData` | `abc` | `dd:Session:abc` |
 
 La convention supprime automatiquement le suffixe `CacheItem` du nom du type.

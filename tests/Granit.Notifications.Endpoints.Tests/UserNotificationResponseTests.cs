@@ -25,7 +25,7 @@ public sealed class UserNotificationResponseTests
         UserNotificationResponse response = new(
             id, notificationId, "NewMessage", NotificationSeverity.Info,
             "user-1", null, UserNotificationState.Unread,
-            createdAt, null, "Guava.Patients", "patient-42");
+            createdAt, null, "Acme.Patients", "patient-42");
 
         // Assert
         response.Id.ShouldBe(id);
@@ -37,7 +37,7 @@ public sealed class UserNotificationResponseTests
         response.State.ShouldBe(UserNotificationState.Unread);
         response.CreatedAt.ShouldBe(createdAt);
         response.ReadAt.ShouldBeNull();
-        response.RelatedEntityType.ShouldBe("Guava.Patients");
+        response.RelatedEntityType.ShouldBe("Acme.Patients");
         response.RelatedEntityId.ShouldBe("patient-42");
     }
 

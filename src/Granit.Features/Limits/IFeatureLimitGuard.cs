@@ -13,7 +13,7 @@ namespace Granit.Features.Limits;
 ///     public async Task HandleAsync(CreatePatientCommand cmd, CancellationToken ct)
 ///     {
 ///         long current = await patients.CountAsync(ct);
-///         await limitGuard.CheckAsync(GuavaFeatures.MaxPatientsCount.Name, current, ct);
+///         await limitGuard.CheckAsync(AcmeFeatures.MaxUsersCount.Name, current, ct);
 ///         // ... proceed with creation
 ///     }
 /// }
@@ -27,7 +27,7 @@ public interface IFeatureLimitGuard
     /// if <paramref name="currentCount"/> has reached or exceeded the resolved numeric
     /// limit for <paramref name="featureName"/>.
     /// </summary>
-    /// <param name="featureName">The numeric feature name (e.g., <c>"Guava.MaxPatientsCount"</c>).</param>
+    /// <param name="featureName">The numeric feature name (e.g., <c>"Acme.MaxUsersCount"</c>).</param>
     /// <param name="currentCount">Current number of existing resources.</param>
     /// <param name="ct">Cancellation token.</param>
     Task CheckAsync(string featureName, long currentCount, CancellationToken ct = default);

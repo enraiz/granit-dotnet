@@ -15,11 +15,11 @@ public static class FeatureEndpointConventionBuilderExtensions
     /// <example>
     /// <code>
     /// app.MapPost("/consultations/start", ...)
-    ///    .RequiresFeature(GuavaFeatures.VideoConsultation.Name);
+    ///    .RequiresFeature(AcmeFeatures.VideoConsultation.Name);
     ///
     /// // Or on a group:
     /// RouteGroupBuilder export = app.MapGroup("/export")
-    ///    .RequiresFeature(GuavaFeatures.ExportPdf.Name);
+    ///    .RequiresFeature(AcmeFeatures.ExportPdf.Name);
     /// </code>
     /// </example>
     public static IEndpointConventionBuilder RequiresFeature(

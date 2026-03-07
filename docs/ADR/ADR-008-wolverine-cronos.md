@@ -8,7 +8,7 @@
 
 ## Contexte
 
-La plateforme Guava nécessite :
+La plateforme nécessite :
 
 - **Messaging asynchrone** : envoi de commandes et d'événements entre modules
   (domain events, integration events) avec garantie de livraison

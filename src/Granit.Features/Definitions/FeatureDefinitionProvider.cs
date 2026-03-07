@@ -9,14 +9,14 @@ namespace Granit.Features.Definitions;
 /// </remarks>
 /// <example>
 /// <code>
-/// public sealed class GuavaFeatureDefinitionProvider : IFeatureDefinitionProvider
+/// public sealed class AcmeFeatureDefinitionProvider : IFeatureDefinitionProvider
 /// {
 ///     public void Define(IFeatureDefinitionContext context)
 ///     {
-///         FeatureGroupDefinition guava = context.AddGroup("Guava", "Guava Features");
+///         FeatureGroupDefinition acme = context.AddGroup("Acme", "Acme Features");
 ///
-///         guava.AddToggle(GuavaFeatures.VideoConsultation.Name, defaultValue: false);
-///         guava.AddNumeric(GuavaFeatures.MaxPatientsCount.Name, defaultValue: 50, min: 1, max: 10_000);
+///         acme.AddToggle(AcmeFeatures.VideoConference.Name, defaultValue: false);
+///         acme.AddNumeric(AcmeFeatures.MaxUsersCount.Name, defaultValue: 50, min: 1, max: 10_000);
 ///     }
 /// }
 /// </code>

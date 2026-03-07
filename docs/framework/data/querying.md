@@ -54,7 +54,7 @@ Chaque entité requêtable est déclarée via une `QueryDefinition<TEntity>` :
 ```csharp
 public sealed class PatientQueryDefinition : QueryDefinition<Patient>
 {
-    public override string Name => "Guava.Patients";
+    public override string Name => "Acme.Patients";
 
     protected override void Configure(QueryDefinitionBuilder<Patient> builder) =>
         builder

@@ -55,12 +55,12 @@ public sealed class EfCoreFeatureStoreTests
     {
         string db = Guid.NewGuid().ToString();
         var tenantId = Guid.NewGuid();
-        await SeedAsync(db, tenantId, "Guava.MaxPatientsCount", "500",
+        await SeedAsync(db, tenantId, "Acme.MaxUsersCount", "500",
             TestContext.Current.CancellationToken);
 
         EfCoreFeatureStore store = CreateStore(db);
         string? result = await store.GetOrNullAsync(
-            "Guava.MaxPatientsCount", tenantId.ToString(),
+            "Acme.MaxUsersCount", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
         result.ShouldBe("500");
@@ -72,7 +72,7 @@ public sealed class EfCoreFeatureStoreTests
         EfCoreFeatureStore store = CreateStore(Guid.NewGuid().ToString());
 
         string? result = await store.GetOrNullAsync(
-            "Guava.VideoConsultation", Guid.NewGuid().ToString(),
+            "Acme.VideoConference", Guid.NewGuid().ToString(),
             TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
@@ -84,12 +84,12 @@ public sealed class EfCoreFeatureStoreTests
         string db = Guid.NewGuid().ToString();
         var tenantA = Guid.NewGuid();
         var tenantB = Guid.NewGuid();
-        await SeedAsync(db, tenantA, "Guava.MaxPatientsCount", "500",
+        await SeedAsync(db, tenantA, "Acme.MaxUsersCount", "500",
             TestContext.Current.CancellationToken);
 
         EfCoreFeatureStore store = CreateStore(db);
         string? result = await store.GetOrNullAsync(
-            "Guava.MaxPatientsCount", tenantB.ToString(),
+            "Acme.MaxUsersCount", tenantB.ToString(),
             TestContext.Current.CancellationToken);
 
         result.ShouldBeNull("override belongs to tenant A, not tenant B");
@@ -103,11 +103,11 @@ public sealed class EfCoreFeatureStoreTests
 
         // Store a global (null tenant) override via the store itself
         await store.SetAsync(
-            "Guava.GlobalFeature", null, "global-value",
+            "Acme.GlobalFeature", null, "global-value",
             TestContext.Current.CancellationToken);
 
         string? result = await store.GetOrNullAsync(
-            "Guava.GlobalFeature", null,
+            "Acme.GlobalFeature", null,
             TestContext.Current.CancellationToken);
 
         result.ShouldBe("global-value");
@@ -125,11 +125,11 @@ public sealed class EfCoreFeatureStoreTests
         EfCoreFeatureStore store = CreateStore(db);
 
         await store.SetAsync(
-            "Guava.MaxPatientsCount", tenantId.ToString(), "1000",
+            "Acme.MaxUsersCount", tenantId.ToString(), "1000",
             TestContext.Current.CancellationToken);
 
         string? result = await store.GetOrNullAsync(
-            "Guava.MaxPatientsCount", tenantId.ToString(),
+            "Acme.MaxUsersCount", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
         result.ShouldBe("1000");
@@ -140,16 +140,16 @@ public sealed class EfCoreFeatureStoreTests
     {
         string db = Guid.NewGuid().ToString();
         var tenantId = Guid.NewGuid();
-        await SeedAsync(db, tenantId, "Guava.MaxPatientsCount", "200",
+        await SeedAsync(db, tenantId, "Acme.MaxUsersCount", "200",
             TestContext.Current.CancellationToken);
 
         EfCoreFeatureStore store = CreateStore(db);
         await store.SetAsync(
-            "Guava.MaxPatientsCount", tenantId.ToString(), "5000",
+            "Acme.MaxUsersCount", tenantId.ToString(), "5000",
             TestContext.Current.CancellationToken);
 
         string? result = await store.GetOrNullAsync(
-            "Guava.MaxPatientsCount", tenantId.ToString(),
+            "Acme.MaxUsersCount", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
         result.ShouldBe("5000");
@@ -163,16 +163,16 @@ public sealed class EfCoreFeatureStoreTests
         EfCoreFeatureStore store = CreateStore(db);
 
         await store.SetAsync(
-            "Guava.Feature", tenantId.ToString(), "true",
+            "Acme.Feature", tenantId.ToString(), "true",
             TestContext.Current.CancellationToken);
         await store.SetAsync(
-            "Guava.Feature", tenantId.ToString(), "true",
+            "Acme.Feature", tenantId.ToString(), "true",
             TestContext.Current.CancellationToken);
 
         InMemoryContextFactory factory = new(db);
         await using GranitFeaturesDbContext ctx = factory.CreateDbContext();
         int count = await ctx.FeatureOverrides.CountAsync(
-            o => o.FeatureName == "Guava.Feature" && o.TenantId == tenantId,
+            o => o.FeatureName == "Acme.Feature" && o.TenantId == tenantId,
             TestContext.Current.CancellationToken);
 
         count.ShouldBe(1, "upsert must not create duplicates");
@@ -187,16 +187,16 @@ public sealed class EfCoreFeatureStoreTests
     {
         string db = Guid.NewGuid().ToString();
         var tenantId = Guid.NewGuid();
-        await SeedAsync(db, tenantId, "Guava.VideoConsultation", "true",
+        await SeedAsync(db, tenantId, "Acme.VideoConference", "true",
             TestContext.Current.CancellationToken);
 
         EfCoreFeatureStore store = CreateStore(db);
         await store.DeleteAsync(
-            "Guava.VideoConsultation", tenantId.ToString(),
+            "Acme.VideoConference", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
         string? result = await store.GetOrNullAsync(
-            "Guava.VideoConsultation", tenantId.ToString(),
+            "Acme.VideoConference", tenantId.ToString(),
             TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
@@ -208,7 +208,7 @@ public sealed class EfCoreFeatureStoreTests
         EfCoreFeatureStore store = CreateStore(Guid.NewGuid().ToString());
 
         Func<Task> act = () => store.DeleteAsync(
-            "Guava.Ghost", Guid.NewGuid().ToString(),
+            "Acme.Ghost", Guid.NewGuid().ToString(),
             TestContext.Current.CancellationToken);
 
         await Should.NotThrowAsync(act);
@@ -220,18 +220,18 @@ public sealed class EfCoreFeatureStoreTests
         string db = Guid.NewGuid().ToString();
         var tenantA = Guid.NewGuid();
         var tenantB = Guid.NewGuid();
-        await SeedAsync(db, tenantA, "Guava.Feature", "true",
+        await SeedAsync(db, tenantA, "Acme.Feature", "true",
             TestContext.Current.CancellationToken);
-        await SeedAsync(db, tenantB, "Guava.Feature", "true",
+        await SeedAsync(db, tenantB, "Acme.Feature", "true",
             TestContext.Current.CancellationToken);
 
         EfCoreFeatureStore store = CreateStore(db);
         await store.DeleteAsync(
-            "Guava.Feature", tenantA.ToString(),
+            "Acme.Feature", tenantA.ToString(),
             TestContext.Current.CancellationToken);
 
         string? resultB = await store.GetOrNullAsync(
-            "Guava.Feature", tenantB.ToString(),
+            "Acme.Feature", tenantB.ToString(),
             TestContext.Current.CancellationToken);
 
         resultB.ShouldBe("true", "tenant B override must not be affected");

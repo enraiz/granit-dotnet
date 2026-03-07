@@ -78,7 +78,7 @@ dotnet add package Granit.MultiTenancy
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
-await builder.AddGranitAsync<GuavaHostModule>();
+await builder.AddGranitAsync<MyAppHostModule>();
 
 var app = builder.Build();
 
@@ -160,7 +160,7 @@ public sealed class SubdomainTenantResolver : ITenantResolver
         HttpContext context,
         CancellationToken cancellationToken = default)
     {
-        string host = context.Request.Host.Host;  // ex: "tenant-abc.guava.health"
+        string host = context.Request.Host.Host;  // ex: "tenant-abc.example.com"
         string subdomain = host.Split('.')[0];
 
         if (Guid.TryParse(subdomain, out Guid tenantId))

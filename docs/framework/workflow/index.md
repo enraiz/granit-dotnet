@@ -86,8 +86,8 @@ Configuration requise pour Keycloak (`appsettings.json`) :
 {
   "KeycloakAdmin": {
     "BaseUrl": "https://keycloak.example.com",
-    "Realm": "guava-health",
-    "ClientId": "guava-admin-service",
+    "Realm": "my-realm",
+    "ClientId": "my-admin-service",
     "ClientSecret": "vault-injected"
   }
 }

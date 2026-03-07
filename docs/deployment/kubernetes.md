@@ -17,13 +17,13 @@ Kubernetes :
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: guava-backend
+  name: my-backend
 spec:
   template:
     spec:
       containers:
         - name: app
-          image: registry.digitaldynamics.be/guava-backend:1.2.0
+          image: registry.digitaldynamics.be/my-backend:1.2.0
           ports:
             - containerPort: 8080
           livenessProbe:
@@ -179,8 +179,8 @@ Les secrets sont injectés via **Vault Agent Injector** ou **CSI Secret Store Dr
 # Vault Agent Injector (annotations)
 annotations:
   vault.hashicorp.com/agent-inject: "true"
-  vault.hashicorp.com/role: "guava-backend"
-  vault.hashicorp.com/agent-inject-secret-db: "database/creds/guava-readonly"
+  vault.hashicorp.com/role: "my-backend"
+  vault.hashicorp.com/agent-inject-secret-db: "database/creds/my-readonly"
 ```
 
 > Ne **jamais** stocker de secrets dans les `ConfigMap` ou `Secret` Kubernetes

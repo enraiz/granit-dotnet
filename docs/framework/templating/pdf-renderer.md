@@ -50,7 +50,7 @@ Section `DocumentGeneration:Pdf` dans `appsettings.json` :
       "MarginLeft": "10mm",
       "MarginRight": "10mm",
       "PrintBackground": true,
-      "HeaderTemplate": "<div style='font-size:8px;text-align:center;width:100%'>Guava Health — Page <span class='pageNumber'></span>/<span class='totalPages'></span></div>",
+      "HeaderTemplate": "<div style='font-size:8px;text-align:center;width:100%'>Acme Corp — Page <span class='pageNumber'></span>/<span class='totalPages'></span></div>",
       "FooterTemplate": null,
       "ChromiumExecutablePath": null,
       "MaxConcurrentPages": 4

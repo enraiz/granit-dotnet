@@ -16,7 +16,7 @@ namespace Granit.DataExchange.Import.Mapping;
 /// <code>
 /// public sealed class PatientImportDefinition : ImportDefinition&lt;Patient&gt;
 /// {
-///     public override string Name =&gt; "Guava.PatientImport";
+///     public override string Name =&gt; "Acme.PatientImport";
 ///     protected override void Configure(ImportDefinitionBuilder&lt;Patient&gt; builder)
 ///     {
 ///         builder
@@ -33,7 +33,7 @@ public abstract class ImportDefinition<TEntity> : IImportDefinitionDescriptor wh
     private ImportDefinitionBuilder<TEntity>? _builder;
 
     /// <summary>
-    /// Unique name identifying this import definition (e.g. <c>"Guava.PatientImport"</c>).
+    /// Unique name identifying this import definition (e.g. <c>"Acme.PatientImport"</c>).
     /// </summary>
     public abstract string Name { get; }
 

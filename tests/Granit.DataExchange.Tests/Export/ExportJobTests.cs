@@ -50,7 +50,7 @@ public sealed class ExportJobTests
 
         ExportJob job = new()
         {
-            DefinitionName = "Guava.PatientExport",
+            DefinitionName = "Acme.PatientExport",
             Format = "xlsx",
             RequestJson = """{"filter":"active"}""",
             Status = ExportJobStatus.Completed,
@@ -61,7 +61,7 @@ public sealed class ExportJobTests
             TenantId = tenantId,
         };
 
-        job.DefinitionName.ShouldBe("Guava.PatientExport");
+        job.DefinitionName.ShouldBe("Acme.PatientExport");
         job.Format.ShouldBe("xlsx");
         job.RequestJson.ShouldBe("""{"filter":"active"}""");
         job.Status.ShouldBe(ExportJobStatus.Completed);

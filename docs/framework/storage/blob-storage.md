@@ -82,7 +82,7 @@ public sealed class MyAppModule : GranitModule { }
   "BlobStorage": {
     "ServiceUrl": "https://s3.rbx.io.cloud.ovh.net",
     "Region": "rbx",
-    "DefaultBucket": "guava-blobs",
+    "DefaultBucket": "my-blobs",
     "ForcePathStyle": false,
     "AccessKey": "INJECTER_DEPUIS_VAULT",
     "SecretKey": "INJECTER_DEPUIS_VAULT"

@@ -26,7 +26,7 @@ internal sealed class ParameterDescriptionOperationTransformer : IOpenApiOperati
         ["name"] = "Unique registered name of the background job.",
 
         // Timeline & Workflow
-        ["entityType"] = "Fully qualified entity type (e.g. 'Guava.Patients').",
+        ["entityType"] = "Fully qualified entity type (e.g. 'Acme.Patients').",
         ["entityId"] = "Entity identifier (primary key).",
         ["entryId"] = "Timeline entry identifier (UUID).",
 

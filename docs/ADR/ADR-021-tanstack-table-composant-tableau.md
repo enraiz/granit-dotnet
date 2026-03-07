@@ -10,7 +10,7 @@
 
 Le module Granit.Querying necessite un composant tableau (data grid) cote frontend
 React pour afficher les listes paginées, filtrées, triées et groupées des
-applications Guava. Le design system du projet est basé sur **Shadcn/UI**
+applications consommatrices. Le design system du projet est basé sur **Shadcn/UI**
 (Radix UI + Tailwind CSS).
 
 Besoins fonctionnels identifies :
@@ -102,7 +102,7 @@ avec le design system du projet.
   realisable
 - Aucun cout de licence, aucune feature bloquee
 - Le wrapper `@granit/querying` devient un asset reutilisable pour toutes les
-  applications Guava
+  applications consommatrices
 - Bundle optimise (< 40 KB pour le tableau)
 
 ### Négatives

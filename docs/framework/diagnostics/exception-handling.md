@@ -260,7 +260,7 @@ Le champ `traceId` dans chaque réponse d'erreur est l'identifiant de trace
 OpenTelemetry. Pour corréler une erreur client avec les logs Loki :
 
 1. Récupérer le `traceId` dans la réponse JSON de l'API
-2. Dans Grafana → Explorer → Loki, rechercher : `{app="guava-backend"} |= "traceId"`
+2. Dans Grafana → Explorer → Loki, rechercher : `{app="my-backend"} |= "traceId"`
 3. Ou directement dans Tempo via le `traceId` complet
 
 ## Dépendances Granit

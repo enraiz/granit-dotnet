@@ -18,13 +18,13 @@ public sealed class NotificationSubscriptionResponseTests
         var id = Guid.NewGuid();
 
         // Act
-        NotificationSubscriptionResponse response = new(id, "user-1", "NewMessage", "Guava.Patients", "p-42");
+        NotificationSubscriptionResponse response = new(id, "user-1", "NewMessage", "Acme.Patients", "p-42");
 
         // Assert
         response.Id.ShouldBe(id);
         response.UserId.ShouldBe("user-1");
         response.NotificationTypeName.ShouldBe("NewMessage");
-        response.EntityType.ShouldBe("Guava.Patients");
+        response.EntityType.ShouldBe("Acme.Patients");
         response.EntityId.ShouldBe("p-42");
     }
 

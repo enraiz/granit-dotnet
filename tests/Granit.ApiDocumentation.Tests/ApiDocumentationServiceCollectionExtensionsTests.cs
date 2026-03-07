@@ -30,7 +30,7 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["ApiDocumentation:Title"] = "Guava API",
+            ["ApiDocumentation:Title"] = "Test API",
             ["ApiDocumentation:MajorVersions:0"] = "2",
             ["ApiDocumentation:EnableInProduction"] = "false",
         });
@@ -42,7 +42,7 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
         ApiDocumentationOptions options =
             sp.GetRequiredService<IOptions<ApiDocumentationOptions>>().Value;
-        options.Title.ShouldBe("Guava API");
+        options.Title.ShouldBe("Test API");
         options.MajorVersions.ShouldContain(2);
         options.EnableInProduction.ShouldBeFalse();
     }
@@ -168,7 +168,7 @@ public sealed class ApiDocumentationServiceCollectionExtensionsTests
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["ApiDocumentation:Title"] = "Guava API",
+            ["ApiDocumentation:Title"] = "Test API",
             ["ApiDocumentation:ContactEmail"] = "api@example.com",
             ["ApiDocumentation:MajorVersions:0"] = "2",
         });
