@@ -15,7 +15,7 @@ namespace Granit.Localization.EntityFrameworkCore.Internal;
 /// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, HDS compliant).
 /// </para>
 /// </remarks>
-internal sealed class GranitLocalizationOverridesDbContext(
+public sealed class GranitLocalizationOverridesDbContext(
     DbContextOptions<GranitLocalizationOverridesDbContext> options)
     : DbContext(options)
 {

@@ -15,7 +15,7 @@ namespace Granit.Localization.EntityFrameworkCore.Internal;
 /// satisfying the HDS 3-year audit trail requirement.
 /// </para>
 /// </remarks>
-internal sealed class LocalizationOverride : AuditedEntity, IMultiTenant
+public sealed class LocalizationOverride : AuditedEntity, IMultiTenant
 {
     /// <summary>Tenant scope. <c>null</c> = host-level override (applies to all tenants).</summary>
     public Guid? TenantId { get; set; }
