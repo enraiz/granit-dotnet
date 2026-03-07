@@ -34,7 +34,7 @@ public sealed class KeycloakAdminOptions
     public string BaseUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// Keycloak realm name (e.g. <c>guava-health</c>).
+    /// Keycloak realm name (e.g. <c>my-company</c>).
     /// </summary>
     [Required]
     public string Realm { get; set; } = string.Empty;
@@ -73,7 +73,7 @@ public sealed class KeycloakAdminOptions
     /// Required for <see cref="IIdentityProvider.VerifyUserCredentialsAsync"/>.
     /// </summary>
     /// <remarks>
-    /// This is typically a public client (e.g. <c>guava-frontend</c>) — not the confidential
+    /// This is typically a public client (e.g. <c>my-frontend</c>) — not the confidential
     /// service account client. It must have the <c>Direct Access Grants Enabled</c> flag turned on
     /// in Keycloak.
     /// </remarks>

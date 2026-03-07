@@ -25,8 +25,8 @@ sequenceDiagram
     participant DVP as DefaultValueProvider (0)
     participant FS as IFeatureStore (DB)
 
-    API->>FC: GetValueAsync("MaxPatients")
-    FC->>HC: GetOrCreateAsync("t:{tid}:MaxPatients")
+    API->>FC: GetValueAsync("MaxUsers")
+    FC->>HC: GetOrCreateAsync("t:{tid}:MaxUsers")
     alt Cache hit
         HC-->>FC: Valeur en cache
     else Cache miss
@@ -102,18 +102,18 @@ sequenceDiagram
 
 ```csharp
 // 1. Définir les features (code-first)
-public sealed class GuavaFeatureDefinitionProvider : FeatureDefinitionProvider
+public sealed class AcmeFeatureDefinitionProvider : FeatureDefinitionProvider
 {
     public override void Define(IFeatureDefinitionContext context)
     {
-        FeatureGroupDefinition group = context.AddGroup("Guava");
+        FeatureGroupDefinition group = context.AddGroup("Acme");
 
-        group.AddFeature("Guava.MaxPatients",
+        group.AddFeature("Acme.MaxUsers",
             defaultValue: "50",
             valueType: FeatureValueType.Numeric,
             numericConstraint: new NumericConstraint(Min: 1, Max: 10_000));
 
-        group.AddFeature("Guava.Telehealth",
+        group.AddFeature("Acme.Telehealth",
             defaultValue: "false",
             valueType: FeatureValueType.Toggle);
     }
@@ -131,10 +131,10 @@ public static class CreatePatientHandler
     {
         // Lève FeatureLimitExceededException si le quota est atteint
         long currentCount = await db.Patients.CountAsync(ct);
-        await limitGuard.CheckAsync("Guava.MaxPatients", currentCount, ct);
+        await limitGuard.CheckAsync("Acme.MaxUsers", currentCount, ct);
 
         // Vérifie qu'une feature toggle est activée
-        await features.RequireEnabledAsync("Guava.Telehealth", ct);
+        await features.RequireEnabledAsync("Acme.Telehealth", ct);
 
         // Logique métier...
     }
@@ -142,5 +142,5 @@ public static class CreatePatientHandler
 
 // 3. Protéger un endpoint
 app.MapPost("/api/patients", CreatePatientEndpoint.Handle)
-    .RequiresFeature("Guava.MaxPatients");
+    .RequiresFeature("Acme.MaxUsers");
 ```

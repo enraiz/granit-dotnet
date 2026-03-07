@@ -27,7 +27,7 @@ Kubernetes du pod :
     "Address": "https://vault.internal:8200",
     "AuthMethod": "Kubernetes",
     "Kubernetes": {
-      "Role": "guava-backend",
+      "Role": "my-backend",
       "ServiceAccountTokenPath": "/var/run/secrets/kubernetes.io/serviceaccount/token"
     }
   }
@@ -45,7 +45,7 @@ sequenceDiagram
     POD->>POD: Lit ServiceAccount JWT (/var/run/secrets/...)
     POD->>VAULT: POST /auth/kubernetes/login (jwt, role)
     VAULT->>K8S: TokenReview (vérifie le JWT)
-    K8S-->>VAULT: JWT valide, ServiceAccount = guava-backend
+    K8S-->>VAULT: JWT valide, ServiceAccount = my-backend
     VAULT-->>POD: Vault token (TTL 1h, renewable)
     Note over POD,VAULT: Le token est renouvelé automatiquement par IVaultCredentialLeaseManager
 ```
@@ -63,7 +63,7 @@ de vie des leases.
   "Vault": {
     "Database": {
       "MountPoint": "database",
-      "RoleName": "guava-readonly",
+      "RoleName": "my-readonly",
       "LeaseTtlSeconds": 3600,
       "LeaseRenewalMarginSeconds": 300
     }

@@ -16,7 +16,7 @@ namespace Granit.Querying;
 /// <code>
 /// public sealed class PatientQueryDefinition : QueryDefinition&lt;Patient&gt;
 /// {
-///     public override string Name =&gt; "Guava.Patients";
+///     public override string Name =&gt; "Acme.Patients";
 ///     protected override void Configure(QueryDefinitionBuilder&lt;Patient&gt; builder)
 ///     {
 ///         builder
@@ -36,7 +36,7 @@ public abstract class QueryDefinition<TEntity> : IQueryDefinitionDescriptor wher
     private QueryingOptions _options = new();
 
     /// <summary>
-    /// Unique name identifying this query definition (e.g. <c>"Guava.Patients"</c>).
+    /// Unique name identifying this query definition (e.g. <c>"Acme.Patients"</c>).
     /// </summary>
     public abstract string Name { get; }
 

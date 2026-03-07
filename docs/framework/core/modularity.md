@@ -18,7 +18,7 @@ builder.Services.AddGranitPersistence();
 builder.Services.AddGranitVault();
 
 // Après (single entry point, async recommandé)
-await builder.AddGranitAsync<GuavaHostModule>();
+await builder.AddGranitAsync<MyAppHostModule>();
 ```
 
 ## Installation
@@ -205,7 +205,7 @@ Si un module apparaît plusieurs fois dans le graphe de dépendances (cas du dia
 il n'est chargé qu'**une seule fois** :
 
 ```text
-GuavaHostModule
+MyAppHostModule
 ├── GranitPersistenceModule
 │   ├── GranitTimingModule      ← chargé une fois
 │   ├── GranitGuidsModule
@@ -238,7 +238,7 @@ GranitWolverineModule     ── → Security
 GranitAuthorizationModule ── → Security
 GranitIdempotencyModule   ── → (standalone → Core)
 
-GuavaHostModule (application) ── → Observability, Security, Persistence, Vault, MultiTenancy
+MyAppHostModule (application) ── → Observability, Security, Persistence, Vault, MultiTenancy
 ```
 
 > **Dépendance souple sur `ICurrentTenant`** : `Granit.Persistence`, `Granit.Settings`,
@@ -249,7 +249,7 @@ GuavaHostModule (application) ── → Observability, Security, Persistence, V
 > enregistrement par l'implémentation réelle. Voir
 > [core.md — Dépendance optionnelle sur le multi-tenancy](core.md#dépendance-optionnelle-sur-le-multi-tenancy).
 
-Ordre de chargement résolu pour `GuavaHostModule` (tri topologique) :
+Ordre de chargement résolu pour `MyAppHostModule` (tri topologique) :
 
 ```text
 1. GranitTimingModule
@@ -259,7 +259,7 @@ Ordre de chargement résolu pour `GuavaHostModule` (tri topologique) :
 5. GranitVaultModule
 6. GranitMultiTenancyModule
 7. GranitPersistenceModule    (après Timing, Guids, Security)
-8. GuavaHostModule            (après tous les autres)
+8. MyAppHostModule            (après tous les autres)
 ```
 
 ## Point d'entrée : AddGranitAsync / UseGranitAsync
@@ -275,7 +275,7 @@ Ordre de chargement résolu pour `GuavaHostModule` (tri topologique) :
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
-await builder.AddGranitAsync<GuavaHostModule>();
+await builder.AddGranitAsync<MyAppHostModule>();
 ```
 
 Une variante synchrone `AddGranit<TModule>()` existe pour les cas où l'async n'est
@@ -303,7 +303,7 @@ Les surcharges sync et async sont disponibles selon le type d'hôte :
 
 ## Créer un module applicatif
 
-Un module applicatif (ex : `GuavaHostModule`) suit le même pattern que les modules
+Un module applicatif (ex : `MyAppHostModule`) suit le même pattern que les modules
 Granit :
 
 ```csharp
@@ -314,13 +314,13 @@ using Granit.Persistence;
 using Granit.Security;
 using Granit.Vault;
 
-namespace Guava.Host;
+namespace MyApp.Host;
 
 [DependsOn(typeof(GranitObservabilityModule))]
 [DependsOn(typeof(GranitSecurityModule))]
 [DependsOn(typeof(GranitPersistenceModule))]
 [DependsOn(typeof(GranitVaultModule))]
-public sealed class GuavaHostModule : GranitModule
+public sealed class MyAppHostModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -342,8 +342,8 @@ Le `Program.cs` résultant est minimal :
 
 ```csharp
 using Granit.Core.Extensions;
-using Guava.Host;
-using Guava.Modules.Auth;
+using MyApp.Host;
+using MyApp.Modules.Auth;
 using Wolverine;
 using Wolverine.FluentValidation;
 using Wolverine.Http;
@@ -352,7 +352,7 @@ using Wolverine.Http.FluentValidation;
 var builder = WebApplication.CreateBuilder(args);
 
 // --- Granit (single entry point) ---
-await builder.AddGranitAsync<GuavaHostModule>();
+await builder.AddGranitAsync<MyAppHostModule>();
 
 // --- Modules applicatifs ---
 AuthModule.ConfigureServices(builder.Services, builder.Configuration);

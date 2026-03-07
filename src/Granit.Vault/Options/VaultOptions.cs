@@ -8,7 +8,7 @@ public sealed class VaultOptions
     /// <summary>Section key in the configuration.</summary>
     public const string SectionName = "Vault";
 
-    /// <summary>Address of the Vault server (e.g. https://vault.guava-health.com).</summary>
+    /// <summary>Address of the Vault server (e.g. https://vault.example.com).</summary>
     public string Address { get; set; } = string.Empty;
 
     /// <summary>Authentication method: "Kubernetes" or "Token" (dev only).</summary>
@@ -18,7 +18,7 @@ public sealed class VaultOptions
     public string? Token { get; set; }
 
     /// <summary>Kubernetes role for Kubernetes authentication.</summary>
-    public string KubernetesRole { get; set; } = "guava-backend";
+    public string KubernetesRole { get; set; } = "my-backend";
 
     /// <summary>Path to the Kubernetes JWT for authentication. Default: /var/run/secrets/kubernetes.io/serviceaccount/token.</summary>
     public string KubernetesTokenPath { get; set; } = "/var/run/secrets/kubernetes.io/serviceaccount/token";

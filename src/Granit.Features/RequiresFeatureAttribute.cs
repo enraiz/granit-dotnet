@@ -14,21 +14,21 @@ namespace Granit.Features;
 /// <b>ASP.NET Core controllers / Razor Pages</b> — apply directly on the action or controller;
 /// the filter is resolved via DI on each request:
 /// <code>
-/// [RequiresFeature(GuavaFeatures.VideoConsultation.Name)]
+/// [RequiresFeature(AcmeFeatures.VideoConsultation.Name)]
 /// public IActionResult StartConsultation() { ... }
 /// </code>
 /// </para>
 /// <para>
 /// <b>Minimal API</b> — use the <c>.RequiresFeature()</c> extension method instead:
 /// <code>
-/// app.MapPost("/consultations", ...).RequiresFeature(GuavaFeatures.VideoConsultation.Name);
+/// app.MapPost("/consultations", ...).RequiresFeature(AcmeFeatures.VideoConsultation.Name);
 /// </code>
 /// </para>
 /// <para>
 /// <b>Wolverine message handlers</b> — decorate the message class; register
 /// <see cref="Wolverine.RequiresFeatureMiddleware"/> in your Wolverine setup:
 /// <code>
-/// [RequiresFeature(GuavaFeatures.ExportPdf.Name)]
+/// [RequiresFeature(AcmeFeatures.ExportPdf.Name)]
 /// public sealed class GenerateExportCommand { }
 /// </code>
 /// </para>

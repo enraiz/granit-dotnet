@@ -38,9 +38,9 @@ app.Run();
 ```json
 {
   "ApiDocumentation": {
-    "Title": "Guava API",
+    "Title": "My API",
     "MajorVersions": [1],
-    "Description": "API clinique Guava — données de santé HDS",
+    "Description": "API clinique — données de santé HDS",
     "ContactEmail": "api@digitaldynamics.be",
     "LogoUrl": "/logo.svg",
     "FaviconUrl": "/favicon.svg",
@@ -303,7 +303,7 @@ les URLs OAuth2 sont configurées indépendamment dans `appsettings.json`.
 ```json
 {
   "ApiDocumentation": {
-    "Title": "Guava API",
+    "Title": "My API",
     "OAuth2": {
       "AuthorizationUrl": "https://keycloak.example.com/realms/my-realm/protocol/openid-connect/auth",
       "TokenUrl": "https://keycloak.example.com/realms/my-realm/protocol/openid-connect/token",
@@ -381,7 +381,7 @@ Configuration `orval.config.ts` :
 import { defineConfig } from "orval";
 
 export default defineConfig({
-  guavaApi: {
+  myApi: {
     input: {
       target: "http://localhost:5000/openapi/v1.json",
     },

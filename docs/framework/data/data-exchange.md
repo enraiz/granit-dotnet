@@ -139,7 +139,7 @@ Chaque entité importable est déclarée via une `ImportDefinition<TEntity>` :
 ```csharp
 public sealed class PatientImportDefinition : ImportDefinition<Patient>
 {
-    public override string Name => "Guava.PatientImport";
+    public override string Name => "Acme.PatientImport";
 
     protected override void Configure(ImportDefinitionBuilder<Patient> builder)
     {
@@ -185,7 +185,7 @@ Pour un fichier plat où un parent s'étend sur plusieurs lignes :
 ```csharp
 public sealed class OrderImportDefinition : ImportDefinition<Order>
 {
-    public override string Name => "Guava.OrderImport";
+    public override string Name => "Acme.OrderImport";
 
     protected override void Configure(ImportDefinitionBuilder<Order> builder)
     {
@@ -397,12 +397,12 @@ builder.AddGranitDataExchangeEntityFrameworkCore(opts =>
     opts.UseNpgsql(connectionString));
 
 // Par entité — executor et identity resolver
-services.AddImportExecutor<Patient, GuavaDbContext>();
-services.AddBusinessKeyResolver<Patient, GuavaDbContext>();
+services.AddImportExecutor<Patient, AppDbContext>();
+services.AddBusinessKeyResolver<Patient, AppDbContext>();
 
 // Ou composite key / external ID :
-// services.AddCompositeKeyResolver<Patient, GuavaDbContext>();
-// services.AddExternalIdResolver<Patient, GuavaDbContext>();
+// services.AddCompositeKeyResolver<Patient, AppDbContext>();
+// services.AddExternalIdResolver<Patient, AppDbContext>();
 ```
 
 ### Double DbContext
@@ -411,7 +411,7 @@ Le package manipule **deux** DbContexts distincts :
 
 1. **`DataExchangeDbContext`** (isolé, propriété du package) — stocke `ImportJob`,
    `SavedMappingEntity`, `ExternalIdMappingEntity`. Utilisé via `IDbContextFactory<>`.
-2. **DbContext applicatif** (ex. `GuavaDbContext`) — contient les entités importées
+2. **DbContext applicatif** (ex. `AppDbContext`) — contient les entités importées
    (ex. `Patient`). Fourni par l'application.
 
 Les classes génériques (`EfImportExecutor`, identity resolvers) prennent **deux paramètres
@@ -565,10 +565,10 @@ Seuls les champs déclarés dans `Configure()` sont disponibles à l'export (whi
 ```csharp
 public sealed class PatientExportDefinition : ExportDefinition<Patient>
 {
-    public override string Name => "Guava.PatientExport";
+    public override string Name => "Acme.PatientExport";
 
     // Lien vers la QueryDefinition pour filtrage/tri (optionnel)
-    public override string? QueryDefinitionName => "Guava.Patients";
+    public override string? QueryDefinitionName => "Acme.Patients";
 
     protected override void Configure(ExportDefinitionBuilder<Patient> builder)
     {
@@ -608,10 +608,10 @@ l'isolation tenant, les ACL et les `Include()` pour les propriétés de navigati
 ```csharp
 public sealed class PatientExportDataSource : IExportDataSource<Patient>
 {
-    private readonly GuavaDbContext _db;
+    private readonly AppDbContext _db;
     private readonly ICurrentTenant _tenant;
 
-    public PatientExportDataSource(GuavaDbContext db, ICurrentTenant tenant)
+    public PatientExportDataSource(AppDbContext db, ICurrentTenant tenant)
     {
         _db = db;
         _tenant = tenant;
@@ -657,7 +657,7 @@ Chaque preset stocke les champs sélectionnés, le format et l'option d'inclusio
 
 ```csharp
 ExportPreset preset = new(
-    DefinitionName: "Guava.PatientExport",
+    DefinitionName: "Acme.PatientExport",
     PresetName: "Export mensuel",
     SelectedFields: ["LastName", "FirstName", "Email"],
     Format: "xlsx",

@@ -23,13 +23,13 @@ namespace Granit.Templating.GlobalContext;
 /// <para>
 /// To add custom ambient variables (e.g. branding):
 /// <code>
-/// public sealed class GuavaBrandingContext : ITemplateGlobalContext
+/// public sealed class AcmeBrandingContext : ITemplateGlobalContext
 /// {
 ///     public string ContextName => "brand";
 ///     public object Resolve() => new { logo_url = "https://...", primary_color = "#..." };
 /// }
 ///
-/// services.AddSingleton&lt;ITemplateGlobalContext, GuavaBrandingContext&gt;();
+/// services.AddSingleton&lt;ITemplateGlobalContext, AcmeBrandingContext&gt;();
 /// </code>
 /// </para>
 /// </remarks>

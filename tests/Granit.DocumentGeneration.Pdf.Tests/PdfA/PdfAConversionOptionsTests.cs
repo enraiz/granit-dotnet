@@ -50,13 +50,13 @@ public sealed class PdfAConversionOptionsTests
             FacturXXmlContent = "<xml>invoice</xml>",
             FacturXConformanceLevel = "EN 16931",
             DocumentTitle = "Invoice 2026-001",
-            DocumentAuthor = "Guava Health",
+            DocumentAuthor = "Test Corp",
         };
 
         options.FacturXXmlContent.ShouldBe("<xml>invoice</xml>");
         options.FacturXConformanceLevel.ShouldBe("EN 16931");
         options.DocumentTitle.ShouldBe("Invoice 2026-001");
-        options.DocumentAuthor.ShouldBe("Guava Health");
+        options.DocumentAuthor.ShouldBe("Test Corp");
     }
 
     [Fact]

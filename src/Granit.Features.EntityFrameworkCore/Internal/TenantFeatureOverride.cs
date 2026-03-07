@@ -18,7 +18,7 @@ internal sealed class TenantFeatureOverride : AuditedEntity, IMultiTenant
     /// <summary>Tenant scope. Never null for a tenant override (enforced at the store level).</summary>
     public Guid? TenantId { get; set; }
 
-    /// <summary>Feature name, e.g. <c>"Guava.MaxPatientsCount"</c>. Max 200 characters.</summary>
+    /// <summary>Feature name, e.g. <c>"Acme.MaxUsersCount"</c>. Max 200 characters.</summary>
     public string FeatureName { get; set; } = string.Empty;
 
     /// <summary>Serialized feature value, e.g. <c>"true"</c> or <c>"5000"</c>. Max 2 000 characters.</summary>

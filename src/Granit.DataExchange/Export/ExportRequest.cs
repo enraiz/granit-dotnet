@@ -3,7 +3,7 @@ namespace Granit.DataExchange.Export;
 /// <summary>
 /// Request to execute a data export.
 /// </summary>
-/// <param name="DefinitionName">The export definition name (e.g. <c>"Guava.PatientExport"</c>).</param>
+/// <param name="DefinitionName">The export definition name (e.g. <c>"Acme.PatientExport"</c>).</param>
 /// <param name="Format">Output format (<c>"xlsx"</c> or <c>"csv"</c>).</param>
 /// <param name="SelectedFields">
 /// Ordered list of field property paths to include.

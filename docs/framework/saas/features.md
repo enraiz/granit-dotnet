@@ -98,7 +98,7 @@ public sealed class AppModule : GranitModule { }
 Implémenter `IFeatureDefinitionProvider` et l'enregistrer au démarrage.
 
 ```csharp
-public sealed class GuavaFeatureDefinitionProvider : IFeatureDefinitionProvider
+public sealed class AcmeFeatureDefinitionProvider : IFeatureDefinitionProvider
 {
     public void Define(IFeatureDefinitionContext context)
     {
@@ -121,7 +121,7 @@ public sealed class GuavaFeatureDefinitionProvider : IFeatureDefinitionProvider
 
 ```csharp
 // Program.cs
-services.AddFeatureDefinitions<GuavaFeatureDefinitionProvider>();
+services.AddFeatureDefinitions<AcmeFeatureDefinitionProvider>();
 ```
 
 ## Résolution du plan commercial
@@ -131,19 +131,19 @@ Sans ces implémentations, la cascade passe directement aux valeurs par défaut.
 
 ```csharp
 // Résolution du plan à partir du tenant courant
-public sealed class GuavaPlanIdProvider(ICurrentTenant currentTenant, IGuavaDb db)
+public sealed class AcmePlanIdProvider(ICurrentTenant currentTenant, IAppDb db)
     : IPlanIdProvider
 {
     public async Task<string?> GetCurrentPlanIdAsync(CancellationToken ct)
     {
         if (!currentTenant.IsAvailable) return null;
-        GuavaTenant? tenant = await db.Tenants.FindAsync(currentTenant.Id, ct);
+        AppTenant? tenant = await db.Tenants.FindAsync(currentTenant.Id, ct);
         return tenant?.PlanId;
     }
 }
 
 // Valeurs des features par plan (depuis la base ou la config)
-public sealed class GuavaPlanFeatureStore(IGuavaDb db) : IPlanFeatureStore
+public sealed class AcmePlanFeatureStore(IAppDb db) : IPlanFeatureStore
 {
     public async Task<string?> GetOrNullAsync(
         string planId, string featureName, CancellationToken ct) =>
@@ -155,8 +155,8 @@ public sealed class GuavaPlanFeatureStore(IGuavaDb db) : IPlanFeatureStore
 ```
 
 ```csharp
-services.AddSingleton<IPlanIdProvider, GuavaPlanIdProvider>();
-services.AddSingleton<IPlanFeatureStore, GuavaPlanFeatureStore>();
+services.AddSingleton<IPlanIdProvider, AcmePlanIdProvider>();
+services.AddSingleton<IPlanFeatureStore, AcmePlanFeatureStore>();
 ```
 
 ## Utilisation

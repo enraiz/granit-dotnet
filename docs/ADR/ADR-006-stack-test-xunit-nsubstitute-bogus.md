@@ -4,7 +4,7 @@
 - **Date** : 2026-02-21
 - **Issue** : [#4](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/4)
 - **Auteurs** : Équipe Digital Dynamics
-- **Portée** : granit-dotnet, guava-backend
+- **Portée** : granit-dotnet, applications consommatrices
 
 ## Contexte
 

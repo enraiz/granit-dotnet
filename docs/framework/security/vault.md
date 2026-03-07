@@ -17,9 +17,9 @@ dotnet add package Granit.Vault
 ```json
 {
   "Vault": {
-    "Address": "https://vault.guava-health.com",
+    "Address": "https://vault.example.com",
     "AuthMethod": "Kubernetes",
-    "KubernetesRole": "guava-backend",
+    "KubernetesRole": "my-backend",
     "DatabaseMountPoint": "database",
     "DatabaseRoleName": "readwrite",
     "TransitMountPoint": "transit"
@@ -53,7 +53,7 @@ public sealed class VaultOptions
     public string Address { get; set; }
     public string AuthMethod { get; set; } = "Kubernetes";
     public string? Token { get; set; }                    // Dev uniquement
-    public string KubernetesRole { get; set; } = "guava-backend";
+    public string KubernetesRole { get; set; } = "my-backend";
     public string KubernetesTokenPath { get; set; }       // Défaut : ServiceAccount token K8s
     public string DatabaseMountPoint { get; set; } = "database";
     public string DatabaseRoleName { get; set; } = "readwrite";

@@ -15,9 +15,9 @@ public sealed class FeatureDefinitionContextTests
     {
         FeatureDefinitionContext context = new();
 
-        FeatureGroupDefinition group = context.AddGroup("Guava");
+        FeatureGroupDefinition group = context.AddGroup("TestApp");
 
-        group.Name.ShouldBe("Guava");
+        group.Name.ShouldBe("TestApp");
         group.DisplayName.ShouldBeNull();
     }
 
@@ -26,9 +26,9 @@ public sealed class FeatureDefinitionContextTests
     {
         FeatureDefinitionContext context = new();
 
-        FeatureGroupDefinition group = context.AddGroup("Guava", "Guava Features");
+        FeatureGroupDefinition group = context.AddGroup("TestApp", "Acme Features");
 
-        group.DisplayName.ShouldBe("Guava Features");
+        group.DisplayName.ShouldBe("Acme Features");
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class FeatureDefinitionContextTests
     {
         FeatureDefinitionContext context = new();
 
-        FeatureGroupDefinition group1 = context.AddGroup("Guava");
+        FeatureGroupDefinition group1 = context.AddGroup("TestApp");
         FeatureGroupDefinition group2 = context.AddGroup("Billing");
 
         group1.ShouldNotBeSameAs(group2);
@@ -71,9 +71,9 @@ public sealed class FeatureDefinitionContextTests
     public void GetAllDefinitions_Flattens_AllGroupFeatures()
     {
         FeatureDefinitionContext context = new();
-        FeatureGroupDefinition group1 = context.AddGroup("Guava");
-        group1.AddToggle("Guava.Video", defaultValue: true);
-        group1.AddNumeric("Guava.MaxPatients", 100);
+        FeatureGroupDefinition group1 = context.AddGroup("TestApp");
+        group1.AddToggle("Acme.Video", defaultValue: true);
+        group1.AddNumeric("Acme.MaxUsers", 100);
 
         FeatureGroupDefinition group2 = context.AddGroup("Billing");
         group2.AddToggle("Billing.Invoices");
@@ -82,8 +82,8 @@ public sealed class FeatureDefinitionContextTests
 
         definitions.Count.ShouldBe(3);
         IEnumerable<string> names = definitions.Select(d => d.Name);
-        names.ShouldContain("Guava.Video");
-        names.ShouldContain("Guava.MaxPatients");
+        names.ShouldContain("Acme.Video");
+        names.ShouldContain("Acme.MaxUsers");
         names.ShouldContain("Billing.Invoices");
     }
 }

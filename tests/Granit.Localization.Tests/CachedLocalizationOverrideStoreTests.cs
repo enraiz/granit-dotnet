@@ -39,16 +39,16 @@ public sealed class CachedLocalizationOverrideStoreTests
     public async Task GetOverridesAsync_CacheMiss_CallsInnerStore()
     {
         ILocalizationOverrideStore inner = Substitute.For<ILocalizationOverrideStore>();
-        inner.GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>())
+        inner.GetOverridesAsync("TestApp", "fr", Arg.Any<CancellationToken>())
              .ReturnsForAnyArgs(Task.FromResult<IReadOnlyDictionary<string, string>>(
                  new Dictionary<string, string> { ["Key1"] = "Valeur1" }));
 
         CachedLocalizationOverrideStore store = BuildStore(inner);
         IReadOnlyDictionary<string, string> result =
-            await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
+            await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
 
         result["Key1"].ShouldBe("Valeur1");
-        await inner.Received(1).GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>());
+        await inner.Received(1).GetOverridesAsync("TestApp", "fr", Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -61,10 +61,10 @@ public sealed class CachedLocalizationOverrideStoreTests
 
         CachedLocalizationOverrideStore store = BuildStore(inner);
 
-        await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
-        await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
+        await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
+        await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
 
-        await inner.Received(1).GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>());
+        await inner.Received(1).GetOverridesAsync("TestApp", "fr", Arg.Any<CancellationToken>());
     }
 
     // -------------------------------------------------------------------------
@@ -80,11 +80,11 @@ public sealed class CachedLocalizationOverrideStoreTests
 
         CachedLocalizationOverrideStore store = BuildStore(inner);
         await store.SetOverrideAsync(
-            "Guava", "fr", "Patient.Title", "Bénéficiaire",
+            "TestApp", "fr", "Patient.Title", "Bénéficiaire",
             TestContext.Current.CancellationToken);
 
         await inner.Received(1).SetOverrideAsync(
-            "Guava", "fr", "Patient.Title", "Bénéficiaire", Arg.Any<CancellationToken>());
+            "TestApp", "fr", "Patient.Title", "Bénéficiaire", Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -106,19 +106,19 @@ public sealed class CachedLocalizationOverrideStoreTests
 
         // First call populates cache
         IReadOnlyDictionary<string, string> first =
-            await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
+            await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
 
         // Write invalidates cache
-        await store.SetOverrideAsync("Guava", "fr", "Key", "updated",
+        await store.SetOverrideAsync("TestApp", "fr", "Key", "updated",
             TestContext.Current.CancellationToken);
 
         // Second call should hit inner store again (cache was invalidated)
         IReadOnlyDictionary<string, string> second =
-            await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
+            await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
 
         first["Key"].ShouldBe("value1");
         second["Key"].ShouldBe("value2");
-        await inner.Received(2).GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>());
+        await inner.Received(2).GetOverridesAsync("TestApp", "fr", Arg.Any<CancellationToken>());
     }
 
     // -------------------------------------------------------------------------
@@ -134,11 +134,11 @@ public sealed class CachedLocalizationOverrideStoreTests
 
         CachedLocalizationOverrideStore store = BuildStore(inner);
         await store.RemoveOverrideAsync(
-            "Guava", "fr", "Patient.Title",
+            "TestApp", "fr", "Patient.Title",
             TestContext.Current.CancellationToken);
 
         await inner.Received(1).RemoveOverrideAsync(
-            "Guava", "fr", "Patient.Title", Arg.Any<CancellationToken>());
+            "TestApp", "fr", "Patient.Title", Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -158,12 +158,12 @@ public sealed class CachedLocalizationOverrideStoreTests
 
         CachedLocalizationOverrideStore store = BuildStore(inner);
 
-        await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
-        await store.RemoveOverrideAsync("Guava", "fr", "Key",
+        await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
+        await store.RemoveOverrideAsync("TestApp", "fr", "Key",
             TestContext.Current.CancellationToken);
-        await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
+        await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
 
-        await inner.Received(2).GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>());
+        await inner.Received(2).GetOverridesAsync("TestApp", "fr", Arg.Any<CancellationToken>());
     }
 
     // -------------------------------------------------------------------------
@@ -174,19 +174,19 @@ public sealed class CachedLocalizationOverrideStoreTests
     public async Task GetOverridesAsync_DifferentCultures_AreIsolatedInCache()
     {
         ILocalizationOverrideStore inner = Substitute.For<ILocalizationOverrideStore>();
-        inner.GetOverridesAsync("Guava", "fr", Arg.Any<CancellationToken>())
+        inner.GetOverridesAsync("TestApp", "fr", Arg.Any<CancellationToken>())
              .Returns(Task.FromResult<IReadOnlyDictionary<string, string>>(
                  new Dictionary<string, string> { ["Key"] = "Français" }));
-        inner.GetOverridesAsync("Guava", "en", Arg.Any<CancellationToken>())
+        inner.GetOverridesAsync("TestApp", "en", Arg.Any<CancellationToken>())
              .Returns(Task.FromResult<IReadOnlyDictionary<string, string>>(
                  new Dictionary<string, string> { ["Key"] = "English" }));
 
         CachedLocalizationOverrideStore store = BuildStore(inner);
 
         IReadOnlyDictionary<string, string> fr =
-            await store.GetOverridesAsync("Guava", "fr", TestContext.Current.CancellationToken);
+            await store.GetOverridesAsync("TestApp", "fr", TestContext.Current.CancellationToken);
         IReadOnlyDictionary<string, string> en =
-            await store.GetOverridesAsync("Guava", "en", TestContext.Current.CancellationToken);
+            await store.GetOverridesAsync("TestApp", "en", TestContext.Current.CancellationToken);
 
         fr["Key"].ShouldBe("Français");
         en["Key"].ShouldBe("English");

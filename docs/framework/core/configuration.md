@@ -110,7 +110,7 @@ C'est le point d'accès à la configuration lors de la phase d'initialisation d'
 
 ```csharp
 [DependsOn(typeof(GranitSecurityModule))]
-public class GuavaHostModule : GranitModule
+public class MyAppHostModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -175,15 +175,15 @@ appsettings.json
 ```json
 {
   "Authentication": {
-    "Authority": "https://auth.digitaldynamics.be/realms/guava-health",
-    "Audience": "guava-backend",
+    "Authority": "https://auth.example.com/realms/my-realm",
+    "Audience": "my-backend",
     "RequireHttpsMetadata": true
   }
 }
 ```
 
 ```csharp
-builder.AddGranit<GuavaHostModule>();
+builder.AddGranit<MyAppHostModule>();
 // ou directement :
 builder.Services.AddGranitJwtBearer();
 ```
@@ -193,8 +193,8 @@ builder.Services.AddGranitJwtBearer();
 ```json
 {
   "Keycloak": {
-    "Authority": "https://auth.digitaldynamics.be/realms/guava-health",
-    "ClientId": "guava-backend",
+    "Authority": "https://auth.example.com/realms/my-realm",
+    "ClientId": "my-backend",
     "AdminRole": "admin",
     "RoleClaimsSource": "realm_access"
   }
@@ -210,9 +210,9 @@ builder.Services.AddGranitKeycloak();
 ```json
 {
   "Vault": {
-    "Address": "https://vault.guava-health.com",
+    "Address": "https://vault.example.com",
     "AuthMethod": "Kubernetes",
-    "KubernetesRole": "guava-backend",
+    "KubernetesRole": "my-backend",
     "DatabaseMountPoint": "database",
     "DatabaseRoleName": "readwrite",
     "TransitMountPoint": "transit"
@@ -248,7 +248,7 @@ builder.Services.AddGranitTiming();
 ```json
 {
   "Observability": {
-    "ServiceName": "guava-backend",
+    "ServiceName": "my-backend",
     "ServiceVersion": "1.0.0",
     "Environment": "production",
     "OtlpEndpoint": "http://otel-collector:4317",
@@ -272,7 +272,7 @@ La configuration spécifique à un environnement est placée dans
 ```json
 {
   "Authentication": {
-    "Authority": "http://localhost:8080/realms/guava-health",
+    "Authority": "http://localhost:8080/realms/my-realm",
     "RequireHttpsMetadata": false
   },
   "Vault": {
@@ -292,7 +292,7 @@ La configuration spécifique à un environnement est placée dans
 ```json
 {
   "Authentication": {
-    "Authority": "http://keycloak.keycloak.svc.cluster.local:80/realms/guava-health",
+    "Authority": "http://keycloak.keycloak.svc.cluster.local:80/realms/my-realm",
     "RequireHttpsMetadata": false
   }
 }
@@ -304,13 +304,13 @@ La configuration spécifique à un environnement est placée dans
 
 ## Lecture des options dans Program.cs
 
-Le `Program.cs` type d'une application Guava :
+Le `Program.cs` type d'une application consommatrice :
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
 // Granit charge tous les modules et leur configuration via IConfiguration
-await builder.AddGranitAsync<GuavaHostModule>();
+await builder.AddGranitAsync<MyAppHostModule>();
 
 var app = builder.Build();
 

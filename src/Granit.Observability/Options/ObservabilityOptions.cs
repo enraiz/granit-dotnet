@@ -8,7 +8,7 @@ public sealed class ObservabilityOptions
     /// <summary>Section key in the configuration.</summary>
     public const string SectionName = "Observability";
 
-    /// <summary>Service name for OTEL (e.g. "guava-backend").</summary>
+    /// <summary>Service name for OTEL (e.g. "my-backend").</summary>
     public string ServiceName { get; set; } = "unknown-service";
 
     /// <summary>Service version.</summary>
@@ -17,8 +17,8 @@ public sealed class ObservabilityOptions
     /// <summary>OTLP gRPC endpoint (e.g. http://otel-collector:4317).</summary>
     public string OtlpEndpoint { get; set; } = "http://localhost:4317";
 
-    /// <summary>Service namespace (e.g. "guava-health").</summary>
-    public string ServiceNamespace { get; set; } = "guava-health";
+    /// <summary>Service namespace (e.g. "my-company").</summary>
+    public string ServiceNamespace { get; set; } = "my-company";
 
     /// <summary>Deployment environment (e.g. "production", "staging", "development").</summary>
     public string Environment { get; set; } = "development";

@@ -25,8 +25,8 @@ namespace Granit.DataExchange.Export;
 /// <code>
 /// public sealed class PatientExportDefinition : ExportDefinition&lt;Patient&gt;
 /// {
-///     public override string Name =&gt; "Guava.PatientExport";
-///     public override string? QueryDefinitionName =&gt; "Guava.Patients";
+///     public override string Name =&gt; "Acme.PatientExport";
+///     public override string? QueryDefinitionName =&gt; "Acme.Patients";
 ///     protected override void Configure(ExportDefinitionBuilder&lt;Patient&gt; builder)
 ///     {
 ///         builder
@@ -45,7 +45,7 @@ public abstract class ExportDefinition<TEntity> : IExportDefinitionDescriptor
     private ExportDefinitionBuilder<TEntity>? _builder;
 
     /// <summary>
-    /// Unique name identifying this export definition (e.g. <c>"Guava.PatientExport"</c>).
+    /// Unique name identifying this export definition (e.g. <c>"Acme.PatientExport"</c>).
     /// </summary>
     public abstract string Name { get; }
 

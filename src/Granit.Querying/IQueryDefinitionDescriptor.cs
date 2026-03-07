@@ -7,7 +7,7 @@ namespace Granit.Querying;
 public interface IQueryDefinitionDescriptor
 {
     /// <summary>
-    /// Unique name identifying this query definition (e.g. <c>"Guava.Patients"</c>).
+    /// Unique name identifying this query definition (e.g. <c>"Acme.Patients"</c>).
     /// </summary>
     string Name { get; }
 

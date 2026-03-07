@@ -24,10 +24,10 @@ namespace Granit.Caching.Hybrid;
 /// <code>
 /// {
 ///   "Cache": {
-///     "KeyPrefix": "guava",
+///     "KeyPrefix": "myapp",
 ///     "EncryptValues": true,
 ///     "Encryption": { "Key": "base64-key-from-vault" },
-///     "Redis": { "Configuration": "redis:6379", "InstanceName": "guava:" },
+///     "Redis": { "Configuration": "redis:6379", "InstanceName": "myapp:" },
 ///     "Hybrid": { "LocalCacheExpiration": "00:00:30" }
 ///   }
 /// }

@@ -24,7 +24,7 @@ public sealed class ObservabilityOptionsTests
         options.ServiceName.ShouldBe("unknown-service");
         options.ServiceVersion.ShouldBe("0.0.0");
         options.OtlpEndpoint.ShouldBe("http://localhost:4317");
-        options.ServiceNamespace.ShouldBe("guava-health");
+        options.ServiceNamespace.ShouldBe("my-company");
         options.Environment.ShouldBe("development");
         options.EnableTracing.ShouldBeTrue();
         options.EnableMetrics.ShouldBeTrue();
@@ -37,7 +37,7 @@ public sealed class ObservabilityOptionsTests
         IConfigurationRoot config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                [$"{ObservabilityOptions.SectionName}:ServiceName"] = "guava-backend",
+                [$"{ObservabilityOptions.SectionName}:ServiceName"] = "test-backend",
                 [$"{ObservabilityOptions.SectionName}:ServiceVersion"] = "1.0.0",
                 [$"{ObservabilityOptions.SectionName}:OtlpEndpoint"] = "http://otel-collector:4317",
                 [$"{ObservabilityOptions.SectionName}:Environment"] = "production",
@@ -52,7 +52,7 @@ public sealed class ObservabilityOptionsTests
 
         // Assert
         options.ShouldNotBeNull();
-        options!.ServiceName.ShouldBe("guava-backend");
+        options!.ServiceName.ShouldBe("test-backend");
         options.ServiceVersion.ShouldBe("1.0.0");
         options.OtlpEndpoint.ShouldBe("http://otel-collector:4317");
         options.Environment.ShouldBe("production");

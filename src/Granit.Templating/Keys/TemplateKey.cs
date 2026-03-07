@@ -5,7 +5,7 @@ namespace Granit.Templating.Keys;
 /// </summary>
 /// <param name="Name">
 /// Logical template name. Convention: <c>"Module.TemplateName"</c>
-/// (e.g. <c>"Guava.InvoiceB2B"</c>).
+/// (e.g. <c>"Acme.InvoiceB2B"</c>).
 /// </param>
 /// <param name="Culture">
 /// Optional BCP 47 culture tag (e.g. <c>"fr"</c>, <c>"en-US"</c>).

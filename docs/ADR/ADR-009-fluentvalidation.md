@@ -8,7 +8,7 @@
 
 ## Contexte
 
-La plateforme Guava nécessite un framework de validation pour :
+La plateforme nécessite un framework de validation pour :
 
 - **Validation métier** : règles complexes et composables (adresse, SIRET, IBAN,
   email, locale) avec codes d'erreur standardisés

@@ -65,7 +65,7 @@ Method garantit que l'ordre est toujours respecté.
 
 ```csharp
 [DependsOn(typeof(GranitPersistenceModule))]
-public sealed class GuavaHostModule : GranitModule
+public sealed class MyAppHostModule : GranitModule
 {
     // Surcharge uniquement les étapes nécessaires
     public override void ConfigureServices(ServiceConfigurationContext context)

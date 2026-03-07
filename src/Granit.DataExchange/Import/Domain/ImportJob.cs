@@ -12,7 +12,7 @@ namespace Granit.DataExchange.Import.Domain;
 public sealed class ImportJob : AuditedEntity
 {
     /// <summary>
-    /// The import definition name (e.g. <c>"Guava.PatientImport"</c>).
+    /// The import definition name (e.g. <c>"Acme.PatientImport"</c>).
     /// Links to the registered <c>ImportDefinition&lt;T&gt;</c>.
     /// </summary>
     public required string DefinitionName { get; set; }

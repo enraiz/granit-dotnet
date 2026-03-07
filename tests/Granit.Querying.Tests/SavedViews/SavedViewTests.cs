@@ -11,12 +11,12 @@ public sealed class SavedViewTests
     {
         SavedView view = new()
         {
-            EntityType = "Guava.Patients",
+            EntityType = "Acme.Patients",
             Name = "Active patients",
             UserId = "user-1",
         };
 
-        view.EntityType.ShouldBe("Guava.Patients");
+        view.EntityType.ShouldBe("Acme.Patients");
         view.Name.ShouldBe("Active patients");
         view.UserId.ShouldBe("user-1");
     }
@@ -46,7 +46,7 @@ public sealed class SavedViewTests
         var tenantId = Guid.NewGuid();
         SavedView view = new()
         {
-            EntityType = "Guava.Patients",
+            EntityType = "Acme.Patients",
             Name = "My view",
             UserId = "user-1",
             IsShared = true,

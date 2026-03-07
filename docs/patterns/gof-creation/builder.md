@@ -56,7 +56,7 @@ remplace des dizaines de lignes d'enregistrement DI.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Un seul appel par module — fluent et composable
-builder.AddGranit<GuavaHostModule>();
+builder.AddGranit<MyAppHostModule>();
 // En interne, le ModuleLoader appelle AddGranitWolverine(),
 // AddGranitPersistence(), AddGranitFeatures(), etc.
 // dans l'ordre topologique des dépendances

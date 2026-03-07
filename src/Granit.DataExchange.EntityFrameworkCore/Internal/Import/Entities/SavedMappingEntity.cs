@@ -9,7 +9,7 @@ internal sealed class SavedMappingEntity
     /// <summary>Unique identifier.</summary>
     public Guid Id { get; set; }
 
-    /// <summary>The import definition name (e.g. <c>"Guava.PatientImport"</c>).</summary>
+    /// <summary>The import definition name (e.g. <c>"Acme.PatientImport"</c>).</summary>
     public required string DefinitionName { get; set; }
 
     /// <summary>Tenant identifier. <c>null</c> when multi-tenancy is not active.</summary>

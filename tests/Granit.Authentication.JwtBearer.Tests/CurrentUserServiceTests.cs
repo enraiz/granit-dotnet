@@ -59,10 +59,10 @@ public sealed class CurrentUserServiceTests
         // Arrange
         CurrentUserService sut = CreateService(
             new Claim("sub", "user-123"),
-            new Claim(ClaimTypes.Email, "jean@guava-health.com"));
+            new Claim(ClaimTypes.Email, "jean@example.com"));
 
         // Act & Assert
-        sut.Email.ShouldBe("jean@guava-health.com");
+        sut.Email.ShouldBe("jean@example.com");
     }
 
     [Fact]

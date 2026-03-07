@@ -12,7 +12,7 @@ namespace Granit.DataExchange.Import.Mapping;
 public interface IImportDefinitionDescriptor
 {
     /// <summary>
-    /// The definition name (e.g. <c>"Guava.PatientImport"</c>).
+    /// The definition name (e.g. <c>"Acme.PatientImport"</c>).
     /// </summary>
     string Name { get; }
 

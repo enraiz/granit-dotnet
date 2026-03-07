@@ -12,7 +12,7 @@ namespace Granit.DataExchange.Export;
 public sealed class ExportJob : AuditedEntity
 {
     /// <summary>
-    /// The export definition name (e.g. <c>"Guava.PatientExport"</c>).
+    /// The export definition name (e.g. <c>"Acme.PatientExport"</c>).
     /// Links to the registered <c>ExportDefinition&lt;T, TFilter&gt;</c>.
     /// </summary>
     public required string DefinitionName { get; set; }

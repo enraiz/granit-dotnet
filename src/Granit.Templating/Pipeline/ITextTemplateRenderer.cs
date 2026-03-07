@@ -21,7 +21,7 @@ namespace Granit.Templating.Pipeline;
 /// <example>
 /// <code>
 /// RenderedTextResult result = await renderer.RenderAsync(
-///     GuavaTemplates.WelcomeEmail, new WelcomeEmailData { PatientName = "Dupont" });
+///     AcmeTemplates.WelcomeEmail, new WelcomeEmailData { PatientName = "Dupont" });
 ///
 /// await emailSender.SendAsync(to: patient.Email, subject: result.Subject, html: result.Html);
 /// </code>
