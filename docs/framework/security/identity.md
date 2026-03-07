@@ -44,30 +44,35 @@ public interface IIdentityProvider
     Task<IReadOnlyList<IdentityUser>> GetUsersAsync(
         string? search = null, int? first = null, int? max = null,
         CancellationToken cancellationToken = default);
-
-    Task<IdentityUser?> GetUserAsync(
-        string userId, CancellationToken cancellationToken = default);
+    Task<IdentityUser?> GetUserAsync(string userId, CancellationToken ct = default);
 
     // --- Gestion du compte ---
-    Task SetUserEnabledAsync(                    // écriture — exceptions propagées
-        string userId, bool enabled,
-        CancellationToken cancellationToken = default);
+    Task SetUserEnabledAsync(string userId, bool enabled, CancellationToken ct = default);
+    Task<IdentityUser> CreateUserAsync(IdentityUserCreate user, CancellationToken ct = default);
 
-    Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(
-        string userId, CancellationToken cancellationToken = default);
+    // --- Sessions ---
+    Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(string userId, CancellationToken ct = default);
+    Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(string userId, CancellationToken ct = default);
+    Task TerminateSessionAsync(string userId, string sessionId, CancellationToken ct = default);
+    Task TerminateAllSessionsAsync(string userId, CancellationToken ct = default);
 
-    Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(
-        string userId, CancellationToken cancellationToken = default);
-
-    Task<DateTimeOffset?> GetPasswordChangedAtAsync(
-        string userId, CancellationToken cancellationToken = default);
+    // --- Credentials ---
+    Task<DateTimeOffset?> GetPasswordChangedAtAsync(string userId, CancellationToken ct = default);
+    Task SendPasswordResetEmailAsync(string userId, CancellationToken ct = default);
+    Task SetTemporaryPasswordAsync(string userId, string temporaryPassword, CancellationToken ct = default);
 
     // --- Rôles ---
-    Task<IReadOnlyList<IdentityRole>> GetRolesAsync(
-        CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<IdentityRole>> GetRolesAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(string roleName, CancellationToken ct = default);
+    Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(string userId, CancellationToken ct = default);
+    Task AssignRoleAsync(string userId, string roleName, CancellationToken ct = default);
+    Task RemoveRoleAsync(string userId, string roleName, CancellationToken ct = default);
 
-    Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(
-        string roleName, CancellationToken cancellationToken = default);
+    // --- Groupes ---
+    Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(string userId, CancellationToken ct = default);
+    Task AddUserToGroupAsync(string userId, string groupId, CancellationToken ct = default);
+    Task RemoveUserFromGroupAsync(string userId, string groupId, CancellationToken ct = default);
 }
 ```
 
@@ -81,10 +86,22 @@ public interface IIdentityProvider
 // Utilisateur dans l'IDP externe
 record IdentityUser(
     string Id, string? Username, string? Email,
-    string? FirstName, string? LastName, bool Enabled);
+    string? FirstName, string? LastName, bool Enabled,
+    IReadOnlyDictionary<string, string>? Attributes = null);
+
+// Données pour créer un utilisateur
+record IdentityUserCreate(
+    string Username, string Email,
+    string? FirstName = null, string? LastName = null,
+    bool Enabled = true, string? TemporaryPassword = null);
 
 // Rôle dans l'IDP externe
 record IdentityRole(string Id, string Name, string? Description);
+
+// Groupe dans l'IDP externe (hiérarchie récursive)
+record IdentityGroup(
+    string Id, string Name, string? Path,
+    IReadOnlyList<IdentityGroup> SubGroups);
 
 // Session SSO active
 record IdentitySession(
@@ -160,8 +177,8 @@ builder.Services.AddGranitIdentityKeycloak();
 
 | Opération | Rôle Keycloak requis |
 | --------- | --------------------- |
-| Lecture users, sessions, credentials | `realm-management:view-users` |
-| `SetUserEnabledAsync` | `realm-management:manage-users` |
+| Lecture users, sessions, credentials, rôles, groupes | `realm-management:view-users` |
+| Toutes les opérations d'écriture (enable/disable, create, roles, sessions, password, groups) | `realm-management:manage-users` |
 | `GetUserDeviceActivityAsync` avec token exchange | `realm-management:impersonation` + feature `admin-fine-grained-authz` |
 
 ### Endpoints Keycloak utilisés
@@ -171,12 +188,24 @@ builder.Services.AddGranitIdentityKeycloak();
 | `GetUsersAsync` | `GET /admin/realms/{realm}/users` |
 | `GetUserAsync` | `GET /admin/realms/{realm}/users/{id}` |
 | `SetUserEnabledAsync` | `PUT /admin/realms/{realm}/users/{id}` |
+| `CreateUserAsync` | `POST /admin/realms/{realm}/users` (+ `PUT .../reset-password` si mot de passe temporaire) |
 | `GetUserSessionsAsync` | `GET /admin/realms/{realm}/users/{id}/sessions` |
 | `GetUserDeviceActivityAsync` (sans token exchange) | `GET /admin/realms/{realm}/users/{id}/sessions` — Device/Os/Browser = `null` |
 | `GetUserDeviceActivityAsync` (avec token exchange) | `GET /realms/{realm}/account/sessions/devices` (Account API, user token) |
+| `TerminateSessionAsync` | `DELETE /admin/realms/{realm}/sessions/{sessionId}` |
+| `TerminateAllSessionsAsync` | `POST /admin/realms/{realm}/users/{id}/logout` |
 | `GetPasswordChangedAtAsync` | `GET /admin/realms/{realm}/users/{id}/credentials` → credential `type=password`, champ `createdDate` |
+| `SendPasswordResetEmailAsync` | `PUT /admin/realms/{realm}/users/{id}/execute-actions-email` body: `["UPDATE_PASSWORD"]` |
+| `SetTemporaryPasswordAsync` | `PUT /admin/realms/{realm}/users/{id}/reset-password` body: `{ type, value, temporary }` |
 | `GetRolesAsync` | `GET /admin/realms/{realm}/roles` |
 | `GetRoleMembersAsync` | `GET /admin/realms/{realm}/roles/{name}/users` |
+| `GetUserRolesAsync` | `GET /admin/realms/{realm}/users/{id}/role-mappings/realm` |
+| `AssignRoleAsync` | `GET .../roles/{name}` puis `POST .../users/{id}/role-mappings/realm` |
+| `RemoveRoleAsync` | `GET .../roles/{name}` puis `DELETE .../users/{id}/role-mappings/realm` |
+| `GetGroupsAsync` | `GET /admin/realms/{realm}/groups` |
+| `GetUserGroupsAsync` | `GET /admin/realms/{realm}/users/{id}/groups` |
+| `AddUserToGroupAsync` | `PUT /admin/realms/{realm}/users/{id}/groups/{groupId}` |
+| `RemoveUserFromGroupAsync` | `DELETE /admin/realms/{realm}/users/{id}/groups/{groupId}` |
 
 ### Device activity — mode token exchange
 
@@ -240,20 +269,21 @@ public sealed class UserAdminService(IIdentityProvider identityProvider)
         => await identityProvider.GetUserAsync(userId, ct);
 
     public async Task DisableUserAsync(string userId, CancellationToken ct)
-        // SetUserEnabledAsync propage l'exception si Keycloak répond 4xx/5xx
         => await identityProvider.SetUserEnabledAsync(userId, false, ct);
 
-    public async Task<IReadOnlyList<IdentitySession>> GetActiveSessionsAsync(
-        string userId, CancellationToken ct)
-        => await identityProvider.GetUserSessionsAsync(userId, ct);
+    public async Task<IdentityUser> CreateUserAsync(
+        string username, string email, CancellationToken ct)
+        => await identityProvider.CreateUserAsync(
+            new IdentityUserCreate(username, email, TemporaryPassword: "ChangeMeNow!"), ct);
 
-    public async Task<IReadOnlyList<IdentityDeviceActivity>> GetDeviceActivityAsync(
-        string userId, CancellationToken ct)
-        => await identityProvider.GetUserDeviceActivityAsync(userId, ct);
+    public async Task AssignRoleAsync(string userId, string role, CancellationToken ct)
+        => await identityProvider.AssignRoleAsync(userId, role, ct);
 
-    public async Task<DateTimeOffset?> GetPasswordChangedAtAsync(
-        string userId, CancellationToken ct)
-        => await identityProvider.GetPasswordChangedAtAsync(userId, ct);
+    public async Task TerminateAllSessionsAsync(string userId, CancellationToken ct)
+        => await identityProvider.TerminateAllSessionsAsync(userId, ct);
+
+    public async Task SendPasswordResetAsync(string userId, CancellationToken ct)
+        => await identityProvider.SendPasswordResetEmailAsync(userId, ct);
 }
 ```
 
@@ -288,31 +318,12 @@ Les tests de `Granit.Identity` couvrent :
 
 | Classe | Ce qui est testé |
 | ------ | ---------------- |
-| `NullIdentityProviderTests` | Toutes les méthodes de `NullIdentityProvider` : retours vides/null, absence d'exception pour `SetUserEnabledAsync` |
-
-**Exemple — tester un service applicatif avec `NSubstitute`**
-
-```csharp
-// Mocker IIdentityProvider avec NSubstitute
-IIdentityProvider identityProvider = Substitute.For<IIdentityProvider>();
-identityProvider
-    .GetUserAsync("user-1", Arg.Any<CancellationToken>())
-    .Returns(new IdentityUser("user-1", "alice", "alice@test.com", "Alice", "Doe", true));
-
-UserAdminService sut = new(identityProvider);
-IdentityUser? user = await sut.GetUserAsync("user-1", CancellationToken.None);
-
-user.ShouldNotBeNull();
-user.Username.ShouldBe("alice");
-```
+| `NullIdentityProviderTests` | Toutes les méthodes de `NullIdentityProvider` : retours vides/null, absence d'exception pour les opérations d'écriture |
+| `IdentityUserTests` | Mapping des attributs, valeur par défaut `null` pour `Attributes` |
 
 **`FakeIdentityProvider`** — implémentation minimale fournie dans `Granit.Identity.Tests`
-pour les tests d'enregistrement DI :
-
-```csharp
-// Retourne des listes vides / null / Task.CompletedTask pour chaque méthode.
-internal sealed class FakeIdentityProvider : IIdentityProvider { ... }
-```
+pour les tests d'enregistrement DI (retourne des listes vides / null / `Task.CompletedTask`
+pour chaque méthode).
 
 ---
 
@@ -339,6 +350,10 @@ internal sealed class MockHttpMessageHandler : HttpMessageHandler
     public string ResponseBody { get; set; } = string.Empty;
 }
 
+// MockHttpMessageHandlerWithLocation — comme MockHttpMessageHandler mais avec
+// un header Location configurable (utilisé pour CreateUserAsync, réponse 201)
+internal sealed class MockHttpMessageHandlerWithLocation : HttpMessageHandler { ... }
+
 // MockSequenceHttpMessageHandler — réponses différentes selon l'ordre d'appel
 // Utilisé pour le token exchange : réponse 1 = token, réponse 2 = données Account API
 internal sealed class MockSequenceHttpMessageHandler(IReadOnlyList<string> responses)
@@ -349,14 +364,26 @@ internal sealed class MockSequenceHttpMessageHandler(IReadOnlyList<string> respo
 
 | Méthode | Cas couverts |
 | ------- | ------------ |
-| `GetUsersAsync` | Résultats avec search/pagination, liste vide, Keycloak indisponible (graceful), mapping des champs |
+| `GetUsersAsync` | Résultats avec search/pagination, liste vide, Keycloak indisponible (graceful), mapping (dont Attributes) |
 | `GetUserAsync` | Utilisateur existant, Keycloak 404 (null), mapping complet, `Enabled = false` |
 | `GetRolesAsync` | Liste de rôles, liste vide, Keycloak 500 (graceful), `Description = null` |
 | `GetRoleMembersAsync` | Utilisateurs renvoyés, rôle vide, Keycloak 503, endpoint correct, encoding du nom de rôle |
-| `SetUserEnabledAsync` | PUT avec `enabled: true`, PUT avec `enabled: false`, Keycloak 403 (exception propagée), guard null |
-| `GetUserSessionsAsync` | Sessions mappées, liste vide, Keycloak 503 (graceful), endpoint correct, guard null |
-| `GetUserDeviceActivityAsync` | Fallback Admin API (Device/Os/Browser = null), Account API avec token exchange (OS/Browser renseignés), Keycloak 503 (graceful), guard null |
-| `GetPasswordChangedAtAsync` | Credential `password` trouvé, credential `password` absent, liste vide, Keycloak 503 (graceful), endpoint correct, guard null |
+| `SetUserEnabledAsync` | PUT avec `enabled: true/false`, Keycloak 403 (exception propagée), guard null |
+| `CreateUserAsync` | Création avec mot de passe temporaire, extraction ID depuis header Location |
+| `GetUserSessionsAsync` | Sessions mappées, liste vide, Keycloak 503 (graceful), guard null |
+| `TerminateSessionAsync` | DELETE session, Keycloak 404, Keycloak 403 (exception), guard null |
+| `TerminateAllSessionsAsync` | POST logout, guard null |
+| `GetUserDeviceActivityAsync` | Fallback Admin API, Account API avec token exchange, Keycloak 503 (graceful) |
+| `GetPasswordChangedAtAsync` | Credential trouvé/absent, liste vide, Keycloak 503 (graceful) |
+| `SendPasswordResetEmailAsync` | PUT execute-actions-email, guard null |
+| `SetTemporaryPasswordAsync` | PUT reset-password, body correct, guard null |
+| `GetUserRolesAsync` | Rôles de l'utilisateur, Keycloak 503 (graceful), guard null, mapping |
+| `AssignRoleAsync` | GET role + POST mapping, guard null, Keycloak 403 |
+| `RemoveRoleAsync` | GET role + DELETE mapping avec body |
+| `GetGroupsAsync` | Groupes avec sous-groupes, liste vide, Keycloak 503 (graceful) |
+| `GetUserGroupsAsync` | Groupes de l'utilisateur, liste vide, Keycloak 503 (graceful) |
+| `AddUserToGroupAsync` | PUT membership, guard null |
+| `RemoveUserFromGroupAsync` | DELETE membership, guard null |
 
 #### Token exchange dans les tests
 
