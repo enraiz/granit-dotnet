@@ -194,6 +194,7 @@ semgrep-sast:
     - docker
   before_script: []
   allow_failure: false
+  timeout: 10m
 
 # --- TRIVY DEPENDENCY SCAN (NuGet) ---
 trivy:fs:
