@@ -16,35 +16,35 @@ internal sealed class EfBackgroundJobStore(
     IDbContextFactory<BackgroundJobsDbContext> contextFactory) : IBackgroundJobStoreReader, IBackgroundJobStoreWriter
 {
     /// <inheritdoc/>
-    public async Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default)
+    public async Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        return await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        return await context.Jobs.Where(j => j.IsEnabled).ToListAsync(ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.Jobs.Where(j => j.IsEnabled).ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        return await context.Jobs.ToListAsync(ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.Jobs.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken ct = default)
+    public async Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         foreach (RecurringJobRegistration reg in registrations)
         {
             BackgroundJobDefinition? existing =
-                await context.Jobs.FirstOrDefaultAsync(j => j.JobName == reg.JobName, ct).ConfigureAwait(false);
+                await context.Jobs.FirstOrDefaultAsync(j => j.JobName == reg.JobName, cancellationToken).ConfigureAwait(false);
 
             if (existing is null)
             {
@@ -65,14 +65,14 @@ internal sealed class EfBackgroundJobStore(
             }
         }
 
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken ct = default)
+    public async Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return;
@@ -82,28 +82,28 @@ internal sealed class EfBackgroundJobStore(
         job.LastErrorMessage = null;
         job.ConsecutiveFailureCount = 0;
         job.TriggeredBy = null;
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default)
+    public async Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return;
         }
 
         job.NextExecutionAt = nextExecution;
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken ct = default)
+    public async Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return;
@@ -111,14 +111,14 @@ internal sealed class EfBackgroundJobStore(
 
         job.ConsecutiveFailureCount++;
         job.LastErrorMessage = errorMessage;
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task SetEnabledAsync(string jobName, bool enabled, CancellationToken ct = default)
+    public async Task SetEnabledAsync(string jobName, bool enabled, CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return;
@@ -132,20 +132,20 @@ internal sealed class EfBackgroundJobStore(
         {
             job.Pause();
         }
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken ct = default)
+    public async Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken cancellationToken = default)
     {
-        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, ct).ConfigureAwait(false);
+        await using BackgroundJobsDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await context.Jobs.FirstOrDefaultAsync(j => j.JobName == jobName, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return;
         }
 
         job.TriggeredBy = triggeredBy;
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

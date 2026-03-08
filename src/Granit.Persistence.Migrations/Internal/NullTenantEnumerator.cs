@@ -14,7 +14,7 @@ internal sealed class NullTenantEnumerator : ITenantEnumerator
 {
     /// <inheritdoc/>
     public async IAsyncEnumerable<Guid> GetActiveTenantIdsAsync(
-        [EnumeratorCancellation] CancellationToken ct)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         yield break;

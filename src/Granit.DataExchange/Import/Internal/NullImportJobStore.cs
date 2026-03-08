@@ -15,19 +15,19 @@ internal sealed class NullImportJobStore : IImportJobReader, IImportJobWriter
         "Call builder.AddGranitDataExchangeEntityFrameworkCore() to register a concrete IImportJobReader/IImportJobWriter.";
 
     /// <inheritdoc/>
-    public Task<ImportJob?> GetAsync(Guid id, CancellationToken ct = default) =>
+    public Task<ImportJob?> GetAsync(Guid id, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
     public Task<PagedResult<ImportJob>> ListAsync(
-        ImportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken ct = default) =>
+        ImportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
-    public Task CreateAsync(ImportJob job, CancellationToken ct = default) =>
+    public Task CreateAsync(ImportJob job, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
-    public Task UpdateAsync(ImportJob job, CancellationToken ct = default) =>
+    public Task UpdateAsync(ImportJob job, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 }

@@ -28,7 +28,7 @@ internal sealed partial class ExportOrchestrator(
     ILogger<ExportOrchestrator> logger) : IExportOrchestrator
 {
     /// <inheritdoc/>
-    public async Task<ExportJobResult> ExportAsync(ExportRequest request, CancellationToken ct = default)
+    public async Task<ExportJobResult> ExportAsync(ExportRequest request, CancellationToken cancellationToken = default)
     {
         _ = serviceProvider.GetRequiredService<IOptions<ExportOptions>>().Value; // Validated early; will carry threshold logic in a future version.
         // Validate early
@@ -45,19 +45,19 @@ internal sealed partial class ExportOrchestrator(
             Status = ExportJobStatus.Queued,
         };
 
-        await jobWriter.CreateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.CreateAsync(job, cancellationToken).ConfigureAwait(false);
 
         // Dispatch to background worker
-        await dispatcher.DispatchAsync(new ExecuteExportCommand(job.Id), ct).ConfigureAwait(false);
+        await dispatcher.DispatchAsync(new ExecuteExportCommand(job.Id), cancellationToken).ConfigureAwait(false);
         LogExportQueued(job.Id, request.DefinitionName, request.Format);
 
         return new ExportJobResult(job.Id, ExportJobStatus.Queued);
     }
 
     /// <inheritdoc/>
-    public async Task ExecuteAsync(Guid jobId, CancellationToken ct = default)
+    public async Task ExecuteAsync(Guid jobId, CancellationToken cancellationToken = default)
     {
-        ExportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ExportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             LogJobNotFound(jobId);
@@ -67,7 +67,7 @@ internal sealed partial class ExportOrchestrator(
         try
         {
             job.Status = ExportJobStatus.Exporting;
-            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
             ExportRequest request = JsonSerializer.Deserialize<ExportRequest>(job.RequestJson)!;
             IExportDefinitionDescriptor definition = ResolveDefinition(request.DefinitionName);
@@ -77,27 +77,27 @@ internal sealed partial class ExportOrchestrator(
             // Project entity rows to flat dictionaries
             int rowCount = 0;
             IAsyncEnumerable<IReadOnlyDictionary<string, object?>> rows =
-                GetProjectedRows(definition, request, fields, count => rowCount = count, ct);
+                GetProjectedRows(definition, request, fields, count => rowCount = count, cancellationToken);
 
             // Write to temporary stream
             MemoryStream outputStream = new();
-            await writer.WriteAsync(outputStream, fields, rows, ct).ConfigureAwait(false);
+            await writer.WriteAsync(outputStream, fields, rows, cancellationToken).ConfigureAwait(false);
             outputStream.Position = 0;
 
             // Store the generated file
             string fileName = $"{SanitizeFileName(request.DefinitionName)}_{clock.Now:yyyy-MM-dd_HHmmss}{writer.FileExtension}";
-            string blobReference = await fileProvider.SaveAsync(fileName, outputStream, ct).ConfigureAwait(false);
+            string blobReference = await fileProvider.SaveAsync(fileName, outputStream, cancellationToken).ConfigureAwait(false);
 
             job.Status = ExportJobStatus.Completed;
             job.BlobReference = blobReference;
             job.FileName = fileName;
             job.RowCount = rowCount;
             job.CompletedAt = clock.Now;
-            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ExportJobCompletedEvent(
                 jobId, request.DefinitionName, ExportJobStatus.Completed,
-                job.CreatedBy, rowCount, ErrorMessage: null), ct).ConfigureAwait(false);
+                job.CreatedBy, rowCount, ErrorMessage: null), cancellationToken).ConfigureAwait(false);
 
             LogExportCompleted(jobId, request.DefinitionName, rowCount);
         }
@@ -106,11 +106,11 @@ internal sealed partial class ExportOrchestrator(
             job.Status = ExportJobStatus.Failed;
             job.ErrorMessage = ex.Message;
             job.CompletedAt = clock.Now;
-            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ExportJobCompletedEvent(
                 jobId, job.DefinitionName, ExportJobStatus.Failed,
-                job.CreatedBy, RowCount: null, ex.Message), ct).ConfigureAwait(false);
+                job.CreatedBy, RowCount: null, ex.Message), cancellationToken).ConfigureAwait(false);
 
             LogExportFailed(jobId, ex);
             throw;
@@ -118,20 +118,20 @@ internal sealed partial class ExportOrchestrator(
     }
 
     /// <inheritdoc/>
-    public async Task<ExportJob?> GetJobAsync(Guid jobId, CancellationToken ct = default) =>
-        await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+    public async Task<ExportJob?> GetJobAsync(Guid jobId, CancellationToken cancellationToken = default) =>
+        await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public async Task<ExportDownload?> GetDownloadAsync(Guid jobId, CancellationToken ct = default)
+    public async Task<ExportDownload?> GetDownloadAsync(Guid jobId, CancellationToken cancellationToken = default)
     {
-        ExportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ExportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job?.Status is not ExportJobStatus.Completed || job.BlobReference is null || job.FileName is null)
         {
             return null;
         }
 
         IExportWriter writer = ResolveWriter(job.Format);
-        Stream stream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
+        Stream stream = await fileProvider.OpenAsync(job.BlobReference, cancellationToken).ConfigureAwait(false);
         return new ExportDownload(stream, writer.MimeType, job.FileName);
     }
 
@@ -184,7 +184,7 @@ internal sealed partial class ExportOrchestrator(
         ExportRequest request,
         IReadOnlyList<ExportFieldDescriptor> fields,
         Action<int> setRowCount,
-        [EnumeratorCancellation] CancellationToken ct = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         // Resolve the data source dynamically (single type param)
         Type dataSourceType = typeof(IExportDataSource<>)
@@ -213,16 +213,16 @@ internal sealed partial class ExportOrchestrator(
                 Search = request.Search,
             };
 
-            // Call ExecuteStreamAsync(queryable, queryRequest, ct) via reflection
+            // Call ExecuteStreamAsync(queryable, queryRequest, cancellationToken) via reflection
             System.Reflection.MethodInfo streamMethod = queryEngineType
                 .GetMethod(nameof(IQueryEngine<object>.ExecuteStreamAsync))!;
-            object asyncEnumerable = streamMethod.Invoke(queryEngine, [queryable, queryRequest, ct])!;
+            object asyncEnumerable = streamMethod.Invoke(queryEngine, [queryable, queryRequest, cancellationToken])!;
 
             // Bridge the generic gap via IterateAsync<TEntity>
             System.Reflection.MethodInfo iterateMethod = typeof(ExportOrchestrator)
                 .GetMethod(nameof(IterateAsync), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!
                 .MakeGenericMethod(definition.EntityType);
-            typedIterator = (IAsyncEnumerable<object>)iterateMethod.Invoke(null, [asyncEnumerable, ct])!;
+            typedIterator = (IAsyncEnumerable<object>)iterateMethod.Invoke(null, [asyncEnumerable, cancellationToken])!;
         }
         else
         {
@@ -230,11 +230,11 @@ internal sealed partial class ExportOrchestrator(
             System.Reflection.MethodInfo enumerateMethod = typeof(ExportOrchestrator)
                 .GetMethod(nameof(EnumerateQueryable), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!
                 .MakeGenericMethod(definition.EntityType);
-            typedIterator = (IAsyncEnumerable<object>)enumerateMethod.Invoke(null, [queryable, ct])!;
+            typedIterator = (IAsyncEnumerable<object>)enumerateMethod.Invoke(null, [queryable, cancellationToken])!;
         }
 
         int count = 0;
-        await foreach (object entity in typedIterator.WithCancellation(ct).ConfigureAwait(false))
+        await foreach (object entity in typedIterator.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             count++;
             yield return ExtractRow(entity, fields);
@@ -250,9 +250,9 @@ internal sealed partial class ExportOrchestrator(
     /// </summary>
     public static async IAsyncEnumerable<object> IterateAsync<T>(
         IAsyncEnumerable<T> source,
-        [EnumeratorCancellation] CancellationToken ct) where T : notnull
+        [EnumeratorCancellation] CancellationToken cancellationToken) where T : notnull
     {
-        await foreach (T item in source.WithCancellation(ct).ConfigureAwait(false))
+        await foreach (T item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             yield return item;
         }
@@ -265,12 +265,12 @@ internal sealed partial class ExportOrchestrator(
     /// </summary>
     public static async IAsyncEnumerable<object> EnumerateQueryable<T>(
         IQueryable<T> source,
-        [EnumeratorCancellation] CancellationToken ct) where T : notnull
+        [EnumeratorCancellation] CancellationToken cancellationToken) where T : notnull
     {
         await Task.CompletedTask.ConfigureAwait(false);
         foreach (T item in source)
         {
-            ct.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             yield return item;
         }
     }

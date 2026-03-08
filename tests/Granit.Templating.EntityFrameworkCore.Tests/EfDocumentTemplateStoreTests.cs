@@ -26,7 +26,7 @@ public sealed class EfDocumentTemplateStoreTests
                 .UseInMemoryDatabase(dbName)
                 .Options);
 
-        public Task<TemplatingDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+        public Task<TemplatingDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(CreateDbContext());
     }
 

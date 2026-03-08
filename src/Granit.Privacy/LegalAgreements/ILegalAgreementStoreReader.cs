@@ -6,8 +6,8 @@ namespace Granit.Privacy.LegalAgreements;
 public interface ILegalAgreementStoreReader
 {
     /// <summary>Returns the latest agreement for a user and document, or <c>null</c> if none.</summary>
-    Task<LegalAgreementBase?> FindLatestAsync(Guid userId, string documentId, CancellationToken ct = default);
+    Task<LegalAgreementBase?> FindLatestAsync(Guid userId, string documentId, CancellationToken cancellationToken = default);
 
     /// <summary>Returns all agreements for a user, ordered by date (most recent first).</summary>
-    Task<IReadOnlyList<LegalAgreementBase>> FindAllByUserAsync(Guid userId, CancellationToken ct = default);
+    Task<IReadOnlyList<LegalAgreementBase>> FindAllByUserAsync(Guid userId, CancellationToken cancellationToken = default);
 }

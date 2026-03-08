@@ -5,10 +5,10 @@ namespace Granit.Notifications.Abstractions;
 /// </summary>
 public interface INotificationSubscriptionWriter
 {
-    Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken ct = default);
-    Task UnsubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken ct = default);
+    Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default);
+    Task UnsubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default);
 
     // Entity followers (Odoo-style)
-    Task FollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default);
-    Task UnfollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default);
+    Task FollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default);
+    Task UnfollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default);
 }

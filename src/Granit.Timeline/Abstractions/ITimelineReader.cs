@@ -17,5 +17,5 @@ public interface ITimelineReader
         string entityId,
         int page = 1,
         int pageSize = QueryingDefaults.DefaultPageSize,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

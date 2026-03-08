@@ -15,25 +15,25 @@ public sealed class SettingProvider(
     private readonly SettingDefinitionManager _definitionManager = definitionManager;
 
     /// <inheritdoc/>
-    public async Task<string?> GetOrNullAsync(string name, CancellationToken ct = default)
+    public async Task<string?> GetOrNullAsync(string name, CancellationToken cancellationToken = default)
     {
-        SettingValue? resolved = await ResolveAsync(name, ct).ConfigureAwait(false);
+        SettingValue? resolved = await ResolveAsync(name, cancellationToken).ConfigureAwait(false);
         return resolved?.Value;
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<SettingValue>> GetAllAsync(string[] names, CancellationToken ct = default)
+    public async Task<IReadOnlyList<SettingValue>> GetAllAsync(string[] names, CancellationToken cancellationToken = default)
     {
         List<SettingValue> result = new(names.Length);
         foreach (string name in names)
         {
-            SettingValue? resolved = await ResolveAsync(name, ct).ConfigureAwait(false);
+            SettingValue? resolved = await ResolveAsync(name, cancellationToken).ConfigureAwait(false);
             result.Add(resolved ?? new SettingValue(name, string.Empty, null, null));
         }
         return result;
     }
 
-    private async Task<SettingValue?> ResolveAsync(string name, CancellationToken ct)
+    private async Task<SettingValue?> ResolveAsync(string name, CancellationToken cancellationToken)
     {
         SettingDefinition? definition = _definitionManager.GetOrNull(name);
         if (definition is null)
@@ -50,7 +50,7 @@ public sealed class SettingProvider(
                 continue;
             }
 
-            SettingValue? value = await provider.GetOrNullAsync(definition, ct).ConfigureAwait(false);
+            SettingValue? value = await provider.GetOrNullAsync(definition, cancellationToken).ConfigureAwait(false);
             if (value is not null)
             {
                 return value;

@@ -11,5 +11,5 @@ public interface INotificationChannel
     /// <summary>
     /// Delivers a notification to a single recipient via this channel.
     /// </summary>
-    Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default);
+    Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default);
 }

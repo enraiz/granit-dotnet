@@ -15,20 +15,20 @@ internal sealed class NotificationBackedFollowerService(
     ICurrentTenant currentTenant) : ITimelineFollowerService
 {
     /// <inheritdoc/>
-    public Task FollowAsync(string userId, string entityType, string entityId, CancellationToken ct = default) =>
-        subscriptionWriter.FollowEntityAsync(userId, entityType, entityId, TenantId, ct);
+    public Task FollowAsync(string userId, string entityType, string entityId, CancellationToken cancellationToken = default) =>
+        subscriptionWriter.FollowEntityAsync(userId, entityType, entityId, TenantId, cancellationToken);
 
     /// <inheritdoc/>
-    public Task UnfollowAsync(string userId, string entityType, string entityId, CancellationToken ct = default) =>
-        subscriptionWriter.UnfollowEntityAsync(userId, entityType, entityId, TenantId, ct);
+    public Task UnfollowAsync(string userId, string entityType, string entityId, CancellationToken cancellationToken = default) =>
+        subscriptionWriter.UnfollowEntityAsync(userId, entityType, entityId, TenantId, cancellationToken);
 
     /// <inheritdoc/>
-    public Task<IReadOnlyList<string>> GetFollowerIdsAsync(string entityType, string entityId, CancellationToken ct = default) =>
-        subscriptionReader.GetEntityFollowerIdsAsync(entityType, entityId, TenantId, ct);
+    public Task<IReadOnlyList<string>> GetFollowerIdsAsync(string entityType, string entityId, CancellationToken cancellationToken = default) =>
+        subscriptionReader.GetEntityFollowerIdsAsync(entityType, entityId, TenantId, cancellationToken);
 
     /// <inheritdoc/>
-    public Task<bool> IsFollowingAsync(string userId, string entityType, string entityId, CancellationToken ct = default) =>
-        subscriptionReader.IsFollowingEntityAsync(userId, entityType, entityId, TenantId, ct);
+    public Task<bool> IsFollowingAsync(string userId, string entityType, string entityId, CancellationToken cancellationToken = default) =>
+        subscriptionReader.IsFollowingEntityAsync(userId, entityType, entityId, TenantId, cancellationToken);
 
     private Guid? TenantId => currentTenant.IsAvailable ? currentTenant.Id : null;
 }

@@ -93,10 +93,10 @@ public sealed class TypedKeyCacheServiceAdapterTests
         // Act
         DistributedCacheServiceTests.UserCacheItem result = await typedSvc.GetOrAddAsync(
             id,
-            async ct =>
+            async cancellationToken =>
             {
                 callCount++;
-                await Task.Delay(1, ct);
+                await Task.Delay(1, cancellationToken);
                 return new DistributedCacheServiceTests.UserCacheItem { Id = id, Name = "Charlie" };
             },
             null,

@@ -48,7 +48,7 @@ public sealed class EfCoreTimelineStoreTests : IDisposable
     {
         TimelineEntry entry = await _store.PostEntryAsync(
             "Patient", "p-1", TimelineEntryType.Comment, "Hello world",
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         entry.EntityType.ShouldBe("Patient");
         entry.EntityId.ShouldBe("p-1");
@@ -70,12 +70,12 @@ public sealed class EfCoreTimelineStoreTests : IDisposable
     {
         TimelineEntry parent = await _store.PostEntryAsync(
             "Patient", "p-1", TimelineEntryType.Comment, "Parent",
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         TimelineEntry reply = await _store.PostEntryAsync(
             "Patient", "p-1", TimelineEntryType.Comment, "Reply",
             parentEntryId: parent.Id,
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         reply.ParentEntryId.ShouldBe(parent.Id);
     }
@@ -85,7 +85,7 @@ public sealed class EfCoreTimelineStoreTests : IDisposable
     {
         TimelineEntry entry = await _store.PostEntryAsync(
             "Patient", "p-1", TimelineEntryType.Comment, "To delete",
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         await _store.DeleteEntryAsync(entry.Id, TestContext.Current.CancellationToken);
 
@@ -105,7 +105,7 @@ public sealed class EfCoreTimelineStoreTests : IDisposable
     {
         TimelineEntry entry = await _store.PostEntryAsync(
             "Invoice", "inv-42", TimelineEntryType.SystemLog, "{\"change\":\"status\"}",
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         await Should.ThrowAsync<InvalidOperationException>(
             () => _store.DeleteEntryAsync(entry.Id, TestContext.Current.CancellationToken));
@@ -123,12 +123,12 @@ public sealed class EfCoreTimelineStoreTests : IDisposable
     {
         TimelineEntry entry = await _store.PostEntryAsync(
             "Patient", "p-1", TimelineEntryType.Comment, "See attached",
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         var blobId = Guid.NewGuid();
         TimelineAttachment attachment = await _store.AddAttachmentAsync(
             entry.Id, blobId, "report.pdf", "application/pdf", 1024,
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         attachment.EntryId.ShouldBe(entry.Id);
         attachment.BlobId.ShouldBe(blobId);
@@ -149,6 +149,6 @@ public sealed class EfCoreTimelineStoreTests : IDisposable
         await Should.ThrowAsync<KeyNotFoundException>(
             () => _store.AddAttachmentAsync(
                 Guid.NewGuid(), Guid.NewGuid(), "file.txt", "text/plain", 100,
-                ct: TestContext.Current.CancellationToken));
+                cancellationToken: TestContext.Current.CancellationToken));
     }
 }

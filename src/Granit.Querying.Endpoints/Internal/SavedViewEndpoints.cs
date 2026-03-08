@@ -28,8 +28,8 @@ internal static class SavedViewEndpoints
             ISavedViewStoreReader store,
             ICurrentTenant tenant,
             ClaimsPrincipal user,
-            CancellationToken ct) =>
-            GetListAsync(store, entityType, tenant, user, ct))
+            CancellationToken cancellationToken) =>
+            GetListAsync(store, entityType, tenant, user, cancellationToken))
             .WithName($"GetSavedViews_{entityType}")
             .WithSummary("Returns saved views for the current user.");
 
@@ -38,8 +38,8 @@ internal static class SavedViewEndpoints
             ISavedViewStoreWriter store,
             ICurrentTenant tenant,
             ClaimsPrincipal user,
-            CancellationToken ct) =>
-            CreateAsync(request, store, entityType, tenant, user, ct))
+            CancellationToken cancellationToken) =>
+            CreateAsync(request, store, entityType, tenant, user, cancellationToken))
             .WithName($"CreateSavedView_{entityType}")
             .WithSummary("Creates a new saved view.")
             .ValidateBody<CreateSavedViewRequest>();
@@ -49,8 +49,8 @@ internal static class SavedViewEndpoints
             UpdateSavedViewRequest request,
             ISavedViewStoreReader reader,
             ISavedViewStoreWriter writer,
-            CancellationToken ct) =>
-            UpdateAsync(id, request, reader, writer, ct))
+            CancellationToken cancellationToken) =>
+            UpdateAsync(id, request, reader, writer, cancellationToken))
             .WithName($"UpdateSavedView_{entityType}")
             .WithSummary("Updates an existing saved view.")
             .ValidateBody<UpdateSavedViewRequest>();
@@ -58,8 +58,8 @@ internal static class SavedViewEndpoints
         savedViews.MapDelete("/{id:guid}", (
             Guid id,
             ISavedViewStoreWriter store,
-            CancellationToken ct) =>
-            DeleteAsync(id, store, ct))
+            CancellationToken cancellationToken) =>
+            DeleteAsync(id, store, cancellationToken))
             .WithName($"DeleteSavedView_{entityType}")
             .WithSummary("Deletes a saved view.");
 
@@ -67,8 +67,8 @@ internal static class SavedViewEndpoints
             Guid id,
             ISavedViewStoreWriter store,
             ClaimsPrincipal user,
-            CancellationToken ct) =>
-            SetDefaultAsync(id, store, entityType, user, ct))
+            CancellationToken cancellationToken) =>
+            SetDefaultAsync(id, store, entityType, user, cancellationToken))
             .WithName($"SetDefaultSavedView_{entityType}")
             .WithSummary("Sets a saved view as the default for the current user.");
     }
@@ -78,13 +78,13 @@ internal static class SavedViewEndpoints
         string entityType,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
 
         IReadOnlyList<SavedView> views = await store
-            .GetListAsync(entityType, userId, tenantId, ct)
+            .GetListAsync(entityType, userId, tenantId, cancellationToken)
             .ConfigureAwait(false);
 
         return TypedResults.Ok(views.Select(MapView).ToList());
@@ -96,7 +96,7 @@ internal static class SavedViewEndpoints
         string entityType,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string userId = GetUserId(user);
 
@@ -117,7 +117,7 @@ internal static class SavedViewEndpoints
             CreatedBy = userId,
         };
 
-        await store.CreateAsync(view, ct).ConfigureAwait(false);
+        await store.CreateAsync(view, cancellationToken).ConfigureAwait(false);
         return TypedResults.Created($"/saved-views/{view.Id}", MapView(view));
     }
 
@@ -126,9 +126,9 @@ internal static class SavedViewEndpoints
         UpdateSavedViewRequest request,
         ISavedViewStoreReader reader,
         ISavedViewStoreWriter writer,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        SavedView? existing = await reader.GetAsync(id, ct).ConfigureAwait(false);
+        SavedView? existing = await reader.GetAsync(id, cancellationToken).ConfigureAwait(false);
         if (existing is null)
         {
             return TypedResults.NotFound();
@@ -142,16 +142,16 @@ internal static class SavedViewEndpoints
         existing.VisibleColumnsJson = request.VisibleColumnsJson;
         existing.ModifiedAt = DateTimeOffset.UtcNow;
 
-        await writer.UpdateAsync(existing, ct).ConfigureAwait(false);
+        await writer.UpdateAsync(existing, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
     private static async Task<NoContent> DeleteAsync(
         Guid id,
         ISavedViewStoreWriter store,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        await store.DeleteAsync(id, ct).ConfigureAwait(false);
+        await store.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -160,10 +160,10 @@ internal static class SavedViewEndpoints
         ISavedViewStoreWriter store,
         string entityType,
         ClaimsPrincipal user,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string userId = GetUserId(user);
-        await store.SetDefaultAsync(id, userId, entityType, ct).ConfigureAwait(false);
+        await store.SetDefaultAsync(id, userId, entityType, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 

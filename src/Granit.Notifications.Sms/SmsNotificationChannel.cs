@@ -16,11 +16,11 @@ internal sealed class SmsNotificationChannel(
     public string Name => NotificationChannels.Sms;
 
     /// <inheritdoc />
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         ISmsSender sender = serviceProvider.GetRequiredKeyedService<ISmsSender>(options.Value.Provider);
 
-        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct).ConfigureAwait(false);
+        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, cancellationToken).ConfigureAwait(false);
         if (recipient?.PhoneNumber is null)
         {
             return;
@@ -33,6 +33,6 @@ internal sealed class SmsNotificationChannel(
             To = recipient.PhoneNumber,
             Body = body,
             SenderId = options.Value.SenderId,
-        }, ct).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(false);
     }
 }

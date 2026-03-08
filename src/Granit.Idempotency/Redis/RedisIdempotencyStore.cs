@@ -23,17 +23,17 @@ internal sealed class RedisIdempotencyStore(
     private readonly ILogger<RedisIdempotencyStore> _logger = logger;
 
     /// <inheritdoc/>
-    public async Task<bool> TryAcquireAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken ct)
+    public async Task<bool> TryAcquireAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken cancellationToken)
     {
         RedisValue payload = Serialize(entry);
-        bool acquired = await _db.StringSetAsync(key, payload, ttl, When.NotExists).WaitAsync(ct).ConfigureAwait(false);
+        bool acquired = await _db.StringSetAsync(key, payload, ttl, When.NotExists).WaitAsync(cancellationToken).ConfigureAwait(false);
         return acquired;
     }
 
     /// <inheritdoc/>
-    public async Task<IdempotencyEntry?> GetAsync(string key, CancellationToken ct)
+    public async Task<IdempotencyEntry?> GetAsync(string key, CancellationToken cancellationToken)
     {
-        RedisValue raw = await _db.StringGetAsync(key).WaitAsync(ct).ConfigureAwait(false);
+        RedisValue raw = await _db.StringGetAsync(key).WaitAsync(cancellationToken).ConfigureAwait(false);
         if (raw.IsNullOrEmpty)
         {
             return null;
@@ -43,10 +43,10 @@ internal sealed class RedisIdempotencyStore(
     }
 
     /// <inheritdoc/>
-    public async Task SetCompletedAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken ct)
+    public async Task SetCompletedAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken cancellationToken)
     {
         RedisValue payload = Serialize(entry);
-        bool updated = await _db.StringSetAsync(key, payload, ttl, When.Exists).WaitAsync(ct).ConfigureAwait(false);
+        bool updated = await _db.StringSetAsync(key, payload, ttl, When.Exists).WaitAsync(cancellationToken).ConfigureAwait(false);
 
         if (!updated)
         {
@@ -57,8 +57,8 @@ internal sealed class RedisIdempotencyStore(
     }
 
     /// <inheritdoc/>
-    public Task DeleteAsync(string key, CancellationToken ct) =>
-        _db.KeyDeleteAsync(key).WaitAsync(ct);
+    public Task DeleteAsync(string key, CancellationToken cancellationToken) =>
+        _db.KeyDeleteAsync(key).WaitAsync(cancellationToken);
 
     // -------------------------------------------------------------------------
     // Serialization helpers

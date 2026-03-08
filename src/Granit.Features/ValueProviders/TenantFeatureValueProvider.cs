@@ -27,7 +27,7 @@ internal sealed class TenantFeatureValueProvider(
     public int Order => 100;
 
     /// <inheritdoc/>
-    public async Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken ct = default)
+    public async Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken cancellationToken = default)
     {
         ICurrentTenant? currentTenant = _serviceProvider.GetService<ICurrentTenant>();
         if (currentTenant is null || !currentTenant.IsAvailable)
@@ -36,6 +36,6 @@ internal sealed class TenantFeatureValueProvider(
         }
 
         string tenantId = currentTenant.Id!.Value.ToString();
-        return await _featureStoreReader.GetOrNullAsync(definition.Name, tenantId, ct).ConfigureAwait(false);
+        return await _featureStoreReader.GetOrNullAsync(definition.Name, tenantId, cancellationToken).ConfigureAwait(false);
     }
 }

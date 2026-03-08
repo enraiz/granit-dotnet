@@ -121,9 +121,9 @@ internal sealed class MagickNetImagePipeline : IImagePipeline
     }
 
     /// <inheritdoc/>
-    public Task<ImageResult> ToResultAsync(CancellationToken ct = default)
+    public Task<ImageResult> ToResultAsync(CancellationToken cancellationToken = default)
     {
-        ct.ThrowIfCancellationRequested();
+        cancellationToken.ThrowIfCancellationRequested();
 
         ApplyOutputSettings();
 
@@ -140,9 +140,9 @@ internal sealed class MagickNetImagePipeline : IImagePipeline
     }
 
     /// <inheritdoc/>
-    public Task SaveToStreamAsync(Stream destination, CancellationToken ct = default)
+    public Task SaveToStreamAsync(Stream destination, CancellationToken cancellationToken = default)
     {
-        ct.ThrowIfCancellationRequested();
+        cancellationToken.ThrowIfCancellationRequested();
 
         ApplyOutputSettings();
 

@@ -17,7 +17,7 @@ internal sealed class BusinessKeyResolver<TEntity, TContext>(
     where TContext : DbContext
 {
     /// <inheritdoc/>
-    public async Task<RecordIdentity<TEntity>> ResolveAsync(TEntity entity, CancellationToken ct = default)
+    public async Task<RecordIdentity<TEntity>> ResolveAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<string> keyProperties = definition.GetBusinessKeyProperties();
         if (keyProperties.Count == 0)
@@ -26,10 +26,10 @@ internal sealed class BusinessKeyResolver<TEntity, TContext>(
         }
 
         string keyProperty = keyProperties[0];
-        await using TContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         Expression<Func<TEntity, bool>> predicate = BuildPredicate(entity, keyProperty);
-        TEntity? existing = await context.Set<TEntity>().FirstOrDefaultAsync(predicate, ct).ConfigureAwait(false);
+        TEntity? existing = await context.Set<TEntity>().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         if (existing is null)
         {

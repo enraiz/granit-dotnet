@@ -22,9 +22,9 @@ internal sealed class RunMigrationBatchHandler(MigrationBatchExecutor executor)
     /// <summary>
     /// Processes one batch and cascades the next command, or returns empty when done.
     /// </summary>
-    public async Task<object[]> HandleAsync(RunMigrationBatchCommand command, CancellationToken ct)
+    public async Task<object[]> HandleAsync(RunMigrationBatchCommand command, CancellationToken cancellationToken)
     {
-        RunMigrationBatchCommand? next = await executor.ExecuteBatchAsync(command, ct).ConfigureAwait(false);
+        RunMigrationBatchCommand? next = await executor.ExecuteBatchAsync(command, cancellationToken).ConfigureAwait(false);
         return next is null ? [] : [next];
     }
 }

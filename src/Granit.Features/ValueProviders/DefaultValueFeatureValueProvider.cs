@@ -15,6 +15,6 @@ internal sealed class DefaultValueFeatureValueProvider : IFeatureValueProvider
     public int Order => 300;
 
     /// <inheritdoc/>
-    public Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken ct = default) =>
+    public Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken cancellationToken = default) =>
         Task.FromResult<string?>(definition.DefaultValue);
 }

@@ -11,9 +11,9 @@ internal sealed class FeatureLimitGuard(IFeatureChecker featureChecker) : IFeatu
     private readonly IFeatureChecker _featureChecker = featureChecker;
 
     /// <inheritdoc/>
-    public async Task CheckAsync(string featureName, long currentCount, CancellationToken ct = default)
+    public async Task CheckAsync(string featureName, long currentCount, CancellationToken cancellationToken = default)
     {
-        long limit = await _featureChecker.GetNumericAsync(featureName, ct).ConfigureAwait(false);
+        long limit = await _featureChecker.GetNumericAsync(featureName, cancellationToken).ConfigureAwait(false);
         if (currentCount >= limit)
         {
             throw new FeatureLimitExceededException(featureName, currentCount, limit);
@@ -21,6 +21,6 @@ internal sealed class FeatureLimitGuard(IFeatureChecker featureChecker) : IFeatu
     }
 
     /// <inheritdoc/>
-    public Task<long> GetLimitAsync(string featureName, CancellationToken ct = default) =>
-        _featureChecker.GetNumericAsync(featureName, ct);
+    public Task<long> GetLimitAsync(string featureName, CancellationToken cancellationToken = default) =>
+        _featureChecker.GetNumericAsync(featureName, cancellationToken);
 }

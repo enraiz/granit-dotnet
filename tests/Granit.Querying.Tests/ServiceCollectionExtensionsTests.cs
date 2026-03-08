@@ -127,25 +127,25 @@ public sealed class ServiceCollectionExtensionsTests
     private sealed class FakeSavedViewStoreReader : ISavedViewStoreReader
     {
         public Task<IReadOnlyList<SavedView>> GetListAsync(
-            string entityType, string userId, Guid? tenantId, CancellationToken ct = default) =>
+            string entityType, string userId, Guid? tenantId, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<SavedView>>([]);
 
-        public Task<SavedView?> GetAsync(Guid id, CancellationToken ct = default) =>
+        public Task<SavedView?> GetAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult<SavedView?>(null);
     }
 
     private sealed class FakeSavedViewStoreWriter : ISavedViewStoreWriter
     {
-        public Task CreateAsync(SavedView view, CancellationToken ct = default) =>
+        public Task CreateAsync(SavedView view, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
-        public Task UpdateAsync(SavedView view, CancellationToken ct = default) =>
+        public Task UpdateAsync(SavedView view, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
-        public Task DeleteAsync(Guid id, CancellationToken ct = default) =>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
-        public Task SetDefaultAsync(Guid id, string userId, string entityType, CancellationToken ct = default) =>
+        public Task SetDefaultAsync(Guid id, string userId, string entityType, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
     }
 }

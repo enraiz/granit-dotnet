@@ -20,9 +20,9 @@ public interface IRowGrouper
     /// Groups consecutive rows by the configured group key.
     /// </summary>
     /// <param name="rows">The raw rows from the file parser.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>An async enumerable of grouped rows, one group per aggregate entity.</returns>
     IAsyncEnumerable<GroupedRows> GroupAsync(
         IAsyncEnumerable<RawImportRow> rows,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

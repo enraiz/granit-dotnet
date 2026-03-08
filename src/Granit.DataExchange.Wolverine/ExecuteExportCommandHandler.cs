@@ -22,6 +22,6 @@ internal sealed class ExecuteExportCommandHandler(IExportOrchestrator orchestrat
     /// <summary>
     /// Handles the export command by delegating to the orchestrator.
     /// </summary>
-    public async Task HandleAsync(ExecuteExportCommand command, CancellationToken ct) =>
-        await orchestrator.ExecuteAsync(command.ExportJobId, ct).ConfigureAwait(false);
+    public async Task HandleAsync(ExecuteExportCommand command, CancellationToken cancellationToken) =>
+        await orchestrator.ExecuteAsync(command.ExportJobId, cancellationToken).ConfigureAwait(false);
 }

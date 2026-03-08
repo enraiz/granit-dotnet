@@ -76,22 +76,22 @@ public sealed class GranitDataExchangeWolverineModuleTests
 
     private sealed class StubEventPublisher : IDataExchangeEventPublisher
     {
-        public Task PublishAsync(Import.Messages.ImportJobCompletedEvent evt, CancellationToken ct = default) =>
+        public Task PublishAsync(Import.Messages.ImportJobCompletedEvent evt, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
-        public Task PublishAsync(Export.Messages.ExportJobCompletedEvent evt, CancellationToken ct = default) =>
+        public Task PublishAsync(Export.Messages.ExportJobCompletedEvent evt, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
     }
 
     private sealed class StubImportDispatcher : IImportCommandDispatcher
     {
-        public Task DispatchAsync(Import.Messages.ExecuteImportCommand command, CancellationToken ct = default) =>
+        public Task DispatchAsync(Import.Messages.ExecuteImportCommand command, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
     }
 
     private sealed class StubExportDispatcher : IExportCommandDispatcher
     {
-        public Task DispatchAsync(Export.Messages.ExecuteExportCommand command, CancellationToken ct = default) =>
+        public Task DispatchAsync(Export.Messages.ExecuteExportCommand command, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
     }
 }

@@ -41,7 +41,7 @@ public sealed class IsolatedDbContextFactoryTests
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options);
 
-        public Task<StubIsolatedDbContext> CreateDbContextAsync(CancellationToken ct = default)
+        public Task<StubIsolatedDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default)
         {
             Interlocked.Increment(ref _callCount);
             return Task.FromResult(CreateDbContext());
@@ -93,7 +93,7 @@ public sealed class IsolatedDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_SharedDatabaseStrategy_CallsSharedFactory()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         CountingFactory factory = new();
 
         IsolatedDbContextFactory<StubIsolatedDbContext> facade = BuildFacade(
@@ -102,7 +102,7 @@ public sealed class IsolatedDbContextFactoryTests
             svc => svc.AddKeyedScoped<IDbContextFactory<StubIsolatedDbContext>>(
                 TenantIsolationStrategy.SharedDatabase, (_, _) => factory));
 
-        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
+        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(cancellationToken);
 
         factory.CallCount.ShouldBe(1);
     }
@@ -114,7 +114,7 @@ public sealed class IsolatedDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_DatabasePerTenantStrategy_CallsPerDatabaseFactory()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         CountingFactory factory = new();
 
         IsolatedDbContextFactory<StubIsolatedDbContext> facade = BuildFacade(
@@ -123,7 +123,7 @@ public sealed class IsolatedDbContextFactoryTests
             svc => svc.AddKeyedScoped<IDbContextFactory<StubIsolatedDbContext>>(
                 TenantIsolationStrategy.DatabasePerTenant, (_, _) => factory));
 
-        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
+        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(cancellationToken);
 
         factory.CallCount.ShouldBe(1);
     }
@@ -135,7 +135,7 @@ public sealed class IsolatedDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_SchemaPerTenantStrategy_CallsPerSchemaFactory()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         CountingFactory factory = new();
 
         IsolatedDbContextFactory<StubIsolatedDbContext> facade = BuildFacade(
@@ -144,7 +144,7 @@ public sealed class IsolatedDbContextFactoryTests
             svc => svc.AddKeyedScoped<IDbContextFactory<StubIsolatedDbContext>>(
                 TenantIsolationStrategy.SchemaPerTenant, (_, _) => factory));
 
-        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
+        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(cancellationToken);
 
         factory.CallCount.ShouldBe(1);
     }
@@ -156,7 +156,7 @@ public sealed class IsolatedDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_CustomDynamicProvider_DispatchesPerTenant()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         CountingFactory premiumFactory = new();
         CountingFactory standardFactory = new();
 
@@ -184,7 +184,7 @@ public sealed class IsolatedDbContextFactoryTests
                     TenantIsolationStrategy.SharedDatabase, (_, _) => standardFactory);
             });
 
-        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(ct);
+        await using StubIsolatedDbContext _ = await facade.CreateDbContextAsync(cancellationToken);
 
         premiumFactory.CallCount.ShouldBe(1);
         standardFactory.CallCount.ShouldBe(0);
@@ -197,14 +197,14 @@ public sealed class IsolatedDbContextFactoryTests
     [Fact]
     public async Task CreateDbContextAsync_MissingFactory_ThrowsInvalidOperationException()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Aucune factory keyed SchemaPerTenant enregistrée.
         IsolatedDbContextFactory<StubIsolatedDbContext> facade = BuildFacade(
             MakeTenant(TenantA),
             MakeStrategy(TenantIsolationStrategy.SchemaPerTenant));
 
-        Func<Task> act = async () => await facade.CreateDbContextAsync(ct);
+        Func<Task> act = async () => await facade.CreateDbContextAsync(cancellationToken);
 
         (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("SchemaPerTenant");
     }

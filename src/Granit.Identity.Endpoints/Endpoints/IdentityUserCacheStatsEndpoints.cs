@@ -22,11 +22,11 @@ internal static class IdentityUserCacheStatsEndpoints
 
     private static async Task<Ok<IdentityUserCacheStatsResponse>> GetStatsAsync(
         IUserCacheStats cacheStats,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        int total = await cacheStats.GetCountAsync(ct).ConfigureAwait(false);
-        int stale = await cacheStats.GetStaleCountAsync(ct).ConfigureAwait(false);
-        (DateTimeOffset? oldest, DateTimeOffset? newest) = await cacheStats.GetSyncRangeAsync(ct)
+        int total = await cacheStats.GetCountAsync(cancellationToken).ConfigureAwait(false);
+        int stale = await cacheStats.GetStaleCountAsync(cancellationToken).ConfigureAwait(false);
+        (DateTimeOffset? oldest, DateTimeOffset? newest) = await cacheStats.GetSyncRangeAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return TypedResults.Ok(new IdentityUserCacheStatsResponse(total, stale, oldest, newest));

@@ -26,11 +26,11 @@ public interface ITenantConnectionStringProvider
     /// Returns the connection string for the specified tenant's isolated database.
     /// </summary>
     /// <param name="tenantId">The tenant identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A valid connection string for the tenant's isolated database.</returns>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the tenant is not registered or its credentials cannot be resolved.
     /// A missing mapping is a configuration error, not a recoverable condition.
     /// </exception>
-    Task<string> GetConnectionStringAsync(Guid tenantId, CancellationToken ct = default);
+    Task<string> GetConnectionStringAsync(Guid tenantId, CancellationToken cancellationToken = default);
 }

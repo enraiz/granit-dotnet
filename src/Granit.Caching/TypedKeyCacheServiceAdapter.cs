@@ -20,54 +20,54 @@ public sealed class TypedKeyCacheServiceAdapter<TCacheItem, TKey>(ICacheService<
     private readonly ICacheService<TCacheItem> _inner = inner;
 
     /// <inheritdoc/>
-    public Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default) =>
-        _inner.GetAsync(key, ct);
+    public Task<TCacheItem?> GetAsync(string key, CancellationToken cancellationToken = default) =>
+        _inner.GetAsync(key, cancellationToken);
 
     /// <inheritdoc/>
-    public Task<TCacheItem?> GetAsync(TKey key, CancellationToken ct = default) =>
-        _inner.GetAsync(key.ToString()!, ct);
+    public Task<TCacheItem?> GetAsync(TKey key, CancellationToken cancellationToken = default) =>
+        _inner.GetAsync(key.ToString()!, cancellationToken);
 
     /// <inheritdoc/>
     public Task<TCacheItem> GetOrAddAsync(
         string key,
         Func<CancellationToken, Task<TCacheItem>> factory,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default) =>
-        _inner.GetOrAddAsync(key, factory, options, ct);
+        CancellationToken cancellationToken = default) =>
+        _inner.GetOrAddAsync(key, factory, options, cancellationToken);
 
     /// <inheritdoc/>
     public Task<TCacheItem> GetOrAddAsync(
         TKey key,
         Func<CancellationToken, Task<TCacheItem>> factory,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default) =>
-        _inner.GetOrAddAsync(key.ToString()!, factory, options, ct);
+        CancellationToken cancellationToken = default) =>
+        _inner.GetOrAddAsync(key.ToString()!, factory, options, cancellationToken);
 
     /// <inheritdoc/>
     public Task SetAsync(
         string key,
         TCacheItem value,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default) =>
-        _inner.SetAsync(key, value, options, ct);
+        CancellationToken cancellationToken = default) =>
+        _inner.SetAsync(key, value, options, cancellationToken);
 
     /// <inheritdoc/>
     public Task SetAsync(
         TKey key,
         TCacheItem value,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default) =>
-        _inner.SetAsync(key.ToString()!, value, options, ct);
+        CancellationToken cancellationToken = default) =>
+        _inner.SetAsync(key.ToString()!, value, options, cancellationToken);
 
     /// <inheritdoc/>
-    public Task RemoveAsync(string key, CancellationToken ct = default) =>
-        _inner.RemoveAsync(key, ct);
+    public Task RemoveAsync(string key, CancellationToken cancellationToken = default) =>
+        _inner.RemoveAsync(key, cancellationToken);
 
     /// <inheritdoc/>
-    public Task RemoveAsync(TKey key, CancellationToken ct = default) =>
-        _inner.RemoveAsync(key.ToString()!, ct);
+    public Task RemoveAsync(TKey key, CancellationToken cancellationToken = default) =>
+        _inner.RemoveAsync(key.ToString()!, cancellationToken);
 
     /// <inheritdoc/>
-    public Task RefreshAsync(string key, CancellationToken ct = default) =>
-        _inner.RefreshAsync(key, ct);
+    public Task RefreshAsync(string key, CancellationToken cancellationToken = default) =>
+        _inner.RefreshAsync(key, cancellationToken);
 }

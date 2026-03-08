@@ -67,10 +67,10 @@ public sealed class BackgroundJobManagerTests
             .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
 
         BackgroundJobManager sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        IReadOnlyList<BackgroundJobStatus> result = await sut.GetAllAsync(ct);
+        IReadOnlyList<BackgroundJobStatus> result = await sut.GetAllAsync(cancellationToken);
 
         // Assert
         result.Count.ShouldBe(1);
@@ -193,13 +193,13 @@ public sealed class BackgroundJobManagerTests
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
 
         BackgroundJobManager sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.PauseAsync("daily-report", ct);
+        await sut.PauseAsync("daily-report", cancellationToken);
 
         // Assert
-        await _storeWriter.Received(1).SetEnabledAsync("daily-report", false, ct);
+        await _storeWriter.Received(1).SetEnabledAsync("daily-report", false, cancellationToken);
     }
 
     [Fact]
@@ -232,15 +232,15 @@ public sealed class BackgroundJobManagerTests
         _clock.Now.Returns(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         BackgroundJobManager sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.ResumeAsync("daily-report", ct);
+        await sut.ResumeAsync("daily-report", cancellationToken);
 
         // Assert
-        await _storeWriter.Received(1).SetEnabledAsync("daily-report", true, ct);
+        await _storeWriter.Received(1).SetEnabledAsync("daily-report", true, cancellationToken);
         await _storeWriter.Received(1).RecordNextExecutionAsync(
-            "daily-report", Arg.Any<DateTimeOffset>(), ct);
+            "daily-report", Arg.Any<DateTimeOffset>(), cancellationToken);
     }
 
     [Fact]
@@ -296,10 +296,10 @@ public sealed class BackgroundJobManagerTests
         _user.UserId.Returns("user-abc");
 
         BackgroundJobManager sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.TriggerNowAsync("daily-report", ct);
+        await sut.TriggerNowAsync("daily-report", cancellationToken);
 
         // Assert
         await _bus.Received(1).PublishAsync(

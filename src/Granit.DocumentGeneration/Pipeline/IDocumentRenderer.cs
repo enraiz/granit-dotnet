@@ -28,10 +28,10 @@ public interface IDocumentRenderer
     /// </summary>
     /// <param name="html">The rendered HTML content to convert.</param>
     /// <param name="targetFormat">The desired output format.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A <see cref="DocumentResult"/> containing the binary content and format.</returns>
     Task<DocumentResult> RenderAsync(
         string html,
         DocumentFormat targetFormat,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

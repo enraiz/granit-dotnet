@@ -12,16 +12,16 @@ internal sealed class EfTemplateCategoryStore(
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<TemplateCategory>> ListCategoriesAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using TemplatingDbContext ctx =
-            await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         List<TemplateCategoryEntity> entities = await ctx.TemplateCategories
             .OrderBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
             .AsNoTracking()
-            .ToListAsync(ct)
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         // Count templates per category in a single query.
@@ -29,7 +29,7 @@ internal sealed class EfTemplateCategoryStore(
             .Where(r => r.CategoryId != null)
             .GroupBy(r => r.CategoryId!.Value)
             .Select(g => new { CategoryId = g.Key, Count = g.Select(r => r.TemplateName).Distinct().Count() })
-            .ToDictionaryAsync(x => x.CategoryId, x => x.Count, ct)
+            .ToDictionaryAsync(x => x.CategoryId, x => x.Count, cancellationToken)
             .ConfigureAwait(false);
 
         return entities
@@ -39,14 +39,14 @@ internal sealed class EfTemplateCategoryStore(
 
     /// <inheritdoc/>
     public async Task<TemplateCategory?> GetCategoryAsync(
-        Guid id, CancellationToken ct = default)
+        Guid id, CancellationToken cancellationToken = default)
     {
         await using TemplatingDbContext ctx =
-            await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         TemplateCategoryEntity? entity = await ctx.TemplateCategories
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == id, ct)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
             .ConfigureAwait(false);
 
         if (entity is null)
@@ -58,7 +58,7 @@ internal sealed class EfTemplateCategoryStore(
             .Where(r => r.CategoryId == id)
             .Select(r => r.TemplateName)
             .Distinct()
-            .CountAsync(ct)
+            .CountAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return ToCategory(entity, templateCount);
@@ -71,13 +71,13 @@ internal sealed class EfTemplateCategoryStore(
         string? icon,
         int sortOrder,
         string createdBy,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using TemplatingDbContext ctx =
-            await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         bool exists = await ctx.TemplateCategories
-            .AnyAsync(c => c.Name == name, ct)
+            .AnyAsync(c => c.Name == name, cancellationToken)
             .ConfigureAwait(false);
 
         if (exists)
@@ -98,7 +98,7 @@ internal sealed class EfTemplateCategoryStore(
         };
 
         ctx.TemplateCategories.Add(entity);
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return ToCategory(entity, templateCount: 0);
     }
@@ -110,13 +110,13 @@ internal sealed class EfTemplateCategoryStore(
         string? description,
         string? icon,
         int sortOrder,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using TemplatingDbContext ctx =
-            await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         TemplateCategoryEntity? entity = await ctx.TemplateCategories
-            .FirstOrDefaultAsync(c => c.Id == id, ct)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
             .ConfigureAwait(false);
 
         if (entity is null)
@@ -126,7 +126,7 @@ internal sealed class EfTemplateCategoryStore(
         }
 
         bool nameConflict = await ctx.TemplateCategories
-            .AnyAsync(c => c.Name == name && c.Id != id, ct)
+            .AnyAsync(c => c.Name == name && c.Id != id, cancellationToken)
             .ConfigureAwait(false);
 
         if (nameConflict)
@@ -140,13 +140,13 @@ internal sealed class EfTemplateCategoryStore(
         entity.Icon = icon;
         entity.SortOrder = sortOrder;
 
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         int templateCount = await ctx.TemplateRevisions
             .Where(r => r.CategoryId == id)
             .Select(r => r.TemplateName)
             .Distinct()
-            .CountAsync(ct)
+            .CountAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return ToCategory(entity, templateCount);
@@ -154,13 +154,13 @@ internal sealed class EfTemplateCategoryStore(
 
     /// <inheritdoc/>
     public async Task DeleteCategoryAsync(
-        Guid id, CancellationToken ct = default)
+        Guid id, CancellationToken cancellationToken = default)
     {
         await using TemplatingDbContext ctx =
-            await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         TemplateCategoryEntity? entity = await ctx.TemplateCategories
-            .FirstOrDefaultAsync(c => c.Id == id, ct)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
             .ConfigureAwait(false);
 
         if (entity is null)
@@ -173,7 +173,7 @@ internal sealed class EfTemplateCategoryStore(
             .Where(r => r.CategoryId == id)
             .Select(r => r.TemplateName)
             .Distinct()
-            .CountAsync(ct)
+            .CountAsync(cancellationToken)
             .ConfigureAwait(false);
 
         if (templateCount > 0)
@@ -183,7 +183,7 @@ internal sealed class EfTemplateCategoryStore(
         }
 
         ctx.TemplateCategories.Remove(entity);
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static TemplateCategory ToCategory(TemplateCategoryEntity entity, int templateCount) =>

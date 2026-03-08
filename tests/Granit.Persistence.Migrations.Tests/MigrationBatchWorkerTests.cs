@@ -92,23 +92,23 @@ public sealed class MigrationBatchWorkerTests : IDisposable
     public async Task ExecuteAsync_SingleBatchNoNextCursor_ProcessesAndStops()
     {
         // Arrange
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         string cycleId = "single-batch";
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, (_, _, _) => Task.FromResult(new MigrationBatchResult(10, null)));
         MigrationBatchWorker worker = BuildWorker(registry);
 
         await _channel.Writer.WriteAsync(
-            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), ct);
+            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), cancellationToken);
         _channel.Writer.Complete();
 
         // Act
-        await worker.StartAsync(ct);
+        await worker.StartAsync(cancellationToken);
         await worker.ExecuteTask!;
 
         // Assert
         MigrationProgress? progress = await _progressContext.MigrationProgresses
-            .FirstOrDefaultAsync(p => p.CycleId == cycleId, ct);
+            .FirstOrDefaultAsync(p => p.CycleId == cycleId, cancellationToken);
         progress.ShouldNotBeNull();
         progress!.Status.ShouldBe(MigrationStatus.Completed);
         progress.ProcessedRows.ShouldBe(10);
@@ -122,7 +122,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
     public async Task ExecuteAsync_CascadeTwoBatches_ProcessesBothAndCompletes()
     {
         // Arrange
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         string cycleId = "cascade";
         int callCount = 0;
         IMigrationCycleRegistry registry = RegistryWith(cycleId, (_, _, _) =>
@@ -134,16 +134,16 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         MigrationBatchWorker worker = BuildWorker(registry);
 
         await _channel.Writer.WriteAsync(
-            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), ct);
+            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), cancellationToken);
         _channel.Writer.Complete();
 
         // Act
-        await worker.StartAsync(ct);
+        await worker.StartAsync(cancellationToken);
         await worker.ExecuteTask!;
 
         // Assert
         MigrationProgress? progress = await _progressContext.MigrationProgresses
-            .FirstOrDefaultAsync(p => p.CycleId == cycleId, ct);
+            .FirstOrDefaultAsync(p => p.CycleId == cycleId, cancellationToken);
         progress.ShouldNotBeNull();
         progress!.Status.ShouldBe(MigrationStatus.Completed);
         progress.ProcessedRows.ShouldBe(100);
@@ -158,9 +158,9 @@ public sealed class MigrationBatchWorkerTests : IDisposable
     public async Task ExecuteAsync_ShutdownDuringBatch_StopsCascade()
     {
         // Arrange
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         string cycleId = "shutdown-during";
-        using var workerCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        using var workerCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         IMigrationCycleRegistry registry = RegistryWith(cycleId, async (_, _, _) =>
         {
@@ -170,12 +170,12 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         MigrationBatchWorker worker = BuildWorker(registry);
 
         await _channel.Writer.WriteAsync(
-            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), ct);
+            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), cancellationToken);
 
         // Act
         await worker.StartAsync(workerCts.Token);
-        await Task.Delay(500, ct);
-        await worker.StopAsync(ct);
+        await Task.Delay(500, cancellationToken);
+        await worker.StopAsync(cancellationToken);
 
         // Assert
         worker.ExecuteTask!.IsCompleted.ShouldBeTrue();
@@ -189,9 +189,9 @@ public sealed class MigrationBatchWorkerTests : IDisposable
     public async Task ExecuteAsync_ShutdownBetweenBatches_StopsBeforeNextCascade()
     {
         // Arrange
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         string cycleId = "shutdown-between";
-        using var workerCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        using var workerCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         int callCount = 0;
 
         IMigrationCycleRegistry registry = RegistryWith(cycleId, (_, _, _) =>
@@ -208,12 +208,12 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         MigrationBatchWorker worker = BuildWorker(registry);
 
         await _channel.Writer.WriteAsync(
-            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), ct);
+            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), cancellationToken);
 
         // Act
         await worker.StartAsync(workerCts.Token);
-        await Task.Delay(500, ct);
-        await worker.StopAsync(ct);
+        await Task.Delay(500, cancellationToken);
+        await worker.StopAsync(cancellationToken);
 
         // Assert
         callCount.ShouldBe(1);
@@ -227,18 +227,18 @@ public sealed class MigrationBatchWorkerTests : IDisposable
     public async Task ExecuteAsync_BatchFails_StopsCascadeGracefully()
     {
         // Arrange
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         string cycleId = "batch-fail";
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, (_, _, _) => throw new InvalidOperationException("db error"));
         MigrationBatchWorker worker = BuildWorker(registry);
 
         await _channel.Writer.WriteAsync(
-            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), ct);
+            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), cancellationToken);
         _channel.Writer.Complete();
 
         // Act
-        await worker.StartAsync(ct);
+        await worker.StartAsync(cancellationToken);
         await worker.ExecuteTask!;
 
         // Assert
@@ -253,7 +253,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
     public async Task ExecuteAsync_BatchTimeout_StopsCascadeGracefully()
     {
         // Arrange
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         string cycleId = "batch-timeout";
         IMigrationCycleRegistry registry = RegistryWith(cycleId, async (_, _, batchCt) =>
         {
@@ -265,11 +265,11 @@ public sealed class MigrationBatchWorkerTests : IDisposable
             batchTimeout: TimeSpan.FromMilliseconds(100));
 
         await _channel.Writer.WriteAsync(
-            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), ct);
+            new RunMigrationBatchCommand(cycleId, Guid.Empty, null, 100), cancellationToken);
         _channel.Writer.Complete();
 
         // Act
-        await worker.StartAsync(ct);
+        await worker.StartAsync(cancellationToken);
         await worker.ExecuteTask!;
 
         // Assert

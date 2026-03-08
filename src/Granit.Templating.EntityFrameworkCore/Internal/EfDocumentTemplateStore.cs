@@ -31,7 +31,7 @@ internal sealed class EfDocumentTemplateStore(
 {
     /// <inheritdoc/>
     public async Task<TemplateDescriptor?> TryGetPublishedAsync(
-        TemplateKey key, CancellationToken ct = default)
+        TemplateKey key, CancellationToken cancellationToken = default)
     {
         TemplateCacheEntry entry = await cache.GetOrCreateAsync(
             CacheKey(key),
@@ -48,7 +48,7 @@ internal sealed class EfDocumentTemplateStore(
                     ? TemplateCacheEntry.NotFound
                     : TemplateCacheEntry.From(entity.Content, entity.MimeType, entity.RevisionId);
             },
-            cancellationToken: ct);
+            cancellationToken: cancellationToken);
 
         return entry.ToDescriptor();
     }
@@ -59,14 +59,14 @@ internal sealed class EfDocumentTemplateStore(
         string content,
         string mimeType,
         string updatedBy,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         TemplateRevisionEntity? existing = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
                         && r.Status == TemplateLifecycleStatus.Draft)
-            .FirstOrDefaultAsync(ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
         if (existing is not null)
         {
@@ -91,26 +91,26 @@ internal sealed class EfDocumentTemplateStore(
             });
         }
 
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task PublishAsync(
         TemplateKey key,
         string publishedBy,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        if (!await transitionHook.CanTransitionAsync(TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, ct).ConfigureAwait(false))
+        if (!await transitionHook.CanTransitionAsync(TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, cancellationToken).ConfigureAwait(false))
         {
             throw new TemplateTransitionDeniedException(TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published);
         }
 
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         TemplateRevisionEntity? draft = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
                         && r.Status == TemplateLifecycleStatus.Draft)
-            .FirstOrDefaultAsync(ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
         if (draft is null)
         {
@@ -123,7 +123,7 @@ internal sealed class EfDocumentTemplateStore(
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
                         && r.Status == TemplateLifecycleStatus.Published)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         DateTimeOffset now = DateTimeOffset.UtcNow;
         foreach (TemplateRevisionEntity published in currentlyPublished)
@@ -137,40 +137,40 @@ internal sealed class EfDocumentTemplateStore(
         draft.PublishedAt = now;
         draft.PublishedBy = publishedBy;
 
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // Notify hook after persistence (archival of previous + promotion of draft)
         foreach (TemplateRevisionEntity archived in currentlyPublished)
         {
             await transitionHook.OnTransitionedAsync(
-                archived.RevisionId, TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, publishedBy, ct).ConfigureAwait(false);
+                archived.RevisionId, TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, publishedBy, cancellationToken).ConfigureAwait(false);
         }
 
         await transitionHook.OnTransitionedAsync(
-            draft.RevisionId, TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, publishedBy, ct).ConfigureAwait(false);
+            draft.RevisionId, TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published, publishedBy, cancellationToken).ConfigureAwait(false);
 
-        await cache.RemoveAsync(CacheKey(key), ct).ConfigureAwait(false);
+        await cache.RemoveAsync(CacheKey(key), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task UnpublishAsync(
         TemplateKey key,
         string unpublishedBy,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         List<TemplateRevisionEntity> published = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
                         && r.Status == TemplateLifecycleStatus.Published)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         if (published.Count == 0)
         {
             return; // Idempotent — nothing published to archive
         }
 
-        if (!await transitionHook.CanTransitionAsync(TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, ct).ConfigureAwait(false))
+        if (!await transitionHook.CanTransitionAsync(TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, cancellationToken).ConfigureAwait(false))
         {
             throw new TemplateTransitionDeniedException(TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived);
         }
@@ -183,29 +183,29 @@ internal sealed class EfDocumentTemplateStore(
             entity.ArchivedBy = unpublishedBy;
         }
 
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         foreach (TemplateRevisionEntity entity in published)
         {
             await transitionHook.OnTransitionedAsync(
-                entity.RevisionId, TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, unpublishedBy, ct).ConfigureAwait(false);
+                entity.RevisionId, TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived, unpublishedBy, cancellationToken).ConfigureAwait(false);
         }
 
-        await cache.RemoveAsync(CacheKey(key), ct).ConfigureAwait(false);
+        await cache.RemoveAsync(CacheKey(key), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task DeleteDraftAsync(
         TemplateKey key,
         string deletedBy,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         TemplateRevisionEntity? draft = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
                         && r.Status == TemplateLifecycleStatus.Draft)
-            .FirstOrDefaultAsync(ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
         if (draft is null)
         {
@@ -215,28 +215,28 @@ internal sealed class EfDocumentTemplateStore(
 
         // Only drafts are physically deleted. Published/archived rows are kept (HDS).
         ctx.TemplateRevisions.Remove(draft);
-        await ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+        await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task<TemplateRevision?> TryGetDraftAsync(
-        TemplateKey key, CancellationToken ct = default)
+        TemplateKey key, CancellationToken cancellationToken = default)
     {
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         TemplateRevisionEntity? entity = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
                         && r.Status == TemplateLifecycleStatus.Draft)
-            .FirstOrDefaultAsync(ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
         return entity is null ? null : ToRevision(entity);
     }
 
     /// <inheritdoc/>
     public async Task<PagedTemplateResult> ListTemplatesAsync(
-        TemplateListFilter filter, CancellationToken ct = default)
+        TemplateListFilter filter, CancellationToken cancellationToken = default)
     {
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         // Exclude archived revisions from the list — they are only visible in history.
         IQueryable<TemplateRevisionEntity> query = ctx.TemplateRevisions
@@ -278,14 +278,14 @@ internal sealed class EfDocumentTemplateStore(
                 HasPublishedVersion = g.Any(r => r.Status == TemplateLifecycleStatus.Published),
             });
 
-        int totalCount = await grouped.CountAsync(ct).ConfigureAwait(false);
+        int totalCount = await grouped.CountAsync(cancellationToken).ConfigureAwait(false);
 
         var items = await grouped
             .OrderBy(g => g.TemplateName)
             .ThenBy(g => g.Culture)
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         List<TemplateSummary> summaries = items.ConvertAll(g => new TemplateSummary
         {
@@ -303,9 +303,9 @@ internal sealed class EfDocumentTemplateStore(
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
-        TemplateKey key, CancellationToken ct = default)
+        TemplateKey key, CancellationToken cancellationToken = default)
     {
-        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name && r.Culture == key.Culture)
             .OrderByDescending(r => r.CreatedAt)
@@ -320,7 +320,7 @@ internal sealed class EfDocumentTemplateStore(
                 PublishedAt = r.PublishedAt,
                 PublishedBy = r.PublishedBy,
             })
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static TemplateRevision ToRevision(TemplateRevisionEntity entity) =>

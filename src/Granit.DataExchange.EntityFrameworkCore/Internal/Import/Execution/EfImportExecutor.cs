@@ -24,7 +24,7 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
         IAsyncEnumerable<ValidatedRow<TEntity>> entities,
         ImportExecutionOptions options,
         IProgress<ImportProgress>? progress = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
         List<ImportRowError> errors = [];
@@ -35,12 +35,12 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
         int updatedRows = 0;
         int batchCount = 0;
 
-        await using TContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(ct).ConfigureAwait(false);
+        await using TContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         try
         {
-            await foreach (ValidatedRow<TEntity> row in entities.WithCancellation(ct))
+            await foreach (ValidatedRow<TEntity> row in entities.WithCancellation(cancellationToken))
             {
                 totalRows++;
 
@@ -62,7 +62,7 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
 
                     if (batchCount >= options.BatchSize)
                     {
-                        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+                        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                         batchCount = 0;
 
                         progress?.Report(new ImportProgress(
@@ -92,14 +92,14 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
             // Save remaining batch
             if (batchCount > 0)
             {
-                await context.SaveChangesAsync(ct).ConfigureAwait(false);
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await CommitOrRollbackAsync(transaction, options.DryRun, ct).ConfigureAwait(false);
+            await CommitOrRollbackAsync(transaction, options.DryRun, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception) when (options.ErrorBehavior != ImportErrorBehavior.FailFast)
         {
-            await transaction.RollbackAsync(ct).ConfigureAwait(false);
+            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
         }
 
         stopwatch.Stop();
@@ -124,15 +124,15 @@ internal sealed class EfImportExecutor<TEntity, TContext>(
         row.Identity?.Operation == RecordOperation.Update && row.Identity.ExistingEntity is not null;
 
     private static async Task CommitOrRollbackAsync(
-        IDbContextTransaction transaction, bool dryRun, CancellationToken ct)
+        IDbContextTransaction transaction, bool dryRun, CancellationToken cancellationToken)
     {
         if (dryRun)
         {
-            await transaction.RollbackAsync(ct).ConfigureAwait(false);
+            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
         }
         else
         {
-            await transaction.CommitAsync(ct).ConfigureAwait(false);
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 

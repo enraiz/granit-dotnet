@@ -29,14 +29,14 @@ internal static class ImportDefinitionResolver
         IMappingSuggestionService mappingService,
         Type entityType,
         IReadOnlyList<string> headers,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         System.Reflection.MethodInfo method = typeof(IMappingSuggestionService)
             .GetMethod(nameof(IMappingSuggestionService.SuggestMappingsAsync))!
             .MakeGenericMethod(entityType);
 
         var task =
-            (Task<IReadOnlyList<ImportColumnMapping>>)method.Invoke(mappingService, [headers, ct])!;
+            (Task<IReadOnlyList<ImportColumnMapping>>)method.Invoke(mappingService, [headers, cancellationToken])!;
 
         return await task.ConfigureAwait(false);
     }

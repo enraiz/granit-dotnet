@@ -17,7 +17,7 @@ internal sealed class WolverineDataExchangeEventPublisher(
     IServiceScopeFactory scopeFactory) : IDataExchangeEventPublisher
 {
     /// <inheritdoc/>
-    public async Task PublishAsync(ImportJobCompletedEvent evt, CancellationToken ct = default)
+    public async Task PublishAsync(ImportJobCompletedEvent evt, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
@@ -25,7 +25,7 @@ internal sealed class WolverineDataExchangeEventPublisher(
     }
 
     /// <inheritdoc/>
-    public async Task PublishAsync(ExportJobCompletedEvent evt, CancellationToken ct = default)
+    public async Task PublishAsync(ExportJobCompletedEvent evt, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();

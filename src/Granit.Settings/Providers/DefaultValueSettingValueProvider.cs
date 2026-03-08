@@ -19,7 +19,7 @@ public sealed class DefaultValueSettingValueProvider : ISettingValueProvider
     public int Order => 500;
 
     /// <inheritdoc/>
-    public Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken ct = default)
+    public Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken cancellationToken = default)
     {
         SettingValue? result = definition.DefaultValue is not null
             ? new SettingValue(definition.Name, ProviderName, null, definition.DefaultValue)
@@ -28,10 +28,10 @@ public sealed class DefaultValueSettingValueProvider : ISettingValueProvider
     }
 
     /// <inheritdoc/>
-    public Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default) =>
+    public Task SetAsync(SettingDefinition definition, string? value, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
     /// <inheritdoc/>
-    public Task ClearAsync(SettingDefinition definition, CancellationToken ct = default) =>
+    public Task ClearAsync(SettingDefinition definition, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 }

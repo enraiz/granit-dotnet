@@ -39,7 +39,7 @@ public sealed partial class RecurringJobSchedulingMiddleware(
     /// <summary>
     /// Records the execution start and captures the <c>X-Triggered-By</c> header for HDS audit.
     /// </summary>
-    public async Task BeforeAsync(Envelope envelope, CancellationToken ct)
+    public async Task BeforeAsync(Envelope envelope, CancellationToken cancellationToken)
     {
         RecurringJobAttribute? attr = envelope.Message?.GetType()
             .GetCustomAttribute<RecurringJobAttribute>();
@@ -49,12 +49,12 @@ public sealed partial class RecurringJobSchedulingMiddleware(
             return;
         }
 
-        await storeWriter.RecordExecutionStartAsync(attr.Name, clock.Now, ct).ConfigureAwait(false);
+        await storeWriter.RecordExecutionStartAsync(attr.Name, clock.Now, cancellationToken).ConfigureAwait(false);
 
         if (envelope.Headers.TryGetValue(TriggeredByHeader, out string? triggeredBy)
             && !string.IsNullOrEmpty(triggeredBy))
         {
-            await storeWriter.SetTriggeredByAsync(attr.Name, triggeredBy, ct).ConfigureAwait(false);
+            await storeWriter.SetTriggeredByAsync(attr.Name, triggeredBy, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -62,7 +62,7 @@ public sealed partial class RecurringJobSchedulingMiddleware(
     /// Calculates the next cron occurrence and schedules the message inside the Outbox
     /// transaction. Skipped when the job is paused (<see cref="BackgroundJobDefinition.IsEnabled"/> = <c>false</c>).
     /// </summary>
-    public async Task AfterAsync(Envelope envelope, IMessageContext context, CancellationToken ct)
+    public async Task AfterAsync(Envelope envelope, IMessageContext context, CancellationToken cancellationToken)
     {
         RecurringJobAttribute? attr = envelope.Message?.GetType()
             .GetCustomAttribute<RecurringJobAttribute>();
@@ -72,7 +72,7 @@ public sealed partial class RecurringJobSchedulingMiddleware(
             return;
         }
 
-        BackgroundJobDefinition? job = await storeReader.FindAsync(attr.Name, ct).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await storeReader.FindAsync(attr.Name, cancellationToken).ConfigureAwait(false);
         if (job is not { IsEnabled: true })
         {
             return;
@@ -98,7 +98,7 @@ public sealed partial class RecurringJobSchedulingMiddleware(
 
         object nextMessage = Activator.CreateInstance(envelope.Message!.GetType())!;
         await context.ScheduleAsync(nextMessage, next.Value).ConfigureAwait(false);
-        await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, ct).ConfigureAwait(false);
+        await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken).ConfigureAwait(false);
     }
 
     // =========================================================================

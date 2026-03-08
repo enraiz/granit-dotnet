@@ -32,16 +32,16 @@ internal static class CodeFixTestHelpers
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
-        CancellationToken ct = Xunit.TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = Xunit.TestContext.Current.CancellationToken;
         // 1. Build the compilation
         ImmutableArray<SyntaxTree>.Builder treeBuilder = ImmutableArray.CreateBuilder<SyntaxTree>();
-        treeBuilder.Add(CSharpSyntaxTree.ParseText(source, cancellationToken: ct));
+        treeBuilder.Add(CSharpSyntaxTree.ParseText(source, cancellationToken: cancellationToken));
 
         if (additionalSources is not null)
         {
             foreach (string additional in additionalSources)
             {
-                treeBuilder.Add(CSharpSyntaxTree.ParseText(additional, cancellationToken: ct));
+                treeBuilder.Add(CSharpSyntaxTree.ParseText(additional, cancellationToken: cancellationToken));
             }
         }
 
@@ -56,7 +56,7 @@ internal static class CodeFixTestHelpers
         CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(
             ImmutableArray.Create<DiagnosticAnalyzer>(analyzer));
 
-        ImmutableArray<Diagnostic> diagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(ct);
+        ImmutableArray<Diagnostic> diagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellationToken);
         diagnostics.ShouldNotBeEmpty("the analyzer should report at least one diagnostic");
 
         // 3. Apply the first CodeFix action on the first diagnostic
@@ -90,19 +90,19 @@ internal static class CodeFixTestHelpers
             document,
             diagnostic,
             (action, _) => codeAction = action,
-            ct);
+            cancellationToken);
 
         await codeFix.RegisterCodeFixesAsync(context);
         codeAction.ShouldNotBeNull("the CodeFix provider should register an action");
 
-        ImmutableArray<CodeActionOperation> operations = await codeAction!.GetOperationsAsync(ct);
+        ImmutableArray<CodeActionOperation> operations = await codeAction!.GetOperationsAsync(cancellationToken);
         ApplyChangesOperation? applyChanges = operations.OfType<ApplyChangesOperation>().FirstOrDefault();
         applyChanges.ShouldNotBeNull("the CodeFix action should produce an ApplyChangesOperation");
 
         // 4. Get the changed document and format it
         Document changedDocument = applyChanges!.ChangedSolution.GetDocument(document.Id)!;
-        Document formattedDocument = await Formatter.FormatAsync(changedDocument, cancellationToken: ct);
-        string actualText = (await formattedDocument.GetTextAsync(ct)).ToString();
+        Document formattedDocument = await Formatter.FormatAsync(changedDocument, cancellationToken: cancellationToken);
+        string actualText = (await formattedDocument.GetTextAsync(cancellationToken)).ToString();
 
         // 5. Compare — use Assert.Equal to avoid FormatException with curly braces in Shouldly
         Xunit.Assert.Equal(expected, actualText);
@@ -117,15 +117,15 @@ internal static class CodeFixTestHelpers
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
-        CancellationToken ct = Xunit.TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = Xunit.TestContext.Current.CancellationToken;
         ImmutableArray<SyntaxTree>.Builder treeBuilder = ImmutableArray.CreateBuilder<SyntaxTree>();
-        treeBuilder.Add(CSharpSyntaxTree.ParseText(source, cancellationToken: ct));
+        treeBuilder.Add(CSharpSyntaxTree.ParseText(source, cancellationToken: cancellationToken));
 
         if (additionalSources is not null)
         {
             foreach (string additional in additionalSources)
             {
-                treeBuilder.Add(CSharpSyntaxTree.ParseText(additional, cancellationToken: ct));
+                treeBuilder.Add(CSharpSyntaxTree.ParseText(additional, cancellationToken: cancellationToken));
             }
         }
 
@@ -139,7 +139,7 @@ internal static class CodeFixTestHelpers
         CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(
             ImmutableArray.Create<DiagnosticAnalyzer>(analyzer));
 
-        ImmutableArray<Diagnostic> diagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(ct);
+        ImmutableArray<Diagnostic> diagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellationToken);
         diagnostics.ShouldBeEmpty("no diagnostic should be reported");
     }
 

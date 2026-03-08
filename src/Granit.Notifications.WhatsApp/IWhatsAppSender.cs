@@ -7,5 +7,5 @@ namespace Granit.Notifications.WhatsApp;
 public interface IWhatsAppSender
 {
     /// <summary>Sends a WhatsApp message.</summary>
-    Task SendAsync(WhatsAppMessage message, CancellationToken ct = default);
+    Task SendAsync(WhatsAppMessage message, CancellationToken cancellationToken = default);
 }

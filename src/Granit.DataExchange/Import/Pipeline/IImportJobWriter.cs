@@ -11,13 +11,13 @@ public interface IImportJobWriter
     /// Creates a new import job.
     /// </summary>
     /// <param name="job">The import job to persist.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task CreateAsync(ImportJob job, CancellationToken ct = default);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task CreateAsync(ImportJob job, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates an existing import job.
     /// </summary>
     /// <param name="job">The import job with updated state.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task UpdateAsync(ImportJob job, CancellationToken ct = default);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task UpdateAsync(ImportJob job, CancellationToken cancellationToken = default);
 }

@@ -14,7 +14,7 @@ public interface ISettingStoreWriter
         string providerName,
         string? providerKey,
         string? value,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes the value of a setting for a given provider and key.
@@ -23,5 +23,5 @@ public interface ISettingStoreWriter
         string name,
         string providerName,
         string? providerKey,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

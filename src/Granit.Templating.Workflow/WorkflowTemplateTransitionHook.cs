@@ -24,12 +24,12 @@ internal sealed class WorkflowTemplateTransitionHook(
     public async Task<bool> CanTransitionAsync(
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         WorkflowLifecycleStatus wFrom = ToWorkflow(from);
         WorkflowLifecycleStatus wTo = ToWorkflow(target);
         IReadOnlyList<WorkflowTransition<WorkflowLifecycleStatus>> allowed =
-            await workflowManager.GetAllowedTransitionsAsync(wFrom, ct).ConfigureAwait(false);
+            await workflowManager.GetAllowedTransitionsAsync(wFrom, cancellationToken).ConfigureAwait(false);
         return allowed.Any(t => t.To == wTo);
     }
 
@@ -39,7 +39,7 @@ internal sealed class WorkflowTemplateTransitionHook(
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
         string userId,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await transitionRecorder.RecordTransitionAsync(
             new RecordTransitionRequest
@@ -52,7 +52,7 @@ internal sealed class WorkflowTemplateTransitionHook(
                 Comment = WorkflowTransitionContext.Current?.Comment,
                 TenantId = currentTenant.IsAvailable ? currentTenant.Id : null,
             },
-            ct).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static WorkflowLifecycleStatus ToWorkflow(TemplateLifecycleStatus status) =>

@@ -35,7 +35,7 @@ public interface ITextTemplateRenderer
     /// <typeparam name="TData">Type of the data model. Must be non-null.</typeparam>
     /// <param name="templateType">Strongly-typed template declaration.</param>
     /// <param name="data">Data model to merge into the template.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A <see cref="RenderedTextResult"/> containing the HTML body, optional plain text,
     /// and optional subject line.
@@ -46,7 +46,7 @@ public interface ITextTemplateRenderer
     Task<RenderedTextResult> RenderAsync<TData>(
         TextTemplateType<TData> templateType,
         TData data,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 
     /// <summary>
     /// Renders the template, returning a <see cref="RenderedContent"/> that may be text or binary.
@@ -59,10 +59,10 @@ public interface ITextTemplateRenderer
     /// <param name="templateType">Strongly-typed template declaration.</param>
     /// <param name="data">Data model to merge into the template.</param>
     /// <param name="targetFormat">The intended output format.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<RenderedContent> RenderDocumentAsync<TData>(
         TextTemplateType<TData> templateType,
         TData data,
         DocumentFormat targetFormat,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 }

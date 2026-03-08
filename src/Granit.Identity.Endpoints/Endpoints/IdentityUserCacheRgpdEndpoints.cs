@@ -26,18 +26,18 @@ internal static class IdentityUserCacheRgpdEndpoints
     private static async Task<NoContent> EraseAsync(
         string userId,
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        await lookupService.DeleteByIdAsync(userId, ct).ConfigureAwait(false);
+        await lookupService.DeleteByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
     private static async Task<NoContent> PseudonymizeAsync(
         string userId,
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        await lookupService.PseudonymizeByIdAsync(userId, ct).ConfigureAwait(false);
+        await lookupService.PseudonymizeByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 }

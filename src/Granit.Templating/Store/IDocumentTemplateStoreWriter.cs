@@ -29,25 +29,25 @@ public interface IDocumentTemplateStoreWriter
     /// <param name="content">Template source (HTML).</param>
     /// <param name="mimeType">MIME type (e.g. <c>"text/html"</c>).</param>
     /// <param name="updatedBy">Identity of the user saving the draft.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task SaveDraftAsync(
         TemplateKey key,
         string content,
         string mimeType,
         string updatedBy,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Promotes the current draft to <c>Published</c>, archiving any previous published revision.
     /// </summary>
     /// <param name="key">Template key.</param>
     /// <param name="publishedBy">Identity of the user publishing.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <exception cref="InvalidOperationException">No draft exists for this key.</exception>
     Task PublishAsync(
         TemplateKey key,
         string publishedBy,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Archives the currently published revision without promoting a new one.
@@ -55,11 +55,11 @@ public interface IDocumentTemplateStoreWriter
     /// </summary>
     /// <param name="key">Template key.</param>
     /// <param name="unpublishedBy">Identity of the user unpublishing.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task UnpublishAsync(
         TemplateKey key,
         string unpublishedBy,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Physically deletes the draft for the given key.
@@ -70,10 +70,10 @@ public interface IDocumentTemplateStoreWriter
     /// </remarks>
     /// <param name="key">Template key.</param>
     /// <param name="deletedBy">Identity of the user performing the deletion.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <exception cref="InvalidOperationException">No draft exists, or the revision is not a draft.</exception>
     Task DeleteDraftAsync(
         TemplateKey key,
         string deletedBy,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

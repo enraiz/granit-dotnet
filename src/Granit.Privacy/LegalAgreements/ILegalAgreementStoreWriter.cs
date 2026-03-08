@@ -6,5 +6,5 @@ namespace Granit.Privacy.LegalAgreements;
 public interface ILegalAgreementStoreWriter
 {
     /// <summary>Records a new legal agreement (append-only).</summary>
-    Task RecordAsync(LegalAgreementBase agreement, CancellationToken ct = default);
+    Task RecordAsync(LegalAgreementBase agreement, CancellationToken cancellationToken = default);
 }

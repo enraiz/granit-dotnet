@@ -17,7 +17,7 @@ internal static class QueryableGroupByExtensions
         this IQueryable<T> source,
         string groupByField,
         QueryDefinitionBuilder<T> builder,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
         where T : class
     {
         PropertyInfo? property = typeof(T).GetProperty(
@@ -55,7 +55,7 @@ internal static class QueryableGroupByExtensions
         // Materialize groups with count
         // We need to project to a known type
         List<GroupEntry<T>> groups = await MaterializeGroupsAsync<T>(
-            groupedQuery, property, groupByField, ct).ConfigureAwait(false);
+            groupedQuery, property, groupByField, cancellationToken).ConfigureAwait(false);
 
         int totalCount = groups.Sum(g => g.Count);
 
@@ -66,7 +66,7 @@ internal static class QueryableGroupByExtensions
         object groupedQuery,
         PropertyInfo property,
         string fieldName,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
         where T : class
     {
         // Use dynamic approach to handle different key types
@@ -105,7 +105,7 @@ internal static class QueryableGroupByExtensions
                 && m.GetParameters().Length == 2)
             .MakeGenericMethod(resultType);
 
-        dynamic task = toListAsync.Invoke(null, [projected, ct])!;
+        dynamic task = toListAsync.Invoke(null, [projected, cancellationToken])!;
         await task.ConfigureAwait(false);
         var materialized = (System.Collections.IList)task.Result;
 

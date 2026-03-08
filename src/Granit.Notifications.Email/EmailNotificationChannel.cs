@@ -16,11 +16,11 @@ internal sealed class EmailNotificationChannel(
     public string Name => NotificationChannels.Email;
 
     /// <inheritdoc />
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         IEmailSender sender = serviceProvider.GetRequiredKeyedService<IEmailSender>(options.Value.Provider);
 
-        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct).ConfigureAwait(false);
+        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, cancellationToken).ConfigureAwait(false);
         if (recipient?.Email is null)
         {
             return;
@@ -35,6 +35,6 @@ internal sealed class EmailNotificationChannel(
             Subject = subject,
             HtmlBody = htmlBody,
             FromOverride = options.Value.SenderAddress,
-        }, ct).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(false);
     }
 }

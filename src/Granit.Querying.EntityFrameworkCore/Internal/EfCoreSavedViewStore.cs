@@ -12,10 +12,10 @@ internal sealed class EfCoreSavedViewStore(
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<SavedView>> GetListAsync(
-        string entityType, string userId, Guid? tenantId, CancellationToken ct = default)
+        string entityType, string userId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         await using QueryingDbContext context = await contextFactory
-            .CreateDbContextAsync(ct).ConfigureAwait(false);
+            .CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         return await context.SavedViews
             .AsNoTracking()
@@ -23,69 +23,69 @@ internal sealed class EfCoreSavedViewStore(
                 && v.TenantId == tenantId
                 && (v.UserId == userId || v.IsShared))
             .OrderBy(v => v.Name)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<SavedView?> GetAsync(Guid id, CancellationToken ct = default)
+    public async Task<SavedView?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await using QueryingDbContext context = await contextFactory
-            .CreateDbContextAsync(ct).ConfigureAwait(false);
+            .CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         return await context.SavedViews
             .AsNoTracking()
-            .FirstOrDefaultAsync(v => v.Id == id, ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(v => v.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task CreateAsync(SavedView view, CancellationToken ct = default)
+    public async Task CreateAsync(SavedView view, CancellationToken cancellationToken = default)
     {
         await using QueryingDbContext context = await contextFactory
-            .CreateDbContextAsync(ct).ConfigureAwait(false);
+            .CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         context.SavedViews.Add(view);
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task UpdateAsync(SavedView view, CancellationToken ct = default)
+    public async Task UpdateAsync(SavedView view, CancellationToken cancellationToken = default)
     {
         await using QueryingDbContext context = await contextFactory
-            .CreateDbContextAsync(ct).ConfigureAwait(false);
+            .CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         context.SavedViews.Update(view);
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await using QueryingDbContext context = await contextFactory
-            .CreateDbContextAsync(ct).ConfigureAwait(false);
+            .CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         SavedView? view = await context.SavedViews
-            .FirstOrDefaultAsync(v => v.Id == id, ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(v => v.Id == id, cancellationToken).ConfigureAwait(false);
 
         if (view is not null)
         {
             context.SavedViews.Remove(view);
-            await context.SaveChangesAsync(ct).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc/>
     public async Task SetDefaultAsync(
-        Guid id, string userId, string entityType, CancellationToken ct = default)
+        Guid id, string userId, string entityType, CancellationToken cancellationToken = default)
     {
         await using QueryingDbContext context = await contextFactory
-            .CreateDbContextAsync(ct).ConfigureAwait(false);
+            .CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         // Unset any previous default for the same user and entity type
         List<SavedView> previousDefaults = await context.SavedViews
             .Where(v => v.EntityType == entityType
                 && v.UserId == userId
                 && v.IsDefault)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         foreach (SavedView previous in previousDefaults)
         {
@@ -94,13 +94,13 @@ internal sealed class EfCoreSavedViewStore(
 
         // Set the new default
         SavedView? target = await context.SavedViews
-            .FirstOrDefaultAsync(v => v.Id == id, ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(v => v.Id == id, cancellationToken).ConfigureAwait(false);
 
         if (target is not null)
         {
             target.IsDefault = true;
         }
 
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

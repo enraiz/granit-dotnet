@@ -19,6 +19,6 @@ internal sealed class StoreTemplateResolver(IDocumentTemplateStoreReader storeRe
 
     /// <inheritdoc/>
     public Task<TemplateDescriptor?> TryResolveAsync(
-        TemplateKey key, CancellationToken ct = default) =>
-        storeReader.TryGetPublishedAsync(key, ct);
+        TemplateKey key, CancellationToken cancellationToken = default) =>
+        storeReader.TryGetPublishedAsync(key, cancellationToken);
 }

@@ -16,19 +16,19 @@ public interface IImportOrchestrator
     /// Executes the full import pipeline for the given job.
     /// </summary>
     /// <param name="importJobId">The import job identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The import report with statistics and row-level errors.</returns>
     Task<ImportReport> ExecuteAsync(
         Guid importJobId,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes the import pipeline in dry-run mode (no data persisted, transaction rolled back).
     /// </summary>
     /// <param name="importJobId">The import job identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The import report with validation results but no actual persistence.</returns>
     Task<ImportReport> DryRunAsync(
         Guid importJobId,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

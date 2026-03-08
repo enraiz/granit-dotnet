@@ -35,7 +35,7 @@ public sealed class LocalizationKeysGenerator : IIncrementalGenerator
 
         // 2. Extract keys from each JSON file
         IncrementalValuesProvider<ImmutableArray<string>> keyCollections = jsonFiles
-            .Select(static (file, ct) => ExtractKeys(file, ct));
+            .Select(static (file, cancellationToken) => ExtractKeys(file, cancellationToken));
 
         // 3. Collect all key collections
         IncrementalValueProvider<ImmutableArray<ImmutableArray<string>>> allKeys = keyCollections.Collect();
@@ -62,9 +62,9 @@ public sealed class LocalizationKeysGenerator : IIncrementalGenerator
     /// <summary>
     /// Extracts all localization keys from a JSON file following the Granit format.
     /// </summary>
-    private static ImmutableArray<string> ExtractKeys(AdditionalText file, System.Threading.CancellationToken ct)
+    private static ImmutableArray<string> ExtractKeys(AdditionalText file, System.Threading.CancellationToken cancellationToken)
     {
-        SourceText? sourceText = file.GetText(ct);
+        SourceText? sourceText = file.GetText(cancellationToken);
         if (sourceText is null)
         {
             return ImmutableArray<string>.Empty;

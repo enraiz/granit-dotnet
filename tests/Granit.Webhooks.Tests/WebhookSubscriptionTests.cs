@@ -27,7 +27,7 @@ public sealed class WebhookSubscriptionTests
         subscription.SuspendedBy.ShouldBe("system");
 
         IDomainEvent domainEvent = subscription.DomainEvents.ShouldHaveSingleItem();
-        var suspended = domainEvent.ShouldBeOfType<WebhookSubscriptionSuspended>();
+        WebhookSubscriptionSuspended suspended = domainEvent.ShouldBeOfType<WebhookSubscriptionSuspended>();
         suspended.SubscriptionId.ShouldBe(subscription.Id);
         suspended.Reason.ShouldBe("HTTP 401");
     }
@@ -43,7 +43,7 @@ public sealed class WebhookSubscriptionTests
         subscription.DeactivationReason.ShouldBe("Admin request");
 
         IDomainEvent domainEvent = subscription.DomainEvents.ShouldHaveSingleItem();
-        var deactivated = domainEvent.ShouldBeOfType<WebhookSubscriptionDeactivated>();
+        WebhookSubscriptionDeactivated deactivated = domainEvent.ShouldBeOfType<WebhookSubscriptionDeactivated>();
         deactivated.SubscriptionId.ShouldBe(subscription.Id);
         deactivated.Reason.ShouldBe("Admin request");
     }

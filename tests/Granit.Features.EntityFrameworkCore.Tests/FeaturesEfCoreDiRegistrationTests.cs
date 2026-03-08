@@ -14,13 +14,13 @@ public sealed class FeaturesEfCoreDiRegistrationTests
     // Stub IFeatureStoreReader/Writer to simulate a prior registration (e.g. InMemoryFeatureStore which is internal).
     private sealed class StubFeatureStore : IFeatureStoreReader, IFeatureStoreWriter
     {
-        public Task<string?> GetOrNullAsync(string featureName, string? tenantId, CancellationToken ct = default) =>
+        public Task<string?> GetOrNullAsync(string featureName, string? tenantId, CancellationToken cancellationToken = default) =>
             Task.FromResult<string?>(null);
 
-        public Task SetAsync(string featureName, string? tenantId, string value, CancellationToken ct = default) =>
+        public Task SetAsync(string featureName, string? tenantId, string value, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
-        public Task DeleteAsync(string featureName, string? tenantId, CancellationToken ct = default) =>
+        public Task DeleteAsync(string featureName, string? tenantId, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
     }
 

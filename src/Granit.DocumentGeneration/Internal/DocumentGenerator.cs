@@ -21,13 +21,13 @@ internal sealed class DocumentGenerator(
         DocumentTemplateType<TData> templateType,
         TData data,
         DocumentFormat? targetFormat = null,
-        CancellationToken ct = default) where TData : notnull
+        CancellationToken cancellationToken = default) where TData : notnull
     {
         DocumentFormat format = targetFormat ?? templateType.DefaultFormat;
 
         // 1. Render via the shared text pipeline (enrichers + resolver + engine).
         //    Binary engines (e.g. ClosedXML for Excel) return BinaryRenderedContent directly.
-        RenderedContent content = await _textRenderer.RenderDocumentAsync(templateType, data, format, ct).ConfigureAwait(false);
+        RenderedContent content = await _textRenderer.RenderDocumentAsync(templateType, data, format, cancellationToken).ConfigureAwait(false);
 
         // 2a. Binary engine result: return directly, no IDocumentRenderer step needed.
         if (content is BinaryRenderedContent binary)
@@ -45,6 +45,6 @@ internal sealed class DocumentGenerator(
         }
 
         // 3. Convert HTML → binary document.
-        return await renderer.RenderAsync(text.Html, format, ct).ConfigureAwait(false);
+        return await renderer.RenderAsync(text.Html, format, cancellationToken).ConfigureAwait(false);
     }
 }

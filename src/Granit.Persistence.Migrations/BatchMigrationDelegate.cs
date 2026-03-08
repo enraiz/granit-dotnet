@@ -12,7 +12,7 @@ namespace Granit.Persistence.Migrations;
 /// Already scoped to the correct tenant by <see cref="ITenantDbIsolator"/>.
 /// </param>
 /// <param name="batch">Contextual information about the current batch.</param>
-/// <param name="ct">Cancellation token.</param>
+/// <param name="cancellationToken">Cancellation token.</param>
 /// <returns>
 /// A <see cref="MigrationBatchResult"/> containing the number of rows processed and
 /// the cursor for the next batch, or <c>null</c> for the next cursor when finished.
@@ -25,4 +25,4 @@ namespace Granit.Persistence.Migrations;
 public delegate Task<MigrationBatchResult> BatchMigrationDelegate(
     DbContext context,
     MigrationBatchContext batch,
-    CancellationToken ct);
+    CancellationToken cancellationToken);

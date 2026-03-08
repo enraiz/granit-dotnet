@@ -31,13 +31,13 @@ internal static class ExportJobListEndpoints
         [FromQuery] ExportJobStatus? status = null,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         int clampedPageSize = Math.Clamp(pageSize, 1, 100);
         int clampedPage = Math.Max(page, 1);
 
         PagedResult<ExportJob> result = await jobReader
-            .ListAsync(status, clampedPage, clampedPageSize, ct)
+            .ListAsync(status, clampedPage, clampedPageSize, cancellationToken)
             .ConfigureAwait(false);
 
         PagedResult<ExportJobResponse> response = new(

@@ -8,7 +8,7 @@ internal sealed class LegalAgreementChecker(
     ILegalAgreementStoreReader storeReader) : ILegalAgreementChecker
 {
     /// <inheritdoc/>
-    public async Task<bool> HasAcceptedLatestAsync(Guid userId, string documentId, CancellationToken ct = default)
+    public async Task<bool> HasAcceptedLatestAsync(Guid userId, string documentId, CancellationToken cancellationToken = default)
     {
         LegalDocumentDefinition? definition = documentRegistry.GetDefinition(documentId);
         if (definition is null)
@@ -16,7 +16,7 @@ internal sealed class LegalAgreementChecker(
             return false;
         }
 
-        LegalAgreementBase? latest = await storeReader.FindLatestAsync(userId, documentId, ct).ConfigureAwait(false);
+        LegalAgreementBase? latest = await storeReader.FindLatestAsync(userId, documentId, cancellationToken).ConfigureAwait(false);
         if (latest is null)
         {
             return false;
@@ -26,6 +26,6 @@ internal sealed class LegalAgreementChecker(
     }
 
     /// <inheritdoc/>
-    public Task<IReadOnlyList<LegalAgreementBase>> GetUserAgreementsAsync(Guid userId, CancellationToken ct = default) =>
-        storeReader.FindAllByUserAsync(userId, ct);
+    public Task<IReadOnlyList<LegalAgreementBase>> GetUserAgreementsAsync(Guid userId, CancellationToken cancellationToken = default) =>
+        storeReader.FindAllByUserAsync(userId, cancellationToken);
 }

@@ -35,7 +35,7 @@ internal sealed class ClosedXmlExportWriter : IExportWriter
         Stream output,
         IReadOnlyList<ExportFieldDescriptor> fields,
         IAsyncEnumerable<IReadOnlyDictionary<string, object?>> rows,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         using XLWorkbook workbook = new();
         IXLWorksheet ws = workbook.AddWorksheet("Export");
@@ -50,7 +50,7 @@ internal sealed class ClosedXmlExportWriter : IExportWriter
 
         // Data rows
         int row = 2;
-        await foreach (IReadOnlyDictionary<string, object?> data in rows.WithCancellation(ct).ConfigureAwait(false))
+        await foreach (IReadOnlyDictionary<string, object?> data in rows.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             for (int col = 0; col < fields.Count; col++)
             {

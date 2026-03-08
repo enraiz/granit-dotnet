@@ -28,5 +28,5 @@ public interface IFeatureValueProvider
     /// Returns the resolved value for <paramref name="definition"/> in the current context,
     /// or <c>null</c> to defer to the next provider.
     /// </summary>
-    Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken ct = default);
+    Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken cancellationToken = default);
 }

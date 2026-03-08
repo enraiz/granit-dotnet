@@ -37,9 +37,9 @@ internal static class ImportReportEndpoints
     private static async Task<Results<Ok<ImportReportResponse>, NotFound>> GetReportAsync(
         Guid jobId,
         IImportJobReader jobReader,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null || string.IsNullOrEmpty(job.ReportJson))
         {
             return TypedResults.NotFound();
@@ -59,9 +59,9 @@ internal static class ImportReportEndpoints
         IImportJobReader jobReader,
         IImportFileProvider fileProvider,
         IServiceProvider serviceProvider,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null || string.IsNullOrEmpty(job.ReportJson))
         {
             return TypedResults.NotFound();
@@ -85,11 +85,11 @@ internal static class ImportReportEndpoints
             return TypedResults.NoContent();
         }
 
-        Stream originalStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
+        Stream originalStream = await fileProvider.OpenAsync(job.BlobReference, cancellationToken).ConfigureAwait(false);
         FileParsingOptions parsingOptions = new() { MimeType = job.MimeType };
 
         Stream correctionStream = await generator.GenerateAsync(
-            originalStream, job.MimeType, report, parsingOptions, ct).ConfigureAwait(false);
+            originalStream, job.MimeType, report, parsingOptions, cancellationToken).ConfigureAwait(false);
 
         string correctionFileName = $"corrections_{job.OriginalFileName}";
         return TypedResults.File(correctionStream, job.MimeType, correctionFileName);

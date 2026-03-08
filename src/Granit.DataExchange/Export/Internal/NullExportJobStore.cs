@@ -9,16 +9,16 @@ namespace Granit.DataExchange.Export.Internal;
 /// </summary>
 internal sealed class NullExportJobStore : IExportJobReader, IExportJobWriter
 {
-    public Task<ExportJob?> GetAsync(Guid id, CancellationToken ct = default) =>
+    public Task<ExportJob?> GetAsync(Guid id, CancellationToken cancellationToken = default) =>
         Task.FromResult<ExportJob?>(null);
 
     public Task<PagedResult<ExportJob>> ListAsync(
-        ExportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken ct = default) =>
+        ExportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken cancellationToken = default) =>
         Task.FromResult(new PagedResult<ExportJob>([], 0));
 
-    public Task CreateAsync(ExportJob job, CancellationToken ct = default) =>
+    public Task CreateAsync(ExportJob job, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
-    public Task UpdateAsync(ExportJob job, CancellationToken ct = default) =>
+    public Task UpdateAsync(ExportJob job, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 }

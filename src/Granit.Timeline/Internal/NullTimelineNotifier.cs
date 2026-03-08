@@ -10,10 +10,10 @@ namespace Granit.Timeline.Internal;
 internal sealed class NullTimelineNotifier : ITimelineNotifier
 {
     /// <inheritdoc/>
-    public Task NotifyEntryPostedAsync(TimelineEntry entry, IReadOnlyList<string> followerUserIds, CancellationToken ct = default) =>
+    public Task NotifyEntryPostedAsync(TimelineEntry entry, IReadOnlyList<string> followerUserIds, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
     /// <inheritdoc/>
-    public Task NotifyMentionedUsersAsync(TimelineEntry entry, IReadOnlyList<string> mentionedUserIds, CancellationToken ct = default) =>
+    public Task NotifyMentionedUsersAsync(TimelineEntry entry, IReadOnlyList<string> mentionedUserIds, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 }

@@ -12,10 +12,10 @@ public interface IRowValidator<in TEntity> where TEntity : class
     /// </summary>
     /// <param name="entity">The mapped entity to validate.</param>
     /// <param name="rowNumber">The source row number (for error reporting).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A validation result containing any field errors.</returns>
     Task<RowValidationResult> ValidateAsync(
         TEntity entity,
         int rowNumber,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

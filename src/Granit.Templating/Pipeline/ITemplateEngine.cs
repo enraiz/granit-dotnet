@@ -40,7 +40,7 @@ public interface ITemplateEngine
     /// Ambient context objects injected into every template (date/time, tenant, culture, …).
     /// Each context is exposed under its <see cref="ITemplateGlobalContext.Namespace"/>.
     /// </param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A <see cref="TextRenderedContent"/> for Scriban/HTML engines or a
     /// <see cref="BinaryRenderedContent"/> for native binary engines (ClosedXML).
@@ -50,5 +50,5 @@ public interface ITemplateEngine
         TData data,
         DocumentFormat targetFormat,
         IReadOnlyList<ITemplateGlobalContext> globalContexts,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 }

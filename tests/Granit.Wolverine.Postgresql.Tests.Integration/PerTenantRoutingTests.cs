@@ -257,20 +257,20 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
     [Fact]
     public async Task Write_WithTenantA_DoesNotAppearInDatabaseB()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Write via Tenant A.
         await using TenantIntegrationDbContext ctxA =
-            await BuildFactory(TenantAId).CreateDbContextAsync(ct);
+            await BuildFactory(TenantAId).CreateDbContextAsync(cancellationToken);
         ctxA.Records.Add(new TenantRecord { Value = "only-in-a" });
-        await ctxA.SaveChangesAsync(ct);
+        await ctxA.SaveChangesAsync(cancellationToken);
 
         // Read via Tenant B — should not see the record.
         await using TenantIntegrationDbContext ctxB =
-            await BuildFactory(TenantBId).CreateDbContextAsync(ct);
+            await BuildFactory(TenantBId).CreateDbContextAsync(cancellationToken);
         List<TenantRecord> rowsInB = await ctxB.Records
             .Where(r => r.Value == "only-in-a")
-            .ToListAsync(ct);
+            .ToListAsync(cancellationToken);
 
         rowsInB.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
     }
@@ -278,20 +278,20 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
     [Fact]
     public async Task Write_WithTenantB_DoesNotAppearInDatabaseA()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Write via Tenant B.
         await using TenantIntegrationDbContext ctxB =
-            await BuildFactory(TenantBId).CreateDbContextAsync(ct);
+            await BuildFactory(TenantBId).CreateDbContextAsync(cancellationToken);
         ctxB.Records.Add(new TenantRecord { Value = "only-in-b" });
-        await ctxB.SaveChangesAsync(ct);
+        await ctxB.SaveChangesAsync(cancellationToken);
 
         // Read via Tenant A — should not see the record.
         await using TenantIntegrationDbContext ctxA =
-            await BuildFactory(TenantAId).CreateDbContextAsync(ct);
+            await BuildFactory(TenantAId).CreateDbContextAsync(cancellationToken);
         List<TenantRecord> rowsInA = await ctxA.Records
             .Where(r => r.Value == "only-in-b")
-            .ToListAsync(ct);
+            .ToListAsync(cancellationToken);
 
         rowsInA.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
     }

@@ -41,10 +41,10 @@ internal static class ExportPresetEndpoints
     private static async Task<Ok<IReadOnlyList<ExportPresetResponse>>> ListPresetsAsync(
         string definitionName,
         IExportPresetReader presetReader,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IReadOnlyList<ExportPreset> presets =
-            await presetReader.ListAsync(definitionName, ct).ConfigureAwait(false);
+            await presetReader.ListAsync(definitionName, cancellationToken).ConfigureAwait(false);
 
         IReadOnlyList<ExportPresetResponse> response = presets
             .Select(ExportPresetResponse.FromPreset)
@@ -58,7 +58,7 @@ internal static class ExportPresetEndpoints
         SaveExportPresetRequest request,
         IExportPresetWriter presetWriter,
         IServiceProvider serviceProvider,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IExportDefinitionDescriptor? descriptor =
             ExportDefinitionResolver.FindByName(serviceProvider, request.DefinitionName);
@@ -84,7 +84,7 @@ internal static class ExportPresetEndpoints
             request.Format,
             request.IncludeIdForImport);
 
-        await presetWriter.SaveAsync(preset, ct).ConfigureAwait(false);
+        await presetWriter.SaveAsync(preset, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Created($"/presets/{request.DefinitionName}");
     }
@@ -94,16 +94,16 @@ internal static class ExportPresetEndpoints
         string presetName,
         IExportPresetReader presetReader,
         IExportPresetWriter presetWriter,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ExportPreset? existing =
-            await presetReader.GetAsync(definitionName, presetName, ct).ConfigureAwait(false);
+            await presetReader.GetAsync(definitionName, presetName, cancellationToken).ConfigureAwait(false);
         if (existing is null)
         {
             return TypedResults.NotFound();
         }
 
-        await presetWriter.DeleteAsync(definitionName, presetName, ct).ConfigureAwait(false);
+        await presetWriter.DeleteAsync(definitionName, presetName, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 }

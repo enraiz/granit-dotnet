@@ -24,46 +24,46 @@ internal sealed partial class BackgroundJobManager(
     IMessageStore? messageStore = null) : IBackgroundJobReader, IBackgroundJobWriter
 {
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<BackgroundJobDefinition> jobs = await storeReader.GetAllJobsAsync(ct).ConfigureAwait(false);
-        Dictionary<string, long> dlqCounts = await GetDlqCountsAsync(ct).ConfigureAwait(false);
+        IReadOnlyList<BackgroundJobDefinition> jobs = await storeReader.GetAllJobsAsync(cancellationToken).ConfigureAwait(false);
+        Dictionary<string, long> dlqCounts = await GetDlqCountsAsync(cancellationToken).ConfigureAwait(false);
         return jobs.Select(j => ToStatus(j, dlqCounts)).ToList();
     }
 
     /// <inheritdoc/>
-    public async Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken ct = default)
+    public async Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken cancellationToken = default)
     {
-        BackgroundJobDefinition? job = await storeReader.FindAsync(jobName, ct).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await storeReader.FindAsync(jobName, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return null;
         }
 
-        Dictionary<string, long> dlqCounts = await GetDlqCountsAsync(ct).ConfigureAwait(false);
+        Dictionary<string, long> dlqCounts = await GetDlqCountsAsync(cancellationToken).ConfigureAwait(false);
         return ToStatus(job, dlqCounts);
     }
 
     /// <inheritdoc/>
-    public async Task PauseAsync(string jobName, CancellationToken ct = default)
+    public async Task PauseAsync(string jobName, CancellationToken cancellationToken = default)
     {
-        BackgroundJobDefinition job = await RequireJobAsync(jobName, ct).ConfigureAwait(false);
-        await storeWriter.SetEnabledAsync(job.JobName, false, ct).ConfigureAwait(false);
+        BackgroundJobDefinition job = await RequireJobAsync(jobName, cancellationToken).ConfigureAwait(false);
+        await storeWriter.SetEnabledAsync(job.JobName, false, cancellationToken).ConfigureAwait(false);
         LogJobPaused(logger, jobName);
     }
 
     /// <inheritdoc/>
-    public async Task ResumeAsync(string jobName, CancellationToken ct = default)
+    public async Task ResumeAsync(string jobName, CancellationToken cancellationToken = default)
     {
-        BackgroundJobDefinition job = await RequireJobAsync(jobName, ct).ConfigureAwait(false);
-        await storeWriter.SetEnabledAsync(job.JobName, true, ct).ConfigureAwait(false);
+        BackgroundJobDefinition job = await RequireJobAsync(jobName, cancellationToken).ConfigureAwait(false);
+        await storeWriter.SetEnabledAsync(job.JobName, true, cancellationToken).ConfigureAwait(false);
 
         DateTimeOffset? next = ComputeNext(job.CronExpression);
         if (next is not null)
         {
             object message = CreateMessage(job.MessageType, jobName);
             await bus.ScheduleAsync(message, next.Value).ConfigureAwait(false);
-            await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, ct).ConfigureAwait(false);
+            await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken).ConfigureAwait(false);
             LogJobResumed(logger, jobName, next.Value);
         }
         else
@@ -73,9 +73,9 @@ internal sealed partial class BackgroundJobManager(
     }
 
     /// <inheritdoc/>
-    public async Task TriggerNowAsync(string jobName, CancellationToken ct = default)
+    public async Task TriggerNowAsync(string jobName, CancellationToken cancellationToken = default)
     {
-        BackgroundJobDefinition job = await RequireJobAsync(jobName, ct).ConfigureAwait(false);
+        BackgroundJobDefinition job = await RequireJobAsync(jobName, cancellationToken).ConfigureAwait(false);
         object message = CreateMessage(job.MessageType, jobName);
 
         DeliveryOptions options = new();
@@ -91,9 +91,9 @@ internal sealed partial class BackgroundJobManager(
 
     private async Task<BackgroundJobDefinition> RequireJobAsync(
         string jobName,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        BackgroundJobDefinition? job = await storeReader.FindAsync(jobName, ct).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await storeReader.FindAsync(jobName, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             throw new EntityNotFoundException(typeof(BackgroundJobDefinition), jobName);
@@ -107,7 +107,7 @@ internal sealed partial class BackgroundJobManager(
     /// Returns an empty dictionary if the store is unavailable or the query fails,
     /// ensuring graceful degradation (DeadLetterCount = 0) without crashing.
     /// </summary>
-    private async Task<Dictionary<string, long>> GetDlqCountsAsync(CancellationToken ct)
+    private async Task<Dictionary<string, long>> GetDlqCountsAsync(CancellationToken cancellationToken)
     {
         if (messageStore is null)
         {
@@ -118,7 +118,7 @@ internal sealed partial class BackgroundJobManager(
         {
             IReadOnlyList<DeadLetterQueueCount> counts =
                 await messageStore.DeadLetters.SummarizeAllAsync(
-                    string.Empty, TimeRange.AllTime(), ct).ConfigureAwait(false);
+                    string.Empty, TimeRange.AllTime(), cancellationToken).ConfigureAwait(false);
 
             return counts.ToDictionary(
                 c => c.MessageType,

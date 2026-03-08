@@ -27,7 +27,7 @@ internal sealed class MigrationBatchExecutor(
     /// </summary>
     public async Task<RunMigrationBatchCommand?> ExecuteBatchAsync(
         RunMigrationBatchCommand command,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         MigrationCycleRegistration? registration = registry.Find(command.CycleId);
         if (registration is null)
@@ -45,10 +45,10 @@ internal sealed class MigrationBatchExecutor(
 
         if (tenantId.HasValue)
         {
-            await isolator.IsolateAsync(tenantContext, tenantId.Value, ct).ConfigureAwait(false);
+            await isolator.IsolateAsync(tenantContext, tenantId.Value, cancellationToken).ConfigureAwait(false);
         }
 
-        MigrationProgress progress = await FindOrCreateProgressAsync(command, tenantId, ct).ConfigureAwait(false);
+        MigrationProgress progress = await FindOrCreateProgressAsync(command, tenantId, cancellationToken).ConfigureAwait(false);
 
         if (progress.Status == MigrationStatus.Completed)
         {
@@ -63,13 +63,13 @@ internal sealed class MigrationBatchExecutor(
 
         try
         {
-            result = await registration.Migration(tenantContext, batchContext, ct).ConfigureAwait(false);
+            result = await registration.Migration(tenantContext, batchContext, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             progress.Status = MigrationStatus.Failed;
             progress.Error = ex.Message.Length > 4000 ? ex.Message[..4000] : ex.Message;
-            await SaveProgressAsync(command.CycleId, tenantId, ct).ConfigureAwait(false);
+            await SaveProgressAsync(command.CycleId, tenantId, cancellationToken).ConfigureAwait(false);
 
             throw;
         }
@@ -93,7 +93,7 @@ internal sealed class MigrationBatchExecutor(
                 command.CycleId, tenantId, result.ProcessedCount, result.NextCursor);
         }
 
-        await SaveProgressAsync(command.CycleId, tenantId, ct).ConfigureAwait(false);
+        await SaveProgressAsync(command.CycleId, tenantId, cancellationToken).ConfigureAwait(false);
 
         return result.NextCursor is null
             ? null
@@ -103,10 +103,10 @@ internal sealed class MigrationBatchExecutor(
     private async Task<MigrationProgress> FindOrCreateProgressAsync(
         RunMigrationBatchCommand command,
         Guid? tenantId,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         MigrationProgress? existing = await progressContext.MigrationProgresses
-            .FirstOrDefaultAsync(p => p.CycleId == command.CycleId && p.TenantId == tenantId, ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(p => p.CycleId == command.CycleId && p.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
 
         if (existing is not null)
         {
@@ -130,11 +130,11 @@ internal sealed class MigrationBatchExecutor(
     private async Task SaveProgressAsync(
         string cycleId,
         Guid? tenantId,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         try
         {
-            await progressContext.SaveChangesAsync(ct).ConfigureAwait(false);
+            await progressContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {

@@ -15,7 +15,7 @@ namespace Granit.Workflow;
 /// using (WorkflowTransitionContext.SetComment("Validated by medical director per HDS protocol"))
 /// {
 ///     invoice.Status = InvoiceStatus.Approved;
-///     await dbContext.SaveChangesAsync(ct);
+///     await dbContext.SaveChangesAsync(cancellationToken);
 /// }
 /// </code>
 /// </example>

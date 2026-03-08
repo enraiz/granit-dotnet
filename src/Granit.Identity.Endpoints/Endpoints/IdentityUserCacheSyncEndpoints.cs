@@ -32,13 +32,13 @@ internal static class IdentityUserCacheSyncEndpoints
     private static async Task<Ok<IReadOnlyList<IdentityUser>>> SyncAsync(
         IdentityUserCacheSyncRequest request,
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         var results = new List<IdentityUser>();
 
         foreach (string userId in request.UserIds)
         {
-            IdentityUser? refreshed = await lookupService.RefreshByIdAsync(userId, ct)
+            IdentityUser? refreshed = await lookupService.RefreshByIdAsync(userId, cancellationToken)
                 .ConfigureAwait(false);
 
             if (refreshed is not null)
@@ -52,17 +52,17 @@ internal static class IdentityUserCacheSyncEndpoints
 
     private static async Task<Ok<IdentityUserCacheSyncAllResponse>> SyncAllAsync(
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        int synced = await lookupService.RefreshAllAsync(ct).ConfigureAwait(false);
+        int synced = await lookupService.RefreshAllAsync(cancellationToken).ConfigureAwait(false);
         return TypedResults.Ok(new IdentityUserCacheSyncAllResponse(synced));
     }
 
     private static async Task<Ok<IdentityUserCacheSyncStaleResponse>> SyncStaleAsync(
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        int refreshed = await lookupService.RefreshStaleAsync(ct).ConfigureAwait(false);
+        int refreshed = await lookupService.RefreshStaleAsync(cancellationToken).ConfigureAwait(false);
         return TypedResults.Ok(new IdentityUserCacheSyncStaleResponse(refreshed));
     }
 }

@@ -22,7 +22,7 @@ public sealed class ConfigurationSettingValueProvider(IConfiguration configurati
     public int Order => 400;
 
     /// <inheritdoc/>
-    public Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken ct = default)
+    public Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken cancellationToken = default)
     {
         string? value = _configuration[$"Settings:{definition.Name}"];
         SettingValue? result = value is not null
@@ -32,10 +32,10 @@ public sealed class ConfigurationSettingValueProvider(IConfiguration configurati
     }
 
     /// <inheritdoc/>
-    public Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default) =>
+    public Task SetAsync(SettingDefinition definition, string? value, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
     /// <inheritdoc/>
-    public Task ClearAsync(SettingDefinition definition, CancellationToken ct = default) =>
+    public Task ClearAsync(SettingDefinition definition, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 }

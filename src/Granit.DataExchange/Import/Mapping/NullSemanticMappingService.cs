@@ -18,6 +18,6 @@ internal sealed class NullSemanticMappingService : ISemanticMappingService
     public Task<IReadOnlyList<SemanticMappingSuggestion>> SuggestSemanticMappingsAsync(
         IReadOnlyList<string> headers,
         IReadOnlyList<ImportFieldMetadata> targetFields,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<SemanticMappingSuggestion>>([]);
 }

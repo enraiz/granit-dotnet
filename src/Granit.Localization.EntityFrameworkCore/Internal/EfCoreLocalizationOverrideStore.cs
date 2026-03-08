@@ -20,30 +20,30 @@ internal sealed class EfCoreLocalizationOverrideStore(
 
     /// <inheritdoc/>
     public async Task<IReadOnlyDictionary<string, string>> GetOverridesAsync(
-        string resourceName, string culture, CancellationToken ct = default)
+        string resourceName, string culture, CancellationToken cancellationToken = default)
     {
         await using GranitLocalizationOverridesDbContext context =
-            await _contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await _contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         List<LocalizationOverride> rows = await context.LocalizationOverrides
             .AsNoTracking()
             .Where(o => o.ResourceName == resourceName && o.CultureName == culture)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         return rows.ToDictionary(o => o.Key, o => o.Value, StringComparer.Ordinal);
     }
 
     /// <inheritdoc/>
     public async Task SetOverrideAsync(
-        string resourceName, string culture, string key, string value, CancellationToken ct = default)
+        string resourceName, string culture, string key, string value, CancellationToken cancellationToken = default)
     {
         await using GranitLocalizationOverridesDbContext context =
-            await _contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await _contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         LocalizationOverride? existing = await context.LocalizationOverrides
             .FirstOrDefaultAsync(
                 o => o.ResourceName == resourceName && o.CultureName == culture && o.Key == key,
-                ct).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -60,20 +60,20 @@ internal sealed class EfCoreLocalizationOverrideStore(
             existing.Value = value;
         }
 
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task RemoveOverrideAsync(
-        string resourceName, string culture, string key, CancellationToken ct = default)
+        string resourceName, string culture, string key, CancellationToken cancellationToken = default)
     {
         await using GranitLocalizationOverridesDbContext context =
-            await _contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+            await _contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         LocalizationOverride? existing = await context.LocalizationOverrides
             .FirstOrDefaultAsync(
                 o => o.ResourceName == resourceName && o.CultureName == culture && o.Key == key,
-                ct).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -81,6 +81,6 @@ internal sealed class EfCoreLocalizationOverrideStore(
         }
 
         context.LocalizationOverrides.Remove(existing);
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

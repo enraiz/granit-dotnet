@@ -13,21 +13,21 @@ internal sealed class InMemoryFeatureStore : IFeatureStoreReader, IFeatureStoreW
         new(StringComparer.Ordinal);
 
     /// <inheritdoc/>
-    public Task<string?> GetOrNullAsync(string featureName, string? tenantId, CancellationToken ct = default)
+    public Task<string?> GetOrNullAsync(string featureName, string? tenantId, CancellationToken cancellationToken = default)
     {
         _store.TryGetValue(BuildKey(featureName, tenantId), out string? value);
         return Task.FromResult(value);
     }
 
     /// <inheritdoc/>
-    public Task SetAsync(string featureName, string? tenantId, string value, CancellationToken ct = default)
+    public Task SetAsync(string featureName, string? tenantId, string value, CancellationToken cancellationToken = default)
     {
         _store[BuildKey(featureName, tenantId)] = value;
         return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public Task DeleteAsync(string featureName, string? tenantId, CancellationToken ct = default)
+    public Task DeleteAsync(string featureName, string? tenantId, CancellationToken cancellationToken = default)
     {
         _store.TryRemove(BuildKey(featureName, tenantId), out _);
         return Task.CompletedTask;

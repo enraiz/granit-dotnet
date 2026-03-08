@@ -312,9 +312,9 @@ public sealed class MigrationBatchExecutorTests : IDisposable
 
         IMigrationCycleRegistry registry = RegistryWith(
             cycleId, typeof(StubDbContext),
-            (_, _, ct) =>
+            (_, _, cancellationToken) =>
             {
-                ct.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
                 return Task.FromResult(new MigrationBatchResult(0, null));
             });
         MigrationBatchExecutor executor = BuildExecutor(registry, ProviderWith(stubContext));

@@ -24,7 +24,7 @@ internal sealed class PlanFeatureValueProvider(IServiceProvider serviceProvider)
     public int Order => 200;
 
     /// <inheritdoc/>
-    public async Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken ct = default)
+    public async Task<string?> GetOrNullAsync(FeatureDefinition definition, CancellationToken cancellationToken = default)
     {
         IPlanIdProvider? planIdProvider = _serviceProvider.GetService<IPlanIdProvider>();
         IPlanFeatureStore? planFeatureStore = _serviceProvider.GetService<IPlanFeatureStore>();
@@ -34,12 +34,12 @@ internal sealed class PlanFeatureValueProvider(IServiceProvider serviceProvider)
             return null;
         }
 
-        string? planId = await planIdProvider.GetCurrentPlanIdAsync(ct).ConfigureAwait(false);
+        string? planId = await planIdProvider.GetCurrentPlanIdAsync(cancellationToken).ConfigureAwait(false);
         if (planId is null)
         {
             return null;
         }
 
-        return await planFeatureStore.GetOrNullAsync(planId, definition.Name, ct).ConfigureAwait(false);
+        return await planFeatureStore.GetOrNullAsync(planId, definition.Name, cancellationToken).ConfigureAwait(false);
     }
 }

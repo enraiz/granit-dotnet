@@ -79,7 +79,7 @@ public abstract class DependencyInjectionCodeFixProviderBase : CodeFixProvider
         context.RegisterCodeFix(
             CodeAction.Create(
                 title: Title,
-                createChangedDocument: ct => ApplyFixAsync(context.Document, node, ct),
+                createChangedDocument: cancellationToken => ApplyFixAsync(context.Document, node, cancellationToken),
                 equivalenceKey: Title),
             diagnostic);
     }
@@ -87,9 +87,9 @@ public abstract class DependencyInjectionCodeFixProviderBase : CodeFixProvider
     private async Task<Document> ApplyFixAsync(
         Document document,
         SyntaxNode node,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        SyntaxNode? root = await document.GetSyntaxRootAsync(ct).ConfigureAwait(false);
+        SyntaxNode? root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null)
         {
             return document;

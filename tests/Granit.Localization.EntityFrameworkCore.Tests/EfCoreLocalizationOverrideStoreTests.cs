@@ -19,7 +19,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
                 .UseInMemoryDatabase(dbName)
                 .Options);
 
-        public Task<GranitLocalizationOverridesDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+        public Task<GranitLocalizationOverridesDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(CreateDbContext());
     }
 
@@ -32,7 +32,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
         string culture,
         string key,
         string value,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         InMemoryContextFactory factory = new(dbName);
         await using GranitLocalizationOverridesDbContext ctx = factory.CreateDbContext();
@@ -46,7 +46,7 @@ public sealed class EfCoreLocalizationOverrideStoreTests
             CreatedAt = DateTimeOffset.UtcNow,
             CreatedBy = "seed",
         });
-        await ctx.SaveChangesAsync(ct);
+        await ctx.SaveChangesAsync(cancellationToken);
     }
 
     // -------------------------------------------------------------------------

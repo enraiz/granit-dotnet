@@ -14,7 +14,7 @@ internal sealed class DefaultTenantSchemaProvider(IOptions<TenantSchemaOptions> 
     private readonly ConcurrentDictionary<Guid, string> _schemaNameCache = new();
 
     /// <inheritdoc/>
-    public ValueTask<string> GetSchemaNameAsync(Guid tenantId, CancellationToken ct = default) =>
+    public ValueTask<string> GetSchemaNameAsync(Guid tenantId, CancellationToken cancellationToken = default) =>
         ValueTask.FromResult(_schemaNameCache.GetOrAdd(tenantId, ComputeSchemaName));
 
     private string ComputeSchemaName(Guid tenantId)

@@ -45,7 +45,7 @@ internal sealed class EmbeddedTemplateResolver(IReadOnlyList<Assembly> assemblie
 
     /// <inheritdoc/>
     public Task<TemplateDescriptor?> TryResolveAsync(
-        TemplateKey key, CancellationToken ct = default)
+        TemplateKey key, CancellationToken cancellationToken = default)
     {
         foreach (Assembly assembly in _assemblies)
         {

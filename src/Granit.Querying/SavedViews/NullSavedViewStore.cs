@@ -12,26 +12,26 @@ internal sealed class NullSavedViewStore : ISavedViewStoreReader, ISavedViewStor
 
     /// <inheritdoc/>
     public Task<IReadOnlyList<SavedView>> GetListAsync(
-        string entityType, string userId, Guid? tenantId, CancellationToken ct = default) =>
+        string entityType, string userId, Guid? tenantId, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
-    public Task<SavedView?> GetAsync(Guid id, CancellationToken ct = default) =>
+    public Task<SavedView?> GetAsync(Guid id, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
-    public Task CreateAsync(SavedView view, CancellationToken ct = default) =>
+    public Task CreateAsync(SavedView view, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
-    public Task UpdateAsync(SavedView view, CancellationToken ct = default) =>
+    public Task UpdateAsync(SavedView view, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
-    public Task DeleteAsync(Guid id, CancellationToken ct = default) =>
+    public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 
     /// <inheritdoc/>
-    public Task SetDefaultAsync(Guid id, string userId, string entityType, CancellationToken ct = default) =>
+    public Task SetDefaultAsync(Guid id, string userId, string entityType, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(Message);
 }

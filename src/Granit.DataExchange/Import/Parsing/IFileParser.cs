@@ -19,12 +19,12 @@ public interface IFileParser
     /// </summary>
     /// <param name="stream">The file stream (seekable).</param>
     /// <param name="options">Parsing options (encoding, separator, sheet, etc.).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>An ordered list of column header names.</returns>
     Task<IReadOnlyList<string>> ExtractHeadersAsync(
         Stream stream,
         FileParsingOptions options,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Reads a limited number of rows for preview purposes.
@@ -32,13 +32,13 @@ public interface IFileParser
     /// <param name="stream">The file stream (seekable).</param>
     /// <param name="options">Parsing options.</param>
     /// <param name="maxRows">Maximum number of data rows to return.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of row arrays, where each array contains the cell values in column order.</returns>
     Task<IReadOnlyList<string[]>> ReadPreviewAsync(
         Stream stream,
         FileParsingOptions options,
         int maxRows = 10,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Parses the entire file as a streaming sequence of raw rows.
@@ -46,10 +46,10 @@ public interface IFileParser
     /// </summary>
     /// <param name="stream">The file stream.</param>
     /// <param name="options">Parsing options.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>An async enumerable of raw import rows.</returns>
     IAsyncEnumerable<RawImportRow> ParseAsync(
         Stream stream,
         FileParsingOptions options,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

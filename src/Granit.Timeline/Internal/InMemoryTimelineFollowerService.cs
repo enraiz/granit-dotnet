@@ -12,7 +12,7 @@ internal sealed class InMemoryTimelineFollowerService : ITimelineFollowerService
     private readonly ConcurrentDictionary<string, HashSet<string>> _followers = new();
 
     /// <inheritdoc/>
-    public Task FollowAsync(string userId, string entityType, string entityId, CancellationToken ct = default)
+    public Task FollowAsync(string userId, string entityType, string entityId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(entityType, entityId);
         HashSet<string> followers = _followers.GetOrAdd(key, _ => []);
@@ -26,7 +26,7 @@ internal sealed class InMemoryTimelineFollowerService : ITimelineFollowerService
     }
 
     /// <inheritdoc/>
-    public Task UnfollowAsync(string userId, string entityType, string entityId, CancellationToken ct = default)
+    public Task UnfollowAsync(string userId, string entityType, string entityId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(entityType, entityId);
 
@@ -42,7 +42,7 @@ internal sealed class InMemoryTimelineFollowerService : ITimelineFollowerService
     }
 
     /// <inheritdoc/>
-    public Task<IReadOnlyList<string>> GetFollowerIdsAsync(string entityType, string entityId, CancellationToken ct = default)
+    public Task<IReadOnlyList<string>> GetFollowerIdsAsync(string entityType, string entityId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(entityType, entityId);
 
@@ -58,7 +58,7 @@ internal sealed class InMemoryTimelineFollowerService : ITimelineFollowerService
     }
 
     /// <inheritdoc/>
-    public Task<bool> IsFollowingAsync(string userId, string entityType, string entityId, CancellationToken ct = default)
+    public Task<bool> IsFollowingAsync(string userId, string entityType, string entityId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(entityType, entityId);
 

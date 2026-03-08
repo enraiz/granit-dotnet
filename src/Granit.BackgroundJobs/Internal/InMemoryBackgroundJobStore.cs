@@ -13,20 +13,20 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IB
     private readonly ConcurrentDictionary<string, BackgroundJobDefinition> _jobs = new();
 
     /// <inheritdoc/>
-    public Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default) =>
+    public Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken cancellationToken = default) =>
         Task.FromResult(_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job) ? job : null);
 
     /// <inheritdoc/>
-    public Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken ct = default) =>
+    public Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>(
             _jobs.Values.Where(j => j.IsEnabled).ToList());
 
     /// <inheritdoc/>
-    public Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken ct = default) =>
+    public Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>(_jobs.Values.ToList());
 
     /// <inheritdoc/>
-    public Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken ct = default)
+    public Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken cancellationToken = default)
     {
         foreach (RecurringJobRegistration reg in registrations)
         {
@@ -53,7 +53,7 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IB
     }
 
     /// <inheritdoc/>
-    public Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken ct = default)
+    public Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken cancellationToken = default)
     {
         if (_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job))
         {
@@ -67,7 +67,7 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IB
     }
 
     /// <inheritdoc/>
-    public Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default)
+    public Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken cancellationToken = default)
     {
         if (_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job))
         {
@@ -78,7 +78,7 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IB
     }
 
     /// <inheritdoc/>
-    public Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken ct = default)
+    public Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken cancellationToken = default)
     {
         if (_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job))
         {
@@ -90,7 +90,7 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IB
     }
 
     /// <inheritdoc/>
-    public Task SetEnabledAsync(string jobName, bool enabled, CancellationToken ct = default)
+    public Task SetEnabledAsync(string jobName, bool enabled, CancellationToken cancellationToken = default)
     {
         if (_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job))
         {
@@ -108,7 +108,7 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IB
     }
 
     /// <inheritdoc/>
-    public Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken ct = default)
+    public Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken cancellationToken = default)
     {
         if (_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job))
         {

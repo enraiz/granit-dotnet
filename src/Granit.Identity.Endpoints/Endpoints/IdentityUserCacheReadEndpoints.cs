@@ -33,7 +33,7 @@ internal static class IdentityUserCacheReadEndpoints
     private static async Task<Ok<PagedResult<IdentityUser>>> SearchAsync(
         IUserLookupService lookupService,
         [AsParameters] IdentityUserCacheListRequest request,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         int clampedPage = Math.Max(request.Page, 1);
         int clampedPageSize = Math.Clamp(request.PageSize, 1, QueryingDefaults.MaxPageSize);
@@ -42,7 +42,7 @@ internal static class IdentityUserCacheReadEndpoints
             request.Search ?? "",
             clampedPage,
             clampedPageSize,
-            ct).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok(result);
     }
@@ -50,9 +50,9 @@ internal static class IdentityUserCacheReadEndpoints
     private static async Task<Results<Ok<IdentityUser>, NotFound>> GetByIdAsync(
         string userId,
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        IdentityUser? user = await lookupService.FindByIdAsync(userId, ct).ConfigureAwait(false);
+        IdentityUser? user = await lookupService.FindByIdAsync(userId, cancellationToken).ConfigureAwait(false);
 
         if (user is null)
         {
@@ -65,10 +65,10 @@ internal static class IdentityUserCacheReadEndpoints
     private static async Task<Ok<IReadOnlyList<IdentityUser>>> BatchResolveAsync(
         IdentityUserCacheBatchRequest request,
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IReadOnlyList<IdentityUser> users = await lookupService.FindByIdsAsync(
-            request.UserIds, ct).ConfigureAwait(false);
+            request.UserIds, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok(users);
     }

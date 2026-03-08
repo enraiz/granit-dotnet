@@ -296,7 +296,7 @@ public sealed class PushNotificationChannelTests
         ];
         SetupSubscriptions(context.RecipientUserId, context.TenantId, subscriptions);
 
-        var ex = await Should.ThrowAsync<AggregateException>(
+        AggregateException ex = await Should.ThrowAsync<AggregateException>(
             () => channel.SendAsync(context, TestContext.Current.CancellationToken));
 
         // All three subscriptions should have been attempted despite the 500 error.

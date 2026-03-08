@@ -26,11 +26,11 @@ public interface IDocumentGenerator
     /// Override the output format. If <see langword="null"/>, uses
     /// <see cref="DocumentTemplateType{TData}.DefaultFormat"/>.
     /// </param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The generated document.</returns>
     Task<DocumentResult> GenerateAsync<TData>(
         DocumentTemplateType<TData> templateType,
         TData data,
         DocumentFormat? targetFormat = null,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 }

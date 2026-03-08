@@ -7,5 +7,5 @@ namespace Granit.Notifications.MobilePush;
 public interface IMobilePushSender
 {
     /// <summary>Sends a mobile push notification to one or more device tokens.</summary>
-    Task SendAsync(MobilePushMessage message, CancellationToken ct = default);
+    Task SendAsync(MobilePushMessage message, CancellationToken cancellationToken = default);
 }

@@ -19,10 +19,10 @@ internal sealed partial class MobilePushNotificationChannel(
     public string Name => NotificationChannels.MobilePush;
 
     /// <inheritdoc />
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<MobilePushTokenInfo> tokens = await tokenReader
-            .GetTokensAsync(context.RecipientUserId, context.TenantId, ct)
+            .GetTokensAsync(context.RecipientUserId, context.TenantId, cancellationToken)
             .ConfigureAwait(false);
 
         if (tokens.Count == 0)
@@ -40,7 +40,7 @@ internal sealed partial class MobilePushNotificationChannel(
             Title = context.NotificationTypeName,
             Body = $"Notification: {context.NotificationTypeName}",
             Data = context.Data,
-        }, ct).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(false);
     }
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "No mobile push tokens for user {UserId}, skipping")]

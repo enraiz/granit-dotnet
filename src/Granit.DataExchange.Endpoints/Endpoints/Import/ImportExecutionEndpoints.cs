@@ -45,9 +45,9 @@ internal static class ImportExecutionEndpoints
         Guid jobId,
         IImportJobReader jobReader,
         IImportCommandDispatcher dispatcher,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -60,7 +60,7 @@ internal static class ImportExecutionEndpoints
         }
 
         ExecuteImportCommand command = new(job.Id, job.DefinitionName);
-        await dispatcher.DispatchAsync(command, ct).ConfigureAwait(false);
+        await dispatcher.DispatchAsync(command, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Accepted($"/{job.Id}");
     }
@@ -69,9 +69,9 @@ internal static class ImportExecutionEndpoints
         Guid jobId,
         IImportJobReader jobReader,
         IImportOrchestrator orchestrator,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -83,7 +83,7 @@ internal static class ImportExecutionEndpoints
                 $"Cannot dry-run import job in status '{job.Status}'. Expected: Mapped.");
         }
 
-        ImportReport report = await orchestrator.DryRunAsync(jobId, ct).ConfigureAwait(false);
+        ImportReport report = await orchestrator.DryRunAsync(jobId, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok(ImportReportResponse.FromReport(jobId, report));
     }
@@ -91,9 +91,9 @@ internal static class ImportExecutionEndpoints
     private static async Task<Results<Ok<ImportJobResponse>, NotFound>> GetStatusAsync(
         Guid jobId,
         IImportJobReader jobReader,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -107,9 +107,9 @@ internal static class ImportExecutionEndpoints
         IImportJobReader jobReader,
         IImportJobWriter jobWriter,
         IImportFileProvider fileProvider,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -123,8 +123,8 @@ internal static class ImportExecutionEndpoints
         }
 
         job.Status = ImportJobStatus.Cancelled;
-        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
-        await fileProvider.DeleteAsync(job.BlobReference, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
+        await fileProvider.DeleteAsync(job.BlobReference, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

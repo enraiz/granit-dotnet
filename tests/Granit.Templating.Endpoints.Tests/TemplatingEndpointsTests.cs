@@ -291,7 +291,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
         _storeReader.TryGetPublishedAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
             .Returns(descriptor);
         _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
-            .Returns(new List<TemplateRevision> { draft, publishedRevision });
+            .Returns([draft, publishedRevision]);
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}/Billing.Invoice",
@@ -592,7 +592,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
         _storeReader.TryGetPublishedAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
             .Returns(new TemplateDescriptor { Content = "<h1>Published</h1>", MimeType = "text/html", RevisionId = publishedRevision.RevisionId });
         _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
-            .Returns(new List<TemplateRevision> { publishedRevision });
+            .Returns([publishedRevision]);
 
         HttpResponseMessage response = await _adminClient.PostAsync(
             $"{Prefix}/Billing.Invoice/publish",
@@ -768,8 +768,8 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
                 Arg.Any<TemplateLifecycleStatus>(), Arg.Any<TemplateLifecycleStatus>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
-                var from = callInfo.ArgAt<TemplateLifecycleStatus>(0);
-                var target = callInfo.ArgAt<TemplateLifecycleStatus>(1);
+                TemplateLifecycleStatus from = callInfo.ArgAt<TemplateLifecycleStatus>(0);
+                TemplateLifecycleStatus target = callInfo.ArgAt<TemplateLifecycleStatus>(1);
                 return from == TemplateLifecycleStatus.Draft && target == TemplateLifecycleStatus.Published;
             });
 
@@ -819,7 +819,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     public async Task GetHistory_WithEmptyHistory_Returns200()
     {
         _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
-            .Returns(new List<TemplateRevision>());
+            .Returns((IReadOnlyList<TemplateRevision>)[]);
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}/Billing.Invoice/history",
@@ -882,7 +882,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetHistory_WithPagination_ReturnsCorrectPage()
     {
-        List<TemplateRevision> revisions = Enumerable.Range(0, 15)
+        var revisions = Enumerable.Range(0, 15)
             .Select(i => new TemplateRevision
             {
                 RevisionId = Guid.NewGuid(),
@@ -951,7 +951,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetRevisionDetail_WhenFound_Returns200WithContent()
     {
-        Guid revisionId = Guid.NewGuid();
+        var revisionId = Guid.NewGuid();
         var revision = new TemplateRevision
         {
             RevisionId = revisionId,
@@ -962,7 +962,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
             CreatedBy = "user-1",
         };
         _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
-            .Returns(new List<TemplateRevision> { revision });
+            .Returns([revision]);
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}/Billing.Invoice/history/{revisionId}",
@@ -981,7 +981,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     public async Task GetRevisionDetail_WhenNotFound_Returns404()
     {
         _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
-            .Returns(new List<TemplateRevision>());
+            .Returns((IReadOnlyList<TemplateRevision>)[]);
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}/Billing.Invoice/history/{Guid.NewGuid()}",
@@ -1150,7 +1150,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task Preview_WithEngine_ReturnsRenderedHtml()
     {
-        Guid revisionId = Guid.NewGuid();
+        var revisionId = Guid.NewGuid();
         _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
             .Returns(new TemplateRevision
             {
@@ -1186,7 +1186,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task Preview_WithCulture_PassesCultureToStore()
     {
-        Guid revisionId = Guid.NewGuid();
+        var revisionId = Guid.NewGuid();
         _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
             .Returns(new TemplateRevision
             {
@@ -1304,7 +1304,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task Preview_WithEmptyData_UsesEmptyDictionary()
     {
-        Guid revisionId = Guid.NewGuid();
+        var revisionId = Guid.NewGuid();
         _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
             .Returns(new TemplateRevision
             {

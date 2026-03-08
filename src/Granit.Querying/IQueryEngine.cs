@@ -15,24 +15,24 @@ public interface IQueryEngine<TEntity> where TEntity : class
     /// </summary>
     /// <param name="source">The base queryable (e.g. from DbContext).</param>
     /// <param name="request">The query parameters.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A paginated result.</returns>
     Task<PagedResult<TEntity>> ExecuteAsync(
         IQueryable<TEntity> source,
         QueryRequest request,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes a grouped query and returns a grouped result.
     /// </summary>
     /// <param name="source">The base queryable.</param>
     /// <param name="request">The query parameters (must include <see cref="QueryRequest.GroupBy"/>).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A grouped result.</returns>
     Task<GroupedResult<TEntity>> ExecuteGroupedAsync(
         IQueryable<TEntity> source,
         QueryRequest request,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes a query and streams all matching entities without pagination.
@@ -41,12 +41,12 @@ public interface IQueryEngine<TEntity> where TEntity : class
     /// </summary>
     /// <param name="source">The base queryable (e.g. from DbContext).</param>
     /// <param name="request">The query parameters (pagination fields are ignored).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>An async stream of all matching entities.</returns>
     IAsyncEnumerable<TEntity> ExecuteStreamAsync(
         IQueryable<TEntity> source,
         QueryRequest request,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates query metadata from the definition for the <c>GET /meta</c> endpoint.

@@ -17,7 +17,7 @@ internal sealed class WolverineImportCommandDispatcher(
     IServiceScopeFactory scopeFactory) : IImportCommandDispatcher
 {
     /// <inheritdoc/>
-    public async Task DispatchAsync(ExecuteImportCommand command, CancellationToken ct = default)
+    public async Task DispatchAsync(ExecuteImportCommand command, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();

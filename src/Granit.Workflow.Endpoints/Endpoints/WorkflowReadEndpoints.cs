@@ -31,13 +31,13 @@ internal static class WorkflowReadEndpoints
         IWorkflowHistoryQuery historyQuery,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = QueryingDefaults.DefaultPageSize,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         int clampedPage = Math.Max(page, 1);
         int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
 
         PagedResult<TransitionHistoryResponse> result = await historyQuery.GetHistoryAsync(
-            entityType, entityId, clampedPage, clampedPageSize, ct).ConfigureAwait(false);
+            entityType, entityId, clampedPage, clampedPageSize, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok(result);
     }

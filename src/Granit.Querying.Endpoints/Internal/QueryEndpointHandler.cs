@@ -18,7 +18,7 @@ internal static class QueryEndpointHandler
         IQueryEngine<TEntity> engine,
         BindableQueryRequest request,
         IQueryable<TEntity> source,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
         where TEntity : class
     {
         QueryRequest queryRequest = request.Value;
@@ -26,13 +26,13 @@ internal static class QueryEndpointHandler
         if (!string.IsNullOrWhiteSpace(queryRequest.GroupBy))
         {
             GroupedResult<TEntity> grouped = await engine
-                .ExecuteGroupedAsync(source, queryRequest, ct)
+                .ExecuteGroupedAsync(source, queryRequest, cancellationToken)
                 .ConfigureAwait(false);
             return TypedResults.Ok(grouped);
         }
 
         PagedResult<TEntity> paged = await engine
-            .ExecuteAsync(source, queryRequest, ct)
+            .ExecuteAsync(source, queryRequest, cancellationToken)
             .ConfigureAwait(false);
         return TypedResults.Ok(paged);
     }
@@ -46,7 +46,7 @@ internal static class QueryEndpointHandler
         QueryDefinition<TEntity> definition,
         Granit.Core.MultiTenancy.ICurrentTenant tenant,
         System.Security.Claims.ClaimsPrincipal user,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
         where TEntity : class
     {
         string userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
@@ -59,7 +59,7 @@ internal static class QueryEndpointHandler
         try
         {
             IReadOnlyList<SavedView> views = await savedViewStore
-                .GetListAsync(definition.Name, userId, tenantId, ct)
+                .GetListAsync(definition.Name, userId, tenantId, cancellationToken)
                 .ConfigureAwait(false);
 
             savedViews = views.Select(v => new SavedViewSummary(

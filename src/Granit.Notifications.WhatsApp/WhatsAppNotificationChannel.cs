@@ -16,11 +16,11 @@ internal sealed class WhatsAppNotificationChannel(
     public string Name => NotificationChannels.WhatsApp;
 
     /// <inheritdoc />
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         IWhatsAppSender sender = serviceProvider.GetRequiredKeyedService<IWhatsAppSender>(options.Value.Provider);
 
-        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, ct).ConfigureAwait(false);
+        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, cancellationToken).ConfigureAwait(false);
         if (recipient?.PhoneNumber is null)
         {
             return;
@@ -31,6 +31,6 @@ internal sealed class WhatsAppNotificationChannel(
             To = recipient.PhoneNumber,
             TemplateName = context.NotificationTypeName,
             Language = context.Culture ?? recipient.PreferredCulture ?? "fr",
-        }, ct).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(false);
     }
 }

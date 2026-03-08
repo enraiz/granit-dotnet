@@ -35,7 +35,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
 
         _httpClientFactory.CreateClient("Brevo").Returns(_httpClient);
 
-        var optionsMonitor = Substitute.For<IOptionsMonitor<BrevoOptions>>();
+        IOptionsMonitor<BrevoOptions> optionsMonitor = Substitute.For<IOptionsMonitor<BrevoOptions>>();
         optionsMonitor.CurrentValue.Returns(new BrevoOptions
         {
             ApiKey = "test-key",
@@ -158,7 +158,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
         _handler.ResponseBody = """{"code":"invalid_parameter","message":"Invalid email address"}""";
         IEmailSender emailSender = _provider;
 
-        var ex = await Should.ThrowAsync<HttpRequestException>(() => emailSender.SendAsync(
+        HttpRequestException ex = await Should.ThrowAsync<HttpRequestException>(() => emailSender.SendAsync(
             new EmailMessage
             {
                 To = "bad-email",
@@ -257,7 +257,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
         _handler.ResponseBody = """{"code":"insufficient_credits","message":"Not enough SMS credits"}""";
         ISmsSender smsSender = _provider;
 
-        var ex = await Should.ThrowAsync<HttpRequestException>(() => smsSender.SendAsync(
+        HttpRequestException ex = await Should.ThrowAsync<HttpRequestException>(() => smsSender.SendAsync(
             new SmsMessage
             {
                 To = "+32470000000",

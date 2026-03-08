@@ -41,7 +41,7 @@ internal static class ExportExecutionEndpoints
         CreateExportJobRequest request,
         IExportOrchestrator orchestrator,
         IServiceProvider serviceProvider,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IExportDefinitionDescriptor? descriptor =
             ExportDefinitionResolver.FindByName(serviceProvider, request.DefinitionName);
@@ -66,9 +66,9 @@ internal static class ExportExecutionEndpoints
             request.Presets,
             request.Search);
 
-        ExportJobResult result = await orchestrator.ExportAsync(exportRequest, ct).ConfigureAwait(false);
+        ExportJobResult result = await orchestrator.ExportAsync(exportRequest, cancellationToken).ConfigureAwait(false);
 
-        ExportJob? job = await orchestrator.GetJobAsync(result.JobId, ct).ConfigureAwait(false);
+        ExportJob? job = await orchestrator.GetJobAsync(result.JobId, cancellationToken).ConfigureAwait(false);
         ExportJobResponse response = job is not null
             ? ExportJobResponse.FromJob(job)
             : new ExportJobResponse(result.JobId, request.DefinitionName, request.Format,
@@ -80,9 +80,9 @@ internal static class ExportExecutionEndpoints
     private static async Task<Results<Ok<ExportJobResponse>, NotFound>> GetJobStatusAsync(
         Guid jobId,
         IExportOrchestrator orchestrator,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ExportJob? job = await orchestrator.GetJobAsync(jobId, ct).ConfigureAwait(false);
+        ExportJob? job = await orchestrator.GetJobAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -94,9 +94,9 @@ internal static class ExportExecutionEndpoints
     private static async Task<Results<FileStreamHttpResult, NotFound, BadRequest<string>>> DownloadAsync(
         Guid jobId,
         IExportOrchestrator orchestrator,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ExportJob? job = await orchestrator.GetJobAsync(jobId, ct).ConfigureAwait(false);
+        ExportJob? job = await orchestrator.GetJobAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -108,7 +108,7 @@ internal static class ExportExecutionEndpoints
                 $"Export job is not completed. Current status: '{job.Status}'.");
         }
 
-        ExportDownload? download = await orchestrator.GetDownloadAsync(jobId, ct).ConfigureAwait(false);
+        ExportDownload? download = await orchestrator.GetDownloadAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (download is null)
         {
             return TypedResults.NotFound();

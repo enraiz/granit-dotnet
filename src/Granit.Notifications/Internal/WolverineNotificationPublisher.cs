@@ -20,15 +20,15 @@ internal sealed class WolverineNotificationPublisher(
         NotificationType<TData> notificationType,
         TData data,
         IReadOnlyList<string> recipientUserIds,
-        CancellationToken ct = default) where TData : notnull =>
-        PublishAsync(notificationType, data, recipientUserIds, relatedEntity: null, ct);
+        CancellationToken cancellationToken = default) where TData : notnull =>
+        PublishAsync(notificationType, data, recipientUserIds, relatedEntity: null, cancellationToken);
 
     public async ValueTask PublishAsync<TData>(
         NotificationType<TData> notificationType,
         TData data,
         IReadOnlyList<string> recipientUserIds,
         EntityReference? relatedEntity,
-        CancellationToken ct = default) where TData : notnull
+        CancellationToken cancellationToken = default) where TData : notnull
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity);
         trigger = trigger with { RecipientUserIds = recipientUserIds };
@@ -38,7 +38,7 @@ internal sealed class WolverineNotificationPublisher(
     public async ValueTask PublishToSubscribersAsync<TData>(
         NotificationType<TData> notificationType,
         TData data,
-        CancellationToken ct = default) where TData : notnull
+        CancellationToken cancellationToken = default) where TData : notnull
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity: null);
         await messageBus.PublishAsync(trigger).ConfigureAwait(false);
@@ -48,7 +48,7 @@ internal sealed class WolverineNotificationPublisher(
         NotificationType<TData> notificationType,
         TData data,
         EntityReference relatedEntity,
-        CancellationToken ct = default) where TData : notnull
+        CancellationToken cancellationToken = default) where TData : notnull
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity);
         await messageBus.PublishAsync(trigger).ConfigureAwait(false);

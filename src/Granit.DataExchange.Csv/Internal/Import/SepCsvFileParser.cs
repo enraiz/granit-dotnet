@@ -22,7 +22,7 @@ internal sealed class SepCsvFileParser : IFileParser
     public Task<IReadOnlyList<string>> ExtractHeadersAsync(
         Stream stream,
         FileParsingOptions options,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         using SepReader reader = CreateReader(stream, options);
         IReadOnlyList<string> headers = reader.Header.ColNames.ToList().AsReadOnly();
@@ -34,7 +34,7 @@ internal sealed class SepCsvFileParser : IFileParser
         Stream stream,
         FileParsingOptions options,
         int maxRows = 10,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         using SepReader reader = CreateReader(stream, options);
         IReadOnlyList<string> colNames = reader.Header.ColNames;
@@ -67,7 +67,7 @@ internal sealed class SepCsvFileParser : IFileParser
     public async IAsyncEnumerable<RawImportRow> ParseAsync(
         Stream stream,
         FileParsingOptions options,
-        [EnumeratorCancellation] CancellationToken ct = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using SepReader reader = CreateReader(stream, options);
         IReadOnlyList<string> colNames = reader.Header.ColNames;
@@ -75,7 +75,7 @@ internal sealed class SepCsvFileParser : IFileParser
 
         foreach (SepReader.Row row in reader)
         {
-            ct.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             rowNumber++;
 
             Dictionary<string, string?> values = new(colNames.Count, StringComparer.OrdinalIgnoreCase);

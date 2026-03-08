@@ -20,10 +20,10 @@ public interface IMigrationBatchDispatcher
     /// <summary>
     /// Dispatches a single migration batch command for execution.
     /// </summary>
-    Task DispatchAsync(RunMigrationBatchCommand command, CancellationToken ct = default);
+    Task DispatchAsync(RunMigrationBatchCommand command, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Dispatches multiple migration batch commands for execution.
     /// </summary>
-    Task DispatchAsync(IEnumerable<RunMigrationBatchCommand> commands, CancellationToken ct = default);
+    Task DispatchAsync(IEnumerable<RunMigrationBatchCommand> commands, CancellationToken cancellationToken = default);
 }

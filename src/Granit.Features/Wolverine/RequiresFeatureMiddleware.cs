@@ -25,11 +25,11 @@ public static class RequiresFeatureMiddleware
     /// </summary>
     /// <param name="message">The incoming message whose type is inspected for attributes.</param>
     /// <param name="featureChecker">Resolved from the DI container by Wolverine.</param>
-    /// <param name="ct">Cancellation token propagated by Wolverine from the transport.</param>
+    /// <param name="cancellationToken">Cancellation token propagated by Wolverine from the transport.</param>
     public static async Task BeforeAsync(
         object message,
         IFeatureChecker featureChecker,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IEnumerable<RequiresFeatureAttribute> attributes =
             message.GetType()
@@ -38,7 +38,7 @@ public static class RequiresFeatureMiddleware
 
         foreach (RequiresFeatureAttribute attribute in attributes)
         {
-            await featureChecker.RequireEnabledAsync(attribute.FeatureName, ct).ConfigureAwait(false);
+            await featureChecker.RequireEnabledAsync(attribute.FeatureName, cancellationToken).ConfigureAwait(false);
         }
     }
 }

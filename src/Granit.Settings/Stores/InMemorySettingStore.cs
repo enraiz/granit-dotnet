@@ -16,7 +16,7 @@ public sealed class InMemorySettingStore : ISettingStoreReader, ISettingStoreWri
         string name,
         string providerName,
         string? providerKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         _store.TryGetValue(BuildKey(name, providerName, providerKey), out SettingValue? value);
         return Task.FromResult(value);
@@ -26,7 +26,7 @@ public sealed class InMemorySettingStore : ISettingStoreReader, ISettingStoreWri
     public Task<IReadOnlyList<SettingValue>> GetListAsync(
         string providerName,
         string? providerKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         IReadOnlyList<SettingValue> result = [.. _store.Values.Where(v => v.ProviderName == providerName && v.ProviderKey == providerKey)];
         return Task.FromResult(result);
@@ -38,7 +38,7 @@ public sealed class InMemorySettingStore : ISettingStoreReader, ISettingStoreWri
         string providerName,
         string? providerKey,
         string? value,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         string key = BuildKey(name, providerName, providerKey);
         SettingValue entry = new(name, providerName, providerKey, value);
@@ -51,7 +51,7 @@ public sealed class InMemorySettingStore : ISettingStoreReader, ISettingStoreWri
         string name,
         string providerName,
         string? providerKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         _store.TryRemove(BuildKey(name, providerName, providerKey), out _);
         return Task.CompletedTask;

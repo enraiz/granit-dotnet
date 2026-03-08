@@ -11,7 +11,7 @@ namespace Granit.Caching;
 /// <typeparam name="TKey">Le type de la clé. Doit implémenter <c>ToString()</c> de manière significative.</typeparam>
 /// <example>
 /// Injection : <c>ICacheService&lt;UserCacheItem, Guid&gt; cache</c>
-/// Usage : <c>await cache.GetOrAddAsync(userId, async ct =&gt; await repo.GetAsync(userId, ct));</c>
+/// Usage : <c>await cache.GetOrAddAsync(userId, async cancellationToken =&gt; await repo.GetAsync(userId, cancellationToken));</c>
 /// </example>
 public interface ICacheService<TCacheItem, TKey> : ICacheService<TCacheItem>
     where TCacheItem : class
@@ -20,7 +20,7 @@ public interface ICacheService<TCacheItem, TKey> : ICacheService<TCacheItem>
     /// <summary>
     /// Retourne l'élément du cache, ou <c>null</c> si absent. La clé est convertie via <c>key.ToString()</c>.
     /// </summary>
-    Task<TCacheItem?> GetAsync(TKey key, CancellationToken ct = default);
+    Task<TCacheItem?> GetAsync(TKey key, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Pattern "remember" avec clé typée. La clé est convertie via <c>key.ToString()</c>.
@@ -29,7 +29,7 @@ public interface ICacheService<TCacheItem, TKey> : ICacheService<TCacheItem>
         TKey key,
         Func<CancellationToken, Task<TCacheItem>> factory,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Stocke un élément avec une clé typée. La clé est convertie via <c>key.ToString()</c>.
@@ -38,10 +38,10 @@ public interface ICacheService<TCacheItem, TKey> : ICacheService<TCacheItem>
         TKey key,
         TCacheItem value,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Supprime l'entrée identifiée par la clé typée.
     /// </summary>
-    Task RemoveAsync(TKey key, CancellationToken ct = default);
+    Task RemoveAsync(TKey key, CancellationToken cancellationToken = default);
 }
