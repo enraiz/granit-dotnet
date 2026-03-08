@@ -5,12 +5,16 @@
 //     (requires Templates.Manage permission)
 // ---------------------------------------------------------------------------
 
+using System.Diagnostics;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Granit.Security;
 using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Permissions;
 using Granit.Templating.Exceptions;
+using Granit.Templating.GlobalContext;
 using Granit.Templating.Keys;
+using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -42,7 +46,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers 10 endpoints:
+    /// Registers 11 endpoints:
     /// <list type="bullet">
     /// <item><c>GET /</c> — paginated list with filters</item>
     /// <item><c>GET /{name}</c> — detail (draft + published)</item>
@@ -52,6 +56,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// <item><c>POST /{name}/publish</c> — publish the current draft</item>
     /// <item><c>POST /{name}/unpublish</c> — unpublish (archive the published revision)</item>
     /// <item><c>GET /{name}/lifecycle</c> — lifecycle info (current status, available transitions)</item>
+    /// <item><c>POST /{name}/preview</c> — render the current draft with test data</item>
     /// <item><c>GET /{name}/history</c> — paginated revision history (summaries, no content)</item>
     /// <item><c>GET /{name}/history/{revisionId}</c> — full detail of a specific revision</item>
     /// </list>
@@ -114,6 +119,10 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         group.MapGet("/{name}/lifecycle", HandleGetLifecycleAsync)
              .WithName("GetTemplateLifecycle")
              .WithSummary("Returns lifecycle status, workflow state, and available transitions.");
+
+        group.MapPost("/{name}/preview", HandlePreviewAsync)
+             .WithName("PreviewTemplate")
+             .WithSummary("Renders the current draft with optional test data and returns the HTML output.");
 
         group.MapGet("/{name}/history", HandleGetHistoryAsync)
              .WithName("GetTemplateHistory")
@@ -714,6 +723,113 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     }
 
     // -------------------------------------------------------------------------
+    // POST /{name}/preview — Render the current draft with test data
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplatePreviewResponse>, NotFound, ProblemHttpResult>> HandlePreviewAsync(
+        HttpContext context,
+        string name,
+        TemplatePreviewRequest body,
+        CancellationToken ct)
+    {
+        IDocumentTemplateStoreReader? storeReader =
+            context.RequestServices.GetService<IDocumentTemplateStoreReader>();
+
+        if (storeReader is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return nameError;
+        }
+
+        if (body.Culture is not null)
+        {
+            ProblemHttpResult? cultureError = ValidateBcp47(body.Culture);
+            if (cultureError is not null)
+            {
+                return cultureError;
+            }
+        }
+
+        TemplateKey key = new(name, body.Culture);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
+
+        if (draft is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        List<ITemplateEngine> engines =
+            context.RequestServices.GetServices<ITemplateEngine>().ToList();
+
+        if (engines.Count == 0)
+        {
+            return TypedResults.Problem(
+                detail: "No template engine is registered. Add Granit.Templating.Scriban to enable rendering.",
+                statusCode: StatusCodes.Status501NotImplemented);
+        }
+
+        TemplateDescriptor descriptor = new()
+        {
+            Content = draft.Content,
+            MimeType = draft.MimeType,
+            RevisionId = draft.RevisionId,
+        };
+
+        ITemplateEngine? engine = engines.FirstOrDefault(e => e.CanRender(descriptor));
+        if (engine is null)
+        {
+            return TypedResults.Problem(
+                detail: $"No template engine can render MIME type '{draft.MimeType}'.",
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+
+        IEnumerable<ITemplateGlobalContext> globalContexts =
+            context.RequestServices.GetServices<ITemplateGlobalContext>();
+
+        Dictionary<string, object?> data = body.Data.HasValue
+            ? ConvertJsonObject(body.Data.Value)
+            : [];
+
+        var sw = Stopwatch.StartNew();
+
+        RenderedContent rendered;
+        try
+        {
+            rendered = await engine.RenderAsync(
+                descriptor,
+                data,
+                DocumentFormat.Html,
+                globalContexts.ToList(),
+                ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return TypedResults.Problem(
+                detail: $"Template rendering failed: {ex.Message}",
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+
+        sw.Stop();
+
+        if (rendered is not TextRenderedContent textContent)
+        {
+            return TypedResults.Problem(
+                detail: "Preview is only supported for text-based templates (HTML). Binary templates (Excel) cannot be previewed.",
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+
+        return TypedResults.Ok(new TemplatePreviewResponse(
+            textContent.Html,
+            rendered.RevisionId,
+            sw.ElapsedMilliseconds));
+    }
+
+    // -------------------------------------------------------------------------
     // Shared helpers
     // -------------------------------------------------------------------------
 
@@ -811,4 +927,37 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         return null;
     }
+
+    /// <summary>
+    /// Converts a <see cref="JsonElement"/> object to a <see cref="Dictionary{TKey, TValue}"/>
+    /// suitable for Scriban template rendering.
+    /// </summary>
+    private static Dictionary<string, object?> ConvertJsonObject(JsonElement element)
+    {
+        Dictionary<string, object?> dict = [];
+
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            return dict;
+        }
+
+        foreach (JsonProperty property in element.EnumerateObject())
+        {
+            dict[property.Name] = ConvertJsonValue(property.Value);
+        }
+
+        return dict;
+    }
+
+    private static object? ConvertJsonValue(JsonElement element) =>
+        element.ValueKind switch
+        {
+            JsonValueKind.Object => ConvertJsonObject(element),
+            JsonValueKind.Array => element.EnumerateArray().Select(ConvertJsonValue).ToList(),
+            JsonValueKind.String => element.GetString(),
+            JsonValueKind.Number => element.TryGetInt64(out long l) ? l : element.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            _ => null,
+        };
 }
