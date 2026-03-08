@@ -250,6 +250,12 @@
           "Granit.Wolverine": "[0.1.0-dev, )"
         }
       },
+      "granit.notifications.mobilepush": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Notifications": "[0.1.0-dev, )"
+        }
+      },
       "granit.querying": {
         "type": "Project",
         "dependencies": {

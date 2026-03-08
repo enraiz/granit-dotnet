@@ -4,20 +4,23 @@ Moteur de notifications **multi-canal** pour les applications Digital Dynamics.
 Publie des notifications aux utilisateurs via InApp, SignalR, Email, SMS, WhatsApp et Web Push.
 Basé sur Wolverine (Outbox at-least-once), conforme HDS (audit trail immuable) et RGPD.
 
-Dix packages composables :
+Treize packages composables :
 
 | Package | Rôle |
 | --- | --- |
 | `Granit.Notifications` | Core : abstractions, définitions, fan-out Wolverine, canal InApp, stores InMemory |
 | `Granit.Notifications.EntityFrameworkCore` | Stores durables PostgreSQL + intercepteur de suivi d'entités |
 | `Granit.Notifications.SignalR` | Temps réel browser via hub SignalR + Redis backplane K8s |
-| `Granit.Notifications.Endpoints` | API REST Minimal API (inbox, préférences, followers) |
+| `Granit.Notifications.Endpoints` | API REST Minimal API (inbox, préférences, followers, tokens push) |
 | `Granit.Notifications.Email` | Abstraction `IEmailSender` + canal Email (Keyed Services) |
 | `Granit.Notifications.Email.Smtp` | Provider MailKit SMTP (clé `"Smtp"`) |
 | `Granit.Notifications.Sms` | Abstraction `ISmsSender` + canal SMS (Keyed Services) |
 | `Granit.Notifications.WhatsApp` | Abstraction `IWhatsAppSender` + canal WhatsApp (templates Meta pré-approuvés) |
 | `Granit.Notifications.Brevo` | Provider unifié Email + SMS + WhatsApp via API Brevo |
 | `Granit.Notifications.Push` | Web Push W3C VAPID (souveraineté, pas de FCM/APNs) |
+| `Granit.Notifications.MobilePush` | Abstraction `IMobilePushSender` + canal MobilePush (Keyed Services), token store |
+| `Granit.Notifications.MobilePush.Fcm` | Provider Firebase Cloud Messaging v1 (clé `"Fcm"`) |
+| `Granit.Notifications.Zulip` | Canal Zulip Bot API pour alertes infra (self-hosted) |
 
 ## Architecture
 
@@ -34,7 +37,7 @@ flowchart TD
     E --> F["NotificationDeliveryHandler
     route vers le INotificationChannel correspondant"]
     F --> G["INotificationChannel.SendAsync
-    InApp | SignalR | Email | SMS | WhatsApp | Push"]
+    InApp | SignalR | Email | SMS | WhatsApp | Push | MobilePush | Zulip"]
 ```
 
 Le fan-out et la livraison sont **entièrement découplés** : Wolverine publie les `N`
@@ -98,6 +101,13 @@ builder.Services.AddGranitNotificationsWhatsApp();
 
 // Web Push VAPID
 builder.Services.AddGranitNotificationsPush();
+
+// Mobile Push (Capacitor / apps natives)
+builder.Services.AddGranitNotificationsMobilePush();
+builder.Services.AddGranitNotificationsMobilePushFcm(); // Provider FCM
+
+// Zulip (alertes infra, self-hosted)
+builder.Services.AddGranitNotificationsZulip();
 
 // Provider unifié Brevo (Email + SMS + WhatsApp)
 builder.Services.AddGranitNotificationsBrevo();
@@ -311,6 +321,67 @@ multi-appareil) via `IPushSubscriptionStore`. Les souscriptions expirées
 (HTTP 410 Gone) sont automatiquement nettoyées.
 
 La clé privée VAPID doit être stockée dans **Vault** en production.
+
+### MobilePush (Capacitor / apps natives)
+
+Canal push pour les applications mobiles construites avec **Capacitor** (transformation
+de Guava-Front en app iOS/Android). Utilise le pattern **Keyed Services** pour résoudre
+le provider d'envoi (FCM, APNs, etc.) à l'exécution.
+
+Le canal résout les **device tokens** de l'utilisateur via `IMobilePushTokenReader`, puis
+délègue l'envoi au provider enregistré (`IMobilePushSender`).
+
+> **HDS / Sécurité :** le payload push est un **wake-up notification** uniquement
+> (titre + corps générique). Aucune donnée de santé (PII) ne transite dans le payload
+> FCM/APNs. Le contenu complet est récupéré par l'application via l'API REST sécurisée.
+
+#### Gestion des tokens
+
+Les device tokens sont gérés via `IMobilePushTokenWriter` / `IMobilePushTokenReader`.
+Chaque token est associé à un `UserId`, une `MobilePlatform` (Android/iOS) et un
+`TenantId` optionnel.
+
+En mode développement, un `InMemoryMobilePushTokenStore` est utilisé. En production,
+`EfCoreMobilePushTokenStore` (fourni par `Granit.Notifications.EntityFrameworkCore`)
+persiste les tokens dans PostgreSQL avec un index unique sur `(DeviceToken, TenantId)`.
+
+#### Endpoints REST
+
+| Méthode | Route | Description |
+| --- | --- | --- |
+| `POST` | `/notifications/push-tokens` | Enregistrer un device token |
+| `DELETE` | `/notifications/push-tokens/{deviceToken}` | Supprimer un device token |
+| `GET` | `/notifications/push-tokens` | Lister les tokens de l'utilisateur |
+
+#### Provider FCM
+
+Le package `Granit.Notifications.MobilePush.Fcm` fournit `FcmMobilePushSender`, enregistré
+sous la clé `"Fcm"`. Il utilise l'API Firebase Cloud Messaging v1 (HTTP) avec
+authentification OAuth2 via service account.
+
+Les tokens invalidés (réponse `UNREGISTERED`) déclenchent automatiquement un événement
+`MobilePushTokenInvalidated` via Wolverine pour nettoyage asynchrone.
+
+Providers disponibles :
+
+| Clé | Package | Implémentation |
+| --- | --- | --- |
+| `"Fcm"` | `Granit.Notifications.MobilePush.Fcm` | `FcmMobilePushSender` |
+
+### Zulip (alertes infra)
+
+Canal d'envoi vers un serveur **Zulip self-hosted** via l'API Bot. Destiné aux
+notifications d'infrastructure (alertes système, monitoring, CI/CD) envoyées vers
+des streams Zulip internes.
+
+Le canal envoie les notifications dans un **stream par défaut** (configurable) avec
+un **topic par défaut**. Le contenu est formaté en Markdown (syntaxe Zulip).
+
+L'authentification utilise un **bot Zulip** (email + API key) via Basic auth.
+Les credentials doivent être stockés dans **Vault** en production.
+
+> **Souveraineté :** Zulip est **self-hosted** sur l'infrastructure OVHcloud FR.
+> Aucune dépendance envers un service cloud US (Slack, Teams, Discord).
 
 ## Architecture multi-provider (Keyed Services)
 
@@ -537,6 +608,28 @@ Exemple complet de configuration `appsettings.json` :
       "DefaultSenderName": "Mon Application",
       "DefaultSmsSenderId": "MonApp",
       "BaseUrl": "https://api.brevo.com/v3"
+    },
+
+    "MobilePush": {
+      "Provider": "Fcm"
+    },
+
+    "Fcm": {
+      "ProjectId": "my-firebase-project",
+      "ServiceAccountJson": "vault://secret/fcm-service-account",
+      "TimeoutSeconds": 30
+    },
+
+    "Zulip": {
+      "DefaultStream": "alerts",
+      "DefaultTopic": "system"
+    },
+
+    "ZulipBot": {
+      "BaseUrl": "https://zulip.internal.digitaldynamics.be",
+      "BotEmail": "granit-bot@zulip.internal.digitaldynamics.be",
+      "ApiKey": "vault://secret/zulip-bot-api-key",
+      "TimeoutSeconds": 30
     }
   }
 }
@@ -733,6 +826,6 @@ Notification aux admins abonnés
 | Direction | Modules |
 | --- | --- |
 | **Dépend de** | `Granit.Core`, `Granit.Timing`, `Granit.Wolverine` |
-| **Utilisé par** | `Granit.Notifications.EntityFrameworkCore`, `Granit.Notifications.SignalR`, `Granit.Notifications.Endpoints`, `Granit.Notifications.Email`, `Granit.Notifications.Sms`, `Granit.Notifications.WhatsApp`, `Granit.Notifications.Push` |
+| **Utilisé par** | `Granit.Notifications.EntityFrameworkCore`, `Granit.Notifications.SignalR`, `Granit.Notifications.Endpoints`, `Granit.Notifications.Email`, `Granit.Notifications.Sms`, `Granit.Notifications.WhatsApp`, `Granit.Notifications.Push`, `Granit.Notifications.MobilePush`, `Granit.Notifications.Zulip` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

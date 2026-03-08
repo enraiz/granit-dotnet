@@ -1,0 +1,124 @@
+using System.Security.Claims;
+using Granit.Core.MultiTenancy;
+using Granit.Notifications.MobilePush;
+using Granit.Timing;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
+
+namespace Granit.Notifications.Endpoints;
+
+/// <summary>
+/// Minimal API endpoints for mobile push device token management.
+/// </summary>
+public static class MobilePushTokenEndpoints
+{
+    /// <summary>Maps mobile push token management endpoints.</summary>
+    public static IEndpointRouteBuilder MapMobilePushTokenEndpoints(
+        this IEndpointRouteBuilder endpoints,
+        string prefix = "api/notifications/mobile-push/tokens")
+    {
+        RouteGroupBuilder group = endpoints.MapGroup(prefix)
+            .RequireAuthorization()
+            .WithTags("MobilePush");
+
+        group.MapPost("/", RegisterTokenAsync)
+            .WithName("RegisterMobilePushToken")
+            .WithSummary("Registers a mobile device token for push notifications.");
+
+        group.MapDelete("/{deviceToken}", RemoveTokenAsync)
+            .WithName("RemoveMobilePushToken")
+            .WithSummary("Removes a mobile device token.");
+
+        group.MapGet("/", GetTokensAsync)
+            .WithName("GetMobilePushTokens")
+            .WithSummary("Returns the current user's registered device tokens.");
+
+        return endpoints;
+    }
+
+    private static async Task<Results<Created, Ok>> RegisterTokenAsync(
+        MobilePushTokenRegisterRequest request,
+        IMobilePushTokenWriter tokenWriter,
+        IMobilePushTokenReader tokenReader,
+        ClaimsPrincipal user,
+        ICurrentTenant tenant,
+        IClock clock,
+        CancellationToken ct)
+    {
+        string userId = GetUserId(user);
+        Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
+
+        // Check if token already exists (upsert)
+        IReadOnlyList<MobilePushTokenInfo> existing = await tokenReader
+            .GetTokensAsync(userId, tenantId, ct)
+            .ConfigureAwait(false);
+
+        bool isUpdate = existing.Any(t => t.DeviceToken == request.DeviceToken);
+
+        await tokenWriter.RegisterAsync(new MobilePushTokenInfo
+        {
+            UserId = userId,
+            DeviceToken = request.DeviceToken,
+            Platform = request.Platform,
+            TenantId = tenantId,
+            CreatedAt = clock.Now,
+        }, ct).ConfigureAwait(false);
+
+        return isUpdate
+            ? TypedResults.Ok()
+            : TypedResults.Created();
+    }
+
+    private static async Task<NoContent> RemoveTokenAsync(
+        string deviceToken,
+        IMobilePushTokenWriter tokenWriter,
+        ICurrentTenant tenant,
+        CancellationToken ct)
+    {
+        Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
+
+        await tokenWriter.RemoveAsync(deviceToken, tenantId, ct).ConfigureAwait(false);
+
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Ok<IReadOnlyList<MobilePushTokenResponse>>> GetTokensAsync(
+        IMobilePushTokenReader tokenReader,
+        ClaimsPrincipal user,
+        ICurrentTenant tenant,
+        CancellationToken ct)
+    {
+        string userId = GetUserId(user);
+        Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
+
+        IReadOnlyList<MobilePushTokenInfo> tokens = await tokenReader
+            .GetTokensAsync(userId, tenantId, ct)
+            .ConfigureAwait(false);
+
+        IReadOnlyList<MobilePushTokenResponse> response = tokens
+            .Select(t => new MobilePushTokenResponse(t.DeviceToken, t.Platform, t.CreatedAt))
+            .ToList();
+
+        return TypedResults.Ok(response);
+    }
+
+    private static string GetUserId(ClaimsPrincipal user) =>
+        user.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? user.FindFirstValue("sub")
+        ?? throw new InvalidOperationException("User identifier claim not found.");
+}
+
+/// <summary>Request to register a mobile push device token.</summary>
+public sealed record MobilePushTokenRegisterRequest
+{
+    /// <summary>Device token from FCM/APNs.</summary>
+    public required string DeviceToken { get; init; }
+
+    /// <summary>Device platform.</summary>
+    public required MobilePlatform Platform { get; init; }
+}
+
+/// <summary>Response for a mobile push device token.</summary>
+public sealed record MobilePushTokenResponse(string DeviceToken, MobilePlatform Platform, DateTimeOffset CreatedAt);
