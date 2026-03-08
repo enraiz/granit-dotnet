@@ -68,7 +68,7 @@ services.AddSingleton<ISettingDefinitionProvider, AppSettingDefinitionProvider>(
 ```csharp
 public sealed class ThemeService(ISettingProvider settings)
 {
-    public async Task<string> GetThemeAsync(CancellationToken ct)
+    public async Task<string> GetThemeAsync(CancellationToken cancellationToken)
     {
         string? theme = await settings.GetOrNullAsync("App.Theme", ct);
         return theme ?? "dark";
@@ -86,15 +86,15 @@ valeur par défaut déclarée.
 public sealed class AdminService(ISettingManager settings)
 {
     // Valeur globale (tous les tenants et utilisateurs)
-    public Task SetGlobalThemeAsync(string theme, CancellationToken ct) =>
+    public Task SetGlobalThemeAsync(string theme, CancellationToken cancellationToken) =>
         settings.SetGlobalAsync("App.Theme", theme, ct);
 
     // Valeur pour un tenant spécifique
-    public Task SetTenantThemeAsync(Guid tenantId, string theme, CancellationToken ct) =>
+    public Task SetTenantThemeAsync(Guid tenantId, string theme, CancellationToken cancellationToken) =>
         settings.SetForTenantAsync(tenantId, "App.Theme", theme, ct);
 
     // Valeur pour un utilisateur spécifique
-    public Task SetUserThemeAsync(string userId, string theme, CancellationToken ct) =>
+    public Task SetUserThemeAsync(string userId, string theme, CancellationToken cancellationToken) =>
         settings.SetForUserAsync(userId, "App.Theme", theme, ct);
 }
 ```

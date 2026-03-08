@@ -182,7 +182,7 @@ builder.AddGranitPersistenceMigrations(opts => opts.UseNpgsql(connectionString))
 ```csharp
 public sealed class MySchemaIsolator : ITenantDbIsolator
 {
-    public async Task IsolateAsync(DbContext context, Guid tenantId, CancellationToken ct)
+    public async Task IsolateAsync(DbContext context, Guid tenantId, CancellationToken cancellationToken)
     {
         string schema = $"schema_{tenantId:N}";
         await context.Database.ExecuteSqlAsync(
@@ -199,7 +199,7 @@ public sealed class MyTenantEnumerator : ITenantEnumerator
     public MyTenantEnumerator(ITenantRepository repository) => _repository = repository;
 
     public async IAsyncEnumerable<Guid> GetActiveTenantIdsAsync(
-        [EnumeratorCancellation] CancellationToken ct)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (Guid id in _repository.GetActiveIdsAsync(ct))
         {

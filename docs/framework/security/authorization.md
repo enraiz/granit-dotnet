@@ -233,7 +233,7 @@ permission connue dans le `PermissionDefinitionManager`. Les policies standards
 ```csharp
 public sealed class InvoiceService(IPermissionChecker permissionChecker)
 {
-    public async Task DeleteAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         if (!await permissionChecker.IsGrantedAsync("Invoices.Delete", ct))
             throw new ForbiddenException("Authorization:Permission:Denied",

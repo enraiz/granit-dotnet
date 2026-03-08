@@ -23,7 +23,7 @@ internal static class PatientEndpoints
         IValidator<CreatePatientRequest> validator,
         AppDbContext db,
         ICacheService<PatientListCache> cache,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // 1. Valider
         FluentValidation.Results.ValidationResult validation =
@@ -114,7 +114,7 @@ public static class PatientCacheInvalidationHandler
     public static async Task HandleAsync(
         PatientCreatedEvent evt,
         ICacheService<PatientListCache> cache,
-        CancellationToken ct) =>
+        CancellationToken cancellationToken) =>
         await cache.RemoveAsync("patients:all", ct);
 }
 ```

@@ -105,7 +105,7 @@ public sealed class QrCodeEnricher : ITemplateDataEnricher<InvoiceData>
 {
     public int Order => 10;
 
-    public Task<InvoiceData> EnrichAsync(InvoiceData data, CancellationToken ct = default)
+    public Task<InvoiceData> EnrichAsync(InvoiceData data, CancellationToken cancellationToken = default)
     {
         string svg = QrCodeGenerator.Generate(data.InvoiceNumber);
         return Task.FromResult(data with { QrCodeSvg = svg });
@@ -313,7 +313,7 @@ Marquer les fichiers comme ressources embarquées dans le `.csproj` :
 public sealed class WelcomeEmailService(ITextTemplateRenderer renderer)
 {
     public async Task<string> GetHtmlAsync(
-        WelcomeEmailData data, CancellationToken ct)
+        WelcomeEmailData data, CancellationToken cancellationToken)
     {
         RenderedTextResult result = await renderer.RenderAsync(
             new WelcomeEmailType(), data, ct);
@@ -329,7 +329,7 @@ public sealed class WelcomeEmailService(ITextTemplateRenderer renderer)
 public sealed class InvoiceService(IDocumentGenerator generator)
 {
     public async Task<DocumentResult> GenerateInvoiceAsync(
-        InvoiceData data, CancellationToken ct)
+        InvoiceData data, CancellationToken cancellationToken)
     {
         return await generator.GenerateAsync(
             new InvoiceTemplateType(), data, ct: ct);
@@ -346,7 +346,7 @@ Le moteur `ClosedXmlTemplateEngine` est sélectionné automatiquement.
 public sealed class ExcelReportService(IDocumentGenerator generator)
 {
     public async Task<DocumentResult> GenerateReportAsync(
-        ReportData data, CancellationToken ct)
+        ReportData data, CancellationToken cancellationToken)
     {
         // Le MIME type du template détermine automatiquement le moteur (ClosedXML)
         return await generator.GenerateAsync(
@@ -372,16 +372,16 @@ public sealed class TemplateAdminService(
     IDocumentTemplateStoreWriter storeWriter)
 {
     // Créer ou mettre à jour un brouillon
-    public Task SaveDraftAsync(TemplateKey key, string html, CancellationToken ct)
+    public Task SaveDraftAsync(TemplateKey key, string html, CancellationToken cancellationToken)
         => storeWriter.SaveDraftAsync(key, html, "text/html", "admin@digitaldynamics.be", ct);
 
     // Publier le brouillon courant (invalide le cache HybridCache)
-    public Task PublishAsync(TemplateKey key, CancellationToken ct)
+    public Task PublishAsync(TemplateKey key, CancellationToken cancellationToken)
         => storeWriter.PublishAsync(key, "admin@digitaldynamics.be", ct);
 
     // Consulter l'historique complet (audit HDS)
     public Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
-        TemplateKey key, CancellationToken ct)
+        TemplateKey key, CancellationToken cancellationToken)
         => storeReader.GetHistoryAsync(key, ct);
 }
 ```

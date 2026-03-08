@@ -73,7 +73,7 @@ app.MapControllers();
 [Idempotent]
 public async Task<IActionResult> CreatePaymentAsync(
     [FromBody] CreatePaymentRequest request,
-    CancellationToken ct)
+    CancellationToken cancellationToken)
 {
     // Exécuté une seule fois, même si le client renvoie la requête.
     Payment payment = await _paymentService.CreateAsync(request, ct);

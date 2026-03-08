@@ -62,7 +62,7 @@ vérifie simplement `IsAvailable` — jamais `null`.
 // Le code fonctionne identiquement avec ou sans multi-tenancy
 public sealed class FeatureChecker(IServiceProvider sp)
 {
-    public async Task<string?> GetValueAsync(string featureName, CancellationToken ct)
+    public async Task<string?> GetValueAsync(string featureName, CancellationToken cancellationToken)
     {
         ICurrentTenant? currentTenant = sp.GetService<ICurrentTenant>();
 

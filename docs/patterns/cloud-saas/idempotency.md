@@ -78,7 +78,7 @@ stateDiagram-v2
 app.MapPost("/api/invoices", async (
     CreateInvoiceRequest request,
     InvoiceService service,
-    CancellationToken ct) =>
+    CancellationToken cancellationToken) =>
 {
     InvoiceDto invoice = await service.CreateAsync(request, ct);
     return Results.Created($"/api/invoices/{invoice.Id}", invoice);

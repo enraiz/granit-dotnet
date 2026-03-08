@@ -21,7 +21,7 @@ public static class PatientCreatedHandler
     public static async Task HandleAsync(
         PatientCreatedEvent evt,
         IWebhookPublisher webhookPublisher,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         await webhookPublisher.PublishAsync(
             eventType: "patient.created",

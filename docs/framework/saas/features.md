@@ -134,7 +134,7 @@ Sans ces implémentations, la cascade passe directement aux valeurs par défaut.
 public sealed class AcmePlanIdProvider(ICurrentTenant currentTenant, IAppDb db)
     : IPlanIdProvider
 {
-    public async Task<string?> GetCurrentPlanIdAsync(CancellationToken ct)
+    public async Task<string?> GetCurrentPlanIdAsync(CancellationToken cancellationToken)
     {
         if (!currentTenant.IsAvailable) return null;
         AppTenant? tenant = await db.Tenants.FindAsync(currentTenant.Id, ct);
@@ -146,7 +146,7 @@ public sealed class AcmePlanIdProvider(ICurrentTenant currentTenant, IAppDb db)
 public sealed class AcmePlanFeatureStore(IAppDb db) : IPlanFeatureStore
 {
     public async Task<string?> GetOrNullAsync(
-        string planId, string featureName, CancellationToken ct) =>
+        string planId, string featureName, CancellationToken cancellationToken) =>
         await db.PlanFeatures
             .Where(f => f.PlanId == planId && f.FeatureName == featureName)
             .Select(f => f.Value)
@@ -166,10 +166,10 @@ services.AddSingleton<IPlanFeatureStore, AcmePlanFeatureStore>();
 ```csharp
 public sealed class VideoConsultationService(IFeatureChecker featureChecker)
 {
-    public async Task<bool> IsAvailableAsync(CancellationToken ct) =>
+    public async Task<bool> IsAvailableAsync(CancellationToken cancellationToken) =>
         await featureChecker.IsEnabledAsync("App.VideoConsultation", ct);
 
-    public async Task<long> GetPatientQuotaAsync(CancellationToken ct) =>
+    public async Task<long> GetPatientQuotaAsync(CancellationToken cancellationToken) =>
         await featureChecker.GetNumericAsync("App.MaxPatients", ct);
 }
 ```
@@ -192,7 +192,7 @@ Rejette les messages Wolverine avant exécution du handler si la feature est ina
 public sealed class CreateVideoSessionHandler
 {
     [RequiresFeature("App.VideoConsultation")]
-    public async Task Handle(CreateVideoSessionCommand cmd, CancellationToken ct) { ... }
+    public async Task Handle(CreateVideoSessionCommand cmd, CancellationToken cancellationToken) { ... }
 }
 ```
 
@@ -201,7 +201,7 @@ public sealed class CreateVideoSessionHandler
 ```csharp
 public sealed class PatientService(IFeatureLimitGuard limitGuard, IPatientRepository repo)
 {
-    public async Task CreateAsync(CreatePatientCommand cmd, CancellationToken ct)
+    public async Task CreateAsync(CreatePatientCommand cmd, CancellationToken cancellationToken)
     {
         long current = await repo.CountAsync(ct);
         await limitGuard.GuardAsync("App.MaxPatients", current, ct);
@@ -218,7 +218,7 @@ Publier `FeatureValueChangedEvent` via Wolverine après toute modification d'un 
 ```csharp
 public sealed class OverrideTenantFeatureHandler(IFeatureStoreWriter store, IMessageBus bus)
 {
-    public async Task Handle(OverrideTenantFeatureCommand cmd, CancellationToken ct)
+    public async Task Handle(OverrideTenantFeatureCommand cmd, CancellationToken cancellationToken)
     {
         await store.SetAsync(cmd.FeatureName, cmd.TenantId, cmd.Value, ct);
         await bus.PublishAsync(new FeatureValueChangedEvent(cmd.TenantId, cmd.FeatureName), ct);

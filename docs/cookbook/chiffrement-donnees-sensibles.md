@@ -23,7 +23,7 @@ public sealed class PatientService(
         string firstName,
         string lastName,
         string nirNumber,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         Patient patient = new()
         {
@@ -39,7 +39,7 @@ public sealed class PatientService(
         return patient.Id;
     }
 
-    public async Task<string?> GetNirAsync(Guid patientId, CancellationToken ct)
+    public async Task<string?> GetNirAsync(Guid patientId, CancellationToken cancellationToken)
     {
         Patient? patient = await db.Patients.FindAsync([patientId], ct);
         if (patient is null)
@@ -77,7 +77,7 @@ public sealed class PatientCacheService(
     ICacheService<PatientCacheItem> cache,
     AppDbContext db)
 {
-    public async Task<PatientCacheItem?> GetAsync(Guid id, CancellationToken ct)
+    public async Task<PatientCacheItem?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
         string cacheKey = $"patient:{id}";
 

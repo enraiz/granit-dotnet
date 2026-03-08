@@ -44,36 +44,36 @@ public interface IIdentityProvider
     Task<IReadOnlyList<IdentityUser>> GetUsersAsync(
         string? search = null, int? first = null, int? max = null,
         CancellationToken cancellationToken = default);
-    Task<IdentityUser?> GetUserAsync(string userId, CancellationToken ct = default);
+    Task<IdentityUser?> GetUserAsync(string userId, CancellationToken cancellationToken = default);
 
     // --- Gestion du compte ---
-    Task SetUserEnabledAsync(string userId, bool enabled, CancellationToken ct = default);
-    Task<IdentityUser> CreateUserAsync(IdentityUserCreate user, CancellationToken ct = default);
+    Task SetUserEnabledAsync(string userId, bool enabled, CancellationToken cancellationToken = default);
+    Task<IdentityUser> CreateUserAsync(IdentityUserCreate user, CancellationToken cancellationToken = default);
 
     // --- Sessions ---
-    Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(string userId, CancellationToken ct = default);
-    Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(string userId, CancellationToken ct = default);
-    Task TerminateSessionAsync(string userId, string sessionId, CancellationToken ct = default);
-    Task TerminateAllSessionsAsync(string userId, CancellationToken ct = default);
+    Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(string userId, CancellationToken cancellationToken = default);
+    Task TerminateSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default);
+    Task TerminateAllSessionsAsync(string userId, CancellationToken cancellationToken = default);
 
     // --- Credentials ---
-    Task<DateTimeOffset?> GetPasswordChangedAtAsync(string userId, CancellationToken ct = default);
-    Task SendPasswordResetEmailAsync(string userId, CancellationToken ct = default);
-    Task SetTemporaryPasswordAsync(string userId, string temporaryPassword, CancellationToken ct = default);
-    Task<bool> VerifyUserCredentialsAsync(string username, string password, CancellationToken ct = default);
+    Task<DateTimeOffset?> GetPasswordChangedAtAsync(string userId, CancellationToken cancellationToken = default);
+    Task SendPasswordResetEmailAsync(string userId, CancellationToken cancellationToken = default);
+    Task SetTemporaryPasswordAsync(string userId, string temporaryPassword, CancellationToken cancellationToken = default);
+    Task<bool> VerifyUserCredentialsAsync(string username, string password, CancellationToken cancellationToken = default);
 
     // --- Rôles ---
-    Task<IReadOnlyList<IdentityRole>> GetRolesAsync(CancellationToken ct = default);
-    Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(string roleName, CancellationToken ct = default);
-    Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(string userId, CancellationToken ct = default);
-    Task AssignRoleAsync(string userId, string roleName, CancellationToken ct = default);
-    Task RemoveRoleAsync(string userId, string roleName, CancellationToken ct = default);
+    Task<IReadOnlyList<IdentityRole>> GetRolesAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(string roleName, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(string userId, CancellationToken cancellationToken = default);
+    Task AssignRoleAsync(string userId, string roleName, CancellationToken cancellationToken = default);
+    Task RemoveRoleAsync(string userId, string roleName, CancellationToken cancellationToken = default);
 
     // --- Groupes ---
-    Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(CancellationToken ct = default);
-    Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(string userId, CancellationToken ct = default);
-    Task AddUserToGroupAsync(string userId, string groupId, CancellationToken ct = default);
-    Task RemoveUserFromGroupAsync(string userId, string groupId, CancellationToken ct = default);
+    Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(string userId, CancellationToken cancellationToken = default);
+    Task AddUserToGroupAsync(string userId, string groupId, CancellationToken cancellationToken = default);
+    Task RemoveUserFromGroupAsync(string userId, string groupId, CancellationToken cancellationToken = default);
 }
 ```
 
@@ -298,24 +298,24 @@ thread-safe (double-check avec `SemaphoreSlim`).
 // Injecter IIdentityProvider depuis le conteneur DI
 public sealed class UserAdminService(IIdentityProvider identityProvider)
 {
-    public async Task<IdentityUser?> GetUserAsync(string userId, CancellationToken ct)
+    public async Task<IdentityUser?> GetUserAsync(string userId, CancellationToken cancellationToken)
         => await identityProvider.GetUserAsync(userId, ct);
 
-    public async Task DisableUserAsync(string userId, CancellationToken ct)
+    public async Task DisableUserAsync(string userId, CancellationToken cancellationToken)
         => await identityProvider.SetUserEnabledAsync(userId, false, ct);
 
     public async Task<IdentityUser> CreateUserAsync(
-        string username, string email, CancellationToken ct)
+        string username, string email, CancellationToken cancellationToken)
         => await identityProvider.CreateUserAsync(
             new IdentityUserCreate(username, email, TemporaryPassword: "ChangeMeNow!"), ct);
 
-    public async Task AssignRoleAsync(string userId, string role, CancellationToken ct)
+    public async Task AssignRoleAsync(string userId, string role, CancellationToken cancellationToken)
         => await identityProvider.AssignRoleAsync(userId, role, ct);
 
-    public async Task TerminateAllSessionsAsync(string userId, CancellationToken ct)
+    public async Task TerminateAllSessionsAsync(string userId, CancellationToken cancellationToken)
         => await identityProvider.TerminateAllSessionsAsync(userId, ct);
 
-    public async Task SendPasswordResetAsync(string userId, CancellationToken ct)
+    public async Task SendPasswordResetAsync(string userId, CancellationToken cancellationToken)
         => await identityProvider.SendPasswordResetEmailAsync(userId, ct);
 }
 ```

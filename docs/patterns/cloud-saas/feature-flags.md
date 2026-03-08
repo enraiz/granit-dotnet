@@ -127,7 +127,7 @@ public static class CreatePatientHandler
         IFeatureLimitGuard limitGuard,
         IFeatureChecker features,
         PatientDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // Lève FeatureLimitExceededException si le quota est atteint
         long currentCount = await db.Patients.CountAsync(ct);

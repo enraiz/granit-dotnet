@@ -49,7 +49,7 @@ internal static class PatientEndpoints
         IPermissionChecker permissionChecker,
         ICurrentTenant currentTenant,
         AppDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // Vérifie la permission dans le contexte du tenant actif
         bool isGranted = await permissionChecker.IsGrantedAsync("Patients.Read");

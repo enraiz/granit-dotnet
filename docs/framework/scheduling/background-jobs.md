@@ -98,7 +98,7 @@ public static class GenerateDailyReportHandler
     public static async Task Handle(
         GenerateDailyReportCommand cmd,
         IReportService reportService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         await reportService.GenerateAsync(ct);
         // Le middleware injecte automatiquement ScheduleAsync() après le retour du handler.
@@ -128,11 +128,11 @@ Formats supportés : **5 champs** (sans secondes) et **6 champs** (avec secondes
 ```csharp
 public interface IBackgroundJobManager
 {
-    Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default);
-    Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken ct = default);
-    Task PauseAsync(string jobName, CancellationToken ct = default);
-    Task ResumeAsync(string jobName, CancellationToken ct = default);
-    Task TriggerNowAsync(string jobName, CancellationToken ct = default);
+    Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken cancellationToken = default);
+    Task PauseAsync(string jobName, CancellationToken cancellationToken = default);
+    Task ResumeAsync(string jobName, CancellationToken cancellationToken = default);
+    Task TriggerNowAsync(string jobName, CancellationToken cancellationToken = default);
 }
 ```
 
@@ -282,19 +282,19 @@ permettent de fournir une implémentation de persistance alternative (Redis, Mon
 ```csharp
 public interface IBackgroundJobStoreReader
 {
-    Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default);
-    Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken ct = default);
-    Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken ct = default);
+    Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken cancellationToken = default);
 }
 
 public interface IBackgroundJobStoreWriter
 {
-    Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken ct = default);
-    Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken ct = default);
-    Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default);
-    Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken ct = default);
-    Task SetEnabledAsync(string jobName, bool enabled, CancellationToken ct = default);
-    Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken ct = default);
+    Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken cancellationToken = default);
+    Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken cancellationToken = default);
+    Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken cancellationToken = default);
+    Task RecordExecutionFailureAsync(string jobName, string errorMessage, CancellationToken cancellationToken = default);
+    Task SetEnabledAsync(string jobName, bool enabled, CancellationToken cancellationToken = default);
+    Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken cancellationToken = default);
 }
 ```
 

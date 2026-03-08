@@ -68,7 +68,7 @@ public sealed class VaultTenantConnectionStringProvider(
     ITransitEncryptionService vault,
     IOptions<TenantDatabaseOptions> options) : ITenantConnectionStringProvider
 {
-    public async Task<string> GetConnectionStringAsync(Guid tenantId, CancellationToken ct = default)
+    public async Task<string> GetConnectionStringAsync(Guid tenantId, CancellationToken cancellationToken = default)
     {
         // Résoudre les credentials dynamiques Vault pour ce tenant.
         string credential = await vault.DecryptAsync(
