@@ -36,10 +36,10 @@ internal static class ImportReportEndpoints
 
     private static async Task<Results<Ok<ImportReportResponse>, NotFound>> GetReportAsync(
         Guid jobId,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null || string.IsNullOrEmpty(job.ReportJson))
         {
             return TypedResults.NotFound();
@@ -56,12 +56,12 @@ internal static class ImportReportEndpoints
 
     private static async Task<Results<FileStreamHttpResult, NoContent, NotFound>> GetCorrectionFileAsync(
         Guid jobId,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
         IImportFileProvider fileProvider,
         IServiceProvider serviceProvider,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null || string.IsNullOrEmpty(job.ReportJson))
         {
             return TypedResults.NotFound();

@@ -11,33 +11,33 @@ public sealed class BackgroundJobsSeedServiceTests
     public async Task StartAsync_CallsSeedJobsAsync()
     {
         // Arrange
-        IBackgroundJobStore store = Substitute.For<IBackgroundJobStore>();
+        IBackgroundJobStoreWriter storeWriter = Substitute.For<IBackgroundJobStoreWriter>();
         IReadOnlyList<RecurringJobRegistration> registrations = [
             new RecurringJobRegistration("job-a", "0 * * * *", "MyMessage, MyAssembly")
         ];
-        BackgroundJobsSeedService sut = new(store, registrations);
+        BackgroundJobsSeedService sut = new(storeWriter, registrations);
         CancellationToken ct = TestContext.Current.CancellationToken;
 
         // Act
         await sut.StartAsync(ct);
 
         // Assert
-        await store.Received(1).SeedJobsAsync(registrations, ct);
+        await storeWriter.Received(1).SeedJobsAsync(registrations, ct);
     }
 
     [Fact]
     public async Task StopAsync_CompletesWithoutSideEffects()
     {
         // Arrange
-        IBackgroundJobStore store = Substitute.For<IBackgroundJobStore>();
-        BackgroundJobsSeedService sut = new(store, []);
+        IBackgroundJobStoreWriter storeWriter = Substitute.For<IBackgroundJobStoreWriter>();
+        BackgroundJobsSeedService sut = new(storeWriter, []);
 
         // Act
         Func<Task> act = () => sut.StopAsync(TestContext.Current.CancellationToken);
 
         // Assert
         await Should.NotThrowAsync(act);
-        await store.DidNotReceive().SeedJobsAsync(Arg.Any<IEnumerable<RecurringJobRegistration>>(),
+        await storeWriter.DidNotReceive().SeedJobsAsync(Arg.Any<IEnumerable<RecurringJobRegistration>>(),
             Arg.Any<CancellationToken>());
     }
 }

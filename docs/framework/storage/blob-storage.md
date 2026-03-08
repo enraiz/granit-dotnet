@@ -6,7 +6,7 @@ sont échangés entre le client, le serveur et OVHcloud Object Storage.
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.BlobStorage` | Core provider-agnostique : `IBlobStorage`, `BlobDescriptor`, pipeline de validation, `IBlobDescriptorStore` |
+| `Granit.BlobStorage` | Core provider-agnostique : `IBlobStorage`, `BlobDescriptor`, pipeline de validation, `IBlobDescriptorStoreReader` / `IBlobDescriptorStoreWriter` |
 | `Granit.BlobStorage.S3` | Adaptateur S3 : client AWS SDK, URL pré-signées, `S3BlobOptions` |
 | `Granit.BlobStorage.EntityFrameworkCore` | Persistance EF Core : `BlobStorageDbContext`, table `storage_blob_descriptors` |
 
@@ -14,26 +14,27 @@ sont échangés entre le client, le serveur et OVHcloud Object Storage.
 
 ### Architecture Direct-to-Cloud
 
-```text
-Client                Serveur (Granit)           OVHcloud S3
-  │                        │                          │
-  │─ POST /upload ─────────▶│                          │
-  │                        │─ InitiateUploadAsync()   │
-  │                        │  crée BlobDescriptor     │
-  │                        │  génère URL pré-signée ──▶│
-  │◀─ PresignedUploadTicket ─│                          │
-  │                          │                          │
-  │─ PUT (octets) ────────────────────────────────────▶│
-  │◀─ 200 OK ─────────────────────────────────────────│
-  │                          │                          │
-  │─ POST /validate ─────────▶│                          │
-  │                          │─ ValidateAsync()         │
-  │                          │  magic bytes (range GET)─▶│
-  │                          │◀─ premiers 261 octets ───│
-  │                          │  taille (HEAD) ──────────▶│
-  │                          │◀─ Content-Length ────────│
-  │                          │  BlobDescriptor → Valid  │
-  │◀─ 200 OK ────────────────│                          │
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Serveur (Granit)
+    participant O as OVHcloud S3
+
+    C->>S: POST /upload
+    S->>S: InitiateUploadAsync()<br/>crée BlobDescriptor
+    S->>O: génère URL pré-signée
+    S-->>C: PresignedUploadTicket
+
+    C->>O: PUT (octets)
+    O-->>C: 200 OK
+
+    C->>S: POST /validate
+    S->>O: ValidateAsync()<br/>magic bytes (range GET)
+    O-->>S: premiers 261 octets
+    S->>O: taille (HEAD)
+    O-->>S: Content-Length
+    S->>S: BlobDescriptor → Valid
+    S-->>C: 200 OK
 ```
 
 Le serveur ne lit jamais le fichier complet : 261 octets max pour la détection de type,
@@ -41,9 +42,13 @@ Le serveur ne lit jamais le fichier complet : 261 octets max pour la détection 
 
 ### Cycle de vie du BlobDescriptor
 
-```text
-Pending → Uploading → Valid → Deleted
-                    ↘ Rejected
+```mermaid
+stateDiagram-v2
+    [*] --> Pending
+    Pending --> Uploading
+    Uploading --> Valid
+    Uploading --> Rejected
+    Valid --> Deleted
 ```
 
 | État | Déclencheur |
@@ -61,7 +66,7 @@ Pending → Uploading → Valid → Deleted
 
 La clé S3 suit le format `{tenantId}/{containerName}/{yyyy}/{MM}/{blobId}`.
 Le préfixe `tenantId/` garantit le cloisonnement sans bucket dédié par tenant.
-`IBlobDescriptorStore.FindAsync` filtre systématiquement par `TenantId` du tenant actif.
+`IBlobDescriptorStoreReader.FindAsync` filtre systématiquement par `TenantId` du tenant actif.
 
 ## Installation
 
@@ -269,7 +274,7 @@ public sealed class BlobDescriptor
 IBlobStorage (DefaultBlobStorage)
   ├── IBlobKeyStrategy (PrefixBlobKeyStrategy)
   │     └── {tenantId}/{containerName}/{yyyy}/{MM}/{blobId}
-  ├── IBlobDescriptorStore (EfBlobDescriptorStore)
+  ├── IBlobDescriptorStoreReader / IBlobDescriptorStoreWriter (EfBlobDescriptorStore)
   │     └── BlobStorageDbContext → table storage_blob_descriptors
   ├── IBlobStorageClient (S3BlobClient)
   │     └── AmazonS3Client — URL pré-signées, Range GET, HEAD, DELETE (thread-safe, Singleton)
@@ -286,7 +291,7 @@ IBlobStorage (DefaultBlobStorage)
 | #173 | ✅ Terminé | `IBlobStorage.CreateDownloadUrlAsync` — URL de téléchargement sécurisée |
 | #174 | ✅ Terminé | `IBlobKeyStrategy` — isolation multi-tenant par préfixe `{tenantId}/` |
 | #175 | ✅ Terminé | Pipeline `IBlobValidator` — magic bytes, taille, extensible |
-| #176 | ✅ Terminé | `IBlobDescriptorStore` — persistance EF Core, isolation tenant, piste HDS |
+| #176 | ✅ Terminé | `IBlobDescriptorStoreReader` / `IBlobDescriptorStoreWriter` — persistance EF Core, isolation tenant, piste HDS |
 | #177 | ✅ Terminé | `IBlobStorage.DeleteAsync` — Crypto-Shredding RGPD, conservation audit |
 | #178 | ✅ Terminé | `S3BlobOptions` — configuration OVHcloud / MinIO, validation au démarrage |
 
@@ -298,7 +303,7 @@ IBlobStorage (DefaultBlobStorage)
   Réduit la surface d'attaque et les coûts de bande passante.
 - **Crypto-Shredding** : `DeleteAsync` efface l'objet S3 (données irrécupérables),
   puis conserve le `BlobDescriptor` 3 ans pour la piste d'audit HDS.
-- **Isolation tenant** : `EfBlobDescriptorStore.FindAsync` filtre par `TenantId` du tenant actif —
+- **Isolation tenant** : `EfBlobDescriptorStore.FindAsync` (via `IBlobDescriptorStoreReader`) filtre par `TenantId` du tenant actif —
   un tenant ne peut pas accéder aux blobs d'un autre, même avec un `BlobId` valide.
 - **Credentials** : `AccessKey` et `SecretKey` ne doivent jamais apparaître en clair.
   Injecter depuis `Granit.Vault` (credentials dynamiques) en production.
@@ -309,7 +314,7 @@ IBlobStorage (DefaultBlobStorage)
 ## Dépendances Granit
 
 | Package | Dépend de | Utilisé par |
-|---------|-----------|-------------|
+| ------- | --------- | ----------- |
 | `Granit.BlobStorage` | `Granit.Core`, `Granit.Guids`, `Granit.Timing` | `BlobStorage.EntityFrameworkCore`, `BlobStorage.S3` |
 | `Granit.BlobStorage.S3` | `Granit.BlobStorage`, `Granit.Timing` | Module feuille |
 | `Granit.BlobStorage.EntityFrameworkCore` | `Granit.BlobStorage` | Module feuille |

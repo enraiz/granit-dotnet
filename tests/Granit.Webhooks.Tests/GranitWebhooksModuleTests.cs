@@ -58,24 +58,35 @@ public sealed class GranitWebhooksModuleTests
     }
 
     [Fact]
-    public void AddGranitWebhooks_RegistersIWebhookSubscriptionStore_Singleton()
+    public void AddGranitWebhooks_RegistersIWebhookSubscriptionReader_Singleton()
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWebhooks();
 
         builder.Services.ShouldContain(d =>
-            d.ServiceType == typeof(IWebhookSubscriptionStore) &&
+            d.ServiceType == typeof(IWebhookSubscriptionReader) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
 
     [Fact]
-    public void AddGranitWebhooks_RegistersIWebhookDeliveryStore_Scoped()
+    public void AddGranitWebhooks_RegistersIWebhookSubscriptionWriter_Singleton()
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.AddGranitWebhooks();
 
         builder.Services.ShouldContain(d =>
-            d.ServiceType == typeof(IWebhookDeliveryStore) &&
+            d.ServiceType == typeof(IWebhookSubscriptionWriter) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void AddGranitWebhooks_RegistersIWebhookDeliveryWriter_Scoped()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        builder.AddGranitWebhooks();
+
+        builder.Services.ShouldContain(d =>
+            d.ServiceType == typeof(IWebhookDeliveryWriter) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
 

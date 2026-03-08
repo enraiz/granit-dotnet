@@ -11,21 +11,22 @@ using Wolverine.Persistence.Durability.DeadLetterManagement;
 namespace Granit.BackgroundJobs.Internal;
 
 /// <summary>
-/// Default implementation of <see cref="IBackgroundJobManager"/>.
+/// Default implementation of <see cref="IBackgroundJobReader"/> and <see cref="IBackgroundJobWriter"/>.
 /// Registered as <b>Scoped</b> in the DI container.
 /// </summary>
 internal sealed partial class BackgroundJobManager(
-    IBackgroundJobStore store,
+    IBackgroundJobStoreReader storeReader,
+    IBackgroundJobStoreWriter storeWriter,
     IMessageBus bus,
     IClock clock,
     ICurrentUserService currentUserService,
     ILogger<BackgroundJobManager> logger,
-    IMessageStore? messageStore = null) : IBackgroundJobManager
+    IMessageStore? messageStore = null) : IBackgroundJobReader, IBackgroundJobWriter
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default)
     {
-        IReadOnlyList<BackgroundJobDefinition> jobs = await store.GetAllJobsAsync(ct).ConfigureAwait(false);
+        IReadOnlyList<BackgroundJobDefinition> jobs = await storeReader.GetAllJobsAsync(ct).ConfigureAwait(false);
         Dictionary<string, long> dlqCounts = await GetDlqCountsAsync(ct).ConfigureAwait(false);
         return jobs.Select(j => ToStatus(j, dlqCounts)).ToList();
     }
@@ -33,7 +34,7 @@ internal sealed partial class BackgroundJobManager(
     /// <inheritdoc/>
     public async Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken ct = default)
     {
-        BackgroundJobDefinition? job = await store.FindAsync(jobName, ct).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await storeReader.FindAsync(jobName, ct).ConfigureAwait(false);
         if (job is null)
         {
             return null;
@@ -47,7 +48,7 @@ internal sealed partial class BackgroundJobManager(
     public async Task PauseAsync(string jobName, CancellationToken ct = default)
     {
         BackgroundJobDefinition job = await RequireJobAsync(jobName, ct).ConfigureAwait(false);
-        await store.SetEnabledAsync(job.JobName, false, ct).ConfigureAwait(false);
+        await storeWriter.SetEnabledAsync(job.JobName, false, ct).ConfigureAwait(false);
         LogJobPaused(logger, jobName);
     }
 
@@ -55,14 +56,14 @@ internal sealed partial class BackgroundJobManager(
     public async Task ResumeAsync(string jobName, CancellationToken ct = default)
     {
         BackgroundJobDefinition job = await RequireJobAsync(jobName, ct).ConfigureAwait(false);
-        await store.SetEnabledAsync(job.JobName, true, ct).ConfigureAwait(false);
+        await storeWriter.SetEnabledAsync(job.JobName, true, ct).ConfigureAwait(false);
 
         DateTimeOffset? next = ComputeNext(job.CronExpression);
         if (next is not null)
         {
             object message = CreateMessage(job.MessageType, jobName);
             await bus.ScheduleAsync(message, next.Value).ConfigureAwait(false);
-            await store.RecordNextExecutionAsync(job.JobName, next.Value, ct).ConfigureAwait(false);
+            await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, ct).ConfigureAwait(false);
             LogJobResumed(logger, jobName, next.Value);
         }
         else
@@ -92,7 +93,7 @@ internal sealed partial class BackgroundJobManager(
         string jobName,
         CancellationToken ct)
     {
-        BackgroundJobDefinition? job = await store.FindAsync(jobName, ct).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await storeReader.FindAsync(jobName, ct).ConfigureAwait(false);
         if (job is null)
         {
             throw new EntityNotFoundException(typeof(BackgroundJobDefinition), jobName);

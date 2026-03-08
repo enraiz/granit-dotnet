@@ -7,6 +7,7 @@
 // =============================================================================
 
 using Granit.Core.DataFiltering;
+using Granit.Core.Events;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.Extensions;
 using Granit.Persistence.Interceptors;
@@ -93,6 +94,58 @@ public sealed class PersistenceServiceCollectionExtensionsTests
 
         ServiceDescriptor softDeleteDescriptor = services.First(d => d.ServiceType == typeof(SoftDeleteInterceptor));
         softDeleteDescriptor.Lifetime.ShouldBe(ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitPersistence_RegistersDomainEventDispatcherInterceptor()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        AddRequiredDependencies(services);
+
+        // Act
+        services.AddGranitPersistence();
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+        using IServiceScope scope = sp.CreateScope();
+
+        // Assert
+        DomainEventDispatcherInterceptor? interceptor = scope.ServiceProvider.GetService<DomainEventDispatcherInterceptor>();
+        interceptor.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitPersistence_RegistersNullDomainEventDispatcher_ByDefault()
+    {
+        // Arrange
+        ServiceCollection services = new();
+
+        // Act
+        services.AddGranitPersistence();
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Assert
+        IDomainEventDispatcher? dispatcher = sp.GetService<IDomainEventDispatcher>();
+        dispatcher.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitPersistence_DoesNotOverrideExistingDispatcher()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        IDomainEventDispatcher custom = NSubstitute.Substitute.For<IDomainEventDispatcher>();
+        services.AddSingleton(custom);
+
+        // Act
+        services.AddGranitPersistence();
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Assert — the custom dispatcher should be preserved (TryAdd)
+        IDomainEventDispatcher? resolved = sp.GetService<IDomainEventDispatcher>();
+        resolved.ShouldBeSameAs(custom);
     }
 
     [Fact]

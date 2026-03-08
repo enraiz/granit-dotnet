@@ -24,12 +24,12 @@ internal static class TimelineStreamEndpoints
     private static async Task<Ok<PagedResult<TimelineStreamEntry>>> GetStreamAsync(
         string entityType,
         string entityId,
-        ITimelineQuery query,
+        ITimelineReader reader,
         int page = 1,
         int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken ct = default)
     {
-        PagedResult<TimelineStreamEntry> result = await query.GetStreamAsync(entityType, entityId, page, pageSize, ct).ConfigureAwait(false);
+        PagedResult<TimelineStreamEntry> result = await reader.GetStreamAsync(entityType, entityId, page, pageSize, ct).ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
 }

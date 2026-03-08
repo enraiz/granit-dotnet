@@ -23,8 +23,8 @@ public static class WebhooksHostApplicationBuilderExtensions
     /// Registers:
     /// <list type="bullet">
     ///   <item><see cref="IWebhookPublisher"/> — application façade (scoped).</item>
-    ///   <item><see cref="IWebhookSubscriptionStore"/> — InMemory by default (replaceable via <c>AddGranitWebhooksEntityFrameworkCore()</c>).</item>
-    ///   <item><see cref="IWebhookDeliveryStore"/> — no-op by default (replaceable via <c>AddGranitWebhooksEntityFrameworkCore()</c>).</item>
+    ///   <item><see cref="IWebhookSubscriptionReader"/> and <see cref="IWebhookSubscriptionWriter"/> — InMemory by default (replaceable via <c>AddGranitWebhooksEntityFrameworkCore()</c>).</item>
+    ///   <item><see cref="IWebhookDeliveryWriter"/> — no-op by default (replaceable via <c>AddGranitWebhooksEntityFrameworkCore()</c>).</item>
     ///   <item><see cref="IWebhookSecretProtector"/> — pass-through by default (replaceable for production Vault integration).</item>
     ///   <item>Named <see cref="System.Net.Http.HttpClient"/> for webhook delivery with configurable timeout.</item>
     ///   <item>Wolverine local queue <c>webhook-delivery</c> with configurable parallelism.</item>
@@ -61,8 +61,10 @@ public static class WebhooksHostApplicationBuilderExtensions
         });
 
         // Default (replaceable) store registrations.
-        builder.Services.AddSingleton<IWebhookSubscriptionStore, InMemoryWebhookSubscriptionStore>();
-        builder.Services.AddScoped<IWebhookDeliveryStore, NullWebhookDeliveryStore>();
+        builder.Services.AddSingleton<InMemoryWebhookSubscriptionStore>();
+        builder.Services.AddSingleton<IWebhookSubscriptionReader>(sp => sp.GetRequiredService<InMemoryWebhookSubscriptionStore>());
+        builder.Services.AddSingleton<IWebhookSubscriptionWriter>(sp => sp.GetRequiredService<InMemoryWebhookSubscriptionStore>());
+        builder.Services.AddScoped<IWebhookDeliveryWriter, NullWebhookDeliveryWriter>();
         builder.Services.AddSingleton<IWebhookSecretProtector, NoOpWebhookSecretProtector>();
 
         // Application façade.

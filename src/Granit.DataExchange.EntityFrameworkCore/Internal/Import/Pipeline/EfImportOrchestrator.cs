@@ -20,7 +20,8 @@ namespace Granit.DataExchange.EntityFrameworkCore.Internal.Import.Pipeline;
 /// Coordinates the full pipeline: Load Job → Parse → Map → Validate → Resolve Identity → Execute.
 /// </summary>
 internal sealed class EfImportOrchestrator(
-    IImportJobStore jobStore,
+    IImportJobReader jobReader,
+    IImportJobWriter jobWriter,
     IImportFileProvider fileProvider,
     IServiceProvider serviceProvider,
     IClock clock,
@@ -30,7 +31,7 @@ internal sealed class EfImportOrchestrator(
     /// <inheritdoc/>
     public async Task<ImportReport> ExecuteAsync(Guid importJobId, CancellationToken ct = default)
     {
-        ImportJob? job = await jobStore.GetAsync(importJobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(importJobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             throw new InvalidOperationException($"Import job '{importJobId}' not found.");
@@ -38,7 +39,7 @@ internal sealed class EfImportOrchestrator(
 
         job.Status = ImportJobStatus.Executing;
         job.ModifiedAt = clock.Now;
-        await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
         var stopwatch = Stopwatch.StartNew();
 
@@ -51,7 +52,7 @@ internal sealed class EfImportOrchestrator(
             job.CompletedAt = clock.Now;
             job.ReportJson = JsonSerializer.Serialize(report);
             job.ModifiedAt = clock.Now;
-            await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ImportJobCompletedEvent(
                 importJobId, job.DefinitionName, report.FinalStatus, job.CreatedBy,
@@ -83,7 +84,7 @@ internal sealed class EfImportOrchestrator(
             job.CompletedAt = clock.Now;
             job.ReportJson = JsonSerializer.Serialize(errorReport);
             job.ModifiedAt = clock.Now;
-            await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ImportJobCompletedEvent(
                 importJobId, job.DefinitionName, ImportJobStatus.Failed, job.CreatedBy,
@@ -97,7 +98,7 @@ internal sealed class EfImportOrchestrator(
     /// <inheritdoc/>
     public async Task<ImportReport> DryRunAsync(Guid importJobId, CancellationToken ct = default)
     {
-        ImportJob? job = await jobStore.GetAsync(importJobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(importJobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             throw new InvalidOperationException($"Import job '{importJobId}' not found.");

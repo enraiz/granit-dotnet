@@ -11,8 +11,8 @@ namespace Granit.ReferenceData.EntityFrameworkCore.Extensions;
 public static class ReferenceDataEfCoreServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers <see cref="IReferenceDataStore{TEntity}"/> backed by an EF Core store
-    /// using <typeparamref name="TDbContext"/> and a <see cref="IDataSeedContributor"/>
+    /// Registers <see cref="IReferenceDataStoreReader{TEntity}"/> and <see cref="IReferenceDataStoreWriter{TEntity}"/>
+    /// backed by an EF Core store using <typeparamref name="TDbContext"/> and a <see cref="IDataSeedContributor"/>
     /// bridge for <typeparamref name="TEntity"/> seeders.
     /// </summary>
     /// <typeparam name="TEntity">The concrete reference data entity type.</typeparam>
@@ -24,11 +24,15 @@ public static class ReferenceDataEfCoreServiceCollectionExtensions
         where TEntity : ReferenceDataEntity
         where TDbContext : DbContext
     {
-        services.AddScoped<IReferenceDataStore<TEntity>>(sp =>
+        services.AddScoped<EfCoreReferenceDataStore<TEntity, TDbContext>>(sp =>
             new EfCoreReferenceDataStore<TEntity, TDbContext>(
                 sp.GetRequiredService<IServiceScopeFactory>(),
                 sp.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>(),
                 sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ReferenceDataOptions>>()));
+        services.AddScoped<IReferenceDataStoreReader<TEntity>>(sp =>
+            sp.GetRequiredService<EfCoreReferenceDataStore<TEntity, TDbContext>>());
+        services.AddScoped<IReferenceDataStoreWriter<TEntity>>(sp =>
+            sp.GetRequiredService<EfCoreReferenceDataStore<TEntity, TDbContext>>());
 
         services.AddTransient<IDataSeedContributor, ReferenceDataSeedContributor<TEntity>>();
 

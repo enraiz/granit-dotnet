@@ -18,7 +18,8 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
     /// <remarks>
     /// Registers the following services:
     /// <list type="bullet">
-    ///   <item><see cref="IDocumentTemplateStore"/> → <c>EfDocumentTemplateStore</c> (scoped)</item>
+    ///   <item><see cref="IDocumentTemplateStoreReader"/> → <c>EfDocumentTemplateStore</c> (scoped)</item>
+    ///   <item><see cref="IDocumentTemplateStoreWriter"/> → <c>EfDocumentTemplateStore</c> (scoped, shared instance)</item>
     ///   <item><see cref="ITemplateResolver"/> → <c>StoreTemplateResolver</c> (scoped, Priority=100)</item>
     /// </list>
     /// <para>
@@ -38,7 +39,9 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
     {
         builder.Services.AddHybridCache();
         builder.Services.AddDbContextFactory<TemplatingDbContext>(configure);
-        builder.Services.AddScoped<IDocumentTemplateStore, EfDocumentTemplateStore>();
+        builder.Services.AddScoped<EfDocumentTemplateStore>();
+        builder.Services.AddScoped<IDocumentTemplateStoreReader>(sp => sp.GetRequiredService<EfDocumentTemplateStore>());
+        builder.Services.AddScoped<IDocumentTemplateStoreWriter>(sp => sp.GetRequiredService<EfDocumentTemplateStore>());
         builder.Services.AddScoped<ITemplateResolver, StoreTemplateResolver>();
 
         return builder;

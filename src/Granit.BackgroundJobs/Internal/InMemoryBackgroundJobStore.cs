@@ -3,11 +3,12 @@ using System.Collections.Concurrent;
 namespace Granit.BackgroundJobs.Internal;
 
 /// <summary>
-/// Thread-safe, in-memory implementation of <see cref="IBackgroundJobStore"/>.
+/// Thread-safe, in-memory implementation of <see cref="IBackgroundJobStoreReader"/> and
+/// <see cref="IBackgroundJobStoreWriter"/>.
 /// Registered as a <b>Singleton</b> when <see cref="BackgroundJobsOptions.Mode"/> is
 /// <see cref="JobStoreMode.InMemory"/>. State is lost on application restart.
 /// </summary>
-internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStore
+internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IBackgroundJobStoreWriter
 {
     private readonly ConcurrentDictionary<string, BackgroundJobDefinition> _jobs = new();
 
@@ -93,7 +94,14 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStore
     {
         if (_jobs.TryGetValue(jobName, out BackgroundJobDefinition? job))
         {
-            job.IsEnabled = enabled;
+            if (enabled)
+            {
+                job.Resume();
+            }
+            else
+            {
+                job.Pause();
+            }
         }
 
         return Task.CompletedTask;

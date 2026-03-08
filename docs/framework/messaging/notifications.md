@@ -21,22 +21,20 @@ Dix packages composables :
 
 ## Architecture
 
-```text
-[Code applicatif]
-      |
-INotificationPublisher.PublishAsync(...)
-      |
-NotificationTrigger             <-- message publié dans l'Outbox Wolverine
-      |
-NotificationFanoutHandler       <-- résout destinataires + préférences + canaux
-      |                              produit N commandes (1 par destinataire x canal)
-      | (cascade Wolverine — même transaction Outbox)
-      |
-DeliverNotificationCommand x N  <-- enqueue dans la queue "notification-delivery"
-      |
-NotificationDeliveryHandler     <-- route vers le INotificationChannel correspondant
-      |
-INotificationChannel.SendAsync  <-- InApp | SignalR | Email | SMS | WhatsApp | Push
+```mermaid
+flowchart TD
+    A["Code applicatif"] --> B["INotificationPublisher.PublishAsync(...)"]
+    B --> C["NotificationTrigger
+    message publié dans l'Outbox Wolverine"]
+    C --> D["NotificationFanoutHandler
+    résout destinataires + préférences + canaux
+    produit N commandes (1 par destinataire × canal)"]
+    D -- "cascade Wolverine — même transaction Outbox" --> E["DeliverNotificationCommand × N
+    enqueue dans la queue notification-delivery"]
+    E --> F["NotificationDeliveryHandler
+    route vers le INotificationChannel correspondant"]
+    F --> G["INotificationChannel.SendAsync
+    InApp | SignalR | Email | SMS | WhatsApp | Push"]
 ```
 
 Le fan-out et la livraison sont **entièrement découplés** : Wolverine publie les `N`

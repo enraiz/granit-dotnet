@@ -30,7 +30,8 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
     private const string AdminRole = "granit-data-exchange-admin";
     private const string Prefix = "/data-exchange";
 
-    private readonly IImportJobStore _jobStore = Substitute.For<IImportJobStore>();
+    private readonly IImportJobReader _jobReader = Substitute.For<IImportJobReader>();
+    private readonly IImportJobWriter _jobWriter = Substitute.For<IImportJobWriter>();
     private readonly IImportCommandDispatcher _dispatcher = Substitute.For<IImportCommandDispatcher>();
     private readonly IImportOrchestrator _orchestrator = Substitute.For<IImportOrchestrator>();
     private readonly IImportFileProvider _fileProvider = Substitute.For<IImportFileProvider>();
@@ -49,7 +50,8 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
 
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_jobStore);
+        builder.Services.AddSingleton(_jobReader);
+        builder.Services.AddSingleton(_jobWriter);
         builder.Services.AddSingleton(_dispatcher);
         builder.Services.AddSingleton(_orchestrator);
         builder.Services.AddSingleton(_fileProvider);
@@ -62,7 +64,9 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
 
         // Required by export endpoints
         builder.Services.AddSingleton(Substitute.For<IExportOrchestrator>());
-        builder.Services.AddSingleton(Substitute.For<IExportPresetStore>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetReader>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetWriter>());
+        builder.Services.AddSingleton(Substitute.For<IExportJobReader>());
 
         _app = builder.Build();
         _app.MapDataExchangeEndpoints();
@@ -82,7 +86,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Mapped);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
         _dispatcher.DispatchAsync(Arg.Any<ExecuteImportCommand>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
@@ -103,7 +107,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Created);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsync(
@@ -118,7 +122,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
     {
         // Arrange
         var jobId = Guid.NewGuid();
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsync(
@@ -136,7 +140,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Mapped);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         ImportReport report = BuildReport();
         _orchestrator.DryRunAsync(jobId, Arg.Any<CancellationToken>()).Returns(report);
@@ -159,7 +163,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Created);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsync(
@@ -177,7 +181,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Completed);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -195,7 +199,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
     {
         // Arrange
         var jobId = Guid.NewGuid();
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -213,7 +217,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Mapped);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
         _fileProvider.DeleteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
@@ -223,7 +227,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _jobStore.Received(1).UpdateAsync(Arg.Is<ImportJob>(j => j.Status == ImportJobStatus.Cancelled), Arg.Any<CancellationToken>());
+        await _jobWriter.Received(1).UpdateAsync(Arg.Is<ImportJob>(j => j.Status == ImportJobStatus.Cancelled), Arg.Any<CancellationToken>());
         await _fileProvider.Received(1).DeleteAsync("blob-ref-1", Arg.Any<CancellationToken>());
     }
 
@@ -233,7 +237,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Executing);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.DeleteAsync(
@@ -248,7 +252,7 @@ public sealed class ImportExecutionEndpointsTests : IAsyncDisposable
     {
         // Arrange
         var jobId = Guid.NewGuid();
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
         HttpResponseMessage response = await _adminClient.DeleteAsync(

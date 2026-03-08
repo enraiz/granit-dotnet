@@ -24,6 +24,12 @@ Utilisez la table des matières à gauche pour naviguer par namespace.
 Les namespaces suivent la convention `Granit.<Package>` (exemple : `Granit.Caching`,
 `Granit.Security`, `Granit.Persistence`).
 
+## API externes
+
+Voir [API externes](external-apis.md) pour la documentation complète des services
+tiers appelés par Granit (Brevo, Keycloak, SMTP, Web Push, Vault, S3, Webhooks, OTLP) :
+authentification, endpoints, configuration, politiques de résilience.
+
 ## Compléments
 
 La référence API est un complément aux guides thématiques :

@@ -45,8 +45,8 @@ public sealed class TimelineFollowerEndpointsTests : IAsyncDisposable
         builder.Services.AddSingleton(_currentUser);
 
         // Required by other endpoints but not exercised here
-        builder.Services.AddSingleton(Substitute.For<ITimelineQuery>());
-        builder.Services.AddSingleton(Substitute.For<ITimelineStore>());
+        builder.Services.AddSingleton(Substitute.For<ITimelineReader>());
+        builder.Services.AddSingleton(Substitute.For<ITimelineWriter>());
         builder.Services.AddSingleton(Substitute.For<ITimelineNotifier>());
 
         _app = builder.Build();

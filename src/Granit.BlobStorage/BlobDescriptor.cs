@@ -1,3 +1,6 @@
+using Granit.BlobStorage.Events;
+using Granit.Core.Events;
+
 namespace Granit.BlobStorage;
 
 /// <summary>
@@ -5,7 +8,7 @@ namespace Granit.BlobStorage;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Persisted by <see cref="IBlobDescriptorStore"/>. The binary content lives on S3;
+/// Persisted by <see cref="IBlobDescriptorWriter"/>. The binary content lives on S3;
 /// this entity is the authoritative source of truth for status and audit metadata.
 /// </para>
 /// <para>
@@ -18,8 +21,10 @@ namespace Granit.BlobStorage;
 /// <see cref="BlobStatus.Deleted"/> means the S3 bytes are gone; the audit row remains for 3 years.
 /// </para>
 /// </remarks>
-public sealed class BlobDescriptor
+public sealed class BlobDescriptor : IDomainEventSource
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
+
     // Parameterless constructor required by EF Core materializer.
     private BlobDescriptor() { }
 
@@ -90,6 +95,12 @@ public sealed class BlobDescriptor
     /// <summary>Human-readable reason for deletion (e.g. "RGPD Art. 17 request"); null unless <see cref="BlobStatus.Deleted"/>.</summary>
     public string? DeletionReason { get; private set; }
 
+    /// <inheritdoc />
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    /// <inheritdoc />
+    public void ClearDomainEvents() => _domainEvents.Clear();
+
     /// <summary>
     /// Transitions from <see cref="BlobStatus.Pending"/> to <see cref="BlobStatus.Uploading"/>.
     /// Called when the S3 upload notification is received.
@@ -126,6 +137,8 @@ public sealed class BlobDescriptor
         VerifiedContentType = verifiedContentType;
         SizeBytes = sizeBytes;
         ValidatedAt = validatedAt;
+
+        _domainEvents.Add(new BlobValidated(Id, ContainerName, verifiedContentType, sizeBytes));
     }
 
     /// <summary>
@@ -144,6 +157,8 @@ public sealed class BlobDescriptor
 
         Status = BlobStatus.Rejected;
         RejectionReason = reason;
+
+        _domainEvents.Add(new BlobRejected(Id, ContainerName, reason));
     }
 
     /// <summary>
@@ -165,5 +180,7 @@ public sealed class BlobDescriptor
         Status = BlobStatus.Deleted;
         DeletedAt = deletedAt;
         DeletionReason = reason;
+
+        _domainEvents.Add(new BlobDeleted(Id, ContainerName, reason));
     }
 }

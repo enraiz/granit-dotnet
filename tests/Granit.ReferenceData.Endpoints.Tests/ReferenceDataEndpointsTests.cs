@@ -24,15 +24,17 @@ internal sealed class TestRefEntity : ReferenceDataEntity;
 
 /// <summary>
 /// Integration tests for reference data endpoints.
-/// Uses a TestServer + NSubstitute mock for IReferenceDataStore.
+/// Uses a TestServer + NSubstitute mocks for IReferenceDataStoreReader and IReferenceDataStoreWriter.
 /// </summary>
 public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
 {
     private const string AdminRole = "granit-reference-data-admin";
     private const string Prefix = "/reference-data/test-ref-entity";
 
-    private readonly IReferenceDataStore<TestRefEntity> _store =
-        Substitute.For<IReferenceDataStore<TestRefEntity>>();
+    private readonly IReferenceDataStoreReader<TestRefEntity> _storeReader =
+        Substitute.For<IReferenceDataStoreReader<TestRefEntity>>();
+    private readonly IReferenceDataStoreWriter<TestRefEntity> _storeWriter =
+        Substitute.For<IReferenceDataStoreWriter<TestRefEntity>>();
     private readonly WebApplication _app;
     private readonly HttpClient _adminClient;
     private readonly HttpClient _anonClient;
@@ -48,7 +50,8 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
 
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_store);
+        builder.Services.AddSingleton(_storeReader);
+        builder.Services.AddSingleton(_storeWriter);
 
         _app = builder.Build();
         _app.MapReferenceDataEndpoints<TestRefEntity>();
@@ -68,7 +71,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
         // Arrange
         PagedResult<TestRefEntity> result = new(
             [new TestRefEntity { Code = "BE", LabelEn = "Belgium" }], 1);
-        _store.GetAllAsync(Arg.Any<ReferenceDataQuery?>(), Arg.Any<CancellationToken>())
+        _storeReader.GetAllAsync(Arg.Any<ReferenceDataQuery?>(), Arg.Any<CancellationToken>())
             .Returns(result);
 
         // Act
@@ -92,7 +95,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     {
         // Arrange
         TestRefEntity entity = new() { Code = "BE", LabelEn = "Belgium" };
-        _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(entity);
+        _storeReader.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(entity);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -109,7 +112,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     public async Task GetByCode_WhenNotFound_Returns404()
     {
         // Arrange
-        _store.GetByCodeAsync("ZZ", Arg.Any<CancellationToken>())
+        _storeReader.GetByCodeAsync("ZZ", Arg.Any<CancellationToken>())
             .Returns((TestRefEntity?)null);
 
         // Act
@@ -134,7 +137,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        await _store.Received(1).CreateAsync(
+        await _storeWriter.Received(1).CreateAsync(
             Arg.Is<TestRefEntity>(e => e.Code == "DE" && e.LabelEn == "Germany"),
             Arg.Any<CancellationToken>());
     }
@@ -158,7 +161,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        await _store.Received(1).CreateAsync(
+        await _storeWriter.Received(1).CreateAsync(
             Arg.Is<TestRefEntity>(e =>
                 e.Code == "BE" &&
                 e.LabelEn == "Belgium" &&
@@ -192,7 +195,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     {
         // Arrange
         TestRefEntity existing = new() { Code = "BE", LabelEn = "Belgium" };
-        _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
+        _storeReader.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
         ReferenceDataUpdateRequest request = new("Kingdom of Belgium");
 
         // Act
@@ -201,7 +204,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _store.Received(1).UpdateAsync(
+        await _storeWriter.Received(1).UpdateAsync(
             Arg.Is<TestRefEntity>(e => e.LabelEn == "Kingdom of Belgium"),
             Arg.Any<CancellationToken>());
     }
@@ -211,7 +214,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     {
         // Arrange
         TestRefEntity existing = new() { Code = "BE", LabelEn = "Belgium" };
-        _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
+        _storeReader.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
         ReferenceDataUpdateRequest request = new(
             "Kingdom of Belgium",
             LabelFr: "Royaume de Belgique",
@@ -224,7 +227,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _store.Received(1).UpdateAsync(
+        await _storeWriter.Received(1).UpdateAsync(
             Arg.Is<TestRefEntity>(e =>
                 e.LabelEn == "Kingdom of Belgium" &&
                 e.LabelFr == "Royaume de Belgique" &&
@@ -237,7 +240,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     public async Task Update_WhenNotFound_Returns404()
     {
         // Arrange
-        _store.GetByCodeAsync("ZZ", Arg.Any<CancellationToken>())
+        _storeReader.GetByCodeAsync("ZZ", Arg.Any<CancellationToken>())
             .Returns((TestRefEntity?)null);
         ReferenceDataUpdateRequest request = new("Unknown");
 
@@ -256,7 +259,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     {
         // Arrange
         TestRefEntity existing = new() { Code = "BE", LabelEn = "Belgium" };
-        _store.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
+        _storeReader.GetByCodeAsync("BE", Arg.Any<CancellationToken>()).Returns(existing);
 
         // Act
         HttpResponseMessage response = await _adminClient.DeleteAsync(
@@ -264,14 +267,14 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _store.Received(1).SetActiveAsync("BE", false, Arg.Any<CancellationToken>());
+        await _storeWriter.Received(1).SetActiveAsync("BE", false, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Delete_WhenNotFound_Returns404()
     {
         // Arrange
-        _store.GetByCodeAsync("ZZ", Arg.Any<CancellationToken>())
+        _storeReader.GetByCodeAsync("ZZ", Arg.Any<CancellationToken>())
             .Returns((TestRefEntity?)null);
 
         // Act

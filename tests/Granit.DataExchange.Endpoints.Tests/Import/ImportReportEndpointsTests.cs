@@ -30,7 +30,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
     private const string AdminRole = "granit-data-exchange-admin";
     private const string Prefix = "/data-exchange";
 
-    private readonly IImportJobStore _jobStore = Substitute.For<IImportJobStore>();
+    private readonly IImportJobReader _jobReader = Substitute.For<IImportJobReader>();
     private readonly IImportFileProvider _fileProvider = Substitute.For<IImportFileProvider>();
     private readonly ICorrectionFileGenerator _correctionGenerator = Substitute.For<ICorrectionFileGenerator>();
     private readonly WebApplication _app;
@@ -55,7 +55,8 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
 
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_jobStore);
+        builder.Services.AddSingleton(_jobReader);
+        builder.Services.AddSingleton(Substitute.For<IImportJobWriter>());
         builder.Services.AddSingleton(_fileProvider);
         builder.Services.AddSingleton<ICorrectionFileGenerator>(_correctionGenerator);
 
@@ -69,7 +70,9 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
 
         // Required by export endpoints (all endpoints are compiled at startup)
         builder.Services.AddSingleton(Substitute.For<IExportOrchestrator>());
-        builder.Services.AddSingleton(Substitute.For<IExportPresetStore>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetReader>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetWriter>());
+        builder.Services.AddSingleton(Substitute.For<IExportJobReader>());
 
         _app = builder.Build();
         _app.MapDataExchangeEndpoints();
@@ -89,7 +92,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
         var jobId = Guid.NewGuid();
         ImportReport report = BuildReport();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Completed, JsonSerializer.Serialize(report));
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -108,7 +111,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
     {
         // Arrange
         var jobId = Guid.NewGuid();
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -124,7 +127,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
         // Arrange
         var jobId = Guid.NewGuid();
         ImportJob job = BuildJob(jobId, ImportJobStatus.Executing, reportJson: null);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -143,7 +146,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
         var jobId = Guid.NewGuid();
         ImportReport report = BuildReport();
         ImportJob job = BuildJob(jobId, ImportJobStatus.PartiallyCompleted, JsonSerializer.Serialize(report));
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -174,7 +177,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
             RowErrors = [],
         };
         ImportJob job = BuildJob(jobId, ImportJobStatus.Completed, JsonSerializer.Serialize(report));
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -189,7 +192,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
     {
         // Arrange
         var jobId = Guid.NewGuid();
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ImportJob?)null);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(

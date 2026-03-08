@@ -26,7 +26,8 @@ public sealed class PushNotificationChannelTests
     private static readonly string TestP256dh;
     private static readonly string TestAuth;
 
-    private readonly IPushSubscriptionStore _subscriptionStore = Substitute.For<IPushSubscriptionStore>();
+    private readonly IPushSubscriptionReader _subscriptionReader = Substitute.For<IPushSubscriptionReader>();
+    private readonly IPushSubscriptionWriter _subscriptionWriter = Substitute.For<IPushSubscriptionWriter>();
     private readonly ILogger<PushNotificationChannel> _logger = Substitute.For<ILogger<PushNotificationChannel>>();
 
     static PushNotificationChannelTests()
@@ -53,7 +54,7 @@ public sealed class PushNotificationChannelTests
     [Fact]
     public async Task SendAsync_NoSubscriptions_DoesNotThrow()
     {
-        _subscriptionStore.GetSubscriptionsAsync(
+        _subscriptionReader.GetSubscriptionsAsync(
             Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<PushSubscriptionInfo>>([]));
         PushNotificationChannel channel = BuildChannel();
@@ -67,7 +68,7 @@ public sealed class PushNotificationChannelTests
     [Fact]
     public async Task SendAsync_NoSubscriptions_QueriesStoreWithCorrectUser()
     {
-        _subscriptionStore.GetSubscriptionsAsync(
+        _subscriptionReader.GetSubscriptionsAsync(
             Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<PushSubscriptionInfo>>([]));
         PushNotificationChannel channel = BuildChannel();
@@ -75,7 +76,7 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        await _subscriptionStore.Received(1).GetSubscriptionsAsync(
+        await _subscriptionReader.Received(1).GetSubscriptionsAsync(
             context.RecipientUserId, context.TenantId, Arg.Any<CancellationToken>());
     }
 
@@ -155,7 +156,7 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        await _subscriptionStore.Received(1).RemoveSubscriptionAsync(
+        await _subscriptionWriter.Received(1).RemoveSubscriptionAsync(
             expiredEndpoint, context.TenantId, Arg.Any<CancellationToken>());
     }
 
@@ -182,7 +183,7 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        await _subscriptionStore.Received(1).RemoveSubscriptionAsync(
+        await _subscriptionWriter.Received(1).RemoveSubscriptionAsync(
             expiredEndpoint, tenantId, Arg.Any<CancellationToken>());
     }
 
@@ -211,11 +212,11 @@ public sealed class PushNotificationChannelTests
         // All three subscriptions should have been attempted.
         handler.Requests.Count.ShouldBe(3);
         // Only the expired endpoint should be removed.
-        await _subscriptionStore.Received(1).RemoveSubscriptionAsync(
+        await _subscriptionWriter.Received(1).RemoveSubscriptionAsync(
             "https://push.example.com/expired", context.TenantId, Arg.Any<CancellationToken>());
-        await _subscriptionStore.DidNotReceive().RemoveSubscriptionAsync(
+        await _subscriptionWriter.DidNotReceive().RemoveSubscriptionAsync(
             "https://push.example.com/active1", Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
-        await _subscriptionStore.DidNotReceive().RemoveSubscriptionAsync(
+        await _subscriptionWriter.DidNotReceive().RemoveSubscriptionAsync(
             "https://push.example.com/active2", Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
     }
 
@@ -241,7 +242,7 @@ public sealed class PushNotificationChannelTests
 
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        await _subscriptionStore.Received(1).GetSubscriptionsAsync(
+        await _subscriptionReader.Received(1).GetSubscriptionsAsync(
             "user-1", tenantId, Arg.Any<CancellationToken>());
     }
 
@@ -266,7 +267,7 @@ public sealed class PushNotificationChannelTests
     {
         MockHttpMessageHandler handler = new();
         PushNotificationChannel channel = BuildChannel(handler);
-        _subscriptionStore.GetSubscriptionsAsync(
+        _subscriptionReader.GetSubscriptionsAsync(
             Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<PushSubscriptionInfo>>([]));
         NotificationDeliveryContext context = BuildContext();
@@ -274,6 +275,33 @@ public sealed class PushNotificationChannelTests
         await channel.SendAsync(context, TestContext.Current.CancellationToken);
 
         handler.Requests.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task SendAsync_ServerError_ThrowsAggregateExceptionAfterAllAttempts()
+    {
+        // First succeeds, second returns 500 (non-retriable by the channel), third succeeds.
+        SequentialMockHttpMessageHandler handler = new([
+            HttpStatusCode.Created,
+            HttpStatusCode.InternalServerError,
+            HttpStatusCode.Created,
+        ]);
+        PushNotificationChannel channel = BuildChannel(handler);
+        NotificationDeliveryContext context = BuildContext();
+        List<PushSubscriptionInfo> subscriptions =
+        [
+            BuildSubscription("https://push.example.com/active1"),
+            BuildSubscription("https://push.example.com/failing"),
+            BuildSubscription("https://push.example.com/active2"),
+        ];
+        SetupSubscriptions(context.RecipientUserId, context.TenantId, subscriptions);
+
+        var ex = await Should.ThrowAsync<AggregateException>(
+            () => channel.SendAsync(context, TestContext.Current.CancellationToken));
+
+        // All three subscriptions should have been attempted despite the 500 error.
+        handler.Requests.Count.ShouldBe(3);
+        ex.InnerExceptions.Count.ShouldBe(1);
     }
 
     // -------------------------------------------------------------------------
@@ -290,7 +318,7 @@ public sealed class PushNotificationChannelTests
         {
             DefaultAuthentication = CreateTestVapidAuthentication(),
         };
-        return new PushNotificationChannel(pushServiceClient, _subscriptionStore, _logger);
+        return new PushNotificationChannel(pushServiceClient, _subscriptionReader, _subscriptionWriter, _logger);
     }
 
     private static VapidAuthentication CreateTestVapidAuthentication()
@@ -306,7 +334,7 @@ public sealed class PushNotificationChannelTests
         Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 
     private void SetupSubscriptions(string userId, Guid? tenantId, List<PushSubscriptionInfo> subscriptions) =>
-        _subscriptionStore.GetSubscriptionsAsync(userId, tenantId, Arg.Any<CancellationToken>())
+        _subscriptionReader.GetSubscriptionsAsync(userId, tenantId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<PushSubscriptionInfo>>(subscriptions));
 
     private static PushSubscriptionInfo BuildSubscription(string endpoint) => new()

@@ -1,10 +1,12 @@
 using Granit.Core.DataFiltering;
+using Granit.Core.Events;
 using Granit.ExceptionHandling;
 using Granit.Persistence.DataSeeding;
 using Granit.Persistence.ExceptionHandling;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Granit.Persistence.Extensions;
@@ -25,6 +27,11 @@ public static class PersistenceServiceCollectionExtensions
     ///     Registered as Singleton: state lives in a <c>static AsyncLocal</c> field,
     ///     not in instance fields.
     ///   </item>
+    ///   <item>Domain event dispatcher interceptor (<see cref="DomainEventDispatcherInterceptor"/>)</item>
+    ///   <item>
+    ///     No-op <see cref="IDomainEventDispatcher"/> (replaced by Wolverine implementation
+    ///     when <c>Granit.Wolverine</c> is configured).
+    ///   </item>
     ///   <item>
     ///     <see cref="EfCoreExceptionStatusCodeMapper"/> if
     ///     <c>Granit.ExceptionHandling</c> is present in the container
@@ -37,6 +44,8 @@ public static class PersistenceServiceCollectionExtensions
         services.AddScoped<AuditedEntityInterceptor>();
         services.AddScoped<VersioningInterceptor>();
         services.AddScoped<SoftDeleteInterceptor>();
+        services.AddScoped<DomainEventDispatcherInterceptor>();
+        services.TryAddSingleton<IDomainEventDispatcher, NullDomainEventDispatcher>();
         services.AddSingleton<IDataFilter, DataFilter>();
 
         // Register the EF Core exception mapper only when Granit.ExceptionHandling

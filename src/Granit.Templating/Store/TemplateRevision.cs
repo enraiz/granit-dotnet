@@ -1,7 +1,7 @@
 namespace Granit.Templating.Store;
 
 /// <summary>
-/// Represents a historical revision of a template in <see cref="IDocumentTemplateStore"/>.
+/// Represents a historical revision of a template returned by <see cref="IDocumentTemplateStoreReader"/>.
 /// </summary>
 /// <remarks>
 /// Revisions are immutable after publication and preserved indefinitely to satisfy the

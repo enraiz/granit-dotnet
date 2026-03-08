@@ -11,7 +11,7 @@ namespace Granit.Notifications.Tests;
 
 public sealed class InAppNotificationChannelEdgeCaseTests
 {
-    private readonly IUserNotificationStore _userNotificationStore = Substitute.For<IUserNotificationStore>();
+    private readonly IUserNotificationWriter _userNotificationWriter = Substitute.For<IUserNotificationWriter>();
     private readonly IClock _clock;
     private readonly InAppNotificationChannel _channel;
 
@@ -19,7 +19,7 @@ public sealed class InAppNotificationChannelEdgeCaseTests
     {
         _clock = Substitute.For<IClock>();
         _clock.Now.Returns(_ => new DateTimeOffset(2026, 3, 1, 12, 0, 0, TimeSpan.Zero));
-        _channel = new InAppNotificationChannel(_userNotificationStore, _clock);
+        _channel = new InAppNotificationChannel(_userNotificationWriter, _clock);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public sealed class InAppNotificationChannelEdgeCaseTests
     {
         // Arrange
         UserNotification? captured = null;
-        _userNotificationStore.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
+        _userNotificationWriter.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 captured = callInfo.Arg<UserNotification>();
@@ -60,7 +60,7 @@ public sealed class InAppNotificationChannelEdgeCaseTests
     {
         // Arrange
         UserNotification? captured = null;
-        _userNotificationStore.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
+        _userNotificationWriter.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 captured = callInfo.Arg<UserNotification>();
@@ -94,7 +94,7 @@ public sealed class InAppNotificationChannelEdgeCaseTests
         // Arrange
         DateTimeOffset expectedTime = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
         UserNotification? captured = null;
-        _userNotificationStore.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
+        _userNotificationWriter.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 captured = callInfo.Arg<UserNotification>();
@@ -126,7 +126,7 @@ public sealed class InAppNotificationChannelEdgeCaseTests
         // Arrange
         var tenantId = Guid.NewGuid();
         UserNotification? captured = null;
-        _userNotificationStore.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
+        _userNotificationWriter.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 captured = callInfo.Arg<UserNotification>();

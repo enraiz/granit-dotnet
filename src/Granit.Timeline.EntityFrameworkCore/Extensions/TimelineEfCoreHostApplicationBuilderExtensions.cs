@@ -38,9 +38,9 @@ public static class TimelineEfCoreHostApplicationBuilderExtensions
         builder.Services.AddDbContextFactory<TimelineDbContext>(configure);
 
         builder.Services.Replace(
-            ServiceDescriptor.Scoped<ITimelineStore, EfCoreTimelineStore>());
+            ServiceDescriptor.Scoped<ITimelineWriter, EfCoreTimelineStore>());
         builder.Services.Replace(
-            ServiceDescriptor.Scoped<ITimelineQuery, EfCoreTimelineQuery>());
+            ServiceDescriptor.Scoped<ITimelineReader, EfCoreTimelineQuery>());
 
         return builder;
     }

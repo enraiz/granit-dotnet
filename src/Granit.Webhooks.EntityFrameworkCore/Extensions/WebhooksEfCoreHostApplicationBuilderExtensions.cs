@@ -19,8 +19,8 @@ public static class WebhooksEfCoreHostApplicationBuilderExtensions
     /// Must be called after <c>AddGranitWebhooks()</c>.
     /// Registers:
     /// <list type="bullet">
-    ///   <item><see cref="EfWebhookSubscriptionStore"/> — replaces <c>InMemoryWebhookSubscriptionStore</c>.</item>
-    ///   <item><see cref="EfWebhookDeliveryStore"/> — replaces <c>NullWebhookDeliveryStore</c> (enables HDS audit trail).</item>
+    ///   <item><see cref="EfWebhookSubscriptionStore"/> — replaces <c>InMemoryWebhookSubscriptionStore</c> for both <see cref="IWebhookSubscriptionReader"/> and <see cref="IWebhookSubscriptionWriter"/>.</item>
+    ///   <item><see cref="EfWebhookDeliveryStore"/> — replaces <c>NullWebhookDeliveryWriter</c> (enables HDS audit trail).</item>
     ///   <item><see cref="WebhooksDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
     /// </list>
     /// <para>
@@ -37,11 +37,14 @@ public static class WebhooksEfCoreHostApplicationBuilderExtensions
     {
         builder.Services.AddDbContextFactory<WebhooksDbContext>(configure);
 
+        builder.Services.AddSingleton<EfWebhookSubscriptionStore>();
         builder.Services.Replace(
-            ServiceDescriptor.Singleton<IWebhookSubscriptionStore, EfWebhookSubscriptionStore>());
+            ServiceDescriptor.Singleton<IWebhookSubscriptionReader>(sp => sp.GetRequiredService<EfWebhookSubscriptionStore>()));
+        builder.Services.Replace(
+            ServiceDescriptor.Singleton<IWebhookSubscriptionWriter>(sp => sp.GetRequiredService<EfWebhookSubscriptionStore>()));
 
         builder.Services.Replace(
-            ServiceDescriptor.Scoped<IWebhookDeliveryStore, EfWebhookDeliveryStore>());
+            ServiceDescriptor.Scoped<IWebhookDeliveryWriter, EfWebhookDeliveryStore>());
 
         return builder;
     }

@@ -17,7 +17,7 @@ public static class LocalizationServiceCollectionExtensions
     /// </summary>
     /// <remarks>
     /// The cache layer (<see cref="CachedLocalizationOverrideStore"/>) activates automatically
-    /// when a keyed <see cref="ILocalizationOverrideStore"/> is registered under
+    /// when a keyed <see cref="ILocalizationOverrideStoreReader"/> is registered under
     /// <see cref="CachedLocalizationOverrideStore.RawStoreKey"/>, e.g. by
     /// <c>Granit.Localization.EntityFrameworkCore</c>.
     /// </remarks>
@@ -31,7 +31,9 @@ public static class LocalizationServiceCollectionExtensions
         services.TryAddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
         services.TryAddTransient(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
         services.TryAddSingleton<IMemoryCache, MemoryCache>();
-        services.TryAddSingleton<ILocalizationOverrideStore, CachedLocalizationOverrideStore>();
+        services.TryAddSingleton<CachedLocalizationOverrideStore>();
+        services.TryAddSingleton<ILocalizationOverrideStoreReader>(sp => sp.GetRequiredService<CachedLocalizationOverrideStore>());
+        services.TryAddSingleton<ILocalizationOverrideStoreWriter>(sp => sp.GetRequiredService<CachedLocalizationOverrideStore>());
 
         if (configure is not null)
         {

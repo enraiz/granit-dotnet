@@ -6,7 +6,7 @@ sans aucun doublon possible en cluster multi-nœuds.
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager`, `IBackgroundJobStore` |
+| `Granit.BackgroundJobs` | Core provider-agnostique : scheduling Wolverine, store InMemory, `IBackgroundJobManager`, `IBackgroundJobStoreReader` / `IBackgroundJobStoreWriter` |
 | `Granit.BackgroundJobs.EntityFrameworkCore` | Persistance EF Core : `BackgroundJobsDbContext`, table `scheduling_background_jobs` (SQL Server / PostgreSQL) |
 | `Granit.BackgroundJobs.Endpoints` | Administration HTTP : endpoints Minimal API, politique d'autorisation `BackgroundJobs.Jobs.Manage` |
 
@@ -274,17 +274,21 @@ app.MapBackgroundJobsEndpoints(opts => opts.RequiredRole = "granit-background-jo
 // → RequireRole("granit-background-jobs-admin") actif
 ```
 
-## Store personnalisé — IBackgroundJobStore
+## Store personnalisé — IBackgroundJobStoreReader / IBackgroundJobStoreWriter
 
-`IBackgroundJobStore` est une interface **publique** permettant de fournir une
-implémentation de persistance alternative (Redis, MongoDB, etc.) :
+Les interfaces **publiques** `IBackgroundJobStoreReader` et `IBackgroundJobStoreWriter`
+permettent de fournir une implémentation de persistance alternative (Redis, MongoDB, etc.) :
 
 ```csharp
-public interface IBackgroundJobStore
+public interface IBackgroundJobStoreReader
 {
     Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default);
     Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken ct = default);
     Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken ct = default);
+}
+
+public interface IBackgroundJobStoreWriter
+{
     Task SeedJobsAsync(IEnumerable<RecurringJobRegistration> registrations, CancellationToken ct = default);
     Task RecordExecutionStartAsync(string jobName, DateTimeOffset startedAt, CancellationToken ct = default);
     Task RecordNextExecutionAsync(string jobName, DateTimeOffset nextExecution, CancellationToken ct = default);
@@ -301,10 +305,11 @@ Deux implémentations sont fournies :
 | `InMemoryBackgroundJobStore` | `Granit.BackgroundJobs` | `JobStoreMode.InMemory` |
 | `EfBackgroundJobStore` | `Granit.BackgroundJobs.EntityFrameworkCore` | `JobStoreMode.Durable` |
 
-Pour une implémentation Redis ou MongoDB, enregistrer le service **en Singleton** :
+Pour une implémentation Redis ou MongoDB, enregistrer les services **en Singleton** :
 
 ```csharp
-services.AddSingleton<IBackgroundJobStore, RedisBackgroundJobStore>();
+services.AddSingleton<IBackgroundJobStoreReader, RedisBackgroundJobStore>();
+services.AddSingleton<IBackgroundJobStoreWriter, RedisBackgroundJobStore>();
 ```
 
 ## Architecture interne
@@ -312,7 +317,7 @@ services.AddSingleton<IBackgroundJobStore, RedisBackgroundJobStore>();
 ```text
 [Startup]
   RecurringJobDiscovery.Discover(assemblies)       → IReadOnlyList<RecurringJobRegistration>
-  BackgroundJobsSeedService.StartAsync()           → IBackgroundJobStore.SeedJobsAsync()
+  BackgroundJobsSeedService.StartAsync()           → IBackgroundJobStoreWriter.SeedJobsAsync()
 
 [WolverineOptions]
   opts.Policies.AddMiddleware<RecurringJobSchedulingMiddleware>(
@@ -321,21 +326,21 @@ services.AddSingleton<IBackgroundJobStore, RedisBackgroundJobStore>();
 
 [Cluster — CronSchedulerAgent]
   startAsync()
-    → store.GetEnabledJobsAsync()
+    → storeReader.GetEnabledJobsAsync()
     → si NextExecutionAt > Now : skip (déjà planifié via Outbox)
     → Cronos.GetNextOccurrence()
     → bus.ScheduleAsync(message, next)
-    → store.RecordNextExecutionAsync()
+    → storeWriter.RecordNextExecutionAsync()
 
 [Runtime — par message récurrent]
   RecurringJobSchedulingMiddleware.BeforeAsync()
-    → store.RecordExecutionStartAsync()
-    → store.SetTriggeredByAsync()  ← si X-Triggered-By présent
+    → storeWriter.RecordExecutionStartAsync()
+    → storeWriter.SetTriggeredByAsync()  ← si X-Triggered-By présent
   [Handler]
   RecurringJobSchedulingMiddleware.AfterAsync()
     → Cronos.GetNextOccurrence()
     → context.ScheduleAsync(nextMessage, next)   ← Outbox, même transaction
-    → store.RecordNextExecutionAsync()
+    → storeWriter.RecordNextExecutionAsync()
 ```
 
 ## Roadmap

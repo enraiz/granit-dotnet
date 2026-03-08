@@ -24,9 +24,12 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
 {
     private const string Prefix = "/notifications";
 
-    private readonly IUserNotificationStore _userNotificationStore = Substitute.For<IUserNotificationStore>();
-    private readonly INotificationPreferenceStore _preferenceStore = Substitute.For<INotificationPreferenceStore>();
-    private readonly INotificationSubscriptionStore _subscriptionStore = Substitute.For<INotificationSubscriptionStore>();
+    private readonly IUserNotificationReader _userNotificationReader = Substitute.For<IUserNotificationReader>();
+    private readonly IUserNotificationWriter _userNotificationWriter = Substitute.For<IUserNotificationWriter>();
+    private readonly INotificationPreferenceReader _preferenceReader = Substitute.For<INotificationPreferenceReader>();
+    private readonly INotificationPreferenceWriter _preferenceWriter = Substitute.For<INotificationPreferenceWriter>();
+    private readonly INotificationSubscriptionReader _subscriptionReader = Substitute.For<INotificationSubscriptionReader>();
+    private readonly INotificationSubscriptionWriter _subscriptionWriter = Substitute.For<INotificationSubscriptionWriter>();
     private readonly INotificationDefinitionStore _definitionStore = Substitute.For<INotificationDefinitionStore>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IClock _clock = Substitute.For<IClock>();
@@ -48,9 +51,12 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
         builder.Services.AddAuthorization();
 
-        builder.Services.AddSingleton(_userNotificationStore);
-        builder.Services.AddSingleton(_preferenceStore);
-        builder.Services.AddSingleton(_subscriptionStore);
+        builder.Services.AddSingleton(_userNotificationReader);
+        builder.Services.AddSingleton(_userNotificationWriter);
+        builder.Services.AddSingleton(_preferenceReader);
+        builder.Services.AddSingleton(_preferenceWriter);
+        builder.Services.AddSingleton(_subscriptionReader);
+        builder.Services.AddSingleton(_subscriptionWriter);
         builder.Services.AddSingleton(_definitionStore);
         builder.Services.AddSingleton(_currentTenant);
         builder.Services.AddSingleton(_clock);
@@ -70,7 +76,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetNotifications_Authenticated_Returns200()
     {
-        _userNotificationStore.GetListAsync("user-123", null, 1, 20, Arg.Any<CancellationToken>())
+        _userNotificationReader.GetListAsync("user-123", null, 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
@@ -90,7 +96,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetUnreadCount_Returns200WithCount()
     {
-        _userNotificationStore.GetUnreadCountAsync("user-123", null, Arg.Any<CancellationToken>())
+        _userNotificationReader.GetUnreadCountAsync("user-123", null, Arg.Any<CancellationToken>())
             .Returns(7);
 
         HttpResponseMessage response = await _authClient.GetAsync($"{Prefix}/unread/count", TestContext.Current.CancellationToken);
@@ -120,7 +126,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             $"{Prefix}/{id}/read", content: null, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _userNotificationStore.Received(1).MarkAsReadAsync(id, _clock.Now, Arg.Any<CancellationToken>());
+        await _userNotificationWriter.Received(1).MarkAsReadAsync(id, _clock.Now, Arg.Any<CancellationToken>());
     }
 
     // ── POST /read-all ─────────────────────────────────────────────────────
@@ -132,7 +138,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             $"{Prefix}/read-all", content: null, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _userNotificationStore.Received(1).MarkAllAsReadAsync(
+        await _userNotificationWriter.Received(1).MarkAllAsReadAsync(
             "user-123", null, _clock.Now, Arg.Any<CancellationToken>());
     }
 
@@ -141,7 +147,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetEntityActivityFeed_Returns200()
     {
-        _userNotificationStore.GetByEntityAsync("Patient", "42", null, 1, 20, Arg.Any<CancellationToken>())
+        _userNotificationReader.GetByEntityAsync("Patient", "42", null, 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -155,7 +161,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetPreferences_Returns200()
     {
-        _preferenceStore.GetListAsync("user-123", null, Arg.Any<CancellationToken>())
+        _preferenceReader.GetListAsync("user-123", null, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NotificationPreference>());
 
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -180,7 +186,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             $"{Prefix}/preferences", request, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _preferenceStore.Received(1).SetAsync(
+        await _preferenceWriter.Received(1).SetAsync(
             Arg.Is<NotificationPreference>(p =>
                 p.NotificationTypeName == "Order.Shipped" &&
                 p.ChannelName == "Email" &&
@@ -207,7 +213,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetSubscriptions_Returns200()
     {
-        _subscriptionStore.GetUserSubscriptionsAsync("user-123", null, Arg.Any<CancellationToken>())
+        _subscriptionReader.GetUserSubscriptionsAsync("user-123", null, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NotificationSubscription>());
 
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -226,7 +232,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _subscriptionStore.Received(1).SubscribeAsync(
+        await _subscriptionWriter.Received(1).SubscribeAsync(
             "user-123", "Order.Shipped", null, Arg.Any<CancellationToken>());
     }
 
@@ -239,7 +245,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             $"{Prefix}/subscriptions/Order.Shipped", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _subscriptionStore.Received(1).UnsubscribeAsync(
+        await _subscriptionWriter.Received(1).UnsubscribeAsync(
             "user-123", "Order.Shipped", null, Arg.Any<CancellationToken>());
     }
 
@@ -253,7 +259,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _subscriptionStore.Received(1).FollowEntityAsync(
+        await _subscriptionWriter.Received(1).FollowEntityAsync(
             "user-123", "Patient", "42", null, Arg.Any<CancellationToken>());
     }
 
@@ -266,7 +272,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             $"{Prefix}/entity/Patient/42/follow", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _subscriptionStore.Received(1).UnfollowEntityAsync(
+        await _subscriptionWriter.Received(1).UnfollowEntityAsync(
             "user-123", "Patient", "42", null, Arg.Any<CancellationToken>());
     }
 
@@ -275,7 +281,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetEntityFollowers_Returns200()
     {
-        _subscriptionStore.GetEntityFollowersAsync("Patient", "42", null, Arg.Any<CancellationToken>())
+        _subscriptionReader.GetEntityFollowersAsync("Patient", "42", null, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NotificationSubscription>());
 
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -292,13 +298,13 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         var tenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
-        _userNotificationStore.GetListAsync("user-123", tenantId, 1, 20, Arg.Any<CancellationToken>())
+        _userNotificationReader.GetListAsync("user-123", tenantId, 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _userNotificationStore.Received(1).GetListAsync(
+        await _userNotificationReader.Received(1).GetListAsync(
             "user-123", tenantId, 1, 20, Arg.Any<CancellationToken>());
     }
 
@@ -314,14 +320,17 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                 TestAuthHandler.SchemeName, _ => { });
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_userNotificationStore);
-        builder.Services.AddSingleton(_preferenceStore);
-        builder.Services.AddSingleton(_subscriptionStore);
+        builder.Services.AddSingleton(_userNotificationReader);
+        builder.Services.AddSingleton(_userNotificationWriter);
+        builder.Services.AddSingleton(_preferenceReader);
+        builder.Services.AddSingleton(_preferenceWriter);
+        builder.Services.AddSingleton(_subscriptionReader);
+        builder.Services.AddSingleton(_subscriptionWriter);
         builder.Services.AddSingleton(_definitionStore);
         builder.Services.AddSingleton(_currentTenant);
         builder.Services.AddSingleton(_clock);
 
-        _userNotificationStore.GetListAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+        _userNotificationReader.GetListAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         await using WebApplication prefixedApp = builder.Build();

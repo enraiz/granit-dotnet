@@ -11,8 +11,8 @@ namespace Granit.Features.EntityFrameworkCore.Tests;
 
 public sealed class FeaturesEfCoreDiRegistrationTests
 {
-    // Stub IFeatureStore to simulate a prior registration (e.g. InMemoryFeatureStore which is internal).
-    private sealed class StubFeatureStore : IFeatureStore
+    // Stub IFeatureStoreReader/Writer to simulate a prior registration (e.g. InMemoryFeatureStore which is internal).
+    private sealed class StubFeatureStore : IFeatureStoreReader, IFeatureStoreWriter
     {
         public Task<string?> GetOrNullAsync(string featureName, string? tenantId, CancellationToken ct = default) =>
             Task.FromResult<string?>(null);
@@ -32,15 +32,18 @@ public sealed class FeaturesEfCoreDiRegistrationTests
     public void AddGranitFeaturesEntityFrameworkCore_RegistersEfCoreFeatureStore()
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
-        builder.Services.AddScoped<IFeatureStore, StubFeatureStore>(); // simulate AddGranitFeatures()
+        builder.Services.AddScoped<IFeatureStoreReader, StubFeatureStore>(); // simulate AddGranitFeatures()
+        builder.Services.AddScoped<IFeatureStoreWriter, StubFeatureStore>();
 
         builder.AddGranitFeaturesEntityFrameworkCore(opts =>
             opts.UseInMemoryDatabase("features-test"));
 
         using ServiceProvider sp = builder.Services.BuildServiceProvider();
-        IFeatureStore store = sp.CreateScope().ServiceProvider.GetRequiredService<IFeatureStore>();
+        IFeatureStoreReader reader = sp.CreateScope().ServiceProvider.GetRequiredService<IFeatureStoreReader>();
+        IFeatureStoreWriter writer = sp.CreateScope().ServiceProvider.GetRequiredService<IFeatureStoreWriter>();
 
-        store.ShouldBeOfType<EfCoreFeatureStore>("AddGranitFeaturesEntityFrameworkCore must replace the pre-registered store with EfCoreFeatureStore");
+        reader.ShouldBeOfType<EfCoreFeatureStore>("AddGranitFeaturesEntityFrameworkCore must replace the pre-registered reader with EfCoreFeatureStore");
+        writer.ShouldBeOfType<EfCoreFeatureStore>("AddGranitFeaturesEntityFrameworkCore must replace the pre-registered writer with EfCoreFeatureStore");
     }
 
     [Fact]

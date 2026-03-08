@@ -2,7 +2,7 @@ namespace Granit.Localization.Endpoints.Permissions;
 
 /// <summary>
 /// Permission constants for the localization override management endpoints.
-/// Use these names when granting permissions via <c>IPermissionManager.SetAsync()</c>
+/// Use these names when granting permissions via <c>IPermissionManagerWriter.SetAsync()</c>
 /// or when checking access via <c>IPermissionChecker.IsGrantedAsync()</c>.
 /// </summary>
 public static class LocalizationOverridesPermissions

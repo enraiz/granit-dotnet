@@ -29,7 +29,7 @@ internal static class BackgroundJobsReadEndpoints
     }
 
     private static async Task<Ok<PagedResult<BackgroundJobStatus>>> GetAllJobsAsync(
-        IBackgroundJobManager manager,
+        IBackgroundJobReader reader,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken ct = default)
@@ -37,7 +37,7 @@ internal static class BackgroundJobsReadEndpoints
         int clampedPage = Math.Max(page, 1);
         int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
 
-        IReadOnlyList<BackgroundJobStatus> all = await manager.GetAllAsync(ct).ConfigureAwait(false);
+        IReadOnlyList<BackgroundJobStatus> all = await reader.GetAllAsync(ct).ConfigureAwait(false);
 
         int totalCount = all.Count;
         int skip = (clampedPage - 1) * clampedPageSize;
@@ -48,10 +48,10 @@ internal static class BackgroundJobsReadEndpoints
 
     private static async Task<Results<Ok<BackgroundJobStatus>, NotFound>> GetJobByNameAsync(
         string name,
-        IBackgroundJobManager manager,
+        IBackgroundJobReader reader,
         CancellationToken ct)
     {
-        BackgroundJobStatus? job = await manager.FindAsync(name, ct).ConfigureAwait(false);
+        BackgroundJobStatus? job = await reader.FindAsync(name, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();

@@ -90,7 +90,7 @@ public static class QueryEndpointRouteBuilderExtensions
         {
             group.MapGet("/meta", async (
                 [FromServices] IQueryEngine<TEntity> engine,
-                [FromServices] ISavedViewStore savedViewStore,
+                [FromServices] ISavedViewStoreReader savedViewStore,
                 [FromServices] QueryDefinition<TEntity> definition,
                 Granit.Core.MultiTenancy.ICurrentTenant tenant,
                 System.Security.Claims.ClaimsPrincipal user,

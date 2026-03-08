@@ -54,7 +54,7 @@ public sealed class ImportOptionsEndpointsTests
     public async Task MapDataExchangeEndpoints_WithApiPrefix_RespondsOnPrefixedRoute()
     {
         // Arrange — separate app with ApiPrefix, mock a job so GET returns 200
-        IImportJobStore jobStore = Substitute.For<IImportJobStore>();
+        IImportJobReader jobStore = Substitute.For<IImportJobReader>();
         var jobId = Guid.NewGuid();
         ImportJob job = new()
         {
@@ -90,7 +90,7 @@ public sealed class ImportOptionsEndpointsTests
         ok.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
-    private static WebApplication BuildApp(IImportJobStore? jobStore = null)
+    private static WebApplication BuildApp(IImportJobReader? jobStore = null)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
@@ -101,7 +101,8 @@ public sealed class ImportOptionsEndpointsTests
         builder.Services.AddAuthorization();
 
         // Register all service dependencies required by endpoint parameter inference
-        builder.Services.AddSingleton(jobStore ?? Substitute.For<IImportJobStore>());
+        builder.Services.AddSingleton(jobStore ?? Substitute.For<IImportJobReader>());
+        builder.Services.AddSingleton(Substitute.For<IImportJobWriter>());
         builder.Services.AddSingleton(Substitute.For<IImportFileProvider>());
         builder.Services.AddSingleton(Substitute.For<IImportCommandDispatcher>());
         builder.Services.AddSingleton(Substitute.For<IImportOrchestrator>());
@@ -112,7 +113,9 @@ public sealed class ImportOptionsEndpointsTests
 
         // Required by export endpoints (all endpoints are compiled at startup)
         builder.Services.AddSingleton(Substitute.For<IExportOrchestrator>());
-        builder.Services.AddSingleton(Substitute.For<IExportPresetStore>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetReader>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetWriter>());
+        builder.Services.AddSingleton(Substitute.For<IExportJobReader>());
 
         return builder.Build();
     }

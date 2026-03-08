@@ -16,7 +16,7 @@ public static class AuthorizationEfCoreServiceCollectionExtensions
     /// Registers EF Core persistence for permission grants.
     /// Replaces the default <see cref="NullPermissionGrantStore"/> registered by
     /// <c>Granit.Authorization</c> with <see cref="EfCorePermissionGrantStore{TContext}"/>,
-    /// and registers <see cref="IPermissionManager"/>.
+    /// and registers <see cref="IPermissionManagerReader"/> and <see cref="IPermissionManagerWriter"/>.
     /// </summary>
     /// <typeparam name="TContext">
     /// The application DbContext, which must implement <see cref="IPermissionGrantDbContext"/>.
@@ -29,7 +29,9 @@ public static class AuthorizationEfCoreServiceCollectionExtensions
         services.Replace(ServiceDescriptor.Scoped<IPermissionGrantStore,
             EfCorePermissionGrantStore<TContext>>());
 
-        services.AddScoped<IPermissionManager, PermissionManager<TContext>>();
+        services.AddScoped<PermissionManager<TContext>>();
+        services.AddScoped<IPermissionManagerReader>(sp => sp.GetRequiredService<PermissionManager<TContext>>());
+        services.AddScoped<IPermissionManagerWriter>(sp => sp.GetRequiredService<PermissionManager<TContext>>());
 
         return services;
     }

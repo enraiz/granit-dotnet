@@ -14,7 +14,7 @@ public sealed class PrivacyServiceCollectionExtensionsTests
     public void AddGranitPrivacy_RegistersServices()
     {
         ServiceCollection services = new();
-        services.AddScoped(_ => Substitute.For<ILegalAgreementStore>());
+        services.AddScoped(_ => Substitute.For<ILegalAgreementStoreReader>());
         services.AddGranitPrivacy(privacy =>
         {
             privacy.RegisterDataProvider("patients");

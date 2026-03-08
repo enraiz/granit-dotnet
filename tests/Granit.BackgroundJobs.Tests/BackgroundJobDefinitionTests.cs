@@ -1,0 +1,79 @@
+// =============================================================================
+// Tests - BackgroundJobDefinition domain events
+// =============================================================================
+// Verifies IDomainEventSource implementation: Pause and Resume emit
+// the correct domain events, ClearDomainEvents resets the collection.
+// =============================================================================
+
+using Granit.BackgroundJobs.Events;
+using Granit.Core.Events;
+using Shouldly;
+using Xunit;
+
+namespace Granit.BackgroundJobs.Tests;
+
+public sealed class BackgroundJobDefinitionTests
+{
+    [Fact]
+    public void Pause_ShouldEmitBackgroundJobPausedEvent()
+    {
+        BackgroundJobDefinition job = BuildJob();
+
+        job.Pause();
+
+        job.IsEnabled.ShouldBeFalse();
+
+        IDomainEvent domainEvent = job.DomainEvents.ShouldHaveSingleItem();
+        var paused = domainEvent.ShouldBeOfType<BackgroundJobPaused>();
+        paused.JobId.ShouldBe(job.Id);
+        paused.JobName.ShouldBe("test-job");
+    }
+
+    [Fact]
+    public void Resume_ShouldEmitBackgroundJobResumedEvent()
+    {
+        BackgroundJobDefinition job = BuildJob(enabled: false);
+
+        job.Resume();
+
+        job.IsEnabled.ShouldBeTrue();
+
+        IDomainEvent domainEvent = job.DomainEvents.ShouldHaveSingleItem();
+        var resumed = domainEvent.ShouldBeOfType<BackgroundJobResumed>();
+        resumed.JobId.ShouldBe(job.Id);
+        resumed.JobName.ShouldBe("test-job");
+    }
+
+    [Fact]
+    public void ClearDomainEvents_ShouldRemoveAllCollectedEvents()
+    {
+        BackgroundJobDefinition job = BuildJob();
+        job.Pause();
+
+        job.ClearDomainEvents();
+
+        job.DomainEvents.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void MultipleTransitions_ShouldAccumulateEvents()
+    {
+        BackgroundJobDefinition job = BuildJob();
+
+        job.Pause();
+        job.Resume();
+
+        job.DomainEvents.Count.ShouldBe(2);
+        job.DomainEvents.First().ShouldBeOfType<BackgroundJobPaused>();
+        job.DomainEvents.Last().ShouldBeOfType<BackgroundJobResumed>();
+    }
+
+    private static BackgroundJobDefinition BuildJob(bool enabled = true) => new()
+    {
+        Id = Guid.NewGuid(),
+        JobName = "test-job",
+        CronExpression = "0 8 * * *",
+        MessageType = "TestMessage, TestAssembly",
+        IsEnabled = enabled,
+    };
+}

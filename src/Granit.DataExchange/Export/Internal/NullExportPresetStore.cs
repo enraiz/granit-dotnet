@@ -1,11 +1,11 @@
 namespace Granit.DataExchange.Export.Internal;
 
 /// <summary>
-/// Null-object implementation of <see cref="IExportPresetStore"/>.
+/// Null-object implementation of <see cref="IExportPresetReader"/> and <see cref="IExportPresetWriter"/>.
 /// Returns empty results. Replaced by EF Core implementation when
 /// <c>Granit.DataExchange.EntityFrameworkCore</c> is installed.
 /// </summary>
-internal sealed class NullExportPresetStore : IExportPresetStore
+internal sealed class NullExportPresetStore : IExportPresetReader, IExportPresetWriter
 {
     public Task<ExportPreset?> GetAsync(
         string definitionName, string presetName, CancellationToken ct = default) =>

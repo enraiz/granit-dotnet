@@ -1,14 +1,14 @@
 namespace Granit.Querying.SavedViews;
 
 /// <summary>
-/// Default implementation of <see cref="ISavedViewStore"/>.
+/// Default implementation of <see cref="ISavedViewStoreReader"/> and <see cref="ISavedViewStoreWriter"/>.
 /// Throws <see cref="NotImplementedException"/> — requires <c>Granit.Querying.EntityFrameworkCore</c>.
 /// </summary>
-internal sealed class NullSavedViewStore : ISavedViewStore
+internal sealed class NullSavedViewStore : ISavedViewStoreReader, ISavedViewStoreWriter
 {
     private const string Message =
         "Saved view persistence requires Granit.Querying.EntityFrameworkCore. " +
-        "Call builder.AddGranitQueryingEntityFrameworkCore() to register a concrete ISavedViewStore.";
+        "Call builder.AddGranitQueryingEntityFrameworkCore() to register a concrete ISavedViewStoreReader/ISavedViewStoreWriter.";
 
     /// <inheritdoc/>
     public Task<IReadOnlyList<SavedView>> GetListAsync(

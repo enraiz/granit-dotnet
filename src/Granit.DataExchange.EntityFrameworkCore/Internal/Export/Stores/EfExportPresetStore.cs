@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.DataExchange.EntityFrameworkCore.Internal.Export.Stores;
 
 /// <summary>
-/// EF Core implementation of <see cref="IExportPresetStore"/>.
+/// EF Core implementation of <see cref="IExportPresetReader"/> and <see cref="IExportPresetWriter"/>.
 /// Persists export presets per definition, preset name, and tenant in <see cref="DataExchangeDbContext"/>.
 /// </summary>
 internal sealed class EfExportPresetStore(
     IDbContextFactory<DataExchangeDbContext> contextFactory,
     IClock clock,
-    ICurrentTenant currentTenant) : IExportPresetStore
+    ICurrentTenant currentTenant) : IExportPresetReader, IExportPresetWriter
 {
     /// <inheritdoc/>
     public async Task<ExportPreset?> GetAsync(

@@ -14,7 +14,7 @@ namespace Granit.Notifications.Handlers;
 /// </summary>
 public sealed class NotificationDeliveryHandler(
     IEnumerable<INotificationChannel> channels,
-    INotificationDeliveryStore deliveryStore,
+    INotificationDeliveryWriter deliveryWriter,
     IClock clock,
     ILogger<NotificationDeliveryHandler> logger)
 {
@@ -54,7 +54,7 @@ public sealed class NotificationDeliveryHandler(
             await channel.SendAsync(context, cancellationToken).ConfigureAwait(false);
             stopwatch.Stop();
 
-            await deliveryStore.RecordAsync(new NotificationDeliveryAttempt
+            await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {
                 Id = Guid.NewGuid(),
                 DeliveryId = command.DeliveryId,
@@ -76,7 +76,7 @@ public sealed class NotificationDeliveryHandler(
         {
             stopwatch.Stop();
 
-            await deliveryStore.RecordAsync(new NotificationDeliveryAttempt
+            await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {
                 Id = Guid.NewGuid(),
                 DeliveryId = command.DeliveryId,

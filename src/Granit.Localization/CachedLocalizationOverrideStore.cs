@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace Granit.Localization;
 
 /// <summary>
-/// Caching decorator for <see cref="ILocalizationOverrideStore"/>.
+/// Caching decorator for <see cref="ILocalizationOverrideStoreReader"/> and <see cref="ILocalizationOverrideStoreWriter"/>.
 /// </summary>
 /// <remarks>
 /// Wraps any inner store (typically EF Core, registered as keyed service <see cref="RawStoreKey"/>)
@@ -26,7 +26,7 @@ internal sealed class CachedLocalizationOverrideStore(
     IMemoryCache memoryCache,
     IOptions<LocalizationOverridesCacheOptions> options,
     IServiceScopeFactory scopeFactory,
-    IServiceProvider serviceProvider) : ILocalizationOverrideStore
+    IServiceProvider serviceProvider) : ILocalizationOverrideStoreReader, ILocalizationOverrideStoreWriter
 {
     private readonly LocalizationOverridesCacheOptions _options = options.Value;
 
@@ -55,8 +55,8 @@ internal sealed class CachedLocalizationOverrideStore(
         string resourceName, string culture, string key, string value, CancellationToken ct = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-        ILocalizationOverrideStore inner =
-            scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStore>(RawStoreKey);
+        ILocalizationOverrideStoreWriter inner =
+            scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStoreWriter>(RawStoreKey);
 
         await inner.SetOverrideAsync(resourceName, culture, key, value, ct).ConfigureAwait(false);
         memoryCache.Remove(BuildCacheKey(resourceName, culture));
@@ -67,8 +67,8 @@ internal sealed class CachedLocalizationOverrideStore(
         string resourceName, string culture, string key, CancellationToken ct = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-        ILocalizationOverrideStore inner =
-            scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStore>(RawStoreKey);
+        ILocalizationOverrideStoreWriter inner =
+            scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStoreWriter>(RawStoreKey);
 
         await inner.RemoveOverrideAsync(resourceName, culture, key, ct).ConfigureAwait(false);
         memoryCache.Remove(BuildCacheKey(resourceName, culture));
@@ -78,8 +78,8 @@ internal sealed class CachedLocalizationOverrideStore(
         string cacheKey, string resourceName, string culture, CancellationToken ct)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-        ILocalizationOverrideStore? inner =
-            scope.ServiceProvider.GetKeyedService<ILocalizationOverrideStore>(RawStoreKey);
+        ILocalizationOverrideStoreReader? inner =
+            scope.ServiceProvider.GetKeyedService<ILocalizationOverrideStoreReader>(RawStoreKey);
 
         // No raw store registered (EF Core package not installed): fall back to empty overrides
         // so the localizer resolves translations from embedded JSON files transparently.

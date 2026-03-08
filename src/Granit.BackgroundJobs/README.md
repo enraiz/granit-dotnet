@@ -1,6 +1,6 @@
 # Granit.BackgroundJobs
 
-Durable and manageable background jobs module for Granit. Declaration via [RecurringJob], atomic Wolverine Outbox scheduling, database-agnostic EF Core store, and IBackgroundJobManager for administration.
+Durable and manageable background jobs module for Granit. Declaration via [RecurringJob], atomic Wolverine Outbox scheduling, database-agnostic EF Core store, and IBackgroundJobReader/IBackgroundJobWriter for administration (CQRS).
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Notifications.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="INotificationSubscriptionStore"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="INotificationSubscriptionReader"/> and
+/// <see cref="INotificationSubscriptionWriter"/> backed by PostgreSQL.
 /// </summary>
-internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationSubscriptionStore
+internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationSubscriptionReader, INotificationSubscriptionWriter
 {
     /// <inheritdoc/>
     public async Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken ct = default)

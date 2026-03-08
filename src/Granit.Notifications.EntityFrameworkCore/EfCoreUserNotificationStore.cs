@@ -6,9 +6,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Notifications.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="IUserNotificationStore"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="IUserNotificationReader"/> and
+/// <see cref="IUserNotificationWriter"/> backed by PostgreSQL.
 /// </summary>
-internal sealed class EfCoreUserNotificationStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : IUserNotificationStore
+internal sealed class EfCoreUserNotificationStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : IUserNotificationReader, IUserNotificationWriter
 {
     /// <inheritdoc/>
     public async Task InsertAsync(UserNotification notification, CancellationToken ct = default)

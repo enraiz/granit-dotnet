@@ -26,9 +26,13 @@ classDiagram
         +DeleteAsync()
     }
 
-    class IBlobDescriptorStore {
+    class IBlobDescriptorStoreReader {
         <<port>>
         +FindAsync()
+    }
+
+    class IBlobDescriptorStoreWriter {
+        <<port>>
         +SaveAsync()
         +UpdateAsync()
     }
@@ -71,12 +75,14 @@ classDiagram
     }
 
     IBlobStorage <|.. DefaultBlobStorage
-    DefaultBlobStorage --> IBlobDescriptorStore
+    DefaultBlobStorage --> IBlobDescriptorStoreReader
+    DefaultBlobStorage --> IBlobDescriptorStoreWriter
     DefaultBlobStorage --> IBlobStorageClient
     DefaultBlobStorage --> IBlobKeyStrategy
     DefaultBlobStorage --> IBlobValidator
 
-    IBlobDescriptorStore <|.. EfBlobDescriptorStore
+    IBlobDescriptorStoreReader <|.. EfBlobDescriptorStore
+    IBlobDescriptorStoreWriter <|.. EfBlobDescriptorStore
     IBlobStorageClient <|.. S3BlobClient
     IBlobKeyStrategy <|.. PrefixBlobKeyStrategy
     IBlobValidator <|.. MagicBytesValidator
@@ -87,9 +93,9 @@ classDiagram
 ### BlobStorage (exemple principal)
 
 | Port (interface) | Fichier | Adaptateur(s) |
-|------------------|---------|---------------|
+| ---------------- | ------- | ------------- |
 | `IBlobStorage` | `src/Granit.BlobStorage/IBlobStorage.cs` | `DefaultBlobStorage` (orchestrateur) |
-| `IBlobDescriptorStore` | `src/Granit.BlobStorage/IBlobDescriptorStore.cs` | `EfBlobDescriptorStore` dans `Granit.BlobStorage.EntityFrameworkCore` |
+| `IBlobDescriptorStoreReader` / `IBlobDescriptorStoreWriter` | `src/Granit.BlobStorage/` | `EfBlobDescriptorStore` dans `Granit.BlobStorage.EntityFrameworkCore` |
 | `IBlobStorageClient` | `src/Granit.BlobStorage/Internal/IBlobStorageClient.cs` | `S3BlobClient` dans `Granit.BlobStorage.S3` |
 | `IBlobKeyStrategy` | `src/Granit.BlobStorage/IBlobKeyStrategy.cs` | `PrefixBlobKeyStrategy` dans `Granit.BlobStorage.S3` |
 | `IBlobValidator` | `src/Granit.BlobStorage/IBlobValidator.cs` | `MagicBytesValidator`, `MaxSizeValidator` (built-in) + custom |
@@ -97,20 +103,20 @@ classDiagram
 ### Même pattern dans les autres modules
 
 | Module | Port | Adaptateurs |
-|--------|------|-------------|
-| Features | `IFeatureStore` | `InMemoryFeatureStore`, `EfCoreFeatureStore` |
-| BackgroundJobs | `IBackgroundJobStore` | `InMemoryBackgroundJobStore`, `EfBackgroundJobStore` |
-| Webhooks | `IWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
-| Settings | `ISettingStore` | `EfCoreSettingStore` |
+| ------ | ---- | ----------- |
+| Features | `IFeatureStoreReader` / `IFeatureStoreWriter` | `InMemoryFeatureStore`, `EfCoreFeatureStore` |
+| BackgroundJobs | `IBackgroundJobStoreReader` / `IBackgroundJobStoreWriter` | `InMemoryBackgroundJobStore`, `EfBackgroundJobStore` |
+| Webhooks | `IWebhookSubscriptionStoreReader` / `IWebhookSubscriptionStoreWriter` | `EfWebhookSubscriptionStore` |
+| Settings | `ISettingStoreReader` / `ISettingStoreWriter` | `EfCoreSettingStore` |
 | Caching | `ICacheService<T>` | `DistributedCacheService`, `HybridCacheService` |
 | Encryption | `IStringEncryptionProvider` | `AesStringEncryptionProvider` |
 
 ## Justification
 
 | Problème | Solution |
-|----------|----------|
+| -------- | -------- |
 | Couplage à un fournisseur cloud (S3, Azure Blob) | Les ports permettent de changer d'adaptateur sans toucher au cœur |
-| Tests unitaires nécessitant une base de données | `InMemoryFeatureStore` et `InMemoryBackgroundJobStore` remplacent EF Core en test |
+| Tests unitaires nécessitant une base de données | `InMemoryFeatureStore` et `InMemoryBackgroundJobStore` implémentent les interfaces Reader/Writer et remplacent EF Core en test |
 | Conformité HDS — pouvoir migrer d'OVHcloud S3 vers un autre provider souverain | Implémenter `IBlobStorageClient` pour le nouveau provider suffit |
 | Packages NuGet indépendants | Le cœur (`Granit.BlobStorage`) n'a aucune dépendance sur EF Core ou AWS SDK |
 

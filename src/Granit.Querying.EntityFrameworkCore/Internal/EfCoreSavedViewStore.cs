@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Querying.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// EF Core implementation of <see cref="ISavedViewStore"/>.
+/// EF Core implementation of <see cref="ISavedViewStoreReader"/> and <see cref="ISavedViewStoreWriter"/>.
 /// Performs CRUD operations on <see cref="SavedView"/> via <see cref="QueryingDbContext"/>.
 /// </summary>
 internal sealed class EfCoreSavedViewStore(
-    IDbContextFactory<QueryingDbContext> contextFactory) : ISavedViewStore
+    IDbContextFactory<QueryingDbContext> contextFactory) : ISavedViewStoreReader, ISavedViewStoreWriter
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<SavedView>> GetListAsync(

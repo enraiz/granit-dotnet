@@ -32,11 +32,20 @@ public static class NotificationsHostApplicationBuilderExtensions
         builder.Configuration.GetSection(NotificationsOptions.SectionName).Bind(options);
         configure?.Invoke(options);
 
-        // Default (replaceable) store registrations
-        builder.Services.AddSingleton<IUserNotificationStore, InMemoryUserNotificationStore>();
-        builder.Services.AddSingleton<INotificationPreferenceStore, InMemoryNotificationPreferenceStore>();
-        builder.Services.AddSingleton<INotificationSubscriptionStore, InMemoryNotificationSubscriptionStore>();
-        builder.Services.AddScoped<INotificationDeliveryStore, NullNotificationDeliveryStore>();
+        // Default (replaceable) store registrations — CQRS forwarding pattern
+        builder.Services.AddSingleton<InMemoryUserNotificationStore>();
+        builder.Services.AddSingleton<IUserNotificationReader>(sp => sp.GetRequiredService<InMemoryUserNotificationStore>());
+        builder.Services.AddSingleton<IUserNotificationWriter>(sp => sp.GetRequiredService<InMemoryUserNotificationStore>());
+
+        builder.Services.AddSingleton<InMemoryNotificationPreferenceStore>();
+        builder.Services.AddSingleton<INotificationPreferenceReader>(sp => sp.GetRequiredService<InMemoryNotificationPreferenceStore>());
+        builder.Services.AddSingleton<INotificationPreferenceWriter>(sp => sp.GetRequiredService<InMemoryNotificationPreferenceStore>());
+
+        builder.Services.AddSingleton<InMemoryNotificationSubscriptionStore>();
+        builder.Services.AddSingleton<INotificationSubscriptionReader>(sp => sp.GetRequiredService<InMemoryNotificationSubscriptionStore>());
+        builder.Services.AddSingleton<INotificationSubscriptionWriter>(sp => sp.GetRequiredService<InMemoryNotificationSubscriptionStore>());
+
+        builder.Services.AddScoped<INotificationDeliveryWriter, NullNotificationDeliveryWriter>();
 
         // Definition store (singleton)
         builder.Services.AddSingleton<NotificationDefinitionStore>();

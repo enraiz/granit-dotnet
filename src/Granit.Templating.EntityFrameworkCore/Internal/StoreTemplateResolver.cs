@@ -5,14 +5,14 @@ using Granit.Templating.Store;
 namespace Granit.Templating.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// <see cref="ITemplateResolver"/> backed by <see cref="IDocumentTemplateStore"/>.
+/// <see cref="ITemplateResolver"/> backed by <see cref="IDocumentTemplateStoreReader"/>.
 /// Returns the currently published template revision for the requested key.
 /// </summary>
 /// <remarks>
 /// Priority is <c>100</c> — higher than <see cref="Resolvers.EmbeddedTemplateResolver"/> (<c>-100</c>),
 /// so store-managed templates take precedence over embedded assembly resources.
 /// </remarks>
-internal sealed class StoreTemplateResolver(IDocumentTemplateStore store) : ITemplateResolver
+internal sealed class StoreTemplateResolver(IDocumentTemplateStoreReader storeReader) : ITemplateResolver
 {
     /// <inheritdoc/>
     public int Priority => 100;
@@ -20,5 +20,5 @@ internal sealed class StoreTemplateResolver(IDocumentTemplateStore store) : ITem
     /// <inheritdoc/>
     public Task<TemplateDescriptor?> TryResolveAsync(
         TemplateKey key, CancellationToken ct = default) =>
-        store.TryGetPublishedAsync(key, ct);
+        storeReader.TryGetPublishedAsync(key, ct);
 }

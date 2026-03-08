@@ -30,12 +30,12 @@ internal static class TimelineEntryEndpoints
         string entityType,
         string entityId,
         PostTimelineEntryRequest request,
-        ITimelineStore store,
+        ITimelineWriter writer,
         ITimelineFollowerService followerService,
         ITimelineNotifier notifier,
         CancellationToken ct)
     {
-        TimelineEntry entry = await store.PostEntryAsync(
+        TimelineEntry entry = await writer.PostEntryAsync(
             entityType, entityId, request.EntryType, request.Body,
             request.ParentEntryId, ct).ConfigureAwait(false);
 
@@ -81,13 +81,13 @@ internal static class TimelineEntryEndpoints
         string entityType,
         string entityId,
         Guid entryId,
-        ITimelineStore store,
+        ITimelineWriter writer,
         CancellationToken ct)
 #pragma warning restore S1172
     {
         try
         {
-            await store.DeleteEntryAsync(entryId, ct).ConfigureAwait(false);
+            await writer.DeleteEntryAsync(entryId, ct).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
         catch (KeyNotFoundException)

@@ -11,8 +11,8 @@ namespace Granit.Notifications.Tests;
 
 public sealed class NotificationFanoutHandlerEdgeCaseTests
 {
-    private readonly INotificationSubscriptionStore _subscriptionStore = Substitute.For<INotificationSubscriptionStore>();
-    private readonly INotificationPreferenceStore _preferenceStore = Substitute.For<INotificationPreferenceStore>();
+    private readonly INotificationSubscriptionReader _subscriptionReader = Substitute.For<INotificationSubscriptionReader>();
+    private readonly INotificationPreferenceReader _preferenceReader = Substitute.For<INotificationPreferenceReader>();
     private readonly INotificationDefinitionStore _definitionStore = Substitute.For<INotificationDefinitionStore>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly NotificationFanoutHandler _handler;
@@ -21,8 +21,8 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
     {
         _currentTenant.IsAvailable.Returns(false);
         _handler = new NotificationFanoutHandler(
-            _subscriptionStore,
-            _preferenceStore,
+            _subscriptionReader,
+            _preferenceReader,
             _definitionStore,
             _currentTenant);
     }
@@ -32,7 +32,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
     {
         // Arrange — definition returns null, handler defaults to InApp
         _definitionStore.Get("unknown.notification").Returns((NotificationDefinition?)null);
-        _preferenceStore.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
 
         NotificationTrigger trigger = BuildTrigger(
@@ -54,7 +54,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
     {
         // Arrange — null definition → allowOptOut defaults to true
         _definitionStore.Get("unknown.notification").Returns((NotificationDefinition?)null);
-        _preferenceStore.IsChannelEnabledAsync("user-1", "unknown.notification", NotificationChannels.InApp, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync("user-1", "unknown.notification", NotificationChannels.InApp, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(false));
 
         NotificationTrigger trigger = BuildTrigger(
@@ -105,7 +105,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
         _definitionStore.Get("test.notification").Returns(definition);
 
         EntityReference entity = new("Document", "doc-99");
-        _subscriptionStore.GetEntityFollowerIdsAsync("Document", "doc-99", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _subscriptionReader.GetEntityFollowerIdsAsync("Document", "doc-99", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>(["follower-1"]));
 
         NotificationTrigger trigger = BuildTrigger(
@@ -161,9 +161,9 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
         _definitionStore.Get("test.notification").Returns(definition);
 
         EntityReference entity = new("Patient", "pat-1");
-        _subscriptionStore.GetEntityFollowerIdsAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _subscriptionReader.GetEntityFollowerIdsAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>([]));
-        _subscriptionStore.GetSubscriberIdsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _subscriptionReader.GetSubscriberIdsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>([]));
 
         NotificationTrigger trigger = BuildTrigger(

@@ -31,7 +31,8 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
 
     private readonly IPermissionChecker _permissionChecker = Substitute.For<IPermissionChecker>();
     private readonly IPermissionDefinitionManager _definitionManager = Substitute.For<IPermissionDefinitionManager>();
-    private readonly IPermissionManager _permissionManager = Substitute.For<IPermissionManager>();
+    private readonly IPermissionManagerReader _permissionManagerReader = Substitute.For<IPermissionManagerReader>();
+    private readonly IPermissionManagerWriter _permissionManagerWriter = Substitute.For<IPermissionManagerWriter>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly WebApplication _app;
 
@@ -79,7 +80,8 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
 
         builder.Services.AddSingleton(_permissionChecker);
         builder.Services.AddSingleton(_definitionManager);
-        builder.Services.AddSingleton(_permissionManager);
+        builder.Services.AddSingleton(_permissionManagerReader);
+        builder.Services.AddSingleton(_permissionManagerWriter);
         builder.Services.AddSingleton(_currentTenant);
 
         _app = builder.Build();
@@ -189,7 +191,7 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
     public async Task GetRolePermissions_WithAdminRole_Returns200()
     {
         // Arrange
-        _permissionManager.GetGrantedPermissionsAsync("editor", null, Arg.Any<CancellationToken>())
+        _permissionManagerReader.GetGrantedPermissionsAsync("editor", null, Arg.Any<CancellationToken>())
             .Returns(["Invoices.Read", "Invoices.Create"]);
 
         // Act
@@ -237,7 +239,7 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _permissionManager.Received(1).SetAsync(
+        await _permissionManagerWriter.Received(1).SetAsync(
             "Invoices.Read", "editor", null, true, Arg.Any<CancellationToken>());
     }
 
@@ -289,7 +291,7 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _permissionManager.Received(1).SetAsync(
+        await _permissionManagerWriter.Received(1).SetAsync(
             "Invoices.Read", "editor", null, false, Arg.Any<CancellationToken>());
     }
 
@@ -332,7 +334,8 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
         builder.Services.AddAuthorization();
         builder.Services.AddSingleton(_permissionChecker);
         builder.Services.AddSingleton(_definitionManager);
-        builder.Services.AddSingleton(_permissionManager);
+        builder.Services.AddSingleton(_permissionManagerReader);
+        builder.Services.AddSingleton(_permissionManagerWriter);
         builder.Services.AddSingleton(_currentTenant);
 
         // Grant all permissions for the /me endpoint.

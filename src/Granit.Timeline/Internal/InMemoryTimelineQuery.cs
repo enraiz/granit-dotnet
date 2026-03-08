@@ -5,9 +5,9 @@ using Granit.Timeline.Domain;
 namespace Granit.Timeline.Internal;
 
 /// <summary>
-/// In-memory implementation of <see cref="ITimelineQuery"/> for development and tests.
+/// In-memory implementation of <see cref="ITimelineReader"/> for development and tests.
 /// </summary>
-internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITimelineQuery
+internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITimelineReader
 {
     /// <inheritdoc/>
     public Task<PagedResult<TimelineStreamEntry>> GetStreamAsync(

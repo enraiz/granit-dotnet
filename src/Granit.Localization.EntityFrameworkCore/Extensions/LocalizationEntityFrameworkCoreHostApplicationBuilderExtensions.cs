@@ -55,7 +55,9 @@ public static class LocalizationEntityFrameworkCoreHostApplicationBuilderExtensi
             }
         }, ServiceLifetime.Scoped);
 
-        builder.Services.TryAddKeyedScoped<ILocalizationOverrideStore, EfCoreLocalizationOverrideStore>(
+        builder.Services.TryAddKeyedScoped<ILocalizationOverrideStoreReader, EfCoreLocalizationOverrideStore>(
+            CachedLocalizationOverrideStore.RawStoreKey);
+        builder.Services.TryAddKeyedScoped<ILocalizationOverrideStoreWriter, EfCoreLocalizationOverrideStore>(
             CachedLocalizationOverrideStore.RawStoreKey);
 
         return builder;

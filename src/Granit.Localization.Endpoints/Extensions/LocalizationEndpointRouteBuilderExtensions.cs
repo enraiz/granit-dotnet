@@ -84,7 +84,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
     /// </para>
     /// <para>
     /// All endpoints require the <c>Localization.Overrides.Manage</c> permission.
-    /// If <see cref="ILocalizationOverrideStore"/> is not registered (no EF Core or other
+    /// If <see cref="ILocalizationOverrideStoreReader"/>/<see cref="ILocalizationOverrideStoreWriter"/> is not registered (no EF Core or other
     /// persistence module loaded), all endpoints return <c>501 Not Implemented</c>.
     /// </para>
     /// </remarks>
@@ -178,10 +178,10 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         string? cultureName,
         CancellationToken ct)
     {
-        ILocalizationOverrideStore? store =
-            context.RequestServices.GetService<ILocalizationOverrideStore>();
+        ILocalizationOverrideStoreReader? storeReader =
+            context.RequestServices.GetService<ILocalizationOverrideStoreReader>();
 
-        if (store is null)
+        if (storeReader is null)
         {
             return StoreNotRegistered();
         }
@@ -202,7 +202,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         }
 
         IReadOnlyDictionary<string, string> overrides =
-            await store.GetOverridesAsync(resourceName, cultureName, ct).ConfigureAwait(false);
+            await storeReader.GetOverridesAsync(resourceName, cultureName, ct).ConfigureAwait(false);
 
         return Results.Ok(overrides);
     }
@@ -215,10 +215,10 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         SetLocalizationOverrideRequest body,
         CancellationToken ct)
     {
-        ILocalizationOverrideStore? store =
-            context.RequestServices.GetService<ILocalizationOverrideStore>();
+        ILocalizationOverrideStoreWriter? storeWriter =
+            context.RequestServices.GetService<ILocalizationOverrideStoreWriter>();
 
-        if (store is null)
+        if (storeWriter is null)
         {
             return StoreNotRegistered();
         }
@@ -246,7 +246,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        await store.SetOverrideAsync(resourceName, cultureName, key, body.Value, ct).ConfigureAwait(false);
+        await storeWriter.SetOverrideAsync(resourceName, cultureName, key, body.Value, ct).ConfigureAwait(false);
         return Results.NoContent();
     }
 
@@ -257,10 +257,10 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         string key,
         CancellationToken ct)
     {
-        ILocalizationOverrideStore? store =
-            context.RequestServices.GetService<ILocalizationOverrideStore>();
+        ILocalizationOverrideStoreWriter? storeWriter =
+            context.RequestServices.GetService<ILocalizationOverrideStoreWriter>();
 
-        if (store is null)
+        if (storeWriter is null)
         {
             return StoreNotRegistered();
         }
@@ -274,7 +274,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
             return error;
         }
 
-        await store.RemoveOverrideAsync(resourceName, cultureName, key, ct).ConfigureAwait(false);
+        await storeWriter.RemoveOverrideAsync(resourceName, cultureName, key, ct).ConfigureAwait(false);
         return Results.NoContent();
     }
 
@@ -289,7 +289,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
     private static IResult StoreNotRegistered() =>
         Results.Problem(
-            detail: "No ILocalizationOverrideStore is registered. Add GranitLocalizationDatabaseSourceEntityFrameworkCoreModule.",
+            detail: "No localization override store is registered. Add GranitLocalizationDatabaseSourceEntityFrameworkCoreModule.",
             statusCode: StatusCodes.Status501NotImplemented);
 
     private static IResult? ValidateBcp47(string cultureName) =>

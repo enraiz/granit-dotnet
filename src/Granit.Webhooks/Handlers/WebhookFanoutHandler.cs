@@ -21,7 +21,7 @@ namespace Granit.Webhooks.Handlers;
 /// </para>
 /// </remarks>
 public sealed class WebhookFanoutHandler(
-    IWebhookSubscriptionStore subscriptionStore,
+    IWebhookSubscriptionReader subscriptionReader,
     ICurrentTenant currentTenant)
 {
     /// <summary>
@@ -35,7 +35,7 @@ public sealed class WebhookFanoutHandler(
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : trigger.TenantId;
 
         IReadOnlyList<Domain.WebhookSubscription> subscriptions =
-            await subscriptionStore.GetActiveSubscriptionsAsync(
+            await subscriptionReader.GetActiveSubscriptionsAsync(
                 trigger.EventType,
                 tenantId,
                 cancellationToken).ConfigureAwait(false);

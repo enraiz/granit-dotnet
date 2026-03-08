@@ -21,7 +21,7 @@ namespace Granit.DataExchange.Endpoints.Permissions;
 /// In production, grant the permission to the desired Keycloak role via one of:
 /// <list type="bullet">
 /// <item>Add the role to <c>GranitAuthorizationOptions.AdminRoles</c> in <c>appsettings.json</c></item>
-/// <item>Call <c>IPermissionManager.SetAsync("DataExchange.Imports.Execute", "my-role", tenantId, true)</c></item>
+/// <item>Call <c>IPermissionManagerWriter.SetAsync("DataExchange.Imports.Execute", "my-role", tenantId, true)</c></item>
 /// </list>
 /// </para>
 /// </remarks>

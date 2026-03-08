@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 namespace Granit.Features.Store;
 
 /// <summary>
-/// Thread-safe in-memory implementation of <see cref="IFeatureStore"/>.
+/// Thread-safe in-memory implementation of <see cref="IFeatureStoreReader"/> and <see cref="IFeatureStoreWriter"/>.
 /// Suitable for testing and development environments.
 /// Values are lost on application restart.
 /// </summary>
-internal sealed class InMemoryFeatureStore : IFeatureStore
+internal sealed class InMemoryFeatureStore : IFeatureStoreReader, IFeatureStoreWriter
 {
     private readonly ConcurrentDictionary<string, string> _store =
         new(StringComparer.Ordinal);

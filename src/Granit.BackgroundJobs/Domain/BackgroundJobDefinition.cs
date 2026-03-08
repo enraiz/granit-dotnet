@@ -1,4 +1,6 @@
+using Granit.BackgroundJobs.Events;
 using Granit.Core.Domain;
+using Granit.Core.Events;
 
 namespace Granit.BackgroundJobs;
 
@@ -16,8 +18,10 @@ namespace Granit.BackgroundJobs;
 /// per execution cycle and preserved for audit purposes.
 /// </para>
 /// </remarks>
-public sealed class BackgroundJobDefinition : Entity
+public sealed class BackgroundJobDefinition : Entity, IDomainEventSource
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
+
     /// <summary>
     /// Unique, stable job name matching <see cref="RecurringJobAttribute.Name"/>.
     /// Primary lookup key. Maximum length: 200 characters.
@@ -26,7 +30,7 @@ public sealed class BackgroundJobDefinition : Entity
 
     /// <summary>
     /// Assembly-qualified CLR type name of the Wolverine message.
-    /// Used by <see cref="IBackgroundJobManager.TriggerNowAsync"/> to instantiate the message.
+    /// Used by <see cref="IBackgroundJobWriter.TriggerNowAsync"/> to instantiate the message.
     /// Maximum length: 500 characters.
     /// </summary>
     public string MessageType { get; set; } = string.Empty;
@@ -64,9 +68,33 @@ public sealed class BackgroundJobDefinition : Entity
 
     /// <summary>
     /// UserId (not PII) of the operator who manually triggered this job via
-    /// <see cref="IBackgroundJobManager.TriggerNowAsync"/>.
+    /// <see cref="IBackgroundJobWriter.TriggerNowAsync"/>.
     /// Null for scheduled executions. HDS audit field.
     /// Maximum length: 450 characters.
     /// </summary>
     public string? TriggeredBy { get; set; }
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    /// <inheritdoc />
+    public void ClearDomainEvents() => _domainEvents.Clear();
+
+    /// <summary>
+    /// Pauses the job and emits a <see cref="BackgroundJobPaused"/> domain event.
+    /// </summary>
+    internal void Pause()
+    {
+        IsEnabled = false;
+        _domainEvents.Add(new BackgroundJobPaused(Id, JobName));
+    }
+
+    /// <summary>
+    /// Resumes the job and emits a <see cref="BackgroundJobResumed"/> domain event.
+    /// </summary>
+    internal void Resume()
+    {
+        IsEnabled = true;
+        _domainEvents.Add(new BackgroundJobResumed(Id, JobName));
+    }
 }

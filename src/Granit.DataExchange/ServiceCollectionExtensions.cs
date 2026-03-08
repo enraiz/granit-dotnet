@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
     /// <list type="bullet">
     ///   <item><see cref="IMappingSuggestionService"/> (scoped) — 4-tier mapping facade.</item>
     ///   <item><see cref="ISemanticMappingService"/> (singleton) — null-object default.</item>
-    ///   <item><see cref="IImportJobStore"/> (scoped) — null-object default.</item>
+    ///   <item><see cref="IImportJobReader"/> / <see cref="IImportJobWriter"/> (scoped) — null-object default.</item>
     ///   <item><see cref="IImportFileProvider"/> (scoped) — null-object default.</item>
     ///   <item><see cref="IImportOrchestrator"/> (scoped) — pipeline orchestrator.</item>
     ///   <item><see cref="IImportCommandDispatcher"/> (singleton) — channel-based dispatch.</item>
@@ -46,7 +46,8 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton<ISemanticMappingService, NullSemanticMappingService>();
         services.TryAddScoped<IMappingSuggestionService, MappingSuggestionService>();
-        services.TryAddScoped<IImportJobStore, NullImportJobStore>();
+        services.TryAddScoped<IImportJobReader, NullImportJobStore>();
+        services.TryAddScoped<IImportJobWriter, NullImportJobStore>();
         services.TryAddScoped<IImportFileProvider, NullImportFileProvider>();
         services.TryAddScoped<IImportOrchestrator, ImportOrchestrator>();
 
@@ -86,8 +87,8 @@ public static class ServiceCollectionExtensions
     /// Registers the following services:
     /// <list type="bullet">
     ///   <item><see cref="IExportOrchestrator"/> (scoped) — export pipeline orchestrator.</item>
-    ///   <item><see cref="IExportJobStore"/> (scoped) — null-object default.</item>
-    ///   <item><see cref="IExportPresetStore"/> (scoped) — null-object default.</item>
+    ///   <item><see cref="IExportJobReader"/> / <see cref="IExportJobWriter"/> (scoped) — null-object default.</item>
+    ///   <item><see cref="IExportPresetReader"/> / <see cref="IExportPresetWriter"/> (scoped) — null-object default.</item>
     ///   <item><see cref="IExportCommandDispatcher"/> (singleton) — channel-based dispatch.</item>
     /// </list>
     /// <para>
@@ -105,8 +106,10 @@ public static class ServiceCollectionExtensions
             .ValidateOnStart();
 
         services.TryAddScoped<IExportOrchestrator, ExportOrchestrator>();
-        services.TryAddScoped<IExportJobStore, NullExportJobStore>();
-        services.TryAddScoped<IExportPresetStore, NullExportPresetStore>();
+        services.TryAddScoped<IExportJobReader, NullExportJobStore>();
+        services.TryAddScoped<IExportJobWriter, NullExportJobStore>();
+        services.TryAddScoped<IExportPresetReader, NullExportPresetStore>();
+        services.TryAddScoped<IExportPresetWriter, NullExportPresetStore>();
 
         // No-op event publisher (default). Replaced by Wolverine if installed.
         services.TryAddSingleton<IDataExchangeEventPublisher, NullDataExchangeEventPublisher>();

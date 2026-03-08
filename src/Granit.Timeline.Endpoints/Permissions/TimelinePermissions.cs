@@ -2,7 +2,7 @@ namespace Granit.Timeline.Endpoints.Permissions;
 
 /// <summary>
 /// Permission constants for the <c>Granit.Timeline.Endpoints</c> module.
-/// Use these names when granting permissions via <c>IPermissionManager.SetAsync()</c>
+/// Use these names when granting permissions via <c>IPermissionManagerWriter.SetAsync()</c>
 /// or when checking access via <c>IPermissionChecker.IsGrantedAsync()</c>.
 /// </summary>
 public static class TimelinePermissions

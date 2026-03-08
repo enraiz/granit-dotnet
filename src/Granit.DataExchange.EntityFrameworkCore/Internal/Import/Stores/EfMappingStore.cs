@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.DataExchange.EntityFrameworkCore.Internal.Import.Stores;
 
 /// <summary>
-/// EF Core implementation of <see cref="IMappingStore"/>.
+/// EF Core implementation of <see cref="IMappingReader"/> and <see cref="IMappingWriter"/>.
 /// Persists column mappings per import definition and tenant in <see cref="DataExchangeDbContext"/>.
 /// </summary>
 internal sealed class EfMappingStore(
     IDbContextFactory<DataExchangeDbContext> contextFactory,
     IClock clock,
-    ICurrentTenant currentTenant) : IMappingStore
+    ICurrentTenant currentTenant) : IMappingReader, IMappingWriter
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ImportColumnMapping>> LoadAsync(

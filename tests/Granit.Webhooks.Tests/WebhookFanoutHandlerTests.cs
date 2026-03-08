@@ -19,20 +19,20 @@ namespace Granit.Webhooks.Tests;
 
 public sealed class WebhookFanoutHandlerTests
 {
-    private readonly IWebhookSubscriptionStore _store = Substitute.For<IWebhookSubscriptionStore>();
+    private readonly IWebhookSubscriptionReader _reader = Substitute.For<IWebhookSubscriptionReader>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly WebhookFanoutHandler _handler;
 
     public WebhookFanoutHandlerTests()
     {
         _currentTenant.IsAvailable.Returns(false);
-        _handler = new WebhookFanoutHandler(_store, _currentTenant);
+        _handler = new WebhookFanoutHandler(_reader, _currentTenant);
     }
 
     [Fact]
     public async Task HandleAsync_NoSubscribers_ReturnsEmptyEnumerable()
     {
-        _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _reader.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
               .Returns(Task.FromResult<IReadOnlyList<WebhookSubscription>>([]));
 
         WebhookTrigger trigger = BuildTrigger();
@@ -47,7 +47,7 @@ public sealed class WebhookFanoutHandlerTests
         IReadOnlyList<WebhookSubscription> subscriptions = [
             BuildSubscription(), BuildSubscription(), BuildSubscription()
         ];
-        _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _reader.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
               .Returns(Task.FromResult(subscriptions));
 
         WebhookTrigger trigger = BuildTrigger();
@@ -60,7 +60,7 @@ public sealed class WebhookFanoutHandlerTests
     public async Task HandleAsync_Commands_HaveDistinctDeliveryIds()
     {
         IReadOnlyList<WebhookSubscription> subscriptions = [BuildSubscription(), BuildSubscription()];
-        _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _reader.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
               .Returns(Task.FromResult(subscriptions));
 
         IEnumerable<SendWebhookCommand> result =
@@ -74,7 +74,7 @@ public sealed class WebhookFanoutHandlerTests
     public async Task HandleAsync_Commands_ShareSameEnvelopeEventId()
     {
         IReadOnlyList<WebhookSubscription> subscriptions = [BuildSubscription(), BuildSubscription()];
-        _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _reader.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
               .Returns(Task.FromResult(subscriptions));
 
         WebhookTrigger trigger = BuildTrigger();
@@ -91,13 +91,13 @@ public sealed class WebhookFanoutHandlerTests
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
 
-        _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), tenantId, Arg.Any<CancellationToken>())
+        _reader.GetActiveSubscriptionsAsync(Arg.Any<string>(), tenantId, Arg.Any<CancellationToken>())
               .Returns(Task.FromResult<IReadOnlyList<WebhookSubscription>>([]));
 
         WebhookTrigger trigger = BuildTrigger(tenantId: Guid.NewGuid()); // different from ambient
         await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        await _store.Received(1).GetActiveSubscriptionsAsync(
+        await _reader.Received(1).GetActiveSubscriptionsAsync(
             Arg.Any<string>(), tenantId, Arg.Any<CancellationToken>());
     }
 
@@ -107,13 +107,13 @@ public sealed class WebhookFanoutHandlerTests
         var triggerTenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(false);
 
-        _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), triggerTenantId, Arg.Any<CancellationToken>())
+        _reader.GetActiveSubscriptionsAsync(Arg.Any<string>(), triggerTenantId, Arg.Any<CancellationToken>())
               .Returns(Task.FromResult<IReadOnlyList<WebhookSubscription>>([]));
 
         WebhookTrigger trigger = BuildTrigger(tenantId: triggerTenantId);
         await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        await _store.Received(1).GetActiveSubscriptionsAsync(
+        await _reader.Received(1).GetActiveSubscriptionsAsync(
             Arg.Any<string>(), triggerTenantId, Arg.Any<CancellationToken>());
     }
 
@@ -121,7 +121,7 @@ public sealed class WebhookFanoutHandlerTests
     public async Task HandleAsync_EnvelopeApiVersion_IsConstant()
     {
         IReadOnlyList<WebhookSubscription> subscriptions = [BuildSubscription()];
-        _store.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _reader.GetActiveSubscriptionsAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
               .Returns(Task.FromResult(subscriptions));
 
         IEnumerable<SendWebhookCommand> result =

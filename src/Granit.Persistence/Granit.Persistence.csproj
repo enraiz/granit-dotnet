@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Persistence</PackageId>
-    <Description>Intercepteurs EF Core pour audit HDS et soft delete RGPD pour les applications .NET Digital Dynamics.</Description>
+    <Description>Intercepteurs EF Core pour audit HDS, soft delete RGPD et dispatch des domain events pour les applications .NET Digital Dynamics.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

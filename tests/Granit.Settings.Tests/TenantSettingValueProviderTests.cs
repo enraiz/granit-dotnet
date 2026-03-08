@@ -43,7 +43,7 @@ public sealed class TenantSettingValueProviderTests
                 callInfo.ArgAt<Func<CancellationToken, Task<SettingValue>>>(1)(CancellationToken.None));
 
         IOptions<SettingsOptions> options = Microsoft.Extensions.Options.Options.Create(new SettingsOptions());
-        TenantSettingValueProvider provider = new(currentTenant, store, cache, options);
+        TenantSettingValueProvider provider = new(currentTenant, store, store, cache, options);
         return (provider, store, cache);
     }
 

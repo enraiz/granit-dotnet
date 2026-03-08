@@ -27,7 +27,8 @@ namespace Granit.BackgroundJobs.Internal;
 /// </para>
 /// </remarks>
 internal sealed partial class CronSchedulerAgent(
-    IBackgroundJobStore store,
+    IBackgroundJobStoreReader storeReader,
+    IBackgroundJobStoreWriter storeWriter,
     IServiceScopeFactory scopeFactory,
     IClock clock,
     ILogger<CronSchedulerAgent> logger) : SingularAgent("granit-background-jobs")
@@ -35,7 +36,7 @@ internal sealed partial class CronSchedulerAgent(
     /// <inheritdoc/>
     protected override async Task startAsync(CancellationToken cancellationToken)
     {
-        IReadOnlyList<BackgroundJobDefinition> jobs = await store.GetEnabledJobsAsync(cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<BackgroundJobDefinition> jobs = await storeReader.GetEnabledJobsAsync(cancellationToken).ConfigureAwait(false);
 
         foreach (BackgroundJobDefinition job in jobs)
         {
@@ -57,7 +58,7 @@ internal sealed partial class CronSchedulerAgent(
             await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
             IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
             await bus.ScheduleAsync(message, next.Value).ConfigureAwait(false);
-            await store.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken).ConfigureAwait(false);
+            await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken).ConfigureAwait(false);
             LogJobScheduled(logger, job.JobName, next.Value);
         }
     }

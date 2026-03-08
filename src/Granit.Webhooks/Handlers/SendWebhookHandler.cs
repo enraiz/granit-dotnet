@@ -39,7 +39,7 @@ namespace Granit.Webhooks.Handlers;
 /// </remarks>
 public sealed class SendWebhookHandler(
     IHttpClientFactory httpClientFactory,
-    IWebhookDeliveryStore deliveryStore,
+    IWebhookDeliveryWriter deliveryWriter,
     IWebhookSecretProtector secretProtector,
     ILogger<SendWebhookHandler> logger,
     IClock clock)
@@ -84,7 +84,7 @@ public sealed class SendWebhookHandler(
                 "Webhook delivery timeout for subscription {SubscriptionId} delivery {DeliveryId}",
                 command.SubscriptionId, command.DeliveryId);
 
-            await deliveryStore.RecordFailureAsync(
+            await deliveryWriter.RecordFailureAsync(
                 command, httpStatusCode: null, stopwatch.ElapsedMilliseconds, timeoutMessage, cancellationToken).ConfigureAwait(false);
 
             throw new WebhookDeliveryException(timeoutMessage, ex);
@@ -99,13 +99,13 @@ public sealed class SendWebhookHandler(
                 "Non-retriable HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}",
                 statusCode, command.SubscriptionId, command.DeliveryId);
 
-            await deliveryStore.RecordFailureAsync(
+            await deliveryWriter.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds,
                 $"Non-retriable HTTP {statusCode}", cancellationToken).ConfigureAwait(false);
 
             if (ShouldSuspend(response.StatusCode))
             {
-                await deliveryStore.SuspendSubscriptionAsync(
+                await deliveryWriter.SuspendSubscriptionAsync(
                     command.SubscriptionId,
                     $"Auto-suspended: HTTP {statusCode}",
                     cancellationToken).ConfigureAwait(false);
@@ -122,7 +122,7 @@ public sealed class SendWebhookHandler(
                 "Retriable HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}",
                 statusCode, command.SubscriptionId, command.DeliveryId);
 
-            await deliveryStore.RecordFailureAsync(
+            await deliveryWriter.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds, retriableMessage, cancellationToken).ConfigureAwait(false);
 
             throw new WebhookDeliveryException(retriableMessage);
@@ -133,7 +133,7 @@ public sealed class SendWebhookHandler(
             "Webhook delivered successfully HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}",
             statusCode, command.SubscriptionId, command.DeliveryId);
 
-        await deliveryStore.RecordSuccessAsync(
+        await deliveryWriter.RecordSuccessAsync(
             command, statusCode, stopwatch.ElapsedMilliseconds, payloadHash, cancellationToken).ConfigureAwait(false);
     }
 

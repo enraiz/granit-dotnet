@@ -68,8 +68,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.500.87",
-        "contentHash": "KG7NSPXxQQR4i166Y5u6yz0LN6ob/lWm4wo/ot5/NnKU8sBpOeQqlzgT0HNHxSUydbsIz9NK9Vk2tAVa2wmgOA=="
+        "resolved": "3.7.500.88",
+        "contentHash": "Mr89+YP/uT/1fWlqsZ9+frjtmWFYu6a0iPris2LBuT+aXGeSJkACET2DYaU4dDeFLqA1oJlGKl9VzHhYZHhWqg=="
       },
       "Castle.Core": {
         "type": "Transitive",
@@ -135,14 +135,6 @@
         "contentHash": "4TD9AXDRsipTmaemwnjt/DM5Ri0de2JzHQhvZ4woBTjUtL4XrPNsMrOk5oiLJAx1gTrE6pOIhxv+lEde5F6CZA==",
         "dependencies": {
           "Microsoft.Extensions.Primitives": "10.0.3"
-        }
-      },
-      "Microsoft.Extensions.Logging.Abstractions": {
-        "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
         }
       },
       "Microsoft.Extensions.Primitives": {
@@ -272,7 +264,8 @@
       "granit.blobstorage": {
         "type": "Project",
         "dependencies": {
-          "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Guids": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -282,7 +275,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "[3.*, )",
-          "Granit.BlobStorage": "[0.1.0-dev, )",
+          "Granit.BlobStorage": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -294,7 +287,7 @@
       "granit.guids": {
         "type": "Project",
         "dependencies": {
-          "Granit.Timing": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -302,7 +295,7 @@
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -310,10 +303,10 @@
       "AWSSDK.S3": {
         "type": "CentralTransitive",
         "requested": "[3.*, )",
-        "resolved": "3.7.510.13",
-        "contentHash": "Q0yADraTgCa6wr56H08EPwpOcR+uNSSAk+NPDmW32zKNqLxEKH4kmrmx7I+cCqWEOtxhTHuATOIt04SEEYi57A==",
+        "resolved": "3.7.510.14",
+        "contentHash": "m5LdMGcrlgXH8ZCVLKVwRm7i7uIPjsP+562XRt1AkTvSzUVMihA65e2O3Kl2u0DPM2vadzKlhIwaP8TkD9AHkA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.500.87, 4.0.0)"
+          "AWSSDK.Core": "[3.7.500.88, 4.0.0)"
         }
       },
       "Microsoft.Extensions.Configuration.Binder": {
@@ -343,6 +336,15 @@
           "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.3",
           "Microsoft.Extensions.FileProviders.Abstractions": "10.0.3",
           "Microsoft.Extensions.Logging.Abstractions": "10.0.3"
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
         }
       },
       "Microsoft.Extensions.Options": {

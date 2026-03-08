@@ -216,7 +216,7 @@ public sealed class PatientService(IFeatureLimitGuard limitGuard, IPatientReposi
 Publier `FeatureValueChangedEvent` via Wolverine après toute modification d'un override.
 
 ```csharp
-public sealed class OverrideTenantFeatureHandler(IFeatureStore store, IMessageBus bus)
+public sealed class OverrideTenantFeatureHandler(IFeatureStoreWriter store, IMessageBus bus)
 {
     public async Task Handle(OverrideTenantFeatureCommand cmd, CancellationToken ct)
     {
@@ -229,7 +229,7 @@ public sealed class OverrideTenantFeatureHandler(IFeatureStore store, IMessageBu
 ## Persistance EF Core
 
 `GranitFeaturesEntityFrameworkCoreModule` remplace `InMemoryFeatureStore` par
-`EfCoreFeatureStore`. Les overrides sont stockés dans la table `saas_feature_overrides`
+`EfCoreFeatureStore` (implémente `IFeatureStoreReader` et `IFeatureStoreWriter`). Les overrides sont stockés dans la table `saas_feature_overrides`
 avec une piste d'audit HDS complète (créé par, modifié par, horodatages).
 
 ```csharp
@@ -247,7 +247,7 @@ src/
   ├── ValueTypes/        Toggle | Numeric | Selection, NumericConstraint
   ├── ValueProviders/    Default (300) → Plan (200) → Tenant (100)
   ├── Plans/             IPlanFeatureStore, IPlanIdProvider  (app implements)
-  ├── Store/             IFeatureStore, InMemoryFeatureStore (dev/test)
+  ├── Store/             IFeatureStoreReader, IFeatureStoreWriter, InMemoryFeatureStore (dev/test)
   ├── Checker/           IFeatureChecker — cache all-in-one par tenant
   ├── Cache/             FeatureCacheKey, FeatureCacheInvalidationHandler
   ├── Limits/            IFeatureLimitGuard, FeatureLimitGuard
@@ -265,13 +265,15 @@ src/
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `IFeatureDefinitionStore` | `FeatureDefinitionStore` | Singleton |
-| `IFeatureStore` | `InMemoryFeatureStore` (remplaçable via `TryAdd`) | Singleton |
+| `IFeatureStoreReader` | `InMemoryFeatureStore` (remplaçable via `TryAdd`) | Singleton |
+| `IFeatureStoreWriter` | `InMemoryFeatureStore` (remplaçable via `TryAdd`) | Singleton |
 | `IFeatureValueProvider` (×3) | Default, Plan, Tenant | Scoped |
 | `IFeatureChecker` | `FeatureChecker` | Scoped |
 | `IFeatureLimitGuard` | `FeatureLimitGuard` | Scoped |
 
 `EfCoreFeatureStore` (module EF Core) remplace `InMemoryFeatureStore` par
-`services.AddSingleton<IFeatureStore, EfCoreFeatureStore>()`.
+`services.AddSingleton<IFeatureStoreReader, EfCoreFeatureStore>()` et
+`services.AddSingleton<IFeatureStoreWriter, EfCoreFeatureStore>()`.
 
 ## Multi-tenancy optionnelle
 
@@ -295,7 +297,7 @@ src/
 ## Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
+| --------- | ------- |
 | **Dépend de** | `Granit.Core`, `Granit.Caching`, `Granit.Localization` |
 | **Utilisé par** | `Granit.Features.EntityFrameworkCore` |
 

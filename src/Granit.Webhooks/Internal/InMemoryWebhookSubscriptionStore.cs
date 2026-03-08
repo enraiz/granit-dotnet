@@ -6,10 +6,11 @@ using Granit.Webhooks.Domain;
 namespace Granit.Webhooks.Internal;
 
 /// <summary>
-/// Thread-safe in-memory implementation of <see cref="IWebhookSubscriptionStore"/>.
+/// Thread-safe in-memory implementation of <see cref="IWebhookSubscriptionReader"/> and
+/// <see cref="IWebhookSubscriptionWriter"/>.
 /// Suitable for development and unit tests. Does not persist across application restarts.
 /// </summary>
-internal sealed class InMemoryWebhookSubscriptionStore(IClock clock) : IWebhookSubscriptionStore
+internal sealed class InMemoryWebhookSubscriptionStore(IClock clock) : IWebhookSubscriptionReader, IWebhookSubscriptionWriter
 {
     private readonly IClock _clock = clock;
     private readonly ConcurrentDictionary<Guid, WebhookSubscription> _subscriptions = new();
@@ -38,8 +39,7 @@ internal sealed class InMemoryWebhookSubscriptionStore(IClock clock) : IWebhookS
     {
         if (_subscriptions.TryGetValue(subscriptionId, out WebhookSubscription? subscription))
         {
-            subscription.Status = WebhookSubscriptionStatus.Deactivated;
-            subscription.DeactivationReason = reason;
+            subscription.Deactivate(reason);
         }
 
         return Task.CompletedTask;
@@ -58,10 +58,7 @@ internal sealed class InMemoryWebhookSubscriptionStore(IClock clock) : IWebhookS
     {
         if (_subscriptions.TryGetValue(subscriptionId, out WebhookSubscription? subscription))
         {
-            subscription.Status = WebhookSubscriptionStatus.Suspended;
-            subscription.DeactivationReason = reason;
-            subscription.SuspendedAt = _clock.Now;
-            subscription.SuspendedBy = "system";
+            subscription.Suspend(_clock.Now, "system", reason);
         }
 
         return Task.CompletedTask;

@@ -29,13 +29,13 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
     public async Task Already_matched_header_skipped_in_exact_tier()
     {
         // Arrange — saved mapping takes "Niss", so exact match on "Niss" should not duplicate
-        IMappingStore store = Substitute.For<IMappingStore>();
+        IMappingReader store = Substitute.For<IMappingReader>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
             .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("Niss", "Niss", MappingConfidence.Saved),
             ]);
-        _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
+        _serviceProvider.GetService(typeof(IMappingReader)).Returns(store);
 
         List<string> headers = ["Niss", "FirstName"];
 
@@ -83,13 +83,13 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
     public async Task Saved_mapping_with_null_target_is_skipped()
     {
         // Arrange — saved mapping with null TargetProperty should be filtered out
-        IMappingStore store = Substitute.For<IMappingStore>();
+        IMappingReader store = Substitute.For<IMappingReader>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
             .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("Unmapped Column", null, MappingConfidence.Saved),
             ]);
-        _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
+        _serviceProvider.GetService(typeof(IMappingReader)).Returns(store);
 
         List<string> headers = ["Unmapped Column"];
 
@@ -105,13 +105,13 @@ public sealed class MappingSuggestionServiceEdgeCaseTests
     public async Task Saved_mapping_not_in_headers_is_skipped()
     {
         // Arrange — saved mapping for a column not in headers
-        IMappingStore store = Substitute.For<IMappingStore>();
+        IMappingReader store = Substitute.For<IMappingReader>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
             .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("Ghost Column", "Niss", MappingConfidence.Saved),
             ]);
-        _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
+        _serviceProvider.GetService(typeof(IMappingReader)).Returns(store);
 
         List<string> headers = ["FirstName"];
 

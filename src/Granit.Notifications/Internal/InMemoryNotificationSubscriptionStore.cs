@@ -4,7 +4,7 @@ using Granit.Notifications.Domain;
 
 namespace Granit.Notifications.Internal;
 
-internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubscriptionStore
+internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubscriptionReader, INotificationSubscriptionWriter
 {
     private readonly ConcurrentDictionary<string, NotificationSubscription> _subscriptions = new();
 

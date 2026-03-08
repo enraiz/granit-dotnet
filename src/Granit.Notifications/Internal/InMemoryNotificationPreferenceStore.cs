@@ -4,7 +4,7 @@ using Granit.Notifications.Domain;
 
 namespace Granit.Notifications.Internal;
 
-internal sealed class InMemoryNotificationPreferenceStore : INotificationPreferenceStore
+internal sealed class InMemoryNotificationPreferenceStore : INotificationPreferenceReader, INotificationPreferenceWriter
 {
     private readonly ConcurrentDictionary<string, NotificationPreference> _preferences = new();
 

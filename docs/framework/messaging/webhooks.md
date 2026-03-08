@@ -13,16 +13,16 @@ Deux packages composables :
 
 ## Architecture
 
-```text
-[Événement métier]
-      ↓
-WebhookTrigger          ← message publié par l'application (IWebhookPublisher)
-      ↓
-WebhookFanoutHandler    ← résout les abonnements actifs → IEnumerable<SendWebhookCommand>
-      ↓  (cascade Wolverine — dans la même transaction Outbox)
-SendWebhookCommand × N  ← un par abonné, enqueue dans la queue "webhook-delivery"
-      ↓
-SendWebhookHandler      ← HTTP POST + signature HMAC-SHA256 + audit HDS
+```mermaid
+flowchart TD
+    A["Événement métier"] --> B["WebhookTrigger
+    message publié par l'application (IWebhookPublisher)"]
+    B --> C["WebhookFanoutHandler
+    résout les abonnements actifs → IEnumerable‹SendWebhookCommand›"]
+    C -- "cascade Wolverine — même transaction Outbox" --> D["SendWebhookCommand × N
+    un par abonné, enqueue dans la queue webhook-delivery"]
+    D --> E["SendWebhookHandler
+    HTTP POST + signature HMAC-SHA256 + audit HDS"]
 ```
 
 Le fan-out et l'envoi sont **entièrement découplés** : Wolverine publie les `N` commandes
@@ -190,17 +190,22 @@ builder.Services.Replace(ServiceDescriptor.Scoped<IWebhookSecretProtector, Vault
 Deux abstractions permettent de remplacer les implémentations selon l'environnement :
 
 ```csharp
-// Résout les abonnements actifs par type d'événement et tenant
-public interface IWebhookSubscriptionStore
+// Lecture des abonnements actifs par type d'événement et tenant
+public interface IWebhookSubscriptionStoreReader
 {
     Task<IReadOnlyList<WebhookSubscription>> GetActiveSubscriptionsAsync(
         string eventType, Guid? tenantId, CancellationToken ct = default);
     Task<WebhookSubscription?> FindByIdAsync(Guid subscriptionId, CancellationToken ct = default);
+}
+
+// Écriture et mutations sur les abonnements
+public interface IWebhookSubscriptionStoreWriter
+{
     Task DeactivateAsync(Guid subscriptionId, string reason, CancellationToken ct = default);
 }
 
 // Enregistre les tentatives de livraison (audit trail HDS)
-public interface IWebhookDeliveryStore
+public interface IWebhookDeliveryStoreWriter
 {
     Task RecordSuccessAsync(SendWebhookCommand command, int httpStatusCode,
         long durationMs, string payloadHash, CancellationToken ct = default);
@@ -212,8 +217,9 @@ public interface IWebhookDeliveryStore
 
 | Store | `Granit.Webhooks` | `Granit.Webhooks.EntityFrameworkCore` |
 | --- | --- | --- |
-| `IWebhookSubscriptionStore` | `InMemoryWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
-| `IWebhookDeliveryStore` | `NullWebhookDeliveryStore` (no-op) | `EfWebhookDeliveryStore` |
+| `IWebhookSubscriptionStoreReader` | `InMemoryWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
+| `IWebhookSubscriptionStoreWriter` | `InMemoryWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
+| `IWebhookDeliveryStoreWriter` | `NullWebhookDeliveryStore` (no-op) | `EfWebhookDeliveryStore` |
 
 ### Abonnements globaux vs par tenant
 

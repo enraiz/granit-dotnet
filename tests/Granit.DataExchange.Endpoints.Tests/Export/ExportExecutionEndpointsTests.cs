@@ -27,7 +27,8 @@ public sealed class ExportExecutionEndpointsTests : IAsyncDisposable
     private const string ExportPrefix = "/data-exchange/export";
 
     private readonly IExportOrchestrator _orchestrator = Substitute.For<IExportOrchestrator>();
-    private readonly IExportPresetStore _presetStore = Substitute.For<IExportPresetStore>();
+    private readonly IExportPresetReader _presetReader = Substitute.For<IExportPresetReader>();
+    private readonly IExportPresetWriter _presetWriter = Substitute.For<IExportPresetWriter>();
     private readonly IExportDefinitionDescriptor _descriptor;
     private readonly WebApplication _app;
     private readonly HttpClient _adminClient;
@@ -55,11 +56,14 @@ public sealed class ExportExecutionEndpointsTests : IAsyncDisposable
 
         builder.Services.AddAuthorization();
         builder.Services.AddSingleton(_orchestrator);
-        builder.Services.AddSingleton(_presetStore);
+        builder.Services.AddSingleton(_presetReader);
+        builder.Services.AddSingleton(_presetWriter);
         builder.Services.AddSingleton(_descriptor);
+        builder.Services.AddSingleton(Substitute.For<IExportJobReader>());
 
         // Required by import endpoints (compiled at startup)
-        builder.Services.AddSingleton(Substitute.For<IImportJobStore>());
+        builder.Services.AddSingleton(Substitute.For<IImportJobReader>());
+        builder.Services.AddSingleton(Substitute.For<IImportJobWriter>());
         builder.Services.AddSingleton(Substitute.For<IImportFileProvider>());
         builder.Services.AddSingleton(Substitute.For<IMappingSuggestionService>());
         builder.Services.AddSingleton(Substitute.For<IClock>());

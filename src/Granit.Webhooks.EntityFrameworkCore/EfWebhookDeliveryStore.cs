@@ -7,14 +7,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Webhooks.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="IWebhookDeliveryStore"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="IWebhookDeliveryWriter"/> backed by PostgreSQL.
 /// </summary>
 /// <remarks>
 /// HDS compliance: <see cref="WebhookDeliveryAttempt"/> records are INSERT-only.
 /// This store never updates or deletes them.
 /// </remarks>
 internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext> contextFactory, IClock clock)
-    : IWebhookDeliveryStore
+    : IWebhookDeliveryWriter
 {
     public async Task RecordSuccessAsync(
         SendWebhookCommand command,
@@ -103,10 +103,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
             return;
         }
 
-        subscription.Status = WebhookSubscriptionStatus.Suspended;
-        subscription.DeactivationReason = reason;
-        subscription.SuspendedAt = clock.Now;
-        subscription.SuspendedBy = "system";
+        subscription.Suspend(clock.Now, "system", reason);
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }

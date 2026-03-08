@@ -34,12 +34,12 @@ internal static class BackgroundJobsWriteEndpoints
 
     private static async Task<Results<NoContent, NotFound>> PauseJobAsync(
         string name,
-        IBackgroundJobManager manager,
+        IBackgroundJobWriter writer,
         CancellationToken ct)
     {
         try
         {
-            await manager.PauseAsync(name, ct).ConfigureAwait(false);
+            await writer.PauseAsync(name, ct).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
         catch (EntityNotFoundException)
@@ -50,12 +50,12 @@ internal static class BackgroundJobsWriteEndpoints
 
     private static async Task<Results<NoContent, NotFound>> ResumeJobAsync(
         string name,
-        IBackgroundJobManager manager,
+        IBackgroundJobWriter writer,
         CancellationToken ct)
     {
         try
         {
-            await manager.ResumeAsync(name, ct).ConfigureAwait(false);
+            await writer.ResumeAsync(name, ct).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
         catch (EntityNotFoundException)
@@ -66,12 +66,12 @@ internal static class BackgroundJobsWriteEndpoints
 
     private static async Task<Results<Accepted, NotFound>> TriggerJobAsync(
         string name,
-        IBackgroundJobManager manager,
+        IBackgroundJobWriter writer,
         CancellationToken ct)
     {
         try
         {
-            await manager.TriggerNowAsync(name, ct).ConfigureAwait(false);
+            await writer.TriggerNowAsync(name, ct).ConfigureAwait(false);
             return TypedResults.Accepted((string?)null);
         }
         catch (EntityNotFoundException)

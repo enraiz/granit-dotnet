@@ -9,17 +9,19 @@ namespace Granit.Settings.Providers;
 
 /// <summary>
 /// Global settings provider (application scope, no tenant/user isolation).
-/// Caches values read from <see cref="ISettingStore"/> (order = 300).
+/// Caches values read from <see cref="ISettingStoreReader"/> (order = 300).
 /// </summary>
 public sealed class GlobalSettingValueProvider(
-    ISettingStore store,
+    ISettingStoreReader storeReader,
+    ISettingStoreWriter storeWriter,
     ICacheService<SettingValue> cache,
     IOptions<SettingsOptions> options) : ISettingValueProvider
 {
     /// <summary>Global provider identifier.</summary>
     public const string ProviderName = "G";
 
-    private readonly ISettingStore _store = store;
+    private readonly ISettingStoreReader _storeReader = storeReader;
+    private readonly ISettingStoreWriter _storeWriter = storeWriter;
     private readonly ICacheService<SettingValue> _cache = cache;
     private readonly IOptions<SettingsOptions> _options = options;
 
@@ -42,7 +44,7 @@ public sealed class GlobalSettingValueProvider(
             cacheKey,
             async innerCt =>
             {
-                SettingValue? stored = await _store.GetOrNullAsync(
+                SettingValue? stored = await _storeReader.GetOrNullAsync(
                     definition.Name, ProviderName, null, innerCt).ConfigureAwait(false);
                 // Sentinel to distinguish "stored null" from "absent from cache"
                 return stored ?? new SettingValue(definition.Name, ProviderName, null, null);
@@ -56,14 +58,14 @@ public sealed class GlobalSettingValueProvider(
     /// <inheritdoc/>
     public async Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default)
     {
-        await _store.SetAsync(definition.Name, ProviderName, null, value, ct).ConfigureAwait(false);
+        await _storeWriter.SetAsync(definition.Name, ProviderName, null, value, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, null, definition.Name), ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task ClearAsync(SettingDefinition definition, CancellationToken ct = default)
     {
-        await _store.DeleteAsync(definition.Name, ProviderName, null, ct).ConfigureAwait(false);
+        await _storeWriter.DeleteAsync(definition.Name, ProviderName, null, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, null, definition.Name), ct).ConfigureAwait(false);
     }
 }

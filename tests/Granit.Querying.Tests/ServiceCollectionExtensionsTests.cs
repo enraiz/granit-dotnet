@@ -8,29 +8,55 @@ namespace Granit.Querying.Tests;
 public sealed class ServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddGranitQuerying_registers_null_saved_view_store()
+    public void AddGranitQuerying_registers_null_saved_view_store_reader()
     {
         ServiceCollection services = new();
 
         services.AddGranitQuerying();
 
         services.ShouldContain(d =>
-            d.ServiceType == typeof(ISavedViewStore) &&
+            d.ServiceType == typeof(ISavedViewStoreReader) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
 
     [Fact]
-    public void AddGranitQuerying_does_not_replace_existing_store()
+    public void AddGranitQuerying_registers_null_saved_view_store_writer()
     {
         ServiceCollection services = new();
-        services.AddScoped<ISavedViewStore, FakeSavedViewStore>();
+
+        services.AddGranitQuerying();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(ISavedViewStoreWriter) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitQuerying_does_not_replace_existing_reader()
+    {
+        ServiceCollection services = new();
+        services.AddScoped<ISavedViewStoreReader, FakeSavedViewStoreReader>();
 
         services.AddGranitQuerying();
 
         ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
-        ISavedViewStore store = scope.ServiceProvider.GetRequiredService<ISavedViewStore>();
-        store.ShouldBeOfType<FakeSavedViewStore>();
+        ISavedViewStoreReader store = scope.ServiceProvider.GetRequiredService<ISavedViewStoreReader>();
+        store.ShouldBeOfType<FakeSavedViewStoreReader>();
+    }
+
+    [Fact]
+    public void AddGranitQuerying_does_not_replace_existing_writer()
+    {
+        ServiceCollection services = new();
+        services.AddScoped<ISavedViewStoreWriter, FakeSavedViewStoreWriter>();
+
+        services.AddGranitQuerying();
+
+        ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+        ISavedViewStoreWriter store = scope.ServiceProvider.GetRequiredService<ISavedViewStoreWriter>();
+        store.ShouldBeOfType<FakeSavedViewStoreWriter>();
     }
 
     [Fact]
@@ -98,7 +124,7 @@ public sealed class ServiceCollectionExtensionsTests
             builder.Column(e => e.Name);
     }
 
-    private sealed class FakeSavedViewStore : ISavedViewStore
+    private sealed class FakeSavedViewStoreReader : ISavedViewStoreReader
     {
         public Task<IReadOnlyList<SavedView>> GetListAsync(
             string entityType, string userId, Guid? tenantId, CancellationToken ct = default) =>
@@ -106,7 +132,10 @@ public sealed class ServiceCollectionExtensionsTests
 
         public Task<SavedView?> GetAsync(Guid id, CancellationToken ct = default) =>
             Task.FromResult<SavedView?>(null);
+    }
 
+    private sealed class FakeSavedViewStoreWriter : ISavedViewStoreWriter
+    {
         public Task CreateAsync(SavedView view, CancellationToken ct = default) =>
             Task.CompletedTask;
 

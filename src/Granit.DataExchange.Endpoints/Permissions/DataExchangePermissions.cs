@@ -4,7 +4,7 @@ namespace Granit.DataExchange.Endpoints.Permissions;
 
 /// <summary>
 /// Permission constants for the <c>Granit.DataExchange.Endpoints</c> module.
-/// Use these names when granting permissions via <c>IPermissionManager.SetAsync()</c>
+/// Use these names when granting permissions via <c>IPermissionManagerWriter.SetAsync()</c>
 /// or when checking access via <c>IPermissionChecker.IsGrantedAsync()</c>.
 /// </summary>
 [SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Permission resource names follow [Module].[Resource].[Action] convention")]

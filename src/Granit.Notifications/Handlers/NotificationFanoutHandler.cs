@@ -9,8 +9,8 @@ namespace Granit.Notifications.Handlers;
 /// <see cref="DeliverNotificationCommand"/> per recipient x channel.
 /// </summary>
 public sealed class NotificationFanoutHandler(
-    INotificationSubscriptionStore subscriptionStore,
-    INotificationPreferenceStore preferenceStore,
+    INotificationSubscriptionReader subscriptionReader,
+    INotificationPreferenceReader preferenceReader,
     INotificationDefinitionStore definitionStore,
     ICurrentTenant currentTenant)
 {
@@ -31,7 +31,7 @@ public sealed class NotificationFanoutHandler(
 
         if (recipientUserIds.Count == 0 && trigger.RelatedEntity is not null)
         {
-            recipientUserIds = await subscriptionStore.GetEntityFollowerIdsAsync(
+            recipientUserIds = await subscriptionReader.GetEntityFollowerIdsAsync(
                 trigger.RelatedEntity.EntityType,
                 trigger.RelatedEntity.EntityId,
                 tenantId,
@@ -40,7 +40,7 @@ public sealed class NotificationFanoutHandler(
 
         if (recipientUserIds.Count == 0)
         {
-            recipientUserIds = await subscriptionStore.GetSubscriberIdsAsync(
+            recipientUserIds = await subscriptionReader.GetSubscriberIdsAsync(
                 trigger.NotificationTypeName,
                 tenantId,
                 cancellationToken).ConfigureAwait(false);
@@ -59,7 +59,7 @@ public sealed class NotificationFanoutHandler(
             {
                 if (allowOptOut)
                 {
-                    bool isEnabled = await preferenceStore.IsChannelEnabledAsync(
+                    bool isEnabled = await preferenceReader.IsChannelEnabledAsync(
                         userId, trigger.NotificationTypeName, channelName, tenantId, cancellationToken).ConfigureAwait(false);
                     if (!isEnabled)
                     {

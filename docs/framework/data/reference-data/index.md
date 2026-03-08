@@ -90,13 +90,18 @@ La configuration est lue depuis la section `ReferenceData` :
 
 ## Store
 
-L'interface `IReferenceDataStore<TEntity>` fournit les opérations CRUD :
+Les interfaces `IReferenceDataStoreReader<TEntity>` et `IReferenceDataStoreWriter<TEntity>`
+séparent les opérations de lecture et d'écriture (CQRS) :
 
 ```csharp
-public interface IReferenceDataStore<TEntity>
+public interface IReferenceDataStoreReader<TEntity>
 {
     Task<ReferenceDataResult<TEntity>> GetAllAsync(ReferenceDataQuery? query, CancellationToken ct);
     Task<TEntity?> GetByCodeAsync(string code, CancellationToken ct);
+}
+
+public interface IReferenceDataStoreWriter<TEntity>
+{
     Task CreateAsync(TEntity entity, CancellationToken ct);
     Task UpdateAsync(TEntity entity, CancellationToken ct);
     Task SetActiveAsync(string code, bool isActive, CancellationToken ct);
@@ -108,7 +113,7 @@ public interface IReferenceDataStore<TEntity>
 `ReferenceDataQuery` supporte le filtrage, le tri et la pagination :
 
 ```csharp
-ReferenceDataResult<Country> result = await store.GetAllAsync(
+ReferenceDataResult<Country> result = await storeReader.GetAllAsync(
     new ReferenceDataQuery(
         ActiveOnly: true,
         SearchTerm: "belg",
@@ -126,13 +131,16 @@ public sealed class CountrySeeder : IReferenceDataSeeder<Country>
 {
     public int Order => 1;
 
-    public async Task SeedAsync(IReferenceDataStore<Country> store, CancellationToken ct)
+    public async Task SeedAsync(
+        IReferenceDataStoreReader<Country> storeReader,
+        IReferenceDataStoreWriter<Country> storeWriter,
+        CancellationToken ct)
     {
         // Upsert par Code (idempotent)
-        Country? existing = await store.GetByCodeAsync("BE", ct);
+        Country? existing = await storeReader.GetByCodeAsync("BE", ct);
         if (existing is null)
         {
-            await store.CreateAsync(new Country
+            await storeWriter.CreateAsync(new Country
             {
                 Code = "BE",
                 LabelEn = "Belgium",

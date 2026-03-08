@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.DataExchange.EntityFrameworkCore.Internal.Import.Stores;
 
 /// <summary>
-/// EF Core implementation of <see cref="IImportJobStore"/>.
+/// EF Core implementation of <see cref="IImportJobReader"/> and <see cref="IImportJobWriter"/>.
 /// Performs CRUD operations on <see cref="ImportJob"/> via <see cref="DataExchangeDbContext"/>.
 /// </summary>
 internal sealed class EfImportJobStore(
-    IDbContextFactory<DataExchangeDbContext> contextFactory) : IImportJobStore
+    IDbContextFactory<DataExchangeDbContext> contextFactory) : IImportJobReader, IImportJobWriter
 {
     /// <inheritdoc/>
     public async Task<ImportJob?> GetAsync(Guid id, CancellationToken ct = default)

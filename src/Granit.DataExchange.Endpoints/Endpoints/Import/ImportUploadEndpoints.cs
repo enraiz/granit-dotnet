@@ -48,7 +48,7 @@ internal static class ImportUploadEndpoints
         [FromForm] string definitionName,
         IServiceProvider serviceProvider,
         IImportFileProvider fileProvider,
-        IImportJobStore jobStore,
+        IImportJobWriter jobWriter,
         IClock clock,
         CancellationToken ct)
     {
@@ -92,20 +92,21 @@ internal static class ImportUploadEndpoints
             CreatedAt = clock.Now,
         };
 
-        await jobStore.CreateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.CreateAsync(job, ct).ConfigureAwait(false);
 
         return TypedResults.Created($"/{job.Id}", ImportJobResponse.FromJob(job));
     }
 
     private static async Task<Results<Ok<ImportPreviewResponse>, NotFound>> PreviewAsync(
         Guid jobId,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
+        IImportJobWriter jobWriter,
         IServiceProvider serviceProvider,
         IImportFileProvider fileProvider,
         IMappingSuggestionService mappingService,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -139,7 +140,7 @@ internal static class ImportUploadEndpoints
         IReadOnlyList<ImportFieldMetadata> fieldMetadata = descriptor.GetFieldMetadata();
 
         job.Status = ImportJobStatus.Previewed;
-        await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
         return TypedResults.Ok(new ImportPreviewResponse(headers, previewRows, suggestions, fieldMetadata));
     }
@@ -147,10 +148,11 @@ internal static class ImportUploadEndpoints
     private static async Task<Results<NoContent, NotFound, BadRequest<string>>> ConfirmMappingsAsync(
         Guid jobId,
         ConfirmMappingsRequest request,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
+        IImportJobWriter jobWriter,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -163,7 +165,7 @@ internal static class ImportUploadEndpoints
 
         job.MappingsJson = JsonSerializer.Serialize(request.Mappings);
         job.Status = ImportJobStatus.Mapped;
-        await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

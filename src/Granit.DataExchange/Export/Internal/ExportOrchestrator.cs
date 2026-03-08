@@ -19,7 +19,8 @@ namespace Granit.DataExchange.Export.Internal;
 internal sealed partial class ExportOrchestrator(
     IServiceProvider serviceProvider,
     IEnumerable<IExportWriter> writers,
-    IExportJobStore jobStore,
+    IExportJobReader jobReader,
+    IExportJobWriter jobWriter,
     IExportCommandDispatcher dispatcher,
     IImportFileProvider fileProvider,
     IClock clock,
@@ -44,7 +45,7 @@ internal sealed partial class ExportOrchestrator(
             Status = ExportJobStatus.Queued,
         };
 
-        await jobStore.CreateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.CreateAsync(job, ct).ConfigureAwait(false);
 
         // Dispatch to background worker
         await dispatcher.DispatchAsync(new ExecuteExportCommand(job.Id), ct).ConfigureAwait(false);
@@ -56,7 +57,7 @@ internal sealed partial class ExportOrchestrator(
     /// <inheritdoc/>
     public async Task ExecuteAsync(Guid jobId, CancellationToken ct = default)
     {
-        ExportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ExportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             LogJobNotFound(jobId);
@@ -66,7 +67,7 @@ internal sealed partial class ExportOrchestrator(
         try
         {
             job.Status = ExportJobStatus.Exporting;
-            await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
             ExportRequest request = JsonSerializer.Deserialize<ExportRequest>(job.RequestJson)!;
             IExportDefinitionDescriptor definition = ResolveDefinition(request.DefinitionName);
@@ -92,7 +93,7 @@ internal sealed partial class ExportOrchestrator(
             job.FileName = fileName;
             job.RowCount = rowCount;
             job.CompletedAt = clock.Now;
-            await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ExportJobCompletedEvent(
                 jobId, request.DefinitionName, ExportJobStatus.Completed,
@@ -105,7 +106,7 @@ internal sealed partial class ExportOrchestrator(
             job.Status = ExportJobStatus.Failed;
             job.ErrorMessage = ex.Message;
             job.CompletedAt = clock.Now;
-            await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ExportJobCompletedEvent(
                 jobId, job.DefinitionName, ExportJobStatus.Failed,
@@ -118,12 +119,12 @@ internal sealed partial class ExportOrchestrator(
 
     /// <inheritdoc/>
     public async Task<ExportJob?> GetJobAsync(Guid jobId, CancellationToken ct = default) =>
-        await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public async Task<ExportDownload?> GetDownloadAsync(Guid jobId, CancellationToken ct = default)
     {
-        ExportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ExportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job?.Status is not ExportJobStatus.Completed || job.BlobReference is null || job.FileName is null)
         {
             return null;

@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     /// Registers the following services:
     /// <list type="bullet">
-    ///   <item><see cref="ISavedViewStore"/> (scoped) — null-object default.</item>
+    ///   <item><see cref="ISavedViewStoreReader"/> / <see cref="ISavedViewStoreWriter"/> (scoped) — null-object default.</item>
     /// </list>
     /// <para>
     /// For the EF Core query engine, add <c>Granit.Querying.EntityFrameworkCore</c>.
@@ -27,7 +27,10 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddGranitQuerying(this IServiceCollection services)
     {
-        services.TryAddScoped<ISavedViewStore, NullSavedViewStore>();
+        // Default in-memory store — register concrete type, then forward both interfaces to same instance.
+        services.TryAddScoped<NullSavedViewStore>();
+        services.TryAddScoped<ISavedViewStoreReader>(sp => sp.GetRequiredService<NullSavedViewStore>());
+        services.TryAddScoped<ISavedViewStoreWriter>(sp => sp.GetRequiredService<NullSavedViewStore>());
 
         services.TryAddSingleton(sp =>
             sp.GetRequiredService<IOptions<QueryingOptions>>().Value);

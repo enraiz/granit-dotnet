@@ -21,8 +21,8 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
     /// Reads <see cref="BackgroundJobsOptions"/> from the <c>"BackgroundJobs"</c>
     /// configuration section and registers:
     /// <list type="bullet">
-    ///   <item><see cref="IBackgroundJobManager"/> — admin API (scoped).</item>
-    ///   <item><see cref="IBackgroundJobStore"/> — InMemory or EF Core, depending on <see cref="JobStoreMode"/>.</item>
+    ///   <item><see cref="IBackgroundJobReader"/> and <see cref="IBackgroundJobWriter"/> — admin API (scoped).</item>
+    ///   <item><see cref="IBackgroundJobStoreReader"/> and <see cref="IBackgroundJobStoreWriter"/> — InMemory or EF Core, depending on <see cref="JobStoreMode"/>.</item>
     ///   <item><see cref="RecurringJobSchedulingMiddleware"/> — Wolverine middleware for atomic rescheduling, injected via <c>opts.Policies.AddMiddleware</c>.</item>
     /// </list>
     /// <para>
@@ -59,9 +59,13 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
         // Register InMemory store as the default. When Mode = Durable, the host application
         // must call AddGranitBackgroundJobsEntityFrameworkCore() (Granit.BackgroundJobs.EntityFrameworkCore)
         // which replaces this registration with EfBackgroundJobStore.
-        builder.Services.AddSingleton<IBackgroundJobStore, InMemoryBackgroundJobStore>();
+        builder.Services.AddSingleton<InMemoryBackgroundJobStore>();
+        builder.Services.AddSingleton<IBackgroundJobStoreReader>(sp => sp.GetRequiredService<InMemoryBackgroundJobStore>());
+        builder.Services.AddSingleton<IBackgroundJobStoreWriter>(sp => sp.GetRequiredService<InMemoryBackgroundJobStore>());
 
-        builder.Services.AddScoped<IBackgroundJobManager, BackgroundJobManager>();
+        builder.Services.AddScoped<BackgroundJobManager>();
+        builder.Services.AddScoped<IBackgroundJobReader>(sp => sp.GetRequiredService<BackgroundJobManager>());
+        builder.Services.AddScoped<IBackgroundJobWriter>(sp => sp.GetRequiredService<BackgroundJobManager>());
         builder.Services.AddSingularAgent<CronSchedulerAgent>();
 
         // Discover and seed recurring jobs from all relevant assemblies.
@@ -87,7 +91,7 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
         // Seed jobs after the host is built — store must be resolved from DI.
         builder.Services.AddHostedService(sp =>
             new BackgroundJobsSeedService(
-                sp.GetRequiredService<IBackgroundJobStore>(),
+                sp.GetRequiredService<IBackgroundJobStoreWriter>(),
                 registrations));
 
         return builder;

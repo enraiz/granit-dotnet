@@ -32,8 +32,10 @@ internal sealed partial class ReferenceDataSeedContributor<TEntity>(
         IEnumerable<IReferenceDataSeeder<TEntity>> seeders =
             serviceProvider.GetServices<IReferenceDataSeeder<TEntity>>();
 
-        IReferenceDataStore<TEntity> store =
-            serviceProvider.GetRequiredService<IReferenceDataStore<TEntity>>();
+        IReferenceDataStoreReader<TEntity> storeReader =
+            serviceProvider.GetRequiredService<IReferenceDataStoreReader<TEntity>>();
+        IReferenceDataStoreWriter<TEntity> storeWriter =
+            serviceProvider.GetRequiredService<IReferenceDataStoreWriter<TEntity>>();
 
         foreach (IReferenceDataSeeder<TEntity> seeder in seeders.OrderBy(s => s.Order))
         {
@@ -42,7 +44,7 @@ internal sealed partial class ReferenceDataSeedContributor<TEntity>(
             try
             {
                 LogSeederStarted(seederName, typeof(TEntity).Name);
-                await seeder.SeedAsync(store, cancellationToken).ConfigureAwait(false);
+                await seeder.SeedAsync(storeReader, storeWriter, cancellationToken).ConfigureAwait(false);
                 LogSeederCompleted(seederName, typeof(TEntity).Name);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)

@@ -19,7 +19,8 @@ namespace Granit.DataExchange.Tests.Export;
 
 public sealed class ExportOrchestratorTests
 {
-    private readonly IExportJobStore _jobStore = Substitute.For<IExportJobStore>();
+    private readonly IExportJobReader _jobReader = Substitute.For<IExportJobReader>();
+    private readonly IExportJobWriter _jobWriter = Substitute.For<IExportJobWriter>();
     private readonly IExportCommandDispatcher _dispatcher = Substitute.For<IExportCommandDispatcher>();
     private readonly IImportFileProvider _fileProvider = Substitute.For<IImportFileProvider>();
     private readonly IClock _clock = Substitute.For<IClock>();
@@ -33,7 +34,7 @@ public sealed class ExportOrchestratorTests
         _fileProvider.SaveAsync(Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<CancellationToken>())
             .Returns("blob-ref-export");
 
-        _jobStore.GetAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _jobReader.GetAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
                 // Return a job matching the requested ID with Queued status by default
@@ -65,7 +66,7 @@ public sealed class ExportOrchestratorTests
         // Assert
         result.Status.ShouldBe(ExportJobStatus.Queued);
         result.JobId.ShouldNotBe(Guid.Empty);
-        await _jobStore.Received(1).CreateAsync(
+        await _jobWriter.Received(1).CreateAsync(
             Arg.Is<ExportJob>(j => j.DefinitionName == "Test.Export" && j.Format == "csv"),
             Arg.Any<CancellationToken>());
         await _dispatcher.Received(1).DispatchAsync(
@@ -106,7 +107,7 @@ public sealed class ExportOrchestratorTests
         ExportOrchestrator sut = CreateOrchestrator();
         var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
@@ -118,7 +119,7 @@ public sealed class ExportOrchestratorTests
         job.FileName.ShouldNotBeNull();
         job.CompletedAt.ShouldBe(_now);
         // 2 calls: Exporting then Completed (same reference, so check call count)
-        await _jobStore.Received(2).UpdateAsync(Arg.Any<ExportJob>(), Arg.Any<CancellationToken>());
+        await _jobWriter.Received(2).UpdateAsync(Arg.Any<ExportJob>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -127,13 +128,13 @@ public sealed class ExportOrchestratorTests
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
         var jobId = Guid.NewGuid();
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ExportJob?)null);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ExportJob?)null);
 
         // Act — should not throw
         await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
 
         // Assert
-        await _jobStore.DidNotReceive().UpdateAsync(Arg.Any<ExportJob>(), Arg.Any<CancellationToken>());
+        await _jobWriter.DidNotReceive().UpdateAsync(Arg.Any<ExportJob>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -151,7 +152,7 @@ public sealed class ExportOrchestratorTests
             RequestJson = JsonSerializer.Serialize(request),
             Status = ExportJobStatus.Queued,
         };
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         IExportWriter capturedWriter = Substitute.For<IExportWriter>();
         capturedWriter.CanWrite("csv").Returns(true);
@@ -171,7 +172,7 @@ public sealed class ExportOrchestratorTests
             });
 
         ExportOrchestrator sutWithCapture = CreateOrchestrator(capturedWriter);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         await sutWithCapture.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
@@ -197,7 +198,7 @@ public sealed class ExportOrchestratorTests
             RequestJson = JsonSerializer.Serialize(request),
             Status = ExportJobStatus.Queued,
         };
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         List<IReadOnlyDictionary<string, object?>> capturedRows = [];
         IExportWriter capturedWriter = Substitute.For<IExportWriter>();
@@ -220,7 +221,7 @@ public sealed class ExportOrchestratorTests
             });
 
         ExportOrchestrator sutWithCapture = CreateOrchestrator(capturedWriter);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         await sutWithCapture.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
@@ -237,7 +238,7 @@ public sealed class ExportOrchestratorTests
         // Arrange
         var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         IExportWriter failingWriter = Substitute.For<IExportWriter>();
         failingWriter.CanWrite("csv").Returns(true);
@@ -251,7 +252,7 @@ public sealed class ExportOrchestratorTests
             .Returns<Task>(_ => throw new IOException("Disk full"));
 
         ExportOrchestrator sut = CreateOrchestrator(failingWriter);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act & Assert
         await Should.ThrowAsync<IOException>(
@@ -276,7 +277,7 @@ public sealed class ExportOrchestratorTests
             RequestJson = JsonSerializer.Serialize(request),
             Status = ExportJobStatus.Queued,
         };
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         FakeQueryEngine queryEngine = new();
         ExportOrchestrator sut = CreateOrchestratorWithQueryEngine(queryEngine);
@@ -307,7 +308,7 @@ public sealed class ExportOrchestratorTests
             RequestJson = JsonSerializer.Serialize(request),
             Status = ExportJobStatus.Queued,
         };
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         IReadOnlyList<ExportFieldDescriptor>? capturedFields = null;
         IExportWriter capturedWriter = Substitute.For<IExportWriter>();
@@ -326,7 +327,7 @@ public sealed class ExportOrchestratorTests
             });
 
         ExportOrchestrator sutWithCapture = CreateOrchestrator(capturedWriter);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         await sutWithCapture.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
@@ -351,7 +352,7 @@ public sealed class ExportOrchestratorTests
             RequestJson = JsonSerializer.Serialize(request),
             Status = ExportJobStatus.Queued,
         };
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         IReadOnlyList<ExportFieldDescriptor>? capturedFields = null;
         IExportWriter capturedWriter = Substitute.For<IExportWriter>();
@@ -370,7 +371,7 @@ public sealed class ExportOrchestratorTests
             });
 
         ExportOrchestrator sutWithCapture = CreateOrchestrator(capturedWriter);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         await sutWithCapture.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
@@ -389,7 +390,7 @@ public sealed class ExportOrchestratorTests
         ExportOrchestrator sut = CreateOrchestrator();
         var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
@@ -419,7 +420,7 @@ public sealed class ExportOrchestratorTests
             RequestJson = JsonSerializer.Serialize(request),
             Status = ExportJobStatus.Queued,
         };
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         FakeQueryEngine queryEngine = new();
         ExportOrchestrator sut = CreateOrchestratorWithQueryEngine(queryEngine);
@@ -446,7 +447,7 @@ public sealed class ExportOrchestratorTests
         var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
         job.CreatedBy = "user-42";
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         await sut.ExecuteAsync(jobId, TestContext.Current.CancellationToken);
@@ -470,7 +471,7 @@ public sealed class ExportOrchestratorTests
         var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
         job.CreatedBy = "user-99";
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         IExportWriter failingWriter = Substitute.For<IExportWriter>();
         failingWriter.CanWrite("csv").Returns(true);
@@ -484,7 +485,7 @@ public sealed class ExportOrchestratorTests
             .Returns<Task>(_ => throw new IOException("Disk full"));
 
         ExportOrchestrator sut = CreateOrchestrator(failingWriter);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act & Assert
         await Should.ThrowAsync<IOException>(
@@ -506,7 +507,7 @@ public sealed class ExportOrchestratorTests
         // Arrange — OperationCanceledException should NOT be caught by the error handler
         var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Queued);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         IExportWriter cancelWriter = Substitute.For<IExportWriter>();
         cancelWriter.CanWrite("csv").Returns(true);
@@ -520,7 +521,7 @@ public sealed class ExportOrchestratorTests
             .Returns<Task>(_ => throw new OperationCanceledException());
 
         ExportOrchestrator sut = CreateOrchestrator(cancelWriter);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act & Assert — should propagate, NOT set job to Failed
         await Should.ThrowAsync<OperationCanceledException>(
@@ -545,7 +546,7 @@ public sealed class ExportOrchestratorTests
             BlobReference = "blob-ref-xlsx",
             FileName = "test_export.xlsx",
         };
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         IExportWriter xlsxWriter = Substitute.For<IExportWriter>();
         xlsxWriter.CanWrite("xlsx").Returns(true);
@@ -564,7 +565,8 @@ public sealed class ExportOrchestratorTests
         ExportOrchestrator sutXlsx = new(
             sp,
             [xlsxWriter],
-            _jobStore,
+            _jobReader,
+            _jobWriter,
             _dispatcher,
             _fileProvider,
             _clock,
@@ -589,7 +591,7 @@ public sealed class ExportOrchestratorTests
         ExportOrchestrator sut = CreateOrchestrator();
         var jobId = Guid.NewGuid();
         ExportJob expected = BuildJob(jobId, ExportJobStatus.Completed);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(expected);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(expected);
 
         // Act
         ExportJob? result = await sut.GetJobAsync(jobId, TestContext.Current.CancellationToken);
@@ -609,7 +611,7 @@ public sealed class ExportOrchestratorTests
         ExportJob job = BuildJob(jobId, ExportJobStatus.Completed);
         job.BlobReference = "blob-ref-export";
         job.FileName = "test_export.csv";
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         MemoryStream blobStream = new([1, 2, 3]);
         _fileProvider.OpenAsync("blob-ref-export", Arg.Any<CancellationToken>())
@@ -631,7 +633,7 @@ public sealed class ExportOrchestratorTests
         ExportOrchestrator sut = CreateOrchestrator();
         var jobId = Guid.NewGuid();
         ExportJob job = BuildJob(jobId, ExportJobStatus.Exporting);
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         ExportDownload? download = await sut.GetDownloadAsync(jobId, TestContext.Current.CancellationToken);
@@ -646,7 +648,7 @@ public sealed class ExportOrchestratorTests
         // Arrange
         ExportOrchestrator sut = CreateOrchestrator();
         var jobId = Guid.NewGuid();
-        _jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ExportJob?)null);
+        _jobReader.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns((ExportJob?)null);
 
         // Act
         ExportDownload? download = await sut.GetDownloadAsync(jobId, TestContext.Current.CancellationToken);
@@ -670,7 +672,8 @@ public sealed class ExportOrchestratorTests
         return new ExportOrchestrator(
             sp,
             [writer],
-            _jobStore,
+            _jobReader,
+            _jobWriter,
             _dispatcher,
             _fileProvider,
             _clock,
@@ -694,7 +697,8 @@ public sealed class ExportOrchestratorTests
         return new ExportOrchestrator(
             sp,
             [writer],
-            _jobStore,
+            _jobReader,
+            _jobWriter,
             _dispatcher,
             _fileProvider,
             _clock,

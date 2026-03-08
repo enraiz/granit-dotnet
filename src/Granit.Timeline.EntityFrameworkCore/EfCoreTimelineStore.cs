@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Timeline.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="ITimelineStore"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="ITimelineWriter"/> backed by PostgreSQL.
 /// </summary>
 /// <remarks>
 /// Each operation creates and disposes its own <see cref="TimelineDbContext"/> via
@@ -21,7 +21,7 @@ internal sealed class EfCoreTimelineStore(
     IClock clock,
     ICurrentUserService currentUser,
     IGuidGenerator guidGenerator,
-    ICurrentTenant currentTenant) : ITimelineStore
+    ICurrentTenant currentTenant) : ITimelineWriter
 {
     private readonly AuditContext _audit = new(guidGenerator, clock, currentUser, currentTenant);
 
@@ -36,6 +36,7 @@ internal sealed class EfCoreTimelineStore(
     {
         TimelineEntry entry = TimelineEntityFactory.CreateEntry(
             entityType, entityId, entryType, body, parentEntryId, _audit);
+        entry.RaisePostedEvent();
 
         await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
         db.TimelineEntries.Add(entry);
@@ -53,14 +54,7 @@ internal sealed class EfCoreTimelineStore(
             .FirstOrDefaultAsync(e => e.Id == entryId, ct).ConfigureAwait(false)
             ?? throw new KeyNotFoundException($"Timeline entry '{entryId}' not found.");
 
-        if (entry.EntryType == TimelineEntryType.SystemLog)
-        {
-            throw new InvalidOperationException("System log entries are immutable and cannot be deleted (HDS audit trail).");
-        }
-
-        entry.IsDeleted = true;
-        entry.DeletedAt = clock.Now;
-        entry.DeletedBy = currentUser.UserId;
+        entry.SoftDelete(clock.Now, currentUser.UserId);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 

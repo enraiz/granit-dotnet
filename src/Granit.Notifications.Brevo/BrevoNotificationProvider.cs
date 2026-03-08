@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Granit.Notifications.Email;
 using Granit.Notifications.Sms;
 using Granit.Notifications.WhatsApp;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Notifications.Brevo;
@@ -13,9 +14,10 @@ namespace Granit.Notifications.Brevo;
 /// and <see cref="IWhatsAppSender"/>. Uses Brevo Transactional API via <see cref="HttpClient"/>.
 /// Registered as three Keyed Services with key "Brevo".
 /// </summary>
-internal sealed class BrevoNotificationProvider(
+internal sealed partial class BrevoNotificationProvider(
     IHttpClientFactory httpClientFactory,
-    IOptions<BrevoOptions> options) : IEmailSender, ISmsSender, IWhatsAppSender
+    IOptionsMonitor<BrevoOptions> options,
+    ILogger<BrevoNotificationProvider> logger) : IEmailSender, ISmsSender, IWhatsAppSender
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -26,7 +28,7 @@ internal sealed class BrevoNotificationProvider(
     /// <inheritdoc />
     async Task IEmailSender.SendAsync(EmailMessage message, CancellationToken ct)
     {
-        BrevoOptions opts = options.Value;
+        BrevoOptions opts = options.CurrentValue;
         HttpClient client = httpClientFactory.CreateClient("Brevo");
 
         object payload = new
@@ -44,13 +46,15 @@ internal sealed class BrevoNotificationProvider(
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
             "smtp/email", payload, JsonOptions, ct).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessAsync("smtp/email", response, ct).ConfigureAwait(false);
+
+        LogEmailSent(message.To);
     }
 
     /// <inheritdoc />
     async Task ISmsSender.SendAsync(SmsMessage message, CancellationToken ct)
     {
-        BrevoOptions opts = options.Value;
+        BrevoOptions opts = options.CurrentValue;
         HttpClient client = httpClientFactory.CreateClient("Brevo");
 
         object payload = new
@@ -63,7 +67,9 @@ internal sealed class BrevoNotificationProvider(
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
             "transactionalSMS/sms", payload, JsonOptions, ct).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessAsync("transactionalSMS/sms", response, ct).ConfigureAwait(false);
+
+        LogSmsSent(message.To);
     }
 
     /// <inheritdoc />
@@ -82,6 +88,48 @@ internal sealed class BrevoNotificationProvider(
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
             "whatsapp/sendTemplate", payload, JsonOptions, ct).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessAsync("whatsapp/sendTemplate", response, ct).ConfigureAwait(false);
+
+        LogWhatsAppSent(message.To, message.TemplateName);
     }
+
+    /// <summary>
+    /// Reads the Brevo error body before throwing, so the caller (and logs) get a meaningful message.
+    /// </summary>
+    private async Task EnsureSuccessAsync(string endpoint, HttpResponseMessage response, CancellationToken ct)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        string? errorBody = null;
+        try
+        {
+            errorBody = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Best-effort — do not mask the original HTTP error.
+        }
+
+        LogBrevoError(endpoint, (int)response.StatusCode, errorBody);
+
+        throw new HttpRequestException(
+            $"Brevo API error {(int)response.StatusCode} on {endpoint}: {errorBody ?? "(no body)"}",
+            inner: null,
+            response.StatusCode);
+    }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Brevo email sent to {Recipient}")]
+    private partial void LogEmailSent(string recipient);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Brevo SMS sent to {Recipient}")]
+    private partial void LogSmsSent(string recipient);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Brevo WhatsApp sent to {Recipient} template {TemplateName}")]
+    private partial void LogWhatsAppSent(string recipient, string templateName);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Brevo API error on {Endpoint}: HTTP {StatusCode} — {ErrorBody}")]
+    private partial void LogBrevoError(string endpoint, int statusCode, string? errorBody);
 }

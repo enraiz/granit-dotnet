@@ -50,11 +50,11 @@ public static class WorkflowNotificationsServiceCollectionExtensions
 
     /// <summary>
     /// Registers the built-in identity-based approver resolver.
-    /// Resolves approvers by: permission → roles (via <c>IPermissionManager</c>) →
+    /// Resolves approvers by: permission → roles (via <c>IPermissionManagerReader</c>) →
     /// role members (via <see cref="Granit.Identity.IIdentityProvider"/>).
     /// </summary>
     /// <remarks>
-    /// Requires both <c>Granit.Authorization</c> (for <c>IPermissionManager</c>) and an
+    /// Requires both <c>Granit.Authorization</c> (for <c>IPermissionManagerReader</c>) and an
     /// <see cref="Granit.Identity.IIdentityProvider"/> implementation (e.g.
     /// <c>Granit.Identity.Keycloak</c>) to be registered.
     /// </remarks>

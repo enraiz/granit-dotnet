@@ -5,14 +5,14 @@ using Granit.Querying;
 namespace Granit.DataExchange.Import.Internal;
 
 /// <summary>
-/// Default implementation of <see cref="IImportJobStore"/>.
+/// Default implementation of <see cref="IImportJobReader"/> and <see cref="IImportJobWriter"/>.
 /// Throws <see cref="NotImplementedException"/> — requires <c>Granit.DataExchange.EntityFrameworkCore</c>.
 /// </summary>
-internal sealed class NullImportJobStore : IImportJobStore
+internal sealed class NullImportJobStore : IImportJobReader, IImportJobWriter
 {
     private const string Message =
         "Import job persistence requires Granit.DataExchange.EntityFrameworkCore. " +
-        "Call builder.AddGranitDataExchangeEntityFrameworkCore() to register a concrete IImportJobStore.";
+        "Call builder.AddGranitDataExchangeEntityFrameworkCore() to register a concrete IImportJobReader/IImportJobWriter.";
 
     /// <inheritdoc/>
     public Task<ImportJob?> GetAsync(Guid id, CancellationToken ct = default) =>

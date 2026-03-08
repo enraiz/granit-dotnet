@@ -3,11 +3,11 @@ using Granit.Querying;
 namespace Granit.DataExchange.Export.Internal;
 
 /// <summary>
-/// Null-object implementation of <see cref="IExportJobStore"/>.
+/// Null-object implementation of <see cref="IExportJobReader"/> and <see cref="IExportJobWriter"/>.
 /// Stores jobs in memory (non-durable). Replaced by EF Core implementation when
 /// <c>Granit.DataExchange.EntityFrameworkCore</c> is installed.
 /// </summary>
-internal sealed class NullExportJobStore : IExportJobStore
+internal sealed class NullExportJobStore : IExportJobReader, IExportJobWriter
 {
     public Task<ExportJob?> GetAsync(Guid id, CancellationToken ct = default) =>
         Task.FromResult<ExportJob?>(null);

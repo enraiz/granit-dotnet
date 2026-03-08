@@ -11,7 +11,7 @@ namespace Granit.Notifications.EntityFrameworkCore;
 /// HDS compliance: <see cref="NotificationDeliveryAttempt"/> records are INSERT-only.
 /// This store never updates or deletes them.
 /// </remarks>
-internal sealed class EfCoreNotificationDeliveryStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationDeliveryStore
+internal sealed class EfCoreNotificationDeliveryStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationDeliveryWriter
 {
     /// <inheritdoc/>
     public async Task RecordAsync(NotificationDeliveryAttempt attempt, CancellationToken ct = default)

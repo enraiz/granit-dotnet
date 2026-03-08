@@ -64,12 +64,22 @@ public sealed class GranitFeaturesModuleTests
     }
 
     [Fact]
-    public void ConfigureServices_Registers_IFeatureStore()
+    public void ConfigureServices_Registers_IFeatureStoreReader()
     {
         ServiceCollection services = BuildServicesViaModule();
 
         services.ShouldContain(d =>
-            d.ServiceType == typeof(IFeatureStore) &&
+            d.ServiceType == typeof(IFeatureStoreReader) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void ConfigureServices_Registers_IFeatureStoreWriter()
+    {
+        ServiceCollection services = BuildServicesViaModule();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IFeatureStoreWriter) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
 

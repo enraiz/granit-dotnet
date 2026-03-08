@@ -21,7 +21,7 @@ namespace Granit.BackgroundJobs.Endpoints.Tests;
 
 /// <summary>
 /// Integration tests for all background jobs administration endpoints.
-/// Uses a TestServer + NSubstitute mock for IBackgroundJobManager.
+/// Uses a TestServer + NSubstitute mocks for IBackgroundJobReader / IBackgroundJobWriter.
 /// A custom TestAuthHandler resolves authentication from X-Test-Roles header.
 /// </summary>
 public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
@@ -29,7 +29,8 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
     private const string AdminRole = "granit-background-jobs-admin";
     private const string Prefix = "/background-jobs";
 
-    private readonly IBackgroundJobManager _manager = Substitute.For<IBackgroundJobManager>();
+    private readonly IBackgroundJobReader _reader = Substitute.For<IBackgroundJobReader>();
+    private readonly IBackgroundJobWriter _writer = Substitute.For<IBackgroundJobWriter>();
     private readonly WebApplication _app;
 
     // Admin client: authenticated with the admin role.
@@ -52,7 +53,8 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
 
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_manager);
+        builder.Services.AddSingleton(_reader);
+        builder.Services.AddSingleton(_writer);
 
         _app = builder.Build();
         _app.MapBackgroundJobsEndpoints();
@@ -77,7 +79,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             BuildStatus("monthly-export", isEnabled: true),
             BuildStatus("weekly-cleanup", isEnabled: false),
         ];
-        _manager.GetAllAsync(Arg.Any<CancellationToken>()).Returns(jobs);
+        _reader.GetAllAsync(Arg.Any<CancellationToken>()).Returns(jobs);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
@@ -112,7 +114,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
     {
         // Arrange
         BackgroundJobStatus job = BuildStatus("daily-report", isEnabled: true);
-        _manager.FindAsync("daily-report", Arg.Any<CancellationToken>()).Returns(job);
+        _reader.FindAsync("daily-report", Arg.Any<CancellationToken>()).Returns(job);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -131,7 +133,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
     public async Task GetByName_WhenJobNotFound_Returns404()
     {
         // Arrange
-        _manager.FindAsync("ghost-job", Arg.Any<CancellationToken>()).Returns((BackgroundJobStatus?)null);
+        _reader.FindAsync("ghost-job", Arg.Any<CancellationToken>()).Returns((BackgroundJobStatus?)null);
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -147,7 +149,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
     public async Task Pause_WhenJobExists_Returns204()
     {
         // Arrange
-        _manager.PauseAsync("daily-report", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _writer.PauseAsync("daily-report", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsync(
@@ -155,14 +157,14 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _manager.Received(1).PauseAsync("daily-report", Arg.Any<CancellationToken>());
+        await _writer.Received(1).PauseAsync("daily-report", Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Pause_WhenJobNotFound_Returns404()
     {
         // Arrange
-        _manager.PauseAsync("ghost-job", Arg.Any<CancellationToken>())
+        _writer.PauseAsync("ghost-job", Arg.Any<CancellationToken>())
             .ThrowsAsync(new EntityNotFoundException(typeof(BackgroundJobDefinition), "ghost-job"));
 
         // Act
@@ -179,7 +181,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
     public async Task Resume_WhenJobExists_Returns204()
     {
         // Arrange
-        _manager.ResumeAsync("daily-report", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _writer.ResumeAsync("daily-report", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsync(
@@ -187,14 +189,14 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _manager.Received(1).ResumeAsync("daily-report", Arg.Any<CancellationToken>());
+        await _writer.Received(1).ResumeAsync("daily-report", Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Resume_WhenJobNotFound_Returns404()
     {
         // Arrange
-        _manager.ResumeAsync("ghost-job", Arg.Any<CancellationToken>())
+        _writer.ResumeAsync("ghost-job", Arg.Any<CancellationToken>())
             .ThrowsAsync(new EntityNotFoundException(typeof(BackgroundJobDefinition), "ghost-job"));
 
         // Act
@@ -211,7 +213,7 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
     public async Task Trigger_WhenJobExists_Returns202()
     {
         // Arrange — TriggerNowAsync is fire-and-forget (async enqueue)
-        _manager.TriggerNowAsync("monthly-export", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        _writer.TriggerNowAsync("monthly-export", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
         // Act
         HttpResponseMessage response = await _adminClient.PostAsync(
@@ -219,14 +221,14 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
 
         // Assert — 202 Accepted, not 200 (processing is async via Wolverine)
         response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
-        await _manager.Received(1).TriggerNowAsync("monthly-export", Arg.Any<CancellationToken>());
+        await _writer.Received(1).TriggerNowAsync("monthly-export", Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Trigger_WhenJobNotFound_Returns404()
     {
         // Arrange
-        _manager.TriggerNowAsync("ghost-job", Arg.Any<CancellationToken>())
+        _writer.TriggerNowAsync("ghost-job", Arg.Any<CancellationToken>())
             .ThrowsAsync(new EntityNotFoundException(typeof(BackgroundJobDefinition), "ghost-job"));
 
         // Act
@@ -250,8 +252,9 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                 TestAuthHandler.SchemeName, _ => { });
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_manager);
-        _manager.GetAllAsync(Arg.Any<CancellationToken>()).Returns([]);
+        builder.Services.AddSingleton(_reader);
+        builder.Services.AddSingleton(_writer);
+        _reader.GetAllAsync(Arg.Any<CancellationToken>()).Returns([]);
 
         await using WebApplication customApp = builder.Build();
         customApp.MapBackgroundJobsEndpoints(opts => opts.RequiredRole = "ops-team");
@@ -289,8 +292,9 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                 TestAuthHandler.SchemeName, _ => { });
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_manager);
-        _manager.GetAllAsync(Arg.Any<CancellationToken>()).Returns([]);
+        builder.Services.AddSingleton(_reader);
+        builder.Services.AddSingleton(_writer);
+        _reader.GetAllAsync(Arg.Any<CancellationToken>()).Returns([]);
 
         await using WebApplication prefixedApp = builder.Build();
         prefixedApp.MapBackgroundJobsEndpoints(opts => opts.ApiPrefix = "api/v1");

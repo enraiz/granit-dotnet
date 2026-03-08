@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Features.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// EF Core implementation of <see cref="IFeatureStore"/>.
+/// EF Core implementation of <see cref="IFeatureStoreReader"/> and <see cref="IFeatureStoreWriter"/>.
 /// Persists tenant-level feature overrides in the <c>feature_overrides</c> table
 /// with full HDS audit trail.
 /// </summary>
@@ -15,7 +15,7 @@ namespace Granit.Features.EntityFrameworkCore.Internal;
 /// <see cref="IDbContextFactory{TContext}"/>, making it safe for concurrent request handling.
 /// </remarks>
 internal sealed class EfCoreFeatureStore(
-    IDbContextFactory<GranitFeaturesDbContext> contextFactory) : IFeatureStore
+    IDbContextFactory<GranitFeaturesDbContext> contextFactory) : IFeatureStoreReader, IFeatureStoreWriter
 {
     /// <inheritdoc/>
     public async Task<string?> GetOrNullAsync(

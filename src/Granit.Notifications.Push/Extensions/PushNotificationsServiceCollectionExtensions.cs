@@ -24,7 +24,9 @@ public static class PushNotificationsServiceCollectionExtensions
             services.Configure(configure);
         }
 
-        services.AddSingleton<IPushSubscriptionStore, InMemoryPushSubscriptionStore>();
+        services.AddSingleton<InMemoryPushSubscriptionStore>();
+        services.AddSingleton<IPushSubscriptionReader>(sp => sp.GetRequiredService<InMemoryPushSubscriptionStore>());
+        services.AddSingleton<IPushSubscriptionWriter>(sp => sp.GetRequiredService<InMemoryPushSubscriptionStore>());
 
         services.AddSingleton(sp =>
         {
