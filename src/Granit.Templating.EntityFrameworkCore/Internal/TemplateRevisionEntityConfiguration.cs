@@ -64,5 +64,13 @@ internal sealed class TemplateRevisionEntityConfiguration
         // Index for history queries: all revisions for a given key
         builder.HasIndex(e => new { e.TemplateName, e.Culture })
             .HasDatabaseName("ix_templating_revisions_name_culture");
+
+        // Optional FK to template category.
+        builder.Property(e => e.CategoryId);
+
+        builder.HasOne<TemplateCategoryEntity>()
+            .WithMany()
+            .HasForeignKey(e => e.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -15,10 +15,14 @@ internal sealed class TemplatingDbContext(DbContextOptions<TemplatingDbContext> 
     /// <summary>All template revisions (Draft, PendingReview, Published, Archived).</summary>
     public DbSet<TemplateRevisionEntity> TemplateRevisions { get; set; } = null!;
 
+    /// <summary>Template categories for organizing templates by domain.</summary>
+    public DbSet<TemplateCategoryEntity> TemplateCategories { get; set; } = null!;
+
     /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new TemplateRevisionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new TemplateCategoryEntityConfiguration());
     }
 }

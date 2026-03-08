@@ -10,9 +10,11 @@ namespace Granit.Templating.Store;
 /// <param name="Search">Optional search term applied to <see cref="TemplateKey.Name"/>.</param>
 /// <param name="Status">Optional lifecycle status filter.</param>
 /// <param name="Culture">Optional BCP 47 culture filter.</param>
+/// <param name="CategoryId">Optional category identifier filter.</param>
 public sealed record TemplateListFilter(
     int Page = 1,
     int PageSize = 20,
     string? Search = null,
     TemplateLifecycleStatus? Status = null,
-    string? Culture = null);
+    string? Culture = null,
+    Guid? CategoryId = null);

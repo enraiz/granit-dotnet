@@ -48,9 +48,9 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers 12 endpoints:
+    /// Registers 16 endpoints:
     /// <list type="bullet">
-    /// <item><c>GET /</c> — paginated list with filters</item>
+    /// <item><c>GET /</c> — paginated list with filters (including <c>categoryId</c>)</item>
     /// <item><c>GET /{name}</c> — detail (draft + published)</item>
     /// <item><c>POST /</c> — create a new draft</item>
     /// <item><c>PUT /{name}</c> — update an existing draft</item>
@@ -62,6 +62,10 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// <item><c>GET /{name}/variables</c> — list available template variables for autocompletion</item>
     /// <item><c>GET /{name}/history</c> — paginated revision history (summaries, no content)</item>
     /// <item><c>GET /{name}/history/{revisionId}</c> — full detail of a specific revision</item>
+    /// <item><c>GET /categories</c> — list all template categories</item>
+    /// <item><c>POST /categories</c> — create a new category</item>
+    /// <item><c>PUT /categories/{id}</c> — update a category</item>
+    /// <item><c>DELETE /categories/{id}</c> — delete a category (409 if templates associated)</item>
     /// </list>
     /// </para>
     /// <para>
@@ -139,6 +143,26 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
              .WithName("GetTemplateRevisionDetail")
              .WithSummary("Returns the full detail of a specific template revision (including content).");
 
+        // ----- Categories -----
+
+        group.MapGet("/categories", HandleListCategoriesAsync)
+             .WithName("ListTemplateCategories")
+             .WithSummary("Returns all template categories ordered by sort order then name.");
+
+        group.MapPost("/categories", HandleCreateCategoryAsync)
+             .WithName("CreateTemplateCategory")
+             .WithSummary("Creates a new template category.")
+             .ValidateBody<SaveTemplateCategoryRequest>();
+
+        group.MapPut("/categories/{id:guid}", HandleUpdateCategoryAsync)
+             .WithName("UpdateTemplateCategory")
+             .WithSummary("Updates an existing template category.")
+             .ValidateBody<SaveTemplateCategoryRequest>();
+
+        group.MapDelete("/categories/{id:guid}", HandleDeleteCategoryAsync)
+             .WithName("DeleteTemplateCategory")
+             .WithSummary("Deletes a template category (409 if templates are still associated).");
+
         return group;
     }
 
@@ -179,7 +203,8 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             PageSize: parameters.PageSize,
             Search: parameters.Search,
             Status: parameters.Status,
-            Culture: parameters.Culture);
+            Culture: parameters.Culture,
+            CategoryId: parameters.CategoryId);
 
         PagedTemplateResult result = await storeReader.ListTemplatesAsync(filter, ct).ConfigureAwait(false);
 
@@ -880,6 +905,144 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         return Task.FromResult<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>>(
             TypedResults.Ok(response));
     }
+
+    // -------------------------------------------------------------------------
+    // GET /categories — List all categories
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<IReadOnlyList<TemplateCategoryResponse>>, ProblemHttpResult>> HandleListCategoriesAsync(
+        HttpContext context,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreReader? storeReader =
+            context.RequestServices.GetService<ITemplateCategoryStoreReader>();
+
+        if (storeReader is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        IReadOnlyList<TemplateCategory> categories =
+            await storeReader.ListCategoriesAsync(ct).ConfigureAwait(false);
+
+        IReadOnlyList<TemplateCategoryResponse> response = categories
+            .Select(ToCategoryResponse)
+            .ToList();
+
+        return TypedResults.Ok(response);
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /categories — Create a category
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Created<TemplateCategoryResponse>, ProblemHttpResult>> HandleCreateCategoryAsync(
+        HttpContext context,
+        SaveTemplateCategoryRequest body,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreWriter? storeWriter =
+            context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
+
+        if (storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        string userId = GetCurrentUserId(context);
+
+        TemplateCategory category;
+        try
+        {
+            category = await storeWriter.CreateCategoryAsync(
+                body.Name, body.Description, body.Icon, body.SortOrder, userId, ct).ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
+        return TypedResults.Created($"categories/{category.Id}", ToCategoryResponse(category));
+    }
+
+    // -------------------------------------------------------------------------
+    // PUT /categories/{id} — Update a category
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplateCategoryResponse>, ProblemHttpResult>> HandleUpdateCategoryAsync(
+        HttpContext context,
+        Guid id,
+        SaveTemplateCategoryRequest body,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreWriter? storeWriter =
+            context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
+
+        if (storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        TemplateCategory category;
+        try
+        {
+            category = await storeWriter.UpdateCategoryAsync(
+                id, body.Name, body.Description, body.Icon, body.SortOrder, ct).ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            int statusCode = ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase)
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status409Conflict;
+
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: statusCode);
+        }
+
+        return TypedResults.Ok(ToCategoryResponse(category));
+    }
+
+    // -------------------------------------------------------------------------
+    // DELETE /categories/{id} — Delete a category
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> HandleDeleteCategoryAsync(
+        HttpContext context,
+        Guid id,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreWriter? storeWriter =
+            context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
+
+        if (storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        try
+        {
+            await storeWriter.DeleteCategoryAsync(id, ct).ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            int statusCode = ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase)
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status409Conflict;
+
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: statusCode);
+        }
+
+        return TypedResults.NoContent();
+    }
+
+    private static TemplateCategoryResponse ToCategoryResponse(TemplateCategory category) =>
+        new(category.Id, category.Name, category.Description, category.Icon,
+            category.SortOrder, category.TemplateCount);
 
     // -------------------------------------------------------------------------
     // Shared helpers

@@ -34,7 +34,7 @@ namespace Granit.Templating.Endpoints.Tests;
 /// </summary>
 public sealed class TemplatingEndpointsTests : IAsyncDisposable
 {
-    private const string Prefix = "/api/v1/admin/templates";
+    private const string Prefix = "/api/v1/templates";
     private const string ManageRole = "template-admin";
 
     private readonly IDocumentTemplateStoreReader _storeReader = Substitute.For<IDocumentTemplateStoreReader>();
