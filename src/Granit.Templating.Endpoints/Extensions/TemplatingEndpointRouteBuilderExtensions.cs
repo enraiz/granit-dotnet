@@ -42,7 +42,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers 8 endpoints:
+    /// Registers 10 endpoints:
     /// <list type="bullet">
     /// <item><c>GET /</c> — paginated list with filters</item>
     /// <item><c>GET /{name}</c> — detail (draft + published)</item>
@@ -52,6 +52,8 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// <item><c>POST /{name}/publish</c> — publish the current draft</item>
     /// <item><c>POST /{name}/unpublish</c> — unpublish (archive the published revision)</item>
     /// <item><c>GET /{name}/lifecycle</c> — lifecycle info (current status, available transitions)</item>
+    /// <item><c>GET /{name}/history</c> — paginated revision history (summaries, no content)</item>
+    /// <item><c>GET /{name}/history/{revisionId}</c> — full detail of a specific revision</item>
     /// </list>
     /// </para>
     /// <para>
@@ -112,6 +114,14 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         group.MapGet("/{name}/lifecycle", HandleGetLifecycleAsync)
              .WithName("GetTemplateLifecycle")
              .WithSummary("Returns lifecycle status, workflow state, and available transitions.");
+
+        group.MapGet("/{name}/history", HandleGetHistoryAsync)
+             .WithName("GetTemplateHistory")
+             .WithSummary("Returns a paginated revision history for the template (without content).");
+
+        group.MapGet("/{name}/history/{revisionId:guid}", HandleGetRevisionDetailAsync)
+             .WithName("GetTemplateRevisionDetail")
+             .WithSummary("Returns the full detail of a specific template revision (including content).");
 
         return group;
     }
@@ -592,6 +602,115 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             currentStatus,
             workflowEnabled,
             availableTransitions));
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /{name}/history — Paginated revision history (summaries)
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplateHistoryResponse>, ProblemHttpResult>> HandleGetHistoryAsync(
+        HttpContext context,
+        string name,
+        string? culture,
+        int page = 1,
+        int pageSize = 20,
+        CancellationToken ct = default)
+    {
+        IDocumentTemplateStoreReader? storeReader =
+            context.RequestServices.GetService<IDocumentTemplateStoreReader>();
+
+        if (storeReader is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return nameError;
+        }
+
+        if (culture is not null)
+        {
+            ProblemHttpResult? cultureError = ValidateBcp47(culture);
+            if (cultureError is not null)
+            {
+                return cultureError;
+            }
+        }
+
+        ProblemHttpResult? paginationError = ValidatePagination(page, pageSize);
+        if (paginationError is not null)
+        {
+            return paginationError;
+        }
+
+        TemplateKey key = new(name, culture);
+        IReadOnlyList<TemplateRevision> allRevisions =
+            await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+
+        int totalCount = allRevisions.Count;
+        List<TemplateRevisionSummaryResponse> summaries = allRevisions
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(r => new TemplateRevisionSummaryResponse(
+                r.RevisionId,
+                r.Status,
+                r.CreatedAt,
+                r.CreatedBy,
+                r.PublishedAt,
+                r.PublishedBy,
+                r.Content.Length))
+            .ToList();
+
+        return TypedResults.Ok(new TemplateHistoryResponse(summaries, totalCount, page, pageSize));
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /{name}/history/{revisionId} — Full detail of a specific revision
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplateRevisionResponse>, NotFound, ProblemHttpResult>> HandleGetRevisionDetailAsync(
+        HttpContext context,
+        string name,
+        Guid revisionId,
+        string? culture,
+        CancellationToken ct)
+    {
+        IDocumentTemplateStoreReader? storeReader =
+            context.RequestServices.GetService<IDocumentTemplateStoreReader>();
+
+        if (storeReader is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return nameError;
+        }
+
+        if (culture is not null)
+        {
+            ProblemHttpResult? cultureError = ValidateBcp47(culture);
+            if (cultureError is not null)
+            {
+                return cultureError;
+            }
+        }
+
+        TemplateKey key = new(name, culture);
+        IReadOnlyList<TemplateRevision> history =
+            await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+
+        TemplateRevision? revision = history.FirstOrDefault(r => r.RevisionId == revisionId);
+        if (revision is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(ToRevisionResponse(revision));
     }
 
     // -------------------------------------------------------------------------

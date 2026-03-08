@@ -418,6 +418,8 @@ app.MapGranitTemplatingAdmin(opts =>
 | `POST /{name}/publish` | Publier le brouillon | Archive l'ancienne version publiée, invalide le cache. 409 si transition refusée |
 | `POST /{name}/unpublish` | Dépublier | Archive la version publiée. Idempotent si rien n'est publié. 409 si refusé |
 | `GET /{name}/lifecycle` | État du cycle de vie | Statut actuel, workflow actif, transitions disponibles |
+| `GET /{name}/history` | Historique des révisions | Paginé (`page`, `pageSize`), sans contenu. HDS audit trail |
+| `GET /{name}/history/{revisionId}` | Détail d'une révision | Contenu complet inclus, pour diff entre versions |
 
 Si `IDocumentTemplateStoreReader`/`IDocumentTemplateStoreWriter` ne sont pas enregistrés
 (pas de module EF Core chargé), tous les endpoints retournent `501 Not Implemented`.

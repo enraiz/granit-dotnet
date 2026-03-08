@@ -797,6 +797,208 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     }
 
     // =========================================================================
+    // GET /{name}/history — Revision history
+    // =========================================================================
+
+    [Fact]
+    public async Task GetHistory_WhenStoreNotRegistered_Returns501()
+    {
+        await using WebApplication app = await BuildAppWithoutStoreAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.GetAsync(
+            $"{Prefix}/Billing.Invoice/history",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotImplemented);
+    }
+
+    [Fact]
+    public async Task GetHistory_WithEmptyHistory_Returns200()
+    {
+        _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new List<TemplateRevision>());
+
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/history",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateHistoryResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateHistoryResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.Revisions.ShouldBeEmpty();
+        result.TotalCount.ShouldBe(0);
+        result.Page.ShouldBe(1);
+        result.PageSize.ShouldBe(20);
+    }
+
+    [Fact]
+    public async Task GetHistory_WithRevisions_ReturnsSummariesWithoutContent()
+    {
+        var revisions = new List<TemplateRevision>
+        {
+            new()
+            {
+                RevisionId = Guid.NewGuid(),
+                Content = "<h1>Published</h1>",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Published,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = "user-1",
+                PublishedAt = DateTimeOffset.UtcNow,
+                PublishedBy = "user-1",
+            },
+            new()
+            {
+                RevisionId = Guid.NewGuid(),
+                Content = "<h1>Archived old</h1>",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Archived,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(-7),
+                CreatedBy = "user-1",
+            },
+        };
+        _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(revisions);
+
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/history",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateHistoryResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateHistoryResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.TotalCount.ShouldBe(2);
+        result.Revisions.Count.ShouldBe(2);
+        result.Revisions[0].ContentLength.ShouldBe("<h1>Published</h1>".Length);
+    }
+
+    [Fact]
+    public async Task GetHistory_WithPagination_ReturnsCorrectPage()
+    {
+        List<TemplateRevision> revisions = Enumerable.Range(0, 15)
+            .Select(i => new TemplateRevision
+            {
+                RevisionId = Guid.NewGuid(),
+                Content = $"<p>Rev {i}</p>",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Archived,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(-i),
+                CreatedBy = "user-1",
+            })
+            .ToList();
+        _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(revisions);
+
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/history?page=2&pageSize=5",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateHistoryResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateHistoryResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.TotalCount.ShouldBe(15);
+        result.Revisions.Count.ShouldBe(5);
+        result.Page.ShouldBe(2);
+        result.PageSize.ShouldBe(5);
+    }
+
+    [Fact]
+    public async Task GetHistory_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/bad/history",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task GetHistory_WithInvalidPagination_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/history?page=0",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    // =========================================================================
+    // GET /{name}/history/{revisionId} — Revision detail
+    // =========================================================================
+
+    [Fact]
+    public async Task GetRevisionDetail_WhenStoreNotRegistered_Returns501()
+    {
+        await using WebApplication app = await BuildAppWithoutStoreAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.GetAsync(
+            $"{Prefix}/Billing.Invoice/history/{Guid.NewGuid()}",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotImplemented);
+    }
+
+    [Fact]
+    public async Task GetRevisionDetail_WhenFound_Returns200WithContent()
+    {
+        Guid revisionId = Guid.NewGuid();
+        var revision = new TemplateRevision
+        {
+            RevisionId = revisionId,
+            Content = "<h1>Full content</h1>",
+            MimeType = "text/html",
+            Status = TemplateLifecycleStatus.Archived,
+            CreatedAt = DateTimeOffset.UtcNow,
+            CreatedBy = "user-1",
+        };
+        _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new List<TemplateRevision> { revision });
+
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/history/{revisionId}",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateRevisionResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateRevisionResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.RevisionId.ShouldBe(revisionId);
+        result.Content.ShouldBe("<h1>Full content</h1>");
+    }
+
+    [Fact]
+    public async Task GetRevisionDetail_WhenNotFound_Returns404()
+    {
+        _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new List<TemplateRevision>());
+
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/history/{Guid.NewGuid()}",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetRevisionDetail_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/bad/history/{Guid.NewGuid()}",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    // =========================================================================
     // Security tests
     // =========================================================================
 
