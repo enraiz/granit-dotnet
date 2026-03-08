@@ -1,4 +1,6 @@
 using Granit.BlobStorage;
+using Granit.BlobStorage.Events;
+using Granit.Core.Events;
 using Shouldly;
 using Xunit;
 
@@ -178,6 +180,98 @@ public sealed class BlobDescriptorTests
         Action act = () => descriptor.MarkAsDeleted(Now);
 
         Should.Throw<InvalidOperationException>(act).Message.ShouldContain($"{illegalStatus}");
+    }
+
+    // ── Domain Events ────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Create_ShouldNotEmitAnyDomainEvent()
+    {
+        BlobDescriptor descriptor = CreatePending();
+
+        descriptor.DomainEvents.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void MarkAsUploading_ShouldNotEmitAnyDomainEvent()
+    {
+        BlobDescriptor descriptor = CreatePending();
+
+        descriptor.MarkAsUploading();
+
+        descriptor.DomainEvents.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void MarkAsValid_ShouldEmitBlobValidatedEvent()
+    {
+        BlobDescriptor descriptor = CreatePending();
+        descriptor.MarkAsUploading();
+
+        descriptor.MarkAsValid("image/jpeg", 512_000, Now.AddMinutes(2));
+
+        descriptor.DomainEvents.ShouldHaveSingleItem();
+        BlobValidated evt = descriptor.DomainEvents.ShouldHaveSingleItem().ShouldBeOfType<BlobValidated>();
+        evt.BlobId.ShouldBe(descriptor.Id);
+        evt.ContainerName.ShouldBe("medical-images");
+        evt.VerifiedContentType.ShouldBe("image/jpeg");
+        evt.SizeBytes.ShouldBe(512_000);
+    }
+
+    [Fact]
+    public void MarkAsRejected_ShouldEmitBlobRejectedEvent()
+    {
+        BlobDescriptor descriptor = CreatePending();
+        descriptor.MarkAsUploading();
+
+        descriptor.MarkAsRejected("MIME mismatch");
+
+        BlobRejected evt = descriptor.DomainEvents.ShouldHaveSingleItem().ShouldBeOfType<BlobRejected>();
+        evt.BlobId.ShouldBe(descriptor.Id);
+        evt.ContainerName.ShouldBe("medical-images");
+        evt.RejectionReason.ShouldBe("MIME mismatch");
+    }
+
+    [Fact]
+    public void MarkAsDeleted_ShouldEmitBlobDeletedEvent()
+    {
+        BlobDescriptor descriptor = CreatePending();
+        descriptor.MarkAsUploading();
+        descriptor.MarkAsValid("image/jpeg", 512_000, Now);
+        descriptor.ClearDomainEvents();
+
+        descriptor.MarkAsDeleted(Now.AddDays(1), "RGPD Art. 17");
+
+        BlobDeleted evt = descriptor.DomainEvents.ShouldHaveSingleItem().ShouldBeOfType<BlobDeleted>();
+        evt.BlobId.ShouldBe(descriptor.Id);
+        evt.ContainerName.ShouldBe("medical-images");
+        evt.DeletionReason.ShouldBe("RGPD Art. 17");
+    }
+
+    [Fact]
+    public void ClearDomainEvents_ShouldRemoveAllCollectedEvents()
+    {
+        BlobDescriptor descriptor = CreatePending();
+        descriptor.MarkAsUploading();
+        descriptor.MarkAsValid("image/jpeg", 512_000, Now);
+        descriptor.DomainEvents.ShouldNotBeEmpty();
+
+        descriptor.ClearDomainEvents();
+
+        descriptor.DomainEvents.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void FullLifecycle_ShouldAccumulateAllEvents()
+    {
+        BlobDescriptor descriptor = CreatePending();
+        descriptor.MarkAsUploading();
+        descriptor.MarkAsValid("image/jpeg", 512_000, Now);
+        descriptor.MarkAsDeleted(Now.AddDays(1), "cleanup");
+
+        descriptor.DomainEvents.Count.ShouldBe(2);
+        descriptor.DomainEvents.ShouldContain(e => e is BlobValidated);
+        descriptor.DomainEvents.ShouldContain(e => e is BlobDeleted);
     }
 
     // ── Helper ────────────────────────────────────────────────────────────────

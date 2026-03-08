@@ -33,7 +33,10 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
         Action<DbContextOptionsBuilder> configure)
     {
         builder.Services.AddDbContextFactory<BlobStorageDbContext>(configure);
-        builder.Services.AddScoped<IBlobDescriptorStore, EfBlobDescriptorStore>();
+        builder.Services.AddScoped<EfBlobDescriptorStore>();
+        builder.Services.AddScoped<IBlobDescriptorStore>(sp => sp.GetRequiredService<EfBlobDescriptorStore>());
+        builder.Services.AddScoped<IBlobDescriptorReader>(sp => sp.GetRequiredService<EfBlobDescriptorStore>());
+        builder.Services.AddScoped<IBlobDescriptorWriter>(sp => sp.GetRequiredService<EfBlobDescriptorStore>());
 
         return builder;
     }

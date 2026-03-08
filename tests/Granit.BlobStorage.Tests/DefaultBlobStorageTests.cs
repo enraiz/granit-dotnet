@@ -15,7 +15,8 @@ public sealed class DefaultBlobStorageTests
     private static readonly DateTimeOffset Now = new(2026, 2, 23, 12, 0, 0, TimeSpan.Zero);
     private static readonly Guid TenantId = Guid.NewGuid();
 
-    private readonly IBlobDescriptorStore _store = Substitute.For<IBlobDescriptorStore>();
+    private readonly IBlobDescriptorReader _reader = Substitute.For<IBlobDescriptorReader>();
+    private readonly IBlobDescriptorWriter _writer = Substitute.For<IBlobDescriptorWriter>();
     private readonly IBlobKeyStrategy _keyStrategy = Substitute.For<IBlobKeyStrategy>();
     private readonly IBlobStorageClient _storageClient = Substitute.For<IBlobStorageClient>();
     private readonly IGuidGenerator _guidGenerator = Substitute.For<IGuidGenerator>();
@@ -30,7 +31,8 @@ public sealed class DefaultBlobStorageTests
         _clock.Now.Returns(Now);
 
         _sut = new DefaultBlobStorage(
-            _store,
+            _reader,
+            _writer,
             _keyStrategy,
             _storageClient,
             _guidGenerator,
@@ -97,7 +99,7 @@ public sealed class DefaultBlobStorageTests
         await _sut.InitiateUploadAsync("medical-images", request, TestContext.Current.CancellationToken);
 
         // Assert
-        await _store.Received(1).SaveAsync(
+        await _writer.Received(1).SaveAsync(
             Arg.Is<BlobDescriptor>(d =>
                 d.Status == BlobStatus.Pending &&
                 d.Id == blobId &&
@@ -125,7 +127,7 @@ public sealed class DefaultBlobStorageTests
 
         BlobStorageOptions customOptions = new() { UploadUrlExpiry = TimeSpan.FromMinutes(30) };
         DefaultBlobStorage sutWithCustomOptions = new(
-            _store, _keyStrategy, _storageClient,
+            _reader, _writer, _keyStrategy, _storageClient,
             _guidGenerator, _clock, _currentTenant,
             Options.Create(customOptions));
 
@@ -152,7 +154,7 @@ public sealed class DefaultBlobStorageTests
 
         // Assert — single-tenant apps must not be blocked
         await Should.NotThrowAsync(act);
-        await _store.Received(1).SaveAsync(
+        await _writer.Received(1).SaveAsync(
             Arg.Is<BlobDescriptor>(d => d.TenantId == string.Empty),
             Arg.Any<CancellationToken>());
     }
@@ -165,7 +167,7 @@ public sealed class DefaultBlobStorageTests
         // Arrange
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
 
         PresignedDownloadUrl expectedUrl = new(new Uri("https://s3.example.com/download"), Now.AddMinutes(5));
@@ -186,7 +188,7 @@ public sealed class DefaultBlobStorageTests
         // Arrange
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildDescriptorInStatus(blobId, BlobStatus.Uploading);
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
 
         // Act
         Func<Task> act = async () => await _sut.CreateDownloadUrlAsync("medical-images", blobId);
@@ -200,7 +202,7 @@ public sealed class DefaultBlobStorageTests
     {
         // Arrange
         var blobId = Guid.NewGuid();
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
 
         // Act
         Func<Task> act = async () => await _sut.CreateDownloadUrlAsync("medical-images", blobId);
@@ -217,7 +219,7 @@ public sealed class DefaultBlobStorageTests
         // Arrange
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
 
         // Act
@@ -226,7 +228,7 @@ public sealed class DefaultBlobStorageTests
         // Assert — S3 physically deleted
         await _storageClient.Received(1).DeleteObjectAsync("granit-blobs", descriptor.ObjectKey, Arg.Any<CancellationToken>());
         // Assert — descriptor updated in store with Deleted status
-        await _store.Received(1).UpdateAsync(
+        await _writer.Received(1).UpdateAsync(
             Arg.Is<BlobDescriptor>(d =>
                 d.Status == BlobStatus.Deleted &&
                 d.DeletionReason == "RGPD Art. 17" &&
@@ -240,14 +242,14 @@ public sealed class DefaultBlobStorageTests
         // Arrange
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildDescriptorInStatus(blobId, BlobStatus.Deleted);
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
 
         // Act
         await _sut.DeleteAsync("medical-images", blobId, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert — no S3 call, no store update
         await _storageClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _store.DidNotReceive().UpdateAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
+        await _writer.DidNotReceive().UpdateAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -255,7 +257,7 @@ public sealed class DefaultBlobStorageTests
     {
         // Arrange
         var blobId = Guid.NewGuid();
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
 
         // Act
         Func<Task> act = async () => await _sut.DeleteAsync("medical-images", blobId);
@@ -271,15 +273,15 @@ public sealed class DefaultBlobStorageTests
         // Arrange — validates the RGPD/HDS constraint: the DB row must survive deletion
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
         _keyStrategy.ResolveBucketName(Arg.Any<string>()).Returns("granit-blobs");
 
         // Act
         await _sut.DeleteAsync("medical-images", blobId, "RGPD erasure", TestContext.Current.CancellationToken);
 
         // Assert — UpdateAsync called (not a delete from DB)
-        await _store.Received(1).UpdateAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
-        await _store.DidNotReceive().SaveAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
+        await _writer.Received(1).UpdateAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
+        await _writer.DidNotReceive().SaveAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
         // No "hard delete" method should exist on IBlobDescriptorStore — there is none by design.
     }
 
@@ -291,7 +293,7 @@ public sealed class DefaultBlobStorageTests
         // Arrange
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
-        _store.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
+        _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);
 
         // Act
         BlobDescriptor? result = await _sut.GetDescriptorAsync("medical-images", blobId, TestContext.Current.CancellationToken);
@@ -304,7 +306,7 @@ public sealed class DefaultBlobStorageTests
     public async Task GetDescriptorAsync_WhenBlobNotFound_ShouldReturnNull()
     {
         // Arrange
-        _store.FindAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
+        _reader.FindAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns((BlobDescriptor?)null);
 
         // Act
         BlobDescriptor? result = await _sut.GetDescriptorAsync("medical-images", Guid.NewGuid(), TestContext.Current.CancellationToken);
