@@ -69,7 +69,7 @@ services.AddReferenceDataStore<Currency, AppDbContext>();
 
 Cela enregistre :
 
-- `IReferenceDataStore<T>` (Scoped) — le store EF Core avec cache mémoire
+- `IReferenceDataStoreReader<T>` / `IReferenceDataStoreWriter<T>` (Scoped) — le store EF Core avec cache mémoire
 - `IDataSeedContributor` — le bridge pour les seeders typés
 
 ## Pattern Shared DbContext
@@ -80,11 +80,12 @@ garantissant la sécurité des accès concurrents.
 
 ## Cache mémoire
 
-Le store met en cache les résultats de `GetByCodeAsync` avec un TTL
-configurable via `ReferenceDataOptions.CacheTimeToLive` (défaut : 1 heure).
+Le store met en cache les résultats de `GetByCodeAsync`
+(`IReferenceDataStoreReader<T>`) avec un TTL configurable via
+`ReferenceDataOptions.CacheTimeToLive` (défaut : 1 heure).
 
 Le cache est invalidé automatiquement lors des opérations d'écriture
-(`CreateAsync`, `UpdateAsync`, `SetActiveAsync`).
+via `IReferenceDataStoreWriter<T>` (`CreateAsync`, `UpdateAsync`, `SetActiveAsync`).
 
 ## Seeding
 

@@ -14,8 +14,8 @@ transitions) et communication humaine (commentaires, notes internes, pièces joi
 ## Architecture
 
 ```text
-ITimelineStore                  ← écriture (PostEntry, Delete, AddAttachment)
-ITimelineQuery                  ← lecture (flux paginé, chronologique desc.)
+ITimelineStoreWriter            ← écriture (PostEntry, Delete, AddAttachment)
+ITimelineStoreReader            ← lecture (flux paginé, chronologique desc.)
 ITimelineFollowerService        ← gestion des abonnés (follow/unfollow)
 ITimelineNotifier               ← fan-out notifications (commentaires, @mentions)
 MentionParser                   ← extraction @[Nom](user:guid) du Markdown
@@ -76,7 +76,7 @@ Format Markdown : `@[Dr. Martin](user:550e8400-e29b-41d4-a716-446655440000)`
 
 Le `MentionParser` extrait les GUIDs valides. Le workflow complet lors d'un POST :
 
-1. Persister l'entrée via `ITimelineStore.PostEntryAsync()`
+1. Persister l'entrée via `ITimelineStoreWriter.PostEntryAsync()`
 2. Extraire les @mentions via `MentionParser.ExtractMentionedUserIds()`
 3. Auto-abonner les utilisateurs mentionnés via `ITimelineFollowerService.FollowAsync()`
 4. Notifier les followers via `ITimelineNotifier.NotifyEntryPostedAsync()`

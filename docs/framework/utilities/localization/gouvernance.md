@@ -9,7 +9,7 @@ voir le [guide de gouvernance applicative](../../../guide/gouvernance-traduction
 ## Principes fondamentaux
 
 1. **Source unique** : les fichiers JSON embarqués sont la source de vérité.
-   Les overrides DB (`ILocalizationOverrideStore`) permettent aux administrateurs
+   Les overrides DB (`ILocalizationOverrideStoreReader` / `ILocalizationOverrideStoreWriter`) permettent aux administrateurs
    de personnaliser les textes sans redéployer.
 2. **Fallback natif** : le mécanisme `CultureInfo.Parent` de .NET gère les
    variantes régionales (`fr-CA` → `fr` → culture par défaut). Aucune logique

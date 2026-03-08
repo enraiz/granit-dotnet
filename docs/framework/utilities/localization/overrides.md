@@ -105,20 +105,26 @@ Index unique sur `(tenant_id, resource_name, culture_name, key)`.
 
 ## Utilisation programmatique
 
-Injecter `ILocalizationOverrideStore` dans un service :
+Injecter `ILocalizationOverrideStoreReader` et/ou `ILocalizationOverrideStoreWriter`
+dans un service :
 
 ```csharp
-public sealed class TranslationAdminService(ILocalizationOverrideStore store)
+public sealed class TranslationAdminService(
+    ILocalizationOverrideStoreReader storeReader,
+    ILocalizationOverrideStoreWriter storeWriter)
 {
+    public Task<Dictionary<string, string>> GetAsync(CancellationToken ct) =>
+        storeReader.GetOverridesAsync("Acme", "fr", ct);
+
     public Task SetAsync(string key, string value, CancellationToken ct) =>
-        store.SetOverrideAsync("Acme", "fr", key, value, ct);
+        storeWriter.SetOverrideAsync("Acme", "fr", key, value, ct);
 
     public Task RemoveAsync(string key, CancellationToken ct) =>
-        store.RemoveOverrideAsync("Acme", "fr", key, ct);
+        storeWriter.RemoveOverrideAsync("Acme", "fr", key, ct);
 }
 ```
 
-`ILocalizationOverrideStore` est automatiquement injecté dans `JsonStringLocalizerFactory`.
+`ILocalizationOverrideStoreReader` est automatiquement injecté dans `JsonStringLocalizerFactory`.
 Après chaque `SetOverrideAsync` ou `RemoveOverrideAsync`, le cache L1 est invalidé
 pour la culture concernée — la prochaine résolution relit PostgreSQL.
 
@@ -179,7 +185,7 @@ Réponse : `204 No Content`.
 | `400` | `cultureName` non valide (BCP 47), `value` vide, paramètres manquants, `resourceName` > 200 car., `key` > 500 car., `value` > 4000 car. |
 | `401` | Non authentifié |
 | `403` | Permission `Localization.Overrides.Manage` non accordée |
-| `501` | `ILocalizationOverrideStore` non enregistré (module EF Core absent) |
+| `501` | `ILocalizationOverrideStoreReader` / `ILocalizationOverrideStoreWriter` non enregistré (module EF Core absent) |
 
 ## Gestion des permissions
 
@@ -228,7 +234,8 @@ pour que l'intercepteur Scoped soit disponible depuis le Singleton de cache.
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `IMemoryCache` | `MemoryCache` | Singleton |
-| `ILocalizationOverrideStore` | `CachedLocalizationOverrideStore` | Singleton |
+| `ILocalizationOverrideStoreReader` | `CachedLocalizationOverrideStore` | Singleton |
+| `ILocalizationOverrideStoreWriter` | `CachedLocalizationOverrideStore` | Singleton |
 
 Sans `Granit.Localization.EntityFrameworkCore`, le store renvoie des dictionnaires
 vides — les traductions proviennent uniquement des fichiers JSON embarqués.
@@ -238,4 +245,5 @@ vides — les traductions proviennent uniquement des fichiers JSON embarqués.
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `IDbContextFactory<GranitLocalizationOverridesDbContext>` | EF Core factory | Scoped |
-| `ILocalizationOverrideStore` (keyed: `"localization-override-raw"`) | `EfCoreLocalizationOverrideStore` | Scoped |
+| `ILocalizationOverrideStoreReader` (keyed: `"localization-override-raw"`) | `EfCoreLocalizationOverrideStore` | Scoped |
+| `ILocalizationOverrideStoreWriter` (keyed: `"localization-override-raw"`) | `EfCoreLocalizationOverrideStore` | Scoped |

@@ -153,7 +153,7 @@ par les valeurs Global, Tenant et User stockées en base.
 
 Pour les paramètres sensibles (`IsEncrypted = true`) :
 
-- **Chiffrement** appliqué uniquement à la couche `ISettingStore` (persistance)
+- **Chiffrement** appliqué uniquement à la couche `ISettingStoreWriter` (persistance)
 - **Le cache stocke le plaintext** — `Granit.Caching` chiffre déjà le backend
   Redis via `AesCacheValueEncryptor`, évitant un double chiffrement coûteux
 - Requiert `GranitEncryptionModule` avec une `PassPhrase` depuis Vault
@@ -265,7 +265,8 @@ src/Granit.Settings/
 │   └── SettingDefinitionManager.cs        (Singleton, registre global)
 ├── Values/
 │   ├── SettingValue.cs                     (record : Name, ProviderName, ProviderKey, Value)
-│   └── ISettingStore.cs                    (abstraction de persistance basse couche)
+│   ├── ISettingStoreReader.cs              (lecture de persistance basse couche)
+│   └── ISettingStoreWriter.cs              (écriture de persistance basse couche)
 ├── Stores/
 │   └── InMemorySettingStore.cs             (ConcurrentDictionary, dev/tests)
 ├── Providers/
@@ -294,7 +295,8 @@ src/Granit.Settings/
 | Service | Implémentation | Lifetime |
 | --- | --- | --- |
 | `SettingDefinitionManager` | `SettingDefinitionManager` | Singleton |
-| `ISettingStore` | `InMemorySettingStore` (défaut) | Singleton |
+| `ISettingStoreReader` | `InMemorySettingStore` (défaut) | Singleton |
+| `ISettingStoreWriter` | `InMemorySettingStore` (défaut) | Singleton |
 | `ISettingValueProvider` × 5 | U, T, G, C, D | Singleton |
 | `SettingValueProviderManager` | `SettingValueProviderManager` | Singleton |
 | `ISettingProvider` | `SettingProvider` | Scoped |
@@ -311,7 +313,7 @@ GranitSettingsModule
 ```
 
 | Direction | Modules |
-|-----------|---------|
+| --------- | ------- |
 | **Dépend de** | `Granit.Core`, `Granit.Caching`, `Granit.Encryption`, `Granit.Security` |
 | **Utilisé par** | `Granit.Settings.EntityFrameworkCore` |
 | **Package EF Core** | `Granit.Settings.EntityFrameworkCore` → ajoute `Granit.Persistence` |
