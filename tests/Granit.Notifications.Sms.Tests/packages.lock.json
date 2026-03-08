@@ -388,14 +388,6 @@
           "Microsoft.Extensions.Options": "10.0.0"
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions": {
-        "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
-        }
-      },
       "Microsoft.Extensions.Logging.Configuration": {
         "type": "Transitive",
         "resolved": "10.0.0",
@@ -650,9 +642,9 @@
       "granit.notifications": {
         "type": "Project",
         "dependencies": {
-          "Granit.Querying": "[0.1.0-dev, )",
-          "Granit.Timing": "[0.1.0-dev, )",
-          "Granit.Wolverine": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev.530, )",
+          "Granit.Timing": "[0.1.0-dev.530, )",
+          "Granit.Wolverine": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.Configuration.Binder": "[10.*, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
@@ -662,7 +654,7 @@
       "granit.notifications.sms": {
         "type": "Project",
         "dependencies": {
-          "Granit.Notifications": "[0.1.0-dev, )",
+          "Granit.Notifications": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -671,19 +663,19 @@
       "granit.querying": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit.Core": "[0.1.0-dev.530, )"
         }
       },
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit.Core": "[0.1.0-dev.530, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -691,7 +683,7 @@
       "granit.wolverine": {
         "type": "Project",
         "dependencies": {
-          "Granit.Security": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev.530, )",
           "WolverineFx": "[5.17.*, )",
           "WolverineFx.FluentValidation": "[5.17.*, )"
         }
@@ -781,6 +773,15 @@
           "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.3",
           "Microsoft.Extensions.FileProviders.Abstractions": "10.0.3",
           "Microsoft.Extensions.Logging.Abstractions": "10.0.3"
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
         }
       },
       "Microsoft.Extensions.Options": {

@@ -287,14 +287,6 @@
           "Microsoft.Extensions.Options": "10.0.3"
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions": {
-        "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
-        }
-      },
       "Microsoft.Extensions.Logging.Configuration": {
         "type": "Transitive",
         "resolved": "10.0.3",
@@ -488,8 +480,8 @@
       "granit.apidocumentation": {
         "type": "Project",
         "dependencies": {
-          "Granit.ApiVersioning": "[0.1.0-dev, )",
-          "Granit.Security": "[0.1.0-dev, )",
+          "Granit.ApiVersioning": "[0.1.0-dev.530, )",
+          "Granit.Security": "[0.1.0-dev.530, )",
           "Microsoft.AspNetCore.OpenApi": "[10.*, )",
           "Scalar.AspNetCore": "[2.*, )"
         }
@@ -499,20 +491,20 @@
         "dependencies": {
           "Asp.Versioning.Mvc": "[10.0.0-preview.*, )",
           "Asp.Versioning.Mvc.ApiExplorer": "[10.0.0-preview.*, )",
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit.Core": "[0.1.0-dev.530, )"
         }
       },
       "granit.authorization": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[0.1.0-dev, )",
-          "Granit.Security": "[0.1.0-dev, )"
+          "Granit.Caching": "[0.1.0-dev.530, )",
+          "Granit.Security": "[0.1.0-dev.530, )"
         }
       },
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Caching.Hybrid": "[10.*, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
@@ -528,19 +520,19 @@
       "granit.querying": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit.Core": "[0.1.0-dev.530, )"
         }
       },
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit.Core": "[0.1.0-dev.530, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Core": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -548,17 +540,17 @@
       "granit.workflow": {
         "type": "Project",
         "dependencies": {
-          "Granit.Querying": "[0.1.0-dev, )",
-          "Granit.Timing": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev.530, )",
+          "Granit.Timing": "[0.1.0-dev.530, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )"
         }
       },
       "granit.workflow.endpoints": {
         "type": "Project",
         "dependencies": {
-          "Granit.ApiDocumentation": "[0.1.0-dev, )",
-          "Granit.Authorization": "[0.1.0-dev, )",
-          "Granit.Workflow": "[0.1.0-dev, )"
+          "Granit.ApiDocumentation": "[0.1.0-dev.530, )",
+          "Granit.Authorization": "[0.1.0-dev.530, )",
+          "Granit.Workflow": "[0.1.0-dev.530, )"
         }
       },
       "Asp.Versioning.Mvc": {
@@ -649,6 +641,15 @@
           "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.3",
           "Microsoft.Extensions.FileProviders.Abstractions": "10.0.3",
           "Microsoft.Extensions.Logging.Abstractions": "10.0.3"
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.0.3",
+        "contentHash": "lxl0WLk7ROgBFAsjcOYjQ8/DVK+VMszxGBzUhgtQmAsTNldLL5pk9NG/cWTsXHq0lUhUEAtZkEE7jOGOA8bGKQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
         }
       },
       "Microsoft.Extensions.Options": {

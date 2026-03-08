@@ -2,8 +2,8 @@
 // Tests - BrevoNotificationProvider
 // =============================================================================
 // Verifies the unified Brevo provider: email, SMS, and WhatsApp sending via
-// Brevo Transactional API, correct endpoint routing, payload mapping, and
-// error handling on non-2xx responses.
+// Brevo Transactional API, correct endpoint routing, payload mapping, error
+// handling on non-2xx responses, and Brevo error body parsing.
 // =============================================================================
 
 using System.Net;
@@ -11,6 +11,7 @@ using System.Text.Json;
 using Granit.Notifications.Email;
 using Granit.Notifications.Sms;
 using Granit.Notifications.WhatsApp;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Shouldly;
@@ -34,7 +35,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
 
         _httpClientFactory.CreateClient("Brevo").Returns(_httpClient);
 
-        IOptions<BrevoOptions> options = Options.Create(new BrevoOptions
+        var optionsMonitor = Substitute.For<IOptionsMonitor<BrevoOptions>>();
+        optionsMonitor.CurrentValue.Returns(new BrevoOptions
         {
             ApiKey = "test-key",
             DefaultSenderEmail = "default@test.com",
@@ -42,7 +44,8 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             DefaultSmsSenderId = "TestApp",
         });
 
-        _provider = new BrevoNotificationProvider(_httpClientFactory, options);
+        _provider = new BrevoNotificationProvider(
+            _httpClientFactory, optionsMonitor, NullLogger<BrevoNotificationProvider>.Instance);
     }
 
     // -------------------------------------------------------------------------
@@ -148,6 +151,27 @@ public sealed class BrevoNotificationProviderTests : IDisposable
         await Should.ThrowAsync<HttpRequestException>(act);
     }
 
+    [Fact]
+    public async Task SendEmailAsync_IncludesBrevoErrorBody_InException()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.BadRequest;
+        _handler.ResponseBody = """{"code":"invalid_parameter","message":"Invalid email address"}""";
+        IEmailSender emailSender = _provider;
+
+        var ex = await Should.ThrowAsync<HttpRequestException>(() => emailSender.SendAsync(
+            new EmailMessage
+            {
+                To = "bad-email",
+                Subject = "Test",
+                HtmlBody = "<p>Hi</p>",
+            },
+            TestContext.Current.CancellationToken));
+
+        ex.Message.ShouldContain("Invalid email address");
+        ex.Message.ShouldContain("smtp/email");
+        ex.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
     // -------------------------------------------------------------------------
     // SMS
     // -------------------------------------------------------------------------
@@ -224,6 +248,25 @@ public sealed class BrevoNotificationProviderTests : IDisposable
 
         string body = _handler.Requests[0].Body;
         body.ShouldContain("TestApp");
+    }
+
+    [Fact]
+    public async Task SendSmsAsync_ThrowsOnNon2xx_WithBrevoErrorBody()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.PaymentRequired;
+        _handler.ResponseBody = """{"code":"insufficient_credits","message":"Not enough SMS credits"}""";
+        ISmsSender smsSender = _provider;
+
+        var ex = await Should.ThrowAsync<HttpRequestException>(() => smsSender.SendAsync(
+            new SmsMessage
+            {
+                To = "+32470000000",
+                Body = "Hello SMS",
+            },
+            TestContext.Current.CancellationToken));
+
+        ex.Message.ShouldContain("Not enough SMS credits");
+        ex.StatusCode.ShouldBe(HttpStatusCode.PaymentRequired);
     }
 
     // -------------------------------------------------------------------------

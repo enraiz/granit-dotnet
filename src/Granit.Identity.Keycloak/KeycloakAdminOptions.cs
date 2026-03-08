@@ -67,6 +67,10 @@ public sealed class KeycloakAdminOptions
     /// </remarks>
     public bool UseTokenExchangeForDeviceActivity { get; set; }
 
+    /// <summary>HTTP request timeout in seconds for Keycloak Admin API calls. Default: 30.</summary>
+    [Range(1, 300)]
+    public int TimeoutSeconds { get; set; } = 30;
+
     /// <summary>
     /// Public Keycloak client ID with <c>Direct Access Grants</c> enabled,
     /// used to verify user credentials via the Resource Owner Password Grant.

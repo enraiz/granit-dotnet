@@ -277,6 +277,33 @@ public sealed class PushNotificationChannelTests
         handler.Requests.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task SendAsync_ServerError_ThrowsAggregateExceptionAfterAllAttempts()
+    {
+        // First succeeds, second returns 500 (non-retriable by the channel), third succeeds.
+        SequentialMockHttpMessageHandler handler = new([
+            HttpStatusCode.Created,
+            HttpStatusCode.InternalServerError,
+            HttpStatusCode.Created,
+        ]);
+        PushNotificationChannel channel = BuildChannel(handler);
+        NotificationDeliveryContext context = BuildContext();
+        List<PushSubscriptionInfo> subscriptions =
+        [
+            BuildSubscription("https://push.example.com/active1"),
+            BuildSubscription("https://push.example.com/failing"),
+            BuildSubscription("https://push.example.com/active2"),
+        ];
+        SetupSubscriptions(context.RecipientUserId, context.TenantId, subscriptions);
+
+        var ex = await Should.ThrowAsync<AggregateException>(
+            () => channel.SendAsync(context, TestContext.Current.CancellationToken));
+
+        // All three subscriptions should have been attempted despite the 500 error.
+        handler.Requests.Count.ShouldBe(3);
+        ex.InnerExceptions.Count.ShouldBe(1);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------

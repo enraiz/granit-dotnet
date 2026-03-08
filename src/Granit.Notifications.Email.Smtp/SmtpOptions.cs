@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Granit.Notifications.Email.Smtp;
 
 /// <summary>SMTP server connection options.</summary>
@@ -20,4 +22,8 @@ public sealed class SmtpOptions
 
     /// <summary>SMTP authentication password.</summary>
     public string? Password { get; set; }
+
+    /// <summary>Connection and send timeout in seconds. Default: 30.</summary>
+    [Range(1, 300)]
+    public int TimeoutSeconds { get; set; } = 30;
 }

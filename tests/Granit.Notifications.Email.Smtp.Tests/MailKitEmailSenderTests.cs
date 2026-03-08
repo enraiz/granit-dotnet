@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Shouldly;
@@ -18,7 +19,7 @@ public sealed class MailKitEmailSenderTests
     public void Class_Implements_IEmailSender()
     {
         SmtpOptions options = new() { Host = "localhost", Port = 25, UseSsl = false };
-        MailKitEmailSender sender = new(Options.Create(options));
+        MailKitEmailSender sender = new(Options.Create(options), NullLogger<MailKitEmailSender>.Instance);
 
         sender.ShouldBeAssignableTo<IEmailSender>();
     }

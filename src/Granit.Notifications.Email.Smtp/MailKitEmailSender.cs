@@ -1,5 +1,6 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
@@ -9,12 +10,15 @@ namespace Granit.Notifications.Email.Smtp;
 /// <see cref="IEmailSender"/> implementation using MailKit SMTP.
 /// Registered as Keyed Service with key "Smtp".
 /// </summary>
-internal sealed class MailKitEmailSender(IOptions<SmtpOptions> options) : IEmailSender
+internal sealed partial class MailKitEmailSender(
+    IOptions<SmtpOptions> options,
+    ILogger<MailKitEmailSender> logger) : IEmailSender
 {
     /// <inheritdoc />
     public async Task SendAsync(EmailMessage message, CancellationToken ct = default)
     {
         SmtpOptions smtp = options.Value;
+        int timeoutMs = smtp.TimeoutSeconds * 1000;
 
         MimeMessage mimeMessage = new();
         mimeMessage.From.Add(new MailboxAddress(
@@ -36,6 +40,8 @@ internal sealed class MailKitEmailSender(IOptions<SmtpOptions> options) : IEmail
         mimeMessage.Body = bodyBuilder.ToMessageBody();
 
         using SmtpClient client = new();
+        client.Timeout = timeoutMs;
+
         SecureSocketOptions socketOptions = smtp.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
         await client.ConnectAsync(smtp.Host, smtp.Port, socketOptions, ct).ConfigureAwait(false);
 
@@ -46,5 +52,10 @@ internal sealed class MailKitEmailSender(IOptions<SmtpOptions> options) : IEmail
 
         await client.SendAsync(mimeMessage, ct).ConfigureAwait(false);
         await client.DisconnectAsync(quit: true, ct).ConfigureAwait(false);
+
+        LogEmailSent(message.To, smtp.Host, smtp.Port);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "SMTP email sent to {Recipient} via {Host}:{Port}")]
+    private partial void LogEmailSent(string recipient, string host, int port);
 }
