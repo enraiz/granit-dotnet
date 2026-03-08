@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Granit.Security;
 using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Permissions;
+using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Store;
 using Granit.Validation.AspNetCore;
@@ -41,13 +42,16 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers 5 endpoints:
+    /// Registers 8 endpoints:
     /// <list type="bullet">
     /// <item><c>GET /</c> — paginated list with filters</item>
     /// <item><c>GET /{name}</c> — detail (draft + published)</item>
     /// <item><c>POST /</c> — create a new draft</item>
     /// <item><c>PUT /{name}</c> — update an existing draft</item>
     /// <item><c>DELETE /{name}/draft</c> — delete draft only</item>
+    /// <item><c>POST /{name}/publish</c> — publish the current draft</item>
+    /// <item><c>POST /{name}/unpublish</c> — unpublish (archive the published revision)</item>
+    /// <item><c>GET /{name}/lifecycle</c> — lifecycle info (current status, available transitions)</item>
     /// </list>
     /// </para>
     /// <para>
@@ -96,6 +100,18 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         group.MapDelete("/{name}/draft", HandleDeleteDraftAsync)
              .WithName("DeleteTemplateDraft")
              .WithSummary("Deletes the draft revision of a template (published/archived are preserved).");
+
+        group.MapPost("/{name}/publish", HandlePublishAsync)
+             .WithName("PublishTemplate")
+             .WithSummary("Publishes the current draft, archiving any previous published revision.");
+
+        group.MapPost("/{name}/unpublish", HandleUnpublishAsync)
+             .WithName("UnpublishTemplate")
+             .WithSummary("Unpublishes the template (archives the published revision).");
+
+        group.MapGet("/{name}/lifecycle", HandleGetLifecycleAsync)
+             .WithName("GetTemplateLifecycle")
+             .WithSummary("Returns lifecycle status, workflow state, and available transitions.");
 
         return group;
     }
@@ -388,6 +404,197 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     }
 
     // -------------------------------------------------------------------------
+    // POST /{name}/publish — Publish the current draft
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplateDetailResponse>, ProblemHttpResult>> HandlePublishAsync(
+        HttpContext context,
+        string name,
+        string? culture,
+        CancellationToken ct)
+    {
+        IDocumentTemplateStoreReader? storeReader =
+            context.RequestServices.GetService<IDocumentTemplateStoreReader>();
+        IDocumentTemplateStoreWriter? storeWriter =
+            context.RequestServices.GetService<IDocumentTemplateStoreWriter>();
+
+        if (storeReader is null || storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return nameError;
+        }
+
+        if (culture is not null)
+        {
+            ProblemHttpResult? cultureError = ValidateBcp47(culture);
+            if (cultureError is not null)
+            {
+                return cultureError;
+            }
+        }
+
+        string userId = GetCurrentUserId(context);
+        TemplateKey key = new(name, culture);
+
+        try
+        {
+            await storeWriter.PublishAsync(key, userId, ct).ConfigureAwait(false);
+        }
+        catch (TemplateTransitionDeniedException ex)
+        {
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status409Conflict);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status404NotFound);
+        }
+
+        return TypedResults.Ok(await BuildDetailResponseAsync(storeReader, key, ct).ConfigureAwait(false));
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /{name}/unpublish — Unpublish (archive the published revision)
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> HandleUnpublishAsync(
+        HttpContext context,
+        string name,
+        string? culture,
+        CancellationToken ct)
+    {
+        IDocumentTemplateStoreWriter? storeWriter =
+            context.RequestServices.GetService<IDocumentTemplateStoreWriter>();
+
+        if (storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return nameError;
+        }
+
+        if (culture is not null)
+        {
+            ProblemHttpResult? cultureError = ValidateBcp47(culture);
+            if (cultureError is not null)
+            {
+                return cultureError;
+            }
+        }
+
+        string userId = GetCurrentUserId(context);
+        TemplateKey key = new(name, culture);
+
+        try
+        {
+            await storeWriter.UnpublishAsync(key, userId, ct).ConfigureAwait(false);
+        }
+        catch (TemplateTransitionDeniedException ex)
+        {
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
+        return TypedResults.NoContent();
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /{name}/lifecycle — Lifecycle status and available transitions
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplateLifecycleResponse>, NotFound, ProblemHttpResult>> HandleGetLifecycleAsync(
+        HttpContext context,
+        string name,
+        string? culture,
+        CancellationToken ct)
+    {
+        IDocumentTemplateStoreReader? storeReader =
+            context.RequestServices.GetService<IDocumentTemplateStoreReader>();
+
+        if (storeReader is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return nameError;
+        }
+
+        if (culture is not null)
+        {
+            ProblemHttpResult? cultureError = ValidateBcp47(culture);
+            if (cultureError is not null)
+            {
+                return cultureError;
+            }
+        }
+
+        TemplateKey key = new(name, culture);
+
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
+        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, ct).ConfigureAwait(false);
+
+        if (draft is null && published is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        // Determine the current status (Draft takes precedence for display)
+        TemplateLifecycleStatus currentStatus = draft is not null
+            ? TemplateLifecycleStatus.Draft
+            : TemplateLifecycleStatus.Published;
+
+        ITemplateTransitionHook? hook = context.RequestServices.GetService<ITemplateTransitionHook>();
+        bool workflowEnabled = hook?.IsWorkflowEnabled ?? false;
+
+        // Compute available transitions from the current status
+        List<TemplateLifecycleStatus> availableTransitions = [];
+        TemplateLifecycleStatus[] possibleTargets =
+        [
+            TemplateLifecycleStatus.Draft,
+            TemplateLifecycleStatus.PendingReview,
+            TemplateLifecycleStatus.Published,
+            TemplateLifecycleStatus.Archived,
+        ];
+
+        foreach (TemplateLifecycleStatus target in possibleTargets)
+        {
+            if (target == currentStatus)
+            {
+                continue;
+            }
+
+            if (hook is not null &&
+                await hook.CanTransitionAsync(currentStatus, target, ct).ConfigureAwait(false))
+            {
+                availableTransitions.Add(target);
+            }
+        }
+
+        return TypedResults.Ok(new TemplateLifecycleResponse(
+            name,
+            culture,
+            currentStatus,
+            workflowEnabled,
+            availableTransitions));
+    }
+
+    // -------------------------------------------------------------------------
     // Shared helpers
     // -------------------------------------------------------------------------
 
@@ -407,6 +614,34 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             revision.CreatedBy,
             revision.PublishedAt,
             revision.PublishedBy);
+
+    private static async Task<TemplateDetailResponse> BuildDetailResponseAsync(
+        IDocumentTemplateStoreReader storeReader,
+        TemplateKey key,
+        CancellationToken ct)
+    {
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
+        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, ct).ConfigureAwait(false);
+
+        TemplateRevisionResponse? publishedResponse = null;
+        if (published is not null)
+        {
+            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+            TemplateRevision? publishedRevision = history.FirstOrDefault(
+                r => r.Status == TemplateLifecycleStatus.Published);
+
+            if (publishedRevision is not null)
+            {
+                publishedResponse = ToRevisionResponse(publishedRevision);
+            }
+        }
+
+        return new TemplateDetailResponse(
+            key.Name,
+            key.Culture,
+            draft is not null ? ToRevisionResponse(draft) : null,
+            publishedResponse);
+    }
 
     private static ProblemHttpResult StoreNotRegistered() =>
         TypedResults.Problem(

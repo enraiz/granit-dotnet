@@ -7,6 +7,7 @@ using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Extensions;
 using Granit.Templating.Endpoints.Permissions;
 using Granit.Templating.Endpoints.Validators;
+using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
@@ -36,6 +37,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
 
     private readonly IDocumentTemplateStoreReader _storeReader = Substitute.For<IDocumentTemplateStoreReader>();
     private readonly IDocumentTemplateStoreWriter _storeWriter = Substitute.For<IDocumentTemplateStoreWriter>();
+    private readonly ITemplateTransitionHook _transitionHook = Substitute.For<ITemplateTransitionHook>();
     private readonly WebApplication _app;
     private readonly HttpClient _adminClient;
     private readonly HttpClient _anonClient;
@@ -56,6 +58,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
 
         builder.Services.AddSingleton(_storeReader);
         builder.Services.AddSingleton(_storeWriter);
+        builder.Services.AddSingleton(_transitionHook);
         builder.Services.AddSingleton<IValidator<SaveTemplateRequest>, SaveTemplateRequestValidator>();
 
         _app = builder.Build();
@@ -542,6 +545,252 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     {
         HttpResponseMessage response = await _adminClient.DeleteAsync(
             $"{Prefix}/Billing.Invoice/draft?culture=en:bad",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    // =========================================================================
+    // POST /{name}/publish — Publish
+    // =========================================================================
+
+    [Fact]
+    public async Task Publish_WhenStoreNotRegistered_Returns501()
+    {
+        await using WebApplication app = await BuildAppWithoutStoreAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.PostAsync(
+            $"{Prefix}/Billing.Invoice/publish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotImplemented);
+    }
+
+    [Fact]
+    public async Task Publish_WithValidDraft_Returns200()
+    {
+        var publishedRevision = new TemplateRevision
+        {
+            RevisionId = Guid.NewGuid(),
+            Content = "<h1>Published</h1>",
+            MimeType = "text/html",
+            Status = TemplateLifecycleStatus.Published,
+            CreatedAt = DateTimeOffset.UtcNow,
+            CreatedBy = "test-user",
+            PublishedAt = DateTimeOffset.UtcNow,
+            PublishedBy = "test-user",
+        };
+
+        _storeWriter.PublishAsync(Arg.Any<TemplateKey>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns((TemplateRevision?)null);
+        _storeReader.TryGetPublishedAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new TemplateDescriptor { Content = "<h1>Published</h1>", MimeType = "text/html", RevisionId = publishedRevision.RevisionId });
+        _storeReader.GetHistoryAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new List<TemplateRevision> { publishedRevision });
+
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/Billing.Invoice/publish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateDetailResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateDetailResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.Published.ShouldNotBeNull();
+
+        await _storeWriter.Received(1).PublishAsync(
+            Arg.Is<TemplateKey>(k => k.Name == "Billing.Invoice"),
+            Arg.Any<string>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Publish_WhenNoDraftExists_Returns404()
+    {
+        _storeWriter.PublishAsync(Arg.Any<TemplateKey>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("Cannot publish: no draft exists."));
+
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/Billing.Invoice/publish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Publish_WhenTransitionDenied_Returns409()
+    {
+        _storeWriter.PublishAsync(Arg.Any<TemplateKey>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new TemplateTransitionDeniedException(
+                TemplateLifecycleStatus.Draft, TemplateLifecycleStatus.Published));
+
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/Billing.Invoice/publish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
+    public async Task Publish_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/bad/publish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    // =========================================================================
+    // POST /{name}/unpublish — Unpublish
+    // =========================================================================
+
+    [Fact]
+    public async Task Unpublish_WhenStoreNotRegistered_Returns501()
+    {
+        await using WebApplication app = await BuildAppWithoutStoreAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.PostAsync(
+            $"{Prefix}/Billing.Invoice/unpublish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotImplemented);
+    }
+
+    [Fact]
+    public async Task Unpublish_WithValidRequest_Returns204()
+    {
+        _storeWriter.UnpublishAsync(Arg.Any<TemplateKey>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/Billing.Invoice/unpublish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        await _storeWriter.Received(1).UnpublishAsync(
+            Arg.Is<TemplateKey>(k => k.Name == "Billing.Invoice"),
+            Arg.Any<string>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Unpublish_WhenTransitionDenied_Returns409()
+    {
+        _storeWriter.UnpublishAsync(Arg.Any<TemplateKey>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new TemplateTransitionDeniedException(
+                TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived));
+
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/Billing.Invoice/unpublish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
+    public async Task Unpublish_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.PostAsync(
+            $"{Prefix}/bad/unpublish",
+            null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    // =========================================================================
+    // GET /{name}/lifecycle — Lifecycle info
+    // =========================================================================
+
+    [Fact]
+    public async Task GetLifecycle_WhenStoreNotRegistered_Returns501()
+    {
+        await using WebApplication app = await BuildAppWithoutStoreAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.GetAsync(
+            $"{Prefix}/Billing.Invoice/lifecycle",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotImplemented);
+    }
+
+    [Fact]
+    public async Task GetLifecycle_WhenNotFound_Returns404()
+    {
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns((TemplateRevision?)null);
+        _storeReader.TryGetPublishedAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns((TemplateDescriptor?)null);
+
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/lifecycle",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetLifecycle_WithDraft_ReturnsStatusAndTransitions()
+    {
+        var draft = new TemplateRevision
+        {
+            RevisionId = Guid.NewGuid(),
+            Content = "<h1>Draft</h1>",
+            MimeType = "text/html",
+            Status = TemplateLifecycleStatus.Draft,
+            CreatedAt = DateTimeOffset.UtcNow,
+            CreatedBy = "user-1",
+        };
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+        _storeReader.TryGetPublishedAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns((TemplateDescriptor?)null);
+
+        _transitionHook.IsWorkflowEnabled.Returns(false);
+        _transitionHook.CanTransitionAsync(
+                Arg.Any<TemplateLifecycleStatus>(), Arg.Any<TemplateLifecycleStatus>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                var from = callInfo.ArgAt<TemplateLifecycleStatus>(0);
+                var target = callInfo.ArgAt<TemplateLifecycleStatus>(1);
+                return from == TemplateLifecycleStatus.Draft && target == TemplateLifecycleStatus.Published;
+            });
+
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/lifecycle",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateLifecycleResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateLifecycleResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe("Billing.Invoice");
+        result.CurrentStatus.ShouldBe(TemplateLifecycleStatus.Draft);
+        result.WorkflowEnabled.ShouldBeFalse();
+        result.AvailableTransitions.ShouldContain(TemplateLifecycleStatus.Published);
+    }
+
+    [Fact]
+    public async Task GetLifecycle_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/bad/lifecycle",
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);

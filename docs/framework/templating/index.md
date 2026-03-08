@@ -415,6 +415,9 @@ app.MapGranitTemplatingAdmin(opts =>
 | `POST /` | Créer un brouillon | Corps : `SaveTemplateRequest` (name, culture, content, mimeType) |
 | `PUT /{name}` | Mettre à jour un brouillon | Corps : `SaveTemplateRequest` (culture, content, mimeType) |
 | `DELETE /{name}/draft` | Supprimer le brouillon | Query `?culture=` — ne supprime jamais les versions publiées/archivées |
+| `POST /{name}/publish` | Publier le brouillon | Archive l'ancienne version publiée, invalide le cache. 409 si transition refusée |
+| `POST /{name}/unpublish` | Dépublier | Archive la version publiée. Idempotent si rien n'est publié. 409 si refusé |
+| `GET /{name}/lifecycle` | État du cycle de vie | Statut actuel, workflow actif, transitions disponibles |
 
 Si `IDocumentTemplateStoreReader`/`IDocumentTemplateStoreWriter` ne sont pas enregistrés
 (pas de module EF Core chargé), tous les endpoints retournent `501 Not Implemented`.
