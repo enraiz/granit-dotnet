@@ -11,6 +11,7 @@ Digital Dynamics.
 | `Granit.DocumentGeneration` | Façade `IDocumentGenerator`, `IDocumentRenderer`, `DocumentResult` |
 | `Granit.DocumentGeneration.Pdf` | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête *(à venir)* |
 | `Granit.DocumentGeneration.Excel` | `ClosedXmlTemplateEngine` — génération de tableurs *.xlsx* natifs |
+| `Granit.Templating.Endpoints` | Endpoints Minimal API d'administration (CRUD brouillons, publish/unpublish, historique) — permission `Templates.Manage` |
 | `Granit.Templating.Workflow` | Pont optionnel vers `Granit.Workflow` — FSM, approbation, piste d'audit unifiée |
 
 ## Pipeline complet
@@ -385,6 +386,51 @@ public sealed class TemplateAdminService(
 }
 ```
 
+## Endpoints d'administration (Granit.Templating.Endpoints)
+
+Le package `Granit.Templating.Endpoints` fournit des endpoints Minimal API pour administrer
+les templates via le store EF Core. Tous les endpoints nécessitent la permission `Templates.Manage`.
+
+### Enregistrement
+
+```csharp
+// Module
+[DependsOn(typeof(GranitTemplatingEndpointsModule))]
+public sealed class MyAppModule : GranitModule { }
+
+// Endpoints (après app.Build())
+app.MapGranitTemplatingAdmin(opts =>
+{
+    opts.ApiPrefix = "api/v1";            // défaut : "api/v1"
+    opts.RoutePrefix = "admin/templates"; // défaut : "admin/templates"
+});
+```
+
+### Endpoints disponibles
+
+| Méthode | Route | Description |
+| --- | --- | --- |
+| `GET /` | Liste paginée | Filtres : `page`, `pageSize`, `search`, `status`, `culture` |
+| `GET /{name}` | Détail | Brouillon + version publiée (query `?culture=`) |
+| `POST /` | Créer un brouillon | Corps : `SaveTemplateRequest` (name, culture, content, mimeType) |
+| `PUT /{name}` | Mettre à jour un brouillon | Corps : `SaveTemplateRequest` (culture, content, mimeType) |
+| `DELETE /{name}/draft` | Supprimer le brouillon | Query `?culture=` — ne supprime jamais les versions publiées/archivées |
+
+Si `IDocumentTemplateStoreReader`/`IDocumentTemplateStoreWriter` ne sont pas enregistrés
+(pas de module EF Core chargé), tous les endpoints retournent `501 Not Implemented`.
+
+### Validation
+
+Le corps des requêtes POST/PUT est validé par FluentValidation (`SaveTemplateRequestValidator`) :
+
+- `Name` : max 200 caractères, format `Domain.Name` (requis pour POST)
+- `Culture` : max 10 caractères, format BCP 47
+- `Content` : non vide
+- `MimeType` : non vide, max 127 caractères
+
+Les paramètres de route et de query (`name`, `culture`, `page`, `pageSize`) sont validés
+en amont dans le handler avec des réponses `400 Problem Details` (RFC 7807).
+
 ## Exceptions
 
 | Classe | Déclencheur |
@@ -468,6 +514,7 @@ Flux selon le type de moteur :
 | `Granit.DocumentGeneration` | `Granit.Templating` |
 | `Granit.DocumentGeneration.Pdf` | `Granit.DocumentGeneration`, `PuppeteerSharp` |
 | `Granit.DocumentGeneration.Excel` | `Granit.Templating`, `ClosedXML 0.104.*` |
+| `Granit.Templating.Endpoints` | `Granit.Templating`, `Granit.Authorization`, `Granit.Security`, `Granit.Validation`, `Granit.ApiDocumentation` |
 | `Granit.Templating.Workflow` | `Granit.Templating`, `Granit.Workflow`, `Granit.Workflow.EntityFrameworkCore` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).
