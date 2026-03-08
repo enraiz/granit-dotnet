@@ -21,7 +21,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
     private const string UserRole = "granit-timeline-user";
     private const string Prefix = "/timeline";
 
-    private readonly ITimelineQuery _query = Substitute.For<ITimelineQuery>();
+    private readonly ITimelineReader _reader = Substitute.For<ITimelineReader>();
     private readonly WebApplication _app;
     private readonly HttpClient _authClient;
     private readonly HttpClient _anonClient;
@@ -37,10 +37,10 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
 
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_query);
+        builder.Services.AddSingleton(_reader);
 
         // Required by follower/entry endpoints but not exercised here
-        builder.Services.AddSingleton(Substitute.For<ITimelineStore>());
+        builder.Services.AddSingleton(Substitute.For<ITimelineWriter>());
         builder.Services.AddSingleton(Substitute.For<ITimelineFollowerService>());
         builder.Services.AddSingleton(Substitute.For<ITimelineNotifier>());
         builder.Services.AddSingleton(Substitute.For<Granit.Security.ICurrentUserService>());
@@ -71,7 +71,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
             Body = "Hello",
         };
 
-        _query.GetStreamAsync("Patient", "42", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
+        _reader.GetStreamAsync("Patient", "42", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<TimelineStreamEntry>([entry], 1));
 
         // Act
@@ -93,7 +93,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
     public async Task GetStream_empty_returns_empty_page()
     {
         // Arrange
-        _query.GetStreamAsync("Invoice", "99", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
+        _reader.GetStreamAsync("Invoice", "99", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<TimelineStreamEntry>([], 0));
 
         // Act
@@ -113,7 +113,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
     public async Task GetStream_passes_page_and_pageSize_parameters()
     {
         // Arrange
-        _query.GetStreamAsync("Patient", "1", 3, 10, Arg.Any<CancellationToken>())
+        _reader.GetStreamAsync("Patient", "1", 3, 10, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<TimelineStreamEntry>([], 50));
 
         // Act
@@ -122,7 +122,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _query.Received(1).GetStreamAsync("Patient", "1", 3, 10, Arg.Any<CancellationToken>());
+        await _reader.Received(1).GetStreamAsync("Patient", "1", 3, 10, Arg.Any<CancellationToken>());
     }
 
     [Fact]

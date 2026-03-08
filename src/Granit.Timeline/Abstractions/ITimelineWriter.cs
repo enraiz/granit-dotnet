@@ -3,9 +3,9 @@ using Granit.Timeline.Domain;
 namespace Granit.Timeline.Abstractions;
 
 /// <summary>
-/// Persistence store for timeline entries and attachments (write operations).
+/// Write operations for timeline entries and attachments.
 /// </summary>
-public interface ITimelineStore
+public interface ITimelineWriter
 {
     /// <summary>Posts a new entry to the activity stream of an entity.</summary>
     Task<TimelineEntry> PostEntryAsync(

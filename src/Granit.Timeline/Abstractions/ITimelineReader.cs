@@ -3,10 +3,10 @@ using Granit.Querying;
 namespace Granit.Timeline.Abstractions;
 
 /// <summary>
-/// Query service for the unified activity stream (read operations).
+/// Read operations for the unified activity stream.
 /// Returns paginated, chronologically ordered entries for a given entity.
 /// </summary>
-public interface ITimelineQuery
+public interface ITimelineReader
 {
     /// <summary>
     /// Returns a paginated activity stream for a specific entity.

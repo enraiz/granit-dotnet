@@ -1,4 +1,6 @@
 using Granit.Core.Domain;
+using Granit.Core.Events;
+using Granit.Timeline.Events;
 
 namespace Granit.Timeline.Domain;
 
@@ -11,8 +13,10 @@ namespace Granit.Timeline.Domain;
 ///   <item><see cref="TimelineEntryType.SystemLog"/> — auto-generated, INSERT-only immutable (HDS).</item>
 /// </list>
 /// </summary>
-public sealed class TimelineEntry : CreationAuditedEntity, ISoftDeletable, IMultiTenant
+public sealed class TimelineEntry : CreationAuditedEntity, ISoftDeletable, IMultiTenant, IDomainEventSource
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
+
     /// <summary>Entity type name (e.g. "Patient", "Invoice").</summary>
     public string EntityType { get; set; } = string.Empty;
 
@@ -49,4 +53,34 @@ public sealed class TimelineEntry : CreationAuditedEntity, ISoftDeletable, IMult
 
     /// <inheritdoc/>
     public string? DeletedBy { get; set; }
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    /// <inheritdoc />
+    public void ClearDomainEvents() => _domainEvents.Clear();
+
+    /// <summary>
+    /// Raises a <see cref="TimelineEntryPosted"/> domain event.
+    /// Called by the store after the entry is fully initialized.
+    /// </summary>
+    internal void RaisePostedEvent() =>
+        _domainEvents.Add(new TimelineEntryPosted(Id, EntityType, EntityId, EntryType, AuthorId));
+
+    /// <summary>
+    /// Marks this entry as soft-deleted and raises a <see cref="TimelineEntrySoftDeleted"/> domain event.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When the entry is a <see cref="TimelineEntryType.SystemLog"/>.</exception>
+    internal void SoftDelete(DateTimeOffset deletedAt, string? deletedBy)
+    {
+        if (EntryType == TimelineEntryType.SystemLog)
+        {
+            throw new InvalidOperationException("System log entries are immutable and cannot be deleted (HDS audit trail).");
+        }
+
+        IsDeleted = true;
+        DeletedAt = deletedAt;
+        DeletedBy = deletedBy;
+        _domainEvents.Add(new TimelineEntrySoftDeleted(Id, EntityType, EntityId));
+    }
 }

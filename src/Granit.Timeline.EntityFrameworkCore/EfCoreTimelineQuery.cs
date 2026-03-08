@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Timeline.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="ITimelineQuery"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="ITimelineReader"/> backed by PostgreSQL.
 /// </summary>
 /// <remarks>
 /// Queries use <c>AsNoTracking</c> for read performance. The soft-delete query filter
 /// on <see cref="TimelineEntry"/> automatically excludes deleted entries.
 /// </remarks>
 internal sealed class EfCoreTimelineQuery(
-    IDbContextFactory<TimelineDbContext> dbContextFactory) : ITimelineQuery
+    IDbContextFactory<TimelineDbContext> dbContextFactory) : ITimelineReader
 {
     /// <inheritdoc/>
     public async Task<PagedResult<TimelineStreamEntry>> GetStreamAsync(

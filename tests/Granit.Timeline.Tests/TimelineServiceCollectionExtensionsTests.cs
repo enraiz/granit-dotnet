@@ -20,7 +20,7 @@ namespace Granit.Timeline.Tests;
 public sealed class TimelineServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddGranitTimeline_RegistersTimelineStore()
+    public void AddGranitTimeline_RegistersTimelineWriter()
     {
         ServiceCollection services = new();
         AddRequiredDependencies(services);
@@ -28,12 +28,12 @@ public sealed class TimelineServiceCollectionExtensionsTests
         services.AddGranitTimeline();
 
         using ServiceProvider sp = services.BuildServiceProvider();
-        ITimelineStore? store = sp.GetService<ITimelineStore>();
-        store.ShouldNotBeNull();
+        ITimelineWriter? writer = sp.GetService<ITimelineWriter>();
+        writer.ShouldNotBeNull();
     }
 
     [Fact]
-    public void AddGranitTimeline_RegistersTimelineQuery()
+    public void AddGranitTimeline_RegistersTimelineReader()
     {
         ServiceCollection services = new();
         AddRequiredDependencies(services);
@@ -41,8 +41,8 @@ public sealed class TimelineServiceCollectionExtensionsTests
         services.AddGranitTimeline();
 
         using ServiceProvider sp = services.BuildServiceProvider();
-        ITimelineQuery? query = sp.GetService<ITimelineQuery>();
-        query.ShouldNotBeNull();
+        ITimelineReader? reader = sp.GetService<ITimelineReader>();
+        reader.ShouldNotBeNull();
     }
 
     [Fact]

@@ -8,6 +8,7 @@ using Granit.Core.MultiTenancy;
 using Granit.Guids;
 using Granit.Security;
 using Granit.Timeline.Domain;
+using Granit.Timeline.Events;
 using Granit.Timeline.Internal;
 using Granit.Timing;
 using NSubstitute;
@@ -151,5 +152,52 @@ public sealed class InMemoryTimelineStoreTests
             () => _store.AddAttachmentAsync(
                 Guid.NewGuid(), Guid.NewGuid(), "file.txt", "text/plain", 100,
                 ct: TestContext.Current.CancellationToken));
+    }
+
+    // ── Domain Events ────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task PostEntryAsync_ShouldEmitTimelineEntryPostedEvent()
+    {
+        TimelineEntry entry = await _store.PostEntryAsync(
+            "Patient", "p-1", TimelineEntryType.Comment, "Hello",
+            ct: TestContext.Current.CancellationToken);
+
+        TimelineEntryPosted evt = entry.DomainEvents.ShouldHaveSingleItem().ShouldBeOfType<TimelineEntryPosted>();
+        evt.EntryId.ShouldBe(entry.Id);
+        evt.EntityType.ShouldBe("Patient");
+        evt.EntityId.ShouldBe("p-1");
+        evt.EntryType.ShouldBe(TimelineEntryType.Comment);
+        evt.AuthorId.ShouldBe("test-user");
+    }
+
+    [Fact]
+    public async Task DeleteEntryAsync_ShouldEmitTimelineEntrySoftDeletedEvent()
+    {
+        TimelineEntry entry = await _store.PostEntryAsync(
+            "Patient", "p-1", TimelineEntryType.Comment, "To delete",
+            ct: TestContext.Current.CancellationToken);
+        entry.ClearDomainEvents();
+
+        await _store.DeleteEntryAsync(entry.Id, TestContext.Current.CancellationToken);
+
+        TimelineEntrySoftDeleted evt = entry.DomainEvents.ShouldHaveSingleItem().ShouldBeOfType<TimelineEntrySoftDeleted>();
+        evt.EntryId.ShouldBe(entry.Id);
+        evt.EntityType.ShouldBe("Patient");
+        evt.EntityId.ShouldBe("p-1");
+    }
+
+    [Fact]
+    public async Task DeleteEntryAsync_SystemLog_ShouldNotEmitEvent()
+    {
+        TimelineEntry entry = await _store.PostEntryAsync(
+            "Invoice", "inv-42", TimelineEntryType.SystemLog, "{}",
+            ct: TestContext.Current.CancellationToken);
+        entry.ClearDomainEvents();
+
+        await Should.ThrowAsync<InvalidOperationException>(
+            () => _store.DeleteEntryAsync(entry.Id, TestContext.Current.CancellationToken));
+
+        entry.DomainEvents.ShouldBeEmpty();
     }
 }

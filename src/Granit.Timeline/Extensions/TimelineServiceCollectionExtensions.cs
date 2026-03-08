@@ -20,8 +20,8 @@ public static class TimelineServiceCollectionExtensions
         // Core stores (default: in-memory, replaced by EF Core package).
         // Scoped: depends on ICurrentUserService (scoped per-request).
         services.TryAddScoped<InMemoryTimelineStore>();
-        services.TryAddScoped<ITimelineStore>(sp => sp.GetRequiredService<InMemoryTimelineStore>());
-        services.TryAddScoped<ITimelineQuery, InMemoryTimelineQuery>();
+        services.TryAddScoped<ITimelineWriter>(sp => sp.GetRequiredService<InMemoryTimelineStore>());
+        services.TryAddScoped<ITimelineReader, InMemoryTimelineQuery>();
 
         // Follower facade (standalone mode, replaced by Granit.Timeline.Notifications)
         services.TryAddScoped<ITimelineFollowerService, InMemoryTimelineFollowerService>();

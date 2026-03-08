@@ -9,13 +9,13 @@ using Granit.Timing;
 namespace Granit.Timeline.Internal;
 
 /// <summary>
-/// In-memory implementation of <see cref="ITimelineStore"/> for development and tests.
+/// In-memory implementation of <see cref="ITimelineWriter"/> for development and tests.
 /// </summary>
 internal sealed class InMemoryTimelineStore(
     IClock clock,
     ICurrentUserService currentUser,
     IGuidGenerator guidGenerator,
-    ICurrentTenant currentTenant) : ITimelineStore
+    ICurrentTenant currentTenant) : ITimelineWriter
 {
     private readonly AuditContext _audit = new(guidGenerator, clock, currentUser, currentTenant);
 
@@ -33,6 +33,7 @@ internal sealed class InMemoryTimelineStore(
     {
         TimelineEntry entry = TimelineEntityFactory.CreateEntry(
             entityType, entityId, entryType, body, parentEntryId, _audit);
+        entry.RaisePostedEvent();
 
         Entries[entry.Id] = entry;
         return Task.FromResult(entry);
@@ -46,14 +47,7 @@ internal sealed class InMemoryTimelineStore(
             throw new KeyNotFoundException($"Timeline entry '{entryId}' not found.");
         }
 
-        if (entry.EntryType == TimelineEntryType.SystemLog)
-        {
-            throw new InvalidOperationException("System log entries are immutable and cannot be deleted (HDS audit trail).");
-        }
-
-        entry.IsDeleted = true;
-        entry.DeletedAt = clock.Now;
-        entry.DeletedBy = currentUser.UserId;
+        entry.SoftDelete(clock.Now, currentUser.UserId);
         return Task.CompletedTask;
     }
 

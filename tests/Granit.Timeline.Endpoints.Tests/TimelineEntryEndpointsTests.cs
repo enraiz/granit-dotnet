@@ -23,7 +23,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     private const string UserRole = "granit-timeline-user";
     private const string Prefix = "/timeline";
 
-    private readonly ITimelineStore _store = Substitute.For<ITimelineStore>();
+    private readonly ITimelineWriter _writer = Substitute.For<ITimelineWriter>();
     private readonly ITimelineFollowerService _followerService = Substitute.For<ITimelineFollowerService>();
     private readonly ITimelineNotifier _notifier = Substitute.For<ITimelineNotifier>();
     private readonly WebApplication _app;
@@ -41,13 +41,13 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
 
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_store);
+        builder.Services.AddSingleton(_writer);
         builder.Services.AddSingleton(_followerService);
         builder.Services.AddSingleton(_notifier);
         builder.Services.AddSingleton(Substitute.For<ICurrentUserService>());
 
         // Required by stream endpoints but not exercised here
-        builder.Services.AddSingleton(Substitute.For<ITimelineQuery>());
+        builder.Services.AddSingleton(Substitute.For<ITimelineReader>());
 
         _app = builder.Build();
         _app.MapTimelineEndpoints();
@@ -78,7 +78,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             CreatedAt = DateTimeOffset.UtcNow,
         };
 
-        _store.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, "Test comment",
+        _writer.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, "Test comment",
                 null, Arg.Any<CancellationToken>())
             .Returns(entry);
 
@@ -122,7 +122,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             CreatedAt = DateTimeOffset.UtcNow,
         };
 
-        _store.PostEntryAsync("Patient", "42", TimelineEntryType.InternalNote, "Staff only note",
+        _writer.PostEntryAsync("Patient", "42", TimelineEntryType.InternalNote, "Staff only note",
                 null, Arg.Any<CancellationToken>())
             .Returns(entry);
 
@@ -166,7 +166,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             CreatedAt = DateTimeOffset.UtcNow,
         };
 
-        _store.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, "Reply",
+        _writer.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, "Reply",
                 parentId, Arg.Any<CancellationToken>())
             .Returns(entry);
 
@@ -211,7 +211,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             CreatedAt = DateTimeOffset.UtcNow,
         };
 
-        _store.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, mentionBody,
+        _writer.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, mentionBody,
                 null, Arg.Any<CancellationToken>())
             .Returns(entry);
 
@@ -261,7 +261,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
             CreatedAt = DateTimeOffset.UtcNow,
         };
 
-        _store.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, "No mentions here",
+        _writer.PostEntryAsync("Patient", "42", TimelineEntryType.Comment, "No mentions here",
                 null, Arg.Any<CancellationToken>())
             .Returns(entry);
 
@@ -315,7 +315,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _store.Received(1).DeleteEntryAsync(entryId, Arg.Any<CancellationToken>());
+        await _writer.Received(1).DeleteEntryAsync(entryId, Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -323,7 +323,7 @@ public sealed class TimelineEntryEndpointsTests : IAsyncDisposable
     {
         // Arrange
         var entryId = Guid.NewGuid();
-        _store.DeleteEntryAsync(entryId, Arg.Any<CancellationToken>())
+        _writer.DeleteEntryAsync(entryId, Arg.Any<CancellationToken>())
             .Throws(new KeyNotFoundException($"Timeline entry '{entryId}' not found."));
 
         // Act
