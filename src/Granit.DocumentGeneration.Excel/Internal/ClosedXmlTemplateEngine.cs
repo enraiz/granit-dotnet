@@ -48,7 +48,7 @@ internal sealed class ClosedXmlTemplateEngine : ITemplateEngine
         TData data,
         TemplatingDocFormat targetFormat,
         IReadOnlyList<ITemplateGlobalContext> globalContexts,
-        CancellationToken ct = default) where TData : notnull
+        CancellationToken cancellationToken = default) where TData : notnull
     {
         byte[] templateBytes = Convert.FromBase64String(descriptor.Content);
         Dictionary<string, string> substitutions = BuildSubstitutions(data);

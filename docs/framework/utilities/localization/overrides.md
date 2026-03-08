@@ -113,13 +113,13 @@ public sealed class TranslationAdminService(
     ILocalizationOverrideStoreReader storeReader,
     ILocalizationOverrideStoreWriter storeWriter)
 {
-    public Task<Dictionary<string, string>> GetAsync(CancellationToken ct) =>
+    public Task<Dictionary<string, string>> GetAsync(CancellationToken cancellationToken) =>
         storeReader.GetOverridesAsync("Acme", "fr", ct);
 
-    public Task SetAsync(string key, string value, CancellationToken ct) =>
+    public Task SetAsync(string key, string value, CancellationToken cancellationToken) =>
         storeWriter.SetOverrideAsync("Acme", "fr", key, value, ct);
 
-    public Task RemoveAsync(string key, CancellationToken ct) =>
+    public Task RemoveAsync(string key, CancellationToken cancellationToken) =>
         storeWriter.RemoveOverrideAsync("Acme", "fr", key, ct);
 }
 ```

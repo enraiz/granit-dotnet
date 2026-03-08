@@ -95,7 +95,7 @@ public sealed class AppDbContext : DbContext
 ```csharp
 public sealed class PurgeService(IDataFilter dataFilter, AppDbContext context)
 {
-    public async Task PurgerDossiersSupprimes(CancellationToken ct)
+    public async Task PurgerDossiersSupprimes(CancellationToken cancellationToken)
     {
         using IDisposable scope = dataFilter.Disable<ISoftDeletable>();
         List<DossierPatient> aSupprimer = await context.Dossiers

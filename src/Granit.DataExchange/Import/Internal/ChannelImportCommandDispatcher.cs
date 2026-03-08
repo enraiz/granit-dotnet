@@ -16,6 +16,6 @@ internal sealed class ChannelImportCommandDispatcher(
     Channel<ExecuteImportCommand> channel) : IImportCommandDispatcher
 {
     /// <inheritdoc/>
-    public async Task DispatchAsync(ExecuteImportCommand command, CancellationToken ct = default) =>
-        await channel.Writer.WriteAsync(command, ct).ConfigureAwait(false);
+    public async Task DispatchAsync(ExecuteImportCommand command, CancellationToken cancellationToken = default) =>
+        await channel.Writer.WriteAsync(command, cancellationToken).ConfigureAwait(false);
 }

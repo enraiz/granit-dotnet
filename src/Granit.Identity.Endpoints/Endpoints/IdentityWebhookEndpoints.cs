@@ -44,12 +44,12 @@ internal static class IdentityWebhookEndpoints
         WebhookSignatureValidator signatureValidator,
         IOptions<IdentityWebhookOptions> webhookOptions,
         IUserLookupService lookupService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // Read raw body for signature validation
         request.EnableBuffering();
         using var ms = new MemoryStream();
-        await request.Body.CopyToAsync(ms, ct).ConfigureAwait(false);
+        await request.Body.CopyToAsync(ms, cancellationToken).ConfigureAwait(false);
         byte[] body = ms.ToArray();
         request.Body.Position = 0;
 
@@ -84,11 +84,11 @@ internal static class IdentityWebhookEndpoints
         {
             case "user_updated":
             case "user_created":
-                await lookupService.RefreshByIdAsync(payload.UserId, ct).ConfigureAwait(false);
+                await lookupService.RefreshByIdAsync(payload.UserId, cancellationToken).ConfigureAwait(false);
                 break;
 
             case "user_deleted":
-                await lookupService.DeleteByIdAsync(payload.UserId, ct).ConfigureAwait(false);
+                await lookupService.DeleteByIdAsync(payload.UserId, cancellationToken).ConfigureAwait(false);
                 break;
 
             default:

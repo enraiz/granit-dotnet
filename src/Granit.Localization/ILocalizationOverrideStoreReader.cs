@@ -11,7 +11,7 @@ public interface ILocalizationOverrideStoreReader
     /// </summary>
     /// <param name="resourceName">Logical name of the localization resource (e.g. <c>"Acme"</c>).</param>
     /// <param name="culture">BCP 47 culture tag (e.g. <c>"fr"</c>, <c>"en-US"</c>).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<IReadOnlyDictionary<string, string>> GetOverridesAsync(
-        string resourceName, string culture, CancellationToken ct = default);
+        string resourceName, string culture, CancellationToken cancellationToken = default);
 }

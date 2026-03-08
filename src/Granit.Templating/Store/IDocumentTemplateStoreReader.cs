@@ -16,31 +16,31 @@ public interface IDocumentTemplateStoreReader
     /// Returns the currently published template for the given key, or <c>null</c> if none exists.
     /// </summary>
     /// <param name="key">Template key (name + optional culture).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<TemplateDescriptor?> TryGetPublishedAsync(
-        TemplateKey key, CancellationToken ct = default);
+        TemplateKey key, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the current draft revision for the given key, or <c>null</c> if no draft exists.
     /// </summary>
     /// <param name="key">Template key (name + optional culture).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<TemplateRevision?> TryGetDraftAsync(
-        TemplateKey key, CancellationToken ct = default);
+        TemplateKey key, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns a paginated, filterable list of template summaries for admin views.
     /// </summary>
     /// <param name="filter">Filter and pagination parameters.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<PagedTemplateResult> ListTemplatesAsync(
-        TemplateListFilter filter, CancellationToken ct = default);
+        TemplateListFilter filter, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the full revision history for the given key, ordered by creation date (newest first).
     /// </summary>
     /// <param name="key">Template key.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
-        TemplateKey key, CancellationToken ct = default);
+        TemplateKey key, CancellationToken cancellationToken = default);
 }

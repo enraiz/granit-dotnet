@@ -330,12 +330,12 @@ de persister ses combinaisons filtre + tri + groupement + colonnes visibles.
 public interface ISavedViewStore
 {
     Task<IReadOnlyList<SavedView>> GetListAsync(
-        string entityType, string userId, Guid? tenantId, CancellationToken ct);
-    Task<SavedView?> GetAsync(Guid id, CancellationToken ct);
-    Task CreateAsync(SavedView view, CancellationToken ct);
-    Task UpdateAsync(SavedView view, CancellationToken ct);
-    Task DeleteAsync(Guid id, CancellationToken ct);
-    Task SetDefaultAsync(Guid id, string userId, string entityType, CancellationToken ct);
+        string entityType, string userId, Guid? tenantId, CancellationToken cancellationToken);
+    Task<SavedView?> GetAsync(Guid id, CancellationToken cancellationToken);
+    Task CreateAsync(SavedView view, CancellationToken cancellationToken);
+    Task UpdateAsync(SavedView view, CancellationToken cancellationToken);
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+    Task SetDefaultAsync(Guid id, string userId, string entityType, CancellationToken cancellationToken);
 }
 ```
 
@@ -374,9 +374,9 @@ et exécute le pipeline complet sur un `IQueryable<T>` source.
 public interface IQueryEngine<TEntity> where TEntity : class
 {
     Task<PagedResult<TEntity>> ExecuteAsync(
-        IQueryable<TEntity> source, QueryRequest request, CancellationToken ct);
+        IQueryable<TEntity> source, QueryRequest request, CancellationToken cancellationToken);
     Task<GroupedResult<TEntity>> ExecuteGroupedAsync(
-        IQueryable<TEntity> source, QueryRequest request, CancellationToken ct);
+        IQueryable<TEntity> source, QueryRequest request, CancellationToken cancellationToken);
     QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummary>? savedViews = null);
 }
 ```

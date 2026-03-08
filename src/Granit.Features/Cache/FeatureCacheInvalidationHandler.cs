@@ -21,9 +21,9 @@ public static class FeatureCacheInvalidationHandler
     public static async Task HandleAsync(
         FeatureValueChangedEvent @event,
         HybridCache hybridCache,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string key = FeatureCacheKey.Build(@event.TenantId, @event.FeatureName);
-        await hybridCache.RemoveAsync(key, ct).ConfigureAwait(false);
+        await hybridCache.RemoveAsync(key, cancellationToken).ConfigureAwait(false);
     }
 }

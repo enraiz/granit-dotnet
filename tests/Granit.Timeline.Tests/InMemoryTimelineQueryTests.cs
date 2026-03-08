@@ -47,7 +47,7 @@ public sealed class InMemoryTimelineQueryTests
     public async Task GetStreamAsync_EmptyStream_ReturnsEmptyPage()
     {
         PagedResult<TimelineStreamEntry> page = await _query.GetStreamAsync(
-            "Patient", "p-1", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", cancellationToken: TestContext.Current.CancellationToken);
 
         page.Items.ShouldBeEmpty();
         page.TotalCount.ShouldBe(0);
@@ -56,12 +56,12 @@ public sealed class InMemoryTimelineQueryTests
     [Fact]
     public async Task GetStreamAsync_ReturnsEntriesOrderedByDateDescending()
     {
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "First", ct: TestContext.Current.CancellationToken);
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Second", ct: TestContext.Current.CancellationToken);
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Third", ct: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "First", cancellationToken: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Second", cancellationToken: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Third", cancellationToken: TestContext.Current.CancellationToken);
 
         PagedResult<TimelineStreamEntry> page = await _query.GetStreamAsync(
-            "Patient", "p-1", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", cancellationToken: TestContext.Current.CancellationToken);
 
         page.TotalCount.ShouldBe(3);
         page.Items[0].Body.ShouldBe("Third");
@@ -74,11 +74,11 @@ public sealed class InMemoryTimelineQueryTests
     {
         for (int i = 0; i < 10; i++)
         {
-            await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, $"Entry {i}", ct: TestContext.Current.CancellationToken);
+            await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, $"Entry {i}", cancellationToken: TestContext.Current.CancellationToken);
         }
 
         PagedResult<TimelineStreamEntry> page = await _query.GetStreamAsync(
-            "Patient", "p-1", page: 2, pageSize: 2, ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", page: 2, pageSize: 2, cancellationToken: TestContext.Current.CancellationToken);
 
         page.TotalCount.ShouldBe(10);
         page.Items.Count.ShouldBe(2);
@@ -88,12 +88,12 @@ public sealed class InMemoryTimelineQueryTests
     public async Task GetStreamAsync_ExcludesSoftDeletedEntries()
     {
         TimelineEntry entry = await _store.PostEntryAsync(
-            "Patient", "p-1", TimelineEntryType.Comment, "To delete", ct: TestContext.Current.CancellationToken);
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Visible", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", TimelineEntryType.Comment, "To delete", cancellationToken: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Visible", cancellationToken: TestContext.Current.CancellationToken);
         await _store.DeleteEntryAsync(entry.Id, TestContext.Current.CancellationToken);
 
         PagedResult<TimelineStreamEntry> page = await _query.GetStreamAsync(
-            "Patient", "p-1", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", cancellationToken: TestContext.Current.CancellationToken);
 
         page.TotalCount.ShouldBe(1);
         page.Items[0].Body.ShouldBe("Visible");
@@ -102,11 +102,11 @@ public sealed class InMemoryTimelineQueryTests
     [Fact]
     public async Task GetStreamAsync_FiltersbyEntityTypeAndId()
     {
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Patient entry", ct: TestContext.Current.CancellationToken);
-        await _store.PostEntryAsync("Invoice", "inv-1", TimelineEntryType.Comment, "Invoice entry", ct: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Patient entry", cancellationToken: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Invoice", "inv-1", TimelineEntryType.Comment, "Invoice entry", cancellationToken: TestContext.Current.CancellationToken);
 
         PagedResult<TimelineStreamEntry> page = await _query.GetStreamAsync(
-            "Patient", "p-1", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", cancellationToken: TestContext.Current.CancellationToken);
 
         page.TotalCount.ShouldBe(1);
         page.Items[0].Body.ShouldBe("Patient entry");
@@ -116,12 +116,12 @@ public sealed class InMemoryTimelineQueryTests
     public async Task GetStreamAsync_IncludesAttachments()
     {
         TimelineEntry entry = await _store.PostEntryAsync(
-            "Patient", "p-1", TimelineEntryType.Comment, "With attachment", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", TimelineEntryType.Comment, "With attachment", cancellationToken: TestContext.Current.CancellationToken);
         var blobId = Guid.NewGuid();
-        await _store.AddAttachmentAsync(entry.Id, blobId, "report.pdf", "application/pdf", 2048, ct: TestContext.Current.CancellationToken);
+        await _store.AddAttachmentAsync(entry.Id, blobId, "report.pdf", "application/pdf", 2048, cancellationToken: TestContext.Current.CancellationToken);
 
         PagedResult<TimelineStreamEntry> page = await _query.GetStreamAsync(
-            "Patient", "p-1", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", cancellationToken: TestContext.Current.CancellationToken);
 
         page.Items[0].Attachments.Count.ShouldBe(1);
         page.Items[0].Attachments[0].FileName.ShouldBe("report.pdf");
@@ -131,12 +131,12 @@ public sealed class InMemoryTimelineQueryTests
     [Fact]
     public async Task GetStreamAsync_MapsEntryTypes()
     {
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Comment", ct: TestContext.Current.CancellationToken);
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.SystemLog, "Log", ct: TestContext.Current.CancellationToken);
-        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.InternalNote, "Note", ct: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.Comment, "Comment", cancellationToken: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.SystemLog, "Log", cancellationToken: TestContext.Current.CancellationToken);
+        await _store.PostEntryAsync("Patient", "p-1", TimelineEntryType.InternalNote, "Note", cancellationToken: TestContext.Current.CancellationToken);
 
         PagedResult<TimelineStreamEntry> page = await _query.GetStreamAsync(
-            "Patient", "p-1", ct: TestContext.Current.CancellationToken);
+            "Patient", "p-1", cancellationToken: TestContext.Current.CancellationToken);
 
         page.Items.ShouldContain(e => e.EntryType == TimelineStreamEntryType.Comment);
         page.Items.ShouldContain(e => e.EntryType == TimelineStreamEntryType.SystemLog);

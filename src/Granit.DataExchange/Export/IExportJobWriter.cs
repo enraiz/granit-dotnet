@@ -8,10 +8,10 @@ public interface IExportJobWriter
     /// <summary>
     /// Creates a new export job.
     /// </summary>
-    Task CreateAsync(ExportJob job, CancellationToken ct = default);
+    Task CreateAsync(ExportJob job, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates an existing export job.
     /// </summary>
-    Task UpdateAsync(ExportJob job, CancellationToken ct = default);
+    Task UpdateAsync(ExportJob job, CancellationToken cancellationToken = default);
 }

@@ -21,34 +21,34 @@ public interface IExportOrchestrator
     /// Starts an export job. Returns immediately with the job ID and initial status.
     /// </summary>
     /// <param name="request">The export configuration.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A result with <see cref="ExportJobStatus.Completed"/> if the export was synchronous,
     /// or <see cref="ExportJobStatus.Queued"/> if dispatched to background.
     /// </returns>
-    Task<ExportJobResult> ExportAsync(ExportRequest request, CancellationToken ct = default);
+    Task<ExportJobResult> ExportAsync(ExportRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes the export for a previously created job (called by the background worker).
     /// </summary>
     /// <param name="jobId">The export job identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task ExecuteAsync(Guid jobId, CancellationToken ct = default);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task ExecuteAsync(Guid jobId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the current status and metadata of an export job.
     /// </summary>
     /// <param name="jobId">The export job identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task<ExportJob?> GetJobAsync(Guid jobId, CancellationToken ct = default);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<ExportJob?> GetJobAsync(Guid jobId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the download stream for a completed export job.
     /// </summary>
     /// <param name="jobId">The export job identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The file stream and metadata, or <c>null</c> if not found or not completed.</returns>
-    Task<ExportDownload?> GetDownloadAsync(Guid jobId, CancellationToken ct = default);
+    Task<ExportDownload?> GetDownloadAsync(Guid jobId, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

@@ -30,7 +30,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         string name,
         string providerName,
         string? providerKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
         TDbContext context = scope.ServiceProvider.GetRequiredService<TDbContext>();
@@ -39,7 +39,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
             .AsNoTracking()
             .FirstOrDefaultAsync(
                 r => r.Name == name && r.ProviderName == providerName && r.ProviderKey == providerKey,
-                ct).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
 
         return record is null
             ? null
@@ -50,7 +50,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
     public async Task<IReadOnlyList<SettingValue>> GetListAsync(
         string providerName,
         string? providerKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
         TDbContext context = scope.ServiceProvider.GetRequiredService<TDbContext>();
@@ -58,7 +58,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         List<SettingRecord> records = await context.SettingRecords
             .AsNoTracking()
             .Where(r => r.ProviderName == providerName && r.ProviderKey == providerKey)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         return records
             .Select(r => new SettingValue(r.Name, r.ProviderName, r.ProviderKey, r.Value))
@@ -71,7 +71,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         string providerName,
         string? providerKey,
         string? value,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
         TDbContext context = scope.ServiceProvider.GetRequiredService<TDbContext>();
@@ -79,7 +79,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         SettingRecord? existing = await context.SettingRecords
             .FirstOrDefaultAsync(
                 r => r.Name == name && r.ProviderName == providerName && r.ProviderKey == providerKey,
-                ct).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -96,7 +96,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
             existing.Value = value;
         }
 
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -104,7 +104,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         string name,
         string providerName,
         string? providerKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
         TDbContext context = scope.ServiceProvider.GetRequiredService<TDbContext>();
@@ -112,7 +112,7 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         SettingRecord? existing = await context.SettingRecords
             .FirstOrDefaultAsync(
                 r => r.Name == name && r.ProviderName == providerName && r.ProviderKey == providerKey,
-                ct).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
 
         if (existing is null)
         {
@@ -120,6 +120,6 @@ internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeF
         }
 
         context.SettingRecords.Remove(existing);
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -115,7 +115,7 @@ public sealed class AppModule : GranitModule { }
 ```csharp
 public sealed class UserService(ICacheService<UserCacheItem> cache)
 {
-    public async Task<UserCacheItem> GetByIdAsync(Guid id, CancellationToken ct)
+    public async Task<UserCacheItem> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await cache.GetOrAddAsync(
             id.ToString(),
@@ -130,7 +130,7 @@ public sealed class UserService(ICacheService<UserCacheItem> cache)
 ```csharp
 public sealed class UserService(ICacheService<UserCacheItem, Guid> cache)
 {
-    public async Task<UserCacheItem> GetByIdAsync(Guid id, CancellationToken ct)
+    public async Task<UserCacheItem> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await cache.GetOrAddAsync(id,
             async ct => await _repo.GetByIdAsync(id, ct),

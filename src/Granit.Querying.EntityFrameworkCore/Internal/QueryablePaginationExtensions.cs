@@ -16,15 +16,15 @@ internal static class QueryablePaginationExtensions
         this IQueryable<T> source,
         int page,
         int pageSize,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        int totalCount = await source.CountAsync(ct).ConfigureAwait(false);
+        int totalCount = await source.CountAsync(cancellationToken).ConfigureAwait(false);
         int skip = (page - 1) * pageSize;
 
         List<T> items = await source
             .Skip(skip)
             .Take(pageSize)
-            .ToListAsync(ct)
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return new PagedResult<T>(items, totalCount);
@@ -38,7 +38,7 @@ internal static class QueryablePaginationExtensions
         string? cursor,
         int pageSize,
         string cursorPropertyName,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
         where T : class
     {
         PropertyInfo? property = typeof(T).GetProperty(
@@ -47,7 +47,7 @@ internal static class QueryablePaginationExtensions
 
         if (property is null)
         {
-            List<T> fallback = await source.Take(pageSize).ToListAsync(ct).ConfigureAwait(false);
+            List<T> fallback = await source.Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false);
             return new PagedResult<T>(fallback, fallback.Count);
         }
 
@@ -79,7 +79,7 @@ internal static class QueryablePaginationExtensions
         // Take pageSize + 1 to determine if there are more pages
         List<T> items = await query
             .Take(pageSize + 1)
-            .ToListAsync(ct)
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         string? nextCursor = null;

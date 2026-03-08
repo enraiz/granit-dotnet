@@ -16,13 +16,13 @@ public sealed class BackgroundJobsSeedServiceTests
             new RecurringJobRegistration("job-a", "0 * * * *", "MyMessage, MyAssembly")
         ];
         BackgroundJobsSeedService sut = new(storeWriter, registrations);
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.StartAsync(ct);
+        await sut.StartAsync(cancellationToken);
 
         // Assert
-        await storeWriter.Received(1).SeedJobsAsync(registrations, ct);
+        await storeWriter.Received(1).SeedJobsAsync(registrations, cancellationToken);
     }
 
     [Fact]

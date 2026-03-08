@@ -21,7 +21,7 @@ internal sealed class QueryEngine<TEntity>(
     public async Task<PagedResult<TEntity>> ExecuteAsync(
         IQueryable<TEntity> source,
         QueryRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         IQueryable<TEntity> query = ApplyCommonFilters(source, request);
 
@@ -34,7 +34,7 @@ internal sealed class QueryEngine<TEntity>(
         if (request.Cursor is not null && _builder.CursorPropertyName is not null)
         {
             return await query.ApplyCursorPaginationAsync(
-                request.Cursor, pageSize, _builder.CursorPropertyName, ct)
+                request.Cursor, pageSize, _builder.CursorPropertyName, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -44,7 +44,7 @@ internal sealed class QueryEngine<TEntity>(
             page = 1;
         }
 
-        return await query.ApplyOffsetPaginationAsync(page, pageSize, ct)
+        return await query.ApplyOffsetPaginationAsync(page, pageSize, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -52,7 +52,7 @@ internal sealed class QueryEngine<TEntity>(
     public async Task<GroupedResult<TEntity>> ExecuteGroupedAsync(
         IQueryable<TEntity> source,
         QueryRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.GroupBy))
         {
@@ -61,7 +61,7 @@ internal sealed class QueryEngine<TEntity>(
 
         IQueryable<TEntity> query = ApplyCommonFilters(source, request);
 
-        return await query.ApplyGroupByAsync(request.GroupBy, _builder, ct)
+        return await query.ApplyGroupByAsync(request.GroupBy, _builder, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -69,12 +69,12 @@ internal sealed class QueryEngine<TEntity>(
     public async IAsyncEnumerable<TEntity> ExecuteStreamAsync(
         IQueryable<TEntity> source,
         QueryRequest request,
-        [EnumeratorCancellation] CancellationToken ct = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         IQueryable<TEntity> query = ApplyCommonFilters(source, request);
         query = query.ApplySort(request.Sort, _builder);
 
-        await foreach (TEntity entity in query.AsAsyncEnumerable().WithCancellation(ct).ConfigureAwait(false))
+        await foreach (TEntity entity in query.AsAsyncEnumerable().WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             yield return entity;
         }

@@ -56,7 +56,7 @@ public sealed class MyAppModule : GranitModule { }
 ```csharp
 public sealed class OrderService(IWebhookPublisher webhooks)
 {
-    public async Task CreateOrderAsync(CreateOrderRequest request, CancellationToken ct)
+    public async Task CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken)
     {
         // … logique métier …
 
@@ -166,8 +166,8 @@ du core du module :
 ```csharp
 public interface IWebhookSecretProtector
 {
-    ValueTask<string> ProtectAsync(string plainSecret, CancellationToken ct = default);
-    ValueTask<string> UnprotectAsync(string protectedSecret, CancellationToken ct = default);
+    ValueTask<string> ProtectAsync(string plainSecret, CancellationToken cancellationToken = default);
+    ValueTask<string> UnprotectAsync(string protectedSecret, CancellationToken cancellationToken = default);
 }
 ```
 
@@ -194,24 +194,24 @@ Deux abstractions permettent de remplacer les implémentations selon l'environne
 public interface IWebhookSubscriptionStoreReader
 {
     Task<IReadOnlyList<WebhookSubscription>> GetActiveSubscriptionsAsync(
-        string eventType, Guid? tenantId, CancellationToken ct = default);
-    Task<WebhookSubscription?> FindByIdAsync(Guid subscriptionId, CancellationToken ct = default);
+        string eventType, Guid? tenantId, CancellationToken cancellationToken = default);
+    Task<WebhookSubscription?> FindByIdAsync(Guid subscriptionId, CancellationToken cancellationToken = default);
 }
 
 // Écriture et mutations sur les abonnements
 public interface IWebhookSubscriptionStoreWriter
 {
-    Task DeactivateAsync(Guid subscriptionId, string reason, CancellationToken ct = default);
+    Task DeactivateAsync(Guid subscriptionId, string reason, CancellationToken cancellationToken = default);
 }
 
 // Enregistre les tentatives de livraison (audit trail HDS)
 public interface IWebhookDeliveryStoreWriter
 {
     Task RecordSuccessAsync(SendWebhookCommand command, int httpStatusCode,
-        long durationMs, string payloadHash, CancellationToken ct = default);
+        long durationMs, string payloadHash, CancellationToken cancellationToken = default);
     Task RecordFailureAsync(SendWebhookCommand command, int? httpStatusCode,
-        long durationMs, string errorMessage, CancellationToken ct = default);
-    Task SuspendSubscriptionAsync(Guid subscriptionId, string reason, CancellationToken ct = default);
+        long durationMs, string errorMessage, CancellationToken cancellationToken = default);
+    Task SuspendSubscriptionAsync(Guid subscriptionId, string reason, CancellationToken cancellationToken = default);
 }
 ```
 

@@ -67,7 +67,7 @@ public sealed class SubdomainTenantResolver : ITenantResolver
 {
     public int Order => 50; // Avant HeaderTenantResolver (100)
 
-    public Task<TenantInfo?> ResolveAsync(HttpContext context, CancellationToken ct)
+    public Task<TenantInfo?> ResolveAsync(HttpContext context, CancellationToken cancellationToken)
     {
         string host = context.Request.Host.Host;
         // Extraire le tenant du sous-domaine...

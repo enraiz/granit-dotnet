@@ -8,7 +8,7 @@ internal sealed class InMemoryPushSubscriptionStore : IPushSubscriptionReader, I
     private readonly ConcurrentDictionary<string, List<PushSubscriptionInfo>> _subscriptions = new();
 
     public Task<IReadOnlyList<PushSubscriptionInfo>> GetSubscriptionsAsync(
-        string userId, Guid? tenantId, CancellationToken ct = default)
+        string userId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, tenantId);
         IReadOnlyList<PushSubscriptionInfo> result = _subscriptions.TryGetValue(key, out List<PushSubscriptionInfo>? subs)
@@ -18,7 +18,7 @@ internal sealed class InMemoryPushSubscriptionStore : IPushSubscriptionReader, I
     }
 
     public Task SaveSubscriptionAsync(
-        string userId, PushSubscriptionInfo subscription, Guid? tenantId, CancellationToken ct = default)
+        string userId, PushSubscriptionInfo subscription, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, tenantId);
         _subscriptions.AddOrUpdate(
@@ -33,7 +33,7 @@ internal sealed class InMemoryPushSubscriptionStore : IPushSubscriptionReader, I
         return Task.CompletedTask;
     }
 
-    public Task RemoveSubscriptionAsync(string endpoint, Guid? tenantId, CancellationToken ct = default)
+    public Task RemoveSubscriptionAsync(string endpoint, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         foreach (KeyValuePair<string, List<PushSubscriptionInfo>> kvp in _subscriptions)
         {

@@ -50,7 +50,7 @@ public sealed class EfCoreSettingStoreTests
         string providerName,
         string? providerKey,
         string? value,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         ServiceCollection services = new();
         services.AddDbContext<TestSettingsDbContext>(options =>
@@ -69,7 +69,7 @@ public sealed class EfCoreSettingStoreTests
             CreatedAt = DateTimeOffset.UtcNow,
             CreatedBy = "seed",
         });
-        await context.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     // -------------------------------------------------------------------------

@@ -27,9 +27,9 @@ internal static class TimelineStreamEndpoints
         ITimelineReader reader,
         int page = 1,
         int pageSize = QueryingDefaults.DefaultPageSize,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        PagedResult<TimelineStreamEntry> result = await reader.GetStreamAsync(entityType, entityId, page, pageSize, ct).ConfigureAwait(false);
+        PagedResult<TimelineStreamEntry> result = await reader.GetStreamAsync(entityType, entityId, page, pageSize, cancellationToken).ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
 }

@@ -15,15 +15,15 @@ internal sealed class ChannelBatchDispatcher(
     Channel<RunMigrationBatchCommand> channel) : IMigrationBatchDispatcher
 {
     /// <inheritdoc/>
-    public async Task DispatchAsync(RunMigrationBatchCommand command, CancellationToken ct = default) =>
-        await channel.Writer.WriteAsync(command, ct).ConfigureAwait(false);
+    public async Task DispatchAsync(RunMigrationBatchCommand command, CancellationToken cancellationToken = default) =>
+        await channel.Writer.WriteAsync(command, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public async Task DispatchAsync(IEnumerable<RunMigrationBatchCommand> commands, CancellationToken ct = default)
+    public async Task DispatchAsync(IEnumerable<RunMigrationBatchCommand> commands, CancellationToken cancellationToken = default)
     {
         foreach (RunMigrationBatchCommand command in commands)
         {
-            await channel.Writer.WriteAsync(command, ct).ConfigureAwait(false);
+            await channel.Writer.WriteAsync(command, cancellationToken).ConfigureAwait(false);
         }
     }
 }

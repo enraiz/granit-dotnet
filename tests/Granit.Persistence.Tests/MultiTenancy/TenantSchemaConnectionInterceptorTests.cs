@@ -83,16 +83,16 @@ public sealed class TenantSchemaConnectionInterceptorTests
     [Fact]
     public async Task ConnectionOpenedAsync_WhenTenantActive_ExecutesSetSearchPath()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         (DbConnection conn, DbCommand cmd) = MakeConnection();
         TenantSchemaConnectionInterceptor interceptor = new(
             MakeTenant(TenantA),
             MakeProvider(TenantA, "tenant_a"));
 
-        await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), ct);
+        await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
         cmd.CommandText.ShouldBe("SET search_path TO \"tenant_a\", public");
-        await cmd.Received(1).ExecuteNonQueryAsync(ct);
+        await cmd.Received(1).ExecuteNonQueryAsync(cancellationToken);
     }
 
     // -----------------------------------------------------------------------
@@ -102,24 +102,24 @@ public sealed class TenantSchemaConnectionInterceptorTests
     [Fact]
     public async Task ConnectionOpenedAsync_RecycledConnection_ReExecutesSetSearchPath()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Tenant A utilise la connexion, puis elle retourne au pool.
         (DbConnection conn, DbCommand cmd) = MakeConnection();
         TenantSchemaConnectionInterceptor interceptorA = new(
             MakeTenant(TenantA),
             MakeProvider(TenantA, "tenant_a"));
-        await interceptorA.ConnectionOpenedAsync(conn, MakeEventData(), ct);
+        await interceptorA.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
         // Tenant B récupère la même connexion physique depuis le pool.
         TenantSchemaConnectionInterceptor interceptorB = new(
             MakeTenant(TenantB),
             MakeProvider(TenantB, "tenant_b"));
-        await interceptorB.ConnectionOpenedAsync(conn, MakeEventData(), ct);
+        await interceptorB.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
         // Le SET search_path doit avoir été émis deux fois — l'intercepteur
         // ne peut pas sauter la seconde exécution même si la connexion est "déjà ouverte".
-        await cmd.Received(2).ExecuteNonQueryAsync(ct);
+        await cmd.Received(2).ExecuteNonQueryAsync(cancellationToken);
         // Le search_path final correspond au tenant B.
         cmd.CommandText.ShouldBe("SET search_path TO \"tenant_b\", public");
     }
@@ -131,15 +131,15 @@ public sealed class TenantSchemaConnectionInterceptorTests
     [Fact]
     public async Task ConnectionOpenedAsync_WhenNoTenant_DoesNotExecuteCommand()
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         (DbConnection conn, DbCommand cmd) = MakeConnection();
         TenantSchemaConnectionInterceptor interceptor = new(
             MakeTenant(null),
             Substitute.For<ITenantSchemaProvider>());
 
-        await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), ct);
+        await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
-        await cmd.DidNotReceiveWithAnyArgs().ExecuteNonQueryAsync(ct);
+        await cmd.DidNotReceiveWithAnyArgs().ExecuteNonQueryAsync(cancellationToken);
     }
 
     // -----------------------------------------------------------------------
@@ -187,13 +187,13 @@ public sealed class TenantSchemaConnectionInterceptorTests
     public async Task ConnectionOpenedAsync_WithInvalidSchemaName_ThrowsInvalidOperationException(
         string badSchema)
     {
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         (DbConnection conn, DbCommand _) = MakeConnection();
         TenantSchemaConnectionInterceptor interceptor = new(
             MakeTenant(TenantA),
             MakeProvider(TenantA, badSchema));
 
-        Func<Task> act = () => interceptor.ConnectionOpenedAsync(conn, MakeEventData(), ct);
+        Func<Task> act = () => interceptor.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
         (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("not a valid PostgreSQL identifier");
     }

@@ -38,10 +38,10 @@ public interface IExportWriter
     /// <param name="output">The target stream.</param>
     /// <param name="fields">Ordered field descriptors (defines columns).</param>
     /// <param name="rows">Streaming row data (property path → value).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task WriteAsync(
         Stream output,
         IReadOnlyList<ExportFieldDescriptor> fields,
         IAsyncEnumerable<IReadOnlyDictionary<string, object?>> rows,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

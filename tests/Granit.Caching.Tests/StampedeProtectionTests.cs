@@ -39,7 +39,7 @@ public sealed class StampedeProtectionTests
 
         int factoryCallCount = 0;
         ProductCacheItem product = new() { Id = 42, Name = "Widget" };
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act — 10 requêtes concurrentes sur la même clé absente du cache
         Task<ProductCacheItem>[] tasks = [.. Enumerable.Range(0, 10)
@@ -52,7 +52,7 @@ public sealed class StampedeProtectionTests
                     return product;
                 },
                 null,
-                ct))];
+                cancellationToken))];
 
         ProductCacheItem[] results = await Task.WhenAll(tasks);
 
@@ -69,13 +69,13 @@ public sealed class StampedeProtectionTests
         ICacheService<ProductCacheItem> sut = sp.GetRequiredService<ICacheService<ProductCacheItem>>();
 
         int factoryCallCount = 0;
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act — 3 clés différentes, chacune doit appeler la factory une fois
         await Task.WhenAll(
-            sut.GetOrAddAsync("key-1", _ => { Interlocked.Increment(ref factoryCallCount); return Task.FromResult(new ProductCacheItem { Id = 1 }); }, null, ct),
-            sut.GetOrAddAsync("key-2", _ => { Interlocked.Increment(ref factoryCallCount); return Task.FromResult(new ProductCacheItem { Id = 2 }); }, null, ct),
-            sut.GetOrAddAsync("key-3", _ => { Interlocked.Increment(ref factoryCallCount); return Task.FromResult(new ProductCacheItem { Id = 3 }); }, null, ct));
+            sut.GetOrAddAsync("key-1", _ => { Interlocked.Increment(ref factoryCallCount); return Task.FromResult(new ProductCacheItem { Id = 1 }); }, null, cancellationToken),
+            sut.GetOrAddAsync("key-2", _ => { Interlocked.Increment(ref factoryCallCount); return Task.FromResult(new ProductCacheItem { Id = 2 }); }, null, cancellationToken),
+            sut.GetOrAddAsync("key-3", _ => { Interlocked.Increment(ref factoryCallCount); return Task.FromResult(new ProductCacheItem { Id = 3 }); }, null, cancellationToken));
 
         // Assert
         factoryCallCount.ShouldBe(3);

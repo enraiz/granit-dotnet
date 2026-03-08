@@ -18,5 +18,5 @@ public interface IPlanIdProvider
     /// Returns the plan identifier (e.g., <c>"starter"</c>, <c>"premium"</c>,
     /// <c>"enterprise"</c>), or <c>null</c> if no plan applies to the current context.
     /// </summary>
-    Task<string?> GetCurrentPlanIdAsync(CancellationToken ct = default);
+    Task<string?> GetCurrentPlanIdAsync(CancellationToken cancellationToken = default);
 }

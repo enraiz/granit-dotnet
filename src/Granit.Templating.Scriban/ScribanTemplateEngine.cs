@@ -39,7 +39,7 @@ internal sealed class ScribanTemplateEngine : ITemplateEngine
         TData data,
         DocumentFormat targetFormat,
         IReadOnlyList<ITemplateGlobalContext> globalContexts,
-        CancellationToken ct = default) where TData : notnull
+        CancellationToken cancellationToken = default) where TData : notnull
     {
         string cacheKey = descriptor.RevisionId?.ToString() ?? descriptor.Content;
         Template template = _templateCache.GetOrAdd(cacheKey, _ =>
@@ -53,7 +53,7 @@ internal sealed class ScribanTemplateEngine : ITemplateEngine
             return parsed;
         });
 
-        TemplateContext context = BuildContext(data, globalContexts, ct);
+        TemplateContext context = BuildContext(data, globalContexts, cancellationToken);
         string rendered = template.Render(context);
 
         RenderedContent result = new TextRenderedContent(rendered, targetFormat)
@@ -67,7 +67,7 @@ internal sealed class ScribanTemplateEngine : ITemplateEngine
     private static TemplateContext BuildContext<TData>(
         TData data,
         IReadOnlyList<ITemplateGlobalContext> globalContexts,
-        CancellationToken ct) where TData : notnull
+        CancellationToken cancellationToken) where TData : notnull
     {
         ScriptObject globals = [];
 
@@ -90,7 +90,7 @@ internal sealed class ScribanTemplateEngine : ITemplateEngine
             EnableRelaxedMemberAccess = false,
 
             // Propagate cancellation to the Scriban render loop
-            CancellationToken = ct,
+            CancellationToken = cancellationToken,
         };
 
         return templateContext;

@@ -96,15 +96,15 @@ séparent les opérations de lecture et d'écriture (CQRS) :
 ```csharp
 public interface IReferenceDataStoreReader<TEntity>
 {
-    Task<ReferenceDataResult<TEntity>> GetAllAsync(ReferenceDataQuery? query, CancellationToken ct);
-    Task<TEntity?> GetByCodeAsync(string code, CancellationToken ct);
+    Task<ReferenceDataResult<TEntity>> GetAllAsync(ReferenceDataQuery? query, CancellationToken cancellationToken);
+    Task<TEntity?> GetByCodeAsync(string code, CancellationToken cancellationToken);
 }
 
 public interface IReferenceDataStoreWriter<TEntity>
 {
-    Task CreateAsync(TEntity entity, CancellationToken ct);
-    Task UpdateAsync(TEntity entity, CancellationToken ct);
-    Task SetActiveAsync(string code, bool isActive, CancellationToken ct);
+    Task CreateAsync(TEntity entity, CancellationToken cancellationToken);
+    Task UpdateAsync(TEntity entity, CancellationToken cancellationToken);
+    Task SetActiveAsync(string code, bool isActive, CancellationToken cancellationToken);
 }
 ```
 
@@ -134,7 +134,7 @@ public sealed class CountrySeeder : IReferenceDataSeeder<Country>
     public async Task SeedAsync(
         IReferenceDataStoreReader<Country> storeReader,
         IReferenceDataStoreWriter<Country> storeWriter,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // Upsert par Code (idempotent)
         Country? existing = await storeReader.GetByCodeAsync("BE", ct);

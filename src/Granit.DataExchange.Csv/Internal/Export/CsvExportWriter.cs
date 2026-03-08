@@ -35,7 +35,7 @@ internal sealed class CsvExportWriter : IExportWriter
         Stream output,
         IReadOnlyList<ExportFieldDescriptor> fields,
         IAsyncEnumerable<IReadOnlyDictionary<string, object?>> rows,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         await using StreamWriter writer = new(output, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true), leaveOpen: true);
 
@@ -50,10 +50,10 @@ internal sealed class CsvExportWriter : IExportWriter
             WriteField(writer, fields[i].Header ?? fields[i].PropertyPath);
         }
 
-        await writer.WriteLineAsync(ReadOnlyMemory<char>.Empty, ct).ConfigureAwait(false);
+        await writer.WriteLineAsync(ReadOnlyMemory<char>.Empty, cancellationToken).ConfigureAwait(false);
 
         // Data rows
-        await foreach (IReadOnlyDictionary<string, object?> data in rows.WithCancellation(ct).ConfigureAwait(false))
+        await foreach (IReadOnlyDictionary<string, object?> data in rows.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             for (int i = 0; i < fields.Count; i++)
             {
@@ -66,10 +66,10 @@ internal sealed class CsvExportWriter : IExportWriter
                 WriteField(writer, FormatValue(value, fields[i]));
             }
 
-            await writer.WriteLineAsync(ReadOnlyMemory<char>.Empty, ct).ConfigureAwait(false);
+            await writer.WriteLineAsync(ReadOnlyMemory<char>.Empty, cancellationToken).ConfigureAwait(false);
         }
 
-        await writer.FlushAsync(ct).ConfigureAwait(false);
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static string FormatValue(object? value, ExportFieldDescriptor field) =>

@@ -19,12 +19,12 @@ public interface ICorrectionFileGenerator
     /// <param name="mimeType">The MIME type of the original file.</param>
     /// <param name="report">The import report containing row errors.</param>
     /// <param name="parsingOptions">The parsing options used for the original file.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A stream containing the correction file.</returns>
     Task<Stream> GenerateAsync(
         Stream originalFileStream,
         string mimeType,
         ImportReport report,
         FileParsingOptions parsingOptions,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

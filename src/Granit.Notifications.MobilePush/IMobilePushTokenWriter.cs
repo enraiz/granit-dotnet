@@ -4,8 +4,8 @@ namespace Granit.Notifications.MobilePush;
 public interface IMobilePushTokenWriter
 {
     /// <summary>Registers or updates a device token for a user.</summary>
-    Task RegisterAsync(MobilePushTokenInfo tokenInfo, CancellationToken ct = default);
+    Task RegisterAsync(MobilePushTokenInfo tokenInfo, CancellationToken cancellationToken = default);
 
     /// <summary>Removes a device token.</summary>
-    Task RemoveAsync(string deviceToken, Guid? tenantId, CancellationToken ct = default);
+    Task RemoveAsync(string deviceToken, Guid? tenantId, CancellationToken cancellationToken = default);
 }

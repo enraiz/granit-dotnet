@@ -809,7 +809,7 @@ public static class ImportJobCompletedHandler
     public static async Task Handle(
         ImportJobCompletedEvent evt,
         INotificationPublisher notificationPublisher,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         await notificationPublisher.PublishAsync(
             AppNotifications.ImportCompleted,

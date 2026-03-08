@@ -32,10 +32,10 @@ public interface ITemplateResolver
     /// Attempts to locate and return the template for the given key.
     /// </summary>
     /// <param name="key">The template key (name + optional culture).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A <see cref="TemplateDescriptor"/> when a matching template is found;
     /// <c>null</c> when this resolver has no template for the key.
     /// </returns>
-    Task<TemplateDescriptor?> TryResolveAsync(TemplateKey key, CancellationToken ct = default);
+    Task<TemplateDescriptor?> TryResolveAsync(TemplateKey key, CancellationToken cancellationToken = default);
 }

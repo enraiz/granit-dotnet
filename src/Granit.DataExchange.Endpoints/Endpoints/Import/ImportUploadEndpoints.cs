@@ -50,7 +50,7 @@ internal static class ImportUploadEndpoints
         IImportFileProvider fileProvider,
         IImportJobWriter jobWriter,
         IClock clock,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IImportDefinitionDescriptor? descriptor =
             ImportDefinitionResolver.FindByName(serviceProvider, definitionName);
@@ -77,7 +77,7 @@ internal static class ImportUploadEndpoints
         }
 
         await using Stream stream = file.OpenReadStream();
-        string blobReference = await fileProvider.SaveAsync(file.FileName, stream, ct).ConfigureAwait(false);
+        string blobReference = await fileProvider.SaveAsync(file.FileName, stream, cancellationToken).ConfigureAwait(false);
 
         ImportJob job = new()
         {
@@ -92,7 +92,7 @@ internal static class ImportUploadEndpoints
             CreatedAt = clock.Now,
         };
 
-        await jobWriter.CreateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.CreateAsync(job, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Created($"/{job.Id}", ImportJobResponse.FromJob(job));
     }
@@ -104,9 +104,9 @@ internal static class ImportUploadEndpoints
         IServiceProvider serviceProvider,
         IImportFileProvider fileProvider,
         IMappingSuggestionService mappingService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -128,19 +128,19 @@ internal static class ImportUploadEndpoints
 
         FileParsingOptions parsingOptions = new() { MimeType = job.MimeType };
 
-        await using Stream headerStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
-        IReadOnlyList<string> headers = await parser.ExtractHeadersAsync(headerStream, parsingOptions, ct).ConfigureAwait(false);
+        await using Stream headerStream = await fileProvider.OpenAsync(job.BlobReference, cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<string> headers = await parser.ExtractHeadersAsync(headerStream, parsingOptions, cancellationToken).ConfigureAwait(false);
 
-        await using Stream previewStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
-        IReadOnlyList<string[]> previewRows = await parser.ReadPreviewAsync(previewStream, parsingOptions, ct: ct).ConfigureAwait(false);
+        await using Stream previewStream = await fileProvider.OpenAsync(job.BlobReference, cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<string[]> previewRows = await parser.ReadPreviewAsync(previewStream, parsingOptions, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         IReadOnlyList<ImportColumnMapping> suggestions =
-            await ImportDefinitionResolver.SuggestMappingsAsync(mappingService, descriptor.EntityType, headers, ct).ConfigureAwait(false);
+            await ImportDefinitionResolver.SuggestMappingsAsync(mappingService, descriptor.EntityType, headers, cancellationToken).ConfigureAwait(false);
 
         IReadOnlyList<ImportFieldMetadata> fieldMetadata = descriptor.GetFieldMetadata();
 
         job.Status = ImportJobStatus.Previewed;
-        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok(new ImportPreviewResponse(headers, previewRows, suggestions, fieldMetadata));
     }
@@ -150,9 +150,9 @@ internal static class ImportUploadEndpoints
         ConfirmMappingsRequest request,
         IImportJobReader jobReader,
         IImportJobWriter jobWriter,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -165,7 +165,7 @@ internal static class ImportUploadEndpoints
 
         job.MappingsJson = JsonSerializer.Serialize(request.Mappings);
         job.Status = ImportJobStatus.Mapped;
-        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

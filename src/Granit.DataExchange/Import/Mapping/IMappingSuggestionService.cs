@@ -15,12 +15,12 @@ public interface IMappingSuggestionService
     /// </summary>
     /// <typeparam name="TEntity">The target entity type (used to resolve the import definition).</typeparam>
     /// <param name="headers">Column headers extracted from the file.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A list of mapping suggestions, one per header that could be matched.
     /// Unmatchable columns are excluded.
     /// </returns>
     Task<IReadOnlyList<ImportColumnMapping>> SuggestMappingsAsync<TEntity>(
         IReadOnlyList<string> headers,
-        CancellationToken ct = default) where TEntity : class;
+        CancellationToken cancellationToken = default) where TEntity : class;
 }

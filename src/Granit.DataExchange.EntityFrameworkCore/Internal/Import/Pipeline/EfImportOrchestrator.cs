@@ -29,9 +29,9 @@ internal sealed class EfImportOrchestrator(
     IOptions<ImportOptions> options) : IImportOrchestrator
 {
     /// <inheritdoc/>
-    public async Task<ImportReport> ExecuteAsync(Guid importJobId, CancellationToken ct = default)
+    public async Task<ImportReport> ExecuteAsync(Guid importJobId, CancellationToken cancellationToken = default)
     {
-        ImportJob? job = await jobReader.GetAsync(importJobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(importJobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             throw new InvalidOperationException($"Import job '{importJobId}' not found.");
@@ -39,25 +39,25 @@ internal sealed class EfImportOrchestrator(
 
         job.Status = ImportJobStatus.Executing;
         job.ModifiedAt = clock.Now;
-        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
         var stopwatch = Stopwatch.StartNew();
 
         try
         {
-            ImportReport report = await ExecuteTypedPipelineAsync(job, dryRun: false, ct).ConfigureAwait(false);
+            ImportReport report = await ExecuteTypedPipelineAsync(job, dryRun: false, cancellationToken).ConfigureAwait(false);
 
             stopwatch.Stop();
             job.Status = report.FinalStatus;
             job.CompletedAt = clock.Now;
             job.ReportJson = JsonSerializer.Serialize(report);
             job.ModifiedAt = clock.Now;
-            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ImportJobCompletedEvent(
                 importJobId, job.DefinitionName, report.FinalStatus, job.CreatedBy,
                 report.TotalRows, report.SucceededRows, report.FailedRows,
-                report.InsertedRows, report.UpdatedRows, report.SkippedRows), ct).ConfigureAwait(false);
+                report.InsertedRows, report.UpdatedRows, report.SkippedRows), cancellationToken).ConfigureAwait(false);
 
             return report;
         }
@@ -84,30 +84,30 @@ internal sealed class EfImportOrchestrator(
             job.CompletedAt = clock.Now;
             job.ReportJson = JsonSerializer.Serialize(errorReport);
             job.ModifiedAt = clock.Now;
-            await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
+            await jobWriter.UpdateAsync(job, cancellationToken).ConfigureAwait(false);
 
             await eventPublisher.PublishAsync(new ImportJobCompletedEvent(
                 importJobId, job.DefinitionName, ImportJobStatus.Failed, job.CreatedBy,
                 errorReport.TotalRows, errorReport.SucceededRows, errorReport.FailedRows,
-                errorReport.InsertedRows, errorReport.UpdatedRows, errorReport.SkippedRows), ct).ConfigureAwait(false);
+                errorReport.InsertedRows, errorReport.UpdatedRows, errorReport.SkippedRows), cancellationToken).ConfigureAwait(false);
 
             return errorReport;
         }
     }
 
     /// <inheritdoc/>
-    public async Task<ImportReport> DryRunAsync(Guid importJobId, CancellationToken ct = default)
+    public async Task<ImportReport> DryRunAsync(Guid importJobId, CancellationToken cancellationToken = default)
     {
-        ImportJob? job = await jobReader.GetAsync(importJobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(importJobId, cancellationToken).ConfigureAwait(false);
         if (job is null)
         {
             throw new InvalidOperationException($"Import job '{importJobId}' not found.");
         }
 
-        return await ExecuteTypedPipelineAsync(job, dryRun: true, ct).ConfigureAwait(false);
+        return await ExecuteTypedPipelineAsync(job, dryRun: true, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<ImportReport> ExecuteTypedPipelineAsync(ImportJob job, bool dryRun, CancellationToken ct)
+    private async Task<ImportReport> ExecuteTypedPipelineAsync(ImportJob job, bool dryRun, CancellationToken cancellationToken)
     {
         // Resolve the file parser for this MIME type
         IEnumerable<IFileParser> parsers = serviceProvider.GetServices<IFileParser>();
@@ -133,7 +133,7 @@ internal sealed class EfImportOrchestrator(
         }
 
         // Open the file stream
-        await using Stream fileStream = await fileProvider.OpenAsync(job.BlobReference, ct).ConfigureAwait(false);
+        await using Stream fileStream = await fileProvider.OpenAsync(job.BlobReference, cancellationToken).ConfigureAwait(false);
         FileParsingOptions parsingOptions = new() { MimeType = job.MimeType };
 
         // Build and execute the typed pipeline via reflection
@@ -146,7 +146,7 @@ internal sealed class EfImportOrchestrator(
         }
 
         return await ExecuteWithReflectionAsync(
-            executorType, parser, fileStream, parsingOptions, mappings, dryRun, ct).ConfigureAwait(false);
+            executorType, parser, fileStream, parsingOptions, mappings, dryRun, cancellationToken).ConfigureAwait(false);
     }
 
     private Type? FindExecutorType(string entityTypeName)
@@ -187,7 +187,7 @@ internal sealed class EfImportOrchestrator(
         FileParsingOptions parsingOptions,
         List<ImportColumnMapping> mappings,
         bool dryRun,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
 #pragma warning disable S3011 // Reflection on private member — needed to invoke generic method with runtime Type
         System.Reflection.MethodInfo pipelineMethod = typeof(EfImportOrchestrator)
@@ -197,7 +197,7 @@ internal sealed class EfImportOrchestrator(
 
         var task = pipelineMethod.Invoke(
             this,
-            [parser, fileStream, parsingOptions, mappings, dryRun, ct]) as Task<ImportReport>;
+            [parser, fileStream, parsingOptions, mappings, dryRun, cancellationToken]) as Task<ImportReport>;
 
         return await task!.ConfigureAwait(false);
     }
@@ -208,7 +208,7 @@ internal sealed class EfImportOrchestrator(
         FileParsingOptions parsingOptions,
         IReadOnlyList<ImportColumnMapping> mappings,
         bool dryRun,
-        CancellationToken ct) where TEntity : class
+        CancellationToken cancellationToken) where TEntity : class
     {
         IImportExecutor<TEntity> executor = serviceProvider.GetRequiredService<IImportExecutor<TEntity>>();
 
@@ -220,9 +220,9 @@ internal sealed class EfImportOrchestrator(
 
         // Build the streaming pipeline
         IAsyncEnumerable<ValidatedRow<TEntity>> pipeline = BuildPipeline<TEntity>(
-            parser, fileStream, parsingOptions, mappings, ct);
+            parser, fileStream, parsingOptions, mappings, cancellationToken);
 
-        return await executor.ExecuteAsync(pipeline, executionOptions, null, ct).ConfigureAwait(false);
+        return await executor.ExecuteAsync(pipeline, executionOptions, null, cancellationToken).ConfigureAwait(false);
     }
 
     private async IAsyncEnumerable<ValidatedRow<TEntity>> BuildPipeline<TEntity>(
@@ -230,14 +230,14 @@ internal sealed class EfImportOrchestrator(
         Stream fileStream,
         FileParsingOptions parsingOptions,
         IReadOnlyList<ImportColumnMapping> mappings,
-        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct) where TEntity : class
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken) where TEntity : class
     {
         IRecordIdentityResolver<TEntity>? identityResolver = serviceProvider.GetService<IRecordIdentityResolver<TEntity>>();
         IDataMapper<TEntity>? dataMapper = serviceProvider.GetService<IDataMapper<TEntity>>();
         IRowValidator<TEntity>? rowValidator = serviceProvider.GetService<IRowValidator<TEntity>>();
         ImportOptions importOptions = options.Value;
 
-        await foreach (RawImportRow row in parser.ParseAsync(fileStream, parsingOptions, ct))
+        await foreach (RawImportRow row in parser.ParseAsync(fileStream, parsingOptions, cancellationToken))
         {
             // Map raw row to entity
             if (dataMapper is null)
@@ -245,7 +245,7 @@ internal sealed class EfImportOrchestrator(
                 continue;
             }
 
-            MappingResult<TEntity> mappingResult = await dataMapper.MapAsync(row, mappings, importOptions, ct).ConfigureAwait(false);
+            MappingResult<TEntity> mappingResult = await dataMapper.MapAsync(row, mappings, importOptions, cancellationToken).ConfigureAwait(false);
             if (!mappingResult.Succeeded || mappingResult.Entity is null)
             {
                 continue;
@@ -256,7 +256,7 @@ internal sealed class EfImportOrchestrator(
             // Validate
             if (rowValidator is not null)
             {
-                RowValidationResult validationResult = await rowValidator.ValidateAsync(entity, row.RowNumber, ct).ConfigureAwait(false);
+                RowValidationResult validationResult = await rowValidator.ValidateAsync(entity, row.RowNumber, cancellationToken).ConfigureAwait(false);
                 if (!validationResult.IsValid)
                 {
                     continue;
@@ -267,7 +267,7 @@ internal sealed class EfImportOrchestrator(
             RecordIdentity<TEntity>? identity = null;
             if (identityResolver is not null)
             {
-                identity = await identityResolver.ResolveAsync(entity, ct).ConfigureAwait(false);
+                identity = await identityResolver.ResolveAsync(entity, cancellationToken).ConfigureAwait(false);
             }
 
             yield return new ValidatedRow<TEntity>(row.RowNumber, entity, identity);

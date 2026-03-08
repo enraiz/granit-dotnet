@@ -50,13 +50,13 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         _clock.Now.Returns(now);
         Envelope envelope = new(new FakeDailyReportMessage());
         RecurringJobSchedulingMiddleware sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.BeforeAsync(envelope, ct);
+        await sut.BeforeAsync(envelope, cancellationToken);
 
         // Assert
-        await _storeWriter.Received(1).RecordExecutionStartAsync("fake-daily-report", now, ct);
+        await _storeWriter.Received(1).RecordExecutionStartAsync("fake-daily-report", now, cancellationToken);
     }
 
     [Fact]
@@ -67,13 +67,13 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         Envelope envelope = new(new FakeDailyReportMessage());
         envelope.Headers[RecurringJobSchedulingMiddleware.TriggeredByHeader] = "admin-user";
         RecurringJobSchedulingMiddleware sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.BeforeAsync(envelope, ct);
+        await sut.BeforeAsync(envelope, cancellationToken);
 
         // Assert
-        await _storeWriter.Received(1).SetTriggeredByAsync("fake-daily-report", "admin-user", ct);
+        await _storeWriter.Received(1).SetTriggeredByAsync("fake-daily-report", "admin-user", cancellationToken);
     }
 
     [Fact]
@@ -83,10 +83,10 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         _clock.Now.Returns(DateTimeOffset.UtcNow);
         Envelope envelope = new(new FakeDailyReportMessage());
         RecurringJobSchedulingMiddleware sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.BeforeAsync(envelope, ct);
+        await sut.BeforeAsync(envelope, cancellationToken);
 
         // Assert — header absent → SetTriggeredByAsync must not be called
         await _storeWriter.DidNotReceive().SetTriggeredByAsync(
@@ -126,15 +126,15 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         Envelope envelope = new(new FakeDailyReportMessage());
         IMessageContext context = Substitute.For<IMessageContext>();
         RecurringJobSchedulingMiddleware sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.AfterAsync(envelope, context, ct);
+        await sut.AfterAsync(envelope, context, cancellationToken);
 
         // Assert — next occurrence is today at 08:00 UTC
         DateTimeOffset expectedNext = new(2026, 1, 15, 8, 0, 0, TimeSpan.Zero);
         await _storeWriter.Received(1).RecordNextExecutionAsync(
-            "fake-daily-report", expectedNext, ct);
+            "fake-daily-report", expectedNext, cancellationToken);
     }
 
     [Fact]
@@ -233,14 +233,14 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         Envelope envelope = new(new FakeDailyReportMessage());
         IMessageContext context = Substitute.For<IMessageContext>();
         RecurringJobSchedulingMiddleware sut = MakeSut();
-        CancellationToken ct = TestContext.Current.CancellationToken;
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        await sut.AfterAsync(envelope, context, ct);
+        await sut.AfterAsync(envelope, context, cancellationToken);
 
         // Assert — next occurrence: next minute at second 0
         DateTimeOffset expectedNext = new(2026, 1, 15, 10, 1, 0, TimeSpan.Zero);
         await _storeWriter.Received(1)
-            .RecordNextExecutionAsync("fake-daily-report", expectedNext, ct);
+            .RecordNextExecutionAsync("fake-daily-report", expectedNext, cancellationToken);
     }
 }

@@ -103,7 +103,7 @@ public sealed class UploadMedicalDocumentHandler
     public static async Task<PresignedUploadTicket> Handle(
         UploadDocumentCommand command,
         IBlobStorage blobStorage,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         PresignedUploadTicket ticket = await blobStorage.InitiateUploadAsync(
             containerName: "medical-documents",

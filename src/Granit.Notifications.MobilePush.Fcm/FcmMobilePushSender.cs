@@ -24,7 +24,7 @@ internal sealed partial class FcmMobilePushSender(
     private const string FcmHttpClientName = "FcmPush";
 
     /// <inheritdoc />
-    public async Task SendAsync(MobilePushMessage message, CancellationToken ct = default)
+    public async Task SendAsync(MobilePushMessage message, CancellationToken cancellationToken = default)
     {
         HttpClient client = httpClientFactory.CreateClient(FcmHttpClientName);
 
@@ -34,7 +34,7 @@ internal sealed partial class FcmMobilePushSender(
         {
             try
             {
-                await SendToTokenAsync(client, token, message, ct).ConfigureAwait(false);
+                await SendToTokenAsync(client, token, message, cancellationToken).ConfigureAwait(false);
             }
             catch (FcmTokenUnregisteredException)
             {
@@ -59,7 +59,7 @@ internal sealed partial class FcmMobilePushSender(
         }
     }
 
-    private async Task SendToTokenAsync(HttpClient client, string token, MobilePushMessage message, CancellationToken ct)
+    private async Task SendToTokenAsync(HttpClient client, string token, MobilePushMessage message, CancellationToken cancellationToken)
     {
         string projectId = options.Value.ProjectId;
 
@@ -83,11 +83,11 @@ internal sealed partial class FcmMobilePushSender(
             $"v1/projects/{projectId}/messages:send",
             payload,
             FcmJsonContext.Default.FcmPayload,
-            ct).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
-            string body = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            string body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             if (body.Contains("UNREGISTERED", StringComparison.OrdinalIgnoreCase))
             {

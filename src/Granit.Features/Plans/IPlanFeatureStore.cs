@@ -19,5 +19,5 @@ public interface IPlanFeatureStore
     /// <paramref name="featureName"/>, or <c>null</c> if the plan does not override
     /// the default value.
     /// </summary>
-    Task<string?> GetOrNullAsync(string planId, string featureName, CancellationToken ct = default);
+    Task<string?> GetOrNullAsync(string planId, string featureName, CancellationToken cancellationToken = default);
 }

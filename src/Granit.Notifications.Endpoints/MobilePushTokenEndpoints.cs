@@ -45,14 +45,14 @@ public static class MobilePushTokenEndpoints
         ClaimsPrincipal user,
         ICurrentTenant tenant,
         IClock clock,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
 
         // Check if token already exists (upsert)
         IReadOnlyList<MobilePushTokenInfo> existing = await tokenReader
-            .GetTokensAsync(userId, tenantId, ct)
+            .GetTokensAsync(userId, tenantId, cancellationToken)
             .ConfigureAwait(false);
 
         bool isUpdate = existing.Any(t => t.DeviceToken == request.DeviceToken);
@@ -64,7 +64,7 @@ public static class MobilePushTokenEndpoints
             Platform = request.Platform,
             TenantId = tenantId,
             CreatedAt = clock.Now,
-        }, ct).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(false);
 
         return isUpdate
             ? TypedResults.Ok()
@@ -75,11 +75,11 @@ public static class MobilePushTokenEndpoints
         string deviceToken,
         IMobilePushTokenWriter tokenWriter,
         ICurrentTenant tenant,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
 
-        await tokenWriter.RemoveAsync(deviceToken, tenantId, ct).ConfigureAwait(false);
+        await tokenWriter.RemoveAsync(deviceToken, tenantId, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }
@@ -88,13 +88,13 @@ public static class MobilePushTokenEndpoints
         IMobilePushTokenReader tokenReader,
         ClaimsPrincipal user,
         ICurrentTenant tenant,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
 
         IReadOnlyList<MobilePushTokenInfo> tokens = await tokenReader
-            .GetTokensAsync(userId, tenantId, ct)
+            .GetTokensAsync(userId, tenantId, cancellationToken)
             .ConfigureAwait(false);
 
         IReadOnlyList<MobilePushTokenResponse> response = tokens

@@ -12,9 +12,9 @@ public interface IImportJobReader
     /// Loads an import job by identifier.
     /// </summary>
     /// <param name="id">The job identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The import job, or <c>null</c> if not found.</returns>
-    Task<ImportJob?> GetAsync(Guid id, CancellationToken ct = default);
+    Task<ImportJob?> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Lists import jobs with optional status filter and offset pagination.
@@ -23,10 +23,10 @@ public interface IImportJobReader
     /// <param name="status">Optional status filter.</param>
     /// <param name="page">One-based page number.</param>
     /// <param name="pageSize">Number of items per page.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<PagedResult<ImportJob>> ListAsync(
         ImportJobStatus? status = null,
         int page = 1,
         int pageSize = 20,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

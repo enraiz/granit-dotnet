@@ -24,7 +24,7 @@ public sealed class BackgroundJobDefinitionTests
         job.IsEnabled.ShouldBeFalse();
 
         IDomainEvent domainEvent = job.DomainEvents.ShouldHaveSingleItem();
-        var paused = domainEvent.ShouldBeOfType<BackgroundJobPaused>();
+        BackgroundJobPaused paused = domainEvent.ShouldBeOfType<BackgroundJobPaused>();
         paused.JobId.ShouldBe(job.Id);
         paused.JobName.ShouldBe("test-job");
     }
@@ -39,7 +39,7 @@ public sealed class BackgroundJobDefinitionTests
         job.IsEnabled.ShouldBeTrue();
 
         IDomainEvent domainEvent = job.DomainEvents.ShouldHaveSingleItem();
-        var resumed = domainEvent.ShouldBeOfType<BackgroundJobResumed>();
+        BackgroundJobResumed resumed = domainEvent.ShouldBeOfType<BackgroundJobResumed>();
         resumed.JobId.ShouldBe(job.Id);
         resumed.JobName.ShouldBe("test-job");
     }

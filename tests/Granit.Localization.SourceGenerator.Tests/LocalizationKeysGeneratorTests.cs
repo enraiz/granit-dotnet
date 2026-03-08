@@ -222,15 +222,15 @@ public sealed class LocalizationKeysGeneratorTests
         string generatedSource = RunGenerator(null, json);
 
         // Assert — the generated source should compile without errors
-        System.Threading.CancellationToken ct = TestContext.Current.CancellationToken;
-        SyntaxTree tree = CSharpSyntaxTree.ParseText(generatedSource, cancellationToken: ct);
+        System.Threading.CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        SyntaxTree tree = CSharpSyntaxTree.ParseText(generatedSource, cancellationToken: cancellationToken);
         var compilation = CSharpCompilation.Create(
             assemblyName: "GeneratedAssembly",
             syntaxTrees: new[] { tree },
             references: GetNetCoreReferences(),
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        ImmutableArray<Diagnostic> diagnostics = compilation.GetDiagnostics(ct);
+        ImmutableArray<Diagnostic> diagnostics = compilation.GetDiagnostics(cancellationToken);
         IEnumerable<Diagnostic> errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
         errors.ShouldBeEmpty("generated source should compile without errors");
     }

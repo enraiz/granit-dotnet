@@ -82,7 +82,7 @@ services.AddGranitPersistence();
 // Le code applicatif est identique quelle que soit la stratégie
 public sealed class PatientService(AppDbContext db)
 {
-    public async Task<Patient?> FindAsync(Guid id, CancellationToken ct)
+    public async Task<Patient?> FindAsync(Guid id, CancellationToken cancellationToken)
         => await db.Patients.FindAsync([id], ct);
     // SharedDatabase → WHERE Id = @id AND TenantId = @tid
     // SchemaPerTenant → SET search_path TO tenant_xxx; SELECT ... WHERE Id = @id

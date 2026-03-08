@@ -25,21 +25,21 @@ internal sealed class FeatureChecker(
     private readonly HybridCache _hybridCache = hybridCache;
 
     /// <inheritdoc/>
-    public async Task<bool> IsEnabledAsync(string featureName, CancellationToken ct = default)
+    public async Task<bool> IsEnabledAsync(string featureName, CancellationToken cancellationToken = default)
     {
-        string value = await GetValueAsync(featureName, ct).ConfigureAwait(false);
+        string value = await GetValueAsync(featureName, cancellationToken).ConfigureAwait(false);
         return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
-    public async Task<long> GetNumericAsync(string featureName, CancellationToken ct = default)
+    public async Task<long> GetNumericAsync(string featureName, CancellationToken cancellationToken = default)
     {
-        string value = await GetValueAsync(featureName, ct).ConfigureAwait(false);
+        string value = await GetValueAsync(featureName, cancellationToken).ConfigureAwait(false);
         return long.TryParse(value, out long parsed) ? parsed : 0L;
     }
 
     /// <inheritdoc/>
-    public async Task<string> GetValueAsync(string featureName, CancellationToken ct = default)
+    public async Task<string> GetValueAsync(string featureName, CancellationToken cancellationToken = default)
     {
         FeatureDefinition definition = _definitionStore.GetRequired(featureName);
         ICurrentTenant? currentTenant = _serviceProvider.GetService<ICurrentTenant>();
@@ -53,26 +53,26 @@ internal sealed class FeatureChecker(
                 string? value = await ResolveAsync(definition, innerCt).ConfigureAwait(false);
                 return value ?? definition.DefaultValue;
             },
-            cancellationToken: ct);
+            cancellationToken: cancellationToken);
 
         return resolved;
     }
 
     /// <inheritdoc/>
-    public async Task RequireEnabledAsync(string featureName, CancellationToken ct = default)
+    public async Task RequireEnabledAsync(string featureName, CancellationToken cancellationToken = default)
     {
-        bool enabled = await IsEnabledAsync(featureName, ct).ConfigureAwait(false);
+        bool enabled = await IsEnabledAsync(featureName, cancellationToken).ConfigureAwait(false);
         if (!enabled)
         {
             throw new FeatureNotEnabledException(featureName);
         }
     }
 
-    private async Task<string?> ResolveAsync(FeatureDefinition definition, CancellationToken ct)
+    private async Task<string?> ResolveAsync(FeatureDefinition definition, CancellationToken cancellationToken)
     {
         foreach (IFeatureValueProvider provider in _providers)
         {
-            string? value = await provider.GetOrNullAsync(definition, ct).ConfigureAwait(false);
+            string? value = await provider.GetOrNullAsync(definition, cancellationToken).ConfigureAwait(false);
             if (value is not null)
             {
                 return value;

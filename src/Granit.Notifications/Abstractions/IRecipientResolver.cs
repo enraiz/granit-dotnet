@@ -10,5 +10,5 @@ public interface IRecipientResolver
     /// Resolves contact information for the given user.
     /// Returns <c>null</c> if the user cannot be found.
     /// </summary>
-    Task<RecipientInfo?> ResolveAsync(string userId, CancellationToken ct = default);
+    Task<RecipientInfo?> ResolveAsync(string userId, CancellationToken cancellationToken = default);
 }

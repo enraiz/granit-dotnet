@@ -105,7 +105,7 @@ public static class ProcessMedicalReportHandler
         ICurrentTenant currentTenant,       // ← restauré par TenantContextBehavior
         ICurrentUserService currentUser,    // ← restauré par UserContextBehavior
         AppDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // currentTenant.Id est le même que celui de la requête HTTP d'origine
         // currentUser.UserId est le même que celui qui a initié l'opération

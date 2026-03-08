@@ -18,9 +18,9 @@ public interface IRecordIdentityResolver<TEntity> where TEntity : class
     /// Resolves the identity of a single imported entity.
     /// </summary>
     /// <param name="entity">The mapped entity.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The identity resolution result (insert or update with existing entity).</returns>
     Task<RecordIdentity<TEntity>> ResolveAsync(
         TEntity entity,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

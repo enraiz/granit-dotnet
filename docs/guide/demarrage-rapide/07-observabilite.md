@@ -65,7 +65,7 @@ internal static class TaskEndpoints
         CreateTaskRequest request,
         TaskDbContext db,
         ILogger<TaskItem> logger,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         TaskItem task = new()
         {

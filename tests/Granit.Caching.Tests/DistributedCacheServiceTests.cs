@@ -77,7 +77,7 @@ public sealed class DistributedCacheServiceTests
 
         UserCacheItem expected = new() { Id = Guid.NewGuid(), Name = "Alice" };
 
-        // Act — paramètre nommé "ct" (convention interface ICacheService)
+        // Act — paramètre nommé "cancellationToken" (convention interface ICacheService)
         await sut.SetAsync("alice", expected, null, TestContext.Current.CancellationToken);
         UserCacheItem? result = await sut.GetAsync("alice", TestContext.Current.CancellationToken);
 
@@ -121,10 +121,10 @@ public sealed class DistributedCacheServiceTests
         // Act
         UserCacheItem result = await sut.GetOrAddAsync(
             "charlie",
-            async ct =>
+            async cancellationToken =>
             {
                 callCount++;
-                await Task.Delay(1, ct);
+                await Task.Delay(1, cancellationToken);
                 return expected;
             },
             null,

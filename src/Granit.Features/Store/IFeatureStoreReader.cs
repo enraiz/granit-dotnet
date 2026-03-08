@@ -10,5 +10,5 @@ public interface IFeatureStoreReader
     /// <paramref name="tenantId"/> (global scope when <c>null</c>),
     /// or <c>null</c> if no override exists.
     /// </summary>
-    Task<string?> GetOrNullAsync(string featureName, string? tenantId, CancellationToken ct = default);
+    Task<string?> GetOrNullAsync(string featureName, string? tenantId, CancellationToken cancellationToken = default);
 }

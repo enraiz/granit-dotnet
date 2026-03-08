@@ -23,7 +23,7 @@ public interface IBackgroundJobWriter
     /// <exception cref="Granit.Core.Exceptions.EntityNotFoundException">
     /// Thrown when no job with <paramref name="jobName"/> exists in the store.
     /// </exception>
-    Task PauseAsync(string jobName, CancellationToken ct = default);
+    Task PauseAsync(string jobName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Resumes a paused job and immediately schedules its next occurrence
@@ -32,7 +32,7 @@ public interface IBackgroundJobWriter
     /// <exception cref="Granit.Core.Exceptions.EntityNotFoundException">
     /// Thrown when no job with <paramref name="jobName"/> exists in the store.
     /// </exception>
-    Task ResumeAsync(string jobName, CancellationToken ct = default);
+    Task ResumeAsync(string jobName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Triggers an immediate execution of a job, independent of its scheduled cycle.
@@ -43,5 +43,5 @@ public interface IBackgroundJobWriter
     /// <exception cref="Granit.Core.Exceptions.EntityNotFoundException">
     /// Thrown when no job with <paramref name="jobName"/> exists in the store.
     /// </exception>
-    Task TriggerNowAsync(string jobName, CancellationToken ct = default);
+    Task TriggerNowAsync(string jobName, CancellationToken cancellationToken = default);
 }

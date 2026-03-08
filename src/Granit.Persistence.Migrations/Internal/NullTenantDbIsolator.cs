@@ -8,6 +8,6 @@ namespace Granit.Persistence.Migrations.Internal;
 internal sealed class NullTenantDbIsolator : ITenantDbIsolator
 {
     /// <inheritdoc/>
-    public Task IsolateAsync(DbContext context, Guid tenantId, CancellationToken ct) =>
+    public Task IsolateAsync(DbContext context, Guid tenantId, CancellationToken cancellationToken) =>
         Task.CompletedTask;
 }

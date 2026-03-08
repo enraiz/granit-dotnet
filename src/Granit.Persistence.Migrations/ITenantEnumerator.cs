@@ -47,10 +47,10 @@ public interface ITenantEnumerator
     /// <summary>
     /// Returns the identifiers of all currently active tenants.
     /// </summary>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// An async stream of <see cref="Guid"/> tenant identifiers.
     /// Returns an empty stream for the default <c>NullTenantEnumerator</c>.
     /// </returns>
-    IAsyncEnumerable<Guid> GetActiveTenantIdsAsync(CancellationToken ct);
+    IAsyncEnumerable<Guid> GetActiveTenantIdsAsync(CancellationToken cancellationToken);
 }

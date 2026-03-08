@@ -98,15 +98,15 @@ public interface IImagePipeline : IAsyncDisposable
     /// Encodes the image and returns the result as an <see cref="ImageResult"/>.
     /// Uses the format set by <see cref="ConvertTo"/> or the source format if not set.
     /// </summary>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The processed image result.</returns>
-    Task<ImageResult> ToResultAsync(CancellationToken ct = default);
+    Task<ImageResult> ToResultAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Encodes the image and writes it to the specified <paramref name="destination"/> stream.
     /// Uses the format set by <see cref="ConvertTo"/> or the source format if not set.
     /// </summary>
     /// <param name="destination">The stream to write the encoded image to.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task SaveToStreamAsync(Stream destination, CancellationToken ct = default);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task SaveToStreamAsync(Stream destination, CancellationToken cancellationToken = default);
 }

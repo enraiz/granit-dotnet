@@ -22,7 +22,7 @@ internal sealed class ExternalIdResolver<TEntity, TContext>(
     where TContext : DbContext
 {
     /// <inheritdoc/>
-    public async Task<RecordIdentity<TEntity>> ResolveAsync(TEntity entity, CancellationToken ct = default)
+    public async Task<RecordIdentity<TEntity>> ResolveAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         // External ID is stored as a special property on the entity
         // The value is extracted from the mapped "ExternalId" column
@@ -32,7 +32,7 @@ internal sealed class ExternalIdResolver<TEntity, TContext>(
             return new RecordIdentity<TEntity> { Operation = RecordOperation.Insert };
         }
 
-        await using DataExchangeDbContext importContext = await importContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext importContext = await importContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         string definitionName = definition.Name;
 
@@ -42,15 +42,15 @@ internal sealed class ExternalIdResolver<TEntity, TContext>(
                 e => e.DefinitionName == definitionName
                      && e.ExternalId == externalId
                      && e.TenantId == tenantId,
-                ct).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
 
         if (mapping is null)
         {
             return new RecordIdentity<TEntity> { Operation = RecordOperation.Insert };
         }
 
-        await using TContext appContext = await appContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        TEntity? existing = await appContext.Set<TEntity>().FindAsync([mapping.InternalId], ct).ConfigureAwait(false);
+        await using TContext appContext = await appContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        TEntity? existing = await appContext.Set<TEntity>().FindAsync([mapping.InternalId], cancellationToken).ConfigureAwait(false);
 
         if (existing is null)
         {

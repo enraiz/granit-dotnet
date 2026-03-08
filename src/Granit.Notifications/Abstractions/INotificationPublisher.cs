@@ -14,7 +14,7 @@ public interface INotificationPublisher
         NotificationType<TData> notificationType,
         TData data,
         IReadOnlyList<string> recipientUserIds,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 
     /// <summary>
     /// Publishes a notification to explicit recipients with a related entity reference (Odoo-style).
@@ -24,7 +24,7 @@ public interface INotificationPublisher
         TData data,
         IReadOnlyList<string> recipientUserIds,
         EntityReference? relatedEntity,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 
     /// <summary>
     /// Publishes a notification to all subscribers of the given notification type.
@@ -32,7 +32,7 @@ public interface INotificationPublisher
     ValueTask PublishToSubscribersAsync<TData>(
         NotificationType<TData> notificationType,
         TData data,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 
     /// <summary>
     /// Publishes a notification to all followers of the given entity (Odoo-style).
@@ -41,5 +41,5 @@ public interface INotificationPublisher
         NotificationType<TData> notificationType,
         TData data,
         EntityReference relatedEntity,
-        CancellationToken ct = default) where TData : notnull;
+        CancellationToken cancellationToken = default) where TData : notnull;
 }

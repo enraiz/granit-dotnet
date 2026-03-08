@@ -55,7 +55,7 @@ public sealed class EfCoreReferenceDataStoreTests
         string label,
         bool isActive = true,
         int sortOrder = 0,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         ServiceCollection services = new();
         services.AddDbContext<TestDbContext>(options =>
@@ -73,7 +73,7 @@ public sealed class EfCoreReferenceDataStoreTests
             CreatedAt = DateTimeOffset.UtcNow,
             CreatedBy = "seed",
         });
-        await context.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     // -------------------------------------------------------------------------
@@ -84,7 +84,7 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetByCodeAsync_ExistingCode_ReturnsEntity()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "BE", "Belgium", ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         TestEntity? result = await store.GetByCodeAsync("BE", TestContext.Current.CancellationToken);
@@ -108,7 +108,7 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetByCodeAsync_CachesResult()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "FR", "France", ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "FR", "France", cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
 
@@ -131,8 +131,8 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetAllAsync_DefaultQuery_ReturnsActiveOnly()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "BE", "Belgium", isActive: true, ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "XX", "Inactive", isActive: false, ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", isActive: true, cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "XX", "Inactive", isActive: false, cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         PagedResult<TestEntity> result = await store.GetAllAsync(
@@ -146,8 +146,8 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetAllAsync_ActiveOnlyFalse_ReturnsAll()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "BE", "Belgium", isActive: true, ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "XX", "Inactive", isActive: false, ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", isActive: true, cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "XX", "Inactive", isActive: false, cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         PagedResult<TestEntity> result = await store.GetAllAsync(
@@ -161,9 +161,9 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetAllAsync_SortByCode_ReturnsSorted()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "FR", "France", ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "BE", "Belgium", ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "NL", "Netherlands", ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "FR", "France", cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "NL", "Netherlands", cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         PagedResult<TestEntity> result = await store.GetAllAsync(
@@ -179,8 +179,8 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetAllAsync_SortByCodeDescending_ReturnsSortedDescending()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "FR", "France", ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "BE", "Belgium", ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "FR", "France", cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         PagedResult<TestEntity> result = await store.GetAllAsync(
@@ -195,8 +195,8 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetAllAsync_SortByLabel_ReturnsSortedByLabel()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "NL", "Netherlands", ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "BE", "Belgium", ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "NL", "Netherlands", cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         PagedResult<TestEntity> result = await store.GetAllAsync(
@@ -211,9 +211,9 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetAllAsync_DefaultSortBySortOrder_ReturnsSortedBySortOrder()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "NL", "Netherlands", sortOrder: 3, ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "BE", "Belgium", sortOrder: 1, ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "FR", "France", sortOrder: 2, ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "NL", "Netherlands", sortOrder: 3, cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", sortOrder: 1, cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "FR", "France", sortOrder: 2, cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         PagedResult<TestEntity> result = await store.GetAllAsync(
@@ -228,9 +228,9 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task GetAllAsync_Pagination_ReturnsCorrectPage()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "BE", "Belgium", sortOrder: 1, ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "FR", "France", sortOrder: 2, ct: TestContext.Current.CancellationToken);
-        await SeedAsync(db, "NL", "Netherlands", sortOrder: 3, ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", sortOrder: 1, cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "FR", "France", sortOrder: 2, cancellationToken: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "NL", "Netherlands", sortOrder: 3, cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         PagedResult<TestEntity> result = await store.GetAllAsync(
@@ -289,7 +289,7 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task UpdateAsync_ModifiesExistingEntity()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "BE", "Belgium", ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", cancellationToken: TestContext.Current.CancellationToken);
 
         // Use a new store to simulate a fresh scope
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
@@ -314,7 +314,7 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task SetActiveAsync_DeactivatesEntity()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "BE", "Belgium", isActive: true, ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", isActive: true, cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         await store.SetActiveAsync("BE", false, TestContext.Current.CancellationToken);
@@ -331,7 +331,7 @@ public sealed class EfCoreReferenceDataStoreTests
     public async Task SetActiveAsync_ReactivatesEntity()
     {
         string db = Guid.NewGuid().ToString();
-        await SeedAsync(db, "BE", "Belgium", isActive: false, ct: TestContext.Current.CancellationToken);
+        await SeedAsync(db, "BE", "Belgium", isActive: false, cancellationToken: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         await store.SetActiveAsync("BE", true, TestContext.Current.CancellationToken);

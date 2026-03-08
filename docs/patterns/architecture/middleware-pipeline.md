@@ -108,7 +108,7 @@ public static class SendInvoiceHandler
         ICurrentTenant currentTenant,      // ← restauré par TenantContextBehavior
         ICurrentUserService currentUser,   // ← restauré par UserContextBehavior
         InvoiceDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // currentTenant.Id est correct même en background
         // currentUser.UserId est correct pour l'audit trail

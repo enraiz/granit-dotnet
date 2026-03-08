@@ -57,7 +57,7 @@ public partial class HybridCacheService<TCacheItem>(
     private readonly string _cacheName = CacheNameProvider.GetCacheName(typeof(TCacheItem));
 
     /// <inheritdoc/>
-    public async Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default)
+    public async Task<TCacheItem?> GetAsync(string key, CancellationToken cancellationToken = default)
     {
         string compositeKey = BuildKey(key);
         LogGet(_logger, compositeKey);
@@ -68,7 +68,7 @@ public partial class HybridCacheService<TCacheItem>(
         TCacheItem? result = await _hybridCache.GetOrCreateAsync<TCacheItem?>(
             compositeKey,
             _ => ValueTask.FromResult<TCacheItem?>(null),
-            cancellationToken: ct).ConfigureAwait(false);
+            cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return result;
     }
@@ -78,7 +78,7 @@ public partial class HybridCacheService<TCacheItem>(
         string key,
         Func<CancellationToken, Task<TCacheItem>> factory,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         string compositeKey = BuildKey(key);
         LogGetOrAdd(_logger, compositeKey);
@@ -96,7 +96,7 @@ public partial class HybridCacheService<TCacheItem>(
                 return value;
             },
             hybridOptions,
-            cancellationToken: ct);
+            cancellationToken: cancellationToken);
 
         return result;
     }
@@ -106,7 +106,7 @@ public partial class HybridCacheService<TCacheItem>(
         string key,
         TCacheItem value,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         string compositeKey = BuildKey(key);
         LogSet(_logger, compositeKey);
@@ -115,20 +115,20 @@ public partial class HybridCacheService<TCacheItem>(
             ? BuildHybridOptions(options)
             : null;
 
-        await _hybridCache.SetAsync(compositeKey, value, hybridOptions, cancellationToken: ct).ConfigureAwait(false);
+        await _hybridCache.SetAsync(compositeKey, value, hybridOptions, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task RemoveAsync(string key, CancellationToken ct = default)
+    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
         string compositeKey = BuildKey(key);
         LogRemove(_logger, compositeKey);
 
-        await _hybridCache.RemoveAsync(compositeKey, ct).ConfigureAwait(false);
+        await _hybridCache.RemoveAsync(compositeKey, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task RefreshAsync(string key, CancellationToken ct = default)
+    public Task RefreshAsync(string key, CancellationToken cancellationToken = default)
     {
         // HybridCache ne supporte pas nativement le refresh (sliding expiration sur IDistributedCache).
         // Un SetAsync avec la valeur actuelle est l'équivalent fonctionnel.

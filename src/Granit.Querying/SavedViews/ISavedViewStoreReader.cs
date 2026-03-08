@@ -14,14 +14,14 @@ public interface ISavedViewStoreReader
     /// <param name="entityType">The query definition name.</param>
     /// <param name="userId">The current user identifier.</param>
     /// <param name="tenantId">The tenant identifier, or <c>null</c>.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<IReadOnlyList<SavedView>> GetListAsync(
-        string entityType, string userId, Guid? tenantId, CancellationToken ct = default);
+        string entityType, string userId, Guid? tenantId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets a single saved view by identifier.
     /// </summary>
     /// <param name="id">The saved view identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task<SavedView?> GetAsync(Guid id, CancellationToken ct = default);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<SavedView?> GetAsync(Guid id, CancellationToken cancellationToken = default);
 }

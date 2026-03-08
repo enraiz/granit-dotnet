@@ -41,7 +41,6 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     private static partial Regex TemplateNamePattern();
 
     private const int MaxNameLength = 200;
-    private const int MaxCultureLength = 10;
 
     /// <summary>
     /// Maps template administration endpoints under <c>/{prefix}</c>.
@@ -173,7 +172,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     private static async Task<Results<Ok<TemplateListResponse>, ProblemHttpResult>> HandleListAsync(
         HttpContext context,
         [AsParameters] TemplateListQueryParameters parameters,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -206,9 +205,9 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             Culture: parameters.Culture,
             CategoryId: parameters.CategoryId);
 
-        PagedTemplateResult result = await storeReader.ListTemplatesAsync(filter, ct).ConfigureAwait(false);
+        PagedTemplateResult result = await storeReader.ListTemplatesAsync(filter, cancellationToken).ConfigureAwait(false);
 
-        List<TemplateListItemResponse> items = result.Items
+        var items = result.Items
             .Select(s => new TemplateListItemResponse(
                 s.Name,
                 s.Culture,
@@ -230,7 +229,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         string name,
         string? culture,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -257,8 +256,8 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         TemplateKey key = new(name, culture);
 
-        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
-        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, ct).ConfigureAwait(false);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, cancellationToken).ConfigureAwait(false);
+        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, cancellationToken).ConfigureAwait(false);
 
         if (draft is null && published is null)
         {
@@ -271,7 +270,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         TemplateRevisionResponse? publishedResponse = null;
         if (published is not null)
         {
-            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, cancellationToken).ConfigureAwait(false);
             TemplateRevision? publishedRevision = history.FirstOrDefault(
                 r => r.Status == TemplateLifecycleStatus.Published);
 
@@ -295,7 +294,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     private static async Task<Results<Created<TemplateDetailResponse>, ProblemHttpResult>> HandleCreateAsync(
         HttpContext context,
         SaveTemplateRequest body,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -323,15 +322,15 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         string userId = GetCurrentUserId(context);
         TemplateKey key = new(body.Name, body.Culture);
 
-        await storeWriter.SaveDraftAsync(key, body.Content, body.MimeType, userId, ct).ConfigureAwait(false);
+        await storeWriter.SaveDraftAsync(key, body.Content, body.MimeType, userId, cancellationToken).ConfigureAwait(false);
 
-        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
-        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, ct).ConfigureAwait(false);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, cancellationToken).ConfigureAwait(false);
+        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, cancellationToken).ConfigureAwait(false);
 
         TemplateRevisionResponse? publishedResponse = null;
         if (published is not null)
         {
-            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, cancellationToken).ConfigureAwait(false);
             TemplateRevision? publishedRevision = history.FirstOrDefault(
                 r => r.Status == TemplateLifecycleStatus.Published);
 
@@ -358,7 +357,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         string name,
         SaveTemplateRequest body,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -379,15 +378,15 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         string userId = GetCurrentUserId(context);
         TemplateKey key = new(name, body.Culture);
 
-        await storeWriter.SaveDraftAsync(key, body.Content, body.MimeType, userId, ct).ConfigureAwait(false);
+        await storeWriter.SaveDraftAsync(key, body.Content, body.MimeType, userId, cancellationToken).ConfigureAwait(false);
 
-        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
-        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, ct).ConfigureAwait(false);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, cancellationToken).ConfigureAwait(false);
+        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, cancellationToken).ConfigureAwait(false);
 
         TemplateRevisionResponse? publishedResponse = null;
         if (published is not null)
         {
-            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, cancellationToken).ConfigureAwait(false);
             TemplateRevision? publishedRevision = history.FirstOrDefault(
                 r => r.Status == TemplateLifecycleStatus.Published);
 
@@ -412,7 +411,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         string name,
         string? culture,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreWriter? storeWriter =
             context.RequestServices.GetService<IDocumentTemplateStoreWriter>();
@@ -442,7 +441,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         try
         {
-            await storeWriter.DeleteDraftAsync(key, userId, ct).ConfigureAwait(false);
+            await storeWriter.DeleteDraftAsync(key, userId, cancellationToken).ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -462,7 +461,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         string name,
         string? culture,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -494,7 +493,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         try
         {
-            await storeWriter.PublishAsync(key, userId, ct).ConfigureAwait(false);
+            await storeWriter.PublishAsync(key, userId, cancellationToken).ConfigureAwait(false);
         }
         catch (TemplateTransitionDeniedException ex)
         {
@@ -509,7 +508,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status404NotFound);
         }
 
-        return TypedResults.Ok(await BuildDetailResponseAsync(storeReader, key, ct).ConfigureAwait(false));
+        return TypedResults.Ok(await BuildDetailResponseAsync(storeReader, key, cancellationToken).ConfigureAwait(false));
     }
 
     // -------------------------------------------------------------------------
@@ -520,7 +519,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         string name,
         string? culture,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreWriter? storeWriter =
             context.RequestServices.GetService<IDocumentTemplateStoreWriter>();
@@ -550,7 +549,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         try
         {
-            await storeWriter.UnpublishAsync(key, userId, ct).ConfigureAwait(false);
+            await storeWriter.UnpublishAsync(key, userId, cancellationToken).ConfigureAwait(false);
         }
         catch (TemplateTransitionDeniedException ex)
         {
@@ -570,7 +569,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         string name,
         string? culture,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -597,8 +596,8 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         TemplateKey key = new(name, culture);
 
-        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
-        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, ct).ConfigureAwait(false);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, cancellationToken).ConfigureAwait(false);
+        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, cancellationToken).ConfigureAwait(false);
 
         if (draft is null && published is null)
         {
@@ -631,7 +630,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             }
 
             if (hook is not null &&
-                await hook.CanTransitionAsync(currentStatus, target, ct).ConfigureAwait(false))
+                await hook.CanTransitionAsync(currentStatus, target, cancellationToken).ConfigureAwait(false))
             {
                 availableTransitions.Add(target);
             }
@@ -655,7 +654,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         string? culture,
         int page = 1,
         int pageSize = 20,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -688,10 +687,10 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         TemplateKey key = new(name, culture);
         IReadOnlyList<TemplateRevision> allRevisions =
-            await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+            await storeReader.GetHistoryAsync(key, cancellationToken).ConfigureAwait(false);
 
         int totalCount = allRevisions.Count;
-        List<TemplateRevisionSummaryResponse> summaries = allRevisions
+        var summaries = allRevisions
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(r => new TemplateRevisionSummaryResponse(
@@ -716,7 +715,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         string name,
         Guid revisionId,
         string? culture,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -743,7 +742,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         TemplateKey key = new(name, culture);
         IReadOnlyList<TemplateRevision> history =
-            await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+            await storeReader.GetHistoryAsync(key, cancellationToken).ConfigureAwait(false);
 
         TemplateRevision? revision = history.FirstOrDefault(r => r.RevisionId == revisionId);
         if (revision is null)
@@ -762,7 +761,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         string name,
         TemplatePreviewRequest body,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IDocumentTemplateStoreReader? storeReader =
             context.RequestServices.GetService<IDocumentTemplateStoreReader>();
@@ -788,14 +787,14 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         }
 
         TemplateKey key = new(name, body.Culture);
-        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, cancellationToken).ConfigureAwait(false);
 
         if (draft is null)
         {
             return TypedResults.NotFound();
         }
 
-        List<ITemplateEngine> engines =
+        var engines =
             context.RequestServices.GetServices<ITemplateEngine>().ToList();
 
         if (engines.Count == 0)
@@ -837,7 +836,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
                 data,
                 DocumentFormat.Html,
                 globalContexts.ToList(),
-                ct).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -867,8 +866,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
     private static Task<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>> HandleGetVariablesAsync(
         HttpContext context,
-        string name,
-        CancellationToken ct)
+        string name)
     {
         ProblemHttpResult? nameError = ValidateTemplateName(name);
         if (nameError is not null)
@@ -877,7 +875,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         }
 
         // Global variables — discovered by reflecting on ITemplateGlobalContext.Resolve() return types
-        List<ITemplateGlobalContext> globalContexts =
+        var globalContexts =
             context.RequestServices.GetServices<ITemplateGlobalContext>().ToList();
 
         List<TemplateVariableItemResponse> globalVariables = [];
@@ -912,7 +910,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
     private static async Task<Results<Ok<IReadOnlyList<TemplateCategoryResponse>>, ProblemHttpResult>> HandleListCategoriesAsync(
         HttpContext context,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ITemplateCategoryStoreReader? storeReader =
             context.RequestServices.GetService<ITemplateCategoryStoreReader>();
@@ -923,7 +921,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         }
 
         IReadOnlyList<TemplateCategory> categories =
-            await storeReader.ListCategoriesAsync(ct).ConfigureAwait(false);
+            await storeReader.ListCategoriesAsync(cancellationToken).ConfigureAwait(false);
 
         IReadOnlyList<TemplateCategoryResponse> response = categories
             .Select(ToCategoryResponse)
@@ -939,7 +937,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     private static async Task<Results<Created<TemplateCategoryResponse>, ProblemHttpResult>> HandleCreateCategoryAsync(
         HttpContext context,
         SaveTemplateCategoryRequest body,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ITemplateCategoryStoreWriter? storeWriter =
             context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
@@ -955,7 +953,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         try
         {
             category = await storeWriter.CreateCategoryAsync(
-                body.Name, body.Description, body.Icon, body.SortOrder, userId, ct).ConfigureAwait(false);
+                body.Name, body.Description, body.Icon, body.SortOrder, userId, cancellationToken).ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -975,7 +973,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         HttpContext context,
         Guid id,
         SaveTemplateCategoryRequest body,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ITemplateCategoryStoreWriter? storeWriter =
             context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
@@ -989,7 +987,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         try
         {
             category = await storeWriter.UpdateCategoryAsync(
-                id, body.Name, body.Description, body.Icon, body.SortOrder, ct).ConfigureAwait(false);
+                id, body.Name, body.Description, body.Icon, body.SortOrder, cancellationToken).ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -1012,7 +1010,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     private static async Task<Results<NoContent, ProblemHttpResult>> HandleDeleteCategoryAsync(
         HttpContext context,
         Guid id,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ITemplateCategoryStoreWriter? storeWriter =
             context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
@@ -1024,7 +1022,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
 
         try
         {
-            await storeWriter.DeleteCategoryAsync(id, ct).ConfigureAwait(false);
+            await storeWriter.DeleteCategoryAsync(id, cancellationToken).ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -1068,15 +1066,15 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     private static async Task<TemplateDetailResponse> BuildDetailResponseAsync(
         IDocumentTemplateStoreReader storeReader,
         TemplateKey key,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
-        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, ct).ConfigureAwait(false);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, cancellationToken).ConfigureAwait(false);
+        Pipeline.TemplateDescriptor? published = await storeReader.TryGetPublishedAsync(key, cancellationToken).ConfigureAwait(false);
 
         TemplateRevisionResponse? publishedResponse = null;
         if (published is not null)
         {
-            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, ct).ConfigureAwait(false);
+            IReadOnlyList<TemplateRevision> history = await storeReader.GetHistoryAsync(key, cancellationToken).ConfigureAwait(false);
             TemplateRevision? publishedRevision = history.FirstOrDefault(
                 r => r.Status == TemplateLifecycleStatus.Published);
 

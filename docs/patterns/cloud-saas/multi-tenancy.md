@@ -99,7 +99,7 @@ Guid? tenantId = currentTenant?.IsAvailable == true ? currentTenant.Id : null;
 // Shared Database : les query filters s'appliquent automatiquement
 public sealed class PatientService(AppDbContext db, ICurrentTenant tenant)
 {
-    public async Task<List<Patient>> GetAllAsync(CancellationToken ct)
+    public async Task<List<Patient>> GetAllAsync(CancellationToken cancellationToken)
     {
         // EF Core ajoute automatiquement WHERE TenantId = @currentTenantId
         List<Patient> patients = await db.Patients.ToListAsync(ct);
@@ -112,7 +112,7 @@ public async Task MigrateTenantDataAsync(
     Guid sourceTenantId,
     Guid targetTenantId,
     ICurrentTenant currentTenant,
-    CancellationToken ct)
+    CancellationToken cancellationToken)
 {
     using (currentTenant.Change(sourceTenantId))
     {

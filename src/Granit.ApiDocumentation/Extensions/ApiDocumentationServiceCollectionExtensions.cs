@@ -80,7 +80,7 @@ public static class ApiDocumentationServiceCollectionExtensions
 
             services.AddOpenApi(documentName, openApiOptions =>
             {
-                openApiOptions.AddDocumentTransformer((doc, ctx, ct) =>
+                openApiOptions.AddDocumentTransformer((doc, ctx, cancellationToken) =>
                 {
                     doc.Info = new OpenApiInfo
                     {

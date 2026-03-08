@@ -16,6 +16,6 @@ internal sealed class InMemoryAppContextFactory(string dbName)
             .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options);
 
-    public Task<TestAppDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+    public Task<TestAppDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(CreateDbContext());
 }

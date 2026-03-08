@@ -17,15 +17,15 @@ public interface ISettingValueProvider
     /// <summary>
     /// Returns the setting value for the current context, or <c>null</c> if absent.
     /// </summary>
-    Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken ct = default);
+    Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates or updates the setting value for the current context.
     /// </summary>
-    Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default);
+    Task SetAsync(SettingDefinition definition, string? value, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes the setting value for the current context.
     /// </summary>
-    Task ClearAsync(SettingDefinition definition, CancellationToken ct = default);
+    Task ClearAsync(SettingDefinition definition, CancellationToken cancellationToken = default);
 }

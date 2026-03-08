@@ -65,7 +65,7 @@ public static class DownloadDocumentHandler
     public static async Task<PresignedDownloadUrl> Handle(
         DownloadDocumentQuery query,
         IBlobStorage blobStorage,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // Guard clause — lève BlobNotFoundException (404)
         BlobDescriptor? descriptor = await blobStorage.GetDescriptorAsync(

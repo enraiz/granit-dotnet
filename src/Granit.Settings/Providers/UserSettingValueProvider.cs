@@ -35,7 +35,7 @@ public sealed class UserSettingValueProvider(
     public int Order => 100;
 
     /// <inheritdoc/>
-    public async Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken ct = default)
+    public async Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken cancellationToken = default)
     {
         if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
         {
@@ -58,13 +58,13 @@ public sealed class UserSettingValueProvider(
                 return stored ?? new SettingValue(definition.Name, ProviderName, userId, null);
             },
             cacheOptions,
-            ct) is { Value: not null } hit
+            cancellationToken) is { Value: not null } hit
             ? hit
             : null;
     }
 
     /// <inheritdoc/>
-    public async Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default)
+    public async Task SetAsync(SettingDefinition definition, string? value, CancellationToken cancellationToken = default)
     {
         if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
         {
@@ -72,12 +72,12 @@ public sealed class UserSettingValueProvider(
         }
 
         string userId = _currentUser.UserId;
-        await _storeWriter.SetAsync(definition.Name, ProviderName, userId, value, ct).ConfigureAwait(false);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct).ConfigureAwait(false);
+        await _storeWriter.SetAsync(definition.Name, ProviderName, userId, value, cancellationToken).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task ClearAsync(SettingDefinition definition, CancellationToken ct = default)
+    public async Task ClearAsync(SettingDefinition definition, CancellationToken cancellationToken = default)
     {
         if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
         {
@@ -85,7 +85,7 @@ public sealed class UserSettingValueProvider(
         }
 
         string userId = _currentUser.UserId;
-        await _storeWriter.DeleteAsync(definition.Name, ProviderName, userId, ct).ConfigureAwait(false);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct).ConfigureAwait(false);
+        await _storeWriter.DeleteAsync(definition.Name, ProviderName, userId, cancellationToken).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), cancellationToken).ConfigureAwait(false);
     }
 }

@@ -24,7 +24,7 @@ public sealed class EfBlobDescriptorStoreTests
             return new BlobStorageDbContext(options);
         }
 
-        public Task<BlobStorageDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+        public Task<BlobStorageDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(CreateDbContext());
     }
 

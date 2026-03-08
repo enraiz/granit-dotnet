@@ -3,6 +3,7 @@ using Granit.DataExchange.Export.Messages;
 using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Messages;
 using Granit.DataExchange.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Granit.DataExchange.Tests.Export;
@@ -18,7 +19,9 @@ public sealed class NullDataExchangeEventPublisherTests
             Guid.NewGuid(), "Test.Import", ImportJobStatus.Completed,
             "user-1", 100, 95, 5, 90, 5, 0);
 
-        await _sut.PublishAsync(evt, TestContext.Current.CancellationToken);
+        Func<Task> act = () => _sut.PublishAsync(evt, TestContext.Current.CancellationToken);
+
+        await Should.NotThrowAsync(act);
     }
 
     [Fact]
@@ -28,6 +31,8 @@ public sealed class NullDataExchangeEventPublisherTests
             Guid.NewGuid(), "Test.Export", ExportJobStatus.Completed,
             "user-1", 200, null);
 
-        await _sut.PublishAsync(evt, TestContext.Current.CancellationToken);
+        Func<Task> act = () => _sut.PublishAsync(evt, TestContext.Current.CancellationToken);
+
+        await Should.NotThrowAsync(act);
     }
 }

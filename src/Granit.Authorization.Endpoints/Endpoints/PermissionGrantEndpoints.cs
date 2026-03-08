@@ -42,12 +42,12 @@ internal static class PermissionGrantEndpoints
         string roleName,
         IPermissionManagerReader permissionManagerReader,
         ICurrentTenant currentTenant,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         IReadOnlyList<string> permissions = await permissionManagerReader
-            .GetGrantedPermissionsAsync(roleName, tenantId, ct)
+            .GetGrantedPermissionsAsync(roleName, tenantId, cancellationToken)
             .ConfigureAwait(false);
 
         return TypedResults.Ok(new PermissionGrantResponse(roleName, permissions));
@@ -59,7 +59,7 @@ internal static class PermissionGrantEndpoints
         IPermissionManagerWriter permissionManagerWriter,
         IPermissionDefinitionManager definitionManager,
         ICurrentTenant currentTenant,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         if (!definitionManager.Exists(permissionName))
         {
@@ -72,7 +72,7 @@ internal static class PermissionGrantEndpoints
 
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
-        await permissionManagerWriter.SetAsync(permissionName, roleName, tenantId, isGranted: true, ct)
+        await permissionManagerWriter.SetAsync(permissionName, roleName, tenantId, isGranted: true, cancellationToken)
             .ConfigureAwait(false);
 
         return TypedResults.NoContent();
@@ -84,7 +84,7 @@ internal static class PermissionGrantEndpoints
         IPermissionManagerWriter permissionManagerWriter,
         IPermissionDefinitionManager definitionManager,
         ICurrentTenant currentTenant,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         if (!definitionManager.Exists(permissionName))
         {
@@ -97,7 +97,7 @@ internal static class PermissionGrantEndpoints
 
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
-        await permissionManagerWriter.SetAsync(permissionName, roleName, tenantId, isGranted: false, ct)
+        await permissionManagerWriter.SetAsync(permissionName, roleName, tenantId, isGranted: false, cancellationToken)
             .ConfigureAwait(false);
 
         return TypedResults.NoContent();

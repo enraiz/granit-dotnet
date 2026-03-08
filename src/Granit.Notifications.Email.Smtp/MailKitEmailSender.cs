@@ -15,7 +15,7 @@ internal sealed partial class MailKitEmailSender(
     ILogger<MailKitEmailSender> logger) : IEmailSender
 {
     /// <inheritdoc />
-    public async Task SendAsync(EmailMessage message, CancellationToken ct = default)
+    public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
     {
         SmtpOptions smtp = options.Value;
         int timeoutMs = smtp.TimeoutSeconds * 1000;
@@ -43,15 +43,15 @@ internal sealed partial class MailKitEmailSender(
         client.Timeout = timeoutMs;
 
         SecureSocketOptions socketOptions = smtp.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
-        await client.ConnectAsync(smtp.Host, smtp.Port, socketOptions, ct).ConfigureAwait(false);
+        await client.ConnectAsync(smtp.Host, smtp.Port, socketOptions, cancellationToken).ConfigureAwait(false);
 
         if (smtp.Username is not null && smtp.Password is not null)
         {
-            await client.AuthenticateAsync(smtp.Username, smtp.Password, ct).ConfigureAwait(false);
+            await client.AuthenticateAsync(smtp.Username, smtp.Password, cancellationToken).ConfigureAwait(false);
         }
 
-        await client.SendAsync(mimeMessage, ct).ConfigureAwait(false);
-        await client.DisconnectAsync(quit: true, ct).ConfigureAwait(false);
+        await client.SendAsync(mimeMessage, cancellationToken).ConfigureAwait(false);
+        await client.DisconnectAsync(quit: true, cancellationToken).ConfigureAwait(false);
 
         LogEmailSent(message.To, smtp.Host, smtp.Port);
     }

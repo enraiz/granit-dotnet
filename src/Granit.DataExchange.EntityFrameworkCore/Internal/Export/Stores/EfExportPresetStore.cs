@@ -19,9 +19,9 @@ internal sealed class EfExportPresetStore(
 {
     /// <inheritdoc/>
     public async Task<ExportPreset?> GetAsync(
-        string definitionName, string presetName, CancellationToken ct = default)
+        string definitionName, string presetName, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         ExportPresetEntity? entity = await context.ExportPresets
@@ -29,31 +29,31 @@ internal sealed class EfExportPresetStore(
             .FirstOrDefaultAsync(
                 e => e.DefinitionName == definitionName
                      && e.PresetName == presetName
-                     && e.TenantId == tenantId, ct).ConfigureAwait(false);
+                     && e.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
 
         return entity is null ? null : ToPreset(entity);
     }
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ExportPreset>> ListAsync(
-        string definitionName, CancellationToken ct = default)
+        string definitionName, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         List<ExportPresetEntity> entities = await context.ExportPresets
             .AsNoTracking()
             .Where(e => e.DefinitionName == definitionName && e.TenantId == tenantId)
             .OrderBy(e => e.PresetName)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         return entities.Select(ToPreset).ToList().AsReadOnly();
     }
 
     /// <inheritdoc/>
-    public async Task SaveAsync(ExportPreset preset, CancellationToken ct = default)
+    public async Task SaveAsync(ExportPreset preset, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         string fieldsJson = JsonSerializer.Serialize(preset.SelectedFields);
 
@@ -61,7 +61,7 @@ internal sealed class EfExportPresetStore(
             .FirstOrDefaultAsync(
                 e => e.DefinitionName == preset.DefinitionName
                      && e.PresetName == preset.PresetName
-                     && e.TenantId == tenantId, ct).ConfigureAwait(false);
+                     && e.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
 
         if (existing is not null)
         {
@@ -86,26 +86,26 @@ internal sealed class EfExportPresetStore(
             });
         }
 
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task DeleteAsync(
-        string definitionName, string presetName, CancellationToken ct = default)
+        string definitionName, string presetName, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         ExportPresetEntity? entity = await context.ExportPresets
             .FirstOrDefaultAsync(
                 e => e.DefinitionName == definitionName
                      && e.PresetName == presetName
-                     && e.TenantId == tenantId, ct).ConfigureAwait(false);
+                     && e.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
 
         if (entity is not null)
         {
             context.ExportPresets.Remove(entity);
-            await context.SaveChangesAsync(ct).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 

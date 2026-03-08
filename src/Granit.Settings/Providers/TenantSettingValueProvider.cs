@@ -35,7 +35,7 @@ public sealed class TenantSettingValueProvider(
     public int Order => 200;
 
     /// <inheritdoc/>
-    public async Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken ct = default)
+    public async Task<SettingValue?> GetOrNullAsync(SettingDefinition definition, CancellationToken cancellationToken = default)
     {
         if (!_currentTenant.IsAvailable)
         {
@@ -58,13 +58,13 @@ public sealed class TenantSettingValueProvider(
                 return stored ?? new SettingValue(definition.Name, ProviderName, tenantKey, null);
             },
             cacheOptions,
-            ct) is { Value: not null } hit
+            cancellationToken) is { Value: not null } hit
             ? hit
             : null;
     }
 
     /// <inheritdoc/>
-    public async Task SetAsync(SettingDefinition definition, string? value, CancellationToken ct = default)
+    public async Task SetAsync(SettingDefinition definition, string? value, CancellationToken cancellationToken = default)
     {
         if (!_currentTenant.IsAvailable)
         {
@@ -72,12 +72,12 @@ public sealed class TenantSettingValueProvider(
         }
 
         string tenantKey = _currentTenant.Id!.Value.ToString();
-        await _storeWriter.SetAsync(definition.Name, ProviderName, tenantKey, value, ct).ConfigureAwait(false);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct).ConfigureAwait(false);
+        await _storeWriter.SetAsync(definition.Name, ProviderName, tenantKey, value, cancellationToken).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task ClearAsync(SettingDefinition definition, CancellationToken ct = default)
+    public async Task ClearAsync(SettingDefinition definition, CancellationToken cancellationToken = default)
     {
         if (!_currentTenant.IsAvailable)
         {
@@ -85,7 +85,7 @@ public sealed class TenantSettingValueProvider(
         }
 
         string tenantKey = _currentTenant.Id!.Value.ToString();
-        await _storeWriter.DeleteAsync(definition.Name, ProviderName, tenantKey, ct).ConfigureAwait(false);
-        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct).ConfigureAwait(false);
+        await _storeWriter.DeleteAsync(definition.Name, ProviderName, tenantKey, cancellationToken).ConfigureAwait(false);
+        await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), cancellationToken).ConfigureAwait(false);
     }
 }

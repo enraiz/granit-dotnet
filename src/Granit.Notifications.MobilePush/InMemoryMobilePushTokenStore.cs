@@ -11,7 +11,7 @@ internal sealed class InMemoryMobilePushTokenStore : IMobilePushTokenReader, IMo
     private readonly ConcurrentDictionary<string, MobilePushTokenInfo> _tokens = new();
 
     /// <inheritdoc />
-    public Task<IReadOnlyList<MobilePushTokenInfo>> GetTokensAsync(string userId, Guid? tenantId, CancellationToken ct = default)
+    public Task<IReadOnlyList<MobilePushTokenInfo>> GetTokensAsync(string userId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<MobilePushTokenInfo> result = _tokens.Values
             .Where(t => t.UserId == userId && t.TenantId == tenantId)
@@ -21,14 +21,14 @@ internal sealed class InMemoryMobilePushTokenStore : IMobilePushTokenReader, IMo
     }
 
     /// <inheritdoc />
-    public Task RegisterAsync(MobilePushTokenInfo tokenInfo, CancellationToken ct = default)
+    public Task RegisterAsync(MobilePushTokenInfo tokenInfo, CancellationToken cancellationToken = default)
     {
         _tokens[tokenInfo.DeviceToken] = tokenInfo;
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public Task RemoveAsync(string deviceToken, Guid? tenantId, CancellationToken ct = default)
+    public Task RemoveAsync(string deviceToken, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         _tokens.TryRemove(deviceToken, out _);
         return Task.CompletedTask;

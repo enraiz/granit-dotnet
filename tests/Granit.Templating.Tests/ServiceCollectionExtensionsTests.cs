@@ -144,16 +144,16 @@ public sealed class ServiceCollectionExtensionsTests
     private sealed class FakeEnricher : ITemplateDataEnricher<string>
     {
         public int Order => 0;
-        public Task<string> EnrichAsync(string data, CancellationToken ct = default) =>
+        public Task<string> EnrichAsync(string data, CancellationToken cancellationToken = default) =>
             Task.FromResult(data);
     }
 
     private sealed class FakeTransitionHook : ITemplateTransitionHook
     {
         public bool IsWorkflowEnabled => true;
-        public Task<bool> CanTransitionAsync(TemplateLifecycleStatus from, TemplateLifecycleStatus to, CancellationToken ct) =>
+        public Task<bool> CanTransitionAsync(TemplateLifecycleStatus from, TemplateLifecycleStatus to, CancellationToken cancellationToken) =>
             Task.FromResult(true);
-        public Task OnTransitionedAsync(Guid revisionId, TemplateLifecycleStatus from, TemplateLifecycleStatus to, string userId, CancellationToken ct) =>
+        public Task OnTransitionedAsync(Guid revisionId, TemplateLifecycleStatus from, TemplateLifecycleStatus to, string userId, CancellationToken cancellationToken) =>
             Task.CompletedTask;
     }
 }

@@ -99,13 +99,13 @@ internal static class TaskEndpoints
 
     private static async Task<Ok<List<TaskItem>>> GetAllAsync(
         TaskDbContext db,
-        CancellationToken ct) =>
+        CancellationToken cancellationToken) =>
         TypedResults.Ok(await db.Tasks.ToListAsync(ct));
 
     private static async Task<Results<Ok<TaskItem>, NotFound>> GetByIdAsync(
         Guid id,
         TaskDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         TaskItem? task = await db.Tasks.FindAsync([id], ct);
         if (task is null)
@@ -119,7 +119,7 @@ internal static class TaskEndpoints
     private static async Task<Created<TaskItem>> CreateAsync(
         CreateTaskRequest request,
         TaskDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         TaskItem task = new()
         {
@@ -140,7 +140,7 @@ internal static class TaskEndpoints
         Guid id,
         UpdateTaskRequest request,
         TaskDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         TaskItem? task = await db.Tasks.FindAsync([id], ct);
         if (task is null)
@@ -162,7 +162,7 @@ internal static class TaskEndpoints
     private static async Task<Results<NoContent, NotFound>> DeleteAsync(
         Guid id,
         TaskDbContext db,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         TaskItem? task = await db.Tasks.FindAsync([id], ct);
         if (task is null)

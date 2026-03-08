@@ -144,15 +144,15 @@ internal static class AnalyzerTestHelpers
     /// <see langword="true"/> (default) to simulate a project that references
     /// <c>Granit.Persistence.Migrations</c>; <see langword="false"/> to omit it.
     /// </param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     internal static async Task<ImmutableArray<Diagnostic>> RunAnalyzerAsync<TAnalyzer>(
         string source,
         bool includeMigrationCycleAttribute = true,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
-        SyntaxTree sourceTree = CSharpSyntaxTree.ParseText(source, cancellationToken: ct);
-        SyntaxTree efCoreTree = CSharpSyntaxTree.ParseText(EfCoreMigrationsStub, cancellationToken: ct);
+        SyntaxTree sourceTree = CSharpSyntaxTree.ParseText(source, cancellationToken: cancellationToken);
+        SyntaxTree efCoreTree = CSharpSyntaxTree.ParseText(EfCoreMigrationsStub, cancellationToken: cancellationToken);
 
         ImmutableArray<SyntaxTree>.Builder treeBuilder = ImmutableArray.CreateBuilder<SyntaxTree>();
         treeBuilder.Add(sourceTree);
@@ -160,7 +160,7 @@ internal static class AnalyzerTestHelpers
 
         if (includeMigrationCycleAttribute)
         {
-            treeBuilder.Add(CSharpSyntaxTree.ParseText(MigrationCycleAttributeStub, cancellationToken: ct));
+            treeBuilder.Add(CSharpSyntaxTree.ParseText(MigrationCycleAttributeStub, cancellationToken: cancellationToken));
         }
 
         ImmutableArray<MetadataReference> references = GetNetCoreReferences();
@@ -174,7 +174,7 @@ internal static class AnalyzerTestHelpers
         CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(
             ImmutableArray.Create<DiagnosticAnalyzer>(new TAnalyzer()));
 
-        return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(ct);
+        return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellationToken);
     }
 
     /// <summary>
@@ -183,19 +183,19 @@ internal static class AnalyzerTestHelpers
     /// </summary>
     /// <param name="source">The C# source snippet to analyze.</param>
     /// <param name="additionalSources">Extra source stubs to include in the compilation.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     internal static async Task<ImmutableArray<Diagnostic>> RunAnalyzerAsync<TAnalyzer>(
         string source,
         string[] additionalSources,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
         ImmutableArray<SyntaxTree>.Builder treeBuilder = ImmutableArray.CreateBuilder<SyntaxTree>();
-        treeBuilder.Add(CSharpSyntaxTree.ParseText(source, cancellationToken: ct));
+        treeBuilder.Add(CSharpSyntaxTree.ParseText(source, cancellationToken: cancellationToken));
 
         foreach (string additional in additionalSources)
         {
-            treeBuilder.Add(CSharpSyntaxTree.ParseText(additional, cancellationToken: ct));
+            treeBuilder.Add(CSharpSyntaxTree.ParseText(additional, cancellationToken: cancellationToken));
         }
 
         ImmutableArray<MetadataReference> references = GetNetCoreReferences();
@@ -209,7 +209,7 @@ internal static class AnalyzerTestHelpers
         CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(
             ImmutableArray.Create<DiagnosticAnalyzer>(new TAnalyzer()));
 
-        return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(ct);
+        return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellationToken);
     }
 
     private static ImmutableArray<MetadataReference> GetNetCoreReferences()

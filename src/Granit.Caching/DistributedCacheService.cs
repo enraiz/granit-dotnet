@@ -46,10 +46,10 @@ public partial class DistributedCacheService<TCacheItem>(
     private readonly string _keyPrefix = $"{options.Value.KeyPrefix}:{CacheNameProvider.GetCacheName(typeof(TCacheItem))}:";
 
     /// <inheritdoc/>
-    public async Task<TCacheItem?> GetAsync(string key, CancellationToken ct = default)
+    public async Task<TCacheItem?> GetAsync(string key, CancellationToken cancellationToken = default)
     {
         string compositeKey = BuildKey(key);
-        byte[]? bytes = await _cache.GetAsync(compositeKey, ct).ConfigureAwait(false);
+        byte[]? bytes = await _cache.GetAsync(compositeKey, cancellationToken).ConfigureAwait(false);
 
         if (bytes is null)
         {
@@ -69,10 +69,10 @@ public partial class DistributedCacheService<TCacheItem>(
         string key,
         Func<CancellationToken, Task<TCacheItem>> factory,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         // 1. Vérification rapide sans verrou (chemin chaud — évite la contention)
-        TCacheItem? cached = await GetAsync(key, ct).ConfigureAwait(false);
+        TCacheItem? cached = await GetAsync(key, cancellationToken).ConfigureAwait(false);
         if (cached is not null)
         {
             return cached;
@@ -81,19 +81,19 @@ public partial class DistributedCacheService<TCacheItem>(
         // 2. Acquisition du verrou stocké dans IMemoryCache (TTL 30 s — auto-nettoyage par le GC)
         string compositeKey = BuildKey(key);
         SemaphoreSlim semaphore = GetOrCreateLock(compositeKey);
-        await semaphore.WaitAsync(ct).ConfigureAwait(false);
+        await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             // 3. Double-check locking : un autre thread peut avoir rempli le cache pendant l'attente
-            cached = await GetAsync(key, ct).ConfigureAwait(false);
+            cached = await GetAsync(key, cancellationToken).ConfigureAwait(false);
             if (cached is not null)
             {
                 return cached;
             }
 
             // 4. Exécution de la factory (garantie une seule fois sous concurrence)
-            TCacheItem value = await factory(ct).ConfigureAwait(false);
-            await SetAsync(key, value, options, ct).ConfigureAwait(false);
+            TCacheItem value = await factory(cancellationToken).ConfigureAwait(false);
+            await SetAsync(key, value, options, cancellationToken).ConfigureAwait(false);
 
             LogCacheMiss(_logger, compositeKey);
 
@@ -110,7 +110,7 @@ public partial class DistributedCacheService<TCacheItem>(
         string key,
         TCacheItem value,
         DistributedCacheEntryOptions? options = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         string compositeKey = BuildKey(key);
         DistributedCacheEntryOptions entryOptions = options ?? BuildDefaultOptions();
@@ -122,18 +122,18 @@ public partial class DistributedCacheService<TCacheItem>(
             bytes = _encryptor.Encrypt(bytes);
         }
 
-        await _cache.SetAsync(compositeKey, bytes, entryOptions, ct).ConfigureAwait(false);
+        await _cache.SetAsync(compositeKey, bytes, entryOptions, cancellationToken).ConfigureAwait(false);
 
         LogCacheSet(_logger, compositeKey);
     }
 
     /// <inheritdoc/>
-    public Task RemoveAsync(string key, CancellationToken ct = default) =>
-        _cache.RemoveAsync(BuildKey(key), ct);
+    public Task RemoveAsync(string key, CancellationToken cancellationToken = default) =>
+        _cache.RemoveAsync(BuildKey(key), cancellationToken);
 
     /// <inheritdoc/>
-    public Task RefreshAsync(string key, CancellationToken ct = default) =>
-        _cache.RefreshAsync(BuildKey(key), ct);
+    public Task RefreshAsync(string key, CancellationToken cancellationToken = default) =>
+        _cache.RefreshAsync(BuildKey(key), cancellationToken);
 
     private string BuildKey(string userKey) =>
         string.Concat(_keyPrefix, userKey);

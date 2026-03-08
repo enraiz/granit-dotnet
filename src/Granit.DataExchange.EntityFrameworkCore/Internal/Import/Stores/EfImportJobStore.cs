@@ -13,19 +13,19 @@ internal sealed class EfImportJobStore(
     IDbContextFactory<DataExchangeDbContext> contextFactory) : IImportJobReader, IImportJobWriter
 {
     /// <inheritdoc/>
-    public async Task<ImportJob?> GetAsync(Guid id, CancellationToken ct = default)
+    public async Task<ImportJob?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await context.ImportJobs
             .AsNoTracking()
-            .FirstOrDefaultAsync(j => j.Id == id, ct).ConfigureAwait(false);
+            .FirstOrDefaultAsync(j => j.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task<PagedResult<ImportJob>> ListAsync(
-        ImportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken ct = default)
+        ImportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         IQueryable<ImportJob> query = context.ImportJobs.AsNoTracking();
 
@@ -34,31 +34,31 @@ internal sealed class EfImportJobStore(
             query = query.Where(j => j.Status == status.Value);
         }
 
-        int totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+        int totalCount = await query.CountAsync(cancellationToken).ConfigureAwait(false);
 
         List<ImportJob> items = await query
             .OrderByDescending(j => j.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync(ct)
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return new PagedResult<ImportJob>(items, totalCount);
     }
 
     /// <inheritdoc/>
-    public async Task CreateAsync(ImportJob job, CancellationToken ct = default)
+    public async Task CreateAsync(ImportJob job, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         context.ImportJobs.Add(job);
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task UpdateAsync(ImportJob job, CancellationToken ct = default)
+    public async Task UpdateAsync(ImportJob job, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         context.ImportJobs.Update(job);
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

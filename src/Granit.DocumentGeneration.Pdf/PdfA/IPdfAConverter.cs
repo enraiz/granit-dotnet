@@ -25,10 +25,10 @@ public interface IPdfAConverter
     /// </summary>
     /// <param name="pdfResult">The source PDF document to convert.</param>
     /// <param name="options">PDF/A conversion options (attachments, conformance level).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A <see cref="DocumentResult"/> containing the PDF/A-3b compliant bytes.</returns>
     Task<DocumentResult> ConvertToPdfAAsync(
         DocumentResult pdfResult,
         PdfAConversionOptions options,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

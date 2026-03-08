@@ -26,12 +26,12 @@ public interface ITemplateTransitionHook
     /// </summary>
     /// <param name="from">Current lifecycle status.</param>
     /// <param name="target">Target lifecycle status.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns><c>true</c> if the transition is allowed; otherwise <c>false</c>.</returns>
     Task<bool> CanTransitionAsync(
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Invoked after a lifecycle transition has been persisted.
@@ -40,11 +40,11 @@ public interface ITemplateTransitionHook
     /// <param name="from">Previous lifecycle status.</param>
     /// <param name="target">New lifecycle status.</param>
     /// <param name="userId">Identity of the user who triggered the transition.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task OnTransitionedAsync(
         Guid revisionId,
         TemplateLifecycleStatus from,
         TemplateLifecycleStatus target,
         string userId,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

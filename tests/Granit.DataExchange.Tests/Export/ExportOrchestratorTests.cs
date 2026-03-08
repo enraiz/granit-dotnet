@@ -785,7 +785,7 @@ public sealed class ExportOrchestratorTests
         public async IAsyncEnumerable<TestEntity> ExecuteStreamAsync(
             IQueryable<TestEntity> source,
             QueryRequest request,
-            [EnumeratorCancellation] CancellationToken ct = default)
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             StreamCalled = true;
             CapturedRequest = request;
@@ -797,11 +797,11 @@ public sealed class ExportOrchestratorTests
         }
 
         public Task<PagedResult<TestEntity>> ExecuteAsync(
-            IQueryable<TestEntity> source, QueryRequest request, CancellationToken ct = default) =>
+            IQueryable<TestEntity> source, QueryRequest request, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
         public Task<GroupedResult<TestEntity>> ExecuteGroupedAsync(
-            IQueryable<TestEntity> source, QueryRequest request, CancellationToken ct = default) =>
+            IQueryable<TestEntity> source, QueryRequest request, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
         public QueryMetadata GetMetadata(IReadOnlyList<SavedViewSummary>? savedViews = null) =>

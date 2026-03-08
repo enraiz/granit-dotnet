@@ -12,7 +12,7 @@ public interface ISettingStoreReader
         string name,
         string providerName,
         string? providerKey,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns all stored values for a given provider and key.
@@ -20,5 +20,5 @@ public interface ISettingStoreReader
     Task<IReadOnlyList<SettingValue>> GetListAsync(
         string providerName,
         string? providerKey,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

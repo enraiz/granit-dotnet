@@ -49,7 +49,7 @@ public sealed class DocumentGeneratorTests
 
         // Act
         DocumentResult result = await sut.GenerateAsync(
-            TemplateType, data, ct: TestContext.Current.CancellationToken);
+            TemplateType, data, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Format.ShouldBe(DocumentFormat.Pdf);
@@ -82,7 +82,7 @@ public sealed class DocumentGeneratorTests
 
         // Act — no targetFormat parameter
         DocumentResult result = await sut.GenerateAsync(
-            TemplateType, data, ct: TestContext.Current.CancellationToken);
+            TemplateType, data, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert — Pdf was passed to the renderer
         await pdfRenderer.Received(1).RenderAsync(
@@ -121,7 +121,7 @@ public sealed class DocumentGeneratorTests
         DocumentResult result = await sut.GenerateAsync(
             TemplateType, data,
             targetFormat: DocumentFormat.Excel,
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Format.ShouldBe(DocumentFormat.Excel);
@@ -152,7 +152,7 @@ public sealed class DocumentGeneratorTests
             await sut.GenerateAsync(
                 TemplateType, data,
                 targetFormat: DocumentFormat.Pdf,
-                ct: TestContext.Current.CancellationToken);
+                cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         DocumentRendererNotFoundException ex = await Should.ThrowAsync<DocumentRendererNotFoundException>(act);
@@ -187,7 +187,7 @@ public sealed class DocumentGeneratorTests
 
         // Act
         await sut.GenerateAsync(
-            TemplateType, data, ct: TestContext.Current.CancellationToken);
+            TemplateType, data, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         capturedHtml.ShouldBe(expectedHtml);
@@ -216,7 +216,7 @@ public sealed class DocumentGeneratorTests
         DocumentResult result = await sut.GenerateAsync(
             TemplateType, data,
             targetFormat: DocumentFormat.Excel,
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert — binary content returned directly, no IDocumentRenderer invoked
         result.Format.ShouldBe(DocumentFormat.Excel);

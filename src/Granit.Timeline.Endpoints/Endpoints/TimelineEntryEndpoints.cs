@@ -33,27 +33,27 @@ internal static class TimelineEntryEndpoints
         ITimelineWriter writer,
         ITimelineFollowerService followerService,
         ITimelineNotifier notifier,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         TimelineEntry entry = await writer.PostEntryAsync(
             entityType, entityId, request.EntryType, request.Body,
-            request.ParentEntryId, ct).ConfigureAwait(false);
+            request.ParentEntryId, cancellationToken).ConfigureAwait(false);
 
         // Parse @mentions and auto-subscribe mentioned users
         IReadOnlyList<string> mentionedUserIds = MentionParser.ExtractMentionedUserIds(entry.Body);
         foreach (string userId in mentionedUserIds)
         {
-            await followerService.FollowAsync(userId, entityType, entityId, ct).ConfigureAwait(false);
+            await followerService.FollowAsync(userId, entityType, entityId, cancellationToken).ConfigureAwait(false);
         }
 
         // Notify followers
-        IReadOnlyList<string> followerIds = await followerService.GetFollowerIdsAsync(entityType, entityId, ct).ConfigureAwait(false);
-        await notifier.NotifyEntryPostedAsync(entry, followerIds, ct).ConfigureAwait(false);
+        IReadOnlyList<string> followerIds = await followerService.GetFollowerIdsAsync(entityType, entityId, cancellationToken).ConfigureAwait(false);
+        await notifier.NotifyEntryPostedAsync(entry, followerIds, cancellationToken).ConfigureAwait(false);
 
         // Notify mentioned users separately (may include extra channels like email)
         if (mentionedUserIds.Count > 0)
         {
-            await notifier.NotifyMentionedUsersAsync(entry, mentionedUserIds, ct).ConfigureAwait(false);
+            await notifier.NotifyMentionedUsersAsync(entry, mentionedUserIds, cancellationToken).ConfigureAwait(false);
         }
 
         TimelineStreamEntry result = new()
@@ -82,12 +82,12 @@ internal static class TimelineEntryEndpoints
         string entityId,
         Guid entryId,
         ITimelineWriter writer,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
 #pragma warning restore S1172
     {
         try
         {
-            await writer.DeleteEntryAsync(entryId, ct).ConfigureAwait(false);
+            await writer.DeleteEntryAsync(entryId, cancellationToken).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
         catch (KeyNotFoundException)

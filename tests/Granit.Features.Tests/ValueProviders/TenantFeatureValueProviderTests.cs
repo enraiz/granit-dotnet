@@ -31,18 +31,18 @@ public sealed class TenantFeatureValueProviderTests
 
     private static ICurrentTenant NoTenant()
     {
-        ICurrentTenant ct = Substitute.For<ICurrentTenant>();
-        ct.IsAvailable.Returns(false);
-        ct.Id.Returns((Guid?)null);
-        return ct;
+        ICurrentTenant cancellationToken = Substitute.For<ICurrentTenant>();
+        cancellationToken.IsAvailable.Returns(false);
+        cancellationToken.Id.Returns((Guid?)null);
+        return cancellationToken;
     }
 
     private static ICurrentTenant WithTenant(Guid tenantId)
     {
-        ICurrentTenant ct = Substitute.For<ICurrentTenant>();
-        ct.IsAvailable.Returns(true);
-        ct.Id.Returns(tenantId);
-        return ct;
+        ICurrentTenant cancellationToken = Substitute.For<ICurrentTenant>();
+        cancellationToken.IsAvailable.Returns(true);
+        cancellationToken.Id.Returns(tenantId);
+        return cancellationToken;
     }
 
     // -------------------------------------------------------------------------

@@ -11,7 +11,7 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
     private static string BuildKey(string userId, string typeName, Guid? tenantId, string? entityType = null, string? entityId = null) =>
         $"{tenantId}:{userId}:{typeName}:{entityType}:{entityId}";
 
-    public Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken ct = default)
+    public Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, notificationTypeName, tenantId);
         _subscriptions.TryAdd(key, new NotificationSubscription
@@ -25,14 +25,14 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         return Task.CompletedTask;
     }
 
-    public Task UnsubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken ct = default)
+    public Task UnsubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, notificationTypeName, tenantId);
         _subscriptions.TryRemove(key, out _);
         return Task.CompletedTask;
     }
 
-    public Task<IReadOnlyList<string>> GetSubscriberIdsAsync(string notificationTypeName, Guid? tenantId, CancellationToken ct = default)
+    public Task<IReadOnlyList<string>> GetSubscriberIdsAsync(string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<string> result = _subscriptions.Values
             .Where(s => s.NotificationTypeName == notificationTypeName && s.TenantId == tenantId && s.EntityType is null)
@@ -42,7 +42,7 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         return Task.FromResult(result);
     }
 
-    public Task<IReadOnlyList<NotificationSubscription>> GetUserSubscriptionsAsync(string userId, Guid? tenantId, CancellationToken ct = default)
+    public Task<IReadOnlyList<NotificationSubscription>> GetUserSubscriptionsAsync(string userId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<NotificationSubscription> result = _subscriptions.Values
             .Where(s => s.UserId == userId && s.TenantId == tenantId)
@@ -50,7 +50,7 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         return Task.FromResult(result);
     }
 
-    public Task FollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public Task FollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, string.Empty, tenantId, entityType, entityId);
         _subscriptions.TryAdd(key, new NotificationSubscription
@@ -66,14 +66,14 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         return Task.CompletedTask;
     }
 
-    public Task UnfollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public Task UnfollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, string.Empty, tenantId, entityType, entityId);
         _subscriptions.TryRemove(key, out _);
         return Task.CompletedTask;
     }
 
-    public Task<IReadOnlyList<string>> GetEntityFollowerIdsAsync(string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public Task<IReadOnlyList<string>> GetEntityFollowerIdsAsync(string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<string> result = _subscriptions.Values
             .Where(s => s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId)
@@ -83,7 +83,7 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         return Task.FromResult(result);
     }
 
-    public Task<IReadOnlyList<NotificationSubscription>> GetEntityFollowersAsync(string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public Task<IReadOnlyList<NotificationSubscription>> GetEntityFollowersAsync(string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<NotificationSubscription> result = _subscriptions.Values
             .Where(s => s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId)
@@ -91,7 +91,7 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         return Task.FromResult(result);
     }
 
-    public Task<bool> IsFollowingEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public Task<bool> IsFollowingEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, string.Empty, tenantId, entityType, entityId);
         return Task.FromResult(_subscriptions.ContainsKey(key));

@@ -21,6 +21,6 @@ public interface IExportCommandDispatcher
     /// Dispatches an export execution command for background processing.
     /// </summary>
     /// <param name="command">The command to dispatch.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task DispatchAsync(ExecuteExportCommand command, CancellationToken ct = default);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task DispatchAsync(ExecuteExportCommand command, CancellationToken cancellationToken = default);
 }

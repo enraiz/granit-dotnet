@@ -26,10 +26,10 @@ public interface ISemanticMappingService
     /// </summary>
     /// <param name="headers">Column headers from the imported file (no row data).</param>
     /// <param name="targetFields">Schema metadata for the target entity (no business data).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of semantic mapping suggestions ordered by confidence score.</returns>
     Task<IReadOnlyList<SemanticMappingSuggestion>> SuggestSemanticMappingsAsync(
         IReadOnlyList<string> headers,
         IReadOnlyList<ImportFieldMetadata> targetFields,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

@@ -9,16 +9,16 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
 {
     private readonly ConcurrentDictionary<Guid, UserNotification> _notifications = new();
 
-    public Task InsertAsync(UserNotification notification, CancellationToken ct = default)
+    public Task InsertAsync(UserNotification notification, CancellationToken cancellationToken = default)
     {
         _notifications[notification.Id] = notification;
         return Task.CompletedTask;
     }
 
-    public Task<UserNotification?> GetAsync(Guid id, CancellationToken ct = default) =>
+    public Task<UserNotification?> GetAsync(Guid id, CancellationToken cancellationToken = default) =>
         Task.FromResult(_notifications.GetValueOrDefault(id));
 
-    public Task<PagedResult<UserNotification>> GetListAsync(string recipientUserId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken ct = default)
+    public Task<PagedResult<UserNotification>> GetListAsync(string recipientUserId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken cancellationToken = default)
     {
         int clampedPage = Math.Max(page, 1);
         int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
@@ -37,14 +37,14 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
         return Task.FromResult(new PagedResult<UserNotification>(items, totalCount));
     }
 
-    public Task<int> GetUnreadCountAsync(string recipientUserId, Guid? tenantId, CancellationToken ct = default)
+    public Task<int> GetUnreadCountAsync(string recipientUserId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         int count = _notifications.Values
             .Count(n => n.RecipientUserId == recipientUserId && n.TenantId == tenantId && n.State == UserNotificationState.Unread);
         return Task.FromResult(count);
     }
 
-    public Task MarkAsReadAsync(Guid id, DateTimeOffset readAt, CancellationToken ct = default)
+    public Task MarkAsReadAsync(Guid id, DateTimeOffset readAt, CancellationToken cancellationToken = default)
     {
         if (_notifications.TryGetValue(id, out UserNotification? notification))
         {
@@ -54,7 +54,7 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
         return Task.CompletedTask;
     }
 
-    public Task MarkAllAsReadAsync(string recipientUserId, Guid? tenantId, DateTimeOffset readAt, CancellationToken ct = default)
+    public Task MarkAllAsReadAsync(string recipientUserId, Guid? tenantId, DateTimeOffset readAt, CancellationToken cancellationToken = default)
     {
         foreach (UserNotification notification in _notifications.Values
             .Where(n => n.RecipientUserId == recipientUserId && n.TenantId == tenantId && n.State == UserNotificationState.Unread))
@@ -65,7 +65,7 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
         return Task.CompletedTask;
     }
 
-    public Task<PagedResult<UserNotification>> GetByEntityAsync(string entityType, string entityId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken ct = default)
+    public Task<PagedResult<UserNotification>> GetByEntityAsync(string entityType, string entityId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken cancellationToken = default)
     {
         int clampedPage = Math.Max(page, 1);
         int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);

@@ -21,7 +21,7 @@ namespace Granit.Templating.Enrichment;
 ///     public int Order => 10;
 ///
 ///     public Task&lt;InvoiceDocumentData&gt; EnrichAsync(
-///         InvoiceDocumentData data, CancellationToken ct = default)
+///         InvoiceDocumentData data, CancellationToken cancellationToken = default)
 ///     {
 ///         using QRCodeGenerator generator = new();
 ///         QRCodeData qrData = generator.CreateQrCode(data.PaymentUrl, QRCodeGenerator.ECCLevel.M);
@@ -44,10 +44,10 @@ public interface ITemplateDataEnricher<TData> where TData : notnull
     /// Returns an enriched copy of <paramref name="data"/>.
     /// </summary>
     /// <param name="data">The data model to enrich. Never mutate this instance.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A new <typeparamref name="TData"/> instance with the enriched fields populated.
     /// Return the original <paramref name="data"/> unchanged when no enrichment is needed.
     /// </returns>
-    Task<TData> EnrichAsync(TData data, CancellationToken ct = default);
+    Task<TData> EnrichAsync(TData data, CancellationToken cancellationToken = default);
 }

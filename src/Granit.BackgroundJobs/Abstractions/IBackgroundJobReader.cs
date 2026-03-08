@@ -6,10 +6,10 @@ namespace Granit.BackgroundJobs;
 public interface IBackgroundJobReader
 {
     /// <summary>Returns the current status of all registered recurring jobs.</summary>
-    Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the status of a specific job, or <c>null</c> if not found.
     /// </summary>
-    Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken ct = default);
+    Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken cancellationToken = default);
 }

@@ -18,7 +18,7 @@ public sealed class EfCoreFeatureStoreTests
                 .UseInMemoryDatabase(dbName)
                 .Options);
 
-        public Task<GranitFeaturesDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+        public Task<GranitFeaturesDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(CreateDbContext());
     }
 
@@ -30,7 +30,7 @@ public sealed class EfCoreFeatureStoreTests
         Guid tenantId,
         string featureName,
         string value,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         InMemoryContextFactory factory = new(dbName);
         await using GranitFeaturesDbContext ctx = factory.CreateDbContext();
@@ -43,7 +43,7 @@ public sealed class EfCoreFeatureStoreTests
             CreatedAt = DateTimeOffset.UtcNow,
             CreatedBy = "seed",
         });
-        await ctx.SaveChangesAsync(ct);
+        await ctx.SaveChangesAsync(cancellationToken);
     }
 
     // -------------------------------------------------------------------------

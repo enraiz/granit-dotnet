@@ -29,7 +29,7 @@ internal sealed class InMemoryTimelineStore(
         TimelineEntryType entryType,
         string body,
         Guid? parentEntryId = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         TimelineEntry entry = TimelineEntityFactory.CreateEntry(
             entityType, entityId, entryType, body, parentEntryId, _audit);
@@ -40,7 +40,7 @@ internal sealed class InMemoryTimelineStore(
     }
 
     /// <inheritdoc/>
-    public Task DeleteEntryAsync(Guid entryId, CancellationToken ct = default)
+    public Task DeleteEntryAsync(Guid entryId, CancellationToken cancellationToken = default)
     {
         if (!Entries.TryGetValue(entryId, out TimelineEntry? entry))
         {
@@ -58,7 +58,7 @@ internal sealed class InMemoryTimelineStore(
         string fileName,
         string contentType,
         long sizeBytes,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (!Entries.ContainsKey(entryId))
         {

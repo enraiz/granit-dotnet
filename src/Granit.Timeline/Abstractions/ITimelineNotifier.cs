@@ -12,11 +12,11 @@ public interface ITimelineNotifier
     Task NotifyEntryPostedAsync(
         TimelineEntry entry,
         IReadOnlyList<string> followerUserIds,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>Notifies mentioned users and auto-subscribes them.</summary>
     Task NotifyMentionedUsersAsync(
         TimelineEntry entry,
         IReadOnlyList<string> mentionedUserIds,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

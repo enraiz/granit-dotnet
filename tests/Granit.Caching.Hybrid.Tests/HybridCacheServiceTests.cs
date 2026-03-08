@@ -128,7 +128,7 @@ public sealed class HybridCacheServiceTests
                 factoryCalled = true;
                 return Task.FromResult(new TestCacheItem { Value = "created" });
             },
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         factoryCalled.ShouldBeTrue();
         result.Value.ShouldBe("created");
@@ -143,7 +143,7 @@ public sealed class HybridCacheServiceTests
         // Warm up cache
         await service.GetOrAddAsync("key",
             _ => Task.FromResult(new TestCacheItem { Value = "first" }),
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         int factoryCallCount = 0;
         TestCacheItem result = await service.GetOrAddAsync("key",
@@ -152,7 +152,7 @@ public sealed class HybridCacheServiceTests
                 factoryCallCount++;
                 return Task.FromResult(new TestCacheItem { Value = "second" });
             },
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Factory should NOT be called on cache hit
         factoryCallCount.ShouldBe(0);
@@ -224,7 +224,7 @@ public sealed class HybridCacheServiceTests
         HybridCacheService<TestCacheItem> service = BuildService(cache);
 
         await service.SetAsync("key", new TestCacheItem { Value = "stored" },
-            ct: TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         cache.SetKeys.ShouldHaveSingleItem().ShouldContain("key");
     }

@@ -16,7 +16,7 @@ internal sealed class WolverineMigrationBatchDispatcher(
     IServiceScopeFactory scopeFactory) : IMigrationBatchDispatcher
 {
     /// <inheritdoc/>
-    public async Task DispatchAsync(RunMigrationBatchCommand command, CancellationToken ct = default)
+    public async Task DispatchAsync(RunMigrationBatchCommand command, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
@@ -24,7 +24,7 @@ internal sealed class WolverineMigrationBatchDispatcher(
     }
 
     /// <inheritdoc/>
-    public async Task DispatchAsync(IEnumerable<RunMigrationBatchCommand> commands, CancellationToken ct = default)
+    public async Task DispatchAsync(IEnumerable<RunMigrationBatchCommand> commands, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();

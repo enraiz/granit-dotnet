@@ -70,7 +70,7 @@ public sealed class ServiceCollectionExtensionsTests
         public bool CanRender(DocumentFormat targetFormat) => targetFormat == DocumentFormat.Html;
 
         public Task<DocumentResult> RenderAsync(
-            string html, DocumentFormat targetFormat, CancellationToken ct = default) =>
+            string html, DocumentFormat targetFormat, CancellationToken cancellationToken = default) =>
             Task.FromResult(new DocumentResult(ReadOnlyMemory<byte>.Empty, targetFormat));
     }
 
@@ -79,7 +79,7 @@ public sealed class ServiceCollectionExtensionsTests
         public bool CanRender(DocumentFormat targetFormat) => targetFormat == DocumentFormat.Pdf;
 
         public Task<DocumentResult> RenderAsync(
-            string html, DocumentFormat targetFormat, CancellationToken ct = default) =>
+            string html, DocumentFormat targetFormat, CancellationToken cancellationToken = default) =>
             Task.FromResult(new DocumentResult(ReadOnlyMemory<byte>.Empty, targetFormat));
     }
 }

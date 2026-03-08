@@ -105,7 +105,7 @@ public static class DischargePatientHandler
     public static async Task Handle(
         DischargePatientCommand cmd,
         IPermissionChecker permissionChecker,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         bool canDischarge = await permissionChecker.IsGrantedAsync("Patients.Discharge", ct);
         if (!canDischarge)

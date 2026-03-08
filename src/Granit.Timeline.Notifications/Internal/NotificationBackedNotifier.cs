@@ -16,7 +16,7 @@ internal sealed class NotificationBackedNotifier(
     public async Task NotifyEntryPostedAsync(
         TimelineEntry entry,
         IReadOnlyList<string> followerUserIds,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (followerUserIds.Count == 0)
         {
@@ -48,14 +48,14 @@ internal sealed class NotificationBackedNotifier(
             data,
             recipients,
             relatedEntity,
-            ct).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public async Task NotifyMentionedUsersAsync(
         TimelineEntry entry,
         IReadOnlyList<string> mentionedUserIds,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (mentionedUserIds.Count == 0)
         {
@@ -87,6 +87,6 @@ internal sealed class NotificationBackedNotifier(
             data,
             recipients,
             relatedEntity,
-            ct).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
     }
 }

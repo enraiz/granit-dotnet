@@ -15,6 +15,6 @@ internal sealed class InMemoryDataExchangeContextFactory(string dbName)
             .UseInMemoryDatabase(dbName)
             .Options);
 
-    public Task<DataExchangeDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+    public Task<DataExchangeDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(CreateDbContext());
 }

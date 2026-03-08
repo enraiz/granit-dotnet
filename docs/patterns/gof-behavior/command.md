@@ -58,7 +58,7 @@ public static class SendInvoiceEmailHandler
     public static async Task Handle(
         SendInvoiceEmailCommand command,
         IEmailService emailService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         await emailService.SendInvoiceAsync(command.InvoiceId, command.RecipientEmail, ct);
     }

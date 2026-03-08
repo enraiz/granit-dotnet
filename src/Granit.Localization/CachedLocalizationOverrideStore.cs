@@ -38,7 +38,7 @@ internal sealed class CachedLocalizationOverrideStore(
 
     /// <inheritdoc />
     public Task<IReadOnlyDictionary<string, string>> GetOverridesAsync(
-        string resourceName, string culture, CancellationToken ct = default)
+        string resourceName, string culture, CancellationToken cancellationToken = default)
     {
         string cacheKey = BuildCacheKey(resourceName, culture);
 
@@ -47,35 +47,35 @@ internal sealed class CachedLocalizationOverrideStore(
             return Task.FromResult(cached);
         }
 
-        return LoadAndCacheAsync(cacheKey, resourceName, culture, ct);
+        return LoadAndCacheAsync(cacheKey, resourceName, culture, cancellationToken);
     }
 
     /// <inheritdoc />
     public async Task SetOverrideAsync(
-        string resourceName, string culture, string key, string value, CancellationToken ct = default)
+        string resourceName, string culture, string key, string value, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         ILocalizationOverrideStoreWriter inner =
             scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStoreWriter>(RawStoreKey);
 
-        await inner.SetOverrideAsync(resourceName, culture, key, value, ct).ConfigureAwait(false);
+        await inner.SetOverrideAsync(resourceName, culture, key, value, cancellationToken).ConfigureAwait(false);
         memoryCache.Remove(BuildCacheKey(resourceName, culture));
     }
 
     /// <inheritdoc />
     public async Task RemoveOverrideAsync(
-        string resourceName, string culture, string key, CancellationToken ct = default)
+        string resourceName, string culture, string key, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         ILocalizationOverrideStoreWriter inner =
             scope.ServiceProvider.GetRequiredKeyedService<ILocalizationOverrideStoreWriter>(RawStoreKey);
 
-        await inner.RemoveOverrideAsync(resourceName, culture, key, ct).ConfigureAwait(false);
+        await inner.RemoveOverrideAsync(resourceName, culture, key, cancellationToken).ConfigureAwait(false);
         memoryCache.Remove(BuildCacheKey(resourceName, culture));
     }
 
     private async Task<IReadOnlyDictionary<string, string>> LoadAndCacheAsync(
-        string cacheKey, string resourceName, string culture, CancellationToken ct)
+        string cacheKey, string resourceName, string culture, CancellationToken cancellationToken)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         ILocalizationOverrideStoreReader? inner =
@@ -84,7 +84,7 @@ internal sealed class CachedLocalizationOverrideStore(
         // No raw store registered (EF Core package not installed): fall back to empty overrides
         // so the localizer resolves translations from embedded JSON files transparently.
         IReadOnlyDictionary<string, string> overrides = inner is not null
-            ? await inner.GetOverridesAsync(resourceName, culture, ct).ConfigureAwait(false)
+            ? await inner.GetOverridesAsync(resourceName, culture, cancellationToken).ConfigureAwait(false)
             : new Dictionary<string, string>(StringComparer.Ordinal);
 
         MemoryCacheEntryOptions entryOptions = new MemoryCacheEntryOptions()

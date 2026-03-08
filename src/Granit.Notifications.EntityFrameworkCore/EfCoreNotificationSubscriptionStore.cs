@@ -11,10 +11,10 @@ namespace Granit.Notifications.EntityFrameworkCore;
 internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationSubscriptionReader, INotificationSubscriptionWriter
 {
     /// <inheritdoc/>
-    public async Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken ct = default)
+    public async Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        bool exists = await db.Subscriptions.AnyAsync(s => s.UserId == userId && s.NotificationTypeName == notificationTypeName && s.TenantId == tenantId && s.EntityType == null, ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        bool exists = await db.Subscriptions.AnyAsync(s => s.UserId == userId && s.NotificationTypeName == notificationTypeName && s.TenantId == tenantId && s.EntityType == null, cancellationToken).ConfigureAwait(false);
         if (!exists)
         {
             db.Subscriptions.Add(new NotificationSubscription
@@ -24,44 +24,44 @@ internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<Noti
                 NotificationTypeName = notificationTypeName,
                 TenantId = tenantId,
             });
-            await db.SaveChangesAsync(ct).ConfigureAwait(false);
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc/>
-    public async Task UnsubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken ct = default)
+    public async Task UnsubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         await db.Subscriptions
             .Where(s => s.UserId == userId && s.NotificationTypeName == notificationTypeName && s.TenantId == tenantId && s.EntityType == null)
-            .ExecuteDeleteAsync(ct).ConfigureAwait(false);
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<string>> GetSubscriberIdsAsync(string notificationTypeName, Guid? tenantId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<string>> GetSubscriberIdsAsync(string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await db.Subscriptions
             .Where(s => s.NotificationTypeName == notificationTypeName && s.TenantId == tenantId && s.EntityType == null)
             .Select(s => s.UserId)
             .Distinct()
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<NotificationSubscription>> GetUserSubscriptionsAsync(string userId, Guid? tenantId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<NotificationSubscription>> GetUserSubscriptionsAsync(string userId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await db.Subscriptions
             .Where(s => s.UserId == userId && s.TenantId == tenantId)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task FollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public async Task FollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        bool exists = await db.Subscriptions.AnyAsync(s => s.UserId == userId && s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId, ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        bool exists = await db.Subscriptions.AnyAsync(s => s.UserId == userId && s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
         if (!exists)
         {
             db.Subscriptions.Add(new NotificationSubscription
@@ -73,44 +73,44 @@ internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<Noti
                 EntityId = entityId,
                 TenantId = tenantId,
             });
-            await db.SaveChangesAsync(ct).ConfigureAwait(false);
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc/>
-    public async Task UnfollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public async Task UnfollowEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         await db.Subscriptions
             .Where(s => s.UserId == userId && s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId)
-            .ExecuteDeleteAsync(ct).ConfigureAwait(false);
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<string>> GetEntityFollowerIdsAsync(string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<string>> GetEntityFollowerIdsAsync(string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await db.Subscriptions
             .Where(s => s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId)
             .Select(s => s.UserId)
             .Distinct()
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<NotificationSubscription>> GetEntityFollowersAsync(string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<NotificationSubscription>> GetEntityFollowersAsync(string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await db.Subscriptions
             .Where(s => s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsFollowingEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken ct = default)
+    public async Task<bool> IsFollowingEntityAsync(string userId, string entityType, string entityId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         return await db.Subscriptions
-            .AnyAsync(s => s.UserId == userId && s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId, ct).ConfigureAwait(false);
+            .AnyAsync(s => s.UserId == userId && s.EntityType == entityType && s.EntityId == entityId && s.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
     }
 }

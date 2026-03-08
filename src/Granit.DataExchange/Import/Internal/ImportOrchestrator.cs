@@ -15,13 +15,13 @@ namespace Granit.DataExchange.Import.Internal;
 internal sealed class ImportOrchestrator : IImportOrchestrator
 {
     /// <inheritdoc/>
-    public Task<ImportReport> ExecuteAsync(Guid importJobId, CancellationToken ct = default) =>
+    public Task<ImportReport> ExecuteAsync(Guid importJobId, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(
             "Import orchestration requires Granit.DataExchange.EntityFrameworkCore. " +
             "Register a concrete IImportOrchestrator implementation.");
 
     /// <inheritdoc/>
-    public Task<ImportReport> DryRunAsync(Guid importJobId, CancellationToken ct = default) =>
+    public Task<ImportReport> DryRunAsync(Guid importJobId, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(
             "Import orchestration requires Granit.DataExchange.EntityFrameworkCore. " +
             "Register a concrete IImportOrchestrator implementation.");

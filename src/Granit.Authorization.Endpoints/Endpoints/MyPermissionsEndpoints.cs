@@ -28,14 +28,14 @@ internal static class MyPermissionsEndpoints
     private static async Task<Ok<MyPermissionsResponse>> GetMyPermissionsAsync(
         IPermissionDefinitionManager definitionManager,
         IPermissionChecker permissionChecker,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         IReadOnlyList<PermissionDefinition> allPermissions = definitionManager.GetAll();
         List<string> granted = [];
 
         foreach (string permissionName in allPermissions.Select(permission => permission.Name))
         {
-            if (await permissionChecker.IsGrantedAsync(permissionName, ct).ConfigureAwait(false))
+            if (await permissionChecker.IsGrantedAsync(permissionName, cancellationToken).ConfigureAwait(false))
             {
                 granted.Add(permissionName);
             }

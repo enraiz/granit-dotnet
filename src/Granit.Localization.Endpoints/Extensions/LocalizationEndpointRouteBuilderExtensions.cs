@@ -176,7 +176,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         HttpContext context,
         string? resourceName,
         string? cultureName,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ILocalizationOverrideStoreReader? storeReader =
             context.RequestServices.GetService<ILocalizationOverrideStoreReader>();
@@ -202,7 +202,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         }
 
         IReadOnlyDictionary<string, string> overrides =
-            await storeReader.GetOverridesAsync(resourceName, cultureName, ct).ConfigureAwait(false);
+            await storeReader.GetOverridesAsync(resourceName, cultureName, cancellationToken).ConfigureAwait(false);
 
         return Results.Ok(overrides);
     }
@@ -213,7 +213,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         string cultureName,
         string key,
         SetLocalizationOverrideRequest body,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ILocalizationOverrideStoreWriter? storeWriter =
             context.RequestServices.GetService<ILocalizationOverrideStoreWriter>();
@@ -246,7 +246,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        await storeWriter.SetOverrideAsync(resourceName, cultureName, key, body.Value, ct).ConfigureAwait(false);
+        await storeWriter.SetOverrideAsync(resourceName, cultureName, key, body.Value, cancellationToken).ConfigureAwait(false);
         return Results.NoContent();
     }
 
@@ -255,7 +255,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         string resourceName,
         string cultureName,
         string key,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ILocalizationOverrideStoreWriter? storeWriter =
             context.RequestServices.GetService<ILocalizationOverrideStoreWriter>();
@@ -274,7 +274,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
             return error;
         }
 
-        await storeWriter.RemoveOverrideAsync(resourceName, cultureName, key, ct).ConfigureAwait(false);
+        await storeWriter.RemoveOverrideAsync(resourceName, cultureName, key, cancellationToken).ConfigureAwait(false);
         return Results.NoContent();
     }
 

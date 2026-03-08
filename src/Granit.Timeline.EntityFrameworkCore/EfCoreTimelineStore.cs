@@ -32,30 +32,30 @@ internal sealed class EfCoreTimelineStore(
         TimelineEntryType entryType,
         string body,
         Guid? parentEntryId = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         TimelineEntry entry = TimelineEntityFactory.CreateEntry(
             entityType, entityId, entryType, body, parentEntryId, _audit);
         entry.RaisePostedEvent();
 
-        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         db.TimelineEntries.Add(entry);
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return entry;
     }
 
     /// <inheritdoc/>
-    public async Task DeleteEntryAsync(Guid entryId, CancellationToken ct = default)
+    public async Task DeleteEntryAsync(Guid entryId, CancellationToken cancellationToken = default)
     {
-        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         TimelineEntry entry = await db.TimelineEntries
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(e => e.Id == entryId, ct).ConfigureAwait(false)
+            .FirstOrDefaultAsync(e => e.Id == entryId, cancellationToken).ConfigureAwait(false)
             ?? throw new KeyNotFoundException($"Timeline entry '{entryId}' not found.");
 
         entry.SoftDelete(clock.Now, currentUser.UserId);
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -65,13 +65,13 @@ internal sealed class EfCoreTimelineStore(
         string fileName,
         string contentType,
         long sizeBytes,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         bool entryExists = await db.TimelineEntries
             .IgnoreQueryFilters()
-            .AnyAsync(e => e.Id == entryId, ct).ConfigureAwait(false);
+            .AnyAsync(e => e.Id == entryId, cancellationToken).ConfigureAwait(false);
 
         if (!entryExists)
         {
@@ -82,7 +82,7 @@ internal sealed class EfCoreTimelineStore(
             entryId, blobId, fileName, contentType, sizeBytes, _audit);
 
         db.TimelineAttachments.Add(attachment);
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return attachment;
     }

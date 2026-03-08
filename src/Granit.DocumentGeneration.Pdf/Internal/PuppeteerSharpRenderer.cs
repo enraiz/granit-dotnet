@@ -24,11 +24,11 @@ internal sealed class PuppeteerSharpRenderer(
     public async Task<DocumentResult> RenderAsync(
         string html,
         DocumentFormat targetFormat,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         PdfRenderOptions opts = options.Value;
 
-        await chromiumLifetime.PageSemaphore.WaitAsync(ct).ConfigureAwait(false);
+        await chromiumLifetime.PageSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             await using IPage page = await chromiumLifetime.Browser.NewPageAsync().ConfigureAwait(false);

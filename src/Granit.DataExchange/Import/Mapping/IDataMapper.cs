@@ -15,11 +15,11 @@ public interface IDataMapper<TEntity> where TEntity : class
     /// <param name="row">The raw import row with string values.</param>
     /// <param name="mappings">The confirmed column-to-property mappings.</param>
     /// <param name="options">Import options (date format, culture, etc.).</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A mapping result containing the entity or conversion errors.</returns>
     Task<MappingResult<TEntity>> MapAsync(
         RawImportRow row,
         IReadOnlyList<ImportColumnMapping> mappings,
         ImportOptions options,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

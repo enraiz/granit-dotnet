@@ -20,7 +20,7 @@ internal sealed class MappingSuggestionService(
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ImportColumnMapping>> SuggestMappingsAsync<TEntity>(
         IReadOnlyList<string> headers,
-        CancellationToken ct = default) where TEntity : class
+        CancellationToken cancellationToken = default) where TEntity : class
     {
         ImportDefinition<TEntity> definition = serviceProvider.GetRequiredService<ImportDefinition<TEntity>>();
         IReadOnlyList<PropertyMapping> properties = definition.GetProperties();
@@ -32,7 +32,7 @@ internal sealed class MappingSuggestionService(
         IMappingReader? mappingReader = serviceProvider.GetService<IMappingReader>();
         if (mappingReader is not null)
         {
-            IReadOnlyList<ImportColumnMapping> saved = await mappingReader.LoadAsync(definition.Name, ct).ConfigureAwait(false);
+            IReadOnlyList<ImportColumnMapping> saved = await mappingReader.LoadAsync(definition.Name, cancellationToken).ConfigureAwait(false);
             ApplySuggestions(suggestions, matchedTargets, headers, saved);
         }
 
@@ -51,7 +51,7 @@ internal sealed class MappingSuggestionService(
         {
             IReadOnlyList<ImportFieldMetadata> targetFields = definition.GetFieldMetadata();
             IReadOnlyList<SemanticMappingSuggestion> semanticSuggestions =
-                await semanticMappingService.SuggestSemanticMappingsAsync(unmappedHeaders, targetFields, ct).ConfigureAwait(false);
+                await semanticMappingService.SuggestSemanticMappingsAsync(unmappedHeaders, targetFields, cancellationToken).ConfigureAwait(false);
 
             foreach (SemanticMappingSuggestion suggestion in semanticSuggestions
                 .Where(s => !suggestions.ContainsKey(s.SourceColumn) &&

@@ -7,5 +7,5 @@ namespace Granit.Notifications.Sms;
 public interface ISmsSender
 {
     /// <summary>Sends an SMS message.</summary>
-    Task SendAsync(SmsMessage message, CancellationToken ct = default);
+    Task SendAsync(SmsMessage message, CancellationToken cancellationToken = default);
 }

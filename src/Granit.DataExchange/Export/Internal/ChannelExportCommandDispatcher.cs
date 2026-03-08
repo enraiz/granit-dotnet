@@ -15,6 +15,6 @@ internal sealed class ChannelExportCommandDispatcher(
     Channel<ExecuteExportCommand> channel) : IExportCommandDispatcher
 {
     /// <inheritdoc/>
-    public async Task DispatchAsync(ExecuteExportCommand command, CancellationToken ct = default) =>
-        await channel.Writer.WriteAsync(command, ct).ConfigureAwait(false);
+    public async Task DispatchAsync(ExecuteExportCommand command, CancellationToken cancellationToken = default) =>
+        await channel.Writer.WriteAsync(command, cancellationToken).ConfigureAwait(false);
 }

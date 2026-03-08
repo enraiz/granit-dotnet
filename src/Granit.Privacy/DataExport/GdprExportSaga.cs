@@ -55,13 +55,13 @@ public sealed class GdprExportSaga : Saga
     /// Otherwise, schedules a timeout to handle unresponsive providers.
     /// </summary>
     public async Task<ExportCompletedEvent?> StartAsync(
-        PersonalDataRequestedEvent evt,
+        PersonalDataRequestedEvent @event,
         IDataProviderRegistry registry,
         IOptions<GranitPrivacyOptions> options,
         IMessageContext context)
     {
-        Id = evt.RequestId;
-        UserId = evt.UserId;
+        Id = @event.RequestId;
+        UserId = @event.UserId;
         ExpectedCount = registry.Count;
         PendingProviders = [.. registry.GetAll()];
 
@@ -72,7 +72,7 @@ public sealed class GdprExportSaga : Saga
         }
 
         await context.ScheduleAsync(
-            new ExportTimedOutEvent(evt.RequestId),
+            new ExportTimedOutEvent(@event.RequestId),
             TimeSpan.FromMinutes(options.Value.ExportTimeoutMinutes)).ConfigureAwait(false);
 
         return null;
@@ -82,10 +82,10 @@ public sealed class GdprExportSaga : Saga
     /// Handles a fragment prepared by a data provider.
     /// Completes the Saga if all expected fragments have been received.
     /// </summary>
-    public ExportCompletedEvent? Handle(PersonalDataPreparedEvent evt)
+    public ExportCompletedEvent? Handle(PersonalDataPreparedEvent @event)
     {
-        ReceivedFragments.Add(new ReceivedFragment(evt.ProviderName, evt.BlobReferenceId, evt.ContentType));
-        PendingProviders.Remove(evt.ProviderName);
+        ReceivedFragments.Add(new ReceivedFragment(@event.ProviderName, @event.BlobReferenceId, @event.ContentType));
+        PendingProviders.Remove(@event.ProviderName);
 
         if (ReceivedFragments.Count < ExpectedCount)
         {
@@ -100,7 +100,7 @@ public sealed class GdprExportSaga : Saga
     /// Handles the timeout event.
     /// Publishes a partial <see cref="ExportCompletedEvent"/> with whatever fragments arrived.
     /// </summary>
-    public ExportCompletedEvent Handle(ExportTimedOutEvent evt)
+    public ExportCompletedEvent Handle(ExportTimedOutEvent @event)
     {
         MarkCompleted();
         return new ExportCompletedEvent(

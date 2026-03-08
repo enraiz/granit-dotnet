@@ -9,19 +9,19 @@ namespace Granit.DataExchange.Import.Internal;
 internal sealed class NullImportFileProvider : IImportFileProvider
 {
     /// <inheritdoc/>
-    public Task<Stream> OpenAsync(string blobReference, CancellationToken ct = default) =>
+    public Task<Stream> OpenAsync(string blobReference, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(
             "No IImportFileProvider is registered. " +
             "The host application must register an implementation that retrieves files from blob storage.");
 
     /// <inheritdoc/>
-    public Task<string> SaveAsync(string fileName, Stream content, CancellationToken ct = default) =>
+    public Task<string> SaveAsync(string fileName, Stream content, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(
             "No IImportFileProvider is registered. " +
             "The host application must register an implementation that stores files to blob storage.");
 
     /// <inheritdoc/>
-    public Task DeleteAsync(string blobReference, CancellationToken ct = default) =>
+    public Task DeleteAsync(string blobReference, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException(
             "No IImportFileProvider is registered. " +
             "The host application must register an implementation that deletes files from blob storage.");

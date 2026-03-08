@@ -14,14 +14,14 @@ public interface ITimelineWriter
         TimelineEntryType entryType,
         string body,
         Guid? parentEntryId = null,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Soft-deletes a comment or internal note (RGPD right to erasure).
     /// Throws <see cref="InvalidOperationException"/> for <see cref="TimelineEntryType.SystemLog"/>
     /// entries because they are immutable (HDS audit trail).
     /// </summary>
-    Task DeleteEntryAsync(Guid entryId, CancellationToken ct = default);
+    Task DeleteEntryAsync(Guid entryId, CancellationToken cancellationToken = default);
 
     /// <summary>Adds an attachment reference to an existing timeline entry.</summary>
     Task<TimelineAttachment> AddAttachmentAsync(
@@ -30,5 +30,5 @@ public interface ITimelineWriter
         string fileName,
         string contentType,
         long sizeBytes,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

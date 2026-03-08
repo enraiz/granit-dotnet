@@ -29,7 +29,7 @@ namespace Granit.Core.Domain;
 /// </code>
 /// </example>
 /// </remarks>
-public abstract class ValueObject : IEquatable<ValueObject>
+public abstract class ValueObject : IEquatable<ValueObject>, IEqualityComparer<ValueObject>
 {
     /// <summary>
     /// Returns the components used for equality comparison.
@@ -63,6 +63,14 @@ public abstract class ValueObject : IEquatable<ValueObject>
 
         return hash.ToHashCode();
     }
+
+    /// <inheritdoc />
+    bool IEqualityComparer<ValueObject>.Equals(ValueObject? x, ValueObject? y) =>
+        Equals(x, y);
+
+    /// <inheritdoc />
+    int IEqualityComparer<ValueObject>.GetHashCode(ValueObject obj) =>
+        obj.GetHashCode();
 
     /// <summary>Equality operator.</summary>
     public static bool operator ==(ValueObject? left, ValueObject? right) =>

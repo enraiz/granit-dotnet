@@ -62,9 +62,9 @@ internal sealed class PermissionChecker(
         {
             PermissionGrantCacheItem result = await cache.GetOrAddAsync(
                 BuildCacheKey(tenantId, role, permissionName),
-                async ct => new PermissionGrantCacheItem
+                async cancellationToken => new PermissionGrantCacheItem
                 {
-                    IsGranted = await grantStore.IsGrantedAsync(role, permissionName, tenantId, ct)
+                    IsGranted = await grantStore.IsGrantedAsync(role, permissionName, tenantId, cancellationToken)
                 },
                 new DistributedCacheEntryOptions
                 {

@@ -23,7 +23,7 @@ public sealed class EfBackgroundJobStoreTests
             return new BackgroundJobsDbContext(options);
         }
 
-        public Task<BackgroundJobsDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+        public Task<BackgroundJobsDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(CreateDbContext());
     }
 
@@ -39,10 +39,10 @@ public sealed class EfBackgroundJobStoreTests
     private static async Task<EfBackgroundJobStore> SeedAsync(
         string dbName,
         string jobName = "test-job",
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         EfBackgroundJobStore store = CreateStore(dbName);
-        await store.SeedJobsAsync([MakeRegistration(jobName)], ct);
+        await store.SeedJobsAsync([MakeRegistration(jobName)], cancellationToken);
         return store;
     }
 
@@ -65,7 +65,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task FindAsync_KnownJob_ReturnsDefinition()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
 
         BackgroundJobDefinition? result = await store.FindAsync(
             "test-job", TestContext.Current.CancellationToken);
@@ -97,7 +97,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task SeedJobsAsync_ExistingJob_PreservesAdminStateAndUpdatesCron()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
         await store.SetEnabledAsync("test-job", false, TestContext.Current.CancellationToken);
 
         await store.SeedJobsAsync(
@@ -131,7 +131,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task SetEnabledAsync_ToFalse_PersistsValue()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
 
         await store.SetEnabledAsync("test-job", false, TestContext.Current.CancellationToken);
 
@@ -159,7 +159,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task RecordExecutionStartAsync_ResetsCountersAndSetsTimestamp()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
         await store.RecordExecutionFailureAsync(
             "test-job", "previous error", TestContext.Current.CancellationToken);
 
@@ -183,7 +183,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task RecordNextExecutionAsync_PersistsNextOccurrence()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
 
         DateTimeOffset next = new(2026, 2, 21, 8, 0, 0, TimeSpan.Zero);
         await store.RecordNextExecutionAsync(
@@ -202,7 +202,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task RecordExecutionFailureAsync_IncrementsCounterAndStoresMessage()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
         await store.RecordExecutionFailureAsync(
             "test-job", "first error", TestContext.Current.CancellationToken);
 
@@ -271,7 +271,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task SetTriggeredByAsync_PersistsOperatorId()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
 
         await store.SetTriggeredByAsync(
             "test-job", "operator-42", TestContext.Current.CancellationToken);
@@ -285,7 +285,7 @@ public sealed class EfBackgroundJobStoreTests
     public async Task SetTriggeredByAsync_Null_ClearsField()
     {
         string db = Guid.NewGuid().ToString();
-        EfBackgroundJobStore store = await SeedAsync(db, ct: TestContext.Current.CancellationToken);
+        EfBackgroundJobStore store = await SeedAsync(db, cancellationToken: TestContext.Current.CancellationToken);
         await store.SetTriggeredByAsync(
             "test-job", "operator-42", TestContext.Current.CancellationToken);
 

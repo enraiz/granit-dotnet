@@ -207,7 +207,7 @@ Le champ `AllowUserOptOut` contrôle si l'utilisateur peut désactiver la notifi
 ```csharp
 public sealed class OrderService(INotificationPublisher notifications)
 {
-    public async Task ShipOrderAsync(Order order, CancellationToken ct)
+    public async Task ShipOrderAsync(Order order, CancellationToken cancellationToken)
     {
         // ... logique métier ...
 

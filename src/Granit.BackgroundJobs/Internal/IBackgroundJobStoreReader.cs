@@ -6,11 +6,11 @@ namespace Granit.BackgroundJobs;
 public interface IBackgroundJobStoreReader
 {
     /// <summary>Returns a job by name, or <c>null</c> if not found.</summary>
-    Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default);
+    Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken cancellationToken = default);
 
     /// <summary>Returns all jobs with <see cref="BackgroundJobDefinition.IsEnabled"/> = <c>true</c>.</summary>
-    Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>Returns all jobs regardless of enabled state.</summary>
-    Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken cancellationToken = default);
 }

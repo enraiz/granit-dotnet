@@ -17,7 +17,7 @@ internal sealed class WolverineExportCommandDispatcher(
     IServiceScopeFactory scopeFactory) : IExportCommandDispatcher
 {
     /// <inheritdoc/>
-    public async Task DispatchAsync(ExecuteExportCommand command, CancellationToken ct = default)
+    public async Task DispatchAsync(ExecuteExportCommand command, CancellationToken cancellationToken = default)
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
         IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();

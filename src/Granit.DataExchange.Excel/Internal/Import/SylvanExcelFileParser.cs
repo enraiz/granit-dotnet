@@ -25,9 +25,9 @@ internal sealed class SylvanExcelFileParser : IFileParser
     public async Task<IReadOnlyList<string>> ExtractHeadersAsync(
         Stream stream,
         FileParsingOptions options,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct).ConfigureAwait(false);
+        using ExcelDataReader reader = await CreateReaderAsync(stream, options, cancellationToken).ConfigureAwait(false);
 
         List<string> headers = new(reader.FieldCount);
         for (int i = 0; i < reader.FieldCount; i++)
@@ -43,15 +43,15 @@ internal sealed class SylvanExcelFileParser : IFileParser
         Stream stream,
         FileParsingOptions options,
         int maxRows = 10,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct).ConfigureAwait(false);
+        using ExcelDataReader reader = await CreateReaderAsync(stream, options, cancellationToken).ConfigureAwait(false);
         int fieldCount = reader.FieldCount;
 
         List<string[]> rows = [];
         int count = 0;
 
-        while (count < maxRows && await reader.ReadAsync(ct).ConfigureAwait(false))
+        while (count < maxRows && await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
             int cellCount = Math.Min(fieldCount, reader.RowFieldCount);
             string[] values = new string[fieldCount];
@@ -77,9 +77,9 @@ internal sealed class SylvanExcelFileParser : IFileParser
     public async IAsyncEnumerable<RawImportRow> ParseAsync(
         Stream stream,
         FileParsingOptions options,
-        [EnumeratorCancellation] CancellationToken ct = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        using ExcelDataReader reader = await CreateReaderAsync(stream, options, ct).ConfigureAwait(false);
+        using ExcelDataReader reader = await CreateReaderAsync(stream, options, cancellationToken).ConfigureAwait(false);
 
         List<string> headers = new(reader.FieldCount);
         for (int i = 0; i < reader.FieldCount; i++)
@@ -89,7 +89,7 @@ internal sealed class SylvanExcelFileParser : IFileParser
 
         int rowNumber = 0;
 
-        while (await reader.ReadAsync(ct).ConfigureAwait(false))
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
             rowNumber++;
             int cellCount = Math.Min(headers.Count, reader.RowFieldCount);
@@ -113,11 +113,11 @@ internal sealed class SylvanExcelFileParser : IFileParser
     private static async Task<ExcelDataReader> CreateReaderAsync(
         Stream stream,
         FileParsingOptions options,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         ExcelWorkbookType workbookType = GetWorkbookType(options.MimeType);
         ExcelDataReaderOptions readerOptions = new() { OwnsStream = false };
-        ExcelDataReader reader = await ExcelDataReader.CreateAsync(stream, workbookType, readerOptions, ct).ConfigureAwait(false);
+        ExcelDataReader reader = await ExcelDataReader.CreateAsync(stream, workbookType, readerOptions, cancellationToken).ConfigureAwait(false);
 
         if (options.SheetName is not null)
         {

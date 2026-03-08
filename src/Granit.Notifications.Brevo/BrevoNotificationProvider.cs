@@ -26,7 +26,7 @@ internal sealed partial class BrevoNotificationProvider(
     };
 
     /// <inheritdoc />
-    async Task IEmailSender.SendAsync(EmailMessage message, CancellationToken ct)
+    async Task IEmailSender.SendAsync(EmailMessage message, CancellationToken cancellationToken)
     {
         BrevoOptions opts = options.CurrentValue;
         HttpClient client = httpClientFactory.CreateClient("Brevo");
@@ -45,14 +45,14 @@ internal sealed partial class BrevoNotificationProvider(
         };
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
-            "smtp/email", payload, JsonOptions, ct).ConfigureAwait(false);
-        await EnsureSuccessAsync("smtp/email", response, ct).ConfigureAwait(false);
+            "smtp/email", payload, JsonOptions, cancellationToken).ConfigureAwait(false);
+        await EnsureSuccessAsync("smtp/email", response, cancellationToken).ConfigureAwait(false);
 
         LogEmailSent(message.To);
     }
 
     /// <inheritdoc />
-    async Task ISmsSender.SendAsync(SmsMessage message, CancellationToken ct)
+    async Task ISmsSender.SendAsync(SmsMessage message, CancellationToken cancellationToken)
     {
         BrevoOptions opts = options.CurrentValue;
         HttpClient client = httpClientFactory.CreateClient("Brevo");
@@ -66,14 +66,14 @@ internal sealed partial class BrevoNotificationProvider(
         };
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
-            "transactionalSMS/sms", payload, JsonOptions, ct).ConfigureAwait(false);
-        await EnsureSuccessAsync("transactionalSMS/sms", response, ct).ConfigureAwait(false);
+            "transactionalSMS/sms", payload, JsonOptions, cancellationToken).ConfigureAwait(false);
+        await EnsureSuccessAsync("transactionalSMS/sms", response, cancellationToken).ConfigureAwait(false);
 
         LogSmsSent(message.To);
     }
 
     /// <inheritdoc />
-    async Task IWhatsAppSender.SendAsync(WhatsAppMessage message, CancellationToken ct)
+    async Task IWhatsAppSender.SendAsync(WhatsAppMessage message, CancellationToken cancellationToken)
     {
         HttpClient client = httpClientFactory.CreateClient("Brevo");
 
@@ -87,8 +87,8 @@ internal sealed partial class BrevoNotificationProvider(
         };
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
-            "whatsapp/sendTemplate", payload, JsonOptions, ct).ConfigureAwait(false);
-        await EnsureSuccessAsync("whatsapp/sendTemplate", response, ct).ConfigureAwait(false);
+            "whatsapp/sendTemplate", payload, JsonOptions, cancellationToken).ConfigureAwait(false);
+        await EnsureSuccessAsync("whatsapp/sendTemplate", response, cancellationToken).ConfigureAwait(false);
 
         LogWhatsAppSent(message.To, message.TemplateName);
     }
@@ -96,7 +96,7 @@ internal sealed partial class BrevoNotificationProvider(
     /// <summary>
     /// Reads the Brevo error body before throwing, so the caller (and logs) get a meaningful message.
     /// </summary>
-    private async Task EnsureSuccessAsync(string endpoint, HttpResponseMessage response, CancellationToken ct)
+    private async Task EnsureSuccessAsync(string endpoint, HttpResponseMessage response, CancellationToken cancellationToken)
     {
         if (response.IsSuccessStatusCode)
         {
@@ -106,7 +106,7 @@ internal sealed partial class BrevoNotificationProvider(
         string? errorBody = null;
         try
         {
-            errorBody = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            errorBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         }
         catch
         {

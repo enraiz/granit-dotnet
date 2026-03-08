@@ -14,7 +14,7 @@ internal sealed class InAppNotificationChannel(
 {
     public string Name => NotificationChannels.InApp;
 
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         UserNotification notification = new()
         {
@@ -31,6 +31,6 @@ internal sealed class InAppNotificationChannel(
             RelatedEntityId = context.RelatedEntity?.EntityId,
         };
 
-        await userNotificationWriter.InsertAsync(notification, ct).ConfigureAwait(false);
+        await userNotificationWriter.InsertAsync(notification, cancellationToken).ConfigureAwait(false);
     }
 }

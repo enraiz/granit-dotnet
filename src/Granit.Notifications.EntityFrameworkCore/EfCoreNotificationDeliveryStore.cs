@@ -14,10 +14,10 @@ namespace Granit.Notifications.EntityFrameworkCore;
 internal sealed class EfCoreNotificationDeliveryStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationDeliveryWriter
 {
     /// <inheritdoc/>
-    public async Task RecordAsync(NotificationDeliveryAttempt attempt, CancellationToken ct = default)
+    public async Task RecordAsync(NotificationDeliveryAttempt attempt, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         db.DeliveryAttempts.Add(attempt);
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

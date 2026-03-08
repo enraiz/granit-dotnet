@@ -22,6 +22,6 @@ internal sealed class ExecuteImportCommandHandler(IImportOrchestrator orchestrat
     /// <summary>
     /// Handles the import command by delegating to the orchestrator.
     /// </summary>
-    public async Task HandleAsync(ExecuteImportCommand command, CancellationToken ct) =>
-        await orchestrator.ExecuteAsync(command.ImportJobId, ct).ConfigureAwait(false);
+    public async Task HandleAsync(ExecuteImportCommand command, CancellationToken cancellationToken) =>
+        await orchestrator.ExecuteAsync(command.ImportJobId, cancellationToken).ConfigureAwait(false);
 }

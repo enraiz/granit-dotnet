@@ -14,7 +14,7 @@ internal sealed partial class ZulipNotificationChannel(
     public string Name => NotificationChannels.Zulip;
 
     /// <inheritdoc />
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         ZulipChannelOptions channelOptions = options.Value;
 
@@ -26,7 +26,7 @@ internal sealed partial class ZulipNotificationChannel(
             Stream = channelOptions.DefaultStream,
             Topic = channelOptions.DefaultTopic,
             Content = content,
-        }, ct).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(false);
 
         LogMessageSent(channelOptions.DefaultStream, channelOptions.DefaultTopic);
     }

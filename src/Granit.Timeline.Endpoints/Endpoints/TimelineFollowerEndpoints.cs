@@ -34,10 +34,10 @@ internal static class TimelineFollowerEndpoints
         string entityId,
         ITimelineFollowerService followerService,
         ICurrentUserService currentUser,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string userId = currentUser.UserId ?? string.Empty;
-        await followerService.FollowAsync(userId, entityType, entityId, ct).ConfigureAwait(false);
+        await followerService.FollowAsync(userId, entityType, entityId, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -46,10 +46,10 @@ internal static class TimelineFollowerEndpoints
         string entityId,
         ITimelineFollowerService followerService,
         ICurrentUserService currentUser,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         string userId = currentUser.UserId ?? string.Empty;
-        await followerService.UnfollowAsync(userId, entityType, entityId, ct).ConfigureAwait(false);
+        await followerService.UnfollowAsync(userId, entityType, entityId, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -57,9 +57,9 @@ internal static class TimelineFollowerEndpoints
         string entityType,
         string entityId,
         ITimelineFollowerService followerService,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        IReadOnlyList<string> followers = await followerService.GetFollowerIdsAsync(entityType, entityId, ct).ConfigureAwait(false);
+        IReadOnlyList<string> followers = await followerService.GetFollowerIdsAsync(entityType, entityId, cancellationToken).ConfigureAwait(false);
         return TypedResults.Ok(followers);
     }
 }

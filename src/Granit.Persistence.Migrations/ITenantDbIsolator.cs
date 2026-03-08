@@ -42,5 +42,5 @@ public interface ITenantDbIsolator
     /// Configures <paramref name="context"/> for the given <paramref name="tenantId"/>
     /// before the batch delegate executes.
     /// </summary>
-    Task IsolateAsync(DbContext context, Guid tenantId, CancellationToken ct);
+    Task IsolateAsync(DbContext context, Guid tenantId, CancellationToken cancellationToken);
 }

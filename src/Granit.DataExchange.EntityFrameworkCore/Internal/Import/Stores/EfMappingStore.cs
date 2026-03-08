@@ -19,15 +19,15 @@ internal sealed class EfMappingStore(
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ImportColumnMapping>> LoadAsync(
-        string definitionName, CancellationToken ct = default)
+        string definitionName, CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         SavedMappingEntity? entity = await context.SavedMappings
             .AsNoTracking()
             .FirstOrDefaultAsync(
-                e => e.DefinitionName == definitionName && e.TenantId == tenantId, ct).ConfigureAwait(false);
+                e => e.DefinitionName == definitionName && e.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
 
         if (entity is null)
         {
@@ -42,15 +42,15 @@ internal sealed class EfMappingStore(
     public async Task SaveAsync(
         string definitionName,
         IReadOnlyList<ImportColumnMapping> mappings,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
-        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using DataExchangeDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         string json = JsonSerializer.Serialize(mappings);
 
         SavedMappingEntity? existing = await context.SavedMappings
             .FirstOrDefaultAsync(
-                e => e.DefinitionName == definitionName && e.TenantId == tenantId, ct).ConfigureAwait(false);
+                e => e.DefinitionName == definitionName && e.TenantId == tenantId, cancellationToken).ConfigureAwait(false);
 
         if (existing is not null)
         {
@@ -70,6 +70,6 @@ internal sealed class EfMappingStore(
             });
         }
 
-        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

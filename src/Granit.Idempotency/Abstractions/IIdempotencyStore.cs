@@ -19,21 +19,21 @@ public interface IIdempotencyStore
     /// <see langword="false"/> if the key already exists (state is <c>InProgress</c> or
     /// <c>Completed</c>).
     /// </returns>
-    Task<bool> TryAcquireAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken ct);
+    Task<bool> TryAcquireAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken cancellationToken);
 
     /// <summary>
     /// Returns the stored entry for <paramref name="key"/>, or <see langword="null"/> if absent.
     /// </summary>
-    Task<IdempotencyEntry?> GetAsync(string key, CancellationToken ct);
+    Task<IdempotencyEntry?> GetAsync(string key, CancellationToken cancellationToken);
 
     /// <summary>
     /// Atomically transitions the entry from <c>InProgress</c> to <c>Completed</c> (SET XX PX).
     /// </summary>
-    Task SetCompletedAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken ct);
+    Task SetCompletedAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes the entry (transitions from <c>InProgress</c> to <c>Absent</c>).
     /// Called on 5xx responses and execution timeouts.
     /// </summary>
-    Task DeleteAsync(string key, CancellationToken ct);
+    Task DeleteAsync(string key, CancellationToken cancellationToken);
 }

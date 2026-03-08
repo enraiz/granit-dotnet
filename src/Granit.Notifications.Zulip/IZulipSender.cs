@@ -4,5 +4,5 @@ namespace Granit.Notifications.Zulip;
 public interface IZulipSender
 {
     /// <summary>Sends a message to Zulip.</summary>
-    Task SendAsync(ZulipMessage message, CancellationToken ct = default);
+    Task SendAsync(ZulipMessage message, CancellationToken cancellationToken = default);
 }

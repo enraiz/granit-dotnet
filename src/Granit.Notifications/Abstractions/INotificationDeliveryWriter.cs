@@ -7,5 +7,5 @@ namespace Granit.Notifications.Abstractions;
 /// </summary>
 public interface INotificationDeliveryWriter
 {
-    Task RecordAsync(NotificationDeliveryAttempt attempt, CancellationToken ct = default);
+    Task RecordAsync(NotificationDeliveryAttempt attempt, CancellationToken cancellationToken = default);
 }

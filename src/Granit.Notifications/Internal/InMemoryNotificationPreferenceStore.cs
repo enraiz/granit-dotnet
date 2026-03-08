@@ -11,7 +11,7 @@ internal sealed class InMemoryNotificationPreferenceStore : INotificationPrefere
     private static string BuildKey(string userId, string typeName, string channelName, Guid? tenantId) =>
         $"{tenantId}:{userId}:{typeName}:{channelName}";
 
-    public Task<IReadOnlyList<NotificationPreference>> GetListAsync(string userId, Guid? tenantId, CancellationToken ct = default)
+    public Task<IReadOnlyList<NotificationPreference>> GetListAsync(string userId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<NotificationPreference> result = _preferences.Values
             .Where(p => p.UserId == userId && p.TenantId == tenantId)
@@ -19,21 +19,21 @@ internal sealed class InMemoryNotificationPreferenceStore : INotificationPrefere
         return Task.FromResult(result);
     }
 
-    public Task<NotificationPreference?> GetAsync(string userId, string notificationTypeName, string channelName, Guid? tenantId, CancellationToken ct = default)
+    public Task<NotificationPreference?> GetAsync(string userId, string notificationTypeName, string channelName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, notificationTypeName, channelName, tenantId);
         _preferences.TryGetValue(key, out NotificationPreference? preference);
         return Task.FromResult(preference);
     }
 
-    public Task SetAsync(NotificationPreference preference, CancellationToken ct = default)
+    public Task SetAsync(NotificationPreference preference, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(preference.UserId, preference.NotificationTypeName, preference.ChannelName, preference.TenantId);
         _preferences[key] = preference;
         return Task.CompletedTask;
     }
 
-    public Task<bool> IsChannelEnabledAsync(string userId, string notificationTypeName, string channelName, Guid? tenantId, CancellationToken ct = default)
+    public Task<bool> IsChannelEnabledAsync(string userId, string notificationTypeName, string channelName, Guid? tenantId, CancellationToken cancellationToken = default)
     {
         string key = BuildKey(userId, notificationTypeName, channelName, tenantId);
         if (_preferences.TryGetValue(key, out NotificationPreference? preference))

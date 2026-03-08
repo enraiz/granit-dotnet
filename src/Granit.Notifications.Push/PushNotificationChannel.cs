@@ -24,10 +24,10 @@ internal sealed partial class PushNotificationChannel(
     public string Name => NotificationChannels.Push;
 
     /// <inheritdoc />
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<PushSubscriptionInfo> subscriptions = await subscriptionReader.GetSubscriptionsAsync(
-            context.RecipientUserId, context.TenantId, ct).ConfigureAwait(false);
+            context.RecipientUserId, context.TenantId, cancellationToken).ConfigureAwait(false);
 
         if (subscriptions.Count == 0)
         {
@@ -65,12 +65,12 @@ internal sealed partial class PushNotificationChannel(
 
             try
             {
-                await pushServiceClient.RequestPushMessageDeliveryAsync(pushSubscription, pushMessage, ct).ConfigureAwait(false);
+                await pushServiceClient.RequestPushMessageDeliveryAsync(pushSubscription, pushMessage, cancellationToken).ConfigureAwait(false);
             }
             catch (PushServiceClientException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Gone)
             {
                 LogSubscriptionExpired(sub.Endpoint);
-                await subscriptionWriter.RemoveSubscriptionAsync(sub.Endpoint, context.TenantId, ct).ConfigureAwait(false);
+                await subscriptionWriter.RemoveSubscriptionAsync(sub.Endpoint, context.TenantId, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

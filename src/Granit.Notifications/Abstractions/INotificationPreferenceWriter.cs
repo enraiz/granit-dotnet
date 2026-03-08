@@ -7,5 +7,5 @@ namespace Granit.Notifications.Abstractions;
 /// </summary>
 public interface INotificationPreferenceWriter
 {
-    Task SetAsync(NotificationPreference preference, CancellationToken ct = default);
+    Task SetAsync(NotificationPreference preference, CancellationToken cancellationToken = default);
 }

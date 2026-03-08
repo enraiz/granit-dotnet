@@ -49,14 +49,14 @@ internal sealed partial class MigrationStartupService(
     /// <inheritdoc/>
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private async Task ResumeAsync(CancellationToken ct)
+    private async Task ResumeAsync(CancellationToken cancellationToken)
     {
-        await using MigrationProgressDbContext db = await progressFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        await db.Database.EnsureCreatedAsync(ct).ConfigureAwait(false);
+        await using MigrationProgressDbContext db = await progressFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        await db.Database.EnsureCreatedAsync(cancellationToken).ConfigureAwait(false);
 
         List<MigrationProgress> pending = await db.MigrationProgresses
             .Where(p => p.Status == MigrationStatus.Pending || p.Status == MigrationStatus.InProgress)
-            .ToListAsync(ct).ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         if (pending.Count == 0)
         {
@@ -65,7 +65,7 @@ internal sealed partial class MigrationStartupService(
         }
 
         List<Guid> tenantIds = [];
-        await foreach (Guid tenantId in tenantEnumerator.GetActiveTenantIdsAsync(ct))
+        await foreach (Guid tenantId in tenantEnumerator.GetActiveTenantIdsAsync(cancellationToken))
         {
             tenantIds.Add(tenantId);
         }
@@ -73,7 +73,7 @@ internal sealed partial class MigrationStartupService(
         int batchSize = options.Value.DefaultBatchSize;
         List<RunMigrationBatchCommand> commands = BuildCommands(pending, tenantIds, batchSize);
 
-        await dispatcher.DispatchAsync(commands, ct).ConfigureAwait(false);
+        await dispatcher.DispatchAsync(commands, cancellationToken).ConfigureAwait(false);
 
         LogCommandsDispatched(commands.Count);
     }

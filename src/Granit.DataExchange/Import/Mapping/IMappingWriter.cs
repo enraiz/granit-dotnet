@@ -10,9 +10,9 @@ public interface IMappingWriter
     /// </summary>
     /// <param name="definitionName">The import definition name.</param>
     /// <param name="mappings">The confirmed column mappings to persist.</param>
-    /// <param name="ct">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task SaveAsync(
         string definitionName,
         IReadOnlyList<ImportColumnMapping> mappings,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

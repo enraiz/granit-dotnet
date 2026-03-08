@@ -8,10 +8,10 @@ public interface IExportPresetWriter
     /// <summary>
     /// Saves or updates a preset (upsert by definition name + preset name).
     /// </summary>
-    Task SaveAsync(ExportPreset preset, CancellationToken ct = default);
+    Task SaveAsync(ExportPreset preset, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a saved preset.
     /// </summary>
-    Task DeleteAsync(string definitionName, string presetName, CancellationToken ct = default);
+    Task DeleteAsync(string definitionName, string presetName, CancellationToken cancellationToken = default);
 }

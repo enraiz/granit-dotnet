@@ -65,20 +65,20 @@ public static class QueryEndpointRouteBuilderExtensions
             [FromServices] IQueryEngine<TEntity> engine,
             BindableQueryRequest request,
             HttpContext httpContext,
-            CancellationToken ct) =>
+            CancellationToken cancellationToken) =>
         {
             IQueryable<TEntity> source = sourceProvider(httpContext.RequestServices);
 
             if (!string.IsNullOrWhiteSpace(request.Value.GroupBy))
             {
                 GroupedResult<TEntity> grouped = await engine
-                    .ExecuteGroupedAsync(source, request.Value, ct)
+                    .ExecuteGroupedAsync(source, request.Value, cancellationToken)
                     .ConfigureAwait(false);
                 return Results.Ok(grouped);
             }
 
             PagedResult<TEntity> paged = await engine
-                .ExecuteAsync(source, request.Value, ct)
+                .ExecuteAsync(source, request.Value, cancellationToken)
                 .ConfigureAwait(false);
             return Results.Ok(paged);
         })
@@ -94,10 +94,10 @@ public static class QueryEndpointRouteBuilderExtensions
                 [FromServices] QueryDefinition<TEntity> definition,
                 Granit.Core.MultiTenancy.ICurrentTenant tenant,
                 System.Security.Claims.ClaimsPrincipal user,
-                CancellationToken ct) =>
+                CancellationToken cancellationToken) =>
             {
                 return await QueryEndpointHandler.GetMetadataAsync(
-                    engine, savedViewStore, definition, tenant, user, ct)
+                    engine, savedViewStore, definition, tenant, user, cancellationToken)
                     .ConfigureAwait(false);
             })
             .WithName($"Get{entityName}Meta")

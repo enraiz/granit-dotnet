@@ -19,7 +19,7 @@ public sealed class UserNotificationResponseTests
         // Arrange
         var id = Guid.NewGuid();
         var notificationId = Guid.NewGuid();
-        var createdAt = DateTimeOffset.UtcNow;
+        DateTimeOffset createdAt = DateTimeOffset.UtcNow;
 
         // Act
         UserNotificationResponse response = new(
@@ -46,7 +46,7 @@ public sealed class UserNotificationResponseTests
     {
         var id = Guid.NewGuid();
         var nid = Guid.NewGuid();
-        var now = DateTimeOffset.UtcNow;
+        DateTimeOffset now = DateTimeOffset.UtcNow;
 
         UserNotificationResponse a = new(id, nid, "T", NotificationSeverity.Info, "u", null, UserNotificationState.Unread, now, null, null, null);
         UserNotificationResponse b = new(id, nid, "T", NotificationSeverity.Info, "u", null, UserNotificationState.Unread, now, null, null, null);

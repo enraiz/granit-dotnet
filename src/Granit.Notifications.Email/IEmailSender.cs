@@ -7,5 +7,5 @@ namespace Granit.Notifications.Email;
 public interface IEmailSender
 {
     /// <summary>Sends an email message.</summary>
-    Task SendAsync(EmailMessage message, CancellationToken ct = default);
+    Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default);
 }

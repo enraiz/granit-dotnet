@@ -183,7 +183,7 @@ public interface IPdfAConverter
     Task<DocumentResult> ConvertToPdfAAsync(
         DocumentResult pdfResult,
         PdfAConversionOptions options,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }
 ```
 

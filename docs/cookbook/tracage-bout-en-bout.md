@@ -24,7 +24,7 @@ internal static class OrderEndpoints
         PlaceOrderRequest request,
         IMessageBus bus,
         ILogger<PlaceOrderRequest> logger,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // Le TraceId est automatiquement propagé par Granit
         logger.LogInformation(
@@ -61,7 +61,7 @@ public static class OrderPlacedEventHandler
         OrderPlacedEvent evt,
         AppDbContext db,
         ILogger logger,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         // Ce log apparaît sous le même TraceId que la requête HTTP
         logger.LogInformation(

@@ -13,7 +13,7 @@ internal sealed class SignalRNotificationChannel(IHubContext<NotificationHub> hu
     public string Name => NotificationChannels.SignalR;
 
     /// <inheritdoc/>
-    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
+    public async Task SendAsync(NotificationDeliveryContext context, CancellationToken cancellationToken = default)
     {
         SignalRNotificationMessage message = new()
         {
@@ -28,6 +28,6 @@ internal sealed class SignalRNotificationChannel(IHubContext<NotificationHub> hu
 
         await hubContext.Clients
             .Group(context.RecipientUserId)
-            .SendAsync("ReceiveNotification", message, ct).ConfigureAwait(false);
+            .SendAsync("ReceiveNotification", message, cancellationToken).ConfigureAwait(false);
     }
 }

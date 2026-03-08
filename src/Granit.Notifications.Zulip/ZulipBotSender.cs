@@ -18,7 +18,7 @@ internal sealed partial class ZulipBotSender(
     internal const string HttpClientName = "ZulipBot";
 
     /// <inheritdoc />
-    public async Task SendAsync(ZulipMessage message, CancellationToken ct = default)
+    public async Task SendAsync(ZulipMessage message, CancellationToken cancellationToken = default)
     {
         HttpClient client = httpClientFactory.CreateClient(HttpClientName);
         ZulipBotOptions botOptions = options.Value;
@@ -43,11 +43,11 @@ internal sealed partial class ZulipBotSender(
         }
 
         using var content = new FormUrlEncodedContent(formData);
-        using HttpResponseMessage response = await client.PostAsync("api/v1/messages", content, ct).ConfigureAwait(false);
+        using HttpResponseMessage response = await client.PostAsync("api/v1/messages", content, cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
-            string body = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            string body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             LogSendFailed(response.StatusCode.ToString(), body);
             response.EnsureSuccessStatusCode();
         }

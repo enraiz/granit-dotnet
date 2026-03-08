@@ -4,7 +4,7 @@ namespace Granit.ReferenceData;
 /// Write-side contract for managing reference data entries.
 /// </summary>
 /// <typeparam name="TEntity">The concrete reference data entity type.</typeparam>
-public interface IReferenceDataStoreWriter<TEntity> where TEntity : ReferenceDataEntity
+public interface IReferenceDataStoreWriter<in TEntity> where TEntity : ReferenceDataEntity
 {
     /// <summary>
     /// Creates a new reference data entry. The <see cref="ReferenceDataEntity.Code"/> must be unique.

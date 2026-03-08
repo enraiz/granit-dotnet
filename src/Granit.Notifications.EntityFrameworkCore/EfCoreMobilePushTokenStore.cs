@@ -11,24 +11,24 @@ internal sealed class EfCoreMobilePushTokenStore(
 {
     /// <inheritdoc />
     public async Task<IReadOnlyList<MobilePushTokenInfo>> GetTokensAsync(
-        string userId, Guid? tenantId, CancellationToken ct = default)
+        string userId, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         return await db.MobilePushTokens
             .Where(t => t.UserId == userId && t.TenantId == tenantId)
             .Select(t => t.ToTokenInfo())
-            .ToListAsync(ct)
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task RegisterAsync(MobilePushTokenInfo tokenInfo, CancellationToken ct = default)
+    public async Task RegisterAsync(MobilePushTokenInfo tokenInfo, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         MobilePushTokenEntity? existing = await db.MobilePushTokens
-            .FirstOrDefaultAsync(t => t.DeviceToken == tokenInfo.DeviceToken && t.TenantId == tokenInfo.TenantId, ct)
+            .FirstOrDefaultAsync(t => t.DeviceToken == tokenInfo.DeviceToken && t.TenantId == tokenInfo.TenantId, cancellationToken)
             .ConfigureAwait(false);
 
         if (existing is not null)
@@ -47,17 +47,17 @@ internal sealed class EfCoreMobilePushTokenStore(
             });
         }
 
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task RemoveAsync(string deviceToken, Guid? tenantId, CancellationToken ct = default)
+    public async Task RemoveAsync(string deviceToken, Guid? tenantId, CancellationToken cancellationToken = default)
     {
-        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
         await db.MobilePushTokens
             .Where(t => t.DeviceToken == deviceToken && t.TenantId == tenantId)
-            .ExecuteDeleteAsync(ct)
+            .ExecuteDeleteAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 }
