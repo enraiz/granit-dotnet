@@ -233,6 +233,12 @@
           "Microsoft.Extensions.Options": "[10.*, )"
         }
       },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
       "granit.security": {
         "type": "Project",
         "dependencies": {
@@ -243,6 +249,7 @@
         "type": "Project",
         "dependencies": {
           "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )"
         }

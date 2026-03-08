@@ -2,6 +2,7 @@ using Granit.Core.MultiTenancy;
 using Granit.Identity.EntityFrameworkCore.Entities;
 using Granit.Identity.EntityFrameworkCore.Internal;
 using Granit.Identity.Models;
+using Granit.Querying;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -204,13 +205,14 @@ public sealed class CachedUserLookupServiceTests
     [Fact]
     public async Task SearchAsync_DelegatesToStore()
     {
-        _store.SearchAsync("john", Arg.Any<Guid?>(), 20, Arg.Any<CancellationToken>())
-            .Returns([CreateCacheEntry()]);
+        _store.SearchAsync("john", Arg.Any<Guid?>(), 1, 20, Arg.Any<CancellationToken>())
+            .Returns((new List<UserCacheEntry> { CreateCacheEntry() } as IReadOnlyList<UserCacheEntry>, 1));
 
         CachedUserLookupService service = CreateService();
-        IReadOnlyList<IdentityUser> result = await service.SearchAsync(
-            "john", 20, TestContext.Current.CancellationToken);
+        PagedResult<IdentityUser> result = await service.SearchAsync(
+            "john", 1, 20, TestContext.Current.CancellationToken);
 
-        result.Count.ShouldBe(1);
+        result.Items.Count.ShouldBe(1);
+        result.TotalCount.ShouldBe(1);
     }
 }

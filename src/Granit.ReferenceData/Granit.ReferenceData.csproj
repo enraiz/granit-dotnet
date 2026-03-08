@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Querying\Granit.Querying.csproj" />
   </ItemGroup>
 
 </Project>

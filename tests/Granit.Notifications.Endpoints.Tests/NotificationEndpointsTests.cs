@@ -6,6 +6,7 @@ using Granit.Core.MultiTenancy;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Endpoints.Extensions;
+using Granit.Querying;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -69,8 +70,8 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetNotifications_Authenticated_Returns200()
     {
-        _userNotificationStore.GetListAsync("user-123", null, 0, 20, Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<UserNotification>());
+        _userNotificationStore.GetListAsync("user-123", null, 1, 20, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
@@ -140,8 +141,8 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task GetEntityActivityFeed_Returns200()
     {
-        _userNotificationStore.GetByEntityAsync("Patient", "42", null, 0, 20, Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<UserNotification>());
+        _userNotificationStore.GetByEntityAsync("Patient", "42", null, 1, 20, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/entity/Patient/42", TestContext.Current.CancellationToken);
@@ -291,14 +292,14 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         var tenantId = Guid.NewGuid();
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
-        _userNotificationStore.GetListAsync("user-123", tenantId, 0, 20, Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<UserNotification>());
+        _userNotificationStore.GetListAsync("user-123", tenantId, 1, 20, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await _userNotificationStore.Received(1).GetListAsync(
-            "user-123", tenantId, 0, 20, Arg.Any<CancellationToken>());
+            "user-123", tenantId, 1, 20, Arg.Any<CancellationToken>());
     }
 
     // ── ApiPrefix ──────────────────────────────────────────────────────────
@@ -321,7 +322,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         builder.Services.AddSingleton(_clock);
 
         _userNotificationStore.GetListAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<UserNotification>());
+            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
 
         await using WebApplication prefixedApp = builder.Build();
         prefixedApp.MapGranitNotificationEndpoints(opts => opts.ApiPrefix = "api/v1");

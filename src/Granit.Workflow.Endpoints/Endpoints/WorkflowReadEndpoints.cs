@@ -1,7 +1,9 @@
+using Granit.Querying;
 using Granit.Workflow.Dtos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.Workflow.Endpoints.Endpoints;
@@ -23,14 +25,20 @@ internal static class WorkflowReadEndpoints
         return group;
     }
 
-    private static async Task<Ok<IReadOnlyList<TransitionHistoryResponse>>> GetTransitionHistoryAsync(
+    private static async Task<Ok<PagedResult<TransitionHistoryResponse>>> GetTransitionHistoryAsync(
         string entityType,
         string entityId,
         IWorkflowHistoryQuery historyQuery,
-        CancellationToken ct)
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = QueryingDefaults.DefaultPageSize,
+        CancellationToken ct = default)
     {
-        IReadOnlyList<TransitionHistoryResponse> history = await historyQuery.GetHistoryAsync(
-            entityType, entityId, ct).ConfigureAwait(false);
-        return TypedResults.Ok(history);
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
+        PagedResult<TransitionHistoryResponse> result = await historyQuery.GetHistoryAsync(
+            entityType, entityId, clampedPage, clampedPageSize, ct).ConfigureAwait(false);
+
+        return TypedResults.Ok(result);
     }
 }

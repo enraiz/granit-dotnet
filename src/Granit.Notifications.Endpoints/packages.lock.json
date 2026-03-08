@@ -245,8 +245,15 @@
       "granit.notifications": {
         "type": "Project",
         "dependencies": {
+          "Granit.Querying": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
           "Granit.Wolverine": "[0.1.0-dev, )"
+        }
+      },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.security": {

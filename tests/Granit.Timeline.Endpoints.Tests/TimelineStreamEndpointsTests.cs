@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Granit.Querying;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.Endpoints.Extensions;
 using Microsoft.AspNetCore.Authentication;
@@ -70,8 +71,8 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
             Body = "Hello",
         };
 
-        _query.GetStreamAsync("Patient", "42", 0, 20, Arg.Any<CancellationToken>())
-            .Returns(new TimelineStreamPage { Items = [entry], TotalCount = 1 });
+        _query.GetStreamAsync("Patient", "42", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TimelineStreamEntry>([entry], 1));
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -79,8 +80,8 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        TimelineStreamPage? page = await response.Content
-            .ReadFromJsonAsync<TimelineStreamPage>(TestContext.Current.CancellationToken);
+        PagedResult<TimelineStreamEntry>? page = await response.Content
+            .ReadFromJsonAsync<PagedResult<TimelineStreamEntry>>(TestContext.Current.CancellationToken);
         page.ShouldNotBeNull();
         page!.TotalCount.ShouldBe(1);
         page.Items.Count.ShouldBe(1);
@@ -92,8 +93,8 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
     public async Task GetStream_empty_returns_empty_page()
     {
         // Arrange
-        _query.GetStreamAsync("Invoice", "99", 0, 20, Arg.Any<CancellationToken>())
-            .Returns(new TimelineStreamPage { Items = [], TotalCount = 0 });
+        _query.GetStreamAsync("Invoice", "99", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TimelineStreamEntry>([], 0));
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -101,27 +102,27 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        TimelineStreamPage? page = await response.Content
-            .ReadFromJsonAsync<TimelineStreamPage>(TestContext.Current.CancellationToken);
+        PagedResult<TimelineStreamEntry>? page = await response.Content
+            .ReadFromJsonAsync<PagedResult<TimelineStreamEntry>>(TestContext.Current.CancellationToken);
         page.ShouldNotBeNull();
         page!.TotalCount.ShouldBe(0);
         page.Items.ShouldBeEmpty();
     }
 
     [Fact]
-    public async Task GetStream_passes_skip_and_take_parameters()
+    public async Task GetStream_passes_page_and_pageSize_parameters()
     {
         // Arrange
-        _query.GetStreamAsync("Patient", "1", 5, 10, Arg.Any<CancellationToken>())
-            .Returns(new TimelineStreamPage { Items = [], TotalCount = 50 });
+        _query.GetStreamAsync("Patient", "1", 3, 10, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TimelineStreamEntry>([], 50));
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(
-            $"{Prefix}/Patient/1?skip=5&take=10", TestContext.Current.CancellationToken);
+            $"{Prefix}/Patient/1?page=3&pageSize=10", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _query.Received(1).GetStreamAsync("Patient", "1", 5, 10, Arg.Any<CancellationToken>());
+        await _query.Received(1).GetStreamAsync("Patient", "1", 3, 10, Arg.Any<CancellationToken>());
     }
 
     [Fact]

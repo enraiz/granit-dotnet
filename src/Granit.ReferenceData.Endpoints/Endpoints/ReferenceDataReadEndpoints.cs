@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Granit.ReferenceData.Endpoints.Dtos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +30,7 @@ internal static class ReferenceDataReadEndpoints
         return group;
     }
 
-    private static async Task<Ok<ReferenceDataListResponse<TEntity>>> GetAllAsync<TEntity>(
+    private static async Task<Ok<PagedResult<TEntity>>> GetAllAsync<TEntity>(
         IReferenceDataStore<TEntity> store,
         [AsParameters] ReferenceDataQueryParameters parameters,
         CancellationToken ct = default)
@@ -40,12 +41,12 @@ internal static class ReferenceDataReadEndpoints
             SearchTerm: parameters.Search,
             SortBy: parameters.SortBy,
             Descending: parameters.Descending,
-            Skip: parameters.Skip,
-            Take: parameters.Take);
+            Page: parameters.Page,
+            PageSize: parameters.PageSize);
 
-        ReferenceDataResult<TEntity> result = await store.GetAllAsync(query, ct).ConfigureAwait(false);
+        PagedResult<TEntity> result = await store.GetAllAsync(query, ct).ConfigureAwait(false);
 
-        return TypedResults.Ok(new ReferenceDataListResponse<TEntity>(result.Items, result.TotalCount));
+        return TypedResults.Ok(result);
     }
 
     private static async Task<Results<Ok<TEntity>, NotFound>> GetByCodeAsync<TEntity>(

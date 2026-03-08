@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Granit.Workflow.Dtos;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,14 +16,25 @@ internal sealed class DefaultWorkflowHistoryQuery<TDbContext>(TDbContext dbConte
     private readonly TDbContext _dbContext = dbContext;
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<TransitionHistoryResponse>> GetHistoryAsync(
+    public async Task<PagedResult<TransitionHistoryResponse>> GetHistoryAsync(
         string entityType,
         string entityId,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken cancellationToken = default)
     {
-        List<TransitionHistoryResponse> history = await _dbContext.WorkflowTransitionRecords
-            .Where(r => r.EntityType == entityType && r.EntityId == entityId)
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
+        IQueryable<Domain.WorkflowTransitionRecord> query = _dbContext.WorkflowTransitionRecords
+            .Where(r => r.EntityType == entityType && r.EntityId == entityId);
+
+        int totalCount = await query.CountAsync(cancellationToken).ConfigureAwait(false);
+
+        List<TransitionHistoryResponse> items = await query
             .OrderBy(r => r.TransitionedAt)
+            .Skip((clampedPage - 1) * clampedPageSize)
+            .Take(clampedPageSize)
             .Select(r => new TransitionHistoryResponse(
                 r.PreviousState,
                 r.NewState,
@@ -31,6 +43,6 @@ internal sealed class DefaultWorkflowHistoryQuery<TDbContext>(TDbContext dbConte
                 r.Comment))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return history;
+        return new PagedResult<TransitionHistoryResponse>(items, totalCount);
     }
 }

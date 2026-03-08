@@ -1,4 +1,5 @@
 using Granit.Identity.Models;
+using Granit.Querying;
 
 namespace Granit.Identity;
 
@@ -44,12 +45,14 @@ public interface IUserLookupService
     /// This is a local-only query — it does not call the identity provider.
     /// </summary>
     /// <param name="searchTerm">Free-text search term.</param>
-    /// <param name="maxResults">Maximum number of results to return.</param>
+    /// <param name="page">1-based page number.</param>
+    /// <param name="pageSize">Number of items per page.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Matching users, or an empty list if none found.</returns>
-    Task<IReadOnlyList<IdentityUser>> SearchAsync(
+    /// <returns>A paginated result with matching users and total count.</returns>
+    Task<PagedResult<IdentityUser>> SearchAsync(
         string searchTerm,
-        int maxResults = 20,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken cancellationToken = default);
 
     // -- Sync --

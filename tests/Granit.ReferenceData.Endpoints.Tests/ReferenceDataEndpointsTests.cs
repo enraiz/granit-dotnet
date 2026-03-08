@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Granit.Querying;
 using Granit.ReferenceData.Endpoints.Dtos;
 using Granit.ReferenceData.Endpoints.Extensions;
 using Microsoft.AspNetCore.Authentication;
@@ -65,7 +66,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     public async Task GetAll_Returns200WithList()
     {
         // Arrange
-        ReferenceDataResult<TestRefEntity> result = new(
+        PagedResult<TestRefEntity> result = new(
             [new TestRefEntity { Code = "BE", LabelEn = "Belgium" }], 1);
         _store.GetAllAsync(Arg.Any<ReferenceDataQuery?>(), Arg.Any<CancellationToken>())
             .Returns(result);
@@ -76,8 +77,8 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        ReferenceDataListResponse<TestRefEntity>? body =
-            await response.Content.ReadFromJsonAsync<ReferenceDataListResponse<TestRefEntity>>(
+        PagedResult<TestRefEntity>? body =
+            await response.Content.ReadFromJsonAsync<PagedResult<TestRefEntity>>(
                 TestContext.Current.CancellationToken);
         body!.TotalCount.ShouldBe(1);
         body.Items.Count.ShouldBe(1);

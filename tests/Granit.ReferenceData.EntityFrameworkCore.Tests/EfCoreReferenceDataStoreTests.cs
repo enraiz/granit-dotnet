@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Granit.ReferenceData.EntityFrameworkCore.Extensions;
 using Granit.ReferenceData.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
@@ -134,7 +135,7 @@ public sealed class EfCoreReferenceDataStoreTests
         await SeedAsync(db, "XX", "Inactive", isActive: false, ct: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             cancellationToken: TestContext.Current.CancellationToken);
 
         result.TotalCount.ShouldBe(1);
@@ -149,7 +150,7 @@ public sealed class EfCoreReferenceDataStoreTests
         await SeedAsync(db, "XX", "Inactive", isActive: false, ct: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             new ReferenceDataQuery(ActiveOnly: false),
             TestContext.Current.CancellationToken);
 
@@ -165,7 +166,7 @@ public sealed class EfCoreReferenceDataStoreTests
         await SeedAsync(db, "NL", "Netherlands", ct: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             new ReferenceDataQuery(SortBy: "Code"),
             TestContext.Current.CancellationToken);
 
@@ -182,7 +183,7 @@ public sealed class EfCoreReferenceDataStoreTests
         await SeedAsync(db, "BE", "Belgium", ct: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             new ReferenceDataQuery(SortBy: "Code", Descending: true),
             TestContext.Current.CancellationToken);
 
@@ -198,7 +199,7 @@ public sealed class EfCoreReferenceDataStoreTests
         await SeedAsync(db, "BE", "Belgium", ct: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             new ReferenceDataQuery(SortBy: "Label"),
             TestContext.Current.CancellationToken);
 
@@ -215,7 +216,7 @@ public sealed class EfCoreReferenceDataStoreTests
         await SeedAsync(db, "FR", "France", sortOrder: 2, ct: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             cancellationToken: TestContext.Current.CancellationToken);
 
         result.Items[0].Code.ShouldBe("BE");
@@ -232,8 +233,8 @@ public sealed class EfCoreReferenceDataStoreTests
         await SeedAsync(db, "NL", "Netherlands", sortOrder: 3, ct: TestContext.Current.CancellationToken);
 
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
-            new ReferenceDataQuery(Skip: 1, Take: 1),
+        PagedResult<TestEntity> result = await store.GetAllAsync(
+            new ReferenceDataQuery(Page: 2, PageSize: 1),
             TestContext.Current.CancellationToken);
 
         result.TotalCount.ShouldBe(3, "TotalCount reflects all matching entries before pagination");
@@ -246,7 +247,7 @@ public sealed class EfCoreReferenceDataStoreTests
     {
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(Guid.NewGuid().ToString());
 
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             cancellationToken: TestContext.Current.CancellationToken);
 
         result.Items.ShouldBeEmpty();
@@ -319,7 +320,7 @@ public sealed class EfCoreReferenceDataStoreTests
         await store.SetActiveAsync("BE", false, TestContext.Current.CancellationToken);
 
         // Query with ActiveOnly: false to see deactivated entry
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             new ReferenceDataQuery(ActiveOnly: false),
             TestContext.Current.CancellationToken);
 
@@ -335,7 +336,7 @@ public sealed class EfCoreReferenceDataStoreTests
         EfCoreReferenceDataStore<TestEntity, TestDbContext> store = CreateStore(db);
         await store.SetActiveAsync("BE", true, TestContext.Current.CancellationToken);
 
-        ReferenceDataResult<TestEntity> result = await store.GetAllAsync(
+        PagedResult<TestEntity> result = await store.GetAllAsync(
             cancellationToken: TestContext.Current.CancellationToken);
 
         result.Items.ShouldContain(e => e.Code == "BE" && e.IsActive);

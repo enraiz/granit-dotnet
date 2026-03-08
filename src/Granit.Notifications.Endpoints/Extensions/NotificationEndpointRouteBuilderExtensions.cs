@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Granit.Core.MultiTenancy;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
+using Granit.Querying;
 using Granit.Timing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -68,16 +69,19 @@ public static class NotificationEndpointRouteBuilderExtensions
             .WithSummary("Marks all notifications as read for the current user.");
     }
 
-    private static async Task<Ok<List<UserNotificationResponse>>> GetNotificationsAsync(
+    private static async Task<Ok<PagedResult<UserNotificationResponse>>> GetNotificationsAsync(
         IUserNotificationStore store,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
-        int skip = 0, int take = 20)
+        int page = 1, int pageSize = QueryingDefaults.DefaultPageSize)
     {
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        IReadOnlyList<UserNotification> notifications = await store.GetListAsync(userId, tenantId, skip, take).ConfigureAwait(false);
-        return TypedResults.Ok(MapNotifications(notifications));
+        PagedResult<UserNotification> result = await store.GetListAsync(userId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
+        return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount));
     }
 
     private static async Task<Ok<UnreadCountResponse>> GetUnreadCountAsync(
@@ -123,16 +127,19 @@ public static class NotificationEndpointRouteBuilderExtensions
             .WithSummary("Returns the activity feed for a specific entity.");
     }
 
-    private static async Task<Ok<List<UserNotificationResponse>>> GetEntityActivityFeedAsync(
+    private static async Task<Ok<PagedResult<UserNotificationResponse>>> GetEntityActivityFeedAsync(
         string entityType,
         string entityId,
         IUserNotificationStore store,
         ICurrentTenant tenant,
-        int skip = 0, int take = 20)
+        int page = 1, int pageSize = QueryingDefaults.DefaultPageSize)
     {
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        IReadOnlyList<UserNotification> notifications = await store.GetByEntityAsync(entityType, entityId, tenantId, skip, take).ConfigureAwait(false);
-        return TypedResults.Ok(MapNotifications(notifications));
+        PagedResult<UserNotification> result = await store.GetByEntityAsync(entityType, entityId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
+        return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount));
     }
 
     // -------------------------------------------------------------------------

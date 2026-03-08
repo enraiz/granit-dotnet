@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +16,16 @@ internal sealed class EfCoreTimelineQuery(
     IDbContextFactory<TimelineDbContext> dbContextFactory) : ITimelineQuery
 {
     /// <inheritdoc/>
-    public async Task<TimelineStreamPage> GetStreamAsync(
+    public async Task<PagedResult<TimelineStreamEntry>> GetStreamAsync(
         string entityType,
         string entityId,
-        int skip = 0,
-        int take = 20,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken ct = default)
     {
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+        int clampedPage = Math.Max(page, 1);
+
         await using TimelineDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
         IQueryable<TimelineEntry> query = db.TimelineEntries
@@ -32,8 +36,8 @@ internal sealed class EfCoreTimelineQuery(
 
         List<TimelineEntry> entries = await query
             .OrderByDescending(e => e.CreatedAt)
-            .Skip(skip)
-            .Take(take)
+            .Skip((clampedPage - 1) * clampedPageSize)
+            .Take(clampedPageSize)
             .ToListAsync(ct).ConfigureAwait(false);
 
         var entryIds = entries.Select(e => e.Id).ToList();
@@ -67,10 +71,6 @@ internal sealed class EfCoreTimelineQuery(
             })
             .ToList();
 
-        return new TimelineStreamPage
-        {
-            Items = items,
-            TotalCount = totalCount,
-        };
+        return new PagedResult<TimelineStreamEntry>(items, totalCount);
     }
 }

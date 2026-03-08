@@ -1,3 +1,5 @@
+using Granit.Querying;
+
 namespace Granit.Timeline.Abstractions;
 
 /// <summary>
@@ -10,10 +12,10 @@ public interface ITimelineQuery
     /// Returns a paginated activity stream for a specific entity.
     /// Entries are ordered by <c>OccurredAt</c> descending (newest first).
     /// </summary>
-    Task<TimelineStreamPage> GetStreamAsync(
+    Task<PagedResult<TimelineStreamEntry>> GetStreamAsync(
         string entityType,
         string entityId,
-        int skip = 0,
-        int take = 20,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken ct = default);
 }

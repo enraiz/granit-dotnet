@@ -1,5 +1,6 @@
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
+using Granit.Querying;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Notifications.EntityFrameworkCore;
@@ -25,15 +26,25 @@ internal sealed class EfCoreUserNotificationStore(IDbContextFactory<Notification
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<UserNotification>> GetListAsync(string recipientUserId, Guid? tenantId, int skipCount, int maxResultCount, CancellationToken ct = default)
+    public async Task<PagedResult<UserNotification>> GetListAsync(string recipientUserId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken ct = default)
     {
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
         await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        return await db.UserNotifications
-            .Where(n => n.RecipientUserId == recipientUserId && n.TenantId == tenantId)
+
+        IQueryable<UserNotification> query = db.UserNotifications
+            .Where(n => n.RecipientUserId == recipientUserId && n.TenantId == tenantId);
+
+        int totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+
+        List<UserNotification> items = await query
             .OrderByDescending(n => n.CreatedAt)
-            .Skip(skipCount)
-            .Take(maxResultCount)
+            .Skip((clampedPage - 1) * clampedPageSize)
+            .Take(clampedPageSize)
             .ToListAsync(ct).ConfigureAwait(false);
+
+        return new PagedResult<UserNotification>(items, totalCount);
     }
 
     /// <inheritdoc/>
@@ -67,14 +78,24 @@ internal sealed class EfCoreUserNotificationStore(IDbContextFactory<Notification
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<UserNotification>> GetByEntityAsync(string entityType, string entityId, Guid? tenantId, int skipCount, int maxResultCount, CancellationToken ct = default)
+    public async Task<PagedResult<UserNotification>> GetByEntityAsync(string entityType, string entityId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken ct = default)
     {
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
         await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
-        return await db.UserNotifications
-            .Where(n => n.RelatedEntityType == entityType && n.RelatedEntityId == entityId && n.TenantId == tenantId)
+
+        IQueryable<UserNotification> query = db.UserNotifications
+            .Where(n => n.RelatedEntityType == entityType && n.RelatedEntityId == entityId && n.TenantId == tenantId);
+
+        int totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+
+        List<UserNotification> items = await query
             .OrderByDescending(n => n.CreatedAt)
-            .Skip(skipCount)
-            .Take(maxResultCount)
+            .Skip((clampedPage - 1) * clampedPageSize)
+            .Take(clampedPageSize)
             .ToListAsync(ct).ConfigureAwait(false);
+
+        return new PagedResult<UserNotification>(items, totalCount);
     }
 }

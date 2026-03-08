@@ -284,7 +284,8 @@
       "granit.identity": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev, )"
         }
       },
       "granit.identity.keycloak": {
@@ -293,6 +294,12 @@
           "Granit.Identity": "[0.1.0-dev, )",
           "Microsoft.Extensions.Http": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
+        }
+      },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "Microsoft.Extensions.Configuration.Binder": {

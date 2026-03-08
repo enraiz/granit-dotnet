@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
+using Granit.Querying;
 
 namespace Granit.Notifications.Internal;
 
@@ -17,15 +18,23 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationStore
     public Task<UserNotification?> GetAsync(Guid id, CancellationToken ct = default) =>
         Task.FromResult(_notifications.GetValueOrDefault(id));
 
-    public Task<IReadOnlyList<UserNotification>> GetListAsync(string recipientUserId, Guid? tenantId, int skipCount, int maxResultCount, CancellationToken ct = default)
+    public Task<PagedResult<UserNotification>> GetListAsync(string recipientUserId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken ct = default)
     {
-        IReadOnlyList<UserNotification> result = _notifications.Values
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
+        var filtered = _notifications.Values
             .Where(n => n.RecipientUserId == recipientUserId && n.TenantId == tenantId)
             .OrderByDescending(n => n.CreatedAt)
-            .Skip(skipCount)
-            .Take(maxResultCount)
             .ToList();
-        return Task.FromResult(result);
+
+        int totalCount = filtered.Count;
+        IReadOnlyList<UserNotification> items = filtered
+            .Skip((clampedPage - 1) * clampedPageSize)
+            .Take(clampedPageSize)
+            .ToList();
+
+        return Task.FromResult(new PagedResult<UserNotification>(items, totalCount));
     }
 
     public Task<int> GetUnreadCountAsync(string recipientUserId, Guid? tenantId, CancellationToken ct = default)
@@ -56,14 +65,22 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationStore
         return Task.CompletedTask;
     }
 
-    public Task<IReadOnlyList<UserNotification>> GetByEntityAsync(string entityType, string entityId, Guid? tenantId, int skipCount, int maxResultCount, CancellationToken ct = default)
+    public Task<PagedResult<UserNotification>> GetByEntityAsync(string entityType, string entityId, Guid? tenantId, int page = 1, int pageSize = QueryingDefaults.DefaultPageSize, CancellationToken ct = default)
     {
-        IReadOnlyList<UserNotification> result = _notifications.Values
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
+        var filtered = _notifications.Values
             .Where(n => n.RelatedEntityType == entityType && n.RelatedEntityId == entityId && n.TenantId == tenantId)
             .OrderByDescending(n => n.CreatedAt)
-            .Skip(skipCount)
-            .Take(maxResultCount)
             .ToList();
-        return Task.FromResult(result);
+
+        int totalCount = filtered.Count;
+        IReadOnlyList<UserNotification> items = filtered
+            .Skip((clampedPage - 1) * clampedPageSize)
+            .Take(clampedPageSize)
+            .ToList();
+
+        return Task.FromResult(new PagedResult<UserNotification>(items, totalCount));
     }
 }

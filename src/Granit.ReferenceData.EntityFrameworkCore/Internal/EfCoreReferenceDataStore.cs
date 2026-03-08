@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
     private readonly ReferenceDataOptions _options = options.Value;
 
     /// <inheritdoc/>
-    public async Task<ReferenceDataResult<TEntity>> GetAllAsync(
+    public async Task<PagedResult<TEntity>> GetAllAsync(
         ReferenceDataQuery? query = null,
         CancellationToken cancellationToken = default)
     {
@@ -82,19 +83,15 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
         };
 
         // Pagination
-        if (query.Skip.HasValue)
-        {
-            queryable = queryable.Skip(query.Skip.Value);
-        }
+        int clampedPage = Math.Max(query.Page, 1);
+        int clampedPageSize = Math.Clamp(query.PageSize, 1, QueryingDefaults.MaxPageSize);
+        int skip = (clampedPage - 1) * clampedPageSize;
 
-        if (query.Take.HasValue)
-        {
-            queryable = queryable.Take(query.Take.Value);
-        }
+        queryable = queryable.Skip(skip).Take(clampedPageSize);
 
         List<TEntity> items = await queryable.ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return new ReferenceDataResult<TEntity>(items, totalCount);
+        return new PagedResult<TEntity>(items, totalCount);
     }
 
     /// <inheritdoc/>

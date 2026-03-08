@@ -24,6 +24,12 @@
           "Microsoft.Extensions.Options": "[10.*, )"
         }
       },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
       "granit.security": {
         "type": "Project",
         "dependencies": {

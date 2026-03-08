@@ -25,6 +25,12 @@
       },
       "granit.core": {
         "type": "Project"
+      },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
       }
     }
   }

@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Granit.Workflow.Dtos;
 
 namespace Granit.Workflow;
@@ -14,13 +15,17 @@ namespace Granit.Workflow;
 public interface IWorkflowHistoryQuery
 {
     /// <summary>
-    /// Returns the transition history for a specific entity, ordered chronologically.
+    /// Returns the paginated transition history for a specific entity, ordered chronologically.
     /// </summary>
     /// <param name="entityType">Logical entity type name.</param>
     /// <param name="entityId">Entity identifier.</param>
+    /// <param name="page">One-based page number.</param>
+    /// <param name="pageSize">Maximum number of entries per page.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task<IReadOnlyList<TransitionHistoryResponse>> GetHistoryAsync(
+    Task<PagedResult<TransitionHistoryResponse>> GetHistoryAsync(
         string entityType,
         string entityId,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken cancellationToken = default);
 }
