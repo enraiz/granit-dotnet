@@ -31,7 +31,7 @@ internal static class ReferenceDataReadEndpoints
     }
 
     private static async Task<Ok<PagedResult<TEntity>>> GetAllAsync<TEntity>(
-        IReferenceDataStore<TEntity> store,
+        IReferenceDataStoreReader<TEntity> storeReader,
         [AsParameters] ReferenceDataQueryParameters parameters,
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity
@@ -44,18 +44,18 @@ internal static class ReferenceDataReadEndpoints
             Page: parameters.Page,
             PageSize: parameters.PageSize);
 
-        PagedResult<TEntity> result = await store.GetAllAsync(query, ct).ConfigureAwait(false);
+        PagedResult<TEntity> result = await storeReader.GetAllAsync(query, ct).ConfigureAwait(false);
 
         return TypedResults.Ok(result);
     }
 
     private static async Task<Results<Ok<TEntity>, NotFound>> GetByCodeAsync<TEntity>(
         string code,
-        IReferenceDataStore<TEntity> store,
+        IReferenceDataStoreReader<TEntity> storeReader,
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity
     {
-        TEntity? entity = await store.GetByCodeAsync(code, ct).ConfigureAwait(false);
+        TEntity? entity = await storeReader.GetByCodeAsync(code, ct).ConfigureAwait(false);
 
         if (entity is null)
         {

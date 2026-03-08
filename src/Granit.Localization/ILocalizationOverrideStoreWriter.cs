@@ -1,25 +1,10 @@
 namespace Granit.Localization;
 
 /// <summary>
-/// Contract for reading and writing per-resource, per-culture translation overrides.
+/// Write-side contract for per-resource, per-culture translation overrides.
 /// </summary>
-/// <remarks>
-/// Overrides take priority over embedded JSON files. An override is identified by
-/// the triple (resourceName, culture, key) and scoped to a tenant when multi-tenancy
-/// is active.
-/// </remarks>
-public interface ILocalizationOverrideStore
+public interface ILocalizationOverrideStoreWriter
 {
-    /// <summary>
-    /// Returns all overrides for the given resource and culture as a key-value dictionary.
-    /// Returns an empty dictionary when no overrides are defined.
-    /// </summary>
-    /// <param name="resourceName">Logical name of the localization resource (e.g. <c>"Acme"</c>).</param>
-    /// <param name="culture">BCP 47 culture tag (e.g. <c>"fr"</c>, <c>"en-US"</c>).</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task<IReadOnlyDictionary<string, string>> GetOverridesAsync(
-        string resourceName, string culture, CancellationToken ct = default);
-
     /// <summary>
     /// Creates or updates the override for a single key (upsert semantics).
     /// </summary>

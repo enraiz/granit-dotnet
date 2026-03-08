@@ -32,9 +32,13 @@ public interface IReferenceDataSeeder<TEntity> where TEntity : ReferenceDataEnti
     int Order { get; }
 
     /// <summary>
-    /// Seeds the reference data using the provided store.
+    /// Seeds the reference data using the provided store reader and writer.
     /// </summary>
-    /// <param name="store">The store to create or update entries.</param>
+    /// <param name="storeReader">The store reader to check existing entries.</param>
+    /// <param name="storeWriter">The store writer to create or update entries.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task SeedAsync(IReferenceDataStore<TEntity> store, CancellationToken cancellationToken = default);
+    Task SeedAsync(
+        IReferenceDataStoreReader<TEntity> storeReader,
+        IReferenceDataStoreWriter<TEntity> storeWriter,
+        CancellationToken cancellationToken = default);
 }

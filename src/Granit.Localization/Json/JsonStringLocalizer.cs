@@ -3,7 +3,7 @@
 // Implements IStringLocalizer with resolution from JSON dictionaries.
 // Supports: native culture fallback (CultureInfo.Parent), parent resource
 // inheritance, {0} formatting, thread-safe cache via Lazy<T>, and optional
-// DB override resolution via ILocalizationOverrideStore (DB > JSON).
+// DB override resolution via ILocalizationOverrideStoreReader (DB > JSON).
 // ---------------------------------------------------------------------------
 
 using System.Collections.Concurrent;
@@ -15,7 +15,7 @@ namespace Granit.Localization.Json;
 
 /// <summary>
 /// Localizer based on embedded JSON dictionaries with culture fallback and inheritance.
-/// DB overrides (when <see cref="ILocalizationOverrideStore"/> is registered) take priority
+/// DB overrides (when <see cref="ILocalizationOverrideStoreReader"/> is registered) take priority
 /// over every embedded JSON file.
 /// </summary>
 /// <remarks>
@@ -31,7 +31,7 @@ internal sealed class JsonStringLocalizer(
     string defaultCulture,
     List<IStringLocalizer> baseLocalizers,
     string? resourceName = null,
-    ILocalizationOverrideStore? overrideStore = null) : IStringLocalizer
+    ILocalizationOverrideStoreReader? overrideStore = null) : IStringLocalizer
 {
     private readonly ConcurrentDictionary<string, Lazy<Dictionary<string, string>>> _cultureCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, Lazy<IReadOnlyDictionary<string, string>>> _overrideCache = new(StringComparer.OrdinalIgnoreCase);
@@ -39,7 +39,7 @@ internal sealed class JsonStringLocalizer(
     private readonly string _defaultCulture = defaultCulture;
     private readonly List<IStringLocalizer> _baseLocalizers = baseLocalizers;
     private readonly string? _resourceName = resourceName;
-    private readonly ILocalizationOverrideStore? _overrideStore = overrideStore;
+    private readonly ILocalizationOverrideStoreReader? _overrideStore = overrideStore;
 
     /// <inheritdoc />
     public LocalizedString this[string name]

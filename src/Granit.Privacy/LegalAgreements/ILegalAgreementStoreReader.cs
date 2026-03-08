@@ -1,16 +1,13 @@
 namespace Granit.Privacy.LegalAgreements;
 
 /// <summary>
-/// Persistence abstraction for legal agreements. Implemented by the application (EF Core, etc.).
+/// Read-only persistence abstraction for legal agreements. Implemented by the application (EF Core, etc.).
 /// </summary>
-public interface ILegalAgreementStore
+public interface ILegalAgreementStoreReader
 {
     /// <summary>Returns the latest agreement for a user and document, or <c>null</c> if none.</summary>
     Task<LegalAgreementBase?> FindLatestAsync(Guid userId, string documentId, CancellationToken ct = default);
 
     /// <summary>Returns all agreements for a user, ordered by date (most recent first).</summary>
     Task<IReadOnlyList<LegalAgreementBase>> FindAllByUserAsync(Guid userId, CancellationToken ct = default);
-
-    /// <summary>Records a new legal agreement (append-only).</summary>
-    Task RecordAsync(LegalAgreementBase agreement, CancellationToken ct = default);
 }

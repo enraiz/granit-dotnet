@@ -40,13 +40,13 @@ internal static class PermissionGrantEndpoints
 
     private static async Task<Ok<PermissionGrantResponse>> GetGrantedPermissionsAsync(
         string roleName,
-        IPermissionManager permissionManager,
+        IPermissionManagerReader permissionManagerReader,
         ICurrentTenant currentTenant,
         CancellationToken ct)
     {
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
-        IReadOnlyList<string> permissions = await permissionManager
+        IReadOnlyList<string> permissions = await permissionManagerReader
             .GetGrantedPermissionsAsync(roleName, tenantId, ct)
             .ConfigureAwait(false);
 
@@ -56,7 +56,7 @@ internal static class PermissionGrantEndpoints
     private static async Task<Results<NoContent, ValidationProblem>> GrantPermissionAsync(
         string roleName,
         string permissionName,
-        IPermissionManager permissionManager,
+        IPermissionManagerWriter permissionManagerWriter,
         IPermissionDefinitionManager definitionManager,
         ICurrentTenant currentTenant,
         CancellationToken ct)
@@ -72,7 +72,7 @@ internal static class PermissionGrantEndpoints
 
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
-        await permissionManager.SetAsync(permissionName, roleName, tenantId, isGranted: true, ct)
+        await permissionManagerWriter.SetAsync(permissionName, roleName, tenantId, isGranted: true, ct)
             .ConfigureAwait(false);
 
         return TypedResults.NoContent();
@@ -81,7 +81,7 @@ internal static class PermissionGrantEndpoints
     private static async Task<Results<NoContent, ValidationProblem>> RevokePermissionAsync(
         string roleName,
         string permissionName,
-        IPermissionManager permissionManager,
+        IPermissionManagerWriter permissionManagerWriter,
         IPermissionDefinitionManager definitionManager,
         ICurrentTenant currentTenant,
         CancellationToken ct)
@@ -97,7 +97,7 @@ internal static class PermissionGrantEndpoints
 
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
-        await permissionManager.SetAsync(permissionName, roleName, tenantId, isGranted: false, ct)
+        await permissionManagerWriter.SetAsync(permissionName, roleName, tenantId, isGranted: false, ct)
             .ConfigureAwait(false);
 
         return TypedResults.NoContent();

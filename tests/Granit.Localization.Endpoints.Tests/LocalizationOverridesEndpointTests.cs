@@ -19,14 +19,15 @@ namespace Granit.Localization.Endpoints.Tests;
 /// <summary>
 /// Integration tests for the localization override management endpoints
 /// (GET/PUT/DELETE /localization/overrides). Uses a TestServer + NSubstitute
-/// mock for <see cref="ILocalizationOverrideStore"/>.
+/// mocks for <see cref="ILocalizationOverrideStoreReader"/> and <see cref="ILocalizationOverrideStoreWriter"/>.
 /// </summary>
 public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
 {
     private const string Prefix = "/localization/overrides";
     private const string ManageRole = "localization-admin";
 
-    private readonly ILocalizationOverrideStore _store = Substitute.For<ILocalizationOverrideStore>();
+    private readonly ILocalizationOverrideStoreReader _storeReader = Substitute.For<ILocalizationOverrideStoreReader>();
+    private readonly ILocalizationOverrideStoreWriter _storeWriter = Substitute.For<ILocalizationOverrideStoreWriter>();
     private readonly WebApplication _app;
     private readonly HttpClient _adminClient;
     private readonly HttpClient _anonClient;
@@ -46,7 +47,8 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
             .AddPolicy(LocalizationOverridesPermissions.Manage,
                 policy => policy.RequireRole(ManageRole));
 
-        builder.Services.AddSingleton(_store);
+        builder.Services.AddSingleton(_storeReader);
+        builder.Services.AddSingleton(_storeWriter);
 
         _app = builder.Build();
         _app.MapGranitLocalizationOverrides();
@@ -138,7 +140,7 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
     public async Task GetOverrides_WithValidParams_ReturnsEmptyDictionary()
     {
         // Arrange
-        _store.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
+        _storeReader.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
             .Returns(new Dictionary<string, string>());
 
         // Act
@@ -164,7 +166,7 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
             ["Hello"] = "Salut",
             ["Goodbye"] = "Ciao",
         };
-        _store.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
+        _storeReader.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
             .Returns(overrides);
 
         // Act
@@ -282,7 +284,7 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
     public async Task PutOverride_WithValidRequest_Returns204()
     {
         // Arrange
-        _store.SetOverrideAsync("Test", "fr", "Hello", "Salut", Arg.Any<CancellationToken>())
+        _storeWriter.SetOverrideAsync("Test", "fr", "Hello", "Salut", Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
         // Act
@@ -293,7 +295,7 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _store.Received(1).SetOverrideAsync("Test", "fr", "Hello", "Salut", Arg.Any<CancellationToken>());
+        await _storeWriter.Received(1).SetOverrideAsync("Test", "fr", "Hello", "Salut", Arg.Any<CancellationToken>());
     }
 
     // =========================================================================
@@ -332,7 +334,7 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
     public async Task DeleteOverride_WithValidRequest_Returns204()
     {
         // Arrange
-        _store.RemoveOverrideAsync("Test", "fr", "Hello", Arg.Any<CancellationToken>())
+        _storeWriter.RemoveOverrideAsync("Test", "fr", "Hello", Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
         // Act
@@ -342,7 +344,7 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _store.Received(1).RemoveOverrideAsync("Test", "fr", "Hello", Arg.Any<CancellationToken>());
+        await _storeWriter.Received(1).RemoveOverrideAsync("Test", "fr", "Hello", Arg.Any<CancellationToken>());
     }
 
     // =========================================================================
@@ -418,9 +420,10 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
         builder.Services.AddAuthorizationBuilder()
             .AddPolicy(LocalizationOverridesPermissions.Manage,
                 policy => policy.RequireRole(ManageRole));
-        builder.Services.AddSingleton(_store);
+        builder.Services.AddSingleton(_storeReader);
+        builder.Services.AddSingleton(_storeWriter);
 
-        _store.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
+        _storeReader.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
             .Returns(new Dictionary<string, string>());
 
         await using WebApplication app = builder.Build();
@@ -457,9 +460,10 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
         builder.Services.AddAuthorizationBuilder()
             .AddPolicy(LocalizationOverridesPermissions.Manage,
                 policy => policy.RequireRole(ManageRole));
-        builder.Services.AddSingleton(_store);
+        builder.Services.AddSingleton(_storeReader);
+        builder.Services.AddSingleton(_storeWriter);
 
-        _store.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
+        _storeReader.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
             .Returns(new Dictionary<string, string>());
 
         await using WebApplication app = builder.Build();
@@ -488,7 +492,7 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
     // =========================================================================
 
     /// <summary>
-    /// Builds a standalone WebApplication without registering <see cref="ILocalizationOverrideStore"/>
+    /// Builds a standalone WebApplication without registering <see cref="ILocalizationOverrideStoreReader"/>
     /// to test the 501 Not Implemented path.
     /// </summary>
     private static async Task<WebApplication> BuildAppWithoutStoreAsync()

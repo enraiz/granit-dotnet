@@ -5,7 +5,7 @@ namespace Granit.Privacy.LegalAgreements.Internal;
 /// </summary>
 internal sealed class LegalAgreementChecker(
     ILegalDocumentRegistry documentRegistry,
-    ILegalAgreementStore store) : ILegalAgreementChecker
+    ILegalAgreementStoreReader storeReader) : ILegalAgreementChecker
 {
     /// <inheritdoc/>
     public async Task<bool> HasAcceptedLatestAsync(Guid userId, string documentId, CancellationToken ct = default)
@@ -16,7 +16,7 @@ internal sealed class LegalAgreementChecker(
             return false;
         }
 
-        LegalAgreementBase? latest = await store.FindLatestAsync(userId, documentId, ct).ConfigureAwait(false);
+        LegalAgreementBase? latest = await storeReader.FindLatestAsync(userId, documentId, ct).ConfigureAwait(false);
         if (latest is null)
         {
             return false;
@@ -27,5 +27,5 @@ internal sealed class LegalAgreementChecker(
 
     /// <inheritdoc/>
     public Task<IReadOnlyList<LegalAgreementBase>> GetUserAgreementsAsync(Guid userId, CancellationToken ct = default) =>
-        store.FindAllByUserAsync(userId, ct);
+        storeReader.FindAllByUserAsync(userId, ct);
 }

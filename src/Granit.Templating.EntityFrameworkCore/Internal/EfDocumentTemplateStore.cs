@@ -8,7 +8,7 @@ using Microsoft.Extensions.Caching.Hybrid;
 namespace Granit.Templating.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// EF Core implementation of <see cref="IDocumentTemplateStore"/>.
+/// EF Core implementation of <see cref="IDocumentTemplateStoreReader"/> and <see cref="IDocumentTemplateStoreWriter"/>.
 /// Manages the Draft → Published → Archived lifecycle of template revisions.
 /// </summary>
 /// <remarks>
@@ -27,7 +27,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 internal sealed class EfDocumentTemplateStore(
     IDbContextFactory<TemplatingDbContext> contextFactory,
     HybridCache cache,
-    ITemplateTransitionHook transitionHook) : IDocumentTemplateStore
+    ITemplateTransitionHook transitionHook) : IDocumentTemplateStoreReader, IDocumentTemplateStoreWriter
 {
     /// <inheritdoc/>
     public async Task<TemplateDescriptor?> TryGetPublishedAsync(

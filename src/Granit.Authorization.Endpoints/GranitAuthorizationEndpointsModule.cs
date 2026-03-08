@@ -13,7 +13,7 @@ namespace Granit.Authorization.Endpoints;
 /// Exposes permission management routes via
 /// <see cref="Extensions.AuthorizationEndpointRouteBuilderExtensions.MapAuthorizationEndpoints"/>.
 /// Requires both <see cref="GranitAuthorizationModule"/> (permission policy enforcement)
-/// and <see cref="GranitAuthorizationEntityFrameworkCoreModule"/> (<see cref="Abstractions.IPermissionManager"/>).
+/// and <see cref="GranitAuthorizationEntityFrameworkCoreModule"/> (<see cref="Abstractions.IPermissionManagerReader"/>/<see cref="Abstractions.IPermissionManagerWriter"/>).
 /// </remarks>
 [DependsOn(
     typeof(GranitAuthorizationModule),

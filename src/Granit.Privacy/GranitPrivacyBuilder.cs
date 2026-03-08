@@ -42,11 +42,15 @@ public sealed class GranitPrivacyBuilder(IServiceCollection services)
 
     /// <summary>
     /// Registers the legal agreement store implementation (provided by the application).
+    /// The concrete type is registered once, then forwarded to both
+    /// <see cref="ILegalAgreementStoreReader"/> and <see cref="ILegalAgreementStoreWriter"/>.
     /// </summary>
     public GranitPrivacyBuilder UseLegalAgreementStore<TStore>()
-        where TStore : class, ILegalAgreementStore
+        where TStore : class, ILegalAgreementStoreReader, ILegalAgreementStoreWriter
     {
-        Services.AddScoped<ILegalAgreementStore, TStore>();
+        Services.AddScoped<TStore>();
+        Services.AddScoped<ILegalAgreementStoreReader>(sp => sp.GetRequiredService<TStore>());
+        Services.AddScoped<ILegalAgreementStoreWriter>(sp => sp.GetRequiredService<TStore>());
         return this;
     }
 }

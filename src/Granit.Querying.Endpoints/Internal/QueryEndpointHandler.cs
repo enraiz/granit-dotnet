@@ -42,7 +42,7 @@ internal static class QueryEndpointHandler
     /// </summary>
     internal static async Task<Ok<QueryMetadata>> GetMetadataAsync<TEntity>(
         IQueryEngine<TEntity> engine,
-        ISavedViewStore savedViewStore,
+        ISavedViewStoreReader savedViewStore,
         QueryDefinition<TEntity> definition,
         Granit.Core.MultiTenancy.ICurrentTenant tenant,
         System.Security.Claims.ClaimsPrincipal user,

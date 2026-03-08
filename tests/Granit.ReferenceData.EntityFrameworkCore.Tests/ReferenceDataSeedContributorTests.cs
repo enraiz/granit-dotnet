@@ -21,9 +21,8 @@ public sealed class ReferenceDataSeedContributorTests
         IReferenceDataSeeder<TestEntity> seeder3 = CreateSeeder(3, () => executionOrder.Add(3));
 
         // Register in reverse order to verify sorting
-        IReferenceDataStore<TestEntity> store = Substitute.For<IReferenceDataStore<TestEntity>>();
         ReferenceDataSeedContributor<TestEntity> contributor = BuildContributor(
-            store, [seeder3, seeder1, seeder2]);
+            [seeder3, seeder1, seeder2]);
 
         // Act
         await contributor.SeedAsync(new DataSeedContext(), TestContext.Current.CancellationToken);
@@ -41,13 +40,12 @@ public sealed class ReferenceDataSeedContributorTests
         IReferenceDataSeeder<TestEntity> seeder1 = CreateSeeder(1, () => executionOrder.Add(1));
         IReferenceDataSeeder<TestEntity> failingSeeder = Substitute.For<IReferenceDataSeeder<TestEntity>>();
         failingSeeder.Order.Returns(2);
-        failingSeeder.SeedAsync(Arg.Any<IReferenceDataStore<TestEntity>>(), Arg.Any<CancellationToken>())
+        failingSeeder.SeedAsync(Arg.Any<IReferenceDataStoreReader<TestEntity>>(), Arg.Any<IReferenceDataStoreWriter<TestEntity>>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("Seed failed"));
         IReferenceDataSeeder<TestEntity> seeder3 = CreateSeeder(3, () => executionOrder.Add(3));
 
-        IReferenceDataStore<TestEntity> store = Substitute.For<IReferenceDataStore<TestEntity>>();
         ReferenceDataSeedContributor<TestEntity> contributor = BuildContributor(
-            store, [seeder1, failingSeeder, seeder3]);
+            [seeder1, failingSeeder, seeder3]);
 
         // Act — should not throw
         await contributor.SeedAsync(new DataSeedContext(), TestContext.Current.CancellationToken);
@@ -62,11 +60,10 @@ public sealed class ReferenceDataSeedContributorTests
         // Arrange
         IReferenceDataSeeder<TestEntity> seeder = Substitute.For<IReferenceDataSeeder<TestEntity>>();
         seeder.Order.Returns(1);
-        seeder.SeedAsync(Arg.Any<IReferenceDataStore<TestEntity>>(), Arg.Any<CancellationToken>())
+        seeder.SeedAsync(Arg.Any<IReferenceDataStoreReader<TestEntity>>(), Arg.Any<IReferenceDataStoreWriter<TestEntity>>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new OperationCanceledException());
 
-        IReferenceDataStore<TestEntity> store = Substitute.For<IReferenceDataStore<TestEntity>>();
-        ReferenceDataSeedContributor<TestEntity> contributor = BuildContributor(store, [seeder]);
+        ReferenceDataSeedContributor<TestEntity> contributor = BuildContributor([seeder]);
 
         // Act & Assert
         await Should.ThrowAsync<OperationCanceledException>(
@@ -77,8 +74,7 @@ public sealed class ReferenceDataSeedContributorTests
     public async Task SeedAsync_NoSeeders_DoesNotThrow()
     {
         // Arrange
-        IReferenceDataStore<TestEntity> store = Substitute.For<IReferenceDataStore<TestEntity>>();
-        ReferenceDataSeedContributor<TestEntity> contributor = BuildContributor(store, []);
+        ReferenceDataSeedContributor<TestEntity> contributor = BuildContributor([]);
 
         // Act & Assert
         await Should.NotThrowAsync(
@@ -91,7 +87,7 @@ public sealed class ReferenceDataSeedContributorTests
     {
         IReferenceDataSeeder<TestEntity> seeder = Substitute.For<IReferenceDataSeeder<TestEntity>>();
         seeder.Order.Returns(order);
-        seeder.SeedAsync(Arg.Any<IReferenceDataStore<TestEntity>>(), Arg.Any<CancellationToken>())
+        seeder.SeedAsync(Arg.Any<IReferenceDataStoreReader<TestEntity>>(), Arg.Any<IReferenceDataStoreWriter<TestEntity>>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 onSeed();
@@ -101,11 +97,13 @@ public sealed class ReferenceDataSeedContributorTests
     }
 
     private static ReferenceDataSeedContributor<TestEntity> BuildContributor(
-        IReferenceDataStore<TestEntity> store,
         IEnumerable<IReferenceDataSeeder<TestEntity>> seeders)
     {
         ServiceCollection services = new();
-        services.AddSingleton(store);
+        IReferenceDataStoreReader<TestEntity> storeReader = Substitute.For<IReferenceDataStoreReader<TestEntity>>();
+        IReferenceDataStoreWriter<TestEntity> storeWriter = Substitute.For<IReferenceDataStoreWriter<TestEntity>>();
+        services.AddSingleton(storeReader);
+        services.AddSingleton(storeWriter);
         foreach (IReferenceDataSeeder<TestEntity> seeder in seeders)
         {
             services.AddSingleton(seeder);

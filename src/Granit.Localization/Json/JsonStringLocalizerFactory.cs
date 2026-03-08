@@ -21,7 +21,7 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
 {
     private readonly ConcurrentDictionary<Type, Lazy<IStringLocalizer>> _cache = new();
     private readonly IOptions<GranitLocalizationOptions> _options;
-    private readonly ILocalizationOverrideStore? _overrideStore;
+    private readonly ILocalizationOverrideStoreReader? _overrideStore;
 
     /// <summary>
     /// Creates a new factory. <paramref name="overrideStore"/> is optional:
@@ -29,7 +29,7 @@ internal sealed class JsonStringLocalizerFactory : IStringLocalizerFactory
     /// </summary>
     public JsonStringLocalizerFactory(
         IOptions<GranitLocalizationOptions> options,
-        ILocalizationOverrideStore? overrideStore = null)
+        ILocalizationOverrideStoreReader? overrideStore = null)
     {
         _options = options;
         _overrideStore = overrideStore;

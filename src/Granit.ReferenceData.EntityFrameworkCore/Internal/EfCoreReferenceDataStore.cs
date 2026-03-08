@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 namespace Granit.ReferenceData.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// EF Core implementation of <see cref="IReferenceDataStore{TEntity}"/>.
+/// EF Core implementation of <see cref="IReferenceDataStoreReader{TEntity}"/> and <see cref="IReferenceDataStoreWriter{TEntity}"/>.
 /// Persists reference data in the host application's DbContext with built-in
 /// <see cref="IMemoryCache"/> for read-heavy workloads.
 /// </summary>
@@ -20,7 +20,7 @@ namespace Granit.ReferenceData.EntityFrameworkCore.Internal;
 internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
     IServiceScopeFactory scopeFactory,
     IMemoryCache cache,
-    IOptions<ReferenceDataOptions> options) : IReferenceDataStore<TEntity>
+    IOptions<ReferenceDataOptions> options) : IReferenceDataStoreReader<TEntity>, IReferenceDataStoreWriter<TEntity>
     where TEntity : ReferenceDataEntity
     where TDbContext : DbContext
 {

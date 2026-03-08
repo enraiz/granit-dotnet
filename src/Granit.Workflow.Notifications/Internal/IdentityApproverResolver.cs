@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace Granit.Workflow.Notifications.Internal;
 
 /// <summary>
-/// Resolves workflow approvers by combining <see cref="IPermissionManager"/> (permission → roles)
+/// Resolves workflow approvers by combining <see cref="IPermissionManagerReader"/> (permission → roles)
 /// with <see cref="IIdentityProvider"/> (roles → users).
 /// </summary>
 /// <remarks>
@@ -15,7 +15,7 @@ namespace Granit.Workflow.Notifications.Internal;
 /// Resolution flow:
 /// <list type="number">
 ///   <item>
-///     <see cref="IPermissionManager.GetGrantedRolesAsync"/> retrieves role names
+///     <see cref="IPermissionManagerReader.GetGrantedRolesAsync"/> retrieves role names
 ///     granted the required permission (from the authorization database).
 ///   </item>
 ///   <item>
@@ -26,7 +26,7 @@ namespace Granit.Workflow.Notifications.Internal;
 /// </para>
 /// </remarks>
 internal sealed class IdentityApproverResolver(
-    IPermissionManager permissionManager,
+    IPermissionManagerReader permissionManagerReader,
     IIdentityProvider identityProvider,
     ICurrentTenant currentTenant,
     ILogger<IdentityApproverResolver> logger) : IApproverResolver
@@ -38,7 +38,7 @@ internal sealed class IdentityApproverResolver(
     {
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
-        IReadOnlyList<string> roles = await permissionManager.GetGrantedRolesAsync(
+        IReadOnlyList<string> roles = await permissionManagerReader.GetGrantedRolesAsync(
             requiredPermission, tenantId, cancellationToken).ConfigureAwait(false);
 
         if (roles.Count == 0)

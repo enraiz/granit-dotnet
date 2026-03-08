@@ -3,18 +3,18 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Localization.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// EF Core implementation of <see cref="ILocalizationOverrideStore"/>.
+/// EF Core implementation of <see cref="ILocalizationOverrideStoreReader"/> and <see cref="ILocalizationOverrideStoreWriter"/>.
 /// Persists translation overrides in PostgreSQL (table <c>i18n_localization_overrides</c>)
 /// with HDS audit trail.
 /// </summary>
 /// <remarks>
 /// Registered as a keyed service (<c>"efcore-raw"</c>) and wrapped by
-/// <c>CachedLocalizationOverrideStore</c> which is the default <see cref="ILocalizationOverrideStore"/>.
+/// <c>CachedLocalizationOverrideStore</c> which is the default reader/writer.
 /// Each operation uses <see cref="IDbContextFactory{TContext}"/> to create and dispose its own
 /// <see cref="GranitLocalizationOverridesDbContext"/>, making it safe for concurrent request handling.
 /// </remarks>
 internal sealed class EfCoreLocalizationOverrideStore(
-    IDbContextFactory<GranitLocalizationOverridesDbContext> contextFactory) : ILocalizationOverrideStore
+    IDbContextFactory<GranitLocalizationOverridesDbContext> contextFactory) : ILocalizationOverrideStoreReader, ILocalizationOverrideStoreWriter
 {
     private readonly IDbContextFactory<GranitLocalizationOverridesDbContext> _contextFactory = contextFactory;
 

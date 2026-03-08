@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Granit.Authorization.EntityFrameworkCore.Services;
 
 /// <summary>
-/// EF Core implementation of <see cref="IPermissionManager"/>.
+/// EF Core implementation of <see cref="IPermissionManagerReader"/> and <see cref="IPermissionManagerWriter"/>.
 /// Provides grant management with mandatory HDS audit logging on every mutation.
 /// Cache is invalidated after each <see cref="SetAsync"/> to maintain consistency.
 /// </summary>
@@ -19,7 +19,7 @@ internal sealed class PermissionManager<TContext>(
     IPermissionDefinitionManager definitionManager,
     ICacheService<PermissionGrantCacheItem> cache,
     ILogger<PermissionManager<TContext>> logger)
-    : IPermissionManager
+    : IPermissionManagerReader, IPermissionManagerWriter
     where TContext : Microsoft.EntityFrameworkCore.DbContext, IPermissionGrantDbContext
 {
     /// <inheritdoc />

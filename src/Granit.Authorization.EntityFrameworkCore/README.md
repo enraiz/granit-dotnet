@@ -1,6 +1,6 @@
 # Granit.Authorization.EntityFrameworkCore
 
-EF Core persistence for Granit.Authorization permission grants. Provides PermissionGrant entity, IPermissionGrantDbContext, and IPermissionManager with HDS audit logging.
+EF Core persistence for Granit.Authorization permission grants. Provides PermissionGrant entity, IPermissionGrantDbContext, and IPermissionManagerReader/IPermissionManagerWriter with HDS audit logging.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

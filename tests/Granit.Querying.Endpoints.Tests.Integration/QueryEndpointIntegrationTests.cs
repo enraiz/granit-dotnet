@@ -19,7 +19,8 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     private const string Prefix = "/api/products";
 
     private readonly IQueryEngine<TestProduct> _engine = Substitute.For<IQueryEngine<TestProduct>>();
-    private readonly ISavedViewStore _savedViewStore = Substitute.For<ISavedViewStore>();
+    private readonly ISavedViewStoreReader _savedViewStoreReader = Substitute.For<ISavedViewStoreReader>();
+    private readonly ISavedViewStoreWriter _savedViewStoreWriter = Substitute.For<ISavedViewStoreWriter>();
     private readonly WebApplication _app;
     private readonly HttpClient _authClient;
     private readonly HttpClient _anonClient;
@@ -37,7 +38,8 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
 
         // Register mocks
         builder.Services.AddSingleton(_engine);
-        builder.Services.AddSingleton(_savedViewStore);
+        builder.Services.AddSingleton(_savedViewStoreReader);
+        builder.Services.AddSingleton(_savedViewStoreWriter);
         builder.Services.AddSingleton<QueryDefinition<TestProduct>, TestProductQueryDefinition>();
         builder.Services.AddSingleton<ICurrentTenant>(Substitute.For<ICurrentTenant>());
 
@@ -153,7 +155,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
         _engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>())
             .Returns(metadata);
 
-        _savedViewStore.GetListAsync(
+        _savedViewStoreReader.GetListAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
@@ -189,7 +191,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
         _engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>())
             .Returns(metadata);
 
-        _savedViewStore.GetListAsync(
+        _savedViewStoreReader.GetListAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Throws(new NotImplementedException("No store"));
 
@@ -204,7 +206,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task SavedViews_GetList_returns_views()
     {
-        _savedViewStore.GetListAsync(
+        _savedViewStoreReader.GetListAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(
             [
@@ -241,7 +243,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
 
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
-        await _savedViewStore.Received(1).CreateAsync(
+        await _savedViewStoreWriter.Received(1).CreateAsync(
             Arg.Is<SavedView>(v =>
                 v.Name == "My Filter" &&
                 v.FilterJson == "{\"status.eq\":\"active\"}" &&
@@ -253,7 +255,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     public async Task SavedViews_Update_returns_204_when_found()
     {
         var viewId = Guid.NewGuid();
-        _savedViewStore.GetAsync(viewId, Arg.Any<CancellationToken>())
+        _savedViewStoreReader.GetAsync(viewId, Arg.Any<CancellationToken>())
             .Returns(new SavedView
             {
                 Id = viewId,
@@ -275,7 +277,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        await _savedViewStore.Received(1).UpdateAsync(
+        await _savedViewStoreWriter.Received(1).UpdateAsync(
             Arg.Is<SavedView>(v => v.Name == "New Name" && v.IsShared),
             Arg.Any<CancellationToken>());
     }
@@ -284,7 +286,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     public async Task SavedViews_Update_returns_404_when_not_found()
     {
         var viewId = Guid.NewGuid();
-        _savedViewStore.GetAsync(viewId, Arg.Any<CancellationToken>())
+        _savedViewStoreReader.GetAsync(viewId, Arg.Any<CancellationToken>())
             .Returns((SavedView?)null);
 
         UpdateSavedViewRequest request = new() { Name = "Whatever" };
@@ -305,7 +307,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        await _savedViewStore.Received(1).DeleteAsync(viewId, Arg.Any<CancellationToken>());
+        await _savedViewStoreWriter.Received(1).DeleteAsync(viewId, Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -318,7 +320,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        await _savedViewStore.Received(1).SetDefaultAsync(
+        await _savedViewStoreWriter.Received(1).SetDefaultAsync(
             viewId, "test-user-id", "Test.Products", Arg.Any<CancellationToken>());
     }
 
@@ -335,7 +337,8 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
         builder.Services.AddAuthorization();
         builder.Services.AddSingleton(_engine);
-        builder.Services.AddSingleton(_savedViewStore);
+        builder.Services.AddSingleton(_savedViewStoreReader);
+        builder.Services.AddSingleton(_savedViewStoreWriter);
         builder.Services.AddSingleton<QueryDefinition<TestProduct>, TestProductQueryDefinition>();
         builder.Services.AddSingleton<ICurrentTenant>(Substitute.For<ICurrentTenant>());
 

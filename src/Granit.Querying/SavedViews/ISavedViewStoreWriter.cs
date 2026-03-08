@@ -1,30 +1,12 @@
 namespace Granit.Querying.SavedViews;
 
 /// <summary>
-/// Persistence abstraction for saved views.
+/// Write-side persistence abstraction for saved views.
 /// Default implementation is a null-object that throws; use
 /// <c>Granit.Querying.EntityFrameworkCore</c> for a concrete store.
 /// </summary>
-public interface ISavedViewStore
+public interface ISavedViewStoreWriter
 {
-    /// <summary>
-    /// Gets all saved views for an entity type visible to the user.
-    /// Includes personal views and shared views.
-    /// </summary>
-    /// <param name="entityType">The query definition name.</param>
-    /// <param name="userId">The current user identifier.</param>
-    /// <param name="tenantId">The tenant identifier, or <c>null</c>.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task<IReadOnlyList<SavedView>> GetListAsync(
-        string entityType, string userId, Guid? tenantId, CancellationToken ct = default);
-
-    /// <summary>
-    /// Gets a single saved view by identifier.
-    /// </summary>
-    /// <param name="id">The saved view identifier.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task<SavedView?> GetAsync(Guid id, CancellationToken ct = default);
-
     /// <summary>
     /// Creates a new saved view.
     /// </summary>

@@ -1,26 +1,11 @@
 namespace Granit.Authorization.Abstractions;
 
 /// <summary>
-/// Administrative service for managing role → permission grants.
-/// Each call to <see cref="SetAsync"/> emits an HDS audit log entry and invalidates the cache.
+/// Read-only service for querying role → permission grants.
 /// Available only when <c>Granit.Authorization.EntityFrameworkCore</c> is registered.
 /// </summary>
-public interface IPermissionManager
+public interface IPermissionManagerReader
 {
-    /// <summary>
-    /// Grants or revokes a permission for a role within a tenant.
-    /// No-op if the current state already matches <paramref name="isGranted"/>.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown if <paramref name="permissionName"/> has not been declared.
-    /// </exception>
-    Task SetAsync(
-        string permissionName,
-        string roleName,
-        Guid? tenantId,
-        bool isGranted,
-        CancellationToken cancellationToken = default);
-
     /// <summary>Returns true if the role has been explicitly granted the permission.</summary>
     Task<bool> IsGrantedAsync(
         string permissionName,

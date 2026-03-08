@@ -1,7 +1,7 @@
 namespace Granit.Templating.Store;
 
 /// <summary>
-/// Lifecycle status of a template stored in <see cref="IDocumentTemplateStore"/>.
+/// Lifecycle status of a template managed by <see cref="IDocumentTemplateStoreWriter"/>.
 /// </summary>
 public enum TemplateLifecycleStatus
 {

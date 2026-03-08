@@ -7,7 +7,7 @@ Digital Dynamics.
 | --- | --- |
 | `Granit.Templating` | Socle générique : interfaces, pipeline, enrichisseurs |
 | `Granit.Templating.Scriban` | Moteur Scriban 6 sandboxé + contextes globaux (`now.*`, `context.*`) |
-| `Granit.Templating.EntityFrameworkCore` | `IDocumentTemplateStore` EF Core — cycle de vie Draft/Published/Archived + **cache hybride** |
+| `Granit.Templating.EntityFrameworkCore` | `IDocumentTemplateStoreReader` / `IDocumentTemplateStoreWriter` EF Core — cycle de vie Draft/Published/Archived + **cache hybride** |
 | `Granit.DocumentGeneration` | Façade `IDocumentGenerator`, `IDocumentRenderer`, `DocumentResult` |
 | `Granit.DocumentGeneration.Pdf` | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête *(à venir)* |
 | `Granit.DocumentGeneration.Excel` | `ClosedXmlTemplateEngine` — génération de tableurs *.xlsx* natifs |
@@ -83,7 +83,7 @@ Résolution de "Billing.Invoice" avec culture "fr-BE" :
 
 | Resolver | Priorité | Source |
 | --- | --- | --- |
-| `StoreTemplateResolver` | 100 | `IDocumentTemplateStore` (EF Core) — templates publiés |
+| `StoreTemplateResolver` | 100 | `IDocumentTemplateStoreReader` (EF Core) — templates publiés |
 | `EmbeddedTemplateResolver` | -100 | Ressources embarquées dans l'assembly — fallback code |
 
 ### Enrichissement des données
@@ -157,7 +157,7 @@ Le remplacement est effectué sur toutes les feuilles du classeur.
 > ni les conditions — il effectue une substitution de chaînes simple. Pour des tableaux
 > dynamiques, utilisez un renderer HTML→Excel avec Scriban comme source.
 
-### Cycle de vie des templates (IDocumentTemplateStore)
+### Cycle de vie des templates (IDocumentTemplateStoreWriter)
 
 Sans le module Workflow :
 
@@ -242,7 +242,7 @@ builder.Services.AddGranitTemplatingWithScriban();
 // Moteur Excel ClosedXML (ITemplateEngine, additive — les deux moteurs coexistent)
 builder.Services.AddGranitDocumentGenerationExcel();
 
-// Store EF Core (IDocumentTemplateStore + StoreTemplateResolver + HybridCache L1)
+// Store EF Core (IDocumentTemplateStoreReader/Writer + StoreTemplateResolver + HybridCache L1)
 builder.AddGranitTemplatingEntityFrameworkCore(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
@@ -355,20 +355,22 @@ DocumentResult excel = await generator.GenerateAsync(
 ### Administration des templates (store EF Core)
 
 ```csharp
-public sealed class TemplateAdminService(IDocumentTemplateStore store)
+public sealed class TemplateAdminService(
+    IDocumentTemplateStoreReader storeReader,
+    IDocumentTemplateStoreWriter storeWriter)
 {
     // Créer ou mettre à jour un brouillon
     public Task SaveDraftAsync(TemplateKey key, string html, CancellationToken ct)
-        => store.SaveDraftAsync(key, html, "text/html", "admin@digitaldynamics.be", ct);
+        => storeWriter.SaveDraftAsync(key, html, "text/html", "admin@digitaldynamics.be", ct);
 
     // Publier le brouillon courant (invalide le cache HybridCache)
     public Task PublishAsync(TemplateKey key, CancellationToken ct)
-        => store.PublishAsync(key, "admin@digitaldynamics.be", ct);
+        => storeWriter.PublishAsync(key, "admin@digitaldynamics.be", ct);
 
     // Consulter l'historique complet (audit HDS)
     public Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
         TemplateKey key, CancellationToken ct)
-        => store.GetHistoryAsync(key, ct);
+        => storeReader.GetHistoryAsync(key, ct);
 }
 ```
 
@@ -397,7 +399,7 @@ ITextTemplateRenderer (TextTemplateRenderer — internal, scoped)
         ├── NowGlobalContext              → now.*
         └── ExecutionContextGlobalContext → context.*
 
-IDocumentTemplateStore (EfDocumentTemplateStore — internal, scoped)
+IDocumentTemplateStoreReader / IDocumentTemplateStoreWriter (EfDocumentTemplateStore — internal, scoped)
   ├── IDbContextFactory<TemplatingDbContext>
   ├── HybridCache                                  (L1 MemoryCache + L2 Redis optionnel)
   └── ITemplateTransitionHook

@@ -8,7 +8,7 @@ public sealed class GranitAuthorizationOptions
 
     /// <summary>
     /// Roles that bypass all permission checks. These roles are the root of trust
-    /// and cannot be restricted via <c>IPermissionManager.SetAsync()</c>.
+    /// and cannot be restricted via <c>IPermissionManagerWriter.SetAsync()</c>.
     /// Defaults to <c>["admin"]</c>.
     /// </summary>
     public IList<string> AdminRoles { get; set; } = ["admin"];

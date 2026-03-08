@@ -10,7 +10,7 @@ namespace Granit.Privacy.Tests;
 public sealed class LegalAgreementCheckerTests
 {
     private readonly LegalDocumentRegistry _documentRegistry = new();
-    private readonly ILegalAgreementStore _store = Substitute.For<ILegalAgreementStore>();
+    private readonly ILegalAgreementStoreReader _store = Substitute.For<ILegalAgreementStoreReader>();
     private readonly LegalAgreementChecker _sut;
 
     public LegalAgreementCheckerTests()

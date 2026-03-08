@@ -1,36 +1,23 @@
 using Granit.Templating.Keys;
-using Granit.Templating.Pipeline;
 
 namespace Granit.Templating.Store;
 
 /// <summary>
-/// Contract for reading and writing template content with draft/published/archived lifecycle.
+/// Write-side contract for managing the draft/published/archived lifecycle of templates.
 /// </summary>
 /// <remarks>
-/// Implemented by <c>EfCoreDocumentTemplateStore</c> in <c>Granit.Templating.EntityFrameworkCore</c>.
-/// A <c>CachedDocumentTemplateStore</c> decorator wraps it with a hybrid memory/Redis cache.
-/// <para>
 /// Lifecycle:
 /// <list type="number">
 ///   <item><see cref="SaveDraftAsync"/> — create or update the editable draft for a key.</item>
 ///   <item><see cref="PublishAsync"/> — promote the current draft to <c>Published</c>,
 ///     archiving any previous published revision.</item>
 ///   <item><see cref="UnpublishAsync"/> — archive the published revision without promoting a new one.</item>
-///   <item><see cref="DeleteAsync"/> — physically delete a draft (only allowed for drafts).</item>
+///   <item><see cref="DeleteDraftAsync"/> — physically delete a draft (only allowed for drafts).</item>
 /// </list>
 /// Published and archived revisions are never physically deleted (HDS requirement).
-/// </para>
 /// </remarks>
-public interface IDocumentTemplateStore
+public interface IDocumentTemplateStoreWriter
 {
-    /// <summary>
-    /// Returns the currently published template for the given key, or <c>null</c> if none exists.
-    /// </summary>
-    /// <param name="key">Template key (name + optional culture).</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task<TemplateDescriptor?> TryGetPublishedAsync(
-        TemplateKey key, CancellationToken ct = default);
-
     /// <summary>
     /// Creates or replaces the draft for the given key.
     /// </summary>
@@ -64,7 +51,7 @@ public interface IDocumentTemplateStore
 
     /// <summary>
     /// Archives the currently published revision without promoting a new one.
-    /// After this call, <see cref="TryGetPublishedAsync"/> returns <c>null</c> for this key.
+    /// After this call, <see cref="IDocumentTemplateStoreReader.TryGetPublishedAsync"/> returns <c>null</c> for this key.
     /// </summary>
     /// <param name="key">Template key.</param>
     /// <param name="unpublishedBy">Identity of the user unpublishing.</param>
@@ -89,12 +76,4 @@ public interface IDocumentTemplateStore
         TemplateKey key,
         string deletedBy,
         CancellationToken ct = default);
-
-    /// <summary>
-    /// Returns the full revision history for the given key, ordered by creation date (newest first).
-    /// </summary>
-    /// <param name="key">Template key.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
-        TemplateKey key, CancellationToken ct = default);
 }

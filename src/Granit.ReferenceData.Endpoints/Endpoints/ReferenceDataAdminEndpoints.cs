@@ -43,7 +43,7 @@ internal static class ReferenceDataAdminEndpoints
 
     private static async Task<Created> CreateAsync<TEntity>(
         ReferenceDataCreateRequest request,
-        IReferenceDataStore<TEntity> store,
+        IReferenceDataStoreWriter<TEntity> storeWriter,
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity, new()
     {
@@ -64,7 +64,7 @@ internal static class ReferenceDataAdminEndpoints
             IsActive = true,
         };
 
-        await store.CreateAsync(entity, ct).ConfigureAwait(false);
+        await storeWriter.CreateAsync(entity, ct).ConfigureAwait(false);
 
         return TypedResults.Created($"{request.Code}");
     }
@@ -72,11 +72,12 @@ internal static class ReferenceDataAdminEndpoints
     private static async Task<Results<Ok, NotFound>> UpdateAsync<TEntity>(
         string code,
         ReferenceDataUpdateRequest request,
-        IReferenceDataStore<TEntity> store,
+        IReferenceDataStoreReader<TEntity> storeReader,
+        IReferenceDataStoreWriter<TEntity> storeWriter,
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity, new()
     {
-        TEntity? existing = await store.GetByCodeAsync(code, ct).ConfigureAwait(false);
+        TEntity? existing = await storeReader.GetByCodeAsync(code, ct).ConfigureAwait(false);
         if (existing is null)
         {
             return TypedResults.NotFound();
@@ -94,24 +95,25 @@ internal static class ReferenceDataAdminEndpoints
         existing.ValidFrom = request.ValidFrom;
         existing.ValidTo = request.ValidTo;
 
-        await store.UpdateAsync(existing, ct).ConfigureAwait(false);
+        await storeWriter.UpdateAsync(existing, ct).ConfigureAwait(false);
 
         return TypedResults.Ok();
     }
 
     private static async Task<Results<NoContent, NotFound>> DeactivateAsync<TEntity>(
         string code,
-        IReferenceDataStore<TEntity> store,
+        IReferenceDataStoreReader<TEntity> storeReader,
+        IReferenceDataStoreWriter<TEntity> storeWriter,
         CancellationToken ct = default)
         where TEntity : ReferenceDataEntity, new()
     {
-        TEntity? existing = await store.GetByCodeAsync(code, ct).ConfigureAwait(false);
+        TEntity? existing = await storeReader.GetByCodeAsync(code, ct).ConfigureAwait(false);
         if (existing is null)
         {
             return TypedResults.NotFound();
         }
 
-        await store.SetActiveAsync(code, false, ct).ConfigureAwait(false);
+        await storeWriter.SetActiveAsync(code, false, ct).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }
