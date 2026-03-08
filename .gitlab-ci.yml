@@ -117,13 +117,14 @@ test:
   variables:
     VSTEST_CONNECTION_TIMEOUT: "300"
     XUNIT_LAUNCH_TIMEOUT: "300"
+    XUNIT_MAX_THREAD_COUNT: "2"
   script:
     - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true
     - >
       dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage;Format=opencover,cobertura"
-      -- RunConfiguration.MaxCpuCount=2
+      -- RunConfiguration.MaxCpuCount=4
   artifacts:
     when: always
     paths:
