@@ -14,26 +14,27 @@ sont échangés entre le client, le serveur et OVHcloud Object Storage.
 
 ### Architecture Direct-to-Cloud
 
-```text
-Client                Serveur (Granit)           OVHcloud S3
-  │                        │                          │
-  │─ POST /upload ─────────▶│                          │
-  │                        │─ InitiateUploadAsync()   │
-  │                        │  crée BlobDescriptor     │
-  │                        │  génère URL pré-signée ──▶│
-  │◀─ PresignedUploadTicket ─│                          │
-  │                          │                          │
-  │─ PUT (octets) ────────────────────────────────────▶│
-  │◀─ 200 OK ─────────────────────────────────────────│
-  │                          │                          │
-  │─ POST /validate ─────────▶│                          │
-  │                          │─ ValidateAsync()         │
-  │                          │  magic bytes (range GET)─▶│
-  │                          │◀─ premiers 261 octets ───│
-  │                          │  taille (HEAD) ──────────▶│
-  │                          │◀─ Content-Length ────────│
-  │                          │  BlobDescriptor → Valid  │
-  │◀─ 200 OK ────────────────│                          │
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Serveur (Granit)
+    participant O as OVHcloud S3
+
+    C->>S: POST /upload
+    S->>S: InitiateUploadAsync()<br/>crée BlobDescriptor
+    S->>O: génère URL pré-signée
+    S-->>C: PresignedUploadTicket
+
+    C->>O: PUT (octets)
+    O-->>C: 200 OK
+
+    C->>S: POST /validate
+    S->>O: ValidateAsync()<br/>magic bytes (range GET)
+    O-->>S: premiers 261 octets
+    S->>O: taille (HEAD)
+    O-->>S: Content-Length
+    S->>S: BlobDescriptor → Valid
+    S-->>C: 200 OK
 ```
 
 Le serveur ne lit jamais le fichier complet : 261 octets max pour la détection de type,
@@ -41,9 +42,13 @@ Le serveur ne lit jamais le fichier complet : 261 octets max pour la détection 
 
 ### Cycle de vie du BlobDescriptor
 
-```text
-Pending → Uploading → Valid → Deleted
-                    ↘ Rejected
+```mermaid
+stateDiagram-v2
+    [*] --> Pending
+    Pending --> Uploading
+    Uploading --> Valid
+    Uploading --> Rejected
+    Valid --> Deleted
 ```
 
 | État | Déclencheur |
