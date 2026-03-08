@@ -219,6 +219,84 @@ internal sealed class EfDocumentTemplateStore(
     }
 
     /// <inheritdoc/>
+    public async Task<TemplateRevision?> TryGetDraftAsync(
+        TemplateKey key, CancellationToken ct = default)
+    {
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+        TemplateRevisionEntity? entity = await ctx.TemplateRevisions
+            .Where(r => r.TemplateName == key.Name
+                        && r.Culture == key.Culture
+                        && r.Status == TemplateLifecycleStatus.Draft)
+            .FirstOrDefaultAsync(ct).ConfigureAwait(false);
+
+        return entity is null ? null : ToRevision(entity);
+    }
+
+    /// <inheritdoc/>
+    public async Task<PagedTemplateResult> ListTemplatesAsync(
+        TemplateListFilter filter, CancellationToken ct = default)
+    {
+        await using TemplatingDbContext ctx = await contextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+
+        // Exclude archived revisions from the list — they are only visible in history.
+        IQueryable<TemplateRevisionEntity> query = ctx.TemplateRevisions
+            .Where(r => r.Status != TemplateLifecycleStatus.Archived);
+
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+        {
+            query = query.Where(r => r.TemplateName.Contains(filter.Search));
+        }
+
+        if (filter.Status.HasValue)
+        {
+            query = query.Where(r => r.Status == filter.Status.Value);
+        }
+
+        if (filter.Culture is not null)
+        {
+            query = query.Where(r => r.Culture == filter.Culture);
+        }
+
+        // Group by (Name, Culture) to produce one row per template key.
+        var grouped = query
+            .GroupBy(r => new { r.TemplateName, r.Culture })
+            .Select(g => new
+            {
+                g.Key.TemplateName,
+                g.Key.Culture,
+                MimeType = g.OrderByDescending(r => r.CreatedAt).Select(r => r.MimeType).First(),
+                CurrentStatus = g.Any(r => r.Status == TemplateLifecycleStatus.Draft)
+                    ? TemplateLifecycleStatus.Draft
+                    : TemplateLifecycleStatus.Published,
+                LastModifiedAt = g.Max(r => r.CreatedAt),
+                LastModifiedBy = g.OrderByDescending(r => r.CreatedAt).Select(r => r.CreatedBy).First(),
+                HasPublishedVersion = g.Any(r => r.Status == TemplateLifecycleStatus.Published),
+            });
+
+        int totalCount = await grouped.CountAsync(ct).ConfigureAwait(false);
+
+        var items = await grouped
+            .OrderBy(g => g.TemplateName)
+            .ThenBy(g => g.Culture)
+            .Skip((filter.Page - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(ct).ConfigureAwait(false);
+
+        List<TemplateSummary> summaries = items.ConvertAll(g => new TemplateSummary
+        {
+            Name = g.TemplateName,
+            Culture = g.Culture,
+            MimeType = g.MimeType,
+            CurrentStatus = g.CurrentStatus,
+            LastModifiedAt = g.LastModifiedAt,
+            LastModifiedBy = g.LastModifiedBy,
+            HasPublishedVersion = g.HasPublishedVersion,
+        });
+
+        return new PagedTemplateResult(summaries, totalCount);
+    }
+
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
         TemplateKey key, CancellationToken ct = default)
     {
@@ -239,6 +317,19 @@ internal sealed class EfDocumentTemplateStore(
             })
             .ToListAsync(ct).ConfigureAwait(false);
     }
+
+    private static TemplateRevision ToRevision(TemplateRevisionEntity entity) =>
+        new()
+        {
+            RevisionId = entity.RevisionId,
+            Content = entity.Content,
+            MimeType = entity.MimeType,
+            Status = entity.Status,
+            CreatedAt = entity.CreatedAt,
+            CreatedBy = entity.CreatedBy,
+            PublishedAt = entity.PublishedAt,
+            PublishedBy = entity.PublishedBy,
+        };
 
     private static string CacheKey(TemplateKey key) =>
         $"granit:tmpl:{key.Name}|{key.Culture ?? string.Empty}";

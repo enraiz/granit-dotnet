@@ -1,0 +1,7 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Templating": "Vorlagenverwaltung",
+    "Permission:Templates.Manage": "Vorlagen verwalten (anzeigen, erstellen, bearbeiten, löschen, veröffentlichen)"
+  }
+}

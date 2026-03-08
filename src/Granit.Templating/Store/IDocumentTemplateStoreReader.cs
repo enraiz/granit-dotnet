@@ -21,6 +21,22 @@ public interface IDocumentTemplateStoreReader
         TemplateKey key, CancellationToken ct = default);
 
     /// <summary>
+    /// Returns the current draft revision for the given key, or <c>null</c> if no draft exists.
+    /// </summary>
+    /// <param name="key">Template key (name + optional culture).</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<TemplateRevision?> TryGetDraftAsync(
+        TemplateKey key, CancellationToken ct = default);
+
+    /// <summary>
+    /// Returns a paginated, filterable list of template summaries for admin views.
+    /// </summary>
+    /// <param name="filter">Filter and pagination parameters.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<PagedTemplateResult> ListTemplatesAsync(
+        TemplateListFilter filter, CancellationToken ct = default);
+
+    /// <summary>
     /// Returns the full revision history for the given key, ordered by creation date (newest first).
     /// </summary>
     /// <param name="key">Template key.</param>
