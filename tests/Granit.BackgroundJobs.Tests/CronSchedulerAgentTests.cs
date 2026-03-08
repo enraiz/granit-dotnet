@@ -15,7 +15,8 @@ public sealed class CronSchedulerAgentTests
     // Test infrastructure
     // =========================================================================
 
-    private readonly IBackgroundJobStore _store = Substitute.For<IBackgroundJobStore>();
+    private readonly IBackgroundJobStoreReader _storeReader = Substitute.For<IBackgroundJobStoreReader>();
+    private readonly IBackgroundJobStoreWriter _storeWriter = Substitute.For<IBackgroundJobStoreWriter>();
     private readonly IMessageBus _bus = Substitute.For<IMessageBus>();
     private readonly IClock _clock = Substitute.For<IClock>();
     private readonly IServiceScopeFactory _scopeFactory;
@@ -33,7 +34,7 @@ public sealed class CronSchedulerAgentTests
     }
 
     private CronSchedulerAgent CreateAgent() =>
-        new(_store, _scopeFactory, _clock, NullLogger<CronSchedulerAgent>.Instance);
+        new(_storeReader, _storeWriter, _scopeFactory, _clock, NullLogger<CronSchedulerAgent>.Instance);
 
     private static BackgroundJobDefinition MakeJob(
         string jobName,
@@ -61,7 +62,7 @@ public sealed class CronSchedulerAgentTests
     public async Task StartAsync_JobWithNoNextExecution_SchedulesFirstOccurrence()
     {
         BackgroundJobDefinition job = MakeJob("daily-sync", cron: "0 9 * * *");
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
             .Returns([job]);
 
         await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
@@ -71,7 +72,7 @@ public sealed class CronSchedulerAgentTests
         await _bus.Received(1).PublishAsync(
             Arg.Any<FakeJobMessage>(),
             Arg.Any<DeliveryOptions>());
-        await _store.Received(1).RecordNextExecutionAsync(
+        await _storeWriter.Received(1).RecordNextExecutionAsync(
             "daily-sync",
             Arg.Any<DateTimeOffset>(),
             Arg.Any<CancellationToken>());
@@ -86,7 +87,7 @@ public sealed class CronSchedulerAgentTests
     {
         DateTimeOffset future = _clock.Now.AddHours(2);
         BackgroundJobDefinition job = MakeJob("daily-sync", nextExecutionAt: future);
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
             .Returns([job]);
 
         await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
@@ -94,7 +95,7 @@ public sealed class CronSchedulerAgentTests
 
         await _bus.DidNotReceive().PublishAsync(
             Arg.Any<object>(), Arg.Any<DeliveryOptions>());
-        await _store.DidNotReceive().RecordNextExecutionAsync(
+        await _storeWriter.DidNotReceive().RecordNextExecutionAsync(
             Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>());
     }
 
@@ -107,7 +108,7 @@ public sealed class CronSchedulerAgentTests
     {
         DateTimeOffset past = _clock.Now.AddHours(-2);
         BackgroundJobDefinition job = MakeJob("daily-sync", cron: "0 9 * * *", nextExecutionAt: past);
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
             .Returns([job]);
 
         await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
@@ -124,7 +125,7 @@ public sealed class CronSchedulerAgentTests
     [Fact]
     public async Task StartAsync_NoEnabledJobs_DoesNotScheduleAnything()
     {
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
             .Returns(Array.Empty<BackgroundJobDefinition>());
 
         await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
@@ -142,7 +143,7 @@ public sealed class CronSchedulerAgentTests
     public async Task StartAsync_CalledTwice_SchedulesOnlyOnce()
     {
         BackgroundJobDefinition job = MakeJob("daily-sync");
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
             .Returns([job]);
 
         Microsoft.Extensions.Hosting.IHostedService agent = CreateAgent();
@@ -151,7 +152,7 @@ public sealed class CronSchedulerAgentTests
 
         // Simulate that RecordNextExecutionAsync updated NextExecutionAt
         job.NextExecutionAt = _clock.Now.AddHours(1);
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>())
             .Returns([job]);
 
         await agent.StartAsync(TestContext.Current.CancellationToken);
@@ -168,13 +169,13 @@ public sealed class CronSchedulerAgentTests
     public async Task StartAsync_JobWithInvalidCron_SkipsWithoutScheduling()
     {
         BackgroundJobDefinition job = MakeJob("bad-cron", cron: "NOT_A_CRON");
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>()).Returns([job]);
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>()).Returns([job]);
 
         await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
             .StartAsync(TestContext.Current.CancellationToken);
 
         await _bus.DidNotReceive().PublishAsync(Arg.Any<object>(), Arg.Any<DeliveryOptions>());
-        await _store.DidNotReceive().RecordNextExecutionAsync(
+        await _storeWriter.DidNotReceive().RecordNextExecutionAsync(
             Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>());
     }
 
@@ -187,7 +188,7 @@ public sealed class CronSchedulerAgentTests
     {
         // "*/30 * * * * *" = every 30 seconds — 6-field cron parsed with IncludeSeconds
         BackgroundJobDefinition job = MakeJob("seconds-job", cron: "*/30 * * * * *");
-        _store.GetEnabledJobsAsync(Arg.Any<CancellationToken>()).Returns([job]);
+        _storeReader.GetEnabledJobsAsync(Arg.Any<CancellationToken>()).Returns([job]);
 
         await ((Microsoft.Extensions.Hosting.IHostedService)CreateAgent())
             .StartAsync(TestContext.Current.CancellationToken);

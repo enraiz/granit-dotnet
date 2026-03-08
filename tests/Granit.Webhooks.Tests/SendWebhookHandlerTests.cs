@@ -22,7 +22,7 @@ namespace Granit.Webhooks.Tests;
 
 public sealed class SendWebhookHandlerTests
 {
-    private readonly IWebhookDeliveryStore _deliveryStore = Substitute.For<IWebhookDeliveryStore>();
+    private readonly IWebhookDeliveryWriter _deliveryWriter = Substitute.For<IWebhookDeliveryWriter>();
 
     // Use the real no-op protector to avoid CA2012 when mocking ValueTask-returning methods.
     private readonly IWebhookSecretProtector _secretProtector = new NoOpWebhookSecretProtector();
@@ -47,7 +47,7 @@ public sealed class SendWebhookHandlerTests
 
         await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        await _deliveryStore.Received(1).RecordSuccessAsync(
+        await _deliveryWriter.Received(1).RecordSuccessAsync(
             command, 200, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -77,9 +77,9 @@ public sealed class SendWebhookHandlerTests
         Func<Task> act = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
         await Should.NotThrowAsync(act);
-        await _deliveryStore.Received(1).RecordFailureAsync(
+        await _deliveryWriter.Received(1).RecordFailureAsync(
             command, (int)statusCode, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _deliveryStore.DidNotReceive().SuspendSubscriptionAsync(
+        await _deliveryWriter.DidNotReceive().SuspendSubscriptionAsync(
             Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -95,7 +95,7 @@ public sealed class SendWebhookHandlerTests
 
         await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        await _deliveryStore.Received(1).SuspendSubscriptionAsync(
+        await _deliveryWriter.Received(1).SuspendSubscriptionAsync(
             command.SubscriptionId, Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -127,7 +127,7 @@ public sealed class SendWebhookHandlerTests
         await Assert.ThrowsAsync<WebhookDeliveryException>(
             () => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
-        await _deliveryStore.Received(1).RecordFailureAsync(
+        await _deliveryWriter.Received(1).RecordFailureAsync(
             command, 503, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -155,7 +155,7 @@ public sealed class SendWebhookHandlerTests
         await Assert.ThrowsAsync<WebhookDeliveryException>(
             () => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
-        await _deliveryStore.Received(1).RecordFailureAsync(
+        await _deliveryWriter.Received(1).RecordFailureAsync(
             command, null, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -168,7 +168,7 @@ public sealed class SendWebhookHandlerTests
         HttpClient httpClient = new(new StaticResponseHandler(statusCode));
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        return new SendWebhookHandler(factory, _deliveryStore, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
+        return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 
     private SendWebhookHandler BuildHandlerWithTimeout()
@@ -176,7 +176,7 @@ public sealed class SendWebhookHandlerTests
         HttpClient httpClient = new(new TimeoutHandler());
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        return new SendWebhookHandler(factory, _deliveryStore, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
+        return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 
     private static SendWebhookCommand BuildCommand() => new()

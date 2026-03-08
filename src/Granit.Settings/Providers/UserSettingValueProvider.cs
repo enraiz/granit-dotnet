@@ -10,11 +10,12 @@ namespace Granit.Settings.Providers;
 
 /// <summary>
 /// User settings provider (isolated per current user via <see cref="ICurrentUserService"/>).
-/// Caches values read from <see cref="ISettingStore"/> (order = 100).
+/// Caches values read from <see cref="ISettingStoreReader"/> (order = 100).
 /// </summary>
 public sealed class UserSettingValueProvider(
     ICurrentUserService currentUser,
-    ISettingStore store,
+    ISettingStoreReader storeReader,
+    ISettingStoreWriter storeWriter,
     ICacheService<SettingValue> cache,
     IOptions<SettingsOptions> options) : ISettingValueProvider
 {
@@ -22,7 +23,8 @@ public sealed class UserSettingValueProvider(
     public const string ProviderName = "U";
 
     private readonly ICurrentUserService _currentUser = currentUser;
-    private readonly ISettingStore _store = store;
+    private readonly ISettingStoreReader _storeReader = storeReader;
+    private readonly ISettingStoreWriter _storeWriter = storeWriter;
     private readonly ICacheService<SettingValue> _cache = cache;
     private readonly IOptions<SettingsOptions> _options = options;
 
@@ -51,7 +53,7 @@ public sealed class UserSettingValueProvider(
             cacheKey,
             async innerCt =>
             {
-                SettingValue? stored = await _store.GetOrNullAsync(
+                SettingValue? stored = await _storeReader.GetOrNullAsync(
                     definition.Name, ProviderName, userId, innerCt).ConfigureAwait(false);
                 return stored ?? new SettingValue(definition.Name, ProviderName, userId, null);
             },
@@ -70,7 +72,7 @@ public sealed class UserSettingValueProvider(
         }
 
         string userId = _currentUser.UserId;
-        await _store.SetAsync(definition.Name, ProviderName, userId, value, ct).ConfigureAwait(false);
+        await _storeWriter.SetAsync(definition.Name, ProviderName, userId, value, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct).ConfigureAwait(false);
     }
 
@@ -83,7 +85,7 @@ public sealed class UserSettingValueProvider(
         }
 
         string userId = _currentUser.UserId;
-        await _store.DeleteAsync(definition.Name, ProviderName, userId, ct).ConfigureAwait(false);
+        await _storeWriter.DeleteAsync(definition.Name, ProviderName, userId, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, userId, definition.Name), ct).ConfigureAwait(false);
     }
 }

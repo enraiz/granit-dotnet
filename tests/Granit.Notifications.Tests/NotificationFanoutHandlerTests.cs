@@ -19,8 +19,8 @@ namespace Granit.Notifications.Tests;
 
 public sealed class NotificationFanoutHandlerTests
 {
-    private readonly INotificationSubscriptionStore _subscriptionStore = Substitute.For<INotificationSubscriptionStore>();
-    private readonly INotificationPreferenceStore _preferenceStore = Substitute.For<INotificationPreferenceStore>();
+    private readonly INotificationSubscriptionReader _subscriptionReader = Substitute.For<INotificationSubscriptionReader>();
+    private readonly INotificationPreferenceReader _preferenceReader = Substitute.For<INotificationPreferenceReader>();
     private readonly INotificationDefinitionStore _definitionStore = Substitute.For<INotificationDefinitionStore>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly NotificationFanoutHandler _handler;
@@ -29,8 +29,8 @@ public sealed class NotificationFanoutHandlerTests
     {
         _currentTenant.IsAvailable.Returns(false);
         _handler = new NotificationFanoutHandler(
-            _subscriptionStore,
-            _preferenceStore,
+            _subscriptionReader,
+            _preferenceReader,
             _definitionStore,
             _currentTenant);
     }
@@ -40,7 +40,7 @@ public sealed class NotificationFanoutHandlerTests
     {
         NotificationDefinition definition = BuildDefinition("test.notification", [NotificationChannels.InApp]);
         _definitionStore.Get("test.notification").Returns(definition);
-        _subscriptionStore.GetSubscriberIdsAsync("test.notification", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _subscriptionReader.GetSubscriberIdsAsync("test.notification", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>([]));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: []);
@@ -57,7 +57,7 @@ public sealed class NotificationFanoutHandlerTests
         NotificationDefinition definition = BuildDefinition("test.notification",
             [NotificationChannels.InApp, NotificationChannels.Email, NotificationChannels.Push]);
         _definitionStore.Get("test.notification").Returns(definition);
-        _preferenceStore.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: ["user-1", "user-2"]);
@@ -75,9 +75,9 @@ public sealed class NotificationFanoutHandlerTests
             [NotificationChannels.InApp, NotificationChannels.Email]);
         _definitionStore.Get("test.notification").Returns(definition);
 
-        _preferenceStore.IsChannelEnabledAsync("user-1", "test.notification", NotificationChannels.InApp, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync("user-1", "test.notification", NotificationChannels.InApp, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
-        _preferenceStore.IsChannelEnabledAsync("user-1", "test.notification", NotificationChannels.Email, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync("user-1", "test.notification", NotificationChannels.Email, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(false));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: ["user-1"]);
@@ -110,11 +110,11 @@ public sealed class NotificationFanoutHandlerTests
     {
         NotificationDefinition definition = BuildDefinition("test.notification", [NotificationChannels.InApp]);
         _definitionStore.Get("test.notification").Returns(definition);
-        _preferenceStore.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
 
         EntityReference entity = new("Invoice", "inv-42");
-        _subscriptionStore.GetEntityFollowerIdsAsync(entity.EntityType, entity.EntityId, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _subscriptionReader.GetEntityFollowerIdsAsync(entity.EntityType, entity.EntityId, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>(["follower-1", "follower-2"]));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: [], relatedEntity: entity);
@@ -123,7 +123,7 @@ public sealed class NotificationFanoutHandlerTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         result.Count().ShouldBe(2);
-        await _subscriptionStore.Received(1).GetEntityFollowerIdsAsync(
+        await _subscriptionReader.Received(1).GetEntityFollowerIdsAsync(
             entity.EntityType, entity.EntityId, Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
     }
 
@@ -132,10 +132,10 @@ public sealed class NotificationFanoutHandlerTests
     {
         NotificationDefinition definition = BuildDefinition("test.notification", [NotificationChannels.InApp]);
         _definitionStore.Get("test.notification").Returns(definition);
-        _preferenceStore.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
 
-        _subscriptionStore.GetSubscriberIdsAsync("test.notification", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _subscriptionReader.GetSubscriberIdsAsync("test.notification", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>(["subscriber-1"]));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: []);
@@ -144,7 +144,7 @@ public sealed class NotificationFanoutHandlerTests
             await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
         result.Count().ShouldBe(1);
-        await _subscriptionStore.Received(1).GetSubscriberIdsAsync(
+        await _subscriptionReader.Received(1).GetSubscriberIdsAsync(
             "test.notification", Arg.Any<Guid?>(), Arg.Any<CancellationToken>());
     }
 
@@ -157,17 +157,17 @@ public sealed class NotificationFanoutHandlerTests
 
         NotificationDefinition definition = BuildDefinition("test.notification", [NotificationChannels.InApp]);
         _definitionStore.Get("test.notification").Returns(definition);
-        _preferenceStore.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
 
-        _subscriptionStore.GetSubscriberIdsAsync("test.notification", tenantId, Arg.Any<CancellationToken>())
+        _subscriptionReader.GetSubscriberIdsAsync("test.notification", tenantId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>(["user-1"]));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: [], tenantId: Guid.NewGuid());
 
         await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        await _subscriptionStore.Received(1).GetSubscriberIdsAsync(
+        await _subscriptionReader.Received(1).GetSubscriberIdsAsync(
             Arg.Any<string>(), tenantId, Arg.Any<CancellationToken>());
     }
 
@@ -179,17 +179,17 @@ public sealed class NotificationFanoutHandlerTests
 
         NotificationDefinition definition = BuildDefinition("test.notification", [NotificationChannels.InApp]);
         _definitionStore.Get("test.notification").Returns(definition);
-        _preferenceStore.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
 
-        _subscriptionStore.GetSubscriberIdsAsync("test.notification", triggerTenantId, Arg.Any<CancellationToken>())
+        _subscriptionReader.GetSubscriberIdsAsync("test.notification", triggerTenantId, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<string>>(["user-1"]));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: [], tenantId: triggerTenantId);
 
         await _handler.HandleAsync(trigger, TestContext.Current.CancellationToken);
 
-        await _subscriptionStore.Received(1).GetSubscriberIdsAsync(
+        await _subscriptionReader.Received(1).GetSubscriberIdsAsync(
             Arg.Any<string>(), triggerTenantId, Arg.Any<CancellationToken>());
     }
 
@@ -199,7 +199,7 @@ public sealed class NotificationFanoutHandlerTests
         NotificationDefinition definition = BuildDefinition("test.notification",
             [NotificationChannels.InApp, NotificationChannels.Email]);
         _definitionStore.Get("test.notification").Returns(definition);
-        _preferenceStore.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+        _preferenceReader.IsChannelEnabledAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
 
         NotificationTrigger trigger = BuildTrigger(recipientUserIds: ["user-1", "user-2"]);

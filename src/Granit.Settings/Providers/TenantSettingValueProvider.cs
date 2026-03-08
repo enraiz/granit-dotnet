@@ -10,11 +10,12 @@ namespace Granit.Settings.Providers;
 
 /// <summary>
 /// Tenant settings provider (isolated per current tenant via <see cref="ICurrentTenant"/>).
-/// Caches values read from <see cref="ISettingStore"/> (order = 200).
+/// Caches values read from <see cref="ISettingStoreReader"/> (order = 200).
 /// </summary>
 public sealed class TenantSettingValueProvider(
     ICurrentTenant currentTenant,
-    ISettingStore store,
+    ISettingStoreReader storeReader,
+    ISettingStoreWriter storeWriter,
     ICacheService<SettingValue> cache,
     IOptions<SettingsOptions> options) : ISettingValueProvider
 {
@@ -22,7 +23,8 @@ public sealed class TenantSettingValueProvider(
     public const string ProviderName = "T";
 
     private readonly ICurrentTenant _currentTenant = currentTenant;
-    private readonly ISettingStore _store = store;
+    private readonly ISettingStoreReader _storeReader = storeReader;
+    private readonly ISettingStoreWriter _storeWriter = storeWriter;
     private readonly ICacheService<SettingValue> _cache = cache;
     private readonly IOptions<SettingsOptions> _options = options;
 
@@ -51,7 +53,7 @@ public sealed class TenantSettingValueProvider(
             cacheKey,
             async innerCt =>
             {
-                SettingValue? stored = await _store.GetOrNullAsync(
+                SettingValue? stored = await _storeReader.GetOrNullAsync(
                     definition.Name, ProviderName, tenantKey, innerCt).ConfigureAwait(false);
                 return stored ?? new SettingValue(definition.Name, ProviderName, tenantKey, null);
             },
@@ -70,7 +72,7 @@ public sealed class TenantSettingValueProvider(
         }
 
         string tenantKey = _currentTenant.Id!.Value.ToString();
-        await _store.SetAsync(definition.Name, ProviderName, tenantKey, value, ct).ConfigureAwait(false);
+        await _storeWriter.SetAsync(definition.Name, ProviderName, tenantKey, value, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct).ConfigureAwait(false);
     }
 
@@ -83,7 +85,7 @@ public sealed class TenantSettingValueProvider(
         }
 
         string tenantKey = _currentTenant.Id!.Value.ToString();
-        await _store.DeleteAsync(definition.Name, ProviderName, tenantKey, ct).ConfigureAwait(false);
+        await _storeWriter.DeleteAsync(definition.Name, ProviderName, tenantKey, ct).ConfigureAwait(false);
         await _cache.RemoveAsync(SettingCacheKey.Build(ProviderName, tenantKey, definition.Name), ct).ConfigureAwait(false);
     }
 }

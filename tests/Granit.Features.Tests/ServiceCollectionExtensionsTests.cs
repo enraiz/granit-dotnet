@@ -27,13 +27,24 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitFeatures_Registers_IFeatureStore_Singleton()
+    public void AddGranitFeatures_Registers_IFeatureStoreReader_Singleton()
     {
         ServiceCollection services = new();
         services.AddGranitFeatures();
 
         services.ShouldContain(d =>
-            d.ServiceType == typeof(IFeatureStore) &&
+            d.ServiceType == typeof(IFeatureStoreReader) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void AddGranitFeatures_Registers_IFeatureStoreWriter_Singleton()
+    {
+        ServiceCollection services = new();
+        services.AddGranitFeatures();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IFeatureStoreWriter) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
 
@@ -70,13 +81,24 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitFeatures_IFeatureStore_IsReplaceable_WithTryAdd()
+    public void AddGranitFeatures_IFeatureStoreReader_IsReplaceable_WithTryAdd()
     {
         ServiceCollection services = new();
-        services.AddSingleton<IFeatureStore, InMemoryFeatureStore>(); // pre-register
+        services.AddSingleton<IFeatureStoreReader, InMemoryFeatureStore>(); // pre-register
         services.AddGranitFeatures(); // TryAdd must not replace
 
-        services.Count(d => d.ServiceType == typeof(IFeatureStore))
+        services.Count(d => d.ServiceType == typeof(IFeatureStoreReader))
+                .ShouldBe(1, "TryAddSingleton must not add a duplicate");
+    }
+
+    [Fact]
+    public void AddGranitFeatures_IFeatureStoreWriter_IsReplaceable_WithTryAdd()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton<IFeatureStoreWriter, InMemoryFeatureStore>(); // pre-register
+        services.AddGranitFeatures(); // TryAdd must not replace
+
+        services.Count(d => d.ServiceType == typeof(IFeatureStoreWriter))
                 .ShouldBe(1, "TryAddSingleton must not add a duplicate");
     }
 

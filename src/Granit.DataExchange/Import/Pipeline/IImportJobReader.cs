@@ -4,13 +4,9 @@ using Granit.Querying;
 namespace Granit.DataExchange.Import.Pipeline;
 
 /// <summary>
-/// Persists and retrieves <see cref="ImportJob"/> entities.
+/// Reads <see cref="ImportJob"/> entities.
 /// </summary>
-/// <remarks>
-/// The default registration is a null-object that throws <see cref="NotImplementedException"/>.
-/// A concrete implementation is provided by <c>Granit.DataExchange.EntityFrameworkCore</c>.
-/// </remarks>
-public interface IImportJobStore
+public interface IImportJobReader
 {
     /// <summary>
     /// Loads an import job by identifier.
@@ -33,18 +29,4 @@ public interface IImportJobStore
         int page = 1,
         int pageSize = 20,
         CancellationToken ct = default);
-
-    /// <summary>
-    /// Creates a new import job.
-    /// </summary>
-    /// <param name="job">The import job to persist.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task CreateAsync(ImportJob job, CancellationToken ct = default);
-
-    /// <summary>
-    /// Updates an existing import job.
-    /// </summary>
-    /// <param name="job">The import job with updated state.</param>
-    /// <param name="ct">Cancellation token.</param>
-    Task UpdateAsync(ImportJob job, CancellationToken ct = default);
 }

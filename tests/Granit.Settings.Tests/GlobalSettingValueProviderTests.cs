@@ -36,7 +36,7 @@ public sealed class GlobalSettingValueProviderTests
                 callInfo.ArgAt<Func<CancellationToken, Task<SettingValue>>>(1)(CancellationToken.None));
 
         IOptions<SettingsOptions> options = Microsoft.Extensions.Options.Options.Create(new SettingsOptions());
-        GlobalSettingValueProvider provider = new(store, cache, options);
+        GlobalSettingValueProvider provider = new(store, store, cache, options);
         return (provider, store, cache);
     }
 

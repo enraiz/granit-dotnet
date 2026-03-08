@@ -24,7 +24,7 @@ namespace Granit.Notifications.Tests;
 public sealed class NotificationDeliveryHandlerTests
 {
     private readonly INotificationChannel _channel = Substitute.For<INotificationChannel>();
-    private readonly INotificationDeliveryStore _deliveryStore = Substitute.For<INotificationDeliveryStore>();
+    private readonly INotificationDeliveryWriter _deliveryWriter = Substitute.For<INotificationDeliveryWriter>();
     private readonly IClock _clock;
     private readonly ILogger<NotificationDeliveryHandler> _logger = NullLogger<NotificationDeliveryHandler>.Instance;
 
@@ -43,7 +43,7 @@ public sealed class NotificationDeliveryHandlerTests
         Func<Task> act = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
         await Should.NotThrowAsync(act);
-        await _deliveryStore.DidNotReceive().RecordAsync(
+        await _deliveryWriter.DidNotReceive().RecordAsync(
             Arg.Any<NotificationDeliveryAttempt>(), Arg.Any<CancellationToken>());
     }
 
@@ -69,7 +69,7 @@ public sealed class NotificationDeliveryHandlerTests
 
         await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-        await _deliveryStore.Received(1).RecordAsync(
+        await _deliveryWriter.Received(1).RecordAsync(
             Arg.Is<NotificationDeliveryAttempt>(r => r.IsSuccess),
             Arg.Any<CancellationToken>());
     }
@@ -86,7 +86,7 @@ public sealed class NotificationDeliveryHandlerTests
         Func<Task> act = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
         await Should.ThrowAsync<NotificationDeliveryException>(act);
-        await _deliveryStore.Received(1).RecordAsync(
+        await _deliveryWriter.Received(1).RecordAsync(
             Arg.Is<NotificationDeliveryAttempt>(r => !r.IsSuccess),
             Arg.Any<CancellationToken>());
     }
@@ -121,7 +121,7 @@ public sealed class NotificationDeliveryHandlerTests
     // -------------------------------------------------------------------------
 
     private NotificationDeliveryHandler BuildHandler(IReadOnlyList<INotificationChannel> channels) =>
-        new(channels, _deliveryStore, _clock, _logger);
+        new(channels, _deliveryWriter, _clock, _logger);
 
     private static DeliverNotificationCommand BuildCommand(string channelName = NotificationChannels.InApp) => new()
     {

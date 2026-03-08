@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
     /// Registers the following services:
     /// <list type="bullet">
     ///   <item><see cref="IFeatureDefinitionStore"/> (singleton) — aggregates all <see cref="IFeatureDefinitionProvider"/> registrations.</item>
-    ///   <item><see cref="IFeatureStore"/> (singleton) — defaults to <see cref="InMemoryFeatureStore"/>; replace with EF Core store via <c>Granit.Features.EntityFrameworkCore</c>.</item>
+    ///   <item><see cref="IFeatureStoreReader"/> / <see cref="IFeatureStoreWriter"/> (singleton) — defaults to <see cref="InMemoryFeatureStore"/>; replace with EF Core store via <c>Granit.Features.EntityFrameworkCore</c>.</item>
     ///   <item>Value providers: Default, Plan, Tenant (scoped).</item>
     ///   <item><see cref="IFeatureChecker"/> (scoped) — resolves feature values with hybrid cache.</item>
     ///   <item><see cref="IFeatureLimitGuard"/> (scoped) — enforces numeric feature limits.</item>
@@ -40,7 +40,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IFeatureDefinitionStore, FeatureDefinitionStore>();
 
-        services.TryAddSingleton<IFeatureStore, InMemoryFeatureStore>();
+        // Default in-memory store — register concrete type, then forward both interfaces to same instance.
+        services.TryAddSingleton<InMemoryFeatureStore>();
+        services.TryAddSingleton<IFeatureStoreReader>(sp => sp.GetRequiredService<InMemoryFeatureStore>());
+        services.TryAddSingleton<IFeatureStoreWriter>(sp => sp.GetRequiredService<InMemoryFeatureStore>());
 
         // Value providers — Scoped so request context (ICurrentTenant) is respected
         services.AddScoped<IFeatureValueProvider, DefaultValueFeatureValueProvider>();

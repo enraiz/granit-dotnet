@@ -28,7 +28,7 @@ public sealed record WebhookTrigger
 
     /// <summary>
     /// Logical event type (e.g., <c>"document.uploaded"</c>).
-    /// Used to resolve active subscriptions from <see cref="Abstractions.IWebhookSubscriptionStore"/>.
+    /// Used to resolve active subscriptions from <see cref="Abstractions.IWebhookSubscriptionReader"/>.
     /// </summary>
     public required string EventType { get; init; }
 

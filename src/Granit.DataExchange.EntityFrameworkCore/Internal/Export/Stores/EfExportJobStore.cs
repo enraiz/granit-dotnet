@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.DataExchange.EntityFrameworkCore.Internal.Export.Stores;
 
 /// <summary>
-/// EF Core implementation of <see cref="IExportJobStore"/>.
+/// EF Core implementation of <see cref="IExportJobReader"/> and <see cref="IExportJobWriter"/>.
 /// Performs CRUD operations on <see cref="ExportJob"/> via <see cref="DataExchangeDbContext"/>.
 /// </summary>
 internal sealed class EfExportJobStore(
-    IDbContextFactory<DataExchangeDbContext> contextFactory) : IExportJobStore
+    IDbContextFactory<DataExchangeDbContext> contextFactory) : IExportJobReader, IExportJobWriter
 {
     /// <inheritdoc/>
     public async Task<ExportJob?> GetAsync(Guid id, CancellationToken ct = default)

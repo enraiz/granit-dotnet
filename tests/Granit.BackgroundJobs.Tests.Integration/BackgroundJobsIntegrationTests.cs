@@ -51,7 +51,7 @@ public sealed class BackgroundJobsIntegrationTests
 
         IMessageContext context = Substitute.For<IMessageContext>();
         RecurringJobSchedulingMiddleware middleware = new(
-            store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
+            store, store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
         Envelope envelope = new(new FakeDailyReportMessage());
 
         // Act
@@ -82,7 +82,7 @@ public sealed class BackgroundJobsIntegrationTests
 
         IMessageContext context = Substitute.For<IMessageContext>();
         RecurringJobSchedulingMiddleware middleware = new(
-            store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
+            store, store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
         Envelope envelope = new(new FakeDailyReportMessage());
 
         // Act
@@ -121,9 +121,9 @@ public sealed class BackgroundJobsIntegrationTests
             .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([]));
 
         BackgroundJobManager manager = new(
-            store, bus, clock, user, NullLogger<BackgroundJobManager>.Instance, messageStore);
+            store, store, bus, clock, user, NullLogger<BackgroundJobManager>.Instance, messageStore);
         RecurringJobSchedulingMiddleware middleware = new(
-            store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
+            store, store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
 
         // Act — TriggerNow injects X-Triggered-By into DeliveryOptions
         await manager.TriggerNowAsync("fake-daily-report", TestContext.Current.CancellationToken);

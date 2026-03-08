@@ -17,7 +17,7 @@ public sealed class TenantFeatureValueProviderTests
 
     private static TenantFeatureValueProvider BuildProvider(
         ICurrentTenant? currentTenant = null,
-        IFeatureStore? featureStore = null)
+        IFeatureStoreReader? featureStoreReader = null)
     {
         ServiceCollection sc = new();
         if (currentTenant is not null)
@@ -26,7 +26,7 @@ public sealed class TenantFeatureValueProviderTests
         }
 
         ServiceProvider sp = sc.BuildServiceProvider();
-        return new TenantFeatureValueProvider(sp, featureStore ?? new InMemoryFeatureStore());
+        return new TenantFeatureValueProvider(sp, featureStoreReader ?? new InMemoryFeatureStore());
     }
 
     private static ICurrentTenant NoTenant()
@@ -97,7 +97,7 @@ public sealed class TenantFeatureValueProviderTests
         var tenantId = Guid.NewGuid();
         TenantFeatureValueProvider provider = BuildProvider(
             currentTenant: WithTenant(tenantId),
-            featureStore: new InMemoryFeatureStore());
+            featureStoreReader: new InMemoryFeatureStore());
 
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
@@ -115,7 +115,7 @@ public sealed class TenantFeatureValueProviderTests
 
         TenantFeatureValueProvider provider = BuildProvider(
             currentTenant: WithTenant(tenantId),
-            featureStore: featureStore);
+            featureStoreReader: featureStore);
 
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);
@@ -135,7 +135,7 @@ public sealed class TenantFeatureValueProviderTests
         // Active tenant is B, but override is stored for A
         TenantFeatureValueProvider provider = BuildProvider(
             currentTenant: WithTenant(tenantB),
-            featureStore: featureStore);
+            featureStoreReader: featureStore);
 
         string? result = await provider.GetOrNullAsync(
             MakeDefinition(), TestContext.Current.CancellationToken);

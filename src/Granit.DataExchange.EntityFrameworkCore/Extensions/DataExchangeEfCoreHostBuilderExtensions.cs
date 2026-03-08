@@ -31,13 +31,17 @@ public static class DataExchangeEfCoreHostBuilderExtensions
         builder.Services.AddDbContextFactory<DataExchangeDbContext>(configure);
 
         // Import stores
-        builder.Services.AddScoped<IMappingStore, EfMappingStore>();
-        builder.Services.AddScoped<IImportJobStore, EfImportJobStore>();
+        builder.Services.AddScoped<IMappingReader, EfMappingStore>();
+        builder.Services.AddScoped<IMappingWriter, EfMappingStore>();
+        builder.Services.AddScoped<IImportJobReader, EfImportJobStore>();
+        builder.Services.AddScoped<IImportJobWriter, EfImportJobStore>();
         builder.Services.AddScoped<IImportOrchestrator, EfImportOrchestrator>();
 
         // Export stores (replace null-object defaults from Granit.DataExchange)
-        builder.Services.AddScoped<IExportJobStore, EfExportJobStore>();
-        builder.Services.AddScoped<IExportPresetStore, EfExportPresetStore>();
+        builder.Services.AddScoped<IExportJobReader, EfExportJobStore>();
+        builder.Services.AddScoped<IExportJobWriter, EfExportJobStore>();
+        builder.Services.AddScoped<IExportPresetReader, EfExportPresetStore>();
+        builder.Services.AddScoped<IExportPresetWriter, EfExportPresetStore>();
 
         return builder;
     }

@@ -1,4 +1,5 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -39,14 +40,33 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
     {
         builder.Services.AddDbContextFactory<NotificationDbContext>(configure);
 
+        // UserNotification store — CQRS forwarding pattern
+        builder.Services.RemoveAll<InMemoryUserNotificationStore>();
+        builder.Services.AddSingleton<EfCoreUserNotificationStore>();
         builder.Services.Replace(
-            ServiceDescriptor.Singleton<IUserNotificationStore, EfCoreUserNotificationStore>());
+            ServiceDescriptor.Singleton<IUserNotificationReader>(sp => sp.GetRequiredService<EfCoreUserNotificationStore>()));
         builder.Services.Replace(
-            ServiceDescriptor.Singleton<INotificationPreferenceStore, EfCoreNotificationPreferenceStore>());
+            ServiceDescriptor.Singleton<IUserNotificationWriter>(sp => sp.GetRequiredService<EfCoreUserNotificationStore>()));
+
+        // Preference store — CQRS forwarding pattern
+        builder.Services.RemoveAll<InMemoryNotificationPreferenceStore>();
+        builder.Services.AddSingleton<EfCoreNotificationPreferenceStore>();
         builder.Services.Replace(
-            ServiceDescriptor.Singleton<INotificationSubscriptionStore, EfCoreNotificationSubscriptionStore>());
+            ServiceDescriptor.Singleton<INotificationPreferenceReader>(sp => sp.GetRequiredService<EfCoreNotificationPreferenceStore>()));
         builder.Services.Replace(
-            ServiceDescriptor.Scoped<INotificationDeliveryStore, EfCoreNotificationDeliveryStore>());
+            ServiceDescriptor.Singleton<INotificationPreferenceWriter>(sp => sp.GetRequiredService<EfCoreNotificationPreferenceStore>()));
+
+        // Subscription store — CQRS forwarding pattern
+        builder.Services.RemoveAll<InMemoryNotificationSubscriptionStore>();
+        builder.Services.AddSingleton<EfCoreNotificationSubscriptionStore>();
+        builder.Services.Replace(
+            ServiceDescriptor.Singleton<INotificationSubscriptionReader>(sp => sp.GetRequiredService<EfCoreNotificationSubscriptionStore>()));
+        builder.Services.Replace(
+            ServiceDescriptor.Singleton<INotificationSubscriptionWriter>(sp => sp.GetRequiredService<EfCoreNotificationSubscriptionStore>()));
+
+        // Delivery store — write-only (HDS audit)
+        builder.Services.Replace(
+            ServiceDescriptor.Scoped<INotificationDeliveryWriter, EfCoreNotificationDeliveryStore>());
 
         return builder;
     }

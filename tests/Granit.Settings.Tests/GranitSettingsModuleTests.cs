@@ -60,13 +60,23 @@ public sealed class GranitSettingsModuleTests
     }
 
     [Fact]
-    public void ISettingStore_Resolves_To_InMemorySettingStore_By_Default()
+    public void ISettingStoreReader_Resolves_To_InMemorySettingStore_By_Default()
     {
         using WebApplication app = BuildApp();
 
-        ISettingStore store = app.Services.GetRequiredService<ISettingStore>();
+        ISettingStoreReader reader = app.Services.GetRequiredService<ISettingStoreReader>();
 
-        store.ShouldBeOfType<InMemorySettingStore>();
+        reader.ShouldBeOfType<InMemorySettingStore>();
+    }
+
+    [Fact]
+    public void ISettingStoreWriter_Resolves_To_InMemorySettingStore_By_Default()
+    {
+        using WebApplication app = BuildApp();
+
+        ISettingStoreWriter writer = app.Services.GetRequiredService<ISettingStoreWriter>();
+
+        writer.ShouldBeOfType<InMemorySettingStore>();
     }
 
     [Fact]
@@ -152,15 +162,16 @@ public sealed class GranitSettingsModuleTests
 
         // Déclarer le paramètre via un provider enregistré dans le DI
         SettingDefinitionManager defManager = scope.ServiceProvider.GetRequiredService<SettingDefinitionManager>();
-        ISettingStore store = scope.ServiceProvider.GetRequiredService<ISettingStore>();
+        ISettingStoreWriter writer = scope.ServiceProvider.GetRequiredService<ISettingStoreWriter>();
+        ISettingStoreReader reader = scope.ServiceProvider.GetRequiredService<ISettingStoreReader>();
 
         // Écrire directement dans le store (bypass manager pour ce test de câblage)
-        await store.SetAsync(
+        await writer.SetAsync(
             "App.Color", GlobalSettingValueProvider.ProviderName, null, "purple",
             TestContext.Current.CancellationToken);
 
         // Lire directement depuis le store
-        SettingValue? retrieved = await store.GetOrNullAsync(
+        SettingValue? retrieved = await reader.GetOrNullAsync(
             "App.Color", GlobalSettingValueProvider.ProviderName, null,
             TestContext.Current.CancellationToken);
 

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Granit.Settings.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// EF Core implementation of <see cref="ISettingStore"/>.
+/// EF Core implementation of <see cref="ISettingStoreReader"/> and <see cref="ISettingStoreWriter"/>.
 /// Persists setting values in the host application's DbContext
 /// (table <c>core_setting_records</c>) with HDS audit trail.
 /// </summary>
@@ -20,7 +20,7 @@ namespace Granit.Settings.EntityFrameworkCore.Internal;
 /// <c>AuditedEntityInterceptor</c> wired in its factory for HDS audit trail compliance.
 /// </para>
 /// </remarks>
-internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeFactory) : ISettingStore
+internal sealed class EfCoreSettingStore<TDbContext>(IServiceScopeFactory scopeFactory) : ISettingStoreReader, ISettingStoreWriter
     where TDbContext : DbContext, ISettingsDbContext
 {
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;

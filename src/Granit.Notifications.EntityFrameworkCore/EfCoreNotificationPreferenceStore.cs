@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Notifications.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="INotificationPreferenceStore"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="INotificationPreferenceReader"/> and
+/// <see cref="INotificationPreferenceWriter"/> backed by PostgreSQL.
 /// </summary>
-internal sealed class EfCoreNotificationPreferenceStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationPreferenceStore
+internal sealed class EfCoreNotificationPreferenceStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationPreferenceReader, INotificationPreferenceWriter
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyList<NotificationPreference>> GetListAsync(string userId, Guid? tenantId, CancellationToken ct = default)

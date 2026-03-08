@@ -18,7 +18,7 @@ internal sealed class TenantFeatureOverrideConfiguration
         builder.HasKey(e => e.Id);
 
         // Nullable: null = global scope (no specific tenant), non-null = tenant-scoped override.
-        // IFeatureStore.SetAsync(featureName, tenantId: null) stores a global override
+        // IFeatureStoreWriter.SetAsync(featureName, tenantId: null) stores a global override
         // that applies when no tenant context is active.
         builder.Property(e => e.TenantId);
 

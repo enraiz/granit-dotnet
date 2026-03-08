@@ -6,10 +6,10 @@ namespace Granit.Notifications.Internal;
 
 /// <summary>
 /// Built-in InApp channel: persists notifications in the user's inbox
-/// via <see cref="IUserNotificationStore"/>. This is the "source of truth" (Django lesson).
+/// via <see cref="IUserNotificationWriter"/>. This is the "source of truth" (Django lesson).
 /// </summary>
 internal sealed class InAppNotificationChannel(
-    IUserNotificationStore userNotificationStore,
+    IUserNotificationWriter userNotificationWriter,
     IClock clock) : INotificationChannel
 {
     public string Name => NotificationChannels.InApp;
@@ -31,6 +31,6 @@ internal sealed class InAppNotificationChannel(
             RelatedEntityId = context.RelatedEntity?.EntityId,
         };
 
-        await userNotificationStore.InsertAsync(notification, ct).ConfigureAwait(false);
+        await userNotificationWriter.InsertAsync(notification, ct).ConfigureAwait(false);
     }
 }

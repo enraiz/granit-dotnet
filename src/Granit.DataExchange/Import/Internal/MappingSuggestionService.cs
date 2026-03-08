@@ -29,10 +29,10 @@ internal sealed class MappingSuggestionService(
         HashSet<string> matchedTargets = new(StringComparer.OrdinalIgnoreCase);
 
         // Tier 1: Saved mappings
-        IMappingStore? mappingStore = serviceProvider.GetService<IMappingStore>();
-        if (mappingStore is not null)
+        IMappingReader? mappingReader = serviceProvider.GetService<IMappingReader>();
+        if (mappingReader is not null)
         {
-            IReadOnlyList<ImportColumnMapping> saved = await mappingStore.LoadAsync(definition.Name, ct).ConfigureAwait(false);
+            IReadOnlyList<ImportColumnMapping> saved = await mappingReader.LoadAsync(definition.Name, ct).ConfigureAwait(false);
             ApplySuggestions(suggestions, matchedTargets, headers, saved);
         }
 

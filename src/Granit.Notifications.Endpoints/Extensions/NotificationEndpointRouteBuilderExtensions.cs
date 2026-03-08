@@ -70,7 +70,7 @@ public static class NotificationEndpointRouteBuilderExtensions
     }
 
     private static async Task<Ok<PagedResult<UserNotificationResponse>>> GetNotificationsAsync(
-        IUserNotificationStore store,
+        IUserNotificationReader reader,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
         int page = 1, int pageSize = QueryingDefaults.DefaultPageSize)
@@ -80,39 +80,39 @@ public static class NotificationEndpointRouteBuilderExtensions
 
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        PagedResult<UserNotification> result = await store.GetListAsync(userId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
+        PagedResult<UserNotification> result = await reader.GetListAsync(userId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
         return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount));
     }
 
     private static async Task<Ok<UnreadCountResponse>> GetUnreadCountAsync(
-        IUserNotificationStore store,
+        IUserNotificationReader reader,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        int count = await store.GetUnreadCountAsync(userId, tenantId).ConfigureAwait(false);
+        int count = await reader.GetUnreadCountAsync(userId, tenantId).ConfigureAwait(false);
         return TypedResults.Ok(new UnreadCountResponse(count));
     }
 
     private static async Task<NoContent> MarkAsReadAsync(
         Guid id,
-        IUserNotificationStore store,
+        IUserNotificationWriter writer,
         IClock clock)
     {
-        await store.MarkAsReadAsync(id, clock.Now).ConfigureAwait(false);
+        await writer.MarkAsReadAsync(id, clock.Now).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
     private static async Task<NoContent> MarkAllAsReadAsync(
-        IUserNotificationStore store,
+        IUserNotificationWriter writer,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
         IClock clock)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        await store.MarkAllAsReadAsync(userId, tenantId, clock.Now).ConfigureAwait(false);
+        await writer.MarkAllAsReadAsync(userId, tenantId, clock.Now).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -130,7 +130,7 @@ public static class NotificationEndpointRouteBuilderExtensions
     private static async Task<Ok<PagedResult<UserNotificationResponse>>> GetEntityActivityFeedAsync(
         string entityType,
         string entityId,
-        IUserNotificationStore store,
+        IUserNotificationReader reader,
         ICurrentTenant tenant,
         int page = 1, int pageSize = QueryingDefaults.DefaultPageSize)
     {
@@ -138,7 +138,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
 
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        PagedResult<UserNotification> result = await store.GetByEntityAsync(entityType, entityId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
+        PagedResult<UserNotification> result = await reader.GetByEntityAsync(entityType, entityId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
         return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount));
     }
 
@@ -162,13 +162,13 @@ public static class NotificationEndpointRouteBuilderExtensions
     }
 
     private static async Task<Ok<List<NotificationPreferenceResponse>>> GetPreferencesAsync(
-        INotificationPreferenceStore store,
+        INotificationPreferenceReader reader,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        IReadOnlyList<NotificationPreference> preferences = await store.GetListAsync(userId, tenantId).ConfigureAwait(false);
+        IReadOnlyList<NotificationPreference> preferences = await reader.GetListAsync(userId, tenantId).ConfigureAwait(false);
         var result = preferences
             .Select(p => new NotificationPreferenceResponse(p.Id, p.UserId, p.NotificationTypeName, p.ChannelName, p.IsEnabled))
             .ToList();
@@ -177,7 +177,7 @@ public static class NotificationEndpointRouteBuilderExtensions
 
     private static async Task<NoContent> UpdatePreferenceAsync(
         UpdatePreferenceRequest request,
-        INotificationPreferenceStore store,
+        INotificationPreferenceWriter writer,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
         IClock clock)
@@ -197,7 +197,7 @@ public static class NotificationEndpointRouteBuilderExtensions
             ModifiedAt = clock.Now,
             ModifiedBy = userId,
         };
-        await store.SetAsync(preference).ConfigureAwait(false);
+        await writer.SetAsync(preference).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -228,37 +228,37 @@ public static class NotificationEndpointRouteBuilderExtensions
     }
 
     private static async Task<Ok<List<NotificationSubscriptionResponse>>> GetSubscriptionsAsync(
-        INotificationSubscriptionStore store,
+        INotificationSubscriptionReader reader,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        IReadOnlyList<NotificationSubscription> subscriptions = await store.GetUserSubscriptionsAsync(userId, tenantId).ConfigureAwait(false);
+        IReadOnlyList<NotificationSubscription> subscriptions = await reader.GetUserSubscriptionsAsync(userId, tenantId).ConfigureAwait(false);
         return TypedResults.Ok(MapSubscriptions(subscriptions));
     }
 
     private static async Task<NoContent> SubscribeAsync(
         string typeName,
-        INotificationSubscriptionStore store,
+        INotificationSubscriptionWriter writer,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        await store.SubscribeAsync(userId, typeName, tenantId).ConfigureAwait(false);
+        await writer.SubscribeAsync(userId, typeName, tenantId).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
     private static async Task<NoContent> UnsubscribeAsync(
         string typeName,
-        INotificationSubscriptionStore store,
+        INotificationSubscriptionWriter writer,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        await store.UnsubscribeAsync(userId, typeName, tenantId).ConfigureAwait(false);
+        await writer.UnsubscribeAsync(userId, typeName, tenantId).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
@@ -284,37 +284,37 @@ public static class NotificationEndpointRouteBuilderExtensions
     private static async Task<NoContent> FollowEntityAsync(
         string entityType,
         string entityId,
-        INotificationSubscriptionStore store,
+        INotificationSubscriptionWriter writer,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        await store.FollowEntityAsync(userId, entityType, entityId, tenantId).ConfigureAwait(false);
+        await writer.FollowEntityAsync(userId, entityType, entityId, tenantId).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
     private static async Task<NoContent> UnfollowEntityAsync(
         string entityType,
         string entityId,
-        INotificationSubscriptionStore store,
+        INotificationSubscriptionWriter writer,
         ICurrentTenant tenant,
         ClaimsPrincipal user)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        await store.UnfollowEntityAsync(userId, entityType, entityId, tenantId).ConfigureAwait(false);
+        await writer.UnfollowEntityAsync(userId, entityType, entityId, tenantId).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
     private static async Task<Ok<List<NotificationSubscriptionResponse>>> GetEntityFollowersAsync(
         string entityType,
         string entityId,
-        INotificationSubscriptionStore store,
+        INotificationSubscriptionReader reader,
         ICurrentTenant tenant)
     {
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
-        IReadOnlyList<NotificationSubscription> followers = await store.GetEntityFollowersAsync(entityType, entityId, tenantId).ConfigureAwait(false);
+        IReadOnlyList<NotificationSubscription> followers = await reader.GetEntityFollowersAsync(entityType, entityId, tenantId).ConfigureAwait(false);
         return TypedResults.Ok(MapSubscriptions(followers));
     }
 

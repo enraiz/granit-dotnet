@@ -18,7 +18,7 @@ namespace Granit.Notifications.Tests;
 
 public sealed class InAppNotificationChannelTests
 {
-    private readonly IUserNotificationStore _userNotificationStore = Substitute.For<IUserNotificationStore>();
+    private readonly IUserNotificationWriter _userNotificationWriter = Substitute.For<IUserNotificationWriter>();
     private readonly IClock _clock;
     private readonly InAppNotificationChannel _channel;
 
@@ -26,7 +26,7 @@ public sealed class InAppNotificationChannelTests
     {
         _clock = Substitute.For<IClock>();
         _clock.Now.Returns(_ => DateTimeOffset.UtcNow);
-        _channel = new InAppNotificationChannel(_userNotificationStore, _clock);
+        _channel = new InAppNotificationChannel(_userNotificationWriter, _clock);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public sealed class InAppNotificationChannelTests
 
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
-        await _userNotificationStore.Received(1).InsertAsync(
+        await _userNotificationWriter.Received(1).InsertAsync(
             Arg.Any<UserNotification>(), Arg.Any<CancellationToken>());
     }
 
@@ -45,7 +45,7 @@ public sealed class InAppNotificationChannelTests
     {
         NotificationDeliveryContext context = BuildContext();
         UserNotification? captured = null;
-        _userNotificationStore.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
+        _userNotificationWriter.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 captured = callInfo.Arg<UserNotification>();
@@ -65,7 +65,7 @@ public sealed class InAppNotificationChannelTests
     {
         NotificationDeliveryContext context = BuildContext();
         UserNotification? captured = null;
-        _userNotificationStore.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
+        _userNotificationWriter.InsertAsync(Arg.Any<UserNotification>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 captured = callInfo.Arg<UserNotification>();

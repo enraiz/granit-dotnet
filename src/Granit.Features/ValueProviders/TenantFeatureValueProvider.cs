@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Granit.Features.ValueProviders;
 
 /// <summary>
-/// Resolves tenant-specific feature overrides from <see cref="IFeatureStore"/>.
+/// Resolves tenant-specific feature overrides from <see cref="IFeatureStoreReader"/>.
 /// Runs first in the cascade (order = 100) — highest priority.
 /// </summary>
 /// <remarks>
@@ -15,10 +15,10 @@ namespace Granit.Features.ValueProviders;
 /// </remarks>
 internal sealed class TenantFeatureValueProvider(
     IServiceProvider serviceProvider,
-    IFeatureStore featureStore) : IFeatureValueProvider
+    IFeatureStoreReader featureStoreReader) : IFeatureValueProvider
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly IFeatureStore _featureStore = featureStore;
+    private readonly IFeatureStoreReader _featureStoreReader = featureStoreReader;
 
     /// <inheritdoc/>
     public string Name => "Tenant";
@@ -36,6 +36,6 @@ internal sealed class TenantFeatureValueProvider(
         }
 
         string tenantId = currentTenant.Id!.Value.ToString();
-        return await _featureStore.GetOrNullAsync(definition.Name, tenantId, ct).ConfigureAwait(false);
+        return await _featureStoreReader.GetOrNullAsync(definition.Name, tenantId, ct).ConfigureAwait(false);
     }
 }

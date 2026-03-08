@@ -43,11 +43,11 @@ internal static class ImportExecutionEndpoints
 
     private static async Task<Results<Accepted, NotFound, BadRequest<string>>> ExecuteAsync(
         Guid jobId,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
         IImportCommandDispatcher dispatcher,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -67,11 +67,11 @@ internal static class ImportExecutionEndpoints
 
     private static async Task<Results<Ok<ImportReportResponse>, NotFound, BadRequest<string>>> DryRunAsync(
         Guid jobId,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
         IImportOrchestrator orchestrator,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -90,10 +90,10 @@ internal static class ImportExecutionEndpoints
 
     private static async Task<Results<Ok<ImportJobResponse>, NotFound>> GetStatusAsync(
         Guid jobId,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -104,11 +104,12 @@ internal static class ImportExecutionEndpoints
 
     private static async Task<Results<NoContent, NotFound, BadRequest<string>>> CancelAsync(
         Guid jobId,
-        IImportJobStore jobStore,
+        IImportJobReader jobReader,
+        IImportJobWriter jobWriter,
         IImportFileProvider fileProvider,
         CancellationToken ct)
     {
-        ImportJob? job = await jobStore.GetAsync(jobId, ct).ConfigureAwait(false);
+        ImportJob? job = await jobReader.GetAsync(jobId, ct).ConfigureAwait(false);
         if (job is null)
         {
             return TypedResults.NotFound();
@@ -122,7 +123,7 @@ internal static class ImportExecutionEndpoints
         }
 
         job.Status = ImportJobStatus.Cancelled;
-        await jobStore.UpdateAsync(job, ct).ConfigureAwait(false);
+        await jobWriter.UpdateAsync(job, ct).ConfigureAwait(false);
         await fileProvider.DeleteAsync(job.BlobReference, ct).ConfigureAwait(false);
 
         return TypedResults.NoContent();

@@ -1,5 +1,5 @@
 // =============================================================================
-// Tests - NullNotificationDeliveryStore
+// Tests - NullNotificationDeliveryWriter
 // =============================================================================
 // Verifies the no-op delivery store used in development: RecordAsync completes
 // without error and does not throw for any valid input.
@@ -12,9 +12,9 @@ using Xunit;
 
 namespace Granit.Notifications.Tests;
 
-public sealed class NullNotificationDeliveryStoreTests
+public sealed class NullNotificationDeliveryWriterTests
 {
-    private readonly NullNotificationDeliveryStore _store = new();
+    private readonly NullNotificationDeliveryWriter _store = new();
 
     [Fact]
     public async Task RecordAsync_CompletesSuccessfully()

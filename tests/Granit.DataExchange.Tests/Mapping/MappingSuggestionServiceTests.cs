@@ -117,13 +117,13 @@ public sealed class MappingSuggestionServiceTests
     public async Task Saved_mappings_have_priority()
     {
         // Arrange
-        IMappingStore store = Substitute.For<IMappingStore>();
+        IMappingReader store = Substitute.For<IMappingReader>();
         store.LoadAsync("Test.PatientImport", Arg.Any<CancellationToken>())
             .Returns<IReadOnlyList<ImportColumnMapping>>(
             [
                 new("My Custom Column", "Niss", MappingConfidence.Saved),
             ]);
-        _serviceProvider.GetService(typeof(IMappingStore)).Returns(store);
+        _serviceProvider.GetService(typeof(IMappingReader)).Returns(store);
 
         List<string> headers = ["My Custom Column", "Niss"];
 

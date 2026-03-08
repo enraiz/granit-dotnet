@@ -27,7 +27,8 @@ public sealed class ExportPresetEndpointsTests : IAsyncDisposable
     private const string MetadataPrefix = "/data-exchange/metadata";
 
     private readonly IExportOrchestrator _orchestrator = Substitute.For<IExportOrchestrator>();
-    private readonly IExportPresetStore _presetStore = Substitute.For<IExportPresetStore>();
+    private readonly IExportPresetReader _presetReader = Substitute.For<IExportPresetReader>();
+    private readonly IExportPresetWriter _presetWriter = Substitute.For<IExportPresetWriter>();
     private readonly IExportDefinitionDescriptor _descriptor;
     private readonly WebApplication _app;
     private readonly HttpClient _adminClient;
@@ -55,11 +56,14 @@ public sealed class ExportPresetEndpointsTests : IAsyncDisposable
 
         builder.Services.AddAuthorization();
         builder.Services.AddSingleton(_orchestrator);
-        builder.Services.AddSingleton(_presetStore);
+        builder.Services.AddSingleton(_presetReader);
+        builder.Services.AddSingleton(_presetWriter);
         builder.Services.AddSingleton(_descriptor);
+        builder.Services.AddSingleton(Substitute.For<IExportJobReader>());
 
         // Required by import endpoints (compiled at startup)
-        builder.Services.AddSingleton(Substitute.For<IImportJobStore>());
+        builder.Services.AddSingleton(Substitute.For<IImportJobReader>());
+        builder.Services.AddSingleton(Substitute.For<IImportJobWriter>());
         builder.Services.AddSingleton(Substitute.For<IImportFileProvider>());
         builder.Services.AddSingleton(Substitute.For<IMappingSuggestionService>());
         builder.Services.AddSingleton(Substitute.For<IClock>());
@@ -82,7 +86,7 @@ public sealed class ExportPresetEndpointsTests : IAsyncDisposable
     public async Task ListPresets_returns_presets_for_definition()
     {
         // Arrange
-        _presetStore.ListAsync("Test.Export", Arg.Any<CancellationToken>())
+        _presetReader.ListAsync("Test.Export", Arg.Any<CancellationToken>())
             .Returns([
                 new ExportPreset("Test.Export", "Monthly", ["Name", "Email"], "xlsx", false),
                 new ExportPreset("Test.Export", "Quick", ["Name"], "csv", true),
@@ -106,7 +110,7 @@ public sealed class ExportPresetEndpointsTests : IAsyncDisposable
     public async Task ListPresets_empty_returns_empty_list()
     {
         // Arrange
-        _presetStore.ListAsync("Test.Export", Arg.Any<CancellationToken>())
+        _presetReader.ListAsync("Test.Export", Arg.Any<CancellationToken>())
             .Returns(Array.Empty<ExportPreset>());
 
         // Act
@@ -146,7 +150,7 @@ public sealed class ExportPresetEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        await _presetStore.Received(1).SaveAsync(
+        await _presetWriter.Received(1).SaveAsync(
             Arg.Is<ExportPreset>(p => p.PresetName == "Monthly" && p.DefinitionName == "Test.Export"),
             Arg.Any<CancellationToken>());
     }
@@ -199,7 +203,7 @@ public sealed class ExportPresetEndpointsTests : IAsyncDisposable
     public async Task DeletePreset_existing_returns_204()
     {
         // Arrange
-        _presetStore.GetAsync("Test.Export", "Monthly", Arg.Any<CancellationToken>())
+        _presetReader.GetAsync("Test.Export", "Monthly", Arg.Any<CancellationToken>())
             .Returns(new ExportPreset("Test.Export", "Monthly", ["Name"], "xlsx", false));
 
         // Act
@@ -208,14 +212,14 @@ public sealed class ExportPresetEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-        await _presetStore.Received(1).DeleteAsync("Test.Export", "Monthly", Arg.Any<CancellationToken>());
+        await _presetWriter.Received(1).DeleteAsync("Test.Export", "Monthly", Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task DeletePreset_nonexistent_returns_404()
     {
         // Arrange
-        _presetStore.GetAsync("Test.Export", "NonExistent", Arg.Any<CancellationToken>())
+        _presetReader.GetAsync("Test.Export", "NonExistent", Arg.Any<CancellationToken>())
             .Returns((ExportPreset?)null);
 
         // Act

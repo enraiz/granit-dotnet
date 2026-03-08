@@ -7,7 +7,7 @@ namespace Granit.Features.Events;
 /// <remarks>
 /// Consumed by <see cref="Cache.FeatureCacheInvalidationHandler"/> to remove the stale
 /// entry from <see cref="Microsoft.Extensions.Caching.Hybrid.HybridCache"/>.
-/// Publish this event after any <see cref="Store.IFeatureStore"/> mutation.
+/// Publish this event after any <see cref="Store.IFeatureStoreWriter"/> mutation.
 /// </remarks>
 /// <param name="FeatureName">The name of the feature whose override changed.</param>
 /// <param name="TenantId">

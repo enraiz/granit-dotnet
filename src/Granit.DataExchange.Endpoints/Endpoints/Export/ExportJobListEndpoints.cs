@@ -27,7 +27,7 @@ internal static class ExportJobListEndpoints
     }
 
     private static async Task<Ok<PagedResult<ExportJobResponse>>> ListAsync(
-        [FromServices] IExportJobStore jobStore,
+        [FromServices] IExportJobReader jobReader,
         [FromQuery] ExportJobStatus? status = null,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
@@ -36,7 +36,7 @@ internal static class ExportJobListEndpoints
         int clampedPageSize = Math.Clamp(pageSize, 1, 100);
         int clampedPage = Math.Max(page, 1);
 
-        PagedResult<ExportJob> result = await jobStore
+        PagedResult<ExportJob> result = await jobReader
             .ListAsync(status, clampedPage, clampedPageSize, ct)
             .ConfigureAwait(false);
 

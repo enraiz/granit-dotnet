@@ -2,8 +2,8 @@ namespace Granit.BackgroundJobs;
 
 /// <summary>
 /// Immutable snapshot of the current state of a recurring job.
-/// Returned by <see cref="IBackgroundJobManager.GetAllAsync"/> and
-/// <see cref="IBackgroundJobManager.FindAsync"/>.
+/// Returned by <see cref="IBackgroundJobReader.GetAllAsync"/> and
+/// <see cref="IBackgroundJobReader.FindAsync"/>.
 /// </summary>
 /// <param name="JobName">Unique job identifier.</param>
 /// <param name="CronExpression">Cron expression defining the schedule.</param>

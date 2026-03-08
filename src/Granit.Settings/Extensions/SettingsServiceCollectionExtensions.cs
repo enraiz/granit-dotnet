@@ -32,8 +32,11 @@ public static class SettingsServiceCollectionExtensions
         // Definition registry (Singleton — loaded once at startup)
         services.TryAddSingleton<SettingDefinitionManager>();
 
-        // Default in-memory store (replaced by EfCoreSettingStore in production)
-        services.TryAddSingleton<ISettingStore, InMemorySettingStore>();
+        // Default in-memory store (replaced by EfCoreSettingStore in production).
+        // Register concrete type first, then forward both interfaces to the same instance.
+        services.TryAddSingleton<InMemorySettingStore>();
+        services.TryAddSingleton<ISettingStoreReader>(sp => sp.GetRequiredService<InMemorySettingStore>());
+        services.TryAddSingleton<ISettingStoreWriter>(sp => sp.GetRequiredService<InMemorySettingStore>());
 
         // Providers (Scoped — UserSettingValueProvider depends on ICurrentUserService)
         services.AddScoped<ISettingValueProvider, UserSettingValueProvider>();

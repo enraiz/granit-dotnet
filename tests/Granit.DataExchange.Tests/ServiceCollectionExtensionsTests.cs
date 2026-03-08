@@ -144,26 +144,50 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitDataExport_registers_null_job_store()
+    public void AddGranitDataExport_registers_null_job_reader()
     {
         ServiceCollection services = new();
 
         services.AddGranitDataExport();
 
         services.ShouldContain(d =>
-            d.ServiceType == typeof(IExportJobStore) &&
+            d.ServiceType == typeof(IExportJobReader) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
 
     [Fact]
-    public void AddGranitDataExport_registers_null_preset_store()
+    public void AddGranitDataExport_registers_null_job_writer()
     {
         ServiceCollection services = new();
 
         services.AddGranitDataExport();
 
         services.ShouldContain(d =>
-            d.ServiceType == typeof(IExportPresetStore) &&
+            d.ServiceType == typeof(IExportJobWriter) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitDataExport_registers_null_preset_reader()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataExport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IExportPresetReader) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitDataExport_registers_null_preset_writer()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitDataExport();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IExportPresetWriter) &&
             d.Lifetime == ServiceLifetime.Scoped);
     }
 

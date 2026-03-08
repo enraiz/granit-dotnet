@@ -1,8 +1,7 @@
 namespace Granit.BackgroundJobs;
 
 /// <summary>
-/// Service for administrative control of Granit recurring background jobs.
-/// Injectable in API controllers, Minimal API handlers, and any DI-aware component.
+/// Write operations for administrative control of Granit recurring background jobs.
 /// </summary>
 /// <remarks>
 /// All write operations (<see cref="PauseAsync"/>, <see cref="ResumeAsync"/>,
@@ -15,16 +14,8 @@ namespace Granit.BackgroundJobs;
 /// in <see cref="BackgroundJobDefinition.TriggeredBy"/> by the scheduling middleware.
 /// </para>
 /// </remarks>
-public interface IBackgroundJobManager
+public interface IBackgroundJobWriter
 {
-    /// <summary>Returns the current status of all registered recurring jobs.</summary>
-    Task<IReadOnlyList<BackgroundJobStatus>> GetAllAsync(CancellationToken ct = default);
-
-    /// <summary>
-    /// Returns the status of a specific job, or <c>null</c> if not found.
-    /// </summary>
-    Task<BackgroundJobStatus?> FindAsync(string jobName, CancellationToken ct = default);
-
     /// <summary>
     /// Pauses a recurring job. The current execution (if running) completes normally,
     /// but rescheduling is skipped. The pause state persists across restarts.

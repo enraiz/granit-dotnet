@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 namespace Granit.Notifications.Push;
 
 /// <summary>In-memory push subscription store for development/testing.</summary>
-internal sealed class InMemoryPushSubscriptionStore : IPushSubscriptionStore
+internal sealed class InMemoryPushSubscriptionStore : IPushSubscriptionReader, IPushSubscriptionWriter
 {
     private readonly ConcurrentDictionary<string, List<PushSubscriptionInfo>> _subscriptions = new();
 

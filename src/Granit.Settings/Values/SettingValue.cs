@@ -8,7 +8,7 @@ namespace Granit.Settings.Values;
 /// <param name="Name">Setting name.</param>
 /// <param name="ProviderName">Provider name (e.g. "G", "T", "U", "C", "D").</param>
 /// <param name="ProviderKey">Provider key (null = Global, tenantId = Tenant, userId = User).</param>
-/// <param name="Value">Setting value (plain text — encryption is handled by ISettingStore).</param>
+/// <param name="Value">Setting value (plain text — encryption is handled by ISettingStoreWriter).</param>
 [CacheName("Setting")]
 [CacheEncrypted]
 public sealed record SettingValue(

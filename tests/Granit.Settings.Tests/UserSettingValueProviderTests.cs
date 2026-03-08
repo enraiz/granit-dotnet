@@ -43,7 +43,7 @@ public sealed class UserSettingValueProviderTests
                 callInfo.ArgAt<Func<CancellationToken, Task<SettingValue>>>(1)(CancellationToken.None));
 
         IOptions<SettingsOptions> options = Microsoft.Extensions.Options.Options.Create(new SettingsOptions());
-        UserSettingValueProvider provider = new(currentUser, store, cache, options);
+        UserSettingValueProvider provider = new(currentUser, store, store, cache, options);
         return (provider, store, cache);
     }
 

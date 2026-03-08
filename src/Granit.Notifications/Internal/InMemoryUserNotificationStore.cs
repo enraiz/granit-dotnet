@@ -5,7 +5,7 @@ using Granit.Querying;
 
 namespace Granit.Notifications.Internal;
 
-internal sealed class InMemoryUserNotificationStore : IUserNotificationStore
+internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, IUserNotificationWriter
 {
     private readonly ConcurrentDictionary<Guid, UserNotification> _notifications = new();
 

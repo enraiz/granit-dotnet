@@ -4,10 +4,10 @@ using Granit.Settings.Values;
 namespace Granit.Settings.Stores;
 
 /// <summary>
-/// In-memory implementation of <see cref="ISettingStore"/>.
+/// In-memory implementation of <see cref="ISettingStoreReader"/> and <see cref="ISettingStoreWriter"/>.
 /// Uses a <see cref="ConcurrentDictionary{TKey,TValue}"/> for thread safety.
 /// </summary>
-public sealed class InMemorySettingStore : ISettingStore
+public sealed class InMemorySettingStore : ISettingStoreReader, ISettingStoreWriter
 {
     private readonly ConcurrentDictionary<string, SettingValue> _store = new();
 

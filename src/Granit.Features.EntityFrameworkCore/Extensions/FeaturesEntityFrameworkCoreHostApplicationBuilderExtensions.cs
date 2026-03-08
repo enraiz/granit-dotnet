@@ -56,7 +56,9 @@ public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
         }, ServiceLifetime.Scoped);
 
         builder.Services.Replace(
-            ServiceDescriptor.Scoped<IFeatureStore, EfCoreFeatureStore>());
+            ServiceDescriptor.Scoped<IFeatureStoreReader, EfCoreFeatureStore>());
+        builder.Services.Replace(
+            ServiceDescriptor.Scoped<IFeatureStoreWriter, EfCoreFeatureStore>());
 
         return builder;
     }

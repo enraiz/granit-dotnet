@@ -27,7 +27,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     private const string AdminRole = "granit-data-exchange-admin";
     private const string ExportPrefix = "/data-exchange/export";
 
-    private readonly IExportJobStore _jobStore = Substitute.For<IExportJobStore>();
+    private readonly IExportJobReader _jobReader = Substitute.For<IExportJobReader>();
     private readonly WebApplication _app;
     private readonly HttpClient _adminClient;
     private readonly HttpClient _userClient;
@@ -44,12 +44,14 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
                 TestAuthHandler.SchemeName, _ => { });
 
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_jobStore);
+        builder.Services.AddSingleton(_jobReader);
         builder.Services.AddSingleton(Substitute.For<IExportOrchestrator>());
-        builder.Services.AddSingleton(Substitute.For<IExportPresetStore>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetReader>());
+        builder.Services.AddSingleton(Substitute.For<IExportPresetWriter>());
 
         // Required by import endpoints (compiled at startup)
-        builder.Services.AddSingleton(Substitute.For<IImportJobStore>());
+        builder.Services.AddSingleton(Substitute.For<IImportJobReader>());
+        builder.Services.AddSingleton(Substitute.For<IImportJobWriter>());
         builder.Services.AddSingleton(Substitute.For<IImportFileProvider>());
         builder.Services.AddSingleton(Substitute.For<IMappingSuggestionService>());
         builder.Services.AddSingleton(Substitute.For<IClock>());
@@ -74,7 +76,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         ExportJob job = CreateJob(ExportJobStatus.Completed);
-        _jobStore.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
+        _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<ExportJob>([job], 1));
 
         // Act
@@ -95,7 +97,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     public async Task List_with_status_filter_passes_status_to_store()
     {
         // Arrange
-        _jobStore.ListAsync(ExportJobStatus.Failed, 1, 20, Arg.Any<CancellationToken>())
+        _jobReader.ListAsync(ExportJobStatus.Failed, 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<ExportJob>([], 0));
 
         // Act
@@ -104,7 +106,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _jobStore.Received(1).ListAsync(
+        await _jobReader.Received(1).ListAsync(
             ExportJobStatus.Failed, 1, 20, Arg.Any<CancellationToken>());
     }
 
@@ -112,7 +114,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     public async Task List_with_pagination_passes_page_and_pageSize()
     {
         // Arrange
-        _jobStore.ListAsync(null, 2, 10, Arg.Any<CancellationToken>())
+        _jobReader.ListAsync(null, 2, 10, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<ExportJob>([], 0));
 
         // Act
@@ -121,7 +123,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _jobStore.Received(1).ListAsync(
+        await _jobReader.Received(1).ListAsync(
             null, 2, 10, Arg.Any<CancellationToken>());
     }
 
@@ -129,7 +131,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     public async Task List_clamps_pageSize_to_100()
     {
         // Arrange
-        _jobStore.ListAsync(null, 1, 100, Arg.Any<CancellationToken>())
+        _jobReader.ListAsync(null, 1, 100, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<ExportJob>([], 0));
 
         // Act
@@ -138,7 +140,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _jobStore.Received(1).ListAsync(
+        await _jobReader.Received(1).ListAsync(
             null, 1, 100, Arg.Any<CancellationToken>());
     }
 
@@ -146,7 +148,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     public async Task List_clamps_page_to_minimum_1()
     {
         // Arrange
-        _jobStore.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
+        _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<ExportJob>([], 0));
 
         // Act
@@ -155,7 +157,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        await _jobStore.Received(1).ListAsync(
+        await _jobReader.Received(1).ListAsync(
             null, 1, 20, Arg.Any<CancellationToken>());
     }
 
@@ -163,7 +165,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     public async Task List_empty_result_returns_200_with_zero_items()
     {
         // Arrange
-        _jobStore.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
+        _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<ExportJob>([], 0));
 
         // Act

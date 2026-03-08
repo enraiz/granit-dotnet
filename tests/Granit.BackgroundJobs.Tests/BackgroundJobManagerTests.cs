@@ -16,7 +16,8 @@ namespace Granit.BackgroundJobs.Tests;
 
 public sealed class BackgroundJobManagerTests
 {
-    private readonly IBackgroundJobStore _store = Substitute.For<IBackgroundJobStore>();
+    private readonly IBackgroundJobStoreReader _storeReader = Substitute.For<IBackgroundJobStoreReader>();
+    private readonly IBackgroundJobStoreWriter _storeWriter = Substitute.For<IBackgroundJobStoreWriter>();
     private readonly IMessageBus _bus = Substitute.For<IMessageBus>();
     private readonly IClock _clock = Substitute.For<IClock>();
     private readonly ICurrentUserService _user = Substitute.For<ICurrentUserService>();
@@ -38,7 +39,7 @@ public sealed class BackgroundJobManagerTests
     }
 
     private BackgroundJobManager MakeSut() =>
-        new(_store, _bus, _clock, _user, _logger, _messageStore);
+        new(_storeReader, _storeWriter, _bus, _clock, _user, _logger, _messageStore);
 
     private static BackgroundJobDefinition MakeJob(
         string name = "test-job",
@@ -62,7 +63,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange
         BackgroundJobDefinition job = MakeJob("daily-report", "0 8 * * *");
-        _store.GetAllJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetAllJobsAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
 
         BackgroundJobManager sut = MakeSut();
@@ -88,7 +89,7 @@ public sealed class BackgroundJobManagerTests
         BackgroundJobDefinition job = MakeJob("daily-report", "0 8 * * *");
         job.ConsecutiveFailureCount = 3;
         job.LastErrorMessage = "timeout";
-        _store.GetAllJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetAllJobsAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
 
         DeadLetterQueueCount dlqEntry = new(
@@ -121,7 +122,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange
         BackgroundJobDefinition job = MakeJob("daily-report");
-        _store.GetAllJobsAsync(Arg.Any<CancellationToken>())
+        _storeReader.GetAllJobsAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
 
         _deadLetters
@@ -148,7 +149,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange
         BackgroundJobDefinition job = MakeJob("daily-report");
-        _store.FindAsync("daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
 
         BackgroundJobManager sut = MakeSut();
@@ -166,7 +167,7 @@ public sealed class BackgroundJobManagerTests
     public async Task FindAsync_UnknownJob_ReturnsNull()
     {
         // Arrange
-        _store.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _storeReader.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(null));
 
         BackgroundJobManager sut = MakeSut();
@@ -188,7 +189,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange
         BackgroundJobDefinition job = MakeJob("daily-report");
-        _store.FindAsync("daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
 
         BackgroundJobManager sut = MakeSut();
@@ -198,14 +199,14 @@ public sealed class BackgroundJobManagerTests
         await sut.PauseAsync("daily-report", ct);
 
         // Assert
-        await _store.Received(1).SetEnabledAsync("daily-report", false, ct);
+        await _storeWriter.Received(1).SetEnabledAsync("daily-report", false, ct);
     }
 
     [Fact]
     public async Task PauseAsync_UnknownJob_ThrowsEntityNotFoundException()
     {
         // Arrange
-        _store.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _storeReader.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(null));
 
         BackgroundJobManager sut = MakeSut();
@@ -226,7 +227,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange
         BackgroundJobDefinition job = MakeJob("daily-report", "0 8 * * *");
-        _store.FindAsync("daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
         _clock.Now.Returns(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
@@ -237,8 +238,8 @@ public sealed class BackgroundJobManagerTests
         await sut.ResumeAsync("daily-report", ct);
 
         // Assert
-        await _store.Received(1).SetEnabledAsync("daily-report", true, ct);
-        await _store.Received(1).RecordNextExecutionAsync(
+        await _storeWriter.Received(1).SetEnabledAsync("daily-report", true, ct);
+        await _storeWriter.Received(1).RecordNextExecutionAsync(
             "daily-report", Arg.Any<DateTimeOffset>(), ct);
     }
 
@@ -246,7 +247,7 @@ public sealed class BackgroundJobManagerTests
     public async Task ResumeAsync_UnknownJob_ThrowsEntityNotFoundException()
     {
         // Arrange
-        _store.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _storeReader.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(null));
 
         BackgroundJobManager sut = MakeSut();
@@ -263,7 +264,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange — cron expression that produces no next occurrence (unreachable)
         BackgroundJobDefinition job = MakeJob("daily-report", "0 8 31 2 *"); // Feb 31 never exists
-        _store.FindAsync("daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
         _clock.Now.Returns(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
@@ -275,7 +276,7 @@ public sealed class BackgroundJobManagerTests
 
         // Assert
         await Should.NotThrowAsync(act);
-        await _store.DidNotReceive()
+        await _storeWriter.DidNotReceive()
             .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
                 Arg.Any<CancellationToken>());
     }
@@ -289,7 +290,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange
         BackgroundJobDefinition job = MakeJob("daily-report");
-        _store.FindAsync("daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
         _user.IsAuthenticated.Returns(true);
         _user.UserId.Returns("user-abc");
@@ -313,7 +314,7 @@ public sealed class BackgroundJobManagerTests
     {
         // Arrange
         BackgroundJobDefinition job = MakeJob("daily-report");
-        _store.FindAsync("daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
         _user.IsAuthenticated.Returns(false);
 
@@ -333,7 +334,7 @@ public sealed class BackgroundJobManagerTests
     public async Task TriggerNowAsync_UnknownJob_ThrowsEntityNotFoundException()
     {
         // Arrange
-        _store.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _storeReader.FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(null));
 
         BackgroundJobManager sut = MakeSut();

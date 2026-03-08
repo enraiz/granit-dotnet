@@ -23,12 +23,13 @@ namespace Granit.BackgroundJobs.Internal;
 /// </para>
 /// <para>
 /// <b>HDS audit:</b> <see cref="BeforeAsync"/> reads the <c>X-Triggered-By</c> header
-/// (set by <see cref="IBackgroundJobManager.TriggerNowAsync"/>) and persists it via
-/// <see cref="IBackgroundJobStore.SetTriggeredByAsync"/>.
+/// (set by <see cref="IBackgroundJobWriter.TriggerNowAsync"/>) and persists it via
+/// <see cref="IBackgroundJobStoreWriter.SetTriggeredByAsync"/>.
 /// </para>
 /// </remarks>
 public sealed partial class RecurringJobSchedulingMiddleware(
-    IBackgroundJobStore store,
+    IBackgroundJobStoreReader storeReader,
+    IBackgroundJobStoreWriter storeWriter,
     IClock clock,
     ILogger<RecurringJobSchedulingMiddleware> logger)
 {
@@ -48,12 +49,12 @@ public sealed partial class RecurringJobSchedulingMiddleware(
             return;
         }
 
-        await store.RecordExecutionStartAsync(attr.Name, clock.Now, ct).ConfigureAwait(false);
+        await storeWriter.RecordExecutionStartAsync(attr.Name, clock.Now, ct).ConfigureAwait(false);
 
         if (envelope.Headers.TryGetValue(TriggeredByHeader, out string? triggeredBy)
             && !string.IsNullOrEmpty(triggeredBy))
         {
-            await store.SetTriggeredByAsync(attr.Name, triggeredBy, ct).ConfigureAwait(false);
+            await storeWriter.SetTriggeredByAsync(attr.Name, triggeredBy, ct).ConfigureAwait(false);
         }
     }
 
@@ -71,7 +72,7 @@ public sealed partial class RecurringJobSchedulingMiddleware(
             return;
         }
 
-        BackgroundJobDefinition? job = await store.FindAsync(attr.Name, ct).ConfigureAwait(false);
+        BackgroundJobDefinition? job = await storeReader.FindAsync(attr.Name, ct).ConfigureAwait(false);
         if (job is not { IsEnabled: true })
         {
             return;
@@ -97,7 +98,7 @@ public sealed partial class RecurringJobSchedulingMiddleware(
 
         object nextMessage = Activator.CreateInstance(envelope.Message!.GetType())!;
         await context.ScheduleAsync(nextMessage, next.Value).ConfigureAwait(false);
-        await store.RecordNextExecutionAsync(job.JobName, next.Value, ct).ConfigureAwait(false);
+        await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, ct).ConfigureAwait(false);
     }
 
     // =========================================================================

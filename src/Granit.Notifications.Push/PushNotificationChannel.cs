@@ -11,7 +11,8 @@ namespace Granit.Notifications.Push;
 /// </summary>
 internal sealed class PushNotificationChannel(
     PushServiceClient pushServiceClient,
-    IPushSubscriptionStore subscriptionStore,
+    IPushSubscriptionReader subscriptionReader,
+    IPushSubscriptionWriter subscriptionWriter,
     ILogger<PushNotificationChannel> logger) : INotificationChannel
 {
     /// <inheritdoc />
@@ -20,7 +21,7 @@ internal sealed class PushNotificationChannel(
     /// <inheritdoc />
     public async Task SendAsync(NotificationDeliveryContext context, CancellationToken ct = default)
     {
-        IReadOnlyList<PushSubscriptionInfo> subscriptions = await subscriptionStore.GetSubscriptionsAsync(
+        IReadOnlyList<PushSubscriptionInfo> subscriptions = await subscriptionReader.GetSubscriptionsAsync(
             context.RecipientUserId, context.TenantId, ct).ConfigureAwait(false);
 
         if (subscriptions.Count == 0)
@@ -66,7 +67,7 @@ internal sealed class PushNotificationChannel(
                     ex,
                     "Push subscription expired for endpoint {Endpoint}, removing",
                     sub.Endpoint);
-                await subscriptionStore.RemoveSubscriptionAsync(sub.Endpoint, context.TenantId, ct).ConfigureAwait(false);
+                await subscriptionWriter.RemoveSubscriptionAsync(sub.Endpoint, context.TenantId, ct).ConfigureAwait(false);
             }
         }
     }

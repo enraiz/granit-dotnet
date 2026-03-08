@@ -10,7 +10,8 @@ namespace Granit.BackgroundJobs.Tests;
 
 public sealed class RecurringJobSchedulingMiddlewareTests
 {
-    private readonly IBackgroundJobStore _store = Substitute.For<IBackgroundJobStore>();
+    private readonly IBackgroundJobStoreReader _storeReader = Substitute.For<IBackgroundJobStoreReader>();
+    private readonly IBackgroundJobStoreWriter _storeWriter = Substitute.For<IBackgroundJobStoreWriter>();
     private readonly IClock _clock = Substitute.For<IClock>();
     private readonly ILogger<RecurringJobSchedulingMiddleware> _logger =
         Substitute.For<ILogger<RecurringJobSchedulingMiddleware>>();
@@ -22,7 +23,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
     }
 
     private RecurringJobSchedulingMiddleware MakeSut() =>
-        new(_store, _clock, _logger);
+        new(_storeReader, _storeWriter, _clock, _logger);
 
     private static BackgroundJobDefinition MakeJob(
         string name = "fake-daily-report",
@@ -55,7 +56,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         await sut.BeforeAsync(envelope, ct);
 
         // Assert
-        await _store.Received(1).RecordExecutionStartAsync("fake-daily-report", now, ct);
+        await _storeWriter.Received(1).RecordExecutionStartAsync("fake-daily-report", now, ct);
     }
 
     [Fact]
@@ -72,7 +73,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         await sut.BeforeAsync(envelope, ct);
 
         // Assert
-        await _store.Received(1).SetTriggeredByAsync("fake-daily-report", "admin-user", ct);
+        await _storeWriter.Received(1).SetTriggeredByAsync("fake-daily-report", "admin-user", ct);
     }
 
     [Fact]
@@ -88,7 +89,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         await sut.BeforeAsync(envelope, ct);
 
         // Assert — header absent → SetTriggeredByAsync must not be called
-        await _store.DidNotReceive().SetTriggeredByAsync(
+        await _storeWriter.DidNotReceive().SetTriggeredByAsync(
             Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
@@ -103,7 +104,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         await sut.BeforeAsync(envelope, TestContext.Current.CancellationToken);
 
         // Assert — store must not be called at all
-        await _store.DidNotReceive()
+        await _storeWriter.DidNotReceive()
             .RecordExecutionStartAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
                 Arg.Any<CancellationToken>());
     }
@@ -119,7 +120,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         DateTimeOffset now = new(2026, 1, 15, 7, 0, 0, TimeSpan.Zero); // before 08:00
         _clock.Now.Returns(now);
         BackgroundJobDefinition job = MakeJob("fake-daily-report", "0 8 * * *");
-        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
 
         Envelope envelope = new(new FakeDailyReportMessage());
@@ -132,7 +133,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
 
         // Assert — next occurrence is today at 08:00 UTC
         DateTimeOffset expectedNext = new(2026, 1, 15, 8, 0, 0, TimeSpan.Zero);
-        await _store.Received(1).RecordNextExecutionAsync(
+        await _storeWriter.Received(1).RecordNextExecutionAsync(
             "fake-daily-report", expectedNext, ct);
     }
 
@@ -142,7 +143,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         // Arrange
         _clock.Now.Returns(DateTimeOffset.UtcNow);
         BackgroundJobDefinition job = MakeJob(enabled: false);
-        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
 
         Envelope envelope = new(new FakeDailyReportMessage());
@@ -153,7 +154,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         await sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
 
         // Assert — paused job must not be rescheduled
-        await _store.DidNotReceive()
+        await _storeWriter.DidNotReceive()
             .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
                 Arg.Any<CancellationToken>());
     }
@@ -170,7 +171,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         await sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
 
         // Assert
-        await _store.DidNotReceive()
+        await _storeReader.DidNotReceive()
             .FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -180,7 +181,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         // Arrange — Feb 31 never exists, GetNextOccurrence returns null
         _clock.Now.Returns(new DateTimeOffset(2026, 2, 28, 8, 0, 0, TimeSpan.Zero));
         BackgroundJobDefinition job = MakeJob("fake-daily-report", "0 8 31 2 *");
-        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
 
         Envelope envelope = new(new FakeDailyReportMessage());
@@ -193,7 +194,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
 
         // Assert — must not throw, no next execution recorded
         await Should.NotThrowAsync(act);
-        await _store.DidNotReceive()
+        await _storeWriter.DidNotReceive()
             .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
                 Arg.Any<CancellationToken>());
     }
@@ -203,7 +204,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
     {
         // Arrange — store returns null (job was removed between BeforeAsync and AfterAsync)
         _clock.Now.Returns(DateTimeOffset.UtcNow);
-        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(null));
 
         Envelope envelope = new(new FakeDailyReportMessage());
@@ -214,7 +215,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         await sut.AfterAsync(envelope, context, TestContext.Current.CancellationToken);
 
         // Assert
-        await _store.DidNotReceive()
+        await _storeWriter.DidNotReceive()
             .RecordNextExecutionAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
                 Arg.Any<CancellationToken>());
     }
@@ -226,7 +227,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
         DateTimeOffset now = new(2026, 1, 15, 10, 0, 30, TimeSpan.Zero);
         _clock.Now.Returns(now);
         BackgroundJobDefinition job = MakeJob("fake-daily-report", "0 * * * * *"); // every minute, second 0
-        _store.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
+        _storeReader.FindAsync("fake-daily-report", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<BackgroundJobDefinition?>(job));
 
         Envelope envelope = new(new FakeDailyReportMessage());
@@ -239,7 +240,7 @@ public sealed class RecurringJobSchedulingMiddlewareTests
 
         // Assert — next occurrence: next minute at second 0
         DateTimeOffset expectedNext = new(2026, 1, 15, 10, 1, 0, TimeSpan.Zero);
-        await _store.Received(1)
+        await _storeWriter.Received(1)
             .RecordNextExecutionAsync("fake-daily-report", expectedNext, ct);
     }
 }

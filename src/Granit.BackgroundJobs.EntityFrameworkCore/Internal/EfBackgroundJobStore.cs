@@ -1,10 +1,10 @@
-using Granit.BackgroundJobs.Internal;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// EF Core implementation of <see cref="IBackgroundJobStore"/>.
+/// EF Core implementation of <see cref="IBackgroundJobStoreReader"/> and
+/// <see cref="IBackgroundJobStoreWriter"/>.
 /// </summary>
 /// <remarks>
 /// Registered as a <b>Singleton</b> when <see cref="JobStoreMode.Durable"/> is configured.
@@ -13,7 +13,7 @@ namespace Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 /// <see cref="Microsoft.Extensions.Hosting.IHostedService"/> consumers.
 /// </remarks>
 internal sealed class EfBackgroundJobStore(
-    IDbContextFactory<BackgroundJobsDbContext> contextFactory) : IBackgroundJobStore
+    IDbContextFactory<BackgroundJobsDbContext> contextFactory) : IBackgroundJobStoreReader, IBackgroundJobStoreWriter
 {
     /// <inheritdoc/>
     public async Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default)
@@ -124,7 +124,14 @@ internal sealed class EfBackgroundJobStore(
             return;
         }
 
-        job.IsEnabled = enabled;
+        if (enabled)
+        {
+            job.Resume();
+        }
+        else
+        {
+            job.Pause();
+        }
         await context.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 

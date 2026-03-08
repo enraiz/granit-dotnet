@@ -25,16 +25,29 @@ public sealed class SettingsEfCoreDiRegistrationTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public void AddGranitSettingsEfCore_RegistersISettingStore_AsSingleton()
+    public void AddGranitSettingsEfCore_RegistersISettingStoreReader_AsSingleton()
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
 
         builder.AddGranitSettingsEfCore<TestSettingsDbContext>();
 
         builder.Services.ShouldContain(d =>
-            d.ServiceType == typeof(ISettingStore) &&
+            d.ServiceType == typeof(ISettingStoreReader) &&
             d.Lifetime == ServiceLifetime.Singleton,
-            "EfCoreSettingStore must be registered as Singleton");
+            "EfCoreSettingStore must be registered as Singleton for ISettingStoreReader");
+    }
+
+    [Fact]
+    public void AddGranitSettingsEfCore_RegistersISettingStoreWriter_AsSingleton()
+    {
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder([]);
+
+        builder.AddGranitSettingsEfCore<TestSettingsDbContext>();
+
+        builder.Services.ShouldContain(d =>
+            d.ServiceType == typeof(ISettingStoreWriter) &&
+            d.Lifetime == ServiceLifetime.Singleton,
+            "EfCoreSettingStore must be registered as Singleton for ISettingStoreWriter");
     }
 
     [Fact]

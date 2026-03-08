@@ -1,21 +1,10 @@
 namespace Granit.BackgroundJobs;
 
 /// <summary>
-/// Abstraction for reading and updating the administrative job store.
-/// Implemented by <see cref="Internal.InMemoryBackgroundJobStore"/> and <c>EfBackgroundJobStore</c>.
-/// Consumers may provide custom implementations (Redis, MongoDB, etc.).
+/// Write operations for the background job store.
 /// </summary>
-public interface IBackgroundJobStore
+public interface IBackgroundJobStoreWriter
 {
-    /// <summary>Returns a job by name, or <c>null</c> if not found.</summary>
-    Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken ct = default);
-
-    /// <summary>Returns all jobs with <see cref="BackgroundJobDefinition.IsEnabled"/> = <c>true</c>.</summary>
-    Task<IReadOnlyList<BackgroundJobDefinition>> GetEnabledJobsAsync(CancellationToken ct = default);
-
-    /// <summary>Returns all jobs regardless of enabled state.</summary>
-    Task<IReadOnlyList<BackgroundJobDefinition>> GetAllJobsAsync(CancellationToken ct = default);
-
     /// <summary>
     /// Inserts new jobs and updates <see cref="BackgroundJobDefinition.CronExpression"/>
     /// for existing ones. Administrative state (IsEnabled, TriggeredBy) is preserved.

@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Webhooks.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="IWebhookSubscriptionStore"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="IWebhookSubscriptionReader"/> and
+/// <see cref="IWebhookSubscriptionWriter"/> backed by PostgreSQL.
 /// </summary>
 internal sealed class EfWebhookSubscriptionStore(IDbContextFactory<WebhooksDbContext> contextFactory)
-    : IWebhookSubscriptionStore
+    : IWebhookSubscriptionReader, IWebhookSubscriptionWriter
 {
     public async Task<IReadOnlyList<WebhookSubscription>> GetActiveSubscriptionsAsync(
         string eventType,
@@ -48,8 +49,7 @@ internal sealed class EfWebhookSubscriptionStore(IDbContextFactory<WebhooksDbCon
             return;
         }
 
-        subscription.Status = WebhookSubscriptionStatus.Deactivated;
-        subscription.DeactivationReason = reason;
+        subscription.Deactivate(reason);
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }

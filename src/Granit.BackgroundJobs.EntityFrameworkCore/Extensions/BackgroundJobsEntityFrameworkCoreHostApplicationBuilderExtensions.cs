@@ -1,5 +1,4 @@
 using Granit.BackgroundJobs.EntityFrameworkCore.Internal;
-using Granit.BackgroundJobs.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -37,8 +36,11 @@ public static class BackgroundJobsEntityFrameworkCoreHostApplicationBuilderExten
     {
         builder.Services.AddDbContextFactory<BackgroundJobsDbContext>(configure);
 
+        builder.Services.AddSingleton<EfBackgroundJobStore>();
         builder.Services.Replace(
-            ServiceDescriptor.Singleton<IBackgroundJobStore, EfBackgroundJobStore>());
+            ServiceDescriptor.Singleton<IBackgroundJobStoreReader>(sp => sp.GetRequiredService<EfBackgroundJobStore>()));
+        builder.Services.Replace(
+            ServiceDescriptor.Singleton<IBackgroundJobStoreWriter>(sp => sp.GetRequiredService<EfBackgroundJobStore>()));
 
         return builder;
     }
