@@ -1330,8 +1330,100 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     }
 
     // =========================================================================
+    // GET /{name}/variables — Template variables
+    // =========================================================================
+
+    [Fact]
+    public async Task GetVariables_WithNoGlobalContexts_ReturnsEmptyLists()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateVariablesResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateVariablesResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.GlobalVariables.ShouldBeEmpty();
+        result.ModelVariables.ShouldBeEmpty();
+        result.EnrichedVariables.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetVariables_WithGlobalContext_ReturnsDiscoveredVariables()
+    {
+        await using WebApplication app = await BuildAppWithGlobalContextAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.GetAsync(
+            $"{Prefix}/Billing.Invoice/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateVariablesResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateVariablesResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.GlobalVariables.Count.ShouldBeGreaterThan(0);
+        result.GlobalVariables.ShouldContain(v => v.Name == "test.first_name");
+        result.GlobalVariables.ShouldContain(v => v.Name == "test.age");
+        TemplateVariableItemResponse firstName = result.GlobalVariables.First(v => v.Name == "test.first_name");
+        firstName.Type.ShouldBe("string");
+        TemplateVariableItemResponse age = result.GlobalVariables.First(v => v.Name == "test.age");
+        age.Type.ShouldBe("number");
+    }
+
+    [Fact]
+    public async Task GetVariables_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/bad/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task GetVariables_WithoutAuth_Returns401()
+    {
+        HttpResponseMessage response = await _anonClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    // =========================================================================
     // Helpers
     // =========================================================================
+
+    private static async Task<WebApplication> BuildAppWithGlobalContextAsync()
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        builder.Services
+            .AddAuthentication(TestAuthHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                TestAuthHandler.SchemeName, _ => { });
+
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(TemplatingPermissions.Manage,
+                policy => policy.RequireRole(ManageRole));
+
+        IDocumentTemplateStoreReader storeReader = Substitute.For<IDocumentTemplateStoreReader>();
+        IDocumentTemplateStoreWriter storeWriter = Substitute.For<IDocumentTemplateStoreWriter>();
+        builder.Services.AddSingleton(storeReader);
+        builder.Services.AddSingleton(storeWriter);
+        builder.Services.AddSingleton<IValidator<SaveTemplateRequest>, SaveTemplateRequestValidator>();
+        builder.Services.AddSingleton<ITemplateGlobalContext, TestGlobalContext>();
+
+        WebApplication app = builder.Build();
+        app.MapGranitTemplatingAdmin();
+        await app.StartAsync(TestContext.Current.CancellationToken);
+        return app;
+    }
 
     private static async Task<WebApplication> BuildAppWithEngineAsync(
         IDocumentTemplateStoreReader storeReader,
@@ -1409,6 +1501,17 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
         HttpClient client = app.GetTestClient();
         client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, role);
         return client;
+    }
+
+    // =========================================================================
+    // Fake global context for variable introspection tests
+    // =========================================================================
+
+    private sealed class TestGlobalContext : ITemplateGlobalContext
+    {
+        public string ContextName => "test";
+
+        public object Resolve() => new { FirstName = "John", Age = 42, IsActive = true };
     }
 
     // =========================================================================

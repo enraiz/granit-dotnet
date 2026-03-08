@@ -6,6 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using System.Diagnostics;
+using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Granit.Security;
@@ -46,7 +48,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers 11 endpoints:
+    /// Registers 12 endpoints:
     /// <list type="bullet">
     /// <item><c>GET /</c> — paginated list with filters</item>
     /// <item><c>GET /{name}</c> — detail (draft + published)</item>
@@ -57,6 +59,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// <item><c>POST /{name}/unpublish</c> — unpublish (archive the published revision)</item>
     /// <item><c>GET /{name}/lifecycle</c> — lifecycle info (current status, available transitions)</item>
     /// <item><c>POST /{name}/preview</c> — render the current draft with test data</item>
+    /// <item><c>GET /{name}/variables</c> — list available template variables for autocompletion</item>
     /// <item><c>GET /{name}/history</c> — paginated revision history (summaries, no content)</item>
     /// <item><c>GET /{name}/history/{revisionId}</c> — full detail of a specific revision</item>
     /// </list>
@@ -123,6 +126,10 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         group.MapPost("/{name}/preview", HandlePreviewAsync)
              .WithName("PreviewTemplate")
              .WithSummary("Renders the current draft with optional test data and returns the HTML output.");
+
+        group.MapGet("/{name}/variables", HandleGetVariablesAsync)
+             .WithName("GetTemplateVariables")
+             .WithSummary("Returns all available template variables (global, model, enriched) for autocompletion.");
 
         group.MapGet("/{name}/history", HandleGetHistoryAsync)
              .WithName("GetTemplateHistory")
@@ -830,6 +837,51 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     }
 
     // -------------------------------------------------------------------------
+    // GET /{name}/variables — Available template variables
+    // -------------------------------------------------------------------------
+
+    private static Task<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>> HandleGetVariablesAsync(
+        HttpContext context,
+        string name,
+        CancellationToken ct)
+    {
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return Task.FromResult<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>>(nameError);
+        }
+
+        // Global variables — discovered by reflecting on ITemplateGlobalContext.Resolve() return types
+        List<ITemplateGlobalContext> globalContexts =
+            context.RequestServices.GetServices<ITemplateGlobalContext>().ToList();
+
+        List<TemplateVariableItemResponse> globalVariables = [];
+        foreach (ITemplateGlobalContext globalContext in globalContexts)
+        {
+            object resolved = globalContext.Resolve();
+            Type resolvedType = resolved.GetType();
+
+            foreach (PropertyInfo property in resolvedType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                string variableName = $"{globalContext.ContextName}.{ToSnakeCase(property.Name)}";
+                string typeName = MapClrTypeName(property.PropertyType);
+                globalVariables.Add(new TemplateVariableItemResponse(variableName, typeName, null));
+            }
+        }
+
+        // Model and enriched variables are not yet discoverable at runtime.
+        // TemplateType<TData> instances are static singletons, not registered in DI.
+        // A future ITemplateTypeRegistry could enable model variable introspection.
+        var response = new TemplateVariablesResponse(
+            globalVariables,
+            ModelVariables: [],
+            EnrichedVariables: []);
+
+        return Task.FromResult<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>>(
+            TypedResults.Ok(response));
+    }
+
+    // -------------------------------------------------------------------------
     // Shared helpers
     // -------------------------------------------------------------------------
 
@@ -960,4 +1012,78 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             JsonValueKind.False => false,
             _ => null,
         };
+
+    /// <summary>
+    /// Converts a PascalCase property name to snake_case.
+    /// Replicates Scriban's <c>StandardMemberRenamer.Default</c> behavior.
+    /// </summary>
+    internal static string ToSnakeCase(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return name;
+        }
+
+        StringBuilder sb = new();
+        for (int i = 0; i < name.Length; i++)
+        {
+            char c = name[i];
+            if (char.IsUpper(c))
+            {
+                if (i > 0)
+                {
+                    sb.Append('_');
+                }
+
+                sb.Append(char.ToLowerInvariant(c));
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static string MapClrTypeName(Type type)
+    {
+        Type underlying = Nullable.GetUnderlyingType(type) ?? type;
+
+        if (underlying == typeof(string))
+        {
+            return "string";
+        }
+
+        if (underlying == typeof(int) || underlying == typeof(long) ||
+            underlying == typeof(short) || underlying == typeof(byte) ||
+            underlying == typeof(decimal) || underlying == typeof(double) ||
+            underlying == typeof(float))
+        {
+            return "number";
+        }
+
+        if (underlying == typeof(bool))
+        {
+            return "boolean";
+        }
+
+        if (underlying == typeof(DateTime) || underlying == typeof(DateTimeOffset) ||
+            underlying == typeof(DateOnly))
+        {
+            return "date";
+        }
+
+        if (underlying == typeof(TimeOnly) || underlying == typeof(TimeSpan))
+        {
+            return "time";
+        }
+
+        if (underlying == typeof(Guid))
+        {
+            return "string";
+        }
+
+        return "object";
+    }
 }

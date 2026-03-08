@@ -419,6 +419,7 @@ app.MapGranitTemplatingAdmin(opts =>
 | `POST /{name}/unpublish` | Dépublier | Archive la version publiée. Idempotent si rien n'est publié. 409 si refusé |
 | `GET /{name}/lifecycle` | État du cycle de vie | Statut actuel, workflow actif, transitions disponibles |
 | `POST /{name}/preview` | Preview du brouillon | Rendu HTML du brouillon avec données test. 501 si pas de moteur, 422 si erreur de rendu |
+| `GET /{name}/variables` | Variables disponibles | Introspection des variables globales (`now.*`, `context.*`, …) pour autocomplétion |
 | `GET /{name}/history` | Historique des révisions | Paginé (`page`, `pageSize`), sans contenu. HDS audit trail |
 | `GET /{name}/history/{revisionId}` | Détail d'une révision | Contenu complet inclus, pour diff entre versions |
 
