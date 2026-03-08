@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Shouldly;
 using Xunit;
 
@@ -13,7 +14,7 @@ public sealed class ReferenceDataResultTests
         TestEntity entity = new() { Code = "BE", LabelEn = "Belgium" };
         List<TestEntity> items = [entity];
 
-        ReferenceDataResult<TestEntity> result = new(items, 42);
+        PagedResult<TestEntity> result = new(items, 42);
 
         result.Items.ShouldBe(items);
         result.TotalCount.ShouldBe(42);
@@ -22,7 +23,7 @@ public sealed class ReferenceDataResultTests
     [Fact]
     public void Empty_Result_Has_Zero_TotalCount()
     {
-        ReferenceDataResult<TestEntity> result = new([], 0);
+        PagedResult<TestEntity> result = new([], 0);
 
         result.Items.ShouldBeEmpty();
         result.TotalCount.ShouldBe(0);

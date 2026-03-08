@@ -5,6 +5,7 @@ using System.Text.Encodings.Web;
 using Granit.BackgroundJobs.Endpoints.Extensions;
 using Granit.BackgroundJobs.Endpoints.Internal;
 using Granit.Core.Exceptions;
+using Granit.Querying;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
@@ -83,10 +84,11 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        IReadOnlyList<BackgroundJobStatus>? result =
-            await response.Content.ReadFromJsonAsync<IReadOnlyList<BackgroundJobStatus>>(
+        PagedResult<BackgroundJobStatus>? result =
+            await response.Content.ReadFromJsonAsync<PagedResult<BackgroundJobStatus>>(
                 TestContext.Current.CancellationToken);
-        result!.Count.ShouldBe(3);
+        result!.Items.Count.ShouldBe(3);
+        result.TotalCount.ShouldBe(3);
     }
 
     [Fact]

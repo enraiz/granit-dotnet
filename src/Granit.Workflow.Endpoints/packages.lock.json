@@ -54,6 +54,12 @@
       "granit.core": {
         "type": "Project"
       },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
       "granit.security": {
         "type": "Project",
         "dependencies": {
@@ -69,6 +75,7 @@
       "granit.workflow": {
         "type": "Project",
         "dependencies": {
+          "Granit.Querying": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )"
         }
       },

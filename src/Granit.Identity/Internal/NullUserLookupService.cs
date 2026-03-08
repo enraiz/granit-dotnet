@@ -1,4 +1,5 @@
 using Granit.Identity.Models;
+using Granit.Querying;
 
 namespace Granit.Identity.Internal;
 
@@ -20,11 +21,12 @@ internal sealed class NullUserLookupService : IUserLookupService
         Task.FromResult<IReadOnlyList<IdentityUser>>([]);
 
     /// <inheritdoc/>
-    public Task<IReadOnlyList<IdentityUser>> SearchAsync(
+    public Task<PagedResult<IdentityUser>> SearchAsync(
         string searchTerm,
-        int maxResults = 20,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult<IReadOnlyList<IdentityUser>>([]);
+        Task.FromResult(new PagedResult<IdentityUser>([], 0));
 
     /// <inheritdoc/>
     public Task<IdentityUser?> RefreshByIdAsync(string userId, CancellationToken cancellationToken = default) =>

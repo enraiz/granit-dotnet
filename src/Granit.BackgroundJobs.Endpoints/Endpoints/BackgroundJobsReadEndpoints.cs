@@ -1,6 +1,8 @@
+using Granit.Querying;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.BackgroundJobs.Endpoints.Endpoints;
@@ -17,7 +19,7 @@ internal static class BackgroundJobsReadEndpoints
     {
         group.MapGet("/", GetAllJobsAsync)
             .WithName("GetAllBackgroundJobs")
-            .WithSummary("Returns the current status of all registered background jobs.");
+            .WithSummary("Returns the current status of all registered background jobs with pagination.");
 
         group.MapGet("/{name}", GetJobByNameAsync)
             .WithName("GetBackgroundJobByName")
@@ -26,10 +28,23 @@ internal static class BackgroundJobsReadEndpoints
         return group;
     }
 
-    private static async Task<Ok<IReadOnlyList<BackgroundJobStatus>>> GetAllJobsAsync(
+    private static async Task<Ok<PagedResult<BackgroundJobStatus>>> GetAllJobsAsync(
         IBackgroundJobManager manager,
-        CancellationToken ct) =>
-        TypedResults.Ok(await manager.GetAllAsync(ct).ConfigureAwait(false));
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = QueryingDefaults.DefaultPageSize,
+        CancellationToken ct = default)
+    {
+        int clampedPage = Math.Max(page, 1);
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+
+        IReadOnlyList<BackgroundJobStatus> all = await manager.GetAllAsync(ct).ConfigureAwait(false);
+
+        int totalCount = all.Count;
+        int skip = (clampedPage - 1) * clampedPageSize;
+        IReadOnlyList<BackgroundJobStatus> items = all.Skip(skip).Take(clampedPageSize).ToList();
+
+        return TypedResults.Ok(new PagedResult<BackgroundJobStatus>(items, totalCount));
+    }
 
     private static async Task<Results<Ok<BackgroundJobStatus>, NotFound>> GetJobByNameAsync(
         string name,

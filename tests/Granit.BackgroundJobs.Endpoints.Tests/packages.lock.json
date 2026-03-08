@@ -687,7 +687,8 @@
         "type": "Project",
         "dependencies": {
           "Granit.Authorization": "[0.1.0-dev, )",
-          "Granit.BackgroundJobs": "[0.1.0-dev, )"
+          "Granit.BackgroundJobs": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev, )"
         }
       },
       "granit.caching": {
@@ -705,6 +706,12 @@
       },
       "granit.core": {
         "type": "Project"
+      },
+      "granit.querying": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
       },
       "granit.security": {
         "type": "Project",

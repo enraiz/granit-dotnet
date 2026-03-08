@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Granit.Timeline.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -20,15 +21,15 @@ internal static class TimelineStreamEndpoints
         return group;
     }
 
-    private static async Task<Ok<TimelineStreamPage>> GetStreamAsync(
+    private static async Task<Ok<PagedResult<TimelineStreamEntry>>> GetStreamAsync(
         string entityType,
         string entityId,
         ITimelineQuery query,
-        int skip = 0,
-        int take = 20,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken ct = default)
     {
-        TimelineStreamPage page = await query.GetStreamAsync(entityType, entityId, skip, take, ct).ConfigureAwait(false);
-        return TypedResults.Ok(page);
+        PagedResult<TimelineStreamEntry> result = await query.GetStreamAsync(entityType, entityId, page, pageSize, ct).ConfigureAwait(false);
+        return TypedResults.Ok(result);
     }
 }

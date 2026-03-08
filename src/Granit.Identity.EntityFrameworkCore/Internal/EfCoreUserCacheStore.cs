@@ -37,21 +37,29 @@ internal sealed class EfCoreUserCacheStore<TContext>(TContext context)
             .Where(e => e.TenantId == tenantId && externalUserIds.Contains(e.ExternalUserId))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-    public async Task<IReadOnlyList<UserCacheEntry>> SearchAsync(
-        string term, Guid? tenantId, int maxResults, CancellationToken cancellationToken = default)
+    public async Task<(IReadOnlyList<UserCacheEntry> Items, int TotalCount)> SearchAsync(
+        string term, Guid? tenantId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
         string pattern = $"%{term}%";
 
-        return await context.UserCacheEntries
+        IQueryable<UserCacheEntry> query = context.UserCacheEntries
             .AsNoTracking()
             .Where(e => e.TenantId == tenantId
                 && (EF.Functions.Like(e.Username ?? "", pattern)
                     || EF.Functions.Like(e.Email ?? "", pattern)
                     || EF.Functions.Like(e.FirstName ?? "", pattern)
-                    || EF.Functions.Like(e.LastName ?? "", pattern)))
+                    || EF.Functions.Like(e.LastName ?? "", pattern)));
+
+        int totalCount = await query.CountAsync(cancellationToken).ConfigureAwait(false);
+
+        int skip = (page - 1) * pageSize;
+        List<UserCacheEntry> items = await query
             .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
-            .Take(maxResults)
+            .Skip(skip)
+            .Take(pageSize)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return (items, totalCount);
     }
 
     // -- Diagnostics --

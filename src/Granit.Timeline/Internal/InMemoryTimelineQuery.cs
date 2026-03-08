@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.Domain;
 
@@ -9,13 +10,16 @@ namespace Granit.Timeline.Internal;
 internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITimelineQuery
 {
     /// <inheritdoc/>
-    public Task<TimelineStreamPage> GetStreamAsync(
+    public Task<PagedResult<TimelineStreamEntry>> GetStreamAsync(
         string entityType,
         string entityId,
-        int skip = 0,
-        int take = 20,
+        int page = 1,
+        int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken ct = default)
     {
+        int clampedPageSize = Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+        int clampedPage = Math.Max(page, 1);
+
         var entries = store.Entries.Values
             .Where(e => e.EntityType == entityType
                         && e.EntityId == entityId
@@ -25,17 +29,13 @@ internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITime
 
         int totalCount = entries.Count;
 
-        var page = entries
-            .Skip(skip)
-            .Take(take)
+        var items = entries
+            .Skip((clampedPage - 1) * clampedPageSize)
+            .Take(clampedPageSize)
             .Select(MapToStreamEntry)
             .ToList();
 
-        return Task.FromResult(new TimelineStreamPage
-        {
-            Items = page,
-            TotalCount = totalCount,
-        });
+        return Task.FromResult(new PagedResult<TimelineStreamEntry>(items, totalCount));
     }
 
     private TimelineStreamEntry MapToStreamEntry(TimelineEntry entry) =>

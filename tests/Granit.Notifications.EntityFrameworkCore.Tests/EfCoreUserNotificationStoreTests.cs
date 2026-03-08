@@ -7,6 +7,7 @@
 
 using System.Text.Json;
 using Granit.Notifications.Domain;
+using Granit.Querying;
 using Shouldly;
 using Xunit;
 
@@ -53,13 +54,13 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
             await _store.InsertAsync(notification, TestContext.Current.CancellationToken);
         }
 
-        // Request page of 3, skipping 1
-        IReadOnlyList<UserNotification> result = await _store.GetListAsync(userId, tenantId, skipCount: 1, maxResultCount: 3, TestContext.Current.CancellationToken);
+        // Request page 2 of size 3 (skips first 3, returns next 2)
+        PagedResult<UserNotification> result = await _store.GetListAsync(userId, tenantId, page: 2, pageSize: 3, TestContext.Current.CancellationToken);
 
-        result.Count.ShouldBe(3);
-        // Should be sorted descending by CreatedAt, so after skip 1 we get items at index 3, 2, 1
-        result[0].CreatedAt.ShouldBeGreaterThanOrEqualTo(result[1].CreatedAt);
-        result[1].CreatedAt.ShouldBeGreaterThanOrEqualTo(result[2].CreatedAt);
+        result.TotalCount.ShouldBe(5);
+        result.Items.Count.ShouldBe(2);
+        // Should be sorted descending by CreatedAt
+        result.Items[0].CreatedAt.ShouldBeGreaterThanOrEqualTo(result.Items[1].CreatedAt);
     }
 
     [Fact]
@@ -72,11 +73,12 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
         await _store.InsertAsync(BuildNotification(recipientUserId: "user-a", tenantId: tenantB), TestContext.Current.CancellationToken);
         await _store.InsertAsync(BuildNotification(recipientUserId: "user-b", tenantId: tenantA), TestContext.Current.CancellationToken);
 
-        IReadOnlyList<UserNotification> result = await _store.GetListAsync("user-a", tenantA, skipCount: 0, maxResultCount: 100, TestContext.Current.CancellationToken);
+        PagedResult<UserNotification> result = await _store.GetListAsync("user-a", tenantA, page: 1, pageSize: 100, TestContext.Current.CancellationToken);
 
-        result.Count.ShouldBe(1);
-        result[0].RecipientUserId.ShouldBe("user-a");
-        result[0].TenantId.ShouldBe(tenantA);
+        result.TotalCount.ShouldBe(1);
+        result.Items.Count.ShouldBe(1);
+        result.Items[0].RecipientUserId.ShouldBe("user-a");
+        result.Items[0].TenantId.ShouldBe(tenantA);
     }
 
     [Fact]
@@ -135,8 +137,8 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
         int unreadCount = await _store.GetUnreadCountAsync(userId, tenantId, TestContext.Current.CancellationToken);
         unreadCount.ShouldBe(0);
 
-        IReadOnlyList<UserNotification> all = await _store.GetListAsync(userId, tenantId, skipCount: 0, maxResultCount: 100, TestContext.Current.CancellationToken);
-        all.ShouldAllBe(n => n.State == UserNotificationState.Read);
+        PagedResult<UserNotification> all = await _store.GetListAsync(userId, tenantId, page: 1, pageSize: 100, TestContext.Current.CancellationToken);
+        all.Items.ShouldAllBe(n => n.State == UserNotificationState.Read);
     }
 
     [Fact]
@@ -151,10 +153,11 @@ public sealed class EfCoreUserNotificationStoreTests : IDisposable
         await _store.InsertAsync(BuildNotification(tenantId: tenantId, relatedEntityType: entityType, relatedEntityId: "order-99"), TestContext.Current.CancellationToken);
         await _store.InsertAsync(BuildNotification(tenantId: tenantId, relatedEntityType: "Invoice", relatedEntityId: entityId), TestContext.Current.CancellationToken);
 
-        IReadOnlyList<UserNotification> result = await _store.GetByEntityAsync(entityType, entityId, tenantId, skipCount: 0, maxResultCount: 100, TestContext.Current.CancellationToken);
+        PagedResult<UserNotification> result = await _store.GetByEntityAsync(entityType, entityId, tenantId, page: 1, pageSize: 100, TestContext.Current.CancellationToken);
 
-        result.Count.ShouldBe(2);
-        result.ShouldAllBe(n => n.RelatedEntityType == entityType && n.RelatedEntityId == entityId);
+        result.TotalCount.ShouldBe(2);
+        result.Items.Count.ShouldBe(2);
+        result.Items.ShouldAllBe(n => n.RelatedEntityType == entityType && n.RelatedEntityId == entityId);
     }
 
     // -------------------------------------------------------------------------

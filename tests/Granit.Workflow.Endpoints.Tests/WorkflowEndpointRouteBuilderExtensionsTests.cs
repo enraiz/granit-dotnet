@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Granit.Querying;
 using Granit.Workflow.Dtos;
 using Granit.Workflow.Endpoints.Extensions;
 using Granit.Workflow.Endpoints.Internal;
@@ -28,8 +29,8 @@ public sealed class WorkflowEndpointRouteBuilderExtensionsTests
     {
         // Arrange
         IWorkflowHistoryQuery historyQuery = Substitute.For<IWorkflowHistoryQuery>();
-        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<TransitionHistoryResponse>());
+        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
 
         await using WebApplication app = BuildApp(historyQuery, opts =>
         {
@@ -51,8 +52,8 @@ public sealed class WorkflowEndpointRouteBuilderExtensionsTests
     {
         // Arrange
         IWorkflowHistoryQuery historyQuery = Substitute.For<IWorkflowHistoryQuery>();
-        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<TransitionHistoryResponse>());
+        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
 
         await using WebApplication app = BuildApp(historyQuery, opts =>
         {
@@ -75,8 +76,8 @@ public sealed class WorkflowEndpointRouteBuilderExtensionsTests
     {
         // Arrange: trailing slash on ApiPrefix, leading slash on RoutePrefix
         IWorkflowHistoryQuery historyQuery = Substitute.For<IWorkflowHistoryQuery>();
-        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<TransitionHistoryResponse>());
+        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
 
         await using WebApplication app = BuildApp(historyQuery, opts =>
         {
@@ -99,8 +100,8 @@ public sealed class WorkflowEndpointRouteBuilderExtensionsTests
     {
         // Arrange
         IWorkflowHistoryQuery historyQuery = Substitute.For<IWorkflowHistoryQuery>();
-        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<TransitionHistoryResponse>());
+        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
 
         await using WebApplication app = BuildApp(historyQuery, opts =>
         {
@@ -145,8 +146,8 @@ public sealed class WorkflowEndpointRouteBuilderExtensionsTests
     {
         // Arrange
         IWorkflowHistoryQuery historyQuery = Substitute.For<IWorkflowHistoryQuery>();
-        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<TransitionHistoryResponse>());
+        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
 
         await using WebApplication app = BuildApp(historyQuery);
         HttpClient client = BuildAdminClient(app);

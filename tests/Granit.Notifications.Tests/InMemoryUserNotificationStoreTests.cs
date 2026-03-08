@@ -8,6 +8,7 @@
 using System.Text.Json;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Internal;
+using Granit.Querying;
 using Shouldly;
 using Xunit;
 
@@ -42,11 +43,12 @@ public sealed class InMemoryUserNotificationStoreTests
         await _store.InsertAsync(middle, TestContext.Current.CancellationToken);
         await _store.InsertAsync(newest, TestContext.Current.CancellationToken);
 
-        IReadOnlyList<UserNotification> results =
-            await _store.GetListAsync("user-1", tenantId: null, skipCount: 0, maxResultCount: 2, TestContext.Current.CancellationToken);
+        PagedResult<UserNotification> results =
+            await _store.GetListAsync("user-1", tenantId: null, page: 1, pageSize: 2, TestContext.Current.CancellationToken);
 
-        results.Count.ShouldBe(2);
-        results[0].CreatedAt.ShouldBeGreaterThanOrEqualTo(results[1].CreatedAt,
+        results.Items.Count.ShouldBe(2);
+        results.TotalCount.ShouldBe(3);
+        results.Items[0].CreatedAt.ShouldBeGreaterThanOrEqualTo(results.Items[1].CreatedAt,
             "results should be sorted by date descending (newest first)");
     }
 
@@ -115,11 +117,12 @@ public sealed class InMemoryUserNotificationStoreTests
         await _store.InsertAsync(nonMatching, TestContext.Current.CancellationToken);
         await _store.InsertAsync(noEntity, TestContext.Current.CancellationToken);
 
-        IReadOnlyList<UserNotification> results =
-            await _store.GetByEntityAsync("Invoice", "inv-42", tenantId: null, skipCount: 0, maxResultCount: 10, TestContext.Current.CancellationToken);
+        PagedResult<UserNotification> results =
+            await _store.GetByEntityAsync("Invoice", "inv-42", tenantId: null, page: 1, pageSize: 10, TestContext.Current.CancellationToken);
 
-        results.ShouldHaveSingleItem();
-        results[0].Id.ShouldBe(matching.Id);
+        results.Items.ShouldHaveSingleItem();
+        results.TotalCount.ShouldBe(1);
+        results.Items[0].Id.ShouldBe(matching.Id);
     }
 
     // -------------------------------------------------------------------------

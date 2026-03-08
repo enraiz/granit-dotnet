@@ -1,3 +1,4 @@
+using Granit.Querying;
 using Shouldly;
 using Xunit;
 
@@ -38,19 +39,19 @@ public sealed class ReferenceDataQueryTests
     }
 
     [Fact]
-    public void Default_Skip_Is_Null()
+    public void Default_Page_Is_1()
     {
         ReferenceDataQuery query = new();
 
-        query.Skip.ShouldBeNull();
+        query.Page.ShouldBe(1);
     }
 
     [Fact]
-    public void Default_Take_Is_Null()
+    public void Default_PageSize_Is_DefaultPageSize()
     {
         ReferenceDataQuery query = new();
 
-        query.Take.ShouldBeNull();
+        query.PageSize.ShouldBe(QueryingDefaults.DefaultPageSize);
     }
 
     [Fact]
@@ -61,14 +62,14 @@ public sealed class ReferenceDataQueryTests
             SearchTerm: "belg",
             SortBy: "Code",
             Descending: true,
-            Skip: 10,
-            Take: 25);
+            Page: 3,
+            PageSize: 25);
 
         query.ActiveOnly.ShouldBeFalse();
         query.SearchTerm.ShouldBe("belg");
         query.SortBy.ShouldBe("Code");
         query.Descending.ShouldBeTrue();
-        query.Skip.ShouldBe(10);
-        query.Take.ShouldBe(25);
+        query.Page.ShouldBe(3);
+        query.PageSize.ShouldBe(25);
     }
 }

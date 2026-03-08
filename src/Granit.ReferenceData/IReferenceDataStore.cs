@@ -1,3 +1,5 @@
+using Granit.Querying;
+
 namespace Granit.ReferenceData;
 
 /// <summary>
@@ -11,8 +13,8 @@ public interface IReferenceDataStore<TEntity> where TEntity : ReferenceDataEntit
     /// </summary>
     /// <param name="query">Optional query parameters. When <c>null</c>, returns all active entries.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>A result containing the matching items and total count.</returns>
-    Task<ReferenceDataResult<TEntity>> GetAllAsync(
+    /// <returns>A <see cref="PagedResult{T}"/> containing the matching items and total count.</returns>
+    Task<PagedResult<TEntity>> GetAllAsync(
         ReferenceDataQuery? query = null,
         CancellationToken cancellationToken = default);
 

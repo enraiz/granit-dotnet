@@ -22,9 +22,9 @@ internal interface IUserCacheStore
     Task<IReadOnlyList<UserCacheEntry>> FindByExternalIdsAsync(
         IReadOnlyCollection<string> externalUserIds, Guid? tenantId, CancellationToken cancellationToken = default);
 
-    /// <summary>Searches cached users by free-text term (username, email, first name, last name).</summary>
-    Task<IReadOnlyList<UserCacheEntry>> SearchAsync(
-        string term, Guid? tenantId, int maxResults, CancellationToken cancellationToken = default);
+    /// <summary>Searches cached users by free-text term (username, email, first name, last name) with pagination.</summary>
+    Task<(IReadOnlyList<UserCacheEntry> Items, int TotalCount)> SearchAsync(
+        string term, Guid? tenantId, int page, int pageSize, CancellationToken cancellationToken = default);
 
     // -- Diagnostics --
 

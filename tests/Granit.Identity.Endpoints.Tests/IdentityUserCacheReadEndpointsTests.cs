@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Granit.Identity.Endpoints.Extensions;
 using Granit.Identity.Endpoints.Internal;
 using Granit.Identity.Models;
+using Granit.Querying;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
@@ -57,18 +58,20 @@ public sealed class IdentityUserCacheReadEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task Search_returns_200_with_results()
     {
-        _lookupService.SearchAsync("john", 20, Arg.Any<CancellationToken>())
-            .Returns([new("user-1", "jdoe", "jdoe@test.com", "John", "Doe", true)]);
+        _lookupService.SearchAsync("john", 1, 20, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<IdentityUser>(
+                [new("user-1", "jdoe", "jdoe@test.com", "John", "Doe", true)], 1));
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}?search=john", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        List<IdentityUser>? users = await response.Content
-            .ReadFromJsonAsync<List<IdentityUser>>(TestContext.Current.CancellationToken);
-        users.ShouldNotBeNull();
-        users.Count.ShouldBe(1);
-        users[0].Username.ShouldBe("jdoe");
+        PagedResult<IdentityUser>? result = await response.Content
+            .ReadFromJsonAsync<PagedResult<IdentityUser>>(TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.Items.Count.ShouldBe(1);
+        result.TotalCount.ShouldBe(1);
+        result.Items[0].Username.ShouldBe("jdoe");
     }
 
     [Fact]

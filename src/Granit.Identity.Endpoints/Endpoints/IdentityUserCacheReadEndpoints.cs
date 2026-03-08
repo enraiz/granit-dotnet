@@ -1,5 +1,6 @@
 using Granit.Identity.Endpoints.Dtos;
 using Granit.Identity.Models;
+using Granit.Querying;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -29,17 +30,21 @@ internal static class IdentityUserCacheReadEndpoints
         return group;
     }
 
-    private static async Task<Ok<IReadOnlyList<IdentityUser>>> SearchAsync(
+    private static async Task<Ok<PagedResult<IdentityUser>>> SearchAsync(
         IUserLookupService lookupService,
         [AsParameters] IdentityUserCacheListRequest request,
         CancellationToken ct)
     {
-        IReadOnlyList<IdentityUser> users = await lookupService.SearchAsync(
+        int clampedPage = Math.Max(request.Page, 1);
+        int clampedPageSize = Math.Clamp(request.PageSize, 1, QueryingDefaults.MaxPageSize);
+
+        PagedResult<IdentityUser> result = await lookupService.SearchAsync(
             request.Search ?? "",
-            request.PageSize,
+            clampedPage,
+            clampedPageSize,
             ct).ConfigureAwait(false);
 
-        return TypedResults.Ok(users);
+        return TypedResults.Ok(result);
     }
 
     private static async Task<Results<Ok<IdentityUser>, NotFound>> GetByIdAsync(
