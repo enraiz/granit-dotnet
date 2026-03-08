@@ -5,14 +5,14 @@ Il fournit un pipeline complet : **filtres typés → presets → quick filters
 → recherche globale → tri → pagination (offset + keyset) → groupement**, avec métadonnées auto-générées
 pour le frontend et vues sauvegardées persistantes.
 
-```text
-Granit.Core
-    │
-Granit.Querying                ← socle (interfaces, builder, DTOs)
-    ├───────────────────┐
-    │                   │
-.EntityFrameworkCore     .Endpoints
-(QueryEngine, stores)   (REST API, binding)
+```mermaid
+graph TD
+    A["Granit.Core"] --> B["Granit.Querying
+    socle (interfaces, builder, DTOs)"]
+    B --> C["Granit.Querying.EntityFrameworkCore
+    QueryEngine, stores"]
+    B --> D["Granit.Querying.Endpoints
+    REST API, binding"]
 ```
 
 > **Inspirations** : Odoo (FilterGroups, SavedViews, DatePeriod),

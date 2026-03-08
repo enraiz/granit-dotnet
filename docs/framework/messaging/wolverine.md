@@ -94,15 +94,21 @@ Lors de l'émission d'un message, trois headers sont injectés automatiquement d
 
 À la réception, les behaviors restaurent le contexte avant l'exécution du handler :
 
-```text
-[Incoming message]
-  → TenantContextBehavior.Before()    — restaure ICurrentTenant via AsyncLocal
-  → UserContextBehavior.Before()      — restaure ICurrentUserService via AsyncLocal
-  → TraceContextBehavior.Before()     — démarre une activity bridge liée au trace-id d'origine
-  → [Handler]
-  → TraceContextBehavior.After()      — dispose l'activity bridge
-  → UserContextBehavior.After()       — dispose le scope
-  → TenantContextBehavior.After()     — dispose le scope
+```mermaid
+flowchart TD
+    A["Incoming message"] --> B["TenantContextBehavior.Before()
+    restaure ICurrentTenant via AsyncLocal"]
+    B --> C["UserContextBehavior.Before()
+    restaure ICurrentUserService via AsyncLocal"]
+    C --> D["TraceContextBehavior.Before()
+    démarre une activity bridge liée au trace-id d'origine"]
+    D --> E["Handler"]
+    E --> F["TraceContextBehavior.After()
+    dispose l'activity bridge"]
+    F --> G["UserContextBehavior.After()
+    dispose le scope"]
+    G --> H["TenantContextBehavior.After()
+    dispose le scope"]
 ```
 
 ```mermaid

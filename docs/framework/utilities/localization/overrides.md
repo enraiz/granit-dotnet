@@ -14,18 +14,18 @@ prennent priorité sur les fichiers embarqués.
 
 ## Architecture
 
-```text
-JsonStringLocalizer
-  │
-  ├── 1. DB override  (CachedLocalizationOverrideStore)
-  │         │
-  │         └── IMemoryCache (L1, 5 min)
-  │                   │
-  │                   └── EfCoreLocalizationOverrideStore (cache miss)
-  │                             └── PostgreSQL (table i18n_localization_overrides)
-  │
-  ├── 2. JSON embarqué (chaîne de cultures : fr-BE → fr → défaut)
-  └── 3. Héritage (ressources parentes)
+```mermaid
+flowchart TD
+    A["JsonStringLocalizer"] --> B["1. DB override
+    CachedLocalizationOverrideStore"]
+    A --> C["2. JSON embarqué
+    chaîne de cultures : fr-BE → fr → défaut"]
+    A --> D["3. Héritage
+    ressources parentes"]
+    B --> E["IMemoryCache (L1, 5 min)"]
+    E -- "cache miss" --> F["EfCoreLocalizationOverrideStore"]
+    F --> G["PostgreSQL
+    table i18n_localization_overrides"]
 ```
 
 ## Packages

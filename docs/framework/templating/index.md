@@ -15,15 +15,22 @@ Digital Dynamics.
 
 ## Pipeline complet
 
-```text
-TData (brut)
-  → ITemplateDataEnricher<TData>[]   (enrichissement ordonné, immutable)
-  → ITemplateResolver[]              (chaîne par Priority, fallback culture)
-  → ITemplateEngine (sélectionné par MIME type)
-        ├── ScribanTemplateEngine  → TextRenderedContent (HTML)
-        │     └── IDocumentRenderer (optionnel — HTML → PDF)
-        └── ClosedXmlTemplateEngine → BinaryRenderedContent (XLSX direct)
-  → DocumentResult
+```mermaid
+flowchart TD
+    A["TData (brut)"] --> B["ITemplateDataEnricher‹TData›[]
+    enrichissement ordonné, immutable"]
+    B --> C["ITemplateResolver[]
+    chaîne par Priority, fallback culture"]
+    C --> D{"ITemplateEngine
+    sélectionné par MIME type"}
+    D --> E["ScribanTemplateEngine
+    → TextRenderedContent (HTML)"]
+    E --> F["IDocumentRenderer
+    optionnel — HTML → PDF"]
+    D --> G["ClosedXmlTemplateEngine
+    → BinaryRenderedContent (XLSX direct)"]
+    F --> H["DocumentResult"]
+    G --> H
 ```
 
 La sélection du moteur est automatique : chaque `ITemplateEngine` déclare les MIME types
@@ -161,18 +168,22 @@ Le remplacement est effectué sur toutes les feuilles du classeur.
 
 Sans le module Workflow :
 
-```text
-Draft → Published → Archived
-                  → Draft (nouvelle version)
+```mermaid
+stateDiagram-v2
+    Draft --> Published
+    Published --> Archived
+    Published --> Draft : Nouvelle version
 ```
 
 Avec `Granit.Templating.Workflow` installé :
 
-```text
-Draft → PendingReview → Published → Archived
-  ↓                                     ↑
-  └──── Publication directe ────────────┘
-                                  Published → Draft (nouvelle version)
+```mermaid
+stateDiagram-v2
+    Draft --> PendingReview
+    PendingReview --> Published
+    Published --> Archived
+    Draft --> Published : Publication directe
+    Published --> Draft : Nouvelle version
 ```
 
 | État | Règle |

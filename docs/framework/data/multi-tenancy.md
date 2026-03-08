@@ -15,21 +15,20 @@ le claim JWT ou l'en-tête HTTP, active le contexte, puis le restaure en fin de 
 
 ## Architecture
 
-```text
-Requête HTTP
-    │
-    ▼
-TenantResolutionMiddleware
-    │
-    ├─ TenantResolverPipeline (exécute les résolveurs par Order croissant)
-    │       ├─ HeaderTenantResolver   (Order=100) → lit X-Tenant-Id
-    │       └─ JwtClaimTenantResolver (Order=200) → lit claim "tenant_id"
-    │
-    ▼
-ICurrentTenant.Change(id, name)  ←─ AsyncLocal, scope = durée de la requête
-    │
-    ▼
-Handlers, Services, Intercepteurs EF Core (lisent ICurrentTenant)
+```mermaid
+flowchart TD
+    A["Requête HTTP"] --> B["TenantResolutionMiddleware"]
+    B --> C["TenantResolverPipeline
+    exécute les résolveurs par Order croissant"]
+    C --> C1["HeaderTenantResolver (Order=100)
+    lit X-Tenant-Id"]
+    C --> C2["JwtClaimTenantResolver (Order=200)
+    lit claim tenant_id"]
+    C1 --> D["ICurrentTenant.Change(id, name)
+    AsyncLocal, scope = durée de la requête"]
+    C2 --> D
+    D --> E["Handlers, Services, Intercepteurs EF Core
+    lisent ICurrentTenant"]
 ```
 
 ```mermaid

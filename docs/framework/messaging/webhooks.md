@@ -13,16 +13,16 @@ Deux packages composables :
 
 ## Architecture
 
-```text
-[Événement métier]
-      ↓
-WebhookTrigger          ← message publié par l'application (IWebhookPublisher)
-      ↓
-WebhookFanoutHandler    ← résout les abonnements actifs → IEnumerable<SendWebhookCommand>
-      ↓  (cascade Wolverine — dans la même transaction Outbox)
-SendWebhookCommand × N  ← un par abonné, enqueue dans la queue "webhook-delivery"
-      ↓
-SendWebhookHandler      ← HTTP POST + signature HMAC-SHA256 + audit HDS
+```mermaid
+flowchart TD
+    A["Événement métier"] --> B["WebhookTrigger
+    message publié par l'application (IWebhookPublisher)"]
+    B --> C["WebhookFanoutHandler
+    résout les abonnements actifs → IEnumerable‹SendWebhookCommand›"]
+    C -- "cascade Wolverine — même transaction Outbox" --> D["SendWebhookCommand × N
+    un par abonné, enqueue dans la queue webhook-delivery"]
+    D --> E["SendWebhookHandler
+    HTTP POST + signature HMAC-SHA256 + audit HDS"]
 ```
 
 Le fan-out et l'envoi sont **entièrement découplés** : Wolverine publie les `N` commandes

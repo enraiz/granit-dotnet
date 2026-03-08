@@ -13,14 +13,16 @@ métier dans les applications Digital Dynamics.
 
 ## Architecture
 
-```text
-WorkflowDefinition<TState>          ← définition immutable (singleton)
-  ↓
-WorkflowManager<TState>             ← orchestrateur scoped (permissions + approval routing)
-  ↓
-WorkflowTransitionInterceptor       ← détection automatique via EF Core SaveChanges
-  ↓
-WorkflowTransitionRecord            ← piste d'audit HDS immutable (INSERT-only)
+```mermaid
+flowchart TD
+    A["WorkflowDefinition‹TState›
+    définition immutable (singleton)"]
+    --> B["WorkflowManager‹TState›
+    orchestrateur scoped (permissions + approval routing)"]
+    --> C["WorkflowTransitionInterceptor
+    détection automatique via EF Core SaveChanges"]
+    --> D["WorkflowTransitionRecord
+    piste d'audit HDS immutable (INSERT-only)"]
 ```
 
 ## Concepts clés
@@ -115,11 +117,13 @@ Informations capturées :
 
 Un cycle de vie pré-construit est fourni via `PublicationWorkflow.Default` :
 
-```text
-Draft → PendingReview → Published → Archived
-  ↓                                    ↑
-  └──── Publication directe ───────────┘
-                                Published → Draft (nouvelle version)
+```mermaid
+stateDiagram-v2
+    Draft --> PendingReview
+    PendingReview --> Published
+    Published --> Archived
+    Draft --> Published : Publication directe
+    Published --> Draft : Nouvelle version
 ```
 
 ### Entités versionnées avec workflow
