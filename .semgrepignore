@@ -1,0 +1,6 @@
+bin/
+obj/
+nupkgs/
+.nuget/
+*.Designer.cs
+**/Migrations/
