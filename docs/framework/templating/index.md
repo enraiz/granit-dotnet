@@ -402,7 +402,7 @@ public sealed class MyAppModule : GranitModule { }
 app.MapGranitTemplatingAdmin(opts =>
 {
     opts.ApiPrefix = "api/v1";            // défaut : "api/v1"
-    opts.RoutePrefix = "admin/templates"; // défaut : "admin/templates"
+    opts.RoutePrefix = "templates"; // défaut : "templates"
 });
 ```
 
@@ -410,7 +410,7 @@ app.MapGranitTemplatingAdmin(opts =>
 
 | Méthode | Route | Description |
 | --- | --- | --- |
-| `GET /` | Liste paginée | Filtres : `page`, `pageSize`, `search`, `status`, `culture` |
+| `GET /` | Liste paginée | Filtres : `page`, `pageSize`, `search`, `status`, `culture`, `categoryId` |
 | `GET /{name}` | Détail | Brouillon + version publiée (query `?culture=`) |
 | `POST /` | Créer un brouillon | Corps : `SaveTemplateRequest` (name, culture, content, mimeType) |
 | `PUT /{name}` | Mettre à jour un brouillon | Corps : `SaveTemplateRequest` (culture, content, mimeType) |
@@ -418,8 +418,14 @@ app.MapGranitTemplatingAdmin(opts =>
 | `POST /{name}/publish` | Publier le brouillon | Archive l'ancienne version publiée, invalide le cache. 409 si transition refusée |
 | `POST /{name}/unpublish` | Dépublier | Archive la version publiée. Idempotent si rien n'est publié. 409 si refusé |
 | `GET /{name}/lifecycle` | État du cycle de vie | Statut actuel, workflow actif, transitions disponibles |
+| `POST /{name}/preview` | Preview du brouillon | Rendu HTML du brouillon avec données test. 501 si pas de moteur, 422 si erreur de rendu |
+| `GET /{name}/variables` | Variables disponibles | Introspection des variables globales (`now.*`, `context.*`, …) pour autocomplétion |
 | `GET /{name}/history` | Historique des révisions | Paginé (`page`, `pageSize`), sans contenu. HDS audit trail |
 | `GET /{name}/history/{revisionId}` | Détail d'une révision | Contenu complet inclus, pour diff entre versions |
+| `GET /categories` | Liste des catégories | Triées par `SortOrder` puis `Name`, avec le compteur de templates |
+| `POST /categories` | Créer une catégorie | Corps : `SaveTemplateCategoryRequest` (name, description, icon, sortOrder) |
+| `PUT /categories/{id}` | Modifier une catégorie | Nom unique requis, 409 si doublon |
+| `DELETE /categories/{id}` | Supprimer une catégorie | 409 si des templates sont encore associés |
 
 Si `IDocumentTemplateStoreReader`/`IDocumentTemplateStoreWriter` ne sont pas enregistrés
 (pas de module EF Core chargé), tous les endpoints retournent `501 Not Implemented`.

@@ -11,7 +11,7 @@ namespace Granit.Templating.Endpoints;
 /// </summary>
 /// <remarks>
 /// Exposes CRUD endpoints for template draft management under
-/// <c>/api/v1/admin/templates</c>, protected by the <c>Templates.Manage</c> permission.
+/// <c>/api/v1/templates</c>, protected by the <c>Templates.Manage</c> permission.
 /// <para>
 /// The host application must call
 /// <see cref="Extensions.TemplatingEndpointRouteBuilderExtensions.MapGranitTemplatingAdmin"/>

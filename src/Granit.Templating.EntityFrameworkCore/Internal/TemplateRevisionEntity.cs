@@ -46,4 +46,7 @@ internal sealed class TemplateRevisionEntity
 
     /// <summary>Identity of the user who archived this revision. <c>null</c> unless archived.</summary>
     public string? ArchivedBy { get; set; }
+
+    /// <summary>Optional category for organizing templates by domain.</summary>
+    public Guid? CategoryId { get; set; }
 }

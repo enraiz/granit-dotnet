@@ -257,6 +257,11 @@ internal sealed class EfDocumentTemplateStore(
             query = query.Where(r => r.Culture == filter.Culture);
         }
 
+        if (filter.CategoryId.HasValue)
+        {
+            query = query.Where(r => r.CategoryId == filter.CategoryId.Value);
+        }
+
         // Group by (Name, Culture) to produce one row per template key.
         var grouped = query
             .GroupBy(r => new { r.TemplateName, r.Culture })

@@ -10,4 +10,5 @@ internal sealed record TemplateListQueryParameters(
     int PageSize = 20,
     string? Search = null,
     TemplateLifecycleStatus? Status = null,
-    string? Culture = null);
+    string? Culture = null,
+    Guid? CategoryId = null);

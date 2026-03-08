@@ -2,12 +2,14 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 using FluentValidation;
 using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Extensions;
 using Granit.Templating.Endpoints.Permissions;
 using Granit.Templating.Endpoints.Validators;
 using Granit.Templating.Exceptions;
+using Granit.Templating.GlobalContext;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
@@ -32,7 +34,7 @@ namespace Granit.Templating.Endpoints.Tests;
 /// </summary>
 public sealed class TemplatingEndpointsTests : IAsyncDisposable
 {
-    private const string Prefix = "/api/v1/admin/templates";
+    private const string Prefix = "/api/v1/templates";
     private const string ManageRole = "template-admin";
 
     private readonly IDocumentTemplateStoreReader _storeReader = Substitute.For<IDocumentTemplateStoreReader>();
@@ -1091,8 +1093,386 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     }
 
     // =========================================================================
+    // POST /{name}/preview — Preview a template draft
+    // =========================================================================
+
+    [Fact]
+    public async Task Preview_WhenStoreNotRegistered_Returns501()
+    {
+        await using WebApplication app = await BuildAppWithoutStoreAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotImplemented);
+    }
+
+    [Fact]
+    public async Task Preview_WhenNoDraft_Returns404()
+    {
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns((TemplateRevision?)null);
+
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Preview_WhenNoEngineRegistered_Returns501()
+    {
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new TemplateRevision
+            {
+                RevisionId = Guid.NewGuid(),
+                Content = "<h1>Hello</h1>",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Draft,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = "admin",
+            });
+
+        // Default test app has no ITemplateEngine registered
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotImplemented);
+    }
+
+    [Fact]
+    public async Task Preview_WithEngine_ReturnsRenderedHtml()
+    {
+        Guid revisionId = Guid.NewGuid();
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new TemplateRevision
+            {
+                RevisionId = revisionId,
+                Content = "<h1>Hello {{ name }}</h1>",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Draft,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = "admin",
+            });
+
+        await using WebApplication app = await BuildAppWithEngineAsync(
+            _storeReader, _storeWriter, _transitionHook,
+            new TextRenderedContent("<h1>Hello World</h1>", DocumentFormat.Html) { RevisionId = revisionId });
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        JsonElement data = JsonSerializer.Deserialize<JsonElement>("""{"name": "World"}""");
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, data),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplatePreviewResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplatePreviewResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.Html.ShouldBe("<h1>Hello World</h1>");
+        result.RevisionId.ShouldBe(revisionId);
+        result.RenderTimeMs.ShouldBeGreaterThanOrEqualTo(0);
+    }
+
+    [Fact]
+    public async Task Preview_WithCulture_PassesCultureToStore()
+    {
+        Guid revisionId = Guid.NewGuid();
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new TemplateRevision
+            {
+                RevisionId = revisionId,
+                Content = "<p>Bonjour</p>",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Draft,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = "admin",
+            });
+
+        await using WebApplication app = await BuildAppWithEngineAsync(
+            _storeReader, _storeWriter, _transitionHook,
+            new TextRenderedContent("<p>Bonjour</p>", DocumentFormat.Html) { RevisionId = revisionId });
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest("fr", null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        await _storeReader.Received(1).TryGetDraftAsync(
+            Arg.Is<TemplateKey>(k => k.Name == "Billing.Invoice" && k.Culture == "fr"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Preview_WhenRenderingFails_Returns422()
+    {
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new TemplateRevision
+            {
+                RevisionId = Guid.NewGuid(),
+                Content = "{{ invalid syntax",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Draft,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = "admin",
+            });
+
+        ITemplateEngine engine = Substitute.For<ITemplateEngine>();
+        engine.CanRender(Arg.Any<TemplateDescriptor>()).Returns(true);
+        engine.RenderAsync(
+                Arg.Any<TemplateDescriptor>(),
+                Arg.Any<Dictionary<string, object?>>(),
+                Arg.Any<DocumentFormat>(),
+                Arg.Any<IReadOnlyList<ITemplateGlobalContext>>(),
+                Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("Parse error in template"));
+
+        await using WebApplication app = await BuildAppWithEngineAsync(
+            _storeReader, _storeWriter, _transitionHook, engine);
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task Preview_WhenNoEngineCanRender_Returns422()
+    {
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new TemplateRevision
+            {
+                RevisionId = Guid.NewGuid(),
+                Content = "binary-content",
+                MimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                Status = TemplateLifecycleStatus.Draft,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = "admin",
+            });
+
+        ITemplateEngine engine = Substitute.For<ITemplateEngine>();
+        engine.CanRender(Arg.Any<TemplateDescriptor>()).Returns(false);
+
+        await using WebApplication app = await BuildAppWithEngineAsync(
+            _storeReader, _storeWriter, _transitionHook, engine);
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task Preview_WithoutAuth_Returns401()
+    {
+        HttpResponseMessage response = await _anonClient.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Preview_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
+            $"{Prefix}/invalid/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Preview_WithEmptyData_UsesEmptyDictionary()
+    {
+        Guid revisionId = Guid.NewGuid();
+        _storeReader.TryGetDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<CancellationToken>())
+            .Returns(new TemplateRevision
+            {
+                RevisionId = revisionId,
+                Content = "<p>No data</p>",
+                MimeType = "text/html",
+                Status = TemplateLifecycleStatus.Draft,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = "admin",
+            });
+
+        await using WebApplication app = await BuildAppWithEngineAsync(
+            _storeReader, _storeWriter, _transitionHook,
+            new TextRenderedContent("<p>No data</p>", DocumentFormat.Html) { RevisionId = revisionId });
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            $"{Prefix}/Billing.Invoice/preview",
+            new TemplatePreviewRequest(null, null),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    // =========================================================================
+    // GET /{name}/variables — Template variables
+    // =========================================================================
+
+    [Fact]
+    public async Task GetVariables_WithNoGlobalContexts_ReturnsEmptyLists()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateVariablesResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateVariablesResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.GlobalVariables.ShouldBeEmpty();
+        result.ModelVariables.ShouldBeEmpty();
+        result.EnrichedVariables.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetVariables_WithGlobalContext_ReturnsDiscoveredVariables()
+    {
+        await using WebApplication app = await BuildAppWithGlobalContextAsync();
+        using HttpClient client = BuildClient(app, ManageRole);
+
+        HttpResponseMessage response = await client.GetAsync(
+            $"{Prefix}/Billing.Invoice/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        TemplateVariablesResponse? result =
+            await response.Content.ReadFromJsonAsync<TemplateVariablesResponse>(
+                TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result.GlobalVariables.Count.ShouldBeGreaterThan(0);
+        result.GlobalVariables.ShouldContain(v => v.Name == "test.first_name");
+        result.GlobalVariables.ShouldContain(v => v.Name == "test.age");
+        TemplateVariableItemResponse firstName = result.GlobalVariables.First(v => v.Name == "test.first_name");
+        firstName.Type.ShouldBe("string");
+        TemplateVariableItemResponse age = result.GlobalVariables.First(v => v.Name == "test.age");
+        age.Type.ShouldBe("number");
+    }
+
+    [Fact]
+    public async Task GetVariables_WithInvalidName_Returns400()
+    {
+        HttpResponseMessage response = await _adminClient.GetAsync(
+            $"{Prefix}/bad/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task GetVariables_WithoutAuth_Returns401()
+    {
+        HttpResponseMessage response = await _anonClient.GetAsync(
+            $"{Prefix}/Billing.Invoice/variables",
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    // =========================================================================
     // Helpers
     // =========================================================================
+
+    private static async Task<WebApplication> BuildAppWithGlobalContextAsync()
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        builder.Services
+            .AddAuthentication(TestAuthHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                TestAuthHandler.SchemeName, _ => { });
+
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(TemplatingPermissions.Manage,
+                policy => policy.RequireRole(ManageRole));
+
+        IDocumentTemplateStoreReader storeReader = Substitute.For<IDocumentTemplateStoreReader>();
+        IDocumentTemplateStoreWriter storeWriter = Substitute.For<IDocumentTemplateStoreWriter>();
+        builder.Services.AddSingleton(storeReader);
+        builder.Services.AddSingleton(storeWriter);
+        builder.Services.AddSingleton<IValidator<SaveTemplateRequest>, SaveTemplateRequestValidator>();
+        builder.Services.AddSingleton<ITemplateGlobalContext, TestGlobalContext>();
+
+        WebApplication app = builder.Build();
+        app.MapGranitTemplatingAdmin();
+        await app.StartAsync(TestContext.Current.CancellationToken);
+        return app;
+    }
+
+    private static async Task<WebApplication> BuildAppWithEngineAsync(
+        IDocumentTemplateStoreReader storeReader,
+        IDocumentTemplateStoreWriter storeWriter,
+        ITemplateTransitionHook transitionHook,
+        RenderedContent renderedContent)
+    {
+        ITemplateEngine engine = Substitute.For<ITemplateEngine>();
+        engine.CanRender(Arg.Any<TemplateDescriptor>()).Returns(true);
+        engine.RenderAsync(
+                Arg.Any<TemplateDescriptor>(),
+                Arg.Any<Dictionary<string, object?>>(),
+                Arg.Any<DocumentFormat>(),
+                Arg.Any<IReadOnlyList<ITemplateGlobalContext>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(renderedContent);
+
+        return await BuildAppWithEngineAsync(storeReader, storeWriter, transitionHook, engine);
+    }
+
+    private static async Task<WebApplication> BuildAppWithEngineAsync(
+        IDocumentTemplateStoreReader storeReader,
+        IDocumentTemplateStoreWriter storeWriter,
+        ITemplateTransitionHook transitionHook,
+        ITemplateEngine engine)
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        builder.Services
+            .AddAuthentication(TestAuthHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                TestAuthHandler.SchemeName, _ => { });
+
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(TemplatingPermissions.Manage,
+                policy => policy.RequireRole(ManageRole));
+
+        builder.Services.AddSingleton(storeReader);
+        builder.Services.AddSingleton(storeWriter);
+        builder.Services.AddSingleton(transitionHook);
+        builder.Services.AddSingleton(engine);
+        builder.Services.AddSingleton<IValidator<SaveTemplateRequest>, SaveTemplateRequestValidator>();
+
+        WebApplication app = builder.Build();
+        app.MapGranitTemplatingAdmin();
+        await app.StartAsync(TestContext.Current.CancellationToken);
+        return app;
+    }
 
     private static async Task<WebApplication> BuildAppWithoutStoreAsync()
     {
@@ -1121,6 +1501,17 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
         HttpClient client = app.GetTestClient();
         client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, role);
         return client;
+    }
+
+    // =========================================================================
+    // Fake global context for variable introspection tests
+    // =========================================================================
+
+    private sealed class TestGlobalContext : ITemplateGlobalContext
+    {
+        public string ContextName => "test";
+
+        public object Resolve() => new { FirstName = "John", Age = 42, IsActive = true };
     }
 
     // =========================================================================

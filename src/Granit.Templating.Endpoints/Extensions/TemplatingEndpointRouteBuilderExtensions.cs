@@ -5,12 +5,18 @@
 //     (requires Templates.Manage permission)
 // ---------------------------------------------------------------------------
 
+using System.Diagnostics;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Granit.Security;
 using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Permissions;
 using Granit.Templating.Exceptions;
+using Granit.Templating.GlobalContext;
 using Granit.Templating.Keys;
+using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -42,9 +48,9 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registers 10 endpoints:
+    /// Registers 16 endpoints:
     /// <list type="bullet">
-    /// <item><c>GET /</c> — paginated list with filters</item>
+    /// <item><c>GET /</c> — paginated list with filters (including <c>categoryId</c>)</item>
     /// <item><c>GET /{name}</c> — detail (draft + published)</item>
     /// <item><c>POST /</c> — create a new draft</item>
     /// <item><c>PUT /{name}</c> — update an existing draft</item>
@@ -52,8 +58,14 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     /// <item><c>POST /{name}/publish</c> — publish the current draft</item>
     /// <item><c>POST /{name}/unpublish</c> — unpublish (archive the published revision)</item>
     /// <item><c>GET /{name}/lifecycle</c> — lifecycle info (current status, available transitions)</item>
+    /// <item><c>POST /{name}/preview</c> — render the current draft with test data</item>
+    /// <item><c>GET /{name}/variables</c> — list available template variables for autocompletion</item>
     /// <item><c>GET /{name}/history</c> — paginated revision history (summaries, no content)</item>
     /// <item><c>GET /{name}/history/{revisionId}</c> — full detail of a specific revision</item>
+    /// <item><c>GET /categories</c> — list all template categories</item>
+    /// <item><c>POST /categories</c> — create a new category</item>
+    /// <item><c>PUT /categories/{id}</c> — update a category</item>
+    /// <item><c>DELETE /categories/{id}</c> — delete a category (409 if templates associated)</item>
     /// </list>
     /// </para>
     /// <para>
@@ -115,6 +127,14 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
              .WithName("GetTemplateLifecycle")
              .WithSummary("Returns lifecycle status, workflow state, and available transitions.");
 
+        group.MapPost("/{name}/preview", HandlePreviewAsync)
+             .WithName("PreviewTemplate")
+             .WithSummary("Renders the current draft with optional test data and returns the HTML output.");
+
+        group.MapGet("/{name}/variables", HandleGetVariablesAsync)
+             .WithName("GetTemplateVariables")
+             .WithSummary("Returns all available template variables (global, model, enriched) for autocompletion.");
+
         group.MapGet("/{name}/history", HandleGetHistoryAsync)
              .WithName("GetTemplateHistory")
              .WithSummary("Returns a paginated revision history for the template (without content).");
@@ -122,6 +142,26 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         group.MapGet("/{name}/history/{revisionId:guid}", HandleGetRevisionDetailAsync)
              .WithName("GetTemplateRevisionDetail")
              .WithSummary("Returns the full detail of a specific template revision (including content).");
+
+        // ----- Categories -----
+
+        group.MapGet("/categories", HandleListCategoriesAsync)
+             .WithName("ListTemplateCategories")
+             .WithSummary("Returns all template categories ordered by sort order then name.");
+
+        group.MapPost("/categories", HandleCreateCategoryAsync)
+             .WithName("CreateTemplateCategory")
+             .WithSummary("Creates a new template category.")
+             .ValidateBody<SaveTemplateCategoryRequest>();
+
+        group.MapPut("/categories/{id:guid}", HandleUpdateCategoryAsync)
+             .WithName("UpdateTemplateCategory")
+             .WithSummary("Updates an existing template category.")
+             .ValidateBody<SaveTemplateCategoryRequest>();
+
+        group.MapDelete("/categories/{id:guid}", HandleDeleteCategoryAsync)
+             .WithName("DeleteTemplateCategory")
+             .WithSummary("Deletes a template category (409 if templates are still associated).");
 
         return group;
     }
@@ -163,7 +203,8 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             PageSize: parameters.PageSize,
             Search: parameters.Search,
             Status: parameters.Status,
-            Culture: parameters.Culture);
+            Culture: parameters.Culture,
+            CategoryId: parameters.CategoryId);
 
         PagedTemplateResult result = await storeReader.ListTemplatesAsync(filter, ct).ConfigureAwait(false);
 
@@ -714,6 +755,296 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
     }
 
     // -------------------------------------------------------------------------
+    // POST /{name}/preview — Render the current draft with test data
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplatePreviewResponse>, NotFound, ProblemHttpResult>> HandlePreviewAsync(
+        HttpContext context,
+        string name,
+        TemplatePreviewRequest body,
+        CancellationToken ct)
+    {
+        IDocumentTemplateStoreReader? storeReader =
+            context.RequestServices.GetService<IDocumentTemplateStoreReader>();
+
+        if (storeReader is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return nameError;
+        }
+
+        if (body.Culture is not null)
+        {
+            ProblemHttpResult? cultureError = ValidateBcp47(body.Culture);
+            if (cultureError is not null)
+            {
+                return cultureError;
+            }
+        }
+
+        TemplateKey key = new(name, body.Culture);
+        TemplateRevision? draft = await storeReader.TryGetDraftAsync(key, ct).ConfigureAwait(false);
+
+        if (draft is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        List<ITemplateEngine> engines =
+            context.RequestServices.GetServices<ITemplateEngine>().ToList();
+
+        if (engines.Count == 0)
+        {
+            return TypedResults.Problem(
+                detail: "No template engine is registered. Add Granit.Templating.Scriban to enable rendering.",
+                statusCode: StatusCodes.Status501NotImplemented);
+        }
+
+        TemplateDescriptor descriptor = new()
+        {
+            Content = draft.Content,
+            MimeType = draft.MimeType,
+            RevisionId = draft.RevisionId,
+        };
+
+        ITemplateEngine? engine = engines.FirstOrDefault(e => e.CanRender(descriptor));
+        if (engine is null)
+        {
+            return TypedResults.Problem(
+                detail: $"No template engine can render MIME type '{draft.MimeType}'.",
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+
+        IEnumerable<ITemplateGlobalContext> globalContexts =
+            context.RequestServices.GetServices<ITemplateGlobalContext>();
+
+        Dictionary<string, object?> data = body.Data.HasValue
+            ? ConvertJsonObject(body.Data.Value)
+            : [];
+
+        var sw = Stopwatch.StartNew();
+
+        RenderedContent rendered;
+        try
+        {
+            rendered = await engine.RenderAsync(
+                descriptor,
+                data,
+                DocumentFormat.Html,
+                globalContexts.ToList(),
+                ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return TypedResults.Problem(
+                detail: $"Template rendering failed: {ex.Message}",
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+
+        sw.Stop();
+
+        if (rendered is not TextRenderedContent textContent)
+        {
+            return TypedResults.Problem(
+                detail: "Preview is only supported for text-based templates (HTML). Binary templates (Excel) cannot be previewed.",
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+
+        return TypedResults.Ok(new TemplatePreviewResponse(
+            textContent.Html,
+            rendered.RevisionId,
+            sw.ElapsedMilliseconds));
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /{name}/variables — Available template variables
+    // -------------------------------------------------------------------------
+
+    private static Task<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>> HandleGetVariablesAsync(
+        HttpContext context,
+        string name,
+        CancellationToken ct)
+    {
+        ProblemHttpResult? nameError = ValidateTemplateName(name);
+        if (nameError is not null)
+        {
+            return Task.FromResult<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>>(nameError);
+        }
+
+        // Global variables — discovered by reflecting on ITemplateGlobalContext.Resolve() return types
+        List<ITemplateGlobalContext> globalContexts =
+            context.RequestServices.GetServices<ITemplateGlobalContext>().ToList();
+
+        List<TemplateVariableItemResponse> globalVariables = [];
+        foreach (ITemplateGlobalContext globalContext in globalContexts)
+        {
+            object resolved = globalContext.Resolve();
+            Type resolvedType = resolved.GetType();
+
+            foreach (PropertyInfo property in resolvedType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                string variableName = $"{globalContext.ContextName}.{ToSnakeCase(property.Name)}";
+                string typeName = MapClrTypeName(property.PropertyType);
+                globalVariables.Add(new TemplateVariableItemResponse(variableName, typeName, null));
+            }
+        }
+
+        // Model and enriched variables are not yet discoverable at runtime.
+        // TemplateType<TData> instances are static singletons, not registered in DI.
+        // A future ITemplateTypeRegistry could enable model variable introspection.
+        var response = new TemplateVariablesResponse(
+            globalVariables,
+            ModelVariables: [],
+            EnrichedVariables: []);
+
+        return Task.FromResult<Results<Ok<TemplateVariablesResponse>, ProblemHttpResult>>(
+            TypedResults.Ok(response));
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /categories — List all categories
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<IReadOnlyList<TemplateCategoryResponse>>, ProblemHttpResult>> HandleListCategoriesAsync(
+        HttpContext context,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreReader? storeReader =
+            context.RequestServices.GetService<ITemplateCategoryStoreReader>();
+
+        if (storeReader is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        IReadOnlyList<TemplateCategory> categories =
+            await storeReader.ListCategoriesAsync(ct).ConfigureAwait(false);
+
+        IReadOnlyList<TemplateCategoryResponse> response = categories
+            .Select(ToCategoryResponse)
+            .ToList();
+
+        return TypedResults.Ok(response);
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /categories — Create a category
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Created<TemplateCategoryResponse>, ProblemHttpResult>> HandleCreateCategoryAsync(
+        HttpContext context,
+        SaveTemplateCategoryRequest body,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreWriter? storeWriter =
+            context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
+
+        if (storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        string userId = GetCurrentUserId(context);
+
+        TemplateCategory category;
+        try
+        {
+            category = await storeWriter.CreateCategoryAsync(
+                body.Name, body.Description, body.Icon, body.SortOrder, userId, ct).ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
+        return TypedResults.Created($"categories/{category.Id}", ToCategoryResponse(category));
+    }
+
+    // -------------------------------------------------------------------------
+    // PUT /categories/{id} — Update a category
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<Ok<TemplateCategoryResponse>, ProblemHttpResult>> HandleUpdateCategoryAsync(
+        HttpContext context,
+        Guid id,
+        SaveTemplateCategoryRequest body,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreWriter? storeWriter =
+            context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
+
+        if (storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        TemplateCategory category;
+        try
+        {
+            category = await storeWriter.UpdateCategoryAsync(
+                id, body.Name, body.Description, body.Icon, body.SortOrder, ct).ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            int statusCode = ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase)
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status409Conflict;
+
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: statusCode);
+        }
+
+        return TypedResults.Ok(ToCategoryResponse(category));
+    }
+
+    // -------------------------------------------------------------------------
+    // DELETE /categories/{id} — Delete a category
+    // -------------------------------------------------------------------------
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> HandleDeleteCategoryAsync(
+        HttpContext context,
+        Guid id,
+        CancellationToken ct)
+    {
+        ITemplateCategoryStoreWriter? storeWriter =
+            context.RequestServices.GetService<ITemplateCategoryStoreWriter>();
+
+        if (storeWriter is null)
+        {
+            return StoreNotRegistered();
+        }
+
+        try
+        {
+            await storeWriter.DeleteCategoryAsync(id, ct).ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            int statusCode = ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase)
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status409Conflict;
+
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: statusCode);
+        }
+
+        return TypedResults.NoContent();
+    }
+
+    private static TemplateCategoryResponse ToCategoryResponse(TemplateCategory category) =>
+        new(category.Id, category.Name, category.Description, category.Icon,
+            category.SortOrder, category.TemplateCount);
+
+    // -------------------------------------------------------------------------
     // Shared helpers
     // -------------------------------------------------------------------------
 
@@ -810,5 +1141,112 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="JsonElement"/> object to a <see cref="Dictionary{TKey, TValue}"/>
+    /// suitable for Scriban template rendering.
+    /// </summary>
+    private static Dictionary<string, object?> ConvertJsonObject(JsonElement element)
+    {
+        Dictionary<string, object?> dict = [];
+
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            return dict;
+        }
+
+        foreach (JsonProperty property in element.EnumerateObject())
+        {
+            dict[property.Name] = ConvertJsonValue(property.Value);
+        }
+
+        return dict;
+    }
+
+    private static object? ConvertJsonValue(JsonElement element) =>
+        element.ValueKind switch
+        {
+            JsonValueKind.Object => ConvertJsonObject(element),
+            JsonValueKind.Array => element.EnumerateArray().Select(ConvertJsonValue).ToList(),
+            JsonValueKind.String => element.GetString(),
+            JsonValueKind.Number => element.TryGetInt64(out long l) ? l : element.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            _ => null,
+        };
+
+    /// <summary>
+    /// Converts a PascalCase property name to snake_case.
+    /// Replicates Scriban's <c>StandardMemberRenamer.Default</c> behavior.
+    /// </summary>
+    internal static string ToSnakeCase(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return name;
+        }
+
+        StringBuilder sb = new();
+        for (int i = 0; i < name.Length; i++)
+        {
+            char c = name[i];
+            if (char.IsUpper(c))
+            {
+                if (i > 0)
+                {
+                    sb.Append('_');
+                }
+
+                sb.Append(char.ToLowerInvariant(c));
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static string MapClrTypeName(Type type)
+    {
+        Type underlying = Nullable.GetUnderlyingType(type) ?? type;
+
+        if (underlying == typeof(string))
+        {
+            return "string";
+        }
+
+        if (underlying == typeof(int) || underlying == typeof(long) ||
+            underlying == typeof(short) || underlying == typeof(byte) ||
+            underlying == typeof(decimal) || underlying == typeof(double) ||
+            underlying == typeof(float))
+        {
+            return "number";
+        }
+
+        if (underlying == typeof(bool))
+        {
+            return "boolean";
+        }
+
+        if (underlying == typeof(DateTime) || underlying == typeof(DateTimeOffset) ||
+            underlying == typeof(DateOnly))
+        {
+            return "date";
+        }
+
+        if (underlying == typeof(TimeOnly) || underlying == typeof(TimeSpan))
+        {
+            return "time";
+        }
+
+        if (underlying == typeof(Guid))
+        {
+            return "string";
+        }
+
+        return "object";
     }
 }
