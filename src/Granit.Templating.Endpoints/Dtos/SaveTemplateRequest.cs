@@ -1,0 +1,17 @@
+namespace Granit.Templating.Endpoints.Dtos;
+
+/// <summary>
+/// Request body for creating or updating a template draft.
+/// </summary>
+/// <param name="Name">
+/// Logical template name using <c>"Domain.Name"</c> convention (e.g. <c>"Billing.Invoice"</c>).
+/// Required for POST (create). Ignored for PUT (name comes from the route).
+/// </param>
+/// <param name="Culture">Optional BCP 47 culture tag (e.g. <c>"fr-BE"</c>). <c>null</c> for culture-neutral.</param>
+/// <param name="Content">Template source content (Scriban HTML).</param>
+/// <param name="MimeType">MIME type of the content. Default: <c>"text/html"</c>.</param>
+public sealed record SaveTemplateRequest(
+    string? Name,
+    string? Culture,
+    string Content,
+    string MimeType = "text/html");

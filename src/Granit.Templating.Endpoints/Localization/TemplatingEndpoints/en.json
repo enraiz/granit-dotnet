@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:Templating": "Templating",
+    "Permission:Templates.Manage": "Manage templates (view, create, edit, delete, publish)"
+  }
+}

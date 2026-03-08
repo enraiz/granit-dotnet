@@ -383,6 +383,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Identity.Endpoints.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Cookies.Endpoints", "src\Granit.Cookies.Endpoints\Granit.Cookies.Endpoints.csproj", "{B504D7EA-42C8-41A1-81CB-883C26B19742}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Templating.Endpoints", "src\Granit.Templating.Endpoints\Granit.Templating.Endpoints.csproj", "{8D39B55A-24D3-425A-AB89-2092B6F87E9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2649,6 +2651,18 @@ Global
 		{B504D7EA-42C8-41A1-81CB-883C26B19742}.Release|x64.Build.0 = Release|Any CPU
 		{B504D7EA-42C8-41A1-81CB-883C26B19742}.Release|x86.ActiveCfg = Release|Any CPU
 		{B504D7EA-42C8-41A1-81CB-883C26B19742}.Release|x86.Build.0 = Release|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Debug|x64.Build.0 = Debug|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Debug|x86.Build.0 = Debug|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Release|x64.ActiveCfg = Release|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Release|x64.Build.0 = Release|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2842,5 +2856,6 @@ Global
 		{BA60FAE1-4D1C-476A-80A4-86C7905EE44A} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{EB8B4D8A-5A81-404E-A57E-6348C2241E2A} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{B504D7EA-42C8-41A1-81CB-883C26B19742} = {A1B2C3D4-0001-0001-0001-000000000001}
+		{8D39B55A-24D3-425A-AB89-2092B6F87E9D} = {A1B2C3D4-0001-0001-0001-000000000001}
 	EndGlobalSection
 EndGlobal

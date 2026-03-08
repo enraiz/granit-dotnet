@@ -1,0 +1,7 @@
+{
+  "culture": "it",
+  "texts": {
+    "PermissionGroup:Templating": "Gestione modelli",
+    "Permission:Templates.Manage": "Gestire i modelli (visualizzare, creare, modificare, eliminare, pubblicare)"
+  }
+}
