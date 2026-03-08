@@ -1,0 +1,144 @@
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Wolverine;
+
+namespace Granit.Notifications.MobilePush.Fcm;
+
+/// <summary>
+/// <see cref="IMobilePushSender"/> implementation using Firebase Cloud Messaging HTTP v1 API.
+/// Registered as Keyed Service with key "Fcm".
+/// </summary>
+/// <remarks>
+/// The push payload must NOT contain PII or health data (HDS compliance).
+/// It serves as a wake-up signal — the actual content is fetched from the Granit API.
+/// </remarks>
+internal sealed partial class FcmMobilePushSender(
+    IHttpClientFactory httpClientFactory,
+    IOptions<FcmOptions> options,
+    IMessageBus messageBus,
+    ILogger<FcmMobilePushSender> logger) : IMobilePushSender
+{
+    private const string FcmHttpClientName = "FcmPush";
+
+    /// <inheritdoc />
+    public async Task SendAsync(MobilePushMessage message, CancellationToken ct = default)
+    {
+        HttpClient client = httpClientFactory.CreateClient(FcmHttpClientName);
+
+        List<Exception>? failures = null;
+
+        foreach (string token in message.DeviceTokens)
+        {
+            try
+            {
+                await SendToTokenAsync(client, token, message, ct).ConfigureAwait(false);
+            }
+            catch (FcmTokenUnregisteredException)
+            {
+                LogTokenUnregistered(token);
+                await messageBus.PublishAsync(new MobilePushTokenInvalidated
+                {
+                    DeviceToken = token,
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                LogSendFailed(token, ex);
+                (failures ??= []).Add(ex);
+            }
+        }
+
+        if (failures is { Count: > 0 })
+        {
+            throw new AggregateException(
+                $"FCM delivery failed for {failures.Count}/{message.DeviceTokens.Count} token(s)",
+                failures);
+        }
+    }
+
+    private async Task SendToTokenAsync(HttpClient client, string token, MobilePushMessage message, CancellationToken ct)
+    {
+        string projectId = options.Value.ProjectId;
+
+        var payload = new FcmPayload
+        {
+            Message = new FcmPayloadMessage
+            {
+                Token = token,
+                Notification = new FcmNotification
+                {
+                    Title = message.Title,
+                    Body = message.Body,
+                },
+                Data = message.Data.HasValue
+                    ? JsonSerializer.Deserialize<Dictionary<string, string>>(message.Data.Value)
+                    : null,
+            },
+        };
+
+        using HttpResponseMessage response = await client.PostAsJsonAsync(
+            $"v1/projects/{projectId}/messages:send",
+            payload,
+            FcmJsonContext.Default.FcmPayload,
+            ct).ConfigureAwait(false);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            string body = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+
+            if (body.Contains("UNREGISTERED", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new FcmTokenUnregisteredException(token);
+            }
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        LogMessageSent(token, projectId);
+    }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "FCM push sent to token {Token} for project {ProjectId}")]
+    private partial void LogMessageSent(string token, string projectId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "FCM token {Token} is unregistered, publishing invalidation event")]
+    private partial void LogTokenUnregistered(string token);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "FCM push delivery failed for token {Token}")]
+    private partial void LogSendFailed(string token, Exception exception);
+}
+
+internal sealed class FcmTokenUnregisteredException(string token)
+    : Exception($"FCM token is unregistered: {token}");
+
+internal sealed record FcmPayload
+{
+    [JsonPropertyName("message")]
+    public required FcmPayloadMessage Message { get; init; }
+}
+
+internal sealed record FcmPayloadMessage
+{
+    [JsonPropertyName("token")]
+    public required string Token { get; init; }
+
+    [JsonPropertyName("notification")]
+    public required FcmNotification Notification { get; init; }
+
+    [JsonPropertyName("data")]
+    public Dictionary<string, string>? Data { get; init; }
+}
+
+internal sealed record FcmNotification
+{
+    [JsonPropertyName("title")]
+    public required string Title { get; init; }
+
+    [JsonPropertyName("body")]
+    public required string Body { get; init; }
+}
+
+[JsonSerializable(typeof(FcmPayload))]
+internal sealed partial class FcmJsonContext : JsonSerializerContext;

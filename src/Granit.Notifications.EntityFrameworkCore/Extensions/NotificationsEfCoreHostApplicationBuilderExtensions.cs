@@ -1,5 +1,6 @@
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Internal;
+using Granit.Notifications.MobilePush;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -24,6 +25,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
     ///   <item><see cref="EfCoreNotificationPreferenceStore"/> — replaces <c>InMemoryNotificationPreferenceStore</c>.</item>
     ///   <item><see cref="EfCoreNotificationSubscriptionStore"/> — replaces <c>InMemoryNotificationSubscriptionStore</c>.</item>
     ///   <item><see cref="EfCoreNotificationDeliveryStore"/> — replaces <c>NullNotificationDeliveryStore</c> (enables HDS audit trail).</item>
+    ///   <item><see cref="EfCoreMobilePushTokenStore"/> — replaces <c>InMemoryMobilePushTokenStore</c>.</item>
     ///   <item><see cref="NotificationDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
     /// </list>
     /// <para>
@@ -67,6 +69,14 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
         // Delivery store — write-only (HDS audit)
         builder.Services.Replace(
             ServiceDescriptor.Scoped<INotificationDeliveryWriter, EfCoreNotificationDeliveryStore>());
+
+        // MobilePush token store — CQRS forwarding pattern
+        builder.Services.RemoveAll<InMemoryMobilePushTokenStore>();
+        builder.Services.AddSingleton<EfCoreMobilePushTokenStore>();
+        builder.Services.Replace(
+            ServiceDescriptor.Singleton<IMobilePushTokenReader>(sp => sp.GetRequiredService<EfCoreMobilePushTokenStore>()));
+        builder.Services.Replace(
+            ServiceDescriptor.Singleton<IMobilePushTokenWriter>(sp => sp.GetRequiredService<EfCoreMobilePushTokenStore>()));
 
         return builder;
     }

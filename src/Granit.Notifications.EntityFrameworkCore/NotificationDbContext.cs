@@ -20,6 +20,9 @@ public sealed class NotificationDbContext : DbContext
     /// <summary>Immutable HDS audit trail of delivery attempts.</summary>
     public DbSet<NotificationDeliveryAttempt> DeliveryAttempts => Set<NotificationDeliveryAttempt>();
 
+    /// <summary>Mobile push device tokens.</summary>
+    public DbSet<MobilePushTokenEntity> MobilePushTokens => Set<MobilePushTokenEntity>();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="NotificationDbContext"/> class.
     /// </summary>
