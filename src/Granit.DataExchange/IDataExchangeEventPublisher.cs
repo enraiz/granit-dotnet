@@ -19,10 +19,10 @@ public interface IDataExchangeEventPublisher
     /// <summary>
     /// Publishes an import job completion event.
     /// </summary>
-    Task PublishAsync(ImportJobCompletedEvent evt, CancellationToken cancellationToken = default);
+    Task PublishAsync(ImportJobCompletedEvent notification, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Publishes an export job completion event.
     /// </summary>
-    Task PublishAsync(ExportJobCompletedEvent evt, CancellationToken cancellationToken = default);
+    Task PublishAsync(ExportJobCompletedEvent notification, CancellationToken cancellationToken = default);
 }

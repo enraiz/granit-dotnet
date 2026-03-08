@@ -76,10 +76,10 @@ public sealed class GranitDataExchangeWolverineModuleTests
 
     private sealed class StubEventPublisher : IDataExchangeEventPublisher
     {
-        public Task PublishAsync(Import.Messages.ImportJobCompletedEvent evt, CancellationToken cancellationToken = default) =>
+        public Task PublishAsync(Import.Messages.ImportJobCompletedEvent notification, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
-        public Task PublishAsync(Export.Messages.ExportJobCompletedEvent evt, CancellationToken cancellationToken = default) =>
+        public Task PublishAsync(Export.Messages.ExportJobCompletedEvent notification, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
     }
 

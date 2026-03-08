@@ -27,20 +27,20 @@ internal static class TimelineEntityFactory
         TimelineEntryType entryType,
         string body,
         Guid? parentEntryId,
-        AuditContext ctx) =>
+        AuditContext context) =>
         new()
         {
-            Id = ctx.GuidGenerator.Create(),
+            Id = context.GuidGenerator.Create(),
             EntityType = entityType,
             EntityId = entityId,
             EntryType = entryType,
             Body = body,
-            AuthorId = ctx.CurrentUser.UserId ?? string.Empty,
-            AuthorName = ctx.CurrentUser.UserName ?? string.Empty,
+            AuthorId = context.CurrentUser.UserId ?? string.Empty,
+            AuthorName = context.CurrentUser.UserName ?? string.Empty,
             ParentEntryId = parentEntryId,
-            CreatedAt = ctx.Clock.Now,
-            CreatedBy = ctx.CurrentUser.UserId ?? string.Empty,
-            TenantId = ctx.CurrentTenant.IsAvailable ? ctx.CurrentTenant.Id : null,
+            CreatedAt = context.Clock.Now,
+            CreatedBy = context.CurrentUser.UserId ?? string.Empty,
+            TenantId = context.CurrentTenant.IsAvailable ? context.CurrentTenant.Id : null,
         };
 
     internal static TimelineAttachment CreateAttachment(
@@ -49,17 +49,17 @@ internal static class TimelineEntityFactory
         string fileName,
         string contentType,
         long sizeBytes,
-        AuditContext ctx) =>
+        AuditContext context) =>
         new()
         {
-            Id = ctx.GuidGenerator.Create(),
+            Id = context.GuidGenerator.Create(),
             EntryId = entryId,
             BlobId = blobId,
             FileName = fileName,
             ContentType = contentType,
             SizeBytes = sizeBytes,
-            CreatedAt = ctx.Clock.Now,
-            CreatedBy = ctx.CurrentUser.UserId ?? string.Empty,
-            TenantId = ctx.CurrentTenant.IsAvailable ? ctx.CurrentTenant.Id : null,
+            CreatedAt = context.Clock.Now,
+            CreatedBy = context.CurrentUser.UserId ?? string.Empty,
+            TenantId = context.CurrentTenant.IsAvailable ? context.CurrentTenant.Id : null,
         };
 }

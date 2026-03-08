@@ -13,10 +13,10 @@ namespace Granit.DataExchange.Internal;
 internal sealed class NullDataExchangeEventPublisher : IDataExchangeEventPublisher
 {
     /// <inheritdoc/>
-    public Task PublishAsync(ImportJobCompletedEvent evt, CancellationToken cancellationToken = default) =>
+    public Task PublishAsync(ImportJobCompletedEvent notification, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
     /// <inheritdoc/>
-    public Task PublishAsync(ExportJobCompletedEvent evt, CancellationToken cancellationToken = default) =>
+    public Task PublishAsync(ExportJobCompletedEvent notification, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 }
