@@ -84,15 +84,11 @@ Résultat : `GET /webhooks/config` retourne `{ "storePayload": true }`.
 pour personnaliser le endpoint :
 
 ```csharp
-endpoints.MapGranitModuleConfig<CookieConsentConfigProvider, CookieConsentConfigResponse>(
-    prefix, "GetCookieConsentConfig", options.TagName,
+endpoints.MapGranitModuleConfig<MyProvider, MyResponse>(
+    "mymodule", "GetMyModuleConfig", "MyModule",
     route => route
         .AllowAnonymous()
-        .AddEndpointFilter(async (context, next) =>
-        {
-            context.HttpContext.Response.Headers.CacheControl = "public, max-age=3600";
-            return await next(context).ConfigureAwait(false);
-        }));
+        .RequireRateLimiting("fixed"));
 ```
 
 Cas d'usage courants :
@@ -100,13 +96,30 @@ Cas d'usage courants :
 | Personnalisation | Code |
 | --- | --- |
 | Endpoint anonyme | `.AllowAnonymous()` |
-| Cache HTTP | `.AddEndpointFilter(...)` avec `CacheControl` |
+| Rate limiting | `.RequireRateLimiting("policy")` |
 | Autorisation spécifique | `.RequireAuthorization("AdminPolicy")` |
+
+## Prérequis DI
+
+`MapGranitModuleConfig` résout le `TProvider` depuis le conteneur DI. Le provider
+**doit** être enregistré avant `app.Build()` — typiquement dans la méthode
+`AddGranit*()` du module.
+
+```csharp
+// ✅ Correct — enregistré dans AddGranitWebhooks(), avant Build()
+builder.Services.AddScoped<WebhookModuleConfigProvider>();
+
+// ❌ Impossible — après Build(), IServiceCollection n'est plus accessible
+app.MapGranitModuleConfig<...>(); // le provider doit déjà être dans le DI
+```
+
+Si le module n'a pas de phase `AddGranit*()` dédiée (ex. Cookies.Endpoints),
+ne pas utiliser `MapGranitModuleConfig` — résoudre les dépendances directement
+dans le delegate `MapGet` et instancier le provider inline.
 
 ## Provider avec plusieurs dépendances
 
-Le provider peut injecter autant de services que nécessaire. Exemple avec Cookies
-qui agrège deux registries :
+Le provider peut agréger autant de services que nécessaire :
 
 ```csharp
 internal sealed class CookieConsentConfigProvider(
@@ -129,12 +142,17 @@ internal sealed class CookieConsentConfigProvider(
 }
 ```
 
+> **Note** : `CookieConsentConfigProvider` implémente `IModuleConfigProvider<T>`
+> mais n'est pas résolu via `MapGranitModuleConfig`. Il est instancié inline dans
+> `MapGranitCookieConsent` car `Granit.Cookies.Endpoints` n'a pas de phase DI
+> `AddGranit*()` dédiée. Le provider reste utile pour le futur endpoint admin agrégé.
+
 ## Implémentations existantes
 
-| Module | Provider | Endpoint | Réponse |
+| Module | Provider | Endpoint | Via `MapGranitModuleConfig` |
 | --- | --- | --- | --- |
-| Webhooks | `WebhookModuleConfigProvider` | `GET /webhooks/config` | `{ "storePayload": bool }` |
-| Cookies | `CookieConsentConfigProvider` | `GET /cookies/config` | `{ "cookies": [...], "services": [...] }` |
+| Webhooks | `WebhookModuleConfigProvider` | `GET /webhooks/config` | Oui (DI dans `AddGranitWebhooks`) |
+| Cookies | `CookieConsentConfigProvider` | `GET /cookies/config` | Non (instancié inline) |
 
 ## Conventions
 
@@ -142,7 +160,7 @@ internal sealed class CookieConsentConfigProvider(
 - **Visibilité** : `internal sealed` — seul le module le connaît
 - **DTO** : `sealed record` suffixé `*Response` (ex. `WebhookModuleConfigResponse`)
 - **Namespace** : `{Module}.Endpoints` ou `{Module}` si pas de package Endpoints séparé
-- **DI** : enregistré dans le `AddGranit*()` du module, pas globalement
+- **DI** : enregistré dans le `AddGranit*()` du module quand `MapGranitModuleConfig` est utilisé
 
 ## Signature de l'extension
 
