@@ -78,7 +78,7 @@ Les types d'exceptions sont définis dans `Granit.Core` afin que tous les packag
 | --- | --- | --- | --- |
 | `BusinessException` | 400 | `IHasErrorCode`, `IUserFriendlyException` | Règle métier non respectée |
 | `NotFoundException` | 404 | `IUserFriendlyException` | Ressource non trouvée (cas génériques, non-entité) |
-| `EntityNotFoundException` | 404 | `IUserFriendlyException` | Entité de domaine introuvable |
+| `EntityNotFoundException` | 404 | `IUserFriendlyException` | Entité de domaine introuvable (message générique côté client) |
 | `ForbiddenException` | 403 | `IUserFriendlyException` | Accès refusé (authentifié) |
 | `ConflictException` | 409 | `IHasErrorCode`, `IUserFriendlyException` | Conflit de ressource |
 | `ValidationException` | 422 | `IHasValidationErrors`, `IUserFriendlyException` | Erreurs de validation par champ |
@@ -90,7 +90,8 @@ Les types d'exceptions sont définis dans `Granit.Core` afin que tous les packag
 throw new BusinessException("Appointment:SlotUnavailable",
     "Le créneau demandé n'est plus disponible.");
 
-// Entité introuvable
+// Entité introuvable — le client reçoit "The requested resource was not found."
+// Le type et l'id sont dans les propriétés EntityType/EntityId et dans ToString() (logs)
 throw new EntityNotFoundException(typeof(Patient), patientId);
 
 // Accès interdit (violation de tenant)
@@ -225,6 +226,21 @@ public sealed class BlobStorageLocalizationResource;
 }
 ```
 
+### Inventaire des errorCode localisés
+
+| Module | Ressource | Clés | Exception |
+| --- | --- | --- | --- |
+| `Granit.BlobStorage` | `BlobStorage` | `BlobStorage:NotFound`, `BlobStorage:NotValid` | `BusinessException` |
+| `Granit.Features` | `Features` | `Features:NotEnabled`, `Features:LimitExceeded`, `Features:InvalidValue` | `BusinessException`, `FeatureValueValidationException` |
+| `Granit.Templating` | `Template` | `Template:TransitionDenied` | `TemplateTransitionDeniedException` |
+| `Granit.Templating` | `TemplateCategory` | `TemplateCategory:DuplicateName`, `TemplateCategory:HasTemplates` | `ConflictException` |
+| `Granit.Cookies` | `Cookies` | `Cookies:Unregistered` | `UnregisteredCookieException` |
+
+> **Convention** : tout module qui lance une exception `IHasErrorCode` **doit** fournir
+> les fichiers de localisation correspondants dans les 9 cultures
+> (en, fr, nl, de, es, it, pt, en-GB, fr-CA). Sans ces fichiers, le handler
+> utilise le `Message` de l'exception en fallback (non traduit).
+
 ## Contraintes HDS/RGPD
 
 ### Règle fondamentale : masquage des erreurs 5xx
@@ -238,6 +254,15 @@ remplacé par `"An unexpected error occurred."`. Cela empêche l'exposition de :
 - Noms de tables ou de colonnes de base de données
 
 L'exception complète est toujours loggée via `ILogger` (vers Loki) pour le diagnostic.
+
+### Règle EntityNotFoundException
+
+`EntityNotFoundException` retourne un message générique `"The requested resource was not found."`
+au client afin de ne pas exposer les noms de classes internes (ex : `TemplateCategoryEntity`,
+`PatientEntity`). Le type d'entité et l'identifiant restent disponibles :
+
+- Via les propriétés `EntityType` et `EntityId` (pour le code)
+- Via `ToString()` (pour les logs — le handler log toujours l'exception complète)
 
 ### Règle IUserFriendlyException
 
@@ -265,9 +290,9 @@ OpenTelemetry. Pour corréler une erreur client avec les logs Loki :
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core` |
+| Direction       | Modules                                   |
+| --------------- | ----------------------------------------- |
+| **Dépend de**   | `Granit.Core`                             |
 | **Utilisé par** | `Granit.Persistence`, `Granit.Validation` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

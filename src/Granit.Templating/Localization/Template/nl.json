@@ -1,0 +1,6 @@
+{
+  "culture": "nl",
+  "texts": {
+    "Template:TransitionDenied": "De levenscyclusovergang van het sjabloon van '{0}' naar '{1}' is geweigerd."
+  }
+}

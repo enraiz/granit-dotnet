@@ -21,4 +21,8 @@
     <!-- Optional at runtime: ICurrentTenant resolved via GetService — no GranitMultiTenancyModule required -->
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\**\*.json" />
+  </ItemGroup>
+
 </Project>
