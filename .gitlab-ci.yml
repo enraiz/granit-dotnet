@@ -69,7 +69,7 @@ default:
 # rebuild complet si le job tourne sur un runner différent du build)
 .ensure-build:
   script:
-    - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true -p:RunAnalyzers=false -p:EnforceCodeStyleInBuild=false
+    - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true -p:RunAnalyzers=false -p:EnforceCodeStyleInBuild=false
 
 # ---------------------------------------------------------------------------
 # BUILD (compilation unique, bin/obj préservés via GIT_CLEAN_FLAGS)
