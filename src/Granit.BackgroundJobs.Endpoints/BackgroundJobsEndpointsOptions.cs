@@ -11,12 +11,6 @@ public sealed class BackgroundJobsEndpointsOptions
     public const string SectionName = "BackgroundJobsEndpoints";
 
     /// <summary>
-    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
-    /// (e.g., <c>"api/v1"</c>). Empty by default (no prefix).
-    /// </summary>
-    public string ApiPrefix { get; set; } = string.Empty;
-
-    /// <summary>
     /// Route prefix for all background jobs endpoints.
     /// Default: <c>"background-jobs"</c>.
     /// </summary>

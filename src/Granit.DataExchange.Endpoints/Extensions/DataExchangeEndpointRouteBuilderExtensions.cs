@@ -62,10 +62,6 @@ public static class DataExchangeEndpointRouteBuilderExtensions
         DataExchangeEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
-
         // Register the named authorization policies so that endpoints can use
         // RequireAuthorization(PolicyName). This is safe to call here because
         // IOptions<AuthorizationOptions> is a singleton and is evaluated lazily
@@ -80,7 +76,7 @@ public static class DataExchangeEndpointRouteBuilderExtensions
             policy => policy.RequireRole(options.RequiredRole));
 
         RouteGroupBuilder group = endpoints
-            .MapGroup(prefix)
+            .MapGroup(options.RoutePrefix)
             .WithTags(options.TagName);
 
         // Import endpoints (listing, upload, mappings, execution, reports)

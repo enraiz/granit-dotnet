@@ -308,45 +308,6 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
             "user-123", tenantId, 1, 20, Arg.Any<CancellationToken>());
     }
 
-    // ── ApiPrefix ──────────────────────────────────────────────────────────
-
-    [Fact]
-    public async Task MapWithApiPrefix_RespondsOnPrefixedRoute()
-    {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-        builder.Services
-            .AddAuthentication(TestAuthHandler.SchemeName)
-            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                TestAuthHandler.SchemeName, _ => { });
-        builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_userNotificationReader);
-        builder.Services.AddSingleton(_userNotificationWriter);
-        builder.Services.AddSingleton(_preferenceReader);
-        builder.Services.AddSingleton(_preferenceWriter);
-        builder.Services.AddSingleton(_subscriptionReader);
-        builder.Services.AddSingleton(_subscriptionWriter);
-        builder.Services.AddSingleton(_definitionStore);
-        builder.Services.AddSingleton(_currentTenant);
-        builder.Services.AddSingleton(_clock);
-
-        _userNotificationReader.GetListAsync(Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
-
-        await using WebApplication prefixedApp = builder.Build();
-        prefixedApp.MapGranitNotificationEndpoints(opts => opts.ApiPrefix = "api/v1");
-        await prefixedApp.StartAsync(TestContext.Current.CancellationToken);
-
-        using HttpClient client = prefixedApp.GetTestClient();
-        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "user-123");
-
-        HttpResponseMessage notFound = await client.GetAsync("/notifications", TestContext.Current.CancellationToken);
-        HttpResponseMessage ok = await client.GetAsync("/api/v1/notifications", TestContext.Current.CancellationToken);
-
-        notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        ok.StatusCode.ShouldBe(HttpStatusCode.OK);
-    }
-
     // ── Helpers ─────────────────────────────────────────────────────────────
 
     private HttpClient BuildClient(string userId)

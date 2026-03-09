@@ -319,49 +319,6 @@ public sealed class AuthorizationEndpointsTests : IAsyncDisposable
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
-    // ── ApiPrefix ──────────────────────────────────────────────────────────────
-
-    [Fact]
-    public async Task MapAuthorizationEndpoints_WithApiPrefix_RespondsOnPrefixedRoute()
-    {
-        // Arrange — separate app with ApiPrefix
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-        builder.Services
-            .AddAuthentication(TestAuthHandler.SchemeName)
-            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                TestAuthHandler.SchemeName, _ => { });
-        builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_permissionChecker);
-        builder.Services.AddSingleton(_definitionManager);
-        builder.Services.AddSingleton(_permissionManagerReader);
-        builder.Services.AddSingleton(_permissionManagerWriter);
-        builder.Services.AddSingleton(_currentTenant);
-
-        // Grant all permissions for the /me endpoint.
-        _permissionChecker.IsGrantedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(false);
-
-        await using WebApplication prefixedApp = builder.Build();
-        prefixedApp.MapAuthorizationEndpoints(opts => opts.ApiPrefix = "api/v1");
-        await prefixedApp.StartAsync(TestContext.Current.CancellationToken);
-
-        using HttpClient client = prefixedApp.GetTestClient();
-        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "regular-user");
-
-        // Act — default route must not be registered
-        HttpResponseMessage notFound = await client.GetAsync(
-            "/auth/me", TestContext.Current.CancellationToken);
-
-        // Act — prefixed route must respond
-        HttpResponseMessage ok = await client.GetAsync(
-            "/api/v1/auth/me", TestContext.Current.CancellationToken);
-
-        // Assert
-        notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        ok.StatusCode.ShouldBe(HttpStatusCode.OK);
-    }
-
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     private HttpClient BuildClient(string role)

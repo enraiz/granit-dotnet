@@ -117,9 +117,6 @@ services.AddGranitTimelineNotifications();
 ```csharp
 app.MapTimelineEndpoints();
 
-// Avec préfixe API (versioning) :
-app.MapTimelineEndpoints(opts => opts.ApiPrefix = "api/v1");
-
 // Avec préfixe de domaine personnalisé :
 app.MapTimelineEndpoints(opts => opts.RoutePrefix = "admin/timeline");
 ```

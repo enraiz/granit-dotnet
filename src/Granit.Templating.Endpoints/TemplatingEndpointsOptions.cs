@@ -6,12 +6,6 @@ namespace Granit.Templating.Endpoints;
 public sealed class TemplatingEndpointsOptions
 {
     /// <summary>
-    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
-    /// (e.g., <c>"api/v1"</c>). Default: <c>"api/v1"</c>.
-    /// </summary>
-    public string ApiPrefix { get; set; } = "api/v1";
-
-    /// <summary>
     /// Route prefix for all template admin endpoints.
     /// Default: <c>"templates"</c>.
     /// </summary>

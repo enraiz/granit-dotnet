@@ -13,13 +13,6 @@ public sealed class TimelineEndpointsOptionsTests
         TimelineEndpointsOptions.SectionName.ShouldBe("TimelineEndpoints");
 
     [Fact]
-    public void Default_ApiPrefix_is_empty()
-    {
-        TimelineEndpointsOptions options = new();
-        options.ApiPrefix.ShouldBe(string.Empty);
-    }
-
-    [Fact]
     public void Default_RoutePrefix_is_timeline()
     {
         TimelineEndpointsOptions options = new();
@@ -45,13 +38,11 @@ public sealed class TimelineEndpointsOptionsTests
     {
         TimelineEndpointsOptions options = new()
         {
-            ApiPrefix = "api/v2",
             RoutePrefix = "audit-trail",
             RequiredRole = "admin",
             TagName = "AuditTrail",
         };
 
-        options.ApiPrefix.ShouldBe("api/v2");
         options.RoutePrefix.ShouldBe("audit-trail");
         options.RequiredRole.ShouldBe("admin");
         options.TagName.ShouldBe("AuditTrail");

@@ -401,7 +401,6 @@ public sealed class MyAppModule : GranitModule { }
 // Endpoints (après app.Build())
 app.MapGranitTemplatingAdmin(opts =>
 {
-    opts.ApiPrefix = "api/v1";            // défaut : "api/v1"
     opts.RoutePrefix = "templates"; // défaut : "templates"
 });
 ```

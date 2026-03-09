@@ -6,12 +6,6 @@ namespace Granit.ReferenceData.Endpoints;
 public sealed class ReferenceDataEndpointsOptions
 {
     /// <summary>
-    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
-    /// (e.g., <c>"api/v1"</c>). Empty by default (no prefix).
-    /// </summary>
-    public string ApiPrefix { get; set; } = string.Empty;
-
-    /// <summary>
     /// Route prefix for all reference data endpoints.
     /// Default: <c>"reference-data"</c>.
     /// </summary>

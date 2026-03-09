@@ -279,43 +279,6 @@ public sealed class BackgroundJobsEndpointsTests : IAsyncDisposable
         adminResponse.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
 
-    // ── ApiPrefix ──────────────────────────────────────────────────────────────
-
-    [Fact]
-    public async Task MapBackgroundJobsEndpoints_WithApiPrefix_RespondsOnPrefixedRoute()
-    {
-        // Arrange — separate app with ApiPrefix
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-        builder.Services
-            .AddAuthentication(TestAuthHandler.SchemeName)
-            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                TestAuthHandler.SchemeName, _ => { });
-        builder.Services.AddAuthorization();
-        builder.Services.AddSingleton(_reader);
-        builder.Services.AddSingleton(_writer);
-        _reader.GetAllAsync(Arg.Any<CancellationToken>()).Returns([]);
-
-        await using WebApplication prefixedApp = builder.Build();
-        prefixedApp.MapBackgroundJobsEndpoints(opts => opts.ApiPrefix = "api/v1");
-        await prefixedApp.StartAsync(TestContext.Current.CancellationToken);
-
-        using HttpClient client = prefixedApp.GetTestClient();
-        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, AdminRole);
-
-        // Act — default route must not be registered
-        HttpResponseMessage notFound = await client.GetAsync(
-            "/background-jobs", TestContext.Current.CancellationToken);
-
-        // Act — prefixed route must respond
-        HttpResponseMessage ok = await client.GetAsync(
-            "/api/v1/background-jobs", TestContext.Current.CancellationToken);
-
-        // Assert
-        notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        ok.StatusCode.ShouldBe(HttpStatusCode.OK);
-    }
-
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private HttpClient BuildClient(string role)

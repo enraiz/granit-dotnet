@@ -40,19 +40,4 @@ public sealed class MapAuthorizationEndpointsTests
         group.ShouldNotBeNull();
     }
 
-    [Fact]
-    public void MapAuthorizationEndpoints_WithApiPrefix_ReturnsRouteGroupBuilder()
-    {
-        // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-        WebApplication app = builder.Build();
-
-        // Act
-        RouteGroupBuilder group = app.MapAuthorizationEndpoints(
-            opts => opts.ApiPrefix = "api/v1");
-
-        // Assert
-        group.ShouldNotBeNull();
-    }
 }

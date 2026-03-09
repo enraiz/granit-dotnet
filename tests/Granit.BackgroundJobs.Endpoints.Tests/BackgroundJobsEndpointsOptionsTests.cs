@@ -7,10 +7,6 @@ namespace Granit.BackgroundJobs.Endpoints.Tests;
 public sealed class BackgroundJobsEndpointsOptionsTests
 {
     [Fact]
-    public void ApiPrefix_Default_ShouldBeEmpty() =>
-        new BackgroundJobsEndpointsOptions().ApiPrefix.ShouldBe(string.Empty);
-
-    [Fact]
     public void RoutePrefix_Default_ShouldBeBackgroundJobs() =>
         new BackgroundJobsEndpointsOptions().RoutePrefix.ShouldBe("background-jobs");
 

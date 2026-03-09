@@ -42,12 +42,8 @@ public static class AuthorizationEndpointRouteBuilderExtensions
         AuthorizationEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
-
         RouteGroupBuilder group = endpoints
-            .MapGroup(prefix)
+            .MapGroup(options.RoutePrefix)
             .WithTags(options.TagName);
 
         group.MapMyPermissionsEndpoints();

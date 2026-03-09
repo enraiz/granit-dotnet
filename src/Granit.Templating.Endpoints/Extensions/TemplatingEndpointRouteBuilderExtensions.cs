@@ -83,12 +83,8 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         TemplatingEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
-
         RouteGroupBuilder group = endpoints
-            .MapGroup(prefix)
+            .MapGroup(options.RoutePrefix)
             .RequireAuthorization(TemplatingPermissions.Manage)
             .WithTags(options.TagName);
 

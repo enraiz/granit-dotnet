@@ -9,12 +9,6 @@ public sealed class IdentityEndpointsOptions
     public const string SectionName = "IdentityEndpoints";
 
     /// <summary>
-    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
-    /// (e.g., <c>"api/v1"</c>). Empty by default.
-    /// </summary>
-    public string ApiPrefix { get; set; } = string.Empty;
-
-    /// <summary>
     /// Route prefix for all identity user cache endpoints.
     /// Default: <c>"identity/users"</c>.
     /// </summary>

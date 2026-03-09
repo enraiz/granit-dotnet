@@ -408,46 +408,6 @@ public sealed class LocalizationOverridesEndpointTests : IAsyncDisposable
     // =========================================================================
 
     [Fact]
-    public async Task MapGranitLocalizationOverrides_WithApiPrefix_RespondsOnPrefixedRoute()
-    {
-        // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-        builder.Services
-            .AddAuthentication(TestAuthHandler.SchemeName)
-            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                TestAuthHandler.SchemeName, _ => { });
-        builder.Services.AddAuthorizationBuilder()
-            .AddPolicy(LocalizationOverridesPermissions.Manage,
-                policy => policy.RequireRole(ManageRole));
-        builder.Services.AddSingleton(_storeReader);
-        builder.Services.AddSingleton(_storeWriter);
-
-        _storeReader.GetOverridesAsync("Test", "fr", Arg.Any<CancellationToken>())
-            .Returns(new Dictionary<string, string>());
-
-        await using WebApplication app = builder.Build();
-        app.MapGranitLocalizationOverrides(opts => opts.ApiPrefix = "api/v1");
-        await app.StartAsync(TestContext.Current.CancellationToken);
-
-        using HttpClient client = BuildClient(app, ManageRole);
-
-        // Act -- default route must not be registered
-        HttpResponseMessage notFound = await client.GetAsync(
-            "/localization/overrides?resourceName=Test&cultureName=fr",
-            TestContext.Current.CancellationToken);
-
-        // Act -- prefixed route must respond
-        HttpResponseMessage ok = await client.GetAsync(
-            "/api/v1/localization/overrides?resourceName=Test&cultureName=fr",
-            TestContext.Current.CancellationToken);
-
-        // Assert
-        notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        ok.StatusCode.ShouldBe(HttpStatusCode.OK);
-    }
-
-    [Fact]
     public async Task MapGranitLocalizationOverrides_WithCustomRoutePrefix_RespondsOnCustomRoute()
     {
         // Arrange
