@@ -3,10 +3,11 @@
 # =============================================================================
 # Pipeline : build -> quality -> security -> analysis -> pack -> publish
 #
-# Le stage build valide la compilation et réchauffe le cache NuGet.
+# Le stage build valide la compilation.
+# Le cache NuGet est persisté via un volume Docker (/srv/nuget-cache)
+# monté dans config.toml, ce qui élimine l'archivage/extraction GitLab.
 # Les artifacts bin/obj sont trop volumineux (~20K fichiers, >500 MB)
-# pour être partagés via artifacts GitLab. Chaque job rebuild avec le
-# cache NuGet (restore rapide ~5-10s).
+# pour être partagés via artifacts GitLab. Chaque job rebuild.
 #
 # Les packages NuGet sont publiés sur GitLab Package Registry.
 # Publication automatique sur tag vX.Y.Z sur main.
@@ -36,7 +37,9 @@ variables:
   DOTNET_VERSION: "10.0"
   CONFIGURATION: Release
   NUGET_SOURCE: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json"
-  NUGET_PACKAGES: '${CI_PROJECT_DIR}/.nuget/packages'
+  # Volume Docker monté via config.toml (/srv/nuget-cache:/nuget-cache)
+  # Élimine l'archivage/extraction du cache GitLab (~10K fichiers)
+  NUGET_PACKAGES: '/nuget-cache'
 
 stages:
   - build
@@ -59,13 +62,6 @@ default:
   image: mcr.microsoft.com/dotnet/sdk:10.0
   tags:
     - docker
-  cache:
-    key:
-      files:
-        - Directory.Packages.props
-    paths:
-      - .nuget/packages/
-    policy: pull
 
 # ---------------------------------------------------------------------------
 # BUILD (validation + cache NuGet warm-up)
@@ -74,13 +70,6 @@ default:
 build:
   extends: .dotnet
   stage: build
-  cache:
-    key:
-      files:
-        - Directory.Packages.props
-    paths:
-      - .nuget/packages/
-    policy: pull-push
   script:
     - dotnet restore
     - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true
@@ -117,14 +106,16 @@ test:
   variables:
     VSTEST_CONNECTION_TIMEOUT: "300"
     XUNIT_LAUNCH_TIMEOUT: "300"
-    XUNIT_MAX_THREAD_COUNT: "2"
   script:
+    - echo "=== CPU diagnostics ==="
+    - nproc
+    - cat /sys/fs/cgroup/cpu.max 2>/dev/null || cat /sys/fs/cgroup/cpu/cpu.cfs_quota_us /sys/fs/cgroup/cpu/cpu.cfs_period_us 2>/dev/null || echo "cgroup info unavailable"
     - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true
     - >
       dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
-      --collect:"XPlat Code Coverage;Format=opencover,cobertura"
-      -- RunConfiguration.MaxCpuCount=8
+      -p:CollectCoverage=true
+      -- RunConfiguration.MaxCpuCount=0
   artifacts:
     when: always
     paths:
