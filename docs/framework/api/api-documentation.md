@@ -511,6 +511,76 @@ Pour automatiser la régénération au build, ajouter un Target MSBuild dans le
   leurs signatures. Configurer l'injection du tenant dans le HTTP handler
   (middleware DelegatingHandler en C#, intercepteur fetch en TypeScript).
 
+## Exemples de schéma pour Scalar Try-it
+
+Le module fournit un mécanisme distribué pour injecter des exemples JSON réalistes
+dans les schémas OpenAPI. L'UI Scalar pré-remplit alors les formulaires **Try it**
+sur les endpoints POST/PUT, évitant la saisie manuelle.
+
+### Architecture
+
+Le mécanisme repose sur trois éléments :
+
+1. **`ISchemaExampleProvider`** — interface dans `Granit.ApiDocumentation` que chaque
+   package `*.Endpoints` implémente pour ses propres types Request
+2. **`SchemaExampleSchemaTransformer`** — transformer `IOpenApiSchemaTransformer` qui
+   collecte tous les providers via DI et applique `example` sur les schémas correspondants
+3. **Auto-discovery** — `AddGranitApiDocumentation()` scanne automatiquement les
+   assemblies chargées pour trouver les implémentations de `ISchemaExampleProvider`
+   et les enregistre en DI (aucun enregistrement manuel nécessaire)
+
+### Implémentation d'un provider
+
+Chaque package `*.Endpoints` crée une classe `internal sealed` implémentant
+`ISchemaExampleProvider`. Les exemples utilisent `JsonObject` (`System.Text.Json.Nodes`)
+pour rester découplés de `Microsoft.OpenApi` :
+
+```csharp
+using System.Text.Json.Nodes;
+using Granit.ApiDocumentation;
+
+namespace Granit.ReferenceData.Endpoints;
+
+internal sealed class ReferenceDataSchemaExampleProvider : ISchemaExampleProvider
+{
+    public IReadOnlyDictionary<Type, JsonNode> GetExamples() =>
+        new Dictionary<Type, JsonNode>
+        {
+            [typeof(ReferenceDataCreateRequest)] = new JsonObject
+            {
+                ["code"] = "BE",
+                ["labelEn"] = "Belgium",
+                ["labelFr"] = "Belgique",
+                ["sortOrder"] = 56,
+            },
+        };
+}
+```
+
+### Contraintes
+
+- Les DTOs restent des POCOs/records purs — pas d'attribut Swagger ni de dépendance
+  à `Microsoft.OpenApi`
+- Les exemples ne doivent contenir **aucune PII** ni donnée patient
+- Les `JsonNode` sont deep-clonés automatiquement par le transformer pour éviter
+  les mutations partagées entre schémas
+
+### Packages avec providers
+
+| Package | Types couverts |
+| ------- | -------------- |
+| `Granit.ReferenceData.Endpoints` | `ReferenceDataCreateRequest`, `ReferenceDataUpdateRequest` |
+| `Granit.DataExchange.Endpoints` | `ConfirmMappingsRequest`, `CreateExportJobRequest`, `SaveExportPresetRequest` |
+| `Granit.Notifications.Endpoints` | `UpdatePreferenceRequest` |
+| `Granit.Querying.Endpoints` | `CreateSavedViewRequest`, `UpdateSavedViewRequest` |
+| `Granit.Workflow.Endpoints` | `WorkflowTransitionRequest` |
+| `Granit.Localization.Endpoints` | `SetLocalizationOverrideRequest` |
+| `Granit.Identity.Endpoints` | `IdentityUserCacheBatchRequest`, `IdentityUserCacheSyncRequest`, `IdentityWebhookPayload` |
+| `Granit.Templating.Endpoints` | `SaveTemplateRequest` |
+
+Les packages `*.Endpoints` sans type Request (Authorization, BackgroundJobs, Cookies,
+Timeline) n'ont pas de provider — c'est attendu.
+
 ## Considérations HDS
 
 ### UI en production
