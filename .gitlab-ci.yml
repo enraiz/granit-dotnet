@@ -104,6 +104,7 @@ format:
 test:
   extends: .dotnet
   stage: quality
+  timeout: 15m
   needs:
     - job: build
       artifacts: true
@@ -118,7 +119,7 @@ test:
       dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
       -p:CollectCoverage=true
-      -- RunConfiguration.MaxCpuCount=0
+      -- RunConfiguration.MaxCpuCount=4
   artifacts:
     when: always
     paths:
