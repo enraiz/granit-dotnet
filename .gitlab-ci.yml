@@ -330,7 +330,6 @@ docfx:
       - _site/
     expire_in: 1 week
   rules:
-    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
 
