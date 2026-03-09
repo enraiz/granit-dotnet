@@ -1,3 +1,4 @@
+using System.Reflection;
 using FluentValidation;
 using Granit.Validation.Internal;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,4 +27,15 @@ public static class ValidationServiceCollectionExtensions
         ValidatorOptions.Global.LanguageManager = new GranitErrorCodeLanguageManager();
         return services;
     }
+
+    /// <summary>
+    /// Registers all <see cref="IValidator{T}"/> implementations from the assembly
+    /// containing <typeparamref name="T"/> as scoped services.
+    /// </summary>
+    /// <typeparam name="T">A type in the assembly to scan for validators.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddGranitValidatorsFromAssemblyContaining<T>(
+        this IServiceCollection services) =>
+        services.AddValidatorsFromAssemblyContaining<T>(ServiceLifetime.Scoped, includeInternalTypes: true);
 }

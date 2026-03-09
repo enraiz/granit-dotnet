@@ -2,6 +2,8 @@ using Granit.Authorization;
 using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
 using Granit.Templating.Endpoints.Permissions;
+using Granit.Templating.Endpoints.Validators;
+using Granit.Validation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Templating.Endpoints;
@@ -24,7 +26,10 @@ namespace Granit.Templating.Endpoints;
 public sealed class GranitTemplatingEndpointsModule : GranitModule
 {
     /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
         context.Services.AddSingleton<IPermissionDefinitionProvider,
             TemplatingPermissionDefinitionProvider>();
+        context.Services.AddGranitValidatorsFromAssemblyContaining<SaveTemplateRequestValidator>();
+    }
 }

@@ -2,6 +2,8 @@ using Granit.Authorization;
 using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
 using Granit.Localization.Endpoints.Permissions;
+using Granit.Localization.Endpoints.Validators;
+using Granit.Validation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Localization.Endpoints;
@@ -25,7 +27,10 @@ namespace Granit.Localization.Endpoints;
 public sealed class GranitLocalizationEndpointsModule : GranitModule
 {
     /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
         context.Services.AddSingleton<IPermissionDefinitionProvider,
             LocalizationOverridesPermissionDefinitionProvider>();
+        context.Services.AddGranitValidatorsFromAssemblyContaining<SetLocalizationOverrideRequestValidator>();
+    }
 }
