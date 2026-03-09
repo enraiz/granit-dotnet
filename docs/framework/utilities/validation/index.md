@@ -187,11 +187,22 @@ qui dépendent du contexte d'exécution (base de données, services externes).
 
 | Package | Validateur | Règles |
 | --- | --- | --- |
-| `Granit.Localization.Endpoints` | `SetLocalizationOverrideRequestValidator` | `Value` NotEmpty, MaxLength(4000) |
-| `Granit.Querying.Endpoints` | `CreateSavedViewRequestValidator` | `Name` NotEmpty, MaxLength(200) |
-| `Granit.Querying.Endpoints` | `UpdateSavedViewRequestValidator` | `Name` NotEmpty, MaxLength(200) |
+| `Granit.DataExchange.Endpoints` | `ConfirmMappingsRequestValidator` | `Mappings` NotEmpty, chaque `SourceColumn` NotEmpty, `Confidence` IsInEnum |
 | `Granit.DataExchange.Endpoints` | `CreateExportJobRequestValidator` | `DefinitionName`, `Format` NotEmpty |
 | `Granit.DataExchange.Endpoints` | `SaveExportPresetRequestValidator` | `DefinitionName`, `PresetName`, `SelectedFields`, `Format` NotEmpty |
+| `Granit.Identity.Endpoints` | `IdentityUserCacheBatchRequestValidator` | `UserIds` NotEmpty, max 100 éléments, chaque ID NotEmpty MaxLength(256) |
+| `Granit.Identity.Endpoints` | `IdentityUserCacheListRequestValidator` | `Search` MaxLength(200), `Page` ≥ 1, `PageSize` 1–100 |
+| `Granit.Identity.Endpoints` | `IdentityUserCacheSyncRequestValidator` | `UserIds` NotEmpty, max 100 éléments, chaque ID NotEmpty MaxLength(256) |
+| `Granit.Localization.Endpoints` | `SetLocalizationOverrideRequestValidator` | `Value` NotEmpty, MaxLength(4000) |
+| `Granit.Notifications.Endpoints` | `UpdatePreferenceRequestValidator` | `NotificationTypeName` NotEmpty MaxLength(256), `ChannelName` NotEmpty MaxLength(64) |
+| `Granit.Querying.Endpoints` | `CreateSavedViewRequestValidator` | `Name` NotEmpty, MaxLength(200) |
+| `Granit.Querying.Endpoints` | `UpdateSavedViewRequestValidator` | `Name` NotEmpty, MaxLength(200) |
+| `Granit.ReferenceData.Endpoints` | `ReferenceDataCreateRequestValidator` | `Code` NotEmpty MaxLength(50), `LabelEn` NotEmpty, 7 labels MaxLength(250), `SortOrder` ≥ 0, `ValidTo` > `ValidFrom` |
+| `Granit.ReferenceData.Endpoints` | `ReferenceDataUpdateRequestValidator` | `LabelEn` NotEmpty, 7 labels MaxLength(250), `SortOrder` ≥ 0, `ValidTo` > `ValidFrom` |
+| `Granit.Templating.Endpoints` | `SaveTemplateCategoryRequestValidator` | `Name` NotEmpty MaxLength(200), `Description` MaxLength(500), `Icon` MaxLength(100) |
+| `Granit.Templating.Endpoints` | `SaveTemplateRequestValidator` | `Content` NotEmpty, `MimeType` NotEmpty MaxLength(127), `Name` regex Domain.Name, `Culture` BCP 47 |
+| `Granit.Templating.Endpoints` | `TemplatePreviewRequestValidator` | `Culture` MaxLength(10), BCP 47 format |
+| `Granit.Workflow.Endpoints` | `WorkflowTransitionRequestValidator` | `TargetState` NotEmpty MaxLength(100), `Comment` MaxLength(2000) |
 
 ## Référence des validateurs
 
