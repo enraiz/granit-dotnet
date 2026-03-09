@@ -154,21 +154,33 @@ group.MapPost("/", HandleCreate)
 
 | `IValidator<T>` en DI ? | Requête valide | Requête invalide |
 | --- | --- | --- |
-| Oui (Wolverine auto-discovery ou enregistrement manuel) | Passe au handler | **422** `HttpValidationProblemDetails` avec codes `Granit:Validation:*` |
-| Non | Passe au handler | Passe au handler (filet de sécurité : la validation manuelle dans le handler s'applique) |
+| Oui (`AddGranitValidatorsFromAssemblyContaining<T>()`) | Passe au handler | **422** `HttpValidationProblemDetails` avec codes `Granit:Validation:*` |
+| Non (oubli d'enregistrement) | Passe au handler | Passe au handler **sans validation** |
 
 Le filtre résout `IValidator<T>` depuis le DI. Si aucun validateur n'est enregistré, il passe
-silencieusement au handler suivant — cela permet une adoption progressive.
+silencieusement au handler suivant — **c'est un bug silencieux**, pas un comportement voulu.
+Tout module qui définit des `GranitValidator<T>` **doit** appeler
+`AddGranitValidatorsFromAssemblyContaining<T>()` dans son `ConfigureServices`.
 
 ### Enregistrement des validateurs en DI
 
-Les validateurs sont auto-découverts par Wolverine via
-`UseFluentValidation(RegistrationBehavior.DiscoverAndRegisterValidators)`. Si Wolverine n'est pas
-utilisé, enregistrez-les manuellement :
+Chaque module Endpoints **doit** enregistrer ses validateurs dans `ConfigureServices` via
+`AddGranitValidatorsFromAssemblyContaining<T>()`. Cette méthode scanne l'assembly et enregistre
+tous les `IValidator<T>` en tant que services **scoped**, y compris les types `internal` :
 
 ```csharp
-builder.Services.AddScoped<IValidator<CreateResourceRequest>, CreateResourceRequestValidator>();
+// Dans le module Endpoints (GranitModule)
+public override void ConfigureServices(ServiceConfigurationContext context) =>
+    context.Services.AddGranitValidatorsFromAssemblyContaining<MyRequestValidator>();
+
+// Dans un module applicatif (static class)
+public static void ConfigureServices(IServiceCollection services) =>
+    services.AddGranitValidatorsFromAssemblyContaining<MyRequestValidator>();
 ```
+
+> **Important** : sans cet appel, `FluentValidationEndpointFilter<T>` résout `null` depuis le DI
+> et passe silencieusement au handler — la validation n'est pas exécutée.
+> Un seul appel par assembly suffit : tous les `GranitValidator<T>` de l'assembly sont enregistrés.
 
 ### Deux couches de validation
 
@@ -380,9 +392,9 @@ Le calcul est effectué chiffre par chiffre (`remainder = (remainder * 10 + digi
 
 ## Dépendances Granit
 
-| Direction       | Modules                                                                                                           |
-|-----------------|-------------------------------------------------------------------------------------------------------------------|
-| **Dépend de**   | `Granit.Core`, `Granit.ExceptionHandling`, `Granit.Localization`, `Microsoft.AspNetCore.App` (FrameworkReference) |
-| **Utilisé par** | Packages `.Endpoints` (filtre validation), applications Wolverine (auto-discovery)                                |
+| Direction | Modules |
+| --- | --- |
+| **Dépend de** | `Granit.Core`, `Granit.ExceptionHandling`, `Granit.Localization`, `FluentValidation.DependencyInjectionExtensions`, `Microsoft.AspNetCore.App` (FrameworkReference) |
+| **Utilisé par** | Packages `.Endpoints` (filtre validation + enregistrement DI via `AddGranitValidatorsFromAssemblyContaining<T>()`) |
 
 > Voir le [graphe de dépendances complet](../../dependencies.md).

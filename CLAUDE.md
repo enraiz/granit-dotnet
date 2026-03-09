@@ -193,6 +193,7 @@ Key rules for quick reference:
 - **Endpoint DTOs**: Module-specific DTOs must be prefixed with module context (`WorkflowTransitionRequest`, not `TransitionRequest`). OpenAPI flattens namespaces — generic names cause schema conflicts. Shared cross-cutting types (`PagedResult<T>`, `ProblemDetails`) are exempt.
 - **DTO suffixes**: `Request` for input bodies, `Response` for top-level returns. NEVER use `Dto` suffix. EF Core entities must NOT be returned directly — create a `*Response` record.
 - **Error responses**: Always `TypedResults.Problem(detail, statusCode)` (RFC 7807), never `TypedResults.BadRequest<string>()`. Return type: `ProblemHttpResult`.
+- **Validator registration**: Every module that defines `GranitValidator<T>` implementations MUST call `AddGranitValidatorsFromAssemblyContaining<TValidator>()` in its `ConfigureServices`. Without this, `FluentValidationEndpointFilter<T>` silently skips validation. One call per assembly suffices.
 
 **Isolated DbContext pattern — MANDATORY for all `*.EntityFrameworkCore` packages**:
 
