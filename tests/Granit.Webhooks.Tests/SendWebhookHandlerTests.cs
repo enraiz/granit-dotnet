@@ -2,7 +2,7 @@
 // Tests - SendWebhookHandler
 // =============================================================================
 // Verifies HTTP delivery: success path, non-retriable errors (suspension),
-// retriable errors (exception thrown), network timeout handling.
+// retriable errors (exception thrown), network timeout handling, StorePayload.
 // =============================================================================
 
 using System.Net;
@@ -14,6 +14,7 @@ using Granit.Webhooks.Handlers;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -48,7 +49,7 @@ public sealed class SendWebhookHandlerTests
         await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
         await _deliveryWriter.Received(1).RecordSuccessAsync(
-            command, 200, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+            command, 200, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -78,7 +79,7 @@ public sealed class SendWebhookHandlerTests
 
         await Should.NotThrowAsync(act);
         await _deliveryWriter.Received(1).RecordFailureAsync(
-            command, (int)statusCode, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+            command, (int)statusCode, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _deliveryWriter.DidNotReceive().SuspendSubscriptionAsync(
             Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
@@ -128,7 +129,7 @@ public sealed class SendWebhookHandlerTests
             () => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
         await _deliveryWriter.Received(1).RecordFailureAsync(
-            command, 503, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+            command, 503, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     // -------------------------------------------------------------------------
@@ -156,19 +157,66 @@ public sealed class SendWebhookHandlerTests
             () => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
         await _deliveryWriter.Received(1).RecordFailureAsync(
-            command, null, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+            command, null, Arg.Any<long>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+    }
+
+    // -------------------------------------------------------------------------
+    // StorePayload
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task HandleAsync_StorePayloadEnabled_PassesBodyJsonToRecordSuccess()
+    {
+        SendWebhookHandler handler = BuildHandler(HttpStatusCode.OK, storePayload: true);
+        SendWebhookCommand command = BuildCommand();
+
+        await handler.HandleAsync(command, TestContext.Current.CancellationToken);
+
+        await _deliveryWriter.Received(1).RecordSuccessAsync(
+            command, 200, Arg.Any<long>(), Arg.Any<string>(),
+            Arg.Is<string?>(p => p != null && p.Contains(command.Envelope.EventType)),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_StorePayloadDisabled_PassesNullPayload()
+    {
+        SendWebhookHandler handler = BuildHandler(HttpStatusCode.OK, storePayload: false);
+        SendWebhookCommand command = BuildCommand();
+
+        await handler.HandleAsync(command, TestContext.Current.CancellationToken);
+
+        await _deliveryWriter.Received(1).RecordSuccessAsync(
+            command, 200, Arg.Any<long>(), Arg.Any<string>(),
+            Arg.Is<string?>(p => p == null),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_StorePayloadEnabled_FailureAlsoStoresPayload()
+    {
+        SendWebhookHandler handler = BuildHandler(HttpStatusCode.BadRequest, storePayload: true);
+        SendWebhookCommand command = BuildCommand();
+
+        await handler.HandleAsync(command, TestContext.Current.CancellationToken);
+
+        await _deliveryWriter.Received(1).RecordFailureAsync(
+            command, 400, Arg.Any<long>(), Arg.Any<string>(),
+            Arg.Is<string?>(p => p != null),
+            Arg.Any<CancellationToken>());
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private SendWebhookHandler BuildHandler(HttpStatusCode statusCode)
+    private SendWebhookHandler BuildHandler(HttpStatusCode statusCode, bool storePayload = false)
     {
         HttpClient httpClient = new(new StaticResponseHandler(statusCode));
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
+        IOptions<WebhooksOptions> opts = Options.Create(new WebhooksOptions { StorePayload = storePayload });
+        return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, opts, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 
     private SendWebhookHandler BuildHandlerWithTimeout()
@@ -176,7 +224,8 @@ public sealed class SendWebhookHandlerTests
         HttpClient httpClient = new(new TimeoutHandler());
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, NullLogger<SendWebhookHandler>.Instance, _clock);
+        IOptions<WebhooksOptions> opts = Options.Create(new WebhooksOptions());
+        return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, opts, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 
     private static SendWebhookCommand BuildCommand() => new()

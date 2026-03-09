@@ -22,6 +22,7 @@ public interface IWebhookDeliveryWriter
         int httpStatusCode,
         long durationMs,
         string payloadHash,
+        string? payload,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -32,6 +33,7 @@ public interface IWebhookDeliveryWriter
         int? httpStatusCode,
         long durationMs,
         string errorMessage,
+        string? payload,
         CancellationToken cancellationToken = default);
 
     /// <summary>

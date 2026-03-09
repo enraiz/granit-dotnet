@@ -14,9 +14,7 @@ Architecture de base et configuration du framework au démarrage.
 | --- | --- |
 | [core.md](core/core.md) | Vue d'ensemble, module system, types domaine partagés |
 | [modularity.md](core/modularity.md) | Système de modules, dépendances, lifecycle |
-| [configuration.md](core/configuration.md) | Sources de configuration, IOptions\<T\>, secrets Vault |
-| [options.md](core/options.md) | Options pattern, IOptionsMonitor, validation au démarrage |
-| [settings.md](core/settings.md) | Paramètres dynamiques par tenant |
+| [configuration/](core/configuration/index.md) | Configuration, options, settings, module config — arbre de décision |
 
 ## Data
 

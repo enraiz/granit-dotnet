@@ -16,11 +16,11 @@ adaptée à un écosystème de packages NuGet indépendants.
 ```mermaid
 flowchart TD
     A[Application Host] -->|AddGranit‹TRootModule›| B[ModuleLoader]
-    B -->|1. Découverte| C["Parcours récursif des\n[DependsOn] attributes"]
-    C -->|2. Graphe| D[Construction du DAG\nde dépendances]
-    D -->|3. Tri topologique| E["Algorithme de Kahn\n(détection de cycles)"]
-    E -->|4. ConfigureServices| F["Module A → Module B → … → Root\n(ordre topologique)"]
-    F -->|5. OnApplicationInitialization| G["Module A → Module B → … → Root\n(même ordre)"]
+    B -->|1. Découverte| C["Parcours récursif des<br/>[DependsOn] attributes"]
+    C -->|2. Graphe| D[Construction du DAG<br/>de dépendances]
+    D -->|3. Tri topologique| E["Algorithme de Kahn<br/>(détection de cycles)"]
+    E -->|4. ConfigureServices| F["Module A → Module B → … → Root<br/>(ordre topologique)"]
+    F -->|5. OnApplicationInitialization| G["Module A → Module B → … → Root<br/>(même ordre)"]
 
     style B fill:#4a9eff,color:#fff
     style E fill:#ff6b6b,color:#fff

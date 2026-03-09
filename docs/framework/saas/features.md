@@ -32,16 +32,16 @@ Default      (300)   ← valeur déclarée dans le code
 
 ```mermaid
 flowchart TD
-    REQ["GetValueAsync(featureName)"] --> CACHE{"HybridCache\nL1 + L2 ?"}
+    REQ["GetValueAsync(featureName)"] --> CACHE{"HybridCache<br/>L1 + L2 ?"}
 
     CACHE -->|hit| RES["Valeur en cache"]
-    CACHE -->|miss| T{"TenantValueProvider\n(Order = 100)"}
+    CACHE -->|miss| T{"TenantValueProvider<br/>(Order = 100)"}
 
     T -->|override trouvé| STORE["Stocke L1 + L2"]
-    T -->|null| P{"PlanValueProvider\n(Order = 200)"}
+    T -->|null| P{"PlanValueProvider<br/>(Order = 200)"}
 
     P -->|valeur plan| STORE
-    P -->|null| D["DefaultValueProvider\n(Order = 300)\nValeur du code"]
+    P -->|null| D["DefaultValueProvider<br/>(Order = 300)<br/>Valeur du code"]
 
     D --> STORE
     STORE --> RES

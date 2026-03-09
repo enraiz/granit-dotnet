@@ -16,10 +16,10 @@ Une API de gestion de tâches (*task management*) avec :
 
 ```mermaid
 flowchart LR
-    CLIENT["Client HTTP"] --> API["Minimal API\n(endpoints)"]
-    API --> AUTH["JWT Keycloak\n(authentification)"]
-    API --> DB["PostgreSQL\n(EF Core + interceptors)"]
-    API --> OBS["OTLP\n(logs + traces)"]
+    CLIENT["Client HTTP"] --> API["Minimal API<br/>(endpoints)"]
+    API --> AUTH["JWT Keycloak<br/>(authentification)"]
+    API --> DB["PostgreSQL<br/>(EF Core + interceptors)"]
+    API --> OBS["OTLP<br/>(logs + traces)"]
 
     style API fill:#4a9eff,color:#fff
     style AUTH fill:#e67e22,color:#fff

@@ -13,8 +13,8 @@ Le pattern se compose de deux niveaux :
 
 ```mermaid
 flowchart LR
-    P["Program.cs\napp.MapTaskEndpoints()"] --> EXT["TaskEndpointRouteBuilderExtensions\n(point d'entrée public)"]
-    EXT --> READ["TaskEndpoints\nMapGet, MapPost, MapPut..."]
+    P["Program.cs<br/>app.MapTaskEndpoints()"] --> EXT["TaskEndpointRouteBuilderExtensions<br/>(point d'entrée public)"]
+    EXT --> READ["TaskEndpoints<br/>MapGet, MapPost, MapPut..."]
 
     style P fill:#4a9eff,color:#fff
     style EXT fill:#2d5a27,color:#fff

@@ -6,13 +6,13 @@ Granit exporte les signaux d'observabilité via OTLP vers une stack LGTM souvera
 
 ```mermaid
 flowchart LR
-    APP["Application Granit\n(Serilog + OTel SDK)"] -->|OTLP gRPC| COLLECTOR["OpenTelemetry\nCollector"]
+    APP["Application Granit<br/>(Serilog + OTel SDK)"] -->|OTLP gRPC| COLLECTOR["OpenTelemetry<br/>Collector"]
 
-    COLLECTOR -->|Logs| LOKI["Loki\n(stockage logs)"]
-    COLLECTOR -->|Traces| TEMPO["Tempo\n(stockage traces)"]
-    COLLECTOR -->|Metrics| MIMIR["Mimir\n(stockage métriques)"]
+    COLLECTOR -->|Logs| LOKI["Loki<br/>(stockage logs)"]
+    COLLECTOR -->|Traces| TEMPO["Tempo<br/>(stockage traces)"]
+    COLLECTOR -->|Metrics| MIMIR["Mimir<br/>(stockage métriques)"]
 
-    LOKI --> GF["Grafana\n(visualisation)"]
+    LOKI --> GF["Grafana<br/>(visualisation)"]
     TEMPO --> GF
     MIMIR --> GF
 

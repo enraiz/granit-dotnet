@@ -30,9 +30,9 @@ classDiagram
         +Disable~T~() IDisposable
     }
 
-    note for NullTenantContext "Static readonly\ninstance unique"
-    note for CurrentTenant "AsyncLocal statique\nun état par flux async"
-    note for DataFilter "AsyncLocal statique\ncopy-on-write"
+    note for NullTenantContext "Static readonly<br/>instance unique"
+    note for CurrentTenant "AsyncLocal statique<br/>un état par flux async"
+    note for DataFilter "AsyncLocal statique<br/>copy-on-write"
 ```
 
 ## Implémentation dans Granit

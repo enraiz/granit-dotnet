@@ -4,8 +4,8 @@
 
 ```mermaid
 flowchart LR
-    APP["Application Granit"] -->|Kubernetes Auth| VA["Vault Agent\n(sidecar)"]
-    VA -->|Lease renewal| VC["Vault Cluster\n(Raft HA)"]
+    APP["Application Granit"] -->|Kubernetes Auth| VA["Vault Agent<br/>(sidecar)"]
+    VA -->|Lease renewal| VC["Vault Cluster<br/>(Raft HA)"]
 
     VC -->|Dynamic credentials| PG["PostgreSQL"]
     VC -->|Transit encrypt/decrypt| APP

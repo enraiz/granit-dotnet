@@ -8,7 +8,7 @@ supplémentaire n'est introduite.
 > **Référence Microsoft** :
 > [Options pattern dans ASP.NET Core](https://learn.microsoft.com/fr-fr/aspnet/core/fundamentals/configuration/options)
 >
-> **Voir aussi** : [configuration.md](configuration.md) pour les sources de configuration
+> **Voir aussi** : [sources.md](sources.md) pour les sources de configuration
 > (appsettings.json, variables d'environnement, Vault).
 
 ## Principe
@@ -19,13 +19,14 @@ Le pattern Options consiste à :
 2. Lier cette classe à une section de la configuration au démarrage (`Configure<T>`)
 3. Injecter `IOptions<T>` dans les services qui ont besoin de ces paramètres
 
-```text
-appsettings.json              classe d'options             service consommateur
-───────────────               ─────────────────            ────────────────────
-"Keycloak": {          →      KeycloakOptions      →       IOptions<KeycloakOptions>
-  "Authority": "...",           Authority                   .Value.Authority
-  "ClientId": "..."             ClientId                    .Value.ClientId
-}
+```mermaid
+flowchart LR
+    A["appsettings.json<br/><br/>Keycloak:<br/>  Authority: '...'<br/>  ClientId: '...'"]
+    B["KeycloakOptions<br/><br/>Authority<br/>ClientId"]
+    C["IOptions&lt;KeycloakOptions&gt;<br/><br/>.Value.Authority<br/>.Value.ClientId"]
+
+    A -->|BindConfiguration| B
+    B -->|injection DI| C
 ```
 
 ## Déclarer une classe d'options

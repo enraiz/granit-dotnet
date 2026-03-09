@@ -58,6 +58,10 @@ internal sealed class WebhookDeliveryAttemptConfiguration : IEntityTypeConfigura
         builder.Property(e => e.IsSuccess)
             .IsRequired();
 
+        // Optional: stored only when WebhooksOptions.StorePayload is enabled.
+        builder.Property(e => e.Payload)
+            .HasColumnType("text");
+
         // Delivery lookup by subscription (e.g., history view).
         builder.HasIndex(e => new { e.SubscriptionId, e.OccurredAt })
             .HasDatabaseName("ix_webhook_delivery_attempts_subscriptionid_occurredat");

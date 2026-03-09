@@ -140,4 +140,4 @@ La base de données est prête. Créons les [endpoints CRUD](05-endpoints.md).
 ## Référence
 
 - [Persistance EF Core](../../framework/data/persistence.md)
-- [Configuration](../../framework/core/configuration.md)
+- [Configuration](../../framework/core/configuration/sources.md)

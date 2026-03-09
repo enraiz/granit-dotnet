@@ -53,7 +53,7 @@ classDiagram
     note for Entity "Identité seule"
     note for CreationAuditedEntity "HDS : qui a créé"
     note for AuditedEntity "HDS : qui a modifié"
-    note for FullAuditedEntity "HDS + RGPD :\nqui a supprimé"
+    note for FullAuditedEntity "HDS + RGPD :<br/>qui a supprimé"
 ```
 
 ## Implémentation dans Granit

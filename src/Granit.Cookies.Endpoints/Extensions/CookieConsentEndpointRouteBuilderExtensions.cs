@@ -1,7 +1,7 @@
 using Granit.Cookies.Endpoints.Dtos;
+using Granit.Core.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.Cookies.Endpoints.Extensions;
@@ -25,40 +25,15 @@ public static class CookieConsentEndpointRouteBuilderExtensions
 
         string prefix = BuildRoutePrefix(options);
 
-        endpoints
-            .MapGet($"{prefix}/config", HandleGetConfigAsync)
-            .AllowAnonymous()
-            .WithName("GetCookieConsentConfig")
-            .WithTags(options.TagName)
-            .WithSummary("Returns the cookie consent configuration for CMP setup.")
-            .Produces<CookieConsentConfigResponse>();
-
-        return endpoints;
-    }
-
-    private static Ok<CookieConsentConfigResponse> HandleGetConfigAsync(
-        ICookieRegistry cookieRegistry,
-        IThirdPartyServiceRegistry serviceRegistry,
-        HttpContext context)
-    {
-        context.Response.Headers.CacheControl = "public, max-age=3600";
-
-        var cookies = cookieRegistry.GetAll()
-            .Select(c => new CookieDefinitionResponse(
-                c.Name,
-                CategoryToSnakeCase(c.Category),
-                c.RetentionDays,
-                c.Purpose))
-            .ToList();
-
-        var services = serviceRegistry.GetAll()
-            .Select(s => new ThirdPartyServiceResponse(
-                s.Name,
-                CategoryToSnakeCase(s.Category),
-                s.CookiePatterns))
-            .ToList();
-
-        return TypedResults.Ok(new CookieConsentConfigResponse(cookies, services));
+        return endpoints.MapGranitModuleConfig<CookieConsentConfigProvider, CookieConsentConfigResponse>(
+            prefix, "GetCookieConsentConfig", options.TagName,
+            route => route
+                .AllowAnonymous()
+                .AddEndpointFilter(async (context, next) =>
+                {
+                    context.HttpContext.Response.Headers.CacheControl = "public, max-age=3600";
+                    return await next(context).ConfigureAwait(false);
+                }));
     }
 
     private static string BuildRoutePrefix(CookieConsentEndpointsOptions options)
@@ -70,13 +45,4 @@ public static class CookieConsentEndpointRouteBuilderExtensions
 
         return $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
     }
-
-    private static string CategoryToSnakeCase(CookieCategory category) => category switch
-    {
-        CookieCategory.StrictlyNecessary => "strictly_necessary",
-        CookieCategory.Preferences => "preferences",
-        CookieCategory.Analytics => "analytics",
-        CookieCategory.Marketing => "marketing",
-        _ => category.ToString().ToLowerInvariant(),
-    };
 }

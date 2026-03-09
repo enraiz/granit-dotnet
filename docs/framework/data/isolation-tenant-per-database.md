@@ -15,12 +15,12 @@ soumis à des audits externes).
 ```mermaid
 flowchart TD
     REQ["HTTP / Message"]
-    CT["ICurrentTenant\n(tenantId)"]
+    CT["ICurrentTenant<br/>(tenantId)"]
     PROV["ITenantConnectionStringProvider"]
     FACTORY["TenantPerDatabaseDbContextFactory&lt;TContext&gt;"]
-    DBA[("Base tenant A\n(PostgreSQL)")]
-    DBB[("Base tenant B\n(PostgreSQL)")]
-    DBC[("Base tenant C\n(PostgreSQL)")]
+    DBA[("Base tenant A<br/>(PostgreSQL)")]
+    DBB[("Base tenant B<br/>(PostgreSQL)")]
+    DBC[("Base tenant C<br/>(PostgreSQL)")]
 
     REQ --> CT
     CT -->|tenantId| PROV

@@ -45,6 +45,8 @@ public static class WebhooksEfCoreHostApplicationBuilderExtensions
 
         builder.Services.Replace(
             ServiceDescriptor.Scoped<IWebhookDeliveryWriter, EfWebhookDeliveryStore>());
+        builder.Services.Replace(
+            ServiceDescriptor.Scoped<IWebhookDeliveryReader, EfWebhookDeliveryStore>());
 
         return builder;
     }

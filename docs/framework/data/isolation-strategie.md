@@ -24,11 +24,11 @@
 flowchart TD
     START([Choisir une stratégie])
 
-    START --> Q1{Contrat HDS\nisolation physique\nrequise ?}
+    START --> Q1{Contrat HDS<br/>isolation physique<br/>requise ?}
     Q1 -->|Oui| DB[DatabasePerTenant]
-    Q1 -->|Non| Q2{Nombre de tenants\n> 1 000 ?}
+    Q1 -->|Non| Q2{Nombre de tenants<br/>> 1 000 ?}
     Q2 -->|Oui| SHARED[SharedDatabase]
-    Q2 -->|Non| Q3{Audit tenant\nindépendant\nnécessaire ?}
+    Q2 -->|Non| Q3{Audit tenant<br/>indépendant<br/>nécessaire ?}
     Q3 -->|Oui| SCHEMA[SchemaPerTenant]
     Q3 -->|Non| SHARED
 
@@ -118,9 +118,9 @@ flowchart LR
     CT["ICurrentTenant"]
     PROV["ITenantIsolationStrategyProvider"]
     FACADE["IsolatedDbContextFactory&lt;TContext&gt;"]
-    F1["SharedDatabaseDbContextFactory\n(keyed: SharedDatabase)"]
-    F2["TenantPerSchemaDbContextFactory\n(keyed: SchemaPerTenant)"]
-    F3["TenantPerDatabaseDbContextFactory\n(keyed: DatabasePerTenant)"]
+    F1["SharedDatabaseDbContextFactory<br/>(keyed: SharedDatabase)"]
+    F2["TenantPerSchemaDbContextFactory<br/>(keyed: SchemaPerTenant)"]
+    F3["TenantPerDatabaseDbContextFactory<br/>(keyed: DatabasePerTenant)"]
 
     REQ --> CT
     CT --> PROV

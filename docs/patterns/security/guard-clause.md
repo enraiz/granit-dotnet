@@ -19,7 +19,7 @@ flowchart TD
     G3 -->|non| X3["throw ForbiddenException"]
     G3 -->|oui| BL[Logique métier]
 
-    X1 --> PD[GranitExceptionHandler\n→ ProblemDetails RFC 7807]
+    X1 --> PD[GranitExceptionHandler<br/>→ ProblemDetails RFC 7807]
     X2 --> PD
     X3 --> PD
 ```

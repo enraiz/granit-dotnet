@@ -38,10 +38,10 @@ classDiagram
     }
 
     DistributedCacheService --> IDistributedCache : décore
-    note for DistributedCacheService "Ajoute :\n- Sérialisation JSON\n- Chiffrement AES\n- Anti-stampede"
+    note for DistributedCacheService "Ajoute :<br/>- Sérialisation JSON<br/>- Chiffrement AES<br/>- Anti-stampede"
 
     CachedLocalizationOverrideStore --> ILocalizationOverrideStore : décore
-    note for CachedLocalizationOverrideStore "Ajoute :\n- Cache mémoire\n- Invalidation"
+    note for CachedLocalizationOverrideStore "Ajoute :<br/>- Cache mémoire<br/>- Invalidation"
 ```
 
 ## Implémentation dans Granit

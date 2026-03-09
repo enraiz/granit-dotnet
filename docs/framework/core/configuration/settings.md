@@ -318,4 +318,4 @@ GranitSettingsModule
 | **Utilisé par** | `Granit.Settings.EntityFrameworkCore` |
 | **Package EF Core** | `Granit.Settings.EntityFrameworkCore` → ajoute `Granit.Persistence` |
 
-> Voir le [graphe de dépendances complet](../dependencies.md).
+> Voir le [graphe de dépendances complet](../../dependencies.md).

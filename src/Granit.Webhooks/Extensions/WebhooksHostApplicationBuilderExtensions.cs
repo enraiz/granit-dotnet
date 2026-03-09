@@ -1,5 +1,7 @@
 using Granit.Webhooks.Abstractions;
+using Granit.Webhooks.Endpoints;
 using Granit.Webhooks.Exceptions;
+using Granit.Webhooks.Handlers;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 using Microsoft.Extensions.Configuration;
@@ -65,10 +67,17 @@ public static class WebhooksHostApplicationBuilderExtensions
         builder.Services.AddSingleton<IWebhookSubscriptionReader>(sp => sp.GetRequiredService<InMemoryWebhookSubscriptionStore>());
         builder.Services.AddSingleton<IWebhookSubscriptionWriter>(sp => sp.GetRequiredService<InMemoryWebhookSubscriptionStore>());
         builder.Services.AddScoped<IWebhookDeliveryWriter, NullWebhookDeliveryWriter>();
+        builder.Services.AddScoped<IWebhookDeliveryReader, NullWebhookDeliveryReader>();
         builder.Services.AddSingleton<IWebhookSecretProtector, NoOpWebhookSecretProtector>();
 
         // Application façade.
         builder.Services.AddScoped<IWebhookPublisher, WolverineWebhookPublisher>();
+
+        // Module config provider — used by GET /webhooks/config endpoint.
+        builder.Services.AddScoped<WebhookModuleConfigProvider>();
+
+        // Redelivery service — used by admin endpoints.
+        builder.Services.AddScoped<RetryWebhookHandler>();
 
         builder.Services.ConfigureWolverine(opts =>
         {

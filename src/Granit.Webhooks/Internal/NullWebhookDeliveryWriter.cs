@@ -13,10 +13,10 @@ namespace Granit.Webhooks.Internal;
 /// </remarks>
 internal sealed class NullWebhookDeliveryWriter : IWebhookDeliveryWriter
 {
-    public Task RecordSuccessAsync(SendWebhookCommand command, int httpStatusCode, long durationMs, string payloadHash, CancellationToken cancellationToken = default) =>
+    public Task RecordSuccessAsync(SendWebhookCommand command, int httpStatusCode, long durationMs, string payloadHash, string? payload, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
-    public Task RecordFailureAsync(SendWebhookCommand command, int? httpStatusCode, long durationMs, string errorMessage, CancellationToken cancellationToken = default) =>
+    public Task RecordFailureAsync(SendWebhookCommand command, int? httpStatusCode, long durationMs, string errorMessage, string? payload, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
     public Task SuspendSubscriptionAsync(Guid subscriptionId, string reason, CancellationToken cancellationToken = default) =>

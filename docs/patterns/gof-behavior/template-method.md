@@ -40,7 +40,7 @@ classDiagram
     GranitModule <|-- GranitFeaturesModule
     AbstractValidator~T~ <|-- GranitValidator~T~
 
-    note for GranitModule "Async délègue à Sync\npar défaut"
+    note for GranitModule "Async délègue à Sync<br/>par défaut"
 ```
 
 ## Implémentation dans Granit
