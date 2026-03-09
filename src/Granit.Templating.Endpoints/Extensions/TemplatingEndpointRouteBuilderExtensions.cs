@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Granit.Core.Exceptions;
 using Granit.Security;
 using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Permissions;
@@ -439,7 +440,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         {
             await storeWriter.DeleteDraftAsync(key, userId, cancellationToken).ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (NotFoundException ex)
         {
             return TypedResults.Problem(
                 detail: ex.Message,
@@ -491,13 +492,13 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         {
             await storeWriter.PublishAsync(key, userId, cancellationToken).ConfigureAwait(false);
         }
-        catch (TemplateTransitionDeniedException ex)
+        catch (ConflictException ex)
         {
             return TypedResults.Problem(
                 detail: ex.Message,
                 statusCode: StatusCodes.Status409Conflict);
         }
-        catch (InvalidOperationException ex)
+        catch (NotFoundException ex)
         {
             return TypedResults.Problem(
                 detail: ex.Message,
@@ -547,7 +548,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         {
             await storeWriter.UnpublishAsync(key, userId, cancellationToken).ConfigureAwait(false);
         }
-        catch (TemplateTransitionDeniedException ex)
+        catch (ConflictException ex)
         {
             return TypedResults.Problem(
                 detail: ex.Message,
@@ -951,7 +952,7 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             category = await storeWriter.CreateCategoryAsync(
                 body.Name, body.Description, body.Icon, body.SortOrder, userId, cancellationToken).ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (ConflictException ex)
         {
             return TypedResults.Problem(
                 detail: ex.Message,
@@ -985,15 +986,17 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
             category = await storeWriter.UpdateCategoryAsync(
                 id, body.Name, body.Description, body.Icon, body.SortOrder, cancellationToken).ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (EntityNotFoundException ex)
         {
-            int statusCode = ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase)
-                ? StatusCodes.Status404NotFound
-                : StatusCodes.Status409Conflict;
-
             return TypedResults.Problem(
                 detail: ex.Message,
-                statusCode: statusCode);
+                statusCode: StatusCodes.Status404NotFound);
+        }
+        catch (ConflictException ex)
+        {
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status409Conflict);
         }
 
         return TypedResults.Ok(ToCategoryResponse(category));
@@ -1020,15 +1023,17 @@ public static partial class TemplatingEndpointRouteBuilderExtensions
         {
             await storeWriter.DeleteCategoryAsync(id, cancellationToken).ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (EntityNotFoundException ex)
         {
-            int statusCode = ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase)
-                ? StatusCodes.Status404NotFound
-                : StatusCodes.Status409Conflict;
-
             return TypedResults.Problem(
                 detail: ex.Message,
-                statusCode: statusCode);
+                statusCode: StatusCodes.Status404NotFound);
+        }
+        catch (ConflictException ex)
+        {
+            return TypedResults.Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status409Conflict);
         }
 
         return TypedResults.NoContent();

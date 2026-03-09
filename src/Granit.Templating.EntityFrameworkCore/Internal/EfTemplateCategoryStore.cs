@@ -1,3 +1,4 @@
+using Granit.Core.Exceptions;
 using Granit.Templating.Store;
 using Microsoft.EntityFrameworkCore;
 
@@ -82,7 +83,8 @@ internal sealed class EfTemplateCategoryStore(
 
         if (exists)
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
+                "TemplateCategory:DuplicateName",
                 $"A category with the name '{name}' already exists.");
         }
 
@@ -121,8 +123,7 @@ internal sealed class EfTemplateCategoryStore(
 
         if (entity is null)
         {
-            throw new InvalidOperationException(
-                $"Category '{id}' not found.");
+            throw new EntityNotFoundException(typeof(TemplateCategoryEntity), id);
         }
 
         bool nameConflict = await ctx.TemplateCategories
@@ -131,7 +132,8 @@ internal sealed class EfTemplateCategoryStore(
 
         if (nameConflict)
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
+                "TemplateCategory:DuplicateName",
                 $"A category with the name '{name}' already exists.");
         }
 
@@ -165,8 +167,7 @@ internal sealed class EfTemplateCategoryStore(
 
         if (entity is null)
         {
-            throw new InvalidOperationException(
-                $"Category '{id}' not found.");
+            throw new EntityNotFoundException(typeof(TemplateCategoryEntity), id);
         }
 
         int templateCount = await ctx.TemplateRevisions
@@ -178,7 +179,8 @@ internal sealed class EfTemplateCategoryStore(
 
         if (templateCount > 0)
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
+                "TemplateCategory:HasTemplates",
                 $"Cannot delete category with {templateCount} associated template(s).");
         }
 

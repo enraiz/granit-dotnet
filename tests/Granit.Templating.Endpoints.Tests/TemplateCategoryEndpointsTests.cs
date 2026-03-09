@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using FluentValidation;
+using Granit.Core.Exceptions;
 using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Extensions;
 using Granit.Templating.Endpoints.Permissions;
@@ -28,7 +29,7 @@ namespace Granit.Templating.Endpoints.Tests;
 /// </summary>
 public sealed class TemplateCategoryEndpointsTests : IAsyncDisposable
 {
-    private const string Prefix = "/api/v1/templates/categories";
+    private const string Prefix = "/templates/categories";
     private const string ManageRole = "template-admin";
 
     private readonly ITemplateCategoryStoreReader _categoryReader = Substitute.For<ITemplateCategoryStoreReader>();
@@ -197,7 +198,7 @@ public sealed class TemplateCategoryEndpointsTests : IAsyncDisposable
         _categoryWriter.CreateCategoryAsync(
                 Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(),
                 Arg.Any<int>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException(
+            .ThrowsAsync(new ConflictException(
                 "A category with the name 'Invoices' already exists."));
 
         HttpResponseMessage response = await _adminClient.PostAsJsonAsync(
@@ -272,8 +273,7 @@ public sealed class TemplateCategoryEndpointsTests : IAsyncDisposable
         _categoryWriter.UpdateCategoryAsync(
                 categoryId, Arg.Any<string>(), Arg.Any<string?>(),
                 Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException(
-                $"Category '{categoryId}' not found."));
+            .ThrowsAsync(new EntityNotFoundException(typeof(object), categoryId));
 
         HttpResponseMessage response = await _adminClient.PutAsJsonAsync(
             $"{Prefix}/{categoryId}",
@@ -290,7 +290,7 @@ public sealed class TemplateCategoryEndpointsTests : IAsyncDisposable
         _categoryWriter.UpdateCategoryAsync(
                 categoryId, Arg.Any<string>(), Arg.Any<string?>(),
                 Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException(
+            .ThrowsAsync(new ConflictException(
                 "A category with the name 'Invoices' already exists."));
 
         HttpResponseMessage response = await _adminClient.PutAsJsonAsync(
@@ -336,8 +336,7 @@ public sealed class TemplateCategoryEndpointsTests : IAsyncDisposable
     {
         var categoryId = Guid.NewGuid();
         _categoryWriter.DeleteCategoryAsync(categoryId, Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException(
-                $"Category '{categoryId}' not found."));
+            .ThrowsAsync(new EntityNotFoundException(typeof(object), categoryId));
 
         HttpResponseMessage response = await _adminClient.DeleteAsync(
             $"{Prefix}/{categoryId}",
@@ -351,7 +350,7 @@ public sealed class TemplateCategoryEndpointsTests : IAsyncDisposable
     {
         var categoryId = Guid.NewGuid();
         _categoryWriter.DeleteCategoryAsync(categoryId, Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException(
+            .ThrowsAsync(new ConflictException(
                 "Cannot delete category with 3 associated template(s)."));
 
         HttpResponseMessage response = await _adminClient.DeleteAsync(
