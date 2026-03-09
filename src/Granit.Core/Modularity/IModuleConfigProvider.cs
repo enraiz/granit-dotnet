@@ -1,21 +1,21 @@
-namespace Granit.Core.Endpoints;
+namespace Granit.Core.Modularity;
 
 /// <summary>
 /// Provides a read-only snapshot of a module's configuration for client consumption.
 /// </summary>
 /// <typeparam name="TResponse">
-/// The response DTO type exposed via <c>GET /{module}/config</c>.
+/// The response DTO type exposed to clients.
 /// Must be a <c>sealed record</c> following the <c>*Response</c> naming convention.
 /// </typeparam>
 /// <remarks>
 /// <para>
 /// Implement this interface in each module that needs to expose its <c>IOptions&lt;T&gt;</c>
-/// configuration to frontend clients. The implementation maps internal options to a
+/// configuration to external consumers. The implementation maps internal options to a
 /// public-facing DTO — never expose the raw options class.
 /// </para>
 /// <para>
-/// Register via <c>AddModuleConfig&lt;TProvider, TResponse&gt;()</c> and map via
-/// <c>MapGranitModuleConfig&lt;TProvider, TResponse&gt;()</c>.
+/// For HTTP exposure, use <c>MapGranitModuleConfig&lt;TProvider, TResponse&gt;()</c>
+/// from <c>Granit.Core.Endpoints</c> to map a standardized <c>GET /{module}/config</c> endpoint.
 /// </para>
 /// <example>
 /// <code>

@@ -1,3 +1,4 @@
+using Granit.Core.Modularity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -24,21 +25,28 @@ public static class ModuleConfigEndpointExtensions
     /// Unique endpoint name for link generation (e.g., <c>"GetWebhooksConfig"</c>).
     /// </param>
     /// <param name="tag">OpenAPI tag (e.g., <c>"Webhooks"</c>).</param>
+    /// <param name="configureEndpoint">
+    /// Optional delegate to customize the <see cref="RouteHandlerBuilder"/>
+    /// (e.g., <c>.AllowAnonymous()</c>, cache headers).
+    /// </param>
     /// <returns>The endpoint route builder for chaining.</returns>
     public static IEndpointRouteBuilder MapGranitModuleConfig<TProvider, TResponse>(
         this IEndpointRouteBuilder endpoints,
         string routePrefix,
         string endpointName,
-        string tag)
+        string tag,
+        Action<RouteHandlerBuilder>? configureEndpoint = null)
         where TProvider : class, IModuleConfigProvider<TResponse>
         where TResponse : class
     {
-        endpoints
+        RouteHandlerBuilder builder = endpoints
             .MapGet($"{routePrefix}/config", (TProvider provider) => HandleGetConfig(provider))
             .WithName(endpointName)
             .WithTags(tag)
             .WithSummary($"Returns the current {tag} module configuration.")
             .Produces<TResponse>();
+
+        configureEndpoint?.Invoke(builder);
 
         return endpoints;
     }
