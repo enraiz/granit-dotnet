@@ -1,0 +1,47 @@
+using FluentValidation;
+using Granit.ReferenceData.Endpoints.Dtos;
+using Granit.Validation;
+
+namespace Granit.ReferenceData.Endpoints.Validators;
+
+/// <summary>
+/// Validates the <see cref="ReferenceDataCreateRequest"/> body for reference data creation.
+/// </summary>
+/// <remarks>
+/// MaxLength values must match <c>ReferenceDataEntityTypeConfiguration</c>:
+/// Code = 50, Labels = 250.
+/// </remarks>
+internal sealed class ReferenceDataCreateRequestValidator : GranitValidator<ReferenceDataCreateRequest>
+{
+    /// <summary>Maximum length for the business code (must match <c>ReferenceDataEntityTypeConfiguration</c>).</summary>
+    internal const int MaxCodeLength = 50;
+
+    /// <summary>Maximum length for label fields (must match <c>ReferenceDataEntityTypeConfiguration</c>).</summary>
+    internal const int MaxLabelLength = 250;
+
+    public ReferenceDataCreateRequestValidator()
+    {
+        RuleFor(x => x.Code)
+            .NotEmpty()
+            .MaximumLength(MaxCodeLength);
+
+        RuleFor(x => x.LabelEn)
+            .NotEmpty()
+            .MaximumLength(MaxLabelLength);
+
+        RuleFor(x => x.LabelFr).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelNl).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelDe).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelEs).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelIt).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelPt).MaximumLength(MaxLabelLength);
+
+        RuleFor(x => x.SortOrder)
+            .GreaterThanOrEqualTo(0);
+
+        RuleFor(x => x.ValidTo)
+            .GreaterThan(x => x.ValidFrom)
+            .WithMessage("ValidTo must be after ValidFrom.")
+            .When(x => x.ValidFrom.HasValue && x.ValidTo.HasValue);
+    }
+}

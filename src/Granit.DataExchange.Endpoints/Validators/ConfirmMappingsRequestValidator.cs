@@ -1,0 +1,24 @@
+using FluentValidation;
+using Granit.DataExchange.Endpoints.Dtos.Import;
+using Granit.Validation;
+
+namespace Granit.DataExchange.Endpoints.Validators;
+
+/// <summary>
+/// Validates the <see cref="ConfirmMappingsRequest"/> body for confirming import column mappings.
+/// </summary>
+internal sealed class ConfirmMappingsRequestValidator : GranitValidator<ConfirmMappingsRequest>
+{
+    public ConfirmMappingsRequestValidator()
+    {
+        RuleFor(x => x.Mappings)
+            .NotEmpty();
+
+        RuleForEach(x => x.Mappings).ChildRules(mapping =>
+        {
+            mapping.RuleFor(m => m.SourceColumn).NotEmpty();
+
+            mapping.RuleFor(m => m.Confidence).IsInEnum();
+        });
+    }
+}
