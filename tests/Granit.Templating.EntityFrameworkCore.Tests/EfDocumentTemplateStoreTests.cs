@@ -1,3 +1,4 @@
+using Granit.Core.Exceptions;
 using Granit.Templating.EntityFrameworkCore.Internal;
 using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
@@ -255,7 +256,7 @@ public sealed class EfDocumentTemplateStoreTests
     }
 
     [Fact]
-    public async Task PublishAsync_NoDraftExists_ThrowsInvalidOperationException()
+    public async Task PublishAsync_NoDraftExists_ThrowsNotFoundException()
     {
         EfDocumentTemplateStore store = CreateStore(NewDb());
         TemplateKey key = new("Ghost.Template");
@@ -263,7 +264,7 @@ public sealed class EfDocumentTemplateStoreTests
         Func<Task> act = () => store.PublishAsync(key, "alice",
             TestContext.Current.CancellationToken);
 
-        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("no draft");
+        (await Should.ThrowAsync<NotFoundException>(act)).Message.ShouldContain("no draft");
     }
 
     [Fact]
@@ -379,7 +380,7 @@ public sealed class EfDocumentTemplateStoreTests
     }
 
     [Fact]
-    public async Task DeleteDraftAsync_NoDraftExists_ThrowsInvalidOperationException()
+    public async Task DeleteDraftAsync_NoDraftExists_ThrowsNotFoundException()
     {
         EfDocumentTemplateStore store = CreateStore(NewDb());
         TemplateKey key = new("Ghost.Template");
@@ -387,7 +388,7 @@ public sealed class EfDocumentTemplateStoreTests
         Func<Task> act = () => store.DeleteDraftAsync(key, "alice",
             TestContext.Current.CancellationToken);
 
-        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("no draft");
+        (await Should.ThrowAsync<NotFoundException>(act)).Message.ShouldContain("no draft");
     }
 
     [Fact]

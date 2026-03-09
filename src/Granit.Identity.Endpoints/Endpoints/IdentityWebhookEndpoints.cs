@@ -39,7 +39,7 @@ internal static class IdentityWebhookEndpoints
         return endpoints;
     }
 
-    private static async Task<Results<Ok, UnauthorizedHttpResult, BadRequest<string>>> HandleWebhookAsync(
+    private static async Task<Results<Ok, UnauthorizedHttpResult, ProblemHttpResult>> HandleWebhookAsync(
         HttpRequest request,
         WebhookSignatureValidator signatureValidator,
         IOptions<IdentityWebhookOptions> webhookOptions,
@@ -71,12 +71,16 @@ internal static class IdentityWebhookEndpoints
         }
         catch (JsonException)
         {
-            return TypedResults.BadRequest("Invalid JSON payload.");
+            return TypedResults.Problem(
+                detail: "Invalid JSON payload.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (payload is null || string.IsNullOrEmpty(payload.UserId) || string.IsNullOrEmpty(payload.EventType))
         {
-            return TypedResults.BadRequest("Missing required fields: eventType, userId.");
+            return TypedResults.Problem(
+                detail: "Missing required fields: eventType, userId.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         // Process event directly via IUserLookupService
@@ -92,7 +96,9 @@ internal static class IdentityWebhookEndpoints
                 break;
 
             default:
-                return TypedResults.BadRequest($"Unknown event type: {payload.EventType}");
+                return TypedResults.Problem(
+                    detail: $"Unknown event type: {payload.EventType}",
+                    statusCode: StatusCodes.Status400BadRequest);
         }
 
         return TypedResults.Ok();

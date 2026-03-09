@@ -34,6 +34,8 @@ public sealed class OutgoingContextMiddleware(
     internal const string UserIdHeader = "X-User-Id";
     internal const string UserFirstNameHeader = "X-User-FirstName";
     internal const string UserLastNameHeader = "X-User-LastName";
+    internal const string ActorKindHeader = "X-Actor-Kind";
+    internal const string ApiKeyIdHeader = "X-Api-Key-Id";
     internal const string TraceParentHeader = "traceparent";
 
     /// <summary>
@@ -60,6 +62,18 @@ public sealed class OutgoingContextMiddleware(
             {
                 envelope.Headers[UserLastNameHeader] = lastName;
             }
+        }
+
+        // Propagate actor kind (User, ExternalSystem, System)
+        ActorKind actorKind = currentUserService.ActorKind;
+        if (actorKind != ActorKind.User)
+        {
+            envelope.Headers[ActorKindHeader] = actorKind.ToString();
+        }
+
+        if (currentUserService.ApiKeyId is { } apiKeyId)
+        {
+            envelope.Headers[ApiKeyIdHeader] = apiKeyId.ToString();
         }
 
         string? traceParent = Activity.Current?.Id;

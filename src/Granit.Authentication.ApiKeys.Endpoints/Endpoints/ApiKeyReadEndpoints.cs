@@ -1,0 +1,65 @@
+using Granit.Authentication.ApiKeys.Endpoints.Dtos;
+using Granit.Querying;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
+
+namespace Granit.Authentication.ApiKeys.Endpoints.Endpoints;
+
+/// <summary>
+/// Endpoints for listing and viewing API keys.
+/// </summary>
+internal static class ApiKeyReadEndpoints
+{
+    internal static RouteGroupBuilder MapReadEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/", ListAsync)
+            .WithName("ListApiKeys")
+            .WithSummary("Returns a paginated list of API keys.");
+
+        group.MapGet("/{id:guid}", GetByIdAsync)
+            .WithName("GetApiKeyById")
+            .WithSummary("Returns a single API key by ID.");
+
+        return group;
+    }
+
+    private static async Task<Ok<PagedResult<ApiKeyResponse>>> ListAsync(
+        IApiKeyAdminStore adminStore,
+        [AsParameters] ApiKeyListRequest request,
+        CancellationToken cancellationToken)
+    {
+        int page = Math.Max(request.Page, 1);
+        int pageSize = Math.Clamp(request.PageSize, 1, 100);
+
+        PagedResult<ApiKeyEntry> result = await adminStore.ListAsync(
+            request.Search,
+            request.Type,
+            request.Environment,
+            request.IncludeRevoked,
+            page,
+            pageSize,
+            cancellationToken).ConfigureAwait(false);
+
+        var items = result.Items.Select(ApiKeyResponse.FromEntry).ToList();
+
+        return TypedResults.Ok(new PagedResult<ApiKeyResponse>(items, result.TotalCount));
+    }
+
+    private static async Task<Results<Ok<ApiKeyResponse>, NotFound>> GetByIdAsync(
+        Guid id,
+        IApiKeyAdminStore adminStore,
+        CancellationToken cancellationToken)
+    {
+        ApiKeyEntry? entry = await adminStore.FindByIdAsync(id, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (entry is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(ApiKeyResponse.FromEntry(entry));
+    }
+}

@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using FluentValidation;
+using Granit.Core.Exceptions;
 using Granit.Templating.Endpoints.Dtos;
 using Granit.Templating.Endpoints.Extensions;
 using Granit.Templating.Endpoints.Permissions;
@@ -34,7 +35,7 @@ namespace Granit.Templating.Endpoints.Tests;
 /// </summary>
 public sealed class TemplatingEndpointsTests : IAsyncDisposable
 {
-    private const string Prefix = "/api/v1/templates";
+    private const string Prefix = "/templates";
     private const string ManageRole = "template-admin";
 
     private readonly IDocumentTemplateStoreReader _storeReader = Substitute.For<IDocumentTemplateStoreReader>();
@@ -523,7 +524,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     public async Task DeleteDraft_WhenNoDraftExists_Returns404()
     {
         _storeWriter.DeleteDraftAsync(Arg.Any<TemplateKey>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException("No draft exists for this key."));
+            .ThrowsAsync(new NotFoundException("No draft exists for this key."));
 
         HttpResponseMessage response = await _adminClient.DeleteAsync(
             $"{Prefix}/Billing.Invoice/draft",
@@ -616,7 +617,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
     public async Task Publish_WhenNoDraftExists_Returns404()
     {
         _storeWriter.PublishAsync(Arg.Any<TemplateKey>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException("Cannot publish: no draft exists."));
+            .ThrowsAsync(new NotFoundException("Cannot publish: no draft exists."));
 
         HttpResponseMessage response = await _adminClient.PostAsync(
             $"{Prefix}/Billing.Invoice/publish",
@@ -1073,18 +1074,18 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
         await using WebApplication app = builder.Build();
         app.MapGranitTemplatingAdmin(opts =>
         {
-            opts.RoutePrefix = "templates";
+            opts.RoutePrefix = "custom-templates";
         });
         await app.StartAsync(TestContext.Current.CancellationToken);
 
         using HttpClient client = BuildClient(app, ManageRole);
 
         HttpResponseMessage notFound = await client.GetAsync(
-            Prefix,
+            "/templates",
             TestContext.Current.CancellationToken);
 
         HttpResponseMessage ok = await client.GetAsync(
-            "/templates",
+            "/custom-templates",
             TestContext.Current.CancellationToken);
 
         notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);

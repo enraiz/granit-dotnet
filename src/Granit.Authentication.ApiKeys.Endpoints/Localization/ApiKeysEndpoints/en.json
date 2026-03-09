@@ -1,0 +1,11 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:ApiKeys": "API Keys",
+    "Permission:ApiKeys.Keys.Read": "View API keys (list, details)",
+    "Permission:ApiKeys.Keys.Create": "Create new API keys",
+    "Permission:ApiKeys.Keys.Revoke": "Revoke API keys",
+    "Permission:ApiKeys.Keys.Rotate": "Rotate API keys (revoke and replace)",
+    "Permission:ApiKeys.Keys.UpdateScopes": "Update API key permissions and CIDR scopes"
+  }
+}

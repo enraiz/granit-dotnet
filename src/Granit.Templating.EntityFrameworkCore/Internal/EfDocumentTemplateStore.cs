@@ -1,3 +1,4 @@
+using Granit.Core.Exceptions;
 using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
@@ -114,7 +115,7 @@ internal sealed class EfDocumentTemplateStore(
 
         if (draft is null)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 $"Cannot publish template '{key.Name}' (culture: {key.Culture ?? "neutral"}): no draft exists.");
         }
 
@@ -209,7 +210,7 @@ internal sealed class EfDocumentTemplateStore(
 
         if (draft is null)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 $"Cannot delete draft for template '{key.Name}' (culture: {key.Culture ?? "neutral"}): no draft exists.");
         }
 

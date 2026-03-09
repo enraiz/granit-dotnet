@@ -1,0 +1,11 @@
+{
+  "culture": "nl",
+  "texts": {
+    "PermissionGroup:ApiKeys": "API-sleutels",
+    "Permission:ApiKeys.Keys.Read": "API-sleutels bekijken (lijst, details)",
+    "Permission:ApiKeys.Keys.Create": "Nieuwe API-sleutels aanmaken",
+    "Permission:ApiKeys.Keys.Revoke": "API-sleutels intrekken",
+    "Permission:ApiKeys.Keys.Rotate": "API-sleutels roteren (intrekken en vervangen)",
+    "Permission:ApiKeys.Keys.UpdateScopes": "Rechten en CIDR-bereiken van API-sleutels bijwerken"
+  }
+}

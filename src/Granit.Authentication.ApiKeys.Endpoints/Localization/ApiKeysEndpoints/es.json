@@ -1,0 +1,11 @@
+{
+  "culture": "es",
+  "texts": {
+    "PermissionGroup:ApiKeys": "Claves API",
+    "Permission:ApiKeys.Keys.Read": "Ver claves API (lista, detalles)",
+    "Permission:ApiKeys.Keys.Create": "Crear nuevas claves API",
+    "Permission:ApiKeys.Keys.Revoke": "Revocar claves API",
+    "Permission:ApiKeys.Keys.Rotate": "Rotar claves API (revocar y reemplazar)",
+    "Permission:ApiKeys.Keys.UpdateScopes": "Actualizar permisos y rangos CIDR de las claves API"
+  }
+}
