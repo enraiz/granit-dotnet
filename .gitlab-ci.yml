@@ -69,7 +69,7 @@ default:
 # rebuild complet si le job tourne sur un runner différent du build)
 .ensure-build:
   script:
-    - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true -p:RunAnalyzers=false -p:EnforceCodeStyleInBuild=false
+    - dotnet build -c $CONFIGURATION -m:4 -p:SkipIntegrationTests=true -p:RunAnalyzers=false -p:EnforceCodeStyleInBuild=false
 
 # ---------------------------------------------------------------------------
 # BUILD (compilation unique, bin/obj préservés via GIT_CLEAN_FLAGS)
@@ -80,7 +80,7 @@ build:
   stage: build
   script:
     - dotnet restore
-    - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true
+    - dotnet build -c $CONFIGURATION --no-restore -m:4 -p:SkipIntegrationTests=true
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
