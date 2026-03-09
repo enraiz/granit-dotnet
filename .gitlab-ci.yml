@@ -3,7 +3,8 @@
 # =============================================================================
 # Pipeline : build -> quality -> security -> analysis -> pack -> publish
 #
-# Le stage build compile une seule fois et partage bin/obj via artifacts.
+# Le stage build compile une seule fois. Les bin/obj sont préservés entre
+# les jobs via GIT_CLEAN_FLAGS (même runner Docker, même workspace).
 # Le cache NuGet est persisté via un volume Docker (/srv/nuget-cache)
 # monté dans config.toml, ce qui élimine l'archivage/extraction GitLab.
 #
@@ -38,6 +39,9 @@ variables:
   # Volume Docker monté via config.toml (/srv/nuget-cache:/nuget-cache)
   # Élimine l'archivage/extraction du cache GitLab (~10K fichiers)
   NUGET_PACKAGES: '/nuget-cache'
+  # Préserver bin/obj entre les jobs (même runner, même workspace Docker)
+  # Évite les artifacts trop volumineux (~38K fichiers, >100 MB)
+  GIT_CLEAN_FLAGS: "-ffdx -e bin/ -e obj/"
 
 stages:
   - build
@@ -61,8 +65,14 @@ default:
   tags:
     - docker
 
+# Build incrémental sans analyzers (rapide si bin/obj déjà présents via GIT_CLEAN_FLAGS,
+# rebuild complet si le job tourne sur un runner différent du build)
+.ensure-build:
+  script:
+    - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true -p:RunAnalyzers=false -p:EnforceCodeStyleInBuild=false
+
 # ---------------------------------------------------------------------------
-# BUILD (compilation unique, partagée via artifacts)
+# BUILD (compilation unique, bin/obj préservés via GIT_CLEAN_FLAGS)
 # ---------------------------------------------------------------------------
 
 build:
@@ -71,13 +81,6 @@ build:
   script:
     - dotnet restore
     - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true
-  artifacts:
-    paths:
-      - "**/bin/"
-      - "**/obj/"
-    exclude:
-      - ".nuget/**"
-    expire_in: 1 hour
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -93,8 +96,9 @@ format:
   stage: quality
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
+    - !reference [.ensure-build, script]
     - dotnet format --verify-no-changes --no-restore
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -107,7 +111,7 @@ test:
   timeout: 15m
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   variables:
     VSTEST_CONNECTION_TIMEOUT: "300"
     XUNIT_LAUNCH_TIMEOUT: "300"
@@ -115,6 +119,7 @@ test:
     - echo "=== CPU diagnostics ==="
     - nproc
     - cat /sys/fs/cgroup/cpu.max 2>/dev/null || cat /sys/fs/cgroup/cpu/cpu.cfs_quota_us /sys/fs/cgroup/cpu/cpu.cfs_period_us 2>/dev/null || echo "cgroup info unavailable"
+    - !reference [.ensure-build, script]
     - >
       dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
@@ -140,7 +145,7 @@ integration-test:
   stage: quality
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   services:
     - name: postgres:18
       alias: postgres
@@ -157,6 +162,7 @@ integration-test:
     POSTGRES_USER: granit_test
     POSTGRES_PASSWORD: test_password
   script:
+    - dotnet build -c $CONFIGURATION -p:RunAnalyzers=false -p:EnforceCodeStyleInBuild=false
     - |
       for proj in tests/*.Tests.Integration/*.Tests.Integration.csproj; do
         dotnet test "$proj" -c $CONFIGURATION --no-build \
@@ -287,8 +293,9 @@ audit:nuget:
   stage: analysis
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
+    - !reference [.ensure-build, script]
     - dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
     - '! grep -q "has the following vulnerable packages" vulnerability-report.txt'
   artifacts:
@@ -311,8 +318,9 @@ docfx:
   stage: docs
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
+    - !reference [.ensure-build, script]
     - dotnet tool install -g docfx
     - export PATH="$PATH:$HOME/.dotnet/tools"
     - docfx metadata docfx.json
@@ -322,7 +330,6 @@ docfx:
       - _site/
     expire_in: 1 week
   rules:
-    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
   allow_failure: true
 
@@ -352,7 +359,7 @@ pack:
   stage: pack
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   script:
     - |
       if [ -n "$CI_COMMIT_TAG" ]; then
@@ -360,6 +367,7 @@ pack:
       else
         VERSION="0.1.0-dev.${CI_PIPELINE_IID}"
       fi
+    - !reference [.ensure-build, script]
     - dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=$VERSION -o ./nupkgs
   artifacts:
     paths:
