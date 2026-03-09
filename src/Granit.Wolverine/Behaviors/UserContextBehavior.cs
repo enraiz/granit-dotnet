@@ -31,6 +31,7 @@ public sealed class UserContextBehavior(IWolverineUserContextSetter setter)
 
     /// <summary>
     /// Activates the user from the <c>X-User-Id</c> header before the handler runs.
+    /// Also restores <c>X-Actor-Kind</c> and <c>X-Api-Key-Id</c> if present.
     /// </summary>
     /// <param name="envelope">The incoming Wolverine envelope.</param>
     public void Before(Envelope envelope)
@@ -40,7 +41,18 @@ public sealed class UserContextBehavior(IWolverineUserContextSetter setter)
         {
             envelope.Headers.TryGetValue(OutgoingContextMiddleware.UserFirstNameHeader, out string? firstName);
             envelope.Headers.TryGetValue(OutgoingContextMiddleware.UserLastNameHeader, out string? lastName);
-            _scope = setter.Change(userId, firstName, lastName);
+
+            var actorKind = envelope.Headers.TryGetValue(OutgoingContextMiddleware.ActorKindHeader, out string? ak)
+                && Enum.TryParse<Security.ActorKind>(ak, out var parsed)
+                    ? parsed
+                    : Security.ActorKind.User;
+
+            Guid? apiKeyId = envelope.Headers.TryGetValue(OutgoingContextMiddleware.ApiKeyIdHeader, out string? akId)
+                && Guid.TryParse(akId, out var parsedId)
+                    ? parsedId
+                    : null;
+
+            _scope = setter.Change(userId, firstName, lastName, actorKind, apiKeyId);
         }
     }
 

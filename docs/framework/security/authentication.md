@@ -6,14 +6,18 @@ suivant le pattern ABP Framework : abstractions / implémentation générique / 
 ```text
 Granit.Core
       ↑
-Granit.Security                   ← ICurrentUserService (interface seule)
+Granit.Security                   ← ICurrentUserService, ActorKind
       ↑
 Granit.Authentication.JwtBearer   ← JWT Bearer générique, CurrentUserService,
       ↑                                  policy "Authenticated"
 Granit.Authentication.Keycloak    ← Claims Keycloak, PostConfigure JWT Bearer,
                                          policy "Admin"
-      (futur)
-Granit.Authentication.Auth0       ← [DependsOn(JwtBearer)]
+
+Granit.Authentication.ApiKeys     ← Clés API M2M (voir api-keys.md)
+      ↑
+Granit.Authentication.ApiKeys.EntityFrameworkCore
+      ↑
+Granit.Authentication.ApiKeys.Endpoints
 ```
 
 ## Packages
@@ -23,6 +27,7 @@ Granit.Authentication.Auth0       ← [DependsOn(JwtBearer)]
 | `Granit.Security` | `ICurrentUserService` (abstraction) | `GranitSecurityModule` |
 | `Granit.Authentication.JwtBearer` | JWT Bearer générique, `CurrentUserService` | `GranitJwtBearerModule` |
 | `Granit.Authentication.Keycloak` | Claims Keycloak, policy `Admin` | `GranitAuthenticationKeycloakModule` |
+| `Granit.Authentication.ApiKeys` | Clés API M2M ([détails](api-keys.md)) | `GranitAuthenticationApiKeysModule` |
 
 ---
 
@@ -464,5 +469,6 @@ public sealed class GranitAuthenticationAuth0Module : GranitModule
 | `Granit.Security` | `Granit.Core` | `Persistence`, `Authorization`, `Wolverine`, `BackgroundJobs`, `Settings`, `Idempotency`, `ApiDocumentation`, `Authentication.JwtBearer` |
 | `Granit.Authentication.JwtBearer` | `Granit.Security` | `Granit.Authentication.Keycloak` |
 | `Granit.Authentication.Keycloak` | `Granit.Authentication.JwtBearer` | Module feuille |
+| `Granit.Authentication.ApiKeys` | `Granit.Security`, `Granit.Timing`, `Granit.Guids` | `Granit.Authentication.ApiKeys.EntityFrameworkCore`, `.Endpoints` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

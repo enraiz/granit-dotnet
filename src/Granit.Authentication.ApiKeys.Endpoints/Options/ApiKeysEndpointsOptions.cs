@@ -1,0 +1,22 @@
+namespace Granit.Authentication.ApiKeys.Endpoints.Options;
+
+/// <summary>
+/// Configuration options for API key management endpoints.
+/// </summary>
+public sealed class ApiKeysEndpointsOptions
+{
+    /// <summary>Configuration section name.</summary>
+    public const string SectionName = "ApiKeysEndpoints";
+
+    /// <summary>Route prefix for API key endpoints. Default: <c>api-keys</c>.</summary>
+    public string RoutePrefix { get; set; } = "api-keys";
+
+    /// <summary>OpenAPI tag name. Default: <c>API Keys</c>.</summary>
+    public string TagName { get; set; } = "API Keys";
+
+    /// <summary>Fallback role required when dynamic permission system is not available.</summary>
+    public string RequiredRole { get; set; } = "granit-apikeys-admin";
+
+    /// <summary>Allowed environments for key creation. Default: <c>live</c>, <c>test</c>, <c>dev</c>.</summary>
+    public IReadOnlyList<string> AllowedEnvironments { get; set; } = ["live", "test", "dev"];
+}

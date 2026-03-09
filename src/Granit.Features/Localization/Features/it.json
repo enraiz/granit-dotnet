@@ -2,6 +2,7 @@
   "culture": "it",
   "texts": {
     "Features:NotEnabled": "La funzionalità '{0}' non è abilitata nel tuo abbonamento attuale.",
-    "Features:LimitExceeded": "Il limite per la funzionalità '{0}' è stato raggiunto ({1}/{2}). Aggiorna il tuo abbonamento per aumentare questo limite."
+    "Features:LimitExceeded": "Il limite per la funzionalità '{0}' è stato raggiunto ({1}/{2}). Aggiorna il tuo abbonamento per aumentare questo limite.",
+    "Features:InvalidValue": "Valore non valido '{0}' per la funzionalità '{1}': {2}"
   }
 }

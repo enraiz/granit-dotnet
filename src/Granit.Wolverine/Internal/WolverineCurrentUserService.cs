@@ -35,17 +35,28 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
     private static readonly AsyncLocal<string?> _overrideUserId = new();
     private static readonly AsyncLocal<string?> _overrideFirstName = new();
     private static readonly AsyncLocal<string?> _overrideLastName = new();
+    private static readonly AsyncLocal<ActorKind?> _overrideActorKind = new();
+    private static readonly AsyncLocal<Guid?> _overrideApiKeyId = new();
 
     /// <inheritdoc/>
-    public IDisposable Change(string? userId, string? firstName = null, string? lastName = null)
+    public IDisposable Change(
+        string? userId,
+        string? firstName = null,
+        string? lastName = null,
+        ActorKind actorKind = ActorKind.User,
+        Guid? apiKeyId = null)
     {
         string? previousUserId = _overrideUserId.Value;
         string? previousFirstName = _overrideFirstName.Value;
         string? previousLastName = _overrideLastName.Value;
+        ActorKind? previousActorKind = _overrideActorKind.Value;
+        Guid? previousApiKeyId = _overrideApiKeyId.Value;
         _overrideUserId.Value = userId;
         _overrideFirstName.Value = firstName;
         _overrideLastName.Value = lastName;
-        return new UserScope(previousUserId, previousFirstName, previousLastName);
+        _overrideActorKind.Value = actorKind;
+        _overrideApiKeyId.Value = apiKeyId;
+        return new UserScope(previousUserId, previousFirstName, previousLastName, previousActorKind, previousApiKeyId);
     }
 
     private ClaimsPrincipal? HttpUser => httpContextAccessor.HttpContext?.User;
@@ -96,10 +107,29 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
     public bool IsInRole(string role) =>
         _overrideUserId.Value == null && (HttpUser?.IsInRole(role) ?? false);
 
+    /// <inheritdoc/>
+    public ActorKind ActorKind =>
+        _overrideActorKind.Value
+        ?? (HttpUser?.FindFirstValue("actor_kind") is { } ak && Enum.TryParse<ActorKind>(ak, out var parsed)
+            ? parsed
+            : ActorKind.User);
+
+    /// <inheritdoc/>
+    public bool IsMachine => ActorKind is not ActorKind.User;
+
+    /// <inheritdoc/>
+    public Guid? ApiKeyId =>
+        _overrideApiKeyId.Value
+        ?? (HttpUser?.FindFirstValue("api_key_id") is { } id && Guid.TryParse(id, out var parsed)
+            ? parsed
+            : null);
+
     private sealed class UserScope(
         string? previousUserId,
         string? previousFirstName,
-        string? previousLastName) : IDisposable
+        string? previousLastName,
+        ActorKind? previousActorKind,
+        Guid? previousApiKeyId) : IDisposable
     {
         private bool _disposed;
 
@@ -111,6 +141,8 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
                 _overrideUserId.Value = previousUserId;
                 _overrideFirstName.Value = previousFirstName;
                 _overrideLastName.Value = previousLastName;
+                _overrideActorKind.Value = previousActorKind;
+                _overrideApiKeyId.Value = previousApiKeyId;
             }
         }
     }

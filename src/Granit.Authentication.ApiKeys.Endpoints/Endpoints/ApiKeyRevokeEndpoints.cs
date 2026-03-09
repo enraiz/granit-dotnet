@@ -1,0 +1,39 @@
+using Granit.Timing;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
+
+namespace Granit.Authentication.ApiKeys.Endpoints.Endpoints;
+
+/// <summary>
+/// Endpoint for revoking API keys.
+/// </summary>
+internal static class ApiKeyRevokeEndpoints
+{
+    internal static RouteGroupBuilder MapRevokeEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapPost("/{id:guid}/revoke", RevokeAsync)
+            .WithName("RevokeApiKey")
+            .WithSummary("Revokes an API key. The key will no longer be accepted for authentication.");
+
+        return group;
+    }
+
+    private static async Task<Results<NoContent, NotFound>> RevokeAsync(
+        Guid id,
+        IApiKeyAdminStore adminStore,
+        IClock clock,
+        CancellationToken cancellationToken)
+    {
+        bool revoked = await adminStore.RevokeAsync(id, clock.Now, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!revoked)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.NoContent();
+    }
+}
