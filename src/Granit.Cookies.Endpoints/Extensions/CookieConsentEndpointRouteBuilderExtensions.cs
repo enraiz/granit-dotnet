@@ -1,7 +1,7 @@
 using Granit.Cookies.Endpoints.Dtos;
-using Granit.Core.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.Cookies.Endpoints.Extensions;
@@ -25,15 +25,26 @@ public static class CookieConsentEndpointRouteBuilderExtensions
 
         string prefix = BuildRoutePrefix(options);
 
-        return endpoints.MapGranitModuleConfig<CookieConsentConfigProvider, CookieConsentConfigResponse>(
-            prefix, "GetCookieConsentConfig", options.TagName,
-            route => route
-                .AllowAnonymous()
-                .AddEndpointFilter(async (context, next) =>
-                {
-                    context.HttpContext.Response.Headers.CacheControl = "public, max-age=3600";
-                    return await next(context).ConfigureAwait(false);
-                }));
+        endpoints
+            .MapGet($"{prefix}/config", HandleGetConfig)
+            .AllowAnonymous()
+            .WithName("GetCookieConsentConfig")
+            .WithTags(options.TagName)
+            .WithSummary("Returns the cookie consent configuration for CMP setup.")
+            .Produces<CookieConsentConfigResponse>();
+
+        return endpoints;
+    }
+
+    private static Ok<CookieConsentConfigResponse> HandleGetConfig(
+        ICookieRegistry cookieRegistry,
+        IThirdPartyServiceRegistry serviceRegistry,
+        HttpContext context)
+    {
+        context.Response.Headers.CacheControl = "public, max-age=3600";
+
+        CookieConsentConfigProvider provider = new(cookieRegistry, serviceRegistry);
+        return TypedResults.Ok(provider.GetConfig());
     }
 
     private static string BuildRoutePrefix(CookieConsentEndpointsOptions options)
