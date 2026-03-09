@@ -207,11 +207,11 @@ public sealed class AppDbContext : DbContext, IWorkflowDbContext
 | --- | --- | --- |
 | `GET` | `/workflow/{entityType}/{entityId}/history` | Piste d'audit des transitions |
 
-Le préfixe par défaut est `workflow`. Avec `ApiPrefix = "api/v1"`, la route
-devient `/api/v1/workflow/{entityType}/{entityId}/history`.
+Le préfixe par défaut est `workflow`. Le versioning (`/api/v1/…`) est hérité
+du groupe de routes parent (`MapGroup("api/v{version:apiVersion}")`) dans `Program.cs`.
 
 ```csharp
-app.MapWorkflowEndpoints(opts => opts.ApiPrefix = "api/v1");
+app.MapWorkflowEndpoints();
 ```
 
 ## Composant React

@@ -11,12 +11,6 @@ public sealed class AuthorizationEndpointsOptions
     public const string SectionName = "AuthorizationEndpoints";
 
     /// <summary>
-    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
-    /// (e.g., <c>"api/v1"</c>). Empty by default (no prefix).
-    /// </summary>
-    public string ApiPrefix { get; set; } = string.Empty;
-
-    /// <summary>
     /// Route prefix for all authorization endpoints.
     /// Default: <c>"auth"</c>.
     /// </summary>

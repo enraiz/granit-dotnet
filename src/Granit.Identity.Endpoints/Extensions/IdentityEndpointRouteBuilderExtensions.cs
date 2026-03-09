@@ -39,10 +39,6 @@ public static class IdentityEndpointRouteBuilderExtensions
         IdentityEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
-
         // Register fallback authorization policies
         IOptions<AuthorizationOptions>? authOptions =
             endpoints.ServiceProvider.GetService<IOptions<AuthorizationOptions>>();
@@ -58,7 +54,7 @@ public static class IdentityEndpointRouteBuilderExtensions
             policy => policy.RequireRole(options.RequiredRole));
 
         RouteGroupBuilder group = endpoints
-            .MapGroup(prefix)
+            .MapGroup(options.RoutePrefix)
             .WithTags(options.TagName);
 
         // Read endpoints (list, get, batch)
@@ -82,8 +78,7 @@ public static class IdentityEndpointRouteBuilderExtensions
             .MapRgpdEndpoints();
 
         // Webhook endpoint (outside the authorized group — uses signature validation)
-        endpoints.MapWebhookEndpoint(
-            string.IsNullOrEmpty(options.ApiPrefix) ? "" : options.ApiPrefix);
+        endpoints.MapWebhookEndpoint("");
 
         return group;
     }

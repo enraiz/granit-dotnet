@@ -17,7 +17,7 @@ using Xunit;
 namespace Granit.DataExchange.Endpoints.Tests;
 
 /// <summary>
-/// Integration tests for custom options (ApiPrefix, RequiredRole).
+/// Integration tests for custom options (RequiredRole).
 /// </summary>
 public sealed class ImportOptionsEndpointsTests
 {
@@ -48,46 +48,6 @@ public sealed class ImportOptionsEndpointsTests
         // Assert — ops client can access (even if 404), admin client is forbidden
         opsResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         adminResponse.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
-    }
-
-    [Fact]
-    public async Task MapDataExchangeEndpoints_WithApiPrefix_RespondsOnPrefixedRoute()
-    {
-        // Arrange — separate app with ApiPrefix, mock a job so GET returns 200
-        IImportJobReader jobStore = Substitute.For<IImportJobReader>();
-        var jobId = Guid.NewGuid();
-        ImportJob job = new()
-        {
-            Id = jobId,
-            DefinitionName = "Test.Import",
-            EntityTypeName = "Object",
-            OriginalFileName = "test.csv",
-            MimeType = "text/csv",
-            FileSizeBytes = 100,
-            BlobReference = "blob-ref-1",
-            Status = ImportJobStatus.Created,
-            CreatedAt = DateTimeOffset.UtcNow,
-        };
-        jobStore.GetAsync(jobId, Arg.Any<CancellationToken>()).Returns(job);
-
-        await using WebApplication prefixedApp = BuildApp(jobStore);
-        prefixedApp.MapDataExchangeEndpoints(opts => opts.ApiPrefix = "api/v1");
-        await prefixedApp.StartAsync(TestContext.Current.CancellationToken);
-
-        using HttpClient client = prefixedApp.GetTestClient();
-        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "granit-data-exchange-admin");
-
-        // Act — default route must not be registered
-        HttpResponseMessage notFound = await client.GetAsync(
-            $"/data-exchange/{jobId}", TestContext.Current.CancellationToken);
-
-        // Act — prefixed route must respond with 200
-        HttpResponseMessage ok = await client.GetAsync(
-            $"/api/v1/data-exchange/{jobId}", TestContext.Current.CancellationToken);
-
-        // Assert
-        notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        ok.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     private static WebApplication BuildApp(IImportJobReader? jobStore = null)

@@ -16,7 +16,7 @@ namespace Granit.Workflow.Endpoints.Tests;
 
 /// <summary>
 /// Verifies that <see cref="WorkflowEndpointRouteBuilderExtensions.MapWorkflowEndpoints"/>
-/// correctly applies route prefix, API prefix, and authorization policy.
+/// correctly applies route prefix and authorization policy.
 /// </summary>
 public sealed class WorkflowEndpointRouteBuilderExtensionsTests
 {
@@ -42,54 +42,6 @@ public sealed class WorkflowEndpointRouteBuilderExtensionsTests
         // Act
         HttpResponseMessage response = await client.GetAsync(
             "/admin/wf/Order/1/history", TestContext.Current.CancellationToken);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    public async Task MapWorkflowEndpoints_with_api_prefix_prepends_prefix()
-    {
-        // Arrange
-        IWorkflowHistoryQuery historyQuery = Substitute.For<IWorkflowHistoryQuery>();
-        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
-
-        await using WebApplication app = BuildApp(historyQuery, opts =>
-        {
-            opts.ApiPrefix = "api/v1";
-            opts.RoutePrefix = "workflow";
-        });
-
-        HttpClient client = BuildAdminClient(app);
-
-        // Act
-        HttpResponseMessage response = await client.GetAsync(
-            "/api/v1/workflow/Order/1/history", TestContext.Current.CancellationToken);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    public async Task MapWorkflowEndpoints_with_api_prefix_trims_slashes()
-    {
-        // Arrange: trailing slash on ApiPrefix, leading slash on RoutePrefix
-        IWorkflowHistoryQuery historyQuery = Substitute.For<IWorkflowHistoryQuery>();
-        historyQuery.GetHistoryAsync("Order", "1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
-
-        await using WebApplication app = BuildApp(historyQuery, opts =>
-        {
-            opts.ApiPrefix = "api/v2/";
-            opts.RoutePrefix = "/workflow";
-        });
-
-        HttpClient client = BuildAdminClient(app);
-
-        // Act
-        HttpResponseMessage response = await client.GetAsync(
-            "/api/v2/workflow/Order/1/history", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);

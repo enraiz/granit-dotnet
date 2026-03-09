@@ -231,40 +231,6 @@ public sealed class LocalizationEndpointTests : IAsyncDisposable
         }
     }
 
-    [Fact]
-    public async Task MapGranitLocalization_WithApiPrefix_RespondsOnPrefixedRoute()
-    {
-        // Arrange
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-        builder.Services.AddGranitLocalization(opts => opts.Resources.Add<TestResource>("fr"));
-
-        WebApplication app = builder.Build();
-        app.MapGranitLocalization(opts => opts.ApiPrefix = "api/v1");
-        await app.StartAsync(TestContext.Current.CancellationToken);
-        HttpClient client = app.GetTestClient();
-
-        try
-        {
-            // Default route (without prefix) must not be registered
-            HttpResponseMessage notFound = await client.GetAsync(
-                "/localization",
-                TestContext.Current.CancellationToken);
-            notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-
-            // Prefixed route must respond
-            HttpResponseMessage ok = await client.GetAsync(
-                "/api/v1/localization",
-                TestContext.Current.CancellationToken);
-            ok.StatusCode.ShouldBe(HttpStatusCode.OK);
-        }
-        finally
-        {
-            client.Dispose();
-            await app.DisposeAsync();
-        }
-    }
-
     public async ValueTask DisposeAsync()
     {
         _client.Dispose();

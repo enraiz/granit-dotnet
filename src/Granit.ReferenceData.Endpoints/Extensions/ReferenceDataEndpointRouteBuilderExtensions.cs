@@ -44,10 +44,6 @@ public static class ReferenceDataEndpointRouteBuilderExtensions
         ReferenceDataEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
-
         // Register the admin authorization policy (role-based fallback)
         if (options.AdminPolicyName is not null)
         {
@@ -61,7 +57,7 @@ public static class ReferenceDataEndpointRouteBuilderExtensions
         string entitySegment = ToKebabCase(typeof(TEntity).Name);
 
         RouteGroupBuilder group = endpoints
-            .MapGroup($"{prefix}/{entitySegment}")
+            .MapGroup($"{options.RoutePrefix}/{entitySegment}")
             .WithTags(options.TagName);
 
         group.MapReadEndpoints<TEntity>();

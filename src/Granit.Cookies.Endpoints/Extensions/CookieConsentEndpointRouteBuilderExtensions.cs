@@ -23,10 +23,8 @@ public static class CookieConsentEndpointRouteBuilderExtensions
         CookieConsentEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = BuildRoutePrefix(options);
-
         endpoints
-            .MapGet($"{prefix}/config", HandleGetConfig)
+            .MapGet($"{options.RoutePrefix}/config", HandleGetConfig)
             .AllowAnonymous()
             .WithName("GetCookieConsentConfig")
             .WithTags(options.TagName)
@@ -47,13 +45,4 @@ public static class CookieConsentEndpointRouteBuilderExtensions
         return TypedResults.Ok(provider.GetConfig());
     }
 
-    private static string BuildRoutePrefix(CookieConsentEndpointsOptions options)
-    {
-        if (string.IsNullOrWhiteSpace(options.ApiPrefix))
-        {
-            return options.RoutePrefix;
-        }
-
-        return $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
-    }
 }

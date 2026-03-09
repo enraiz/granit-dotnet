@@ -119,11 +119,11 @@ builder.Services.AddGranitNotificationsBrevo();
 app.MapGranitNotificationEndpoints();
 ```
 
-Le préfixe par défaut est `notifications`. Pour ajouter un préfixe API :
+Le préfixe par défaut est `notifications`. Le versioning est hérité du groupe
+de routes parent (`MapGroup("api/v{version:apiVersion}")`) dans `Program.cs`.
 
 ```csharp
-app.MapGranitNotificationEndpoints(opts => opts.ApiPrefix = "api/v1");
-// Routes : /api/v1/notifications, /api/v1/notifications/unread/count, etc.
+app.MapGranitNotificationEndpoints();
 ```
 
 ### Configuration minimale

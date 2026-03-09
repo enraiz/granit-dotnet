@@ -57,10 +57,8 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         LocalizationEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = BuildRoutePrefix(options);
-
         endpoints
-            .MapGet(prefix, HandleGetLocalizationAsync)
+            .MapGet(options.RoutePrefix, HandleGetLocalizationAsync)
             .AllowAnonymous()
             .WithName("GetGranitLocalization")
             .WithTags(options.TagName)
@@ -98,10 +96,8 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         LocalizationEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = BuildRoutePrefix(options);
-
         RouteGroupBuilder group = endpoints
-            .MapGroup($"{prefix}/overrides")
+            .MapGroup($"{options.RoutePrefix}/overrides")
             .RequireAuthorization(LocalizationOverridesPermissions.Manage)
             .WithTags(options.TagName);
 
@@ -281,11 +277,6 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
     // -------------------------------------------------------------------------
     // Shared validation helpers
     // -------------------------------------------------------------------------
-
-    private static string BuildRoutePrefix(LocalizationEndpointsOptions options) =>
-        string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
 
     private static IResult StoreNotRegistered() =>
         Results.Problem(

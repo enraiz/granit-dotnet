@@ -6,14 +6,6 @@ namespace Granit.ReferenceData.Endpoints.Tests;
 public sealed class ReferenceDataEndpointsOptionsTests
 {
     [Fact]
-    public void Default_ApiPrefix_Is_Empty()
-    {
-        ReferenceDataEndpointsOptions options = new();
-
-        options.ApiPrefix.ShouldBe(string.Empty);
-    }
-
-    [Fact]
     public void Default_RoutePrefix_Is_ReferenceData()
     {
         ReferenceDataEndpointsOptions options = new();

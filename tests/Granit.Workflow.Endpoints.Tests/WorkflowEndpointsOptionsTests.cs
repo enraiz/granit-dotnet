@@ -13,13 +13,6 @@ public sealed class WorkflowEndpointsOptionsTests
         WorkflowEndpointsOptions.SectionName.ShouldBe("WorkflowEndpoints");
 
     [Fact]
-    public void Default_ApiPrefix_is_empty()
-    {
-        WorkflowEndpointsOptions options = new();
-        options.ApiPrefix.ShouldBe(string.Empty);
-    }
-
-    [Fact]
     public void Default_RoutePrefix_is_workflow()
     {
         WorkflowEndpointsOptions options = new();
@@ -45,13 +38,11 @@ public sealed class WorkflowEndpointsOptionsTests
     {
         WorkflowEndpointsOptions options = new()
         {
-            ApiPrefix = "api/v2",
             RoutePrefix = "wf",
             RequiredRole = "admin",
             TagName = "WF",
         };
 
-        options.ApiPrefix.ShouldBe("api/v2");
         options.RoutePrefix.ShouldBe("wf");
         options.RequiredRole.ShouldBe("admin");
         options.TagName.ShouldBe("WF");

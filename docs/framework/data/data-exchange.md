@@ -469,7 +469,6 @@ app.MapDataExchangeEndpoints();
 // Avec options personnalisées
 app.MapDataExchangeEndpoints(opts =>
 {
-    opts.ApiPrefix = "api/v1";
     opts.RoutePrefix = "imports";
     opts.RequiredRole = "admin";
 });
@@ -512,7 +511,6 @@ app.MapDataExchangeEndpoints(opts =>
 ```json
 {
   "DataExchangeEndpoints": {
-    "ApiPrefix": "",
     "RoutePrefix": "data-exchange",
     "RequiredRole": "granit-data-exchange-admin",
     "TagName": "Data Import"

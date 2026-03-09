@@ -11,12 +11,6 @@ public sealed class DataExchangeEndpointsOptions
     public const string SectionName = "DataExchangeEndpoints";
 
     /// <summary>
-    /// Optional API prefix prepended to <see cref="RoutePrefix"/>
-    /// (e.g., <c>"api/v1"</c>). Empty by default (no prefix).
-    /// </summary>
-    public string ApiPrefix { get; set; } = string.Empty;
-
-    /// <summary>
     /// Route prefix for all data exchange endpoints.
     /// Default: <c>"data-exchange"</c>.
     /// </summary>

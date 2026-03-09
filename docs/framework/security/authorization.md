@@ -406,7 +406,7 @@ dotnet add package Granit.Authorization.Endpoints
 public sealed class AppModule : GranitModule { }
 
 // Program.cs
-app.MapAuthorizationEndpoints(opts => opts.ApiPrefix = "api/v1");
+app.MapAuthorizationEndpoints();
 ```
 
 ### Routes
@@ -454,7 +454,6 @@ enregistré, les clés de localisation sont retournées telles quelles.
 
 | Paramètre | Type | Défaut | Description |
 | --- | --- | --- | --- |
-| `ApiPrefix` | `string` | `""` | Préfixe API global (ex : `api/v1`) |
 | `RoutePrefix` | `string` | `"auth"` | Préfixe de route pour les endpoints |
 | `TagName` | `string` | `"Authorization"` | Tag OpenAPI |
 

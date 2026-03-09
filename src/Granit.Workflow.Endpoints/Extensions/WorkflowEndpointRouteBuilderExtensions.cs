@@ -49,10 +49,6 @@ public static class WorkflowEndpointRouteBuilderExtensions
         WorkflowEndpointsOptions options = new();
         configure?.Invoke(options);
 
-        string prefix = string.IsNullOrEmpty(options.ApiPrefix)
-            ? options.RoutePrefix
-            : $"{options.ApiPrefix.TrimEnd('/')}/{options.RoutePrefix.TrimStart('/')}";
-
         IOptions<AuthorizationOptions>? authOptions =
             endpoints.ServiceProvider.GetService<IOptions<AuthorizationOptions>>();
         authOptions?.Value.AddPolicy(
@@ -60,7 +56,7 @@ public static class WorkflowEndpointRouteBuilderExtensions
             policy => policy.RequireRole(options.RequiredRole));
 
         RouteGroupBuilder group = endpoints
-            .MapGroup(prefix)
+            .MapGroup(options.RoutePrefix)
             .WithTags(options.TagName)
             .RequireAuthorization(WorkflowAuthorizationPolicy.PolicyName);
 

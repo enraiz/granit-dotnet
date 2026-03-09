@@ -64,8 +64,8 @@ var api = app.MapGroup("api/v{version:apiVersion}")
     .WithApiVersionSet(apiVersionSet);
 
 // 3. Enregistrer les endpoints — ils héritent du versioning automatiquement
-api.MapBackgroundJobsEndpoints(opts => opts.ApiPrefix = "");
-api.MapTimelineEndpoints(opts => opts.ApiPrefix = "");
+api.MapBackgroundJobsEndpoints();
+api.MapTimelineEndpoints();
 ```
 
 Tous les endpoints enregistrés sur le groupe `api` héritent automatiquement de la version.

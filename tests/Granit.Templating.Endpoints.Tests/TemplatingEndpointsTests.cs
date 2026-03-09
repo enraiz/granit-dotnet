@@ -1073,7 +1073,6 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
         await using WebApplication app = builder.Build();
         app.MapGranitTemplatingAdmin(opts =>
         {
-            opts.ApiPrefix = "api/v2";
             opts.RoutePrefix = "templates";
         });
         await app.StartAsync(TestContext.Current.CancellationToken);
@@ -1085,7 +1084,7 @@ public sealed class TemplatingEndpointsTests : IAsyncDisposable
             TestContext.Current.CancellationToken);
 
         HttpResponseMessage ok = await client.GetAsync(
-            "/api/v2/templates",
+            "/templates",
             TestContext.Current.CancellationToken);
 
         notFound.StatusCode.ShouldBe(HttpStatusCode.NotFound);

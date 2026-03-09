@@ -38,19 +38,16 @@ permettent de composer l'URL finale :
 
 | Option | Par défaut | Description |
 | --- | --- | --- |
-| `ApiPrefix` | *(vide)* | Préfixe API prépendé au `RoutePrefix` (ex. `api/v1`) |
 | `RoutePrefix` | `localization` | Segment de domaine |
 | `TagName` | `Localization` | Tag OpenAPI |
 
 ```csharp
-// Ajouter un segment de version via ApiPrefix
-app.MapGranitLocalization(opts => opts.ApiPrefix = "api/v1");
-app.MapGranitLocalizationOverrides(opts => opts.ApiPrefix = "api/v1");
+app.MapGranitLocalization();
+app.MapGranitLocalizationOverrides();
 ```
 
-Le préfixe effectif est calculé : `{ApiPrefix}/{RoutePrefix}`. Sans `ApiPrefix`,
-seul le `RoutePrefix` est utilisé. Les deux méthodes acceptent la même option
-indépendamment, ce qui permet de versionner l'un sans l'autre.
+Le versioning (`/api/v1/…`) est hérité du groupe de routes parent
+(`MapGroup("api/v{version:apiVersion}")`) dans `Program.cs`.
 
 ## Endpoint
 
@@ -58,16 +55,10 @@ indépendamment, ce qui permet de versionner l'un sans l'autre.
 GET /{prefix}?cultureName={culture}
 ```
 
-Par défaut (sans `ApiPrefix`) :
+Par défaut :
 
 ```text
 GET /localization?cultureName={culture}
-```
-
-Avec `ApiPrefix = "api/v1"` :
-
-```text
-GET /api/v1/localization?cultureName={culture}
 ```
 
 | Paramètre | Obligatoire | Description |

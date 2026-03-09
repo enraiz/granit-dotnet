@@ -35,19 +35,6 @@ public sealed class MapGranitNotificationEndpointsTests
     }
 
     [Fact]
-    public void MapGranitNotificationEndpoints_WithApiPrefix_ReturnsEndpointRouteBuilder()
-    {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-        WebApplication app = builder.Build();
-
-        IEndpointRouteBuilder result = app.MapGranitNotificationEndpoints(
-            opts => opts.ApiPrefix = "api/v1");
-
-        result.ShouldNotBeNull();
-    }
-
-    [Fact]
     public void MapGranitNotificationEndpoints_WithNullConfigure_DoesNotThrow()
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
