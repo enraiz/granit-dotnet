@@ -1,0 +1,49 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
+
+namespace Granit.Core.Endpoints;
+
+/// <summary>
+/// Extension methods for mapping standardized <c>GET /{module}/config</c> endpoints.
+/// </summary>
+public static class ModuleConfigEndpointExtensions
+{
+    /// <summary>
+    /// Maps a <c>GET /{routePrefix}/config</c> endpoint that returns the module configuration
+    /// from the registered <see cref="IModuleConfigProvider{TResponse}"/>.
+    /// </summary>
+    /// <typeparam name="TProvider">
+    /// The <see cref="IModuleConfigProvider{TResponse}"/> implementation (resolved from DI).
+    /// </typeparam>
+    /// <typeparam name="TResponse">The response DTO type.</typeparam>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="routePrefix">Module route prefix (e.g., <c>"webhooks"</c>, <c>"cookies"</c>).</param>
+    /// <param name="endpointName">
+    /// Unique endpoint name for link generation (e.g., <c>"GetWebhooksConfig"</c>).
+    /// </param>
+    /// <param name="tag">OpenAPI tag (e.g., <c>"Webhooks"</c>).</param>
+    /// <returns>The endpoint route builder for chaining.</returns>
+    public static IEndpointRouteBuilder MapGranitModuleConfig<TProvider, TResponse>(
+        this IEndpointRouteBuilder endpoints,
+        string routePrefix,
+        string endpointName,
+        string tag)
+        where TProvider : class, IModuleConfigProvider<TResponse>
+        where TResponse : class
+    {
+        endpoints
+            .MapGet($"{routePrefix}/config", (TProvider provider) => HandleGetConfig(provider))
+            .WithName(endpointName)
+            .WithTags(tag)
+            .WithSummary($"Returns the current {tag} module configuration.")
+            .Produces<TResponse>();
+
+        return endpoints;
+    }
+
+    private static Ok<TResponse> HandleGetConfig<TResponse>(IModuleConfigProvider<TResponse> provider)
+        where TResponse : class =>
+        TypedResults.Ok(provider.GetConfig());
+}

@@ -8,6 +8,7 @@ using Granit.Webhooks.Exceptions;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Webhooks.Handlers;
 
@@ -41,6 +42,7 @@ public sealed class SendWebhookHandler(
     IHttpClientFactory httpClientFactory,
     IWebhookDeliveryWriter deliveryWriter,
     IWebhookSecretProtector secretProtector,
+    IOptions<WebhooksOptions> options,
     ILogger<SendWebhookHandler> logger,
     IClock clock)
 {
@@ -52,6 +54,7 @@ public sealed class SendWebhookHandler(
     {
         string bodyJson = JsonSerializer.Serialize(command.Envelope);
         string payloadHash = WebhookSignatureService.ComputePayloadHash(bodyJson);
+        string? storedPayload = options.Value.StorePayload ? bodyJson : null;
         DateTimeOffset sentAt = clock.Now;
 
         string plainSecret = await secretProtector.UnprotectAsync(command.SigningSecret, cancellationToken).ConfigureAwait(false);
@@ -85,7 +88,7 @@ public sealed class SendWebhookHandler(
                 command.SubscriptionId, command.DeliveryId);
 
             await deliveryWriter.RecordFailureAsync(
-                command, httpStatusCode: null, stopwatch.ElapsedMilliseconds, timeoutMessage, cancellationToken).ConfigureAwait(false);
+                command, httpStatusCode: null, stopwatch.ElapsedMilliseconds, timeoutMessage, storedPayload, cancellationToken).ConfigureAwait(false);
 
             throw new WebhookDeliveryException(timeoutMessage, ex);
         }
@@ -101,7 +104,7 @@ public sealed class SendWebhookHandler(
 
             await deliveryWriter.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds,
-                $"Non-retriable HTTP {statusCode}", cancellationToken).ConfigureAwait(false);
+                $"Non-retriable HTTP {statusCode}", storedPayload, cancellationToken).ConfigureAwait(false);
 
             if (ShouldSuspend(response.StatusCode))
             {
@@ -123,7 +126,7 @@ public sealed class SendWebhookHandler(
                 statusCode, command.SubscriptionId, command.DeliveryId);
 
             await deliveryWriter.RecordFailureAsync(
-                command, statusCode, stopwatch.ElapsedMilliseconds, retriableMessage, cancellationToken).ConfigureAwait(false);
+                command, statusCode, stopwatch.ElapsedMilliseconds, retriableMessage, storedPayload, cancellationToken).ConfigureAwait(false);
 
             throw new WebhookDeliveryException(retriableMessage);
         }
@@ -134,7 +137,7 @@ public sealed class SendWebhookHandler(
             statusCode, command.SubscriptionId, command.DeliveryId);
 
         await deliveryWriter.RecordSuccessAsync(
-            command, statusCode, stopwatch.ElapsedMilliseconds, payloadHash, cancellationToken).ConfigureAwait(false);
+            command, statusCode, stopwatch.ElapsedMilliseconds, payloadHash, storedPayload, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

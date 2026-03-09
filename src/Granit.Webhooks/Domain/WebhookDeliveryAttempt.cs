@@ -67,4 +67,14 @@ public sealed class WebhookDeliveryAttempt : Entity
 
     /// <summary>Whether this attempt resulted in a 2xx HTTP response.</summary>
     public bool IsSuccess { get; set; }
+
+    /// <summary>
+    /// Serialized JSON body of the <see cref="Messages.WebhookEnvelope"/> sent to the subscriber.
+    /// <c>null</c> when <see cref="WebhooksOptions.StorePayload"/> is <c>false</c> (default).
+    /// </summary>
+    /// <remarks>
+    /// When stored, this field contains health data in clear text. Encryption at rest
+    /// must be enabled on the database and RGPD validation by the DPO is required.
+    /// </remarks>
+    public string? Payload { get; set; }
 }

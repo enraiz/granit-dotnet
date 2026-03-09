@@ -7,20 +7,32 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Webhooks.EntityFrameworkCore;
 
 /// <summary>
-/// EF Core implementation of <see cref="IWebhookDeliveryWriter"/> backed by PostgreSQL.
+/// EF Core implementation of <see cref="IWebhookDeliveryWriter"/> and <see cref="IWebhookDeliveryReader"/>
+/// backed by PostgreSQL.
 /// </summary>
 /// <remarks>
 /// HDS compliance: <see cref="WebhookDeliveryAttempt"/> records are INSERT-only.
 /// This store never updates or deletes them.
 /// </remarks>
 internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext> contextFactory, IClock clock)
-    : IWebhookDeliveryWriter
+    : IWebhookDeliveryWriter, IWebhookDeliveryReader
 {
+    public async Task<WebhookDeliveryAttempt?> FindByDeliveryIdAsync(
+        Guid deliveryId,
+        CancellationToken cancellationToken = default)
+    {
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.WebhookDeliveryAttempts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.DeliveryId == deliveryId, cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task RecordSuccessAsync(
         SendWebhookCommand command,
         int httpStatusCode,
         long durationMs,
         string payloadHash,
+        string? payload,
         CancellationToken cancellationToken = default)
     {
         await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
@@ -35,6 +47,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
             TargetUrl = command.TargetUrl,
             HttpStatusCode = httpStatusCode,
             PayloadHash = payloadHash,
+            Payload = payload,
             OccurredAt = clock.Now,
             DurationMs = durationMs,
             IsSuccess = true,
@@ -57,6 +70,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
         int? httpStatusCode,
         long durationMs,
         string errorMessage,
+        string? payload,
         CancellationToken cancellationToken = default)
     {
         await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
@@ -71,6 +85,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
             TargetUrl = command.TargetUrl,
             HttpStatusCode = httpStatusCode,
             PayloadHash = string.Empty,
+            Payload = payload,
             OccurredAt = clock.Now,
             DurationMs = durationMs,
             ErrorMessage = errorMessage.Length > 2000 ? errorMessage[..2000] : errorMessage,

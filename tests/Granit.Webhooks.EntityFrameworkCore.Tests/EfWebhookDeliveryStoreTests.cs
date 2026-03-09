@@ -42,7 +42,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
         SendWebhookCommand command = BuildCommand();
 
         // Act
-        await _sut.RecordSuccessAsync(command, 200, 42, "abc123", TestContext.Current.CancellationToken);
+        await _sut.RecordSuccessAsync(command, 200, 42, "abc123", null, TestContext.Current.CancellationToken);
 
         // Assert
         await using WebhooksDbContext context = new(_options);
@@ -66,7 +66,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
         SendWebhookCommand command = BuildCommand(subscriptionId: subscriptionId);
 
         // Act
-        await _sut.RecordSuccessAsync(command, 200, 10, "hash", TestContext.Current.CancellationToken);
+        await _sut.RecordSuccessAsync(command, 200, 10, "hash", null, TestContext.Current.CancellationToken);
 
         // Assert
         await using WebhooksDbContext context = new(_options);
@@ -84,7 +84,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
 
         // Act & Assert — should not throw
         await Should.NotThrowAsync(async () =>
-            await _sut.RecordSuccessAsync(command, 200, 10, "hash", TestContext.Current.CancellationToken));
+            await _sut.RecordSuccessAsync(command, 200, 10, "hash", null, TestContext.Current.CancellationToken));
 
         await using WebhooksDbContext context = new(_options);
         (await context.WebhookDeliveryAttempts.CountAsync(TestContext.Current.CancellationToken)).ShouldBe(1);
@@ -97,7 +97,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
         SendWebhookCommand command = BuildCommand();
 
         // Act
-        await _sut.RecordFailureAsync(command, 500, 100, "Server Error", TestContext.Current.CancellationToken);
+        await _sut.RecordFailureAsync(command, 500, 100, "Server Error", null, TestContext.Current.CancellationToken);
 
         // Assert
         await using WebhooksDbContext context = new(_options);
@@ -117,7 +117,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
         SendWebhookCommand command = BuildCommand(subscriptionId: subscriptionId);
 
         // Act
-        await _sut.RecordFailureAsync(command, 500, 50, "Error", TestContext.Current.CancellationToken);
+        await _sut.RecordFailureAsync(command, 500, 50, "Error", null, TestContext.Current.CancellationToken);
 
         // Assert
         await using WebhooksDbContext context = new(_options);
@@ -133,7 +133,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
         string longError = new('X', 3000);
 
         // Act
-        await _sut.RecordFailureAsync(command, null, 50, longError, TestContext.Current.CancellationToken);
+        await _sut.RecordFailureAsync(command, null, 50, longError, null, TestContext.Current.CancellationToken);
 
         // Assert
         await using WebhooksDbContext context = new(_options);
@@ -148,7 +148,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
         SendWebhookCommand command = BuildCommand();
 
         // Act
-        await _sut.RecordFailureAsync(command, null, 10000, "Timeout", TestContext.Current.CancellationToken);
+        await _sut.RecordFailureAsync(command, null, 10000, "Timeout", null, TestContext.Current.CancellationToken);
 
         // Assert
         await using WebhooksDbContext context = new(_options);

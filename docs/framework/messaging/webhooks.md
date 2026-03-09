@@ -46,7 +46,8 @@ public sealed class MyAppModule : GranitModule { }
 {
   "Webhooks": {
     "HttpTimeoutSeconds": 10,
-    "MaxParallelDeliveries": 20
+    "MaxParallelDeliveries": 20,
+    "StorePayload": false
   }
 }
 ```
@@ -157,6 +158,11 @@ Wolverine pour investigation manuelle. L'audit trail conserve chaque tentative.
 | --- | --- | --- | --- | --- |
 | `HttpTimeoutSeconds` | `int` | `10` | 5 – 120 | Timeout des requêtes HTTP vers les abonnés |
 | `MaxParallelDeliveries` | `int` | `20` | 1 – 100 | Parallélisme de la queue `webhook-delivery` |
+| `StorePayload` | `bool` | `false` | — | Stocker le body JSON complet dans chaque tentative de livraison |
+
+> **Attention RGPD/HDS :** activer `StorePayload` persiste les données de santé en clair dans
+> la table d'audit. Vérifier que le chiffrement au repos est activé sur la base et que le DPO
+> a validé ce paramétrage avant activation en production.
 
 ## Protection des secrets
 
@@ -205,21 +211,28 @@ public interface IWebhookSubscriptionStoreWriter
 }
 
 // Enregistre les tentatives de livraison (audit trail HDS)
-public interface IWebhookDeliveryStoreWriter
+public interface IWebhookDeliveryWriter
 {
     Task RecordSuccessAsync(SendWebhookCommand command, int httpStatusCode,
-        long durationMs, string payloadHash, CancellationToken cancellationToken = default);
+        long durationMs, string payloadHash, string? payload, CancellationToken cancellationToken = default);
     Task RecordFailureAsync(SendWebhookCommand command, int? httpStatusCode,
-        long durationMs, string errorMessage, CancellationToken cancellationToken = default);
+        long durationMs, string errorMessage, string? payload, CancellationToken cancellationToken = default);
     Task SuspendSubscriptionAsync(Guid subscriptionId, string reason, CancellationToken cancellationToken = default);
+}
+
+// Lecture des tentatives de livraison (redelivery)
+public interface IWebhookDeliveryReader
+{
+    Task<WebhookDeliveryAttempt?> FindByDeliveryIdAsync(Guid deliveryId, CancellationToken cancellationToken = default);
 }
 ```
 
 | Store | `Granit.Webhooks` | `Granit.Webhooks.EntityFrameworkCore` |
 | --- | --- | --- |
-| `IWebhookSubscriptionStoreReader` | `InMemoryWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
-| `IWebhookSubscriptionStoreWriter` | `InMemoryWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
-| `IWebhookDeliveryStoreWriter` | `NullWebhookDeliveryStore` (no-op) | `EfWebhookDeliveryStore` |
+| `IWebhookSubscriptionReader` | `InMemoryWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
+| `IWebhookSubscriptionWriter` | `InMemoryWebhookSubscriptionStore` | `EfWebhookSubscriptionStore` |
+| `IWebhookDeliveryWriter` | `NullWebhookDeliveryWriter` (no-op) | `EfWebhookDeliveryStore` |
+| `IWebhookDeliveryReader` | `NullWebhookDeliveryReader` (no-op) | `EfWebhookDeliveryStore` |
 
 ### Abonnements globaux vs par tenant
 
@@ -267,6 +280,7 @@ Table **INSERT-only** (pas de soft delete, pas de cascade delete) — piste d'au
 | `target_url` | `varchar(2048)` | URL utilisée lors de la tentative |
 | `http_status_code` | `int?` | Code HTTP reçu — null en cas de timeout |
 | `payload_hash` | `char(64)` | SHA-256 hex du payload (non le payload lui-même) |
+| `payload` | `text?` | Body JSON complet — uniquement si `StorePayload = true` |
 | `occurred_at` | `timestamptz` | Date-heure de la tentative |
 | `duration_ms` | `bigint` | Durée en millisecondes |
 | `error_message` | `text?` | Message d'erreur (timeout, exception réseau) |
@@ -284,6 +298,50 @@ Table **INSERT-only** (pas de soft delete, pas de cascade delete) — piste d'au
 2. Sinon → utilise `WebhookTrigger.TenantId` (passé explicitement par l'émetteur)
 
 Cela garantit que le module fonctionne avec ou sans `GranitMultiTenancyModule` installé.
+
+## Redelivery (rejeu manuel)
+
+Lorsque `StorePayload = true`, les tentatives échouées peuvent être rejouées via le service
+`RetryWebhookHandler` ou l'endpoint Minimal API :
+
+```http
+POST /webhooks/deliveries/{deliveryId}/retry
+```
+
+**Règles de validation :**
+
+| Condition | Code HTTP | Raison |
+| --- | --- | --- |
+| Tentative introuvable | 404 | `deliveryId` inconnu dans la base |
+| Tentative réussie | 400 | Pas de rejeu sur une livraison 2xx |
+| Abonnement `Deactivated` | 409 | L'abonnement est définitivement désactivé |
+| Abonnement `Suspended` | 202 | Autorisé — permet de tester la réactivation |
+
+Le rejeu publie un **nouveau** `SendWebhookCommand` dans l'Outbox Wolverine avec un
+nouveau `DeliveryId`. L'`EventId` de l'enveloppe reprend le `DeliveryId` original pour
+permettre la traçabilité.
+
+> **Sans `StorePayload` :** le rejeu est techniquement possible mais le champ `data` de
+> l'enveloppe sera un objet vide `{}` car le payload original n'a pas été persisté.
+
+## Endpoint de configuration
+
+```http
+GET /webhooks/config
+```
+
+Retourne la configuration publique du module :
+
+```json
+{ "storePayload": true }
+```
+
+Enregistrement dans l'application :
+
+```csharp
+app.MapGranitWebhooksConfig();      // GET /webhooks/config
+app.MapGranitWebhooksRedelivery();  // POST /webhooks/deliveries/{id}/retry
+```
 
 ## Conformité HDS
 

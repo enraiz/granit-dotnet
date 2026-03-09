@@ -25,6 +25,18 @@ public sealed class WebhooksOptions
     /// Must be between 1 and 100. Default: 20.
     /// </summary>
     public int MaxParallelDeliveries { get; set; } = 20;
+
+    /// <summary>
+    /// When <c>true</c>, the serialized JSON body of each delivery attempt is persisted
+    /// alongside the <see cref="Domain.WebhookDeliveryAttempt"/> record, enabling manual redelivery.
+    /// Default: <c>false</c> (only the SHA-256 hash is stored — HDS-safe minimum).
+    /// </summary>
+    /// <remarks>
+    /// Enabling this option stores health data in clear text in the audit trail.
+    /// Ensure encryption at rest is configured on the database and that your DPO has validated
+    /// this setting against RGPD data-minimization requirements.
+    /// </remarks>
+    public bool StorePayload { get; set; }
 }
 
 /// <summary>
