@@ -45,7 +45,7 @@ flowchart TD
 
 > **Secrets en production** : les secrets (mots de passe, tokens, clés API) ne sont
 > **jamais** dans les fichiers de configuration. Ils sont injectés via HashiCorp Vault
-> (voir [vault.md](../security/vault.md)) ou via des variables d'environnement sécurisées dans
+> (voir [vault.md](../../security/vault.md)) ou via des variables d'environnement sécurisées dans
 > Kubernetes.
 
 ## Pattern IOptions\<T\>
@@ -354,7 +354,7 @@ les fichiers de configuration. Elles sont injectées depuis Vault via le package
 builder.Services.AddGranitVault();
 ```
 
-Voir [vault.md](../security/vault.md) pour le détail de l'intégration Vault.
+Voir [vault.md](../../security/vault.md) pour le détail de l'intégration Vault.
 
 ## Bonnes pratiques
 
@@ -385,5 +385,5 @@ dynamiques stockés en base de données). Les raisons :
 | Complexité | Faible | Élevée |
 
 Pour les paramètres dynamiques par tenant ou par utilisateur, utiliser le package
-`Granit.MultiTenancy` (voir [multi-tenancy.md](../data/multi-tenancy.md)) et une table de
+`Granit.MultiTenancy` (voir [multi-tenancy.md](../../data/multi-tenancy.md)) et une table de
 configuration dédiée dans la base de données applicative.
