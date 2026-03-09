@@ -3,11 +3,9 @@
 # =============================================================================
 # Pipeline : build -> quality -> security -> analysis -> pack -> publish
 #
-# Le stage build valide la compilation.
+# Le stage build compile une seule fois et partage bin/obj via artifacts.
 # Le cache NuGet est persisté via un volume Docker (/srv/nuget-cache)
 # monté dans config.toml, ce qui élimine l'archivage/extraction GitLab.
-# Les artifacts bin/obj sont trop volumineux (~20K fichiers, >500 MB)
-# pour être partagés via artifacts GitLab. Chaque job rebuild.
 #
 # Les packages NuGet sont publiés sur GitLab Package Registry.
 # Publication automatique sur tag vX.Y.Z sur main.
@@ -64,7 +62,7 @@ default:
     - docker
 
 # ---------------------------------------------------------------------------
-# BUILD (validation + cache NuGet warm-up)
+# BUILD (compilation unique, partagée via artifacts)
 # ---------------------------------------------------------------------------
 
 build:
@@ -73,6 +71,13 @@ build:
   script:
     - dotnet restore
     - dotnet build -c $CONFIGURATION --no-restore -p:SkipIntegrationTests=true
+  artifacts:
+    paths:
+      - "**/bin/"
+      - "**/obj/"
+    exclude:
+      - ".nuget/**"
+    expire_in: 1 hour
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -88,9 +93,8 @@ format:
   stage: quality
   needs:
     - job: build
-      artifacts: false
+      artifacts: true
   script:
-    - dotnet restore
     - dotnet format --verify-no-changes --no-restore
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -102,7 +106,7 @@ test:
   stage: quality
   needs:
     - job: build
-      artifacts: false
+      artifacts: true
   variables:
     VSTEST_CONNECTION_TIMEOUT: "300"
     XUNIT_LAUNCH_TIMEOUT: "300"
@@ -110,7 +114,6 @@ test:
     - echo "=== CPU diagnostics ==="
     - nproc
     - cat /sys/fs/cgroup/cpu.max 2>/dev/null || cat /sys/fs/cgroup/cpu/cpu.cfs_quota_us /sys/fs/cgroup/cpu/cpu.cfs_period_us 2>/dev/null || echo "cgroup info unavailable"
-    - dotnet build -c $CONFIGURATION -p:SkipIntegrationTests=true
     - >
       dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
@@ -136,7 +139,7 @@ integration-test:
   stage: quality
   needs:
     - job: build
-      artifacts: false
+      artifacts: true
   services:
     - name: postgres:18
       alias: postgres
@@ -153,12 +156,11 @@ integration-test:
     POSTGRES_USER: granit_test
     POSTGRES_PASSWORD: test_password
   script:
-    - dotnet build -c $CONFIGURATION
     - |
       for proj in tests/*.Tests.Integration/*.Tests.Integration.csproj; do
         dotnet test "$proj" -c $CONFIGURATION --no-build \
           --logger "junit;LogFilePath=TestResults/results.xml" \
-          --collect:"XPlat Code Coverage;Format=opencover,cobertura"
+          -p:CollectCoverage=true
       done
   artifacts:
     when: always
@@ -284,9 +286,8 @@ audit:nuget:
   stage: analysis
   needs:
     - job: build
-      artifacts: false
+      artifacts: true
   script:
-    - dotnet restore
     - dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
     - '! grep -q "has the following vulnerable packages" vulnerability-report.txt'
   artifacts:
@@ -309,11 +310,10 @@ docfx:
   stage: docs
   needs:
     - job: build
-      artifacts: false
+      artifacts: true
   script:
     - dotnet tool install -g docfx
     - export PATH="$PATH:$HOME/.dotnet/tools"
-    - dotnet restore
     - docfx metadata docfx.json
     - docfx build docfx.json
   artifacts:
@@ -351,7 +351,7 @@ pack:
   stage: pack
   needs:
     - job: build
-      artifacts: false
+      artifacts: true
   script:
     - |
       if [ -n "$CI_COMMIT_TAG" ]; then
@@ -359,7 +359,6 @@ pack:
       else
         VERSION="0.1.0-dev.${CI_PIPELINE_IID}"
       fi
-    - dotnet build -c $CONFIGURATION
     - dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=$VERSION -o ./nupkgs
   artifacts:
     paths:
