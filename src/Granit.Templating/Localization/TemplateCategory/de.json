@@ -1,0 +1,7 @@
+{
+  "culture": "de",
+  "texts": {
+    "TemplateCategory:DuplicateName": "Eine Kategorie mit dem Namen '{0}' existiert bereits.",
+    "TemplateCategory:HasTemplates": "Die Kategorie kann nicht gelöscht werden: {0} Vorlage(n) sind noch zugeordnet."
+  }
+}

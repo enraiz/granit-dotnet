@@ -1,0 +1,6 @@
+{
+  "culture": "pt",
+  "texts": {
+    "Template:TransitionDenied": "A transição do ciclo de vida do modelo de '{0}' para '{1}' foi recusada."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "culture": "es",
+  "texts": {
+    "Template:TransitionDenied": "La transición del ciclo de vida de la plantilla de '{0}' a '{1}' fue denegada."
+  }
+}

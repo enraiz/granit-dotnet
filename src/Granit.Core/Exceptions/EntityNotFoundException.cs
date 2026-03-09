@@ -5,9 +5,16 @@ namespace Granit.Core.Exceptions;
 /// Maps to <c>404 Not Found</c>.
 /// </summary>
 /// <remarks>
-/// Implements <see cref="IUserFriendlyException"/>: the generated message is safe for clients.
+/// <para>
+/// Implements <see cref="IUserFriendlyException"/>: the client-facing message is a generic
+/// "The requested resource was not found." to avoid leaking entity type names or identifiers.
+/// Entity details are preserved in <see cref="EntityType"/> and <see cref="EntityId"/>
+/// properties and in the <see cref="ToString"/> output (used by the logger).
+/// </para>
+/// <para>
 /// Does NOT implement <see cref="IHasErrorCode"/> intentionally: entity type names and identifiers
 /// must not be used as localizable keys, as they may inadvertently leak schema information.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -28,9 +35,19 @@ public class EntityNotFoundException : Exception, IUserFriendlyException
     /// <param name="entityType">CLR type of the missing entity.</param>
     /// <param name="id">Identifier used in the lookup.</param>
     public EntityNotFoundException(Type entityType, object id)
-        : base($"Entity '{entityType.Name}' with id '{id}' was not found.")
+        : base("The requested resource was not found.")
     {
         EntityType = entityType;
         EntityId = id;
     }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Includes entity type and identifier for diagnostic logging.
+    /// This output is logged by <c>GranitExceptionHandler</c> but never exposed to clients.
+    /// </remarks>
+    public override string ToString() =>
+        $"{GetType().FullName}: Entity '{EntityType.Name}' with id '{EntityId}' was not found." +
+        (InnerException is not null ? $"\r\n ---> {InnerException}" : string.Empty) +
+        $"\r\n{StackTrace}";
 }

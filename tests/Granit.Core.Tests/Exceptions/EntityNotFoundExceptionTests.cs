@@ -3,7 +3,7 @@
 // =============================================================================
 // Verifies:
 //   - Constructor stores EntityType and EntityId
-//   - Message includes entity type name and id
+//   - Message is generic (does not leak entity type name or id)
 //   - Implements IUserFriendlyException
 //   - Does NOT implement IHasErrorCode (by design — entity names must not leak as error keys)
 // =============================================================================
@@ -40,20 +40,23 @@ public sealed class EntityNotFoundExceptionTests
     }
 
     [Fact]
-    public void Constructor_MessageContainsEntityTypeName()
+    public void Constructor_MessageIsGeneric()
     {
         EntityNotFoundException exception = new(typeof(Appointment), 42);
 
-        exception.Message.ShouldContain("Appointment");
+        exception.Message.ShouldBe("The requested resource was not found.");
+        exception.Message.ShouldNotContain("Appointment");
     }
 
     [Fact]
-    public void Constructor_MessageContainsEntityId()
+    public void ToString_ContainsEntityTypeAndId()
     {
         var id = Guid.NewGuid();
         EntityNotFoundException exception = new(typeof(Appointment), id);
 
-        exception.Message.ShouldContain(id.ToString());
+        string diagnostic = exception.ToString();
+        diagnostic.ShouldContain("Appointment");
+        diagnostic.ShouldContain(id.ToString());
     }
 
     // -------------------------------------------------------------------------

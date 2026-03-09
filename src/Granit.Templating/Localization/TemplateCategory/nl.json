@@ -1,0 +1,7 @@
+{
+  "culture": "nl",
+  "texts": {
+    "TemplateCategory:DuplicateName": "Er bestaat al een categorie met de naam '{0}'.",
+    "TemplateCategory:HasTemplates": "De categorie kan niet worden verwijderd: {0} sjablo(o)n(en) zijn nog gekoppeld."
+  }
+}

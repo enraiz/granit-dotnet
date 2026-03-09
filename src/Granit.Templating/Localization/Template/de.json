@@ -1,0 +1,6 @@
+{
+  "culture": "de",
+  "texts": {
+    "Template:TransitionDenied": "Der Lebenszyklusübergang der Vorlage von '{0}' nach '{1}' wurde abgelehnt."
+  }
+}

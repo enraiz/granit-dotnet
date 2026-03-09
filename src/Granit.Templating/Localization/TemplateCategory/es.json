@@ -1,0 +1,7 @@
+{
+  "culture": "es",
+  "texts": {
+    "TemplateCategory:DuplicateName": "Ya existe una categoría con el nombre '{0}'.",
+    "TemplateCategory:HasTemplates": "No se puede eliminar la categoría: {0} plantilla(s) siguen asociadas."
+  }
+}

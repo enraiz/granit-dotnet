@@ -1,0 +1,7 @@
+{
+  "culture": "fr",
+  "texts": {
+    "TemplateCategory:DuplicateName": "Une catégorie portant le nom '{0}' existe déjà.",
+    "TemplateCategory:HasTemplates": "Impossible de supprimer la catégorie : {0} template(s) sont encore associés."
+  }
+}
