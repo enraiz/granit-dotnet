@@ -34,7 +34,7 @@ classDiagram
     ICurrentTenant <|.. CurrentTenant
     ICurrentTenant <|.. NullTenantContext
 
-    note for NullTenantContext "Singleton statique\nComportement neutre"
+    note for NullTenantContext "Singleton statique<br/>Comportement neutre"
 ```
 
 ## Implémentation dans Granit

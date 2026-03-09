@@ -11,10 +11,10 @@ verrou. Le premier check (sans lock) sert de fast-path pour le cas nominal
 
 ```mermaid
 flowchart TD
-    REQ[GetOrAddAsync] --> C1{Check 1\nsans lock}
+    REQ[GetOrAddAsync] --> C1{Check 1<br/>sans lock}
     C1 -->|hit| RET[Retourne valeur]
     C1 -->|miss| ACQ[Acquire SemaphoreSlim]
-    ACQ --> C2{Check 2\naprès lock}
+    ACQ --> C2{Check 2<br/>après lock}
     C2 -->|hit| REL1[Release lock] --> RET
     C2 -->|miss| FAC[Exécute factory]
     FAC --> SET[Stocke en cache]

@@ -27,7 +27,7 @@ classDiagram
     }
 
     ICacheService~TCacheItem TKey~ <|.. TypedKeyCacheServiceAdapter~TCacheItem TKey~
-    TypedKeyCacheServiceAdapter~TCacheItem TKey~ --> ICacheService~TCacheItem~ : délègue\n(key.ToString())
+    TypedKeyCacheServiceAdapter~TCacheItem TKey~ --> ICacheService~TCacheItem~ : délègue<br/>(key.ToString())
 
     class IBlobStorageClient {
         <<interface>>

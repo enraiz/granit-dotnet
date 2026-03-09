@@ -17,15 +17,15 @@ payload pour détecter les mutations, et un store Redis multi-tenant.
 stateDiagram-v2
     [*] --> Absent : Première requête
 
-    Absent --> InProgress : Acquiert le lock\n(SET NX PX)
-    InProgress --> Completed : Handler réussit\n(cache réponse)
-    InProgress --> Absent : Handler échoue (5xx)\n(libère le lock)
+    Absent --> InProgress : Acquiert le lock<br/>(SET NX PX)
+    InProgress --> Completed : Handler réussit<br/>(cache réponse)
+    InProgress --> Absent : Handler échoue (5xx)<br/>(libère le lock)
 
-    Absent --> Completed : Double-check\naprès lock
+    Absent --> Completed : Double-check<br/>après lock
     Completed --> Completed : Même hash → replay (200)
     Completed --> [*] : Hash différent → rejet (422)
 
-    InProgress --> InProgress : Requête concurrente\n→ 409 + Retry-After
+    InProgress --> InProgress : Requête concurrente<br/>→ 409 + Retry-After
 ```
 
 ## Implémentation dans Granit

@@ -71,13 +71,13 @@ internal static class PatientEndpoints
 
 ```mermaid
 flowchart TD
-    REQ["Requête HTTP\n(Bearer token + X-Tenant-Id)"] --> AUTH["Authentication\n(JWT Keycloak)"]
-    AUTH --> TENANT["TenantResolutionMiddleware\nICurrentTenant.Change(tenantId)"]
-    TENANT --> AZ["Authorization\nRequireAuthorization()"]
-    AZ --> PC{"IPermissionChecker\n.IsGrantedAsync()"}
+    REQ["Requête HTTP<br/>(Bearer token + X-Tenant-Id)"] --> AUTH["Authentication<br/>(JWT Keycloak)"]
+    AUTH --> TENANT["TenantResolutionMiddleware<br/>ICurrentTenant.Change(tenantId)"]
+    TENANT --> AZ["Authorization<br/>RequireAuthorization()"]
+    AZ --> PC{"IPermissionChecker<br/>.IsGrantedAsync()"}
 
-    PC -->|Permission trouvée| GRANT["PermissionGrant\n(TenantId + UserId + Permission)"]
-    GRANT --> H["Handler exécuté\n(filtre tenant EF Core actif)"]
+    PC -->|Permission trouvée| GRANT["PermissionGrant<br/>(TenantId + UserId + Permission)"]
+    GRANT --> H["Handler exécuté<br/>(filtre tenant EF Core actif)"]
 
     PC -->|Non trouvée| DENY["403 Forbidden"]
 

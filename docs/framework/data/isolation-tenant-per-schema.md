@@ -21,11 +21,11 @@ d'isolation physique.
 ```mermaid
 flowchart TD
     REQ["HTTP / Message"]
-    CT["ICurrentTenant\n(tenantId)"]
+    CT["ICurrentTenant<br/>(tenantId)"]
     PROV["ITenantSchemaProvider"]
     FACTORY["TenantPerSchemaDbContextFactory&lt;TContext&gt;"]
-    INTERCEPTOR["TenantSchemaConnectionInterceptor\nSET search_path TO {schema}, public"]
-    PG[("PostgreSQL\n(base partagée)")]
+    INTERCEPTOR["TenantSchemaConnectionInterceptor<br/>SET search_path TO {schema}, public"]
+    PG[("PostgreSQL<br/>(base partagée)")]
     SA[/"Schéma tenant_a"/]
     SB[/"Schéma tenant_b"/]
     SC[/"Schéma tenant_c"/]

@@ -20,7 +20,7 @@ flowchart TD
     L2 -->|miss| LOCK[Acquire SemaphoreSlim]
     LOCK --> DC{Double-check L2}
     DC -->|hit| REL1[Release lock] --> SET1
-    DC -->|miss| FAC[Exécute factory\n→ requête DB]
+    DC -->|miss| FAC[Exécute factory<br/>→ requête DB]
     FAC --> SET2[Stocke en L1 + L2]
     SET2 --> REL2[Release lock] --> RET
 ```

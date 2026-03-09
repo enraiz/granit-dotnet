@@ -18,21 +18,21 @@ sans dépendance directe vers `Granit.MultiTenancy`.
 flowchart TD
     REQ[Requête HTTP] --> PIPE[TenantResolverPipeline]
 
-    PIPE --> HR["HeaderTenantResolver\n(Order = 100)"]
+    PIPE --> HR["HeaderTenantResolver<br/>(Order = 100)"]
     HR -->|trouvé| CTX[CurrentTenant via AsyncLocal]
-    HR -->|non trouvé| JR["JwtClaimTenantResolver\n(Order = 200)"]
+    HR -->|non trouvé| JR["JwtClaimTenantResolver<br/>(Order = 200)"]
     JR -->|trouvé| CTX
-    JR -->|non trouvé| NULL[NullTenantContext\nIsAvailable = false]
+    JR -->|non trouvé| NULL[NullTenantContext<br/>IsAvailable = false]
 
     CTX --> STRAT{Stratégie d'isolation}
 
-    STRAT -->|SharedDatabase| QF["EF Core Query Filter\nWHERE TenantId = @tid"]
-    STRAT -->|SchemaPerTenant| SP["SET search_path TO\ntenant_{tid}"]
-    STRAT -->|DatabasePerTenant| DB["Connection string\ndédiée par tenant"]
+    STRAT -->|SharedDatabase| QF["EF Core Query Filter<br/>WHERE TenantId = @tid"]
+    STRAT -->|SchemaPerTenant| SP["SET search_path TO<br/>tenant_{tid}"]
+    STRAT -->|DatabasePerTenant| DB["Connection string<br/>dédiée par tenant"]
 
-    CTX --> OCM["OutgoingContextMiddleware\ninjecte X-Tenant-Id"]
+    CTX --> OCM["OutgoingContextMiddleware<br/>injecte X-Tenant-Id"]
     OCM --> WOL["Wolverine Outbox"]
-    WOL --> TCB["TenantContextBehavior\nrestaure ICurrentTenant"]
+    WOL --> TCB["TenantContextBehavior<br/>restaure ICurrentTenant"]
     TCB --> BH[Background Handler]
 ```
 
