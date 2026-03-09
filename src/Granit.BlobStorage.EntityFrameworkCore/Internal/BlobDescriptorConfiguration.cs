@@ -16,9 +16,7 @@ internal sealed class BlobDescriptorConfiguration : IEntityTypeConfiguration<Blo
 
         builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.TenantId)
-            .HasMaxLength(50)
-            .IsRequired();
+        builder.Property(e => e.TenantId);
 
         builder.Property(e => e.ContainerName)
             .HasMaxLength(100)

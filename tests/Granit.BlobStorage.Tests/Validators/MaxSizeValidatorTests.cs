@@ -13,9 +13,9 @@ public sealed class MaxSizeValidatorTests
         {
             Descriptor = BlobDescriptor.Create(
                 id: Guid.NewGuid(),
-                tenantId: "tenant-abc",
+                tenantId: Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                 containerName: "docs",
-                objectKey: "tenant-abc/docs/2026/02/some-id",
+                objectKey: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/docs/2026/02/some-id",
                 request: new BlobUploadRequest("document.pdf", "application/pdf", maxAllowedBytes),
                 createdAt: Now),
             ActualSizeBytes = actualSizeBytes,
@@ -69,9 +69,9 @@ public sealed class MaxSizeValidatorTests
         {
             Descriptor = BlobDescriptor.Create(
                 id: Guid.NewGuid(),
-                tenantId: "t",
+                tenantId: Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                 containerName: "c",
-                objectKey: "t/c/2026/02/id",
+                objectKey: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/c/2026/02/id",
                 request: new BlobUploadRequest("f.pdf", "application/pdf", 1_000L),
                 createdAt: Now),
             ActualSizeBytes = 500L,

@@ -103,7 +103,7 @@ public sealed class DefaultBlobStorageTests
             Arg.Is<BlobDescriptor>(d =>
                 d.Status == BlobStatus.Pending &&
                 d.Id == blobId &&
-                d.TenantId == TenantId.ToString() &&
+                d.TenantId == TenantId &&
                 d.ContainerName == "medical-images" &&
                 d.ObjectKey == expectedKey &&
                 d.OriginalFileName == "ordonnance.pdf" &&
@@ -142,7 +142,7 @@ public sealed class DefaultBlobStorageTests
     }
 
     [Fact]
-    public async Task InitiateUploadAsync_WhenNoActiveTenant_ShouldSucceedWithEmptyTenantId()
+    public async Task InitiateUploadAsync_WhenNoActiveTenant_ShouldSucceedWithNullTenantId()
     {
         // Arrange
         _currentTenant.IsAvailable.Returns(false);
@@ -155,7 +155,7 @@ public sealed class DefaultBlobStorageTests
         // Assert — single-tenant apps must not be blocked
         await Should.NotThrowAsync(act);
         await _writer.Received(1).SaveAsync(
-            Arg.Is<BlobDescriptor>(d => d.TenantId == string.Empty),
+            Arg.Is<BlobDescriptor>(d => d.TenantId == null),
             Arg.Any<CancellationToken>());
     }
 
@@ -321,7 +321,7 @@ public sealed class DefaultBlobStorageTests
     {
         var descriptor = BlobDescriptor.Create(
             id: blobId,
-            tenantId: TenantId.ToString(),
+            tenantId: TenantId,
             containerName: "medical-images",
             objectKey: $"{TenantId}/medical-images/2026/02/{blobId}",
             request: new BlobUploadRequest("radio.jpg", "image/jpeg", 10_000_000L),
@@ -335,7 +335,7 @@ public sealed class DefaultBlobStorageTests
     {
         var descriptor = BlobDescriptor.Create(
             id: blobId,
-            tenantId: TenantId.ToString(),
+            tenantId: TenantId,
             containerName: "medical-images",
             objectKey: $"{TenantId}/medical-images/2026/02/{blobId}",
             request: new BlobUploadRequest("file.jpg", "image/jpeg", 10_000_000L),

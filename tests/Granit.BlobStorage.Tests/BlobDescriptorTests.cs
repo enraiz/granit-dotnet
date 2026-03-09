@@ -9,12 +9,13 @@ namespace Granit.BlobStorage.Tests;
 public sealed class BlobDescriptorTests
 {
     private static readonly DateTimeOffset Now = new(2026, 2, 23, 12, 0, 0, TimeSpan.Zero);
+    private static readonly Guid TestTenantId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
     private static BlobDescriptor CreatePending() => BlobDescriptor.Create(
         id: Guid.NewGuid(),
-        tenantId: "tenant-abc",
+        tenantId: TestTenantId,
         containerName: "medical-images",
-        objectKey: "tenant-abc/medical-images/2026/02/some-guid",
+        objectKey: $"{TestTenantId}/medical-images/2026/02/some-guid",
         request: new BlobUploadRequest("radio.jpg", "image/jpeg", 10_000_000L),
         createdAt: Now);
 
@@ -27,14 +28,14 @@ public sealed class BlobDescriptorTests
 
         var descriptor = BlobDescriptor.Create(
             id: id,
-            tenantId: "tenant-abc",
+            tenantId: TestTenantId,
             containerName: "medical-images",
-            objectKey: "tenant-abc/medical-images/2026/02/some-guid",
+            objectKey: $"{TestTenantId}/medical-images/2026/02/some-guid",
             request: new BlobUploadRequest("radio.jpg", "image/jpeg", 10_000_000L),
             createdAt: Now);
 
         descriptor.Id.ShouldBe(id);
-        descriptor.TenantId.ShouldBe("tenant-abc");
+        descriptor.TenantId.ShouldBe(TestTenantId);
         descriptor.ContainerName.ShouldBe("medical-images");
         descriptor.Status.ShouldBe(BlobStatus.Pending);
         descriptor.OriginalFileName.ShouldBe("radio.jpg");
@@ -150,7 +151,7 @@ public sealed class BlobDescriptorTests
         descriptor.DeletionReason.ShouldBe("RGPD Art. 17 erasure request");
         // Audit fields must be preserved — the DB record is never removed.
         descriptor.Id.ShouldNotBe(Guid.Empty);
-        descriptor.TenantId.ShouldBe("tenant-abc");
+        descriptor.TenantId.ShouldBe(TestTenantId);
         descriptor.OriginalFileName.ShouldBe("radio.jpg");
         descriptor.ValidatedAt.ShouldNotBeNull();
     }

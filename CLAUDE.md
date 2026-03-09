@@ -194,6 +194,27 @@ Key rules for quick reference:
 - **DTO suffixes**: `Request` for input bodies, `Response` for top-level returns. NEVER use `Dto` suffix. EF Core entities must NOT be returned directly — create a `*Response` record.
 - **Error responses**: Always `TypedResults.Problem(detail, statusCode)` (RFC 7807), never `TypedResults.BadRequest<string>()`. Return type: `ProblemHttpResult`.
 
+**Isolated DbContext pattern — MANDATORY for all `*.EntityFrameworkCore` packages**:
+
+Every Granit `*.EntityFrameworkCore` package that owns an isolated `DbContext` MUST follow this
+checklist (no exceptions):
+
+1. **`<ProjectReference>` to `Granit.Persistence`** in the `.csproj`.
+2. **Constructor injection** of `ICurrentTenant?` and `IDataFilter?` (both optional, default `null`).
+3. **Call `modelBuilder.ApplyGranitConventions(currentTenant, dataFilter)`** at the end of
+   `OnModelCreating` — this applies query filters for `ISoftDeletable`, `IMultiTenant`, `IActive`,
+   `IProcessingRestrictable`, and `IPublishable`.
+4. **Interceptor wiring** in the extension method: use the `(sp, options)` overload of
+   `AddDbContextFactory` with `ServiceLifetime.Scoped` and resolve `AuditedEntityInterceptor` /
+   `SoftDeleteInterceptor` from the service provider.
+5. **`[DependsOn(typeof(GranitPersistenceModule))]`** on the module class.
+6. **No manual `HasQueryFilter`** in entity configurations — `ApplyGranitConventions` handles all
+   standard filters centrally. Manual filters cause duplicates or conflicts.
+7. **`IMultiTenant`** entities use `Guid? TenantId` (never `string`). The interface lives in
+   `Granit.Core.Domain`. `IDataFilter` lives in `Granit.Core.DataFiltering`.
+
+Reference: [`docs/framework/data/persistence.md`](docs/framework/data/persistence.md)
+
 **Multi-tenancy — soft dependency rule**: `ICurrentTenant` lives in `Granit.Core.MultiTenancy`
 and is available in every module without referencing `Granit.MultiTenancy`.
 

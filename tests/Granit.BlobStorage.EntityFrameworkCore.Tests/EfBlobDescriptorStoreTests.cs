@@ -13,7 +13,8 @@ public sealed class EfBlobDescriptorStoreTests
     // Test infrastructure
     // =========================================================================
 
-    private sealed class InMemoryContextFactory(string dbName) : IDbContextFactory<BlobStorageDbContext>
+    private sealed class InMemoryContextFactory(string dbName, ICurrentTenant? currentTenant = null)
+        : IDbContextFactory<BlobStorageDbContext>
     {
         public BlobStorageDbContext CreateDbContext()
         {
@@ -21,7 +22,7 @@ public sealed class EfBlobDescriptorStoreTests
                 new DbContextOptionsBuilder<BlobStorageDbContext>()
                     .UseInMemoryDatabase(dbName)
                     .Options;
-            return new BlobStorageDbContext(options);
+            return new BlobStorageDbContext(options, currentTenant);
         }
 
         public Task<BlobStorageDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
@@ -40,19 +41,23 @@ public sealed class EfBlobDescriptorStoreTests
     }
 
     private static EfBlobDescriptorStore CreateStore(string dbName, Guid? tenantId = null) =>
-        new(new InMemoryContextFactory(dbName), MakeTenant(tenantId ?? TenantId));
+        new(new InMemoryContextFactory(dbName, MakeTenant(tenantId ?? TenantId)));
 
     private static BlobDescriptor MakeDescriptor(
         Guid? id = null,
-        string? tenantId = null,
-        string containerName = "prescriptions") =>
-        BlobDescriptor.Create(
-            id: id ?? Guid.NewGuid(),
-            tenantId: tenantId ?? TenantId.ToString(),
+        Guid? tenantId = null,
+        string containerName = "prescriptions")
+    {
+        Guid tid = tenantId ?? TenantId;
+        Guid bid = id ?? Guid.NewGuid();
+        return BlobDescriptor.Create(
+            id: bid,
+            tenantId: tid,
             containerName: containerName,
-            objectKey: $"{tenantId ?? TenantId.ToString()}/{containerName}/2026/02/{id ?? Guid.NewGuid()}",
+            objectKey: $"{tid}/{containerName}/2026/02/{bid}",
             request: new BlobUploadRequest("prescription.pdf", "application/pdf", 5_000_000L),
             createdAt: new DateTimeOffset(2026, 2, 23, 10, 0, 0, TimeSpan.Zero));
+    }
 
     // =========================================================================
     // FindAsync — not found
@@ -101,7 +106,7 @@ public sealed class EfBlobDescriptorStoreTests
         DateTimeOffset createdAt = new(2026, 2, 23, 10, 0, 0, TimeSpan.Zero);
         var descriptor = BlobDescriptor.Create(
             id: blobId,
-            tenantId: TenantId.ToString(),
+            tenantId: TenantId,
             containerName: "medical-images",
             objectKey: $"{TenantId}/medical-images/2026/02/{blobId}",
             request: new BlobUploadRequest("scan.dcm", "application/dicom", 20_000_000L),
@@ -111,7 +116,7 @@ public sealed class EfBlobDescriptorStoreTests
 
         BlobDescriptor? retrieved = await store.FindAsync(
             blobId, TestContext.Current.CancellationToken);
-        retrieved!.TenantId.ShouldBe(TenantId.ToString());
+        retrieved!.TenantId.ShouldBe(TenantId);
         retrieved.ContainerName.ShouldBe("medical-images");
         retrieved.ObjectKey.ShouldBe($"{TenantId}/medical-images/2026/02/{blobId}");
         retrieved.OriginalFileName.ShouldBe("scan.dcm");
@@ -234,7 +239,7 @@ public sealed class EfBlobDescriptorStoreTests
         EfBlobDescriptorStore storeOther = CreateStore(db, OtherTenantId);
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptorOther = MakeDescriptor(
-            id: blobId, tenantId: OtherTenantId.ToString());
+            id: blobId, tenantId: OtherTenantId);
         await storeOther.SaveAsync(descriptorOther, TestContext.Current.CancellationToken);
 
         // Attempt to retrieve it as TenantId (current tenant) -> must return null.
@@ -246,7 +251,7 @@ public sealed class EfBlobDescriptorStoreTests
     }
 
     // =========================================================================
-    // GetRequiredTenantId guard
+    // No active tenant
     // =========================================================================
 
     [Fact]
@@ -256,11 +261,11 @@ public sealed class EfBlobDescriptorStoreTests
         noTenant.IsAvailable.Returns(false);
         noTenant.Id.Returns((Guid?)null);
         EfBlobDescriptorStore store = new(
-            new InMemoryContextFactory(Guid.NewGuid().ToString()), noTenant);
+            new InMemoryContextFactory(Guid.NewGuid().ToString(), noTenant));
 
         BlobDescriptor? result = await store.FindAsync(
             Guid.NewGuid(), TestContext.Current.CancellationToken);
 
-        result.ShouldBeNull("no blob exists with TenantId = string.Empty");
+        result.ShouldBeNull("no blob exists with matching TenantId");
     }
 }

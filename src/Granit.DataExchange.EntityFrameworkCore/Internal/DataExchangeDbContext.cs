@@ -1,9 +1,12 @@
+using Granit.Core.DataFiltering;
+using Granit.Core.MultiTenancy;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Export.Configurations;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Export.Entities;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Configurations;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Entities;
 using Granit.DataExchange.Export;
 using Granit.DataExchange.Import.Domain;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.DataExchange.EntityFrameworkCore.Internal;
@@ -13,7 +16,10 @@ namespace Granit.DataExchange.EntityFrameworkCore.Internal;
 /// Owns <see cref="ImportJob"/>, <see cref="SavedMappingEntity"/>, <see cref="ExternalIdMappingEntity"/>,
 /// <see cref="ExportJob"/>, and <see cref="ExportPresetEntity"/>.
 /// </summary>
-internal sealed class DataExchangeDbContext(DbContextOptions<DataExchangeDbContext> options)
+internal sealed class DataExchangeDbContext(
+    DbContextOptions<DataExchangeDbContext> options,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null)
     : DbContext(options)
 {
     public DbSet<ImportJob> ImportJobs { get; set; } = null!;
@@ -30,5 +36,6 @@ internal sealed class DataExchangeDbContext(DbContextOptions<DataExchangeDbConte
         modelBuilder.ApplyConfiguration(new ExternalIdMappingEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ExportJobConfiguration());
         modelBuilder.ApplyConfiguration(new ExportPresetEntityConfiguration());
+        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
     }
 }

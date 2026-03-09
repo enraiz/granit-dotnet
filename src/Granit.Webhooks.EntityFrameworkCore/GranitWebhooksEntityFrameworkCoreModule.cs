@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Persistence;
 using Granit.Webhooks.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ namespace Granit.Webhooks.EntityFrameworkCore;
 /// instead of using this module directly when custom DbContext options are needed.
 /// </remarks>
 [DependsOn(typeof(GranitWebhooksModule))]
+[DependsOn(typeof(GranitPersistenceModule))]
 public sealed class GranitWebhooksEntityFrameworkCoreModule : GranitModule
 {
     private readonly Action<DbContextOptionsBuilder> _configure;

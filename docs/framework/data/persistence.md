@@ -180,6 +180,74 @@ await db.SaveChangesAsync();
 // patient.DeletedBy == "user-123"
 ```
 
+## Checklist — DbContext isolé (`*.EntityFrameworkCore`)
+
+Chaque package Granit `*.EntityFrameworkCore` qui possède un `DbContext` isolé
+**DOIT** respecter cette checklist sans exception :
+
+1. **`<ProjectReference>` vers `Granit.Persistence`** dans le `.csproj`.
+2. **Injection constructeur** de `ICurrentTenant?` (`Granit.Core.MultiTenancy`)
+   et `IDataFilter?` (`Granit.Core.DataFiltering`), tous deux optionnels avec
+   valeur par défaut `null`.
+3. **Appel `modelBuilder.ApplyGranitConventions(currentTenant, dataFilter)`** à
+   la fin de `OnModelCreating` — applique les query filters pour `ISoftDeletable`,
+   `IMultiTenant`, `IActive`, `IProcessingRestrictable` et `IPublishable`.
+4. **Câblage des intercepteurs** dans la méthode d'extension : utiliser la
+   surcharge `(sp, options)` de `AddDbContextFactory` avec
+   `ServiceLifetime.Scoped` et résoudre `AuditedEntityInterceptor` /
+   `SoftDeleteInterceptor` depuis le service provider.
+5. **`[DependsOn(typeof(GranitPersistenceModule))]`** sur la classe module.
+6. **Pas de `HasQueryFilter` manuel** dans les configurations d'entité —
+   `ApplyGranitConventions` gère tous les filtres standard centralement. Les
+   filtres manuels causent des doublons ou des conflits (EF Core ne conserve
+   que le dernier `HasQueryFilter` par entité).
+7. **`IMultiTenant`** : les entités multi-tenant utilisent `Guid? TenantId`
+   (jamais `string`). L'interface vit dans `Granit.Core.Domain`.
+
+### Exemple complet
+
+```csharp
+// DbContext
+internal sealed class MyDbContext(
+    DbContextOptions<MyDbContext> options,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null) : DbContext(options)
+{
+    public DbSet<MyEntity> Entities { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new MyEntityConfiguration());
+        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
+    }
+}
+
+// Extension method
+public static IHostApplicationBuilder AddMyEntityFrameworkCore(
+    this IHostApplicationBuilder builder,
+    Action<DbContextOptionsBuilder> configure)
+{
+    builder.Services.AddDbContextFactory<MyDbContext>((sp, options) =>
+    {
+        configure(options);
+
+        AuditedEntityInterceptor? auditInterceptor =
+            sp.GetService<AuditedEntityInterceptor>();
+        if (auditInterceptor is not null)
+            options.AddInterceptors(auditInterceptor);
+
+        SoftDeleteInterceptor? softDeleteInterceptor =
+            sp.GetService<SoftDeleteInterceptor>();
+        if (softDeleteInterceptor is not null)
+            options.AddInterceptors(softDeleteInterceptor);
+    }, ServiceLifetime.Scoped);
+
+    // ... service registrations
+    return builder;
+}
+```
+
 ## Query Filters
 
 `ModelBuilderExtensions.ApplyGranitConventions()` applique automatiquement des

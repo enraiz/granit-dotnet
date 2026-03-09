@@ -1,4 +1,7 @@
+using Granit.Core.DataFiltering;
+using Granit.Core.MultiTenancy;
 using Granit.Notifications.Domain;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Notifications.EntityFrameworkCore;
@@ -8,6 +11,9 @@ namespace Granit.Notifications.EntityFrameworkCore;
 /// </summary>
 public sealed class NotificationDbContext : DbContext
 {
+    private readonly ICurrentTenant? _currentTenant;
+    private readonly IDataFilter? _dataFilter;
+
     /// <summary>In-app user notifications (inbox).</summary>
     public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
 
@@ -26,12 +32,20 @@ public sealed class NotificationDbContext : DbContext
     /// <summary>
     /// Initializes a new instance of the <see cref="NotificationDbContext"/> class.
     /// </summary>
-    public NotificationDbContext(DbContextOptions<NotificationDbContext> options) : base(options) { }
+    public NotificationDbContext(
+        DbContextOptions<NotificationDbContext> options,
+        ICurrentTenant? currentTenant = null,
+        IDataFilter? dataFilter = null) : base(options)
+    {
+        _currentTenant = currentTenant;
+        _dataFilter = dataFilter;
+    }
 
     /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(NotificationDbContext).Assembly);
+        modelBuilder.ApplyGranitConventions(_currentTenant, _dataFilter);
     }
 }
