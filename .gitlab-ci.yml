@@ -123,8 +123,9 @@ test:
     - >
       dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
-      -p:CollectCoverage=true
+      --collect:"XPlat Code Coverage"
       -- RunConfiguration.MaxCpuCount=4
+      DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover,cobertura
   artifacts:
     when: always
     paths:
@@ -167,7 +168,8 @@ integration-test:
       for proj in tests/*.Tests.Integration/*.Tests.Integration.csproj; do
         dotnet test "$proj" -c $CONFIGURATION --no-build \
           --logger "junit;LogFilePath=TestResults/results.xml" \
-          -p:CollectCoverage=true
+          --collect:"XPlat Code Coverage" \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover,cobertura
       done
   artifacts:
     when: always
