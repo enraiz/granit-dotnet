@@ -31,9 +31,7 @@ internal sealed class DefaultBlobStorage(
         Guid blobId = guidGenerator.Create();
         string objectKey = keyStrategy.BuildObjectKey(containerName, blobId);
         string bucket = keyStrategy.ResolveBucketName(containerName);
-        string tenantId = currentTenant.IsAvailable && currentTenant.Id is not null
-            ? currentTenant.Id.Value.ToString()
-            : string.Empty;
+        Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
 
         var descriptor = BlobDescriptor.Create(
             id: blobId,

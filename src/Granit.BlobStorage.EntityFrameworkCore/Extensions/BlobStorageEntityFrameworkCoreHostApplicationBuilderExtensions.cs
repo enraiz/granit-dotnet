@@ -1,4 +1,5 @@
 using Granit.BlobStorage.EntityFrameworkCore.Internal;
+using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,6 +19,10 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
     /// <see cref="EntityFrameworkServiceCollectionExtensions.AddDbContextFactory{TContext}(IServiceCollection, Action{DbContextOptionsBuilder}?, ServiceLifetime)"/>
     /// and binds <see cref="IBlobDescriptorStore"/> to <c>EfBlobDescriptorStore</c>.
     /// <para>
+    /// <see cref="AuditedEntityInterceptor"/> is added automatically when
+    /// <c>Granit.Persistence</c> is configured, enabling the HDS 3-year audit trail.
+    /// </para>
+    /// <para>
     /// Must be called after <c>AddGranitBlobStorageS3()</c> (or any other blob storage provider).
     /// </para>
     /// <para>
@@ -32,7 +37,19 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<BlobStorageDbContext>(configure);
+        builder.Services.AddDbContextFactory<BlobStorageDbContext>((sp, options) =>
+        {
+            configure(options);
+
+            // Automatically wire the HDS audit interceptor when Granit.Persistence is present.
+            AuditedEntityInterceptor? auditInterceptor =
+                sp.GetService<AuditedEntityInterceptor>();
+            if (auditInterceptor is not null)
+            {
+                options.AddInterceptors(auditInterceptor);
+            }
+        }, ServiceLifetime.Scoped);
+
         builder.Services.AddScoped<EfBlobDescriptorStore>();
         builder.Services.AddScoped<IBlobDescriptorStore>(sp => sp.GetRequiredService<EfBlobDescriptorStore>());
         builder.Services.AddScoped<IBlobDescriptorReader>(sp => sp.GetRequiredService<EfBlobDescriptorStore>());

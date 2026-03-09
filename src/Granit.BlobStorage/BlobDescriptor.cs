@@ -1,4 +1,5 @@
 using Granit.BlobStorage.Events;
+using Granit.Core.Domain;
 using Granit.Core.Events;
 
 namespace Granit.BlobStorage;
@@ -21,7 +22,7 @@ namespace Granit.BlobStorage;
 /// <see cref="BlobStatus.Deleted"/> means the S3 bytes are gone; the audit row remains for 3 years.
 /// </para>
 /// </remarks>
-public sealed class BlobDescriptor : IDomainEventSource
+public sealed class BlobDescriptor : IDomainEventSource, IMultiTenant
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
@@ -33,7 +34,7 @@ public sealed class BlobDescriptor : IDomainEventSource
     /// </summary>
     public static BlobDescriptor Create(
         Guid id,
-        string tenantId,
+        Guid? tenantId,
         string containerName,
         string objectKey,
         BlobUploadRequest request,
@@ -54,7 +55,19 @@ public sealed class BlobDescriptor : IDomainEventSource
     public Guid Id { get; private set; }
 
     /// <summary>Identifier of the tenant that owns this blob.</summary>
-    public string TenantId { get; private set; } = string.Empty;
+    public Guid? TenantId { get; private set; }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// Explicit implementation preserves the <c>private set</c> DDD encapsulation
+    /// on the public property while satisfying the interface contract.
+    /// Used by <c>AuditedEntityInterceptor</c> to inject the tenant identifier.
+    /// </remarks>
+    Guid? IMultiTenant.TenantId
+    {
+        get => TenantId;
+        set => TenantId = value;
+    }
 
     /// <summary>Logical container (e.g. <c>medical-images</c>, <c>prescriptions</c>).</summary>
     public string ContainerName { get; private set; } = string.Empty;

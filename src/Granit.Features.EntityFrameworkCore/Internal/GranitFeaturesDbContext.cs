@@ -1,3 +1,6 @@
+using Granit.Core.DataFiltering;
+using Granit.Core.MultiTenancy;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Features.EntityFrameworkCore.Internal;
@@ -15,7 +18,10 @@ namespace Granit.Features.EntityFrameworkCore.Internal;
 /// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, HDS compliant).
 /// </para>
 /// </remarks>
-internal sealed class GranitFeaturesDbContext(DbContextOptions<GranitFeaturesDbContext> options)
+internal sealed class GranitFeaturesDbContext(
+    DbContextOptions<GranitFeaturesDbContext> options,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null)
     : DbContext(options)
 {
     /// <summary>Tenant-level feature value overrides.</summary>
@@ -26,5 +32,6 @@ internal sealed class GranitFeaturesDbContext(DbContextOptions<GranitFeaturesDbC
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new TenantFeatureOverrideConfiguration());
+        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
     }
 }

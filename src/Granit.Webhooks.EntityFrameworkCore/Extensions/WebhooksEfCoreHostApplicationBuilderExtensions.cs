@@ -1,3 +1,4 @@
+using Granit.Persistence.Interceptors;
 using Granit.Webhooks.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +36,24 @@ public static class WebhooksEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<WebhooksDbContext>(configure);
+        builder.Services.AddDbContextFactory<WebhooksDbContext>((sp, options) =>
+        {
+            configure(options);
+
+            AuditedEntityInterceptor? auditInterceptor =
+                sp.GetService<AuditedEntityInterceptor>();
+            if (auditInterceptor is not null)
+            {
+                options.AddInterceptors(auditInterceptor);
+            }
+
+            SoftDeleteInterceptor? softDeleteInterceptor =
+                sp.GetService<SoftDeleteInterceptor>();
+            if (softDeleteInterceptor is not null)
+            {
+                options.AddInterceptors(softDeleteInterceptor);
+            }
+        }, ServiceLifetime.Scoped);
 
         builder.Services.AddSingleton<EfWebhookSubscriptionStore>();
         builder.Services.Replace(

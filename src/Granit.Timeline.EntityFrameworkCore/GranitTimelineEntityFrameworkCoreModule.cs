@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Persistence;
 
 namespace Granit.Timeline.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace Granit.Timeline.EntityFrameworkCore;
 /// instead of using this module directly when custom DbContext options are needed.
 /// </remarks>
 [DependsOn(typeof(GranitTimelineModule))]
+[DependsOn(typeof(GranitPersistenceModule))]
 public sealed class GranitTimelineEntityFrameworkCoreModule : GranitModule
 {
     // Services are registered via AddGranitTimelineEntityFrameworkCore() extension method

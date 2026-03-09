@@ -29,9 +29,6 @@ internal sealed class TimelineEntryConfiguration : IEntityTypeConfiguration<Time
             .IsDescending(false, false, false, true)
             .HasDatabaseName("ix_timeline_entries_entity_stream");
 
-        // Soft-delete global filter
-        builder.HasQueryFilter(x => !x.IsDeleted);
-
         // Self-referencing for threaded replies (no navigation property)
         builder.HasIndex(x => x.ParentEntryId)
             .HasDatabaseName("ix_timeline_entries_parent");

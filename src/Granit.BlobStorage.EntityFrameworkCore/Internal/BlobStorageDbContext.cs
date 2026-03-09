@@ -1,3 +1,6 @@
+using Granit.Core.DataFiltering;
+using Granit.Core.MultiTenancy;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.BlobStorage.EntityFrameworkCore.Internal;
@@ -14,7 +17,10 @@ namespace Granit.BlobStorage.EntityFrameworkCore.Internal;
 /// Compatible with SQL Server and PostgreSQL.
 /// </para>
 /// </remarks>
-internal sealed class BlobStorageDbContext(DbContextOptions<BlobStorageDbContext> options)
+internal sealed class BlobStorageDbContext(
+    DbContextOptions<BlobStorageDbContext> options,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null)
     : DbContext(options)
 {
     /// <summary>Lifecycle records for all uploaded blobs.</summary>
@@ -25,5 +31,6 @@ internal sealed class BlobStorageDbContext(DbContextOptions<BlobStorageDbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new BlobDescriptorConfiguration());
+        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
     }
 }

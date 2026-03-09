@@ -7,13 +7,14 @@ namespace Granit.BlobStorage.Tests.Validators;
 public sealed class MagicBytesValidatorTests
 {
     private static readonly DateTimeOffset Now = new(2026, 2, 23, 12, 0, 0, TimeSpan.Zero);
+    private static readonly Guid TestTenantId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
     private static BlobDescriptor MakeDescriptor(string contentType) =>
         BlobDescriptor.Create(
             id: Guid.NewGuid(),
-            tenantId: "tenant-abc",
+            tenantId: TestTenantId,
             containerName: "prescriptions",
-            objectKey: "tenant-abc/prescriptions/2026/02/some-id",
+            objectKey: $"{TestTenantId}/prescriptions/2026/02/some-id",
             request: new BlobUploadRequest("file", contentType, 10_000_000L),
             createdAt: Now);
 

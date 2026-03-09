@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.DataExchange.EntityFrameworkCore.Internal;
+using Granit.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +17,7 @@ namespace Granit.DataExchange.EntityFrameworkCore;
 /// tables are managed by infrastructure (Terraform / SQL scripts).
 /// </remarks>
 [DependsOn(typeof(GranitDataExchangeModule))]
+[DependsOn(typeof(GranitPersistenceModule))]
 public sealed class GranitDataExchangeEntityFrameworkCoreModule : GranitModule
 {
     /// <inheritdoc />
