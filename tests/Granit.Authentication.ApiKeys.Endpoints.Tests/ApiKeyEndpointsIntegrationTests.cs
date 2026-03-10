@@ -84,7 +84,7 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task ListApiKeys_ReturnsOkWithPagedResult()
     {
-        var entry = CreateSampleEntry();
+        ApiKeyEntry entry = CreateSampleEntry();
         _adminStore.ListAsync(
                 null, null, null, false, 1, 20,
                 Arg.Any<CancellationToken>())
@@ -139,7 +139,7 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task GetApiKeyById_WhenExists_ReturnsOk()
     {
-        var entry = CreateSampleEntry();
+        ApiKeyEntry entry = CreateSampleEntry();
         _adminStore.FindByIdAsync(entry.Id, Arg.Any<CancellationToken>())
             .Returns(entry);
 
@@ -307,9 +307,9 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task RotateApiKey_WhenExists_ReturnsOkWithNewSecret()
     {
-        var oldId = Guid.NewGuid();
-        var newId = Guid.NewGuid();
-        var existing = CreateSampleEntry(oldId);
+        Guid oldId = Guid.NewGuid();
+        Guid newId = Guid.NewGuid();
+        ApiKeyEntry existing = CreateSampleEntry(oldId);
 
         _adminStore.FindByIdAsync(oldId, Arg.Any<CancellationToken>())
             .Returns(existing);
@@ -351,8 +351,8 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task RotateApiKey_WhenAlreadyRevoked_Returns404()
     {
-        var id = Guid.NewGuid();
-        var revoked = CreateSampleEntry(id);
+        Guid id = Guid.NewGuid();
+        ApiKeyEntry revoked = CreateSampleEntry(id);
         revoked.RevokedAt = DateTimeOffset.UtcNow.AddDays(-1);
 
         _adminStore.FindByIdAsync(id, Arg.Any<CancellationToken>())
@@ -368,9 +368,9 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task RotateApiKey_PreservesPermissionsAndCidrs()
     {
-        var oldId = Guid.NewGuid();
-        var newId = Guid.NewGuid();
-        var existing = CreateSampleEntry(oldId);
+        Guid oldId = Guid.NewGuid();
+        Guid newId = Guid.NewGuid();
+        ApiKeyEntry existing = CreateSampleEntry(oldId);
         existing.Permissions = ["Patients.Read", "Patients.Write"];
         existing.AllowedCidrs = ["10.0.0.0/24"];
         existing.CacheBehavior = CacheBehavior.NoCache;

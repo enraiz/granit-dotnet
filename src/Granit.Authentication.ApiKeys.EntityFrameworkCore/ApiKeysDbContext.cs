@@ -6,7 +6,7 @@ namespace Granit.Authentication.ApiKeys.EntityFrameworkCore;
 /// <summary>
 /// EF Core DbContext for API key persistence.
 /// </summary>
-public class ApiKeysDbContext(DbContextOptions<ApiKeysDbContext> options) : DbContext(options)
+internal sealed class ApiKeysDbContext(DbContextOptions<ApiKeysDbContext> options) : DbContext(options)
 {
     /// <summary>
     /// API keys table.

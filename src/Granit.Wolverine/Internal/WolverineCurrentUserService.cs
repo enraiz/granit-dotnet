@@ -110,7 +110,7 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
     /// <inheritdoc/>
     public ActorKind ActorKind =>
         _overrideActorKind.Value
-        ?? (HttpUser?.FindFirstValue("actor_kind") is { } ak && Enum.TryParse<ActorKind>(ak, out var parsed)
+        ?? (HttpUser?.FindFirstValue("actor_kind") is { } ak && Enum.TryParse<ActorKind>(ak, out ActorKind parsed)
             ? parsed
             : ActorKind.User);
 
@@ -120,7 +120,7 @@ internal sealed class WolverineCurrentUserService(IHttpContextAccessor httpConte
     /// <inheritdoc/>
     public Guid? ApiKeyId =>
         _overrideApiKeyId.Value
-        ?? (HttpUser?.FindFirstValue("api_key_id") is { } id && Guid.TryParse(id, out var parsed)
+        ?? (HttpUser?.FindFirstValue("api_key_id") is { } id && Guid.TryParse(id, out Guid parsed)
             ? parsed
             : null);
 

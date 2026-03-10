@@ -52,7 +52,7 @@ public sealed class EfCoreApiKeyStoreTests : IAsyncLifetime
     [Fact]
     public async Task FindByHashAsync_SoftDeletedKey_ReturnsNull()
     {
-        var entry = CreateEntry("hash_deleted");
+        ApiKeyEntry entry = CreateEntry("hash_deleted");
         entry.IsDeleted = true;
         entry.DeletedAt = DateTimeOffset.UtcNow;
         await SeedAsync(entry);
@@ -65,15 +65,15 @@ public sealed class EfCoreApiKeyStoreTests : IAsyncLifetime
     [Fact]
     public async Task UpdateLastUsedAsync_UpdatesTimestamp()
     {
-        var entry = CreateEntry("hash_used");
+        ApiKeyEntry entry = CreateEntry("hash_used");
         await SeedAsync(entry);
 
         var usedAt = new DateTimeOffset(2026, 3, 9, 12, 0, 0, TimeSpan.Zero);
         await _sut.UpdateLastUsedAsync(entry.Id, usedAt, TestContext.Current.CancellationToken);
 
         // Re-fetch with a fresh context to verify
-        await using var db = new ApiKeysDbContext(_options);
-        var updated = await db.ApiKeys
+        await using ApiKeysDbContext db = new(_options);
+        ApiKeyEntry? updated = await db.ApiKeys
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(k => k.Id == entry.Id, TestContext.Current.CancellationToken);
         updated.ShouldNotBeNull();

@@ -53,7 +53,7 @@ internal sealed class ParameterDescriptionOperationTransformer : IOpenApiOperati
             return Task.CompletedTask;
         }
 
-        foreach (var parameter in operation.Parameters)
+        foreach (OpenApiParameter parameter in operation.Parameters)
         {
             if (!string.IsNullOrEmpty(parameter.Description))
             {

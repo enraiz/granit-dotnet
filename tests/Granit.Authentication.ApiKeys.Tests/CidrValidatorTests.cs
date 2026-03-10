@@ -14,10 +14,8 @@ public sealed class CidrValidatorTests
     }
 
     [Fact]
-    public void IsAllowed_NullIpWithRestrictions_ReturnsFalse()
-    {
+    public void IsAllowed_NullIpWithRestrictions_ReturnsFalse() =>
         CidrValidator.IsAllowed(null, ["10.0.0.0/8"]).ShouldBeFalse();
-    }
 
     [Fact]
     public void IsAllowed_IpInRange_ReturnsTrue()
@@ -68,8 +66,6 @@ public sealed class CidrValidatorTests
     [InlineData("invalid", false)]
     [InlineData("", false)]
     [InlineData("10.0.0.0/32", true)]
-    public void IsValidCidr_ValidatesCorrectly(string cidr, bool expected)
-    {
+    public void IsValidCidr_ValidatesCorrectly(string cidr, bool expected) =>
         CidrValidator.IsValidCidr(cidr).ShouldBe(expected);
-    }
 }

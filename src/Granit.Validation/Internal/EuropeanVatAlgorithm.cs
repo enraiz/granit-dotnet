@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.RegularExpressions;
 
 namespace Granit.Validation.Internal;
@@ -10,40 +11,39 @@ namespace Granit.Validation.Internal;
 /// available per country — algorithm-based for FR and BE, format-based (regex) for others.
 /// Country codes follow ISO 3166-1 alpha-2 (except Greece which uses <c>EL</c> in tax contexts).
 /// </remarks>
-internal static class EuropeanVatAlgorithm
+internal static partial class EuropeanVatAlgorithm
 {
-    // Country-code → (min length of number, max length, regex of the full VAT string)
-    // Format: CC + local number (regex anchored on the full string after uppercasing).
-    private static readonly Dictionary<string, Regex> FormatMap = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["AT"] = Compiled(@"^ATU\d{8}$"),
-        ["BE"] = Compiled(@"^BE0?\d{9}$"),
-        ["BG"] = Compiled(@"^BG\d{9,10}$"),
-        ["CY"] = Compiled(@"^CY\d{8}[A-Z]$"),
-        ["CZ"] = Compiled(@"^CZ\d{8,10}$"),
-        ["DE"] = Compiled(@"^DE\d{9}$"),
-        ["DK"] = Compiled(@"^DK\d{8}$"),
-        ["EE"] = Compiled(@"^EE\d{9}$"),
-        ["EL"] = Compiled(@"^EL\d{9}$"),  // Greece uses EL in EU VAT context
-        ["ES"] = Compiled(@"^ES[A-Z0-9]\d{7}[A-Z0-9]$"),
-        ["FI"] = Compiled(@"^FI\d{8}$"),
-        ["FR"] = Compiled(@"^FR[0-9]{2}\d{9}$"),
-        ["HR"] = Compiled(@"^HR\d{11}$"),
-        ["HU"] = Compiled(@"^HU\d{8}$"),
-        ["IE"] = Compiled(@"^IE\d[A-Z0-9+*]\d{5}[A-Z]{1,2}$"),
-        ["IT"] = Compiled(@"^IT\d{11}$"),
-        ["LT"] = Compiled(@"^LT(\d{9}|\d{12})$"),
-        ["LU"] = Compiled(@"^LU\d{8}$"),
-        ["LV"] = Compiled(@"^LV\d{11}$"),
-        ["MT"] = Compiled(@"^MT\d{8}$"),
-        ["NL"] = Compiled(@"^NL\d{9}B\d{2}$"),
-        ["PL"] = Compiled(@"^PL\d{10}$"),
-        ["PT"] = Compiled(@"^PT\d{9}$"),
-        ["RO"] = Compiled(@"^RO\d{2,10}$"),
-        ["SE"] = Compiled(@"^SE\d{12}$"),
-        ["SI"] = Compiled(@"^SI\d{8}$"),
-        ["SK"] = Compiled(@"^SK\d{10}$"),
-    };
+    private static readonly FrozenDictionary<string, Regex> FormatMap =
+        new Dictionary<string, Regex>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["AT"] = AtRegex(),
+            ["BE"] = BeRegex(),
+            ["BG"] = BgRegex(),
+            ["CY"] = CyRegex(),
+            ["CZ"] = CzRegex(),
+            ["DE"] = DeRegex(),
+            ["DK"] = DkRegex(),
+            ["EE"] = EeRegex(),
+            ["EL"] = ElRegex(),
+            ["ES"] = EsRegex(),
+            ["FI"] = FiRegex(),
+            ["FR"] = FrRegex(),
+            ["HR"] = HrRegex(),
+            ["HU"] = HuRegex(),
+            ["IE"] = IeRegex(),
+            ["IT"] = ItRegex(),
+            ["LT"] = LtRegex(),
+            ["LU"] = LuRegex(),
+            ["LV"] = LvRegex(),
+            ["MT"] = MtRegex(),
+            ["NL"] = NlRegex(),
+            ["PL"] = PlRegex(),
+            ["PT"] = PtRegex(),
+            ["RO"] = RoRegex(),
+            ["SE"] = SeRegex(),
+            ["SI"] = SiRegex(),
+            ["SK"] = SkRegex(),
+        }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Returns <see langword="true"/> if <paramref name="value"/> is a valid EU VAT number.
@@ -99,6 +99,84 @@ internal static class EuropeanVatAlgorithm
         return BceAlgorithm.IsValid(digits);
     }
 
-    private static Regex Compiled(string pattern) =>
-        new(pattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+    [GeneratedRegex(@"^ATU\d{8}$", RegexOptions.None, 100)]
+    private static partial Regex AtRegex();
+
+    [GeneratedRegex(@"^BE0?\d{9}$", RegexOptions.None, 100)]
+    private static partial Regex BeRegex();
+
+    [GeneratedRegex(@"^BG\d{9,10}$", RegexOptions.None, 100)]
+    private static partial Regex BgRegex();
+
+    [GeneratedRegex(@"^CY\d{8}[A-Z]$", RegexOptions.None, 100)]
+    private static partial Regex CyRegex();
+
+    [GeneratedRegex(@"^CZ\d{8,10}$", RegexOptions.None, 100)]
+    private static partial Regex CzRegex();
+
+    [GeneratedRegex(@"^DE\d{9}$", RegexOptions.None, 100)]
+    private static partial Regex DeRegex();
+
+    [GeneratedRegex(@"^DK\d{8}$", RegexOptions.None, 100)]
+    private static partial Regex DkRegex();
+
+    [GeneratedRegex(@"^EE\d{9}$", RegexOptions.None, 100)]
+    private static partial Regex EeRegex();
+
+    [GeneratedRegex(@"^EL\d{9}$", RegexOptions.None, 100)]
+    private static partial Regex ElRegex();
+
+    [GeneratedRegex(@"^ES[A-Z0-9]\d{7}[A-Z0-9]$", RegexOptions.None, 100)]
+    private static partial Regex EsRegex();
+
+    [GeneratedRegex(@"^FI\d{8}$", RegexOptions.None, 100)]
+    private static partial Regex FiRegex();
+
+    [GeneratedRegex(@"^FR[0-9]{2}\d{9}$", RegexOptions.None, 100)]
+    private static partial Regex FrRegex();
+
+    [GeneratedRegex(@"^HR\d{11}$", RegexOptions.None, 100)]
+    private static partial Regex HrRegex();
+
+    [GeneratedRegex(@"^HU\d{8}$", RegexOptions.None, 100)]
+    private static partial Regex HuRegex();
+
+    [GeneratedRegex(@"^IE\d[A-Z0-9+*]\d{5}[A-Z]{1,2}$", RegexOptions.None, 100)]
+    private static partial Regex IeRegex();
+
+    [GeneratedRegex(@"^IT\d{11}$", RegexOptions.None, 100)]
+    private static partial Regex ItRegex();
+
+    [GeneratedRegex(@"^LT(\d{9}|\d{12})$", RegexOptions.None, 100)]
+    private static partial Regex LtRegex();
+
+    [GeneratedRegex(@"^LU\d{8}$", RegexOptions.None, 100)]
+    private static partial Regex LuRegex();
+
+    [GeneratedRegex(@"^LV\d{11}$", RegexOptions.None, 100)]
+    private static partial Regex LvRegex();
+
+    [GeneratedRegex(@"^MT\d{8}$", RegexOptions.None, 100)]
+    private static partial Regex MtRegex();
+
+    [GeneratedRegex(@"^NL\d{9}B\d{2}$", RegexOptions.None, 100)]
+    private static partial Regex NlRegex();
+
+    [GeneratedRegex(@"^PL\d{10}$", RegexOptions.None, 100)]
+    private static partial Regex PlRegex();
+
+    [GeneratedRegex(@"^PT\d{9}$", RegexOptions.None, 100)]
+    private static partial Regex PtRegex();
+
+    [GeneratedRegex(@"^RO\d{2,10}$", RegexOptions.None, 100)]
+    private static partial Regex RoRegex();
+
+    [GeneratedRegex(@"^SE\d{12}$", RegexOptions.None, 100)]
+    private static partial Regex SeRegex();
+
+    [GeneratedRegex(@"^SI\d{8}$", RegexOptions.None, 100)]
+    private static partial Regex SiRegex();
+
+    [GeneratedRegex(@"^SK\d{10}$", RegexOptions.None, 100)]
+    private static partial Regex SkRegex();
 }

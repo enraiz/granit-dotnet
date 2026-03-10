@@ -14,6 +14,12 @@
         "resolved": "7.1.0",
         "contentHash": "Iu3dSnhJ+gzjlOtpIPZgHvJbmvmPbIGjxT7h5pNxxMiNTXKfxgi0O0eehnZ29qlC5bElAM0o9dSrjzjydCaGiA=="
       },
+      "Microsoft.CodeAnalysis.BannedApiAnalyzers": {
+        "type": "Direct",
+        "requested": "[3.*, )",
+        "resolved": "3.3.4",
+        "contentHash": "0k2Jwpc8eq0hjOtX6TxRkHm9clkJ2PAQ3heEHgqIJZcsfdFosC/iyz18nsgTVDDWpID80rC7aiYK7ripx+Qndg=="
+      },
       "Microsoft.EntityFrameworkCore.InMemory": {
         "type": "Direct",
         "requested": "[10.*, )",
@@ -286,7 +292,7 @@
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Caching.Hybrid": "[10.*, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
@@ -302,7 +308,7 @@
       "granit.encryption": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -311,13 +317,13 @@
       "granit.exceptionhandling": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.guids": {
         "type": "Project",
         "dependencies": {
-          "Granit.Timing": "[0.1.0-dev.530, )",
+          "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -325,9 +331,9 @@
       "granit.persistence": {
         "type": "Project",
         "dependencies": {
-          "Granit.ExceptionHandling": "[0.1.0-dev.530, )",
-          "Granit.Guids": "[0.1.0-dev.530, )",
-          "Granit.Security": "[0.1.0-dev.530, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore": "[10.*, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
@@ -338,29 +344,29 @@
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.settings": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[0.1.0-dev.530, )",
-          "Granit.Encryption": "[0.1.0-dev.530, )",
-          "Granit.Security": "[0.1.0-dev.530, )"
+          "Granit.Caching": "[0.1.0-dev, )",
+          "Granit.Encryption": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )"
         }
       },
       "granit.settings.entityframeworkcore": {
         "type": "Project",
         "dependencies": {
-          "Granit.Persistence": "[0.1.0-dev.530, )",
-          "Granit.Settings": "[0.1.0-dev.530, )",
+          "Granit.Persistence": "[0.1.0-dev, )",
+          "Granit.Settings": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }

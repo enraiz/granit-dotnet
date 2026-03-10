@@ -26,7 +26,7 @@ public sealed class ApiKeyResponseTests
             CreatedAt = DateTimeOffset.UtcNow.AddDays(-7),
         };
 
-        ApiKeyResponse response = ApiKeyResponse.FromEntry(entry);
+        var response = ApiKeyResponse.FromEntry(entry);
 
         response.Id.ShouldBe(entry.Id);
         response.Name.ShouldBe(entry.Name);

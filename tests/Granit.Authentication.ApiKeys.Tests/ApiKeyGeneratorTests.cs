@@ -59,10 +59,8 @@ public sealed class ApiKeyGeneratorTests
     }
 
     [Fact]
-    public void Generate_ThrowsOnNullEnvironment()
-    {
+    public void Generate_ThrowsOnNullEnvironment() =>
         Should.Throw<ArgumentNullException>(() => _sut.Generate(ApiKeyType.Secret, null!));
-    }
 
     [Fact]
     public void ComputeSha256_IsDeterministic()
