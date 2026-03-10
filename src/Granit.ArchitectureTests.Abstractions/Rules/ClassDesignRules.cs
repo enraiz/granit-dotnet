@@ -8,7 +8,8 @@ using static ArchUnitNET.Fluent.ArchRuleDefinition;
 namespace Granit.ArchitectureTests.Abstractions.Rules;
 
 /// <summary>
-/// Reusable class design rules: sealed DbContexts, internal EfStores, no MVC, sealed Options.
+/// Reusable class design rules: sealed DbContexts, internal EfStores, no MVC, sealed Options,
+/// internal Configurations, IEntityTypeConfiguration confinement.
 /// </summary>
 public static class ClassDesignRules
 {
@@ -54,6 +55,50 @@ public static class ClassDesignRules
         controllers.ShouldBeEmpty(
             "Minimal API only — no MVC controllers allowed. " +
             $"Violators: {string.Join(", ", controllers.Select(c => c.FullName))}");
+    }
+
+    /// <summary>
+    /// IEntityTypeConfiguration implementations must reside in persistence layer namespaces.
+    /// By default, allows *.EntityFrameworkCore and *.Migrations namespaces.
+    /// </summary>
+    public static void EntityTypeConfigurationsShouldBeInEfCoreLayer(
+        ArchUnitNET.Domain.Architecture architecture,
+        string typePrefix,
+        params string[] additionalAllowedNamespaceFragments)
+    {
+        string[] defaultAllowed = ["EntityFrameworkCore", "Migrations"];
+        string[] allAllowed = [.. defaultAllowed, .. additionalAllowedNamespaceFragments];
+
+        IEnumerable<IType> violations = architecture.Types
+            .Where(t => t.FullName.StartsWith(typePrefix, StringComparison.Ordinal)
+                && t.Dependencies.Any(d =>
+                    d.Target.FullName.StartsWith("Microsoft.EntityFrameworkCore.IEntityTypeConfiguration", StringComparison.Ordinal))
+                && !allAllowed.Any(ns =>
+                    t.Namespace.FullName.Contains(ns, StringComparison.Ordinal)));
+
+        violations.ShouldBeEmpty(
+            "IEntityTypeConfiguration<T> implementations must reside in persistence layer namespaces. " +
+            $"Violators: {string.Join(", ", violations.Select(t => t.FullName))}");
+    }
+
+    /// <summary>
+    /// EF entity configuration classes (names ending with "Configuration" in EntityFrameworkCore namespaces)
+    /// must not be public (unless abstract — meant to be subclassed by consumers).
+    /// </summary>
+    public static void EntityConfigurationsShouldNotBePublic(
+        ArchUnitNET.Domain.Architecture architecture,
+        string typePrefix)
+    {
+        IEnumerable<Class> violations = architecture.Classes
+            .Where(c => c.FullName.StartsWith(typePrefix, StringComparison.Ordinal)
+                && c.Name.EndsWith("Configuration", StringComparison.Ordinal)
+                && c.Namespace.FullName.Contains("EntityFrameworkCore", StringComparison.Ordinal)
+                && c.IsAbstract != true
+                && c.Visibility == Visibility.Public);
+
+        violations.ShouldBeEmpty(
+            "EF Core entity configuration classes must be internal (infrastructure detail). " +
+            $"Violators: {string.Join(", ", violations.Select(c => c.FullName))}");
     }
 
     /// <summary>
