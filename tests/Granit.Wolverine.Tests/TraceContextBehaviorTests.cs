@@ -26,7 +26,7 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
     private static ILogger<TraceContextBehavior> CreateLogger()
     {
-        var logger = Substitute.For<ILogger<TraceContextBehavior>>();
+        ILogger<TraceContextBehavior> logger = Substitute.For<ILogger<TraceContextBehavior>>();
         // [LoggerMessage] source-generated methods guard with IsEnabled() — must return true.
         logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         return logger;

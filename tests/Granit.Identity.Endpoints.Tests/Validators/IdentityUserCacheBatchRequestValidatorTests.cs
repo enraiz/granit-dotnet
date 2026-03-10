@@ -46,7 +46,7 @@ public sealed class IdentityUserCacheBatchRequestValidatorTests
     [Fact]
     public void Validate_ExceedsMaxBatchSize_Fails()
     {
-        List<string> ids = Enumerable.Range(1, IdentityUserCacheBatchRequestValidator.MaxBatchSize + 1)
+        var ids = Enumerable.Range(1, IdentityUserCacheBatchRequestValidator.MaxBatchSize + 1)
             .Select(i => $"user-{i}")
             .ToList();
         IdentityUserCacheBatchRequest request = new(ids);
@@ -59,7 +59,7 @@ public sealed class IdentityUserCacheBatchRequestValidatorTests
     [Fact]
     public void Validate_ExactMaxBatchSize_ReturnsValid()
     {
-        List<string> ids = Enumerable.Range(1, IdentityUserCacheBatchRequestValidator.MaxBatchSize)
+        var ids = Enumerable.Range(1, IdentityUserCacheBatchRequestValidator.MaxBatchSize)
             .Select(i => $"user-{i}")
             .ToList();
         IdentityUserCacheBatchRequest request = new(ids);

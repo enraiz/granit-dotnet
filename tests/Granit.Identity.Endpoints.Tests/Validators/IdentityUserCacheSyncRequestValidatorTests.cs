@@ -34,7 +34,7 @@ public sealed class IdentityUserCacheSyncRequestValidatorTests
     [Fact]
     public void Validate_ExceedsMaxBatchSize_Fails()
     {
-        List<string> ids = Enumerable.Range(1, IdentityUserCacheSyncRequestValidator.MaxBatchSize + 1)
+        var ids = Enumerable.Range(1, IdentityUserCacheSyncRequestValidator.MaxBatchSize + 1)
             .Select(i => $"user-{i}")
             .ToList();
         IdentityUserCacheSyncRequest request = new(ids);
