@@ -1,4 +1,6 @@
+using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
+using Granit.BackgroundJobs.Options;
 using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;

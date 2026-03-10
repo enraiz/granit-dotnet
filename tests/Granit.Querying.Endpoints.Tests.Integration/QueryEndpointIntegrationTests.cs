@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
+using Granit.Querying.Endpoints.Extensions;
 using Granit.Querying.Meta;
 using Granit.Querying.SavedViews;
 using Granit.Timing;

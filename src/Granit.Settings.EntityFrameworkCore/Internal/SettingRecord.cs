@@ -1,6 +1,6 @@
 using Granit.Core.Domain;
 
-namespace Granit.Settings.EntityFrameworkCore;
+namespace Granit.Settings.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// Persistent setting value record stored in the <c>core_setting_records</c> table.

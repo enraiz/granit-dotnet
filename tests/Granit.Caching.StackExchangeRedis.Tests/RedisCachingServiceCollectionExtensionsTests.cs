@@ -8,8 +8,10 @@
 //   - Configure correctement les options Redis et StackExchange
 // =============================================================================
 
+using Granit.Caching.Options;
 using Granit.Caching.StackExchangeRedis.Extensions;
 using Granit.Caching.StackExchangeRedis.HealthChecks;
+using Granit.Caching.StackExchangeRedis.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;

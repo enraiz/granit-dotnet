@@ -1,5 +1,6 @@
 using Granit.Persistence.Interceptors;
 using Granit.Webhooks.Abstractions;
+using Granit.Webhooks.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

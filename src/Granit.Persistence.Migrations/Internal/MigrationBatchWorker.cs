@@ -1,5 +1,6 @@
 using System.Threading.Channels;
 using Granit.Persistence.Migrations.Messages;
+using Granit.Persistence.Migrations.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,6 @@
 using Granit.Persistence.Migrations.Messages;
 
-namespace Granit.Persistence.Migrations;
+namespace Granit.Persistence.Migrations.Abstractions;
 
 /// <summary>
 /// Abstraction for dispatching migration batch execution.

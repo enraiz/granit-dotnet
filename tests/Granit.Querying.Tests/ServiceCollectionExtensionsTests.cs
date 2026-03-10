@@ -1,3 +1,4 @@
+using Granit.Querying.Extensions;
 using Granit.Querying.SavedViews;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

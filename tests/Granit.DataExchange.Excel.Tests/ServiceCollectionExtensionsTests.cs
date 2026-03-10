@@ -1,3 +1,4 @@
+using Granit.DataExchange.Excel.Extensions;
 using Granit.DataExchange.Export;
 using Granit.DataExchange.Import.Parsing;
 using Microsoft.Extensions.DependencyInjection;

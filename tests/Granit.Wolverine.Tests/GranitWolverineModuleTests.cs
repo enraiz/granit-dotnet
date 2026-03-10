@@ -12,6 +12,7 @@ using Granit.MultiTenancy;
 using Granit.Security;
 using Granit.Wolverine.Extensions;
 using Granit.Wolverine.Internal;
+using Granit.Wolverine.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

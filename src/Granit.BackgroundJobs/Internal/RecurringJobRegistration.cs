@@ -1,4 +1,4 @@
-namespace Granit.BackgroundJobs;
+namespace Granit.BackgroundJobs.Internal;
 
 /// <summary>
 /// Immutable descriptor of a recurring job discovered at startup via

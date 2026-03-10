@@ -1,4 +1,6 @@
-namespace Granit.BackgroundJobs;
+using Granit.BackgroundJobs.Domain;
+using Granit.BackgroundJobs.Options;
+namespace Granit.BackgroundJobs.Abstractions;
 
 /// <summary>
 /// Write operations for administrative control of Granit recurring background jobs.

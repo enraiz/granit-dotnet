@@ -8,6 +8,7 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
+using Granit.Localization.Internal;
 using Microsoft.Extensions.Localization;
 using SmartFormat;
 

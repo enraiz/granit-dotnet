@@ -1,4 +1,6 @@
+using Granit.Templating.Extensions;
 using Granit.Templating.Store;
+using Granit.Templating.Workflow.Extensions;
 using Granit.Workflow;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;

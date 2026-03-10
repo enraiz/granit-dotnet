@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Granit.BackgroundJobs.Abstractions;
+using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Endpoints.Extensions;
 using Granit.BackgroundJobs.Endpoints.Internal;
 using Granit.Core.Exceptions;

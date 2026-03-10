@@ -8,6 +8,7 @@
 //   - Respecte la configuration du type sequentiel
 // =============================================================================
 
+using Granit.Guids.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 using NSubstitute;

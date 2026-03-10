@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Granit.Querying.Filtering;
+using Granit.Querying.Options;
 
 namespace Granit.Querying;
 

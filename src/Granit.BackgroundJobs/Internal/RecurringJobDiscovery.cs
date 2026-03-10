@@ -1,4 +1,5 @@
 using System.Reflection;
+using Granit.BackgroundJobs.Abstractions;
 
 namespace Granit.BackgroundJobs.Internal;
 

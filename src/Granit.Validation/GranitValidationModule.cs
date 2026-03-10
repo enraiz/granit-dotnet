@@ -1,6 +1,7 @@
 using Granit.Core.Modularity;
 using Granit.ExceptionHandling;
 using Granit.Localization;
+using Granit.Localization.Options;
 using Granit.Validation.Extensions;
 using Granit.Validation.Internal;
 using Microsoft.Extensions.DependencyInjection;

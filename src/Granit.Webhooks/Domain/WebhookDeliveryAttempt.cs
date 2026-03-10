@@ -1,4 +1,5 @@
 using Granit.Core.Domain;
+using Granit.Webhooks.Options;
 
 namespace Granit.Webhooks.Domain;
 

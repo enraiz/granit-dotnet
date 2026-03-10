@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using Granit.BackgroundJobs.Domain;
+using Granit.BackgroundJobs.Options;
 using Granit.Guids;
 
 namespace Granit.BackgroundJobs.Internal;

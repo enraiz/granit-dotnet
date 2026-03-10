@@ -1,4 +1,5 @@
 using Granit.Caching.StackExchangeRedis.Extensions;
+using Granit.Caching.StackExchangeRedis.Options;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.Configuration;
 

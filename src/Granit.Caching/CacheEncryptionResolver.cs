@@ -1,4 +1,5 @@
 using System.Reflection;
+using Granit.Caching.Options;
 
 namespace Granit.Caching;
 

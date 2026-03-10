@@ -4,6 +4,7 @@
 // Verifies default values and configuration for the notification engine options.
 // =============================================================================
 
+using Granit.Notifications.Options;
 using Shouldly;
 using Xunit;
 

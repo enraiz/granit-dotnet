@@ -7,6 +7,7 @@
 // =============================================================================
 
 using Granit.Diagnostics.Extensions;
+using Granit.Diagnostics.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;

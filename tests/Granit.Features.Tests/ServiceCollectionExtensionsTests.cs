@@ -1,5 +1,6 @@
 using Granit.Features.Checker;
 using Granit.Features.Definitions;
+using Granit.Features.Extensions;
 using Granit.Features.Limits;
 using Granit.Features.Store;
 using Granit.Features.ValueProviders;

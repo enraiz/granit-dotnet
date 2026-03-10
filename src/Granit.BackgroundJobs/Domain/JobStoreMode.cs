@@ -1,4 +1,5 @@
-namespace Granit.BackgroundJobs;
+using Granit.BackgroundJobs.Options;
+namespace Granit.BackgroundJobs.Domain;
 
 /// <summary>
 /// Determines the persistence strategy for the background jobs administrative store.

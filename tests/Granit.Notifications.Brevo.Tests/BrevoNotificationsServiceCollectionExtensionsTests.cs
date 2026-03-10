@@ -1,4 +1,5 @@
 using Granit.Notifications.Brevo.Extensions;
+using Granit.Notifications.Brevo.Options;
 using Granit.Notifications.Email;
 using Granit.Notifications.Sms;
 using Granit.Notifications.WhatsApp;

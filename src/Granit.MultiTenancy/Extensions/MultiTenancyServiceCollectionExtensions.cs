@@ -1,4 +1,5 @@
 using Granit.MultiTenancy.Middleware;
+using Granit.MultiTenancy.Options;
 using Granit.MultiTenancy.Pipeline;
 using Granit.MultiTenancy.Resolvers;
 using Microsoft.Extensions.DependencyInjection;

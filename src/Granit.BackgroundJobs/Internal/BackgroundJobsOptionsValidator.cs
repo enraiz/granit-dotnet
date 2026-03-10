@@ -1,3 +1,5 @@
+using Granit.BackgroundJobs.Domain;
+using Granit.BackgroundJobs.Options;
 using Microsoft.Extensions.Options;
 
 namespace Granit.BackgroundJobs.Internal;

@@ -8,6 +8,7 @@
 // =============================================================================
 
 using Granit.Caching;
+using Granit.Caching.Hybrid.Options;
 using Granit.Caching.StackExchangeRedis;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;

@@ -3,6 +3,7 @@
 // =============================================================================
 
 using Granit.Encryption;
+using Granit.Encryption.Options;
 using Granit.Encryption.Providers;
 using Microsoft.Extensions.Options;
 using Shouldly;
@@ -14,7 +15,7 @@ public sealed class AesStringEncryptionProviderTests
 {
     private static AesStringEncryptionProvider CreateProvider(string passPhrase = "P@ssw0rdVaultSecret!HDS2026")
     {
-        IOptions<StringEncryptionOptions> options = Options.Create(new StringEncryptionOptions
+        IOptions<StringEncryptionOptions> options = Microsoft.Extensions.Options.Options.Create(new StringEncryptionOptions
         {
             PassPhrase = passPhrase,
             KeySize = 256,
@@ -133,7 +134,7 @@ public sealed class AesStringEncryptionProviderTests
     [Fact]
     public void Constructor_EmptyPassPhrase_Throws_InvalidOperationException()
     {
-        IOptions<StringEncryptionOptions> options = Options.Create(new StringEncryptionOptions
+        IOptions<StringEncryptionOptions> options = Microsoft.Extensions.Options.Options.Create(new StringEncryptionOptions
         {
             PassPhrase = string.Empty
         });

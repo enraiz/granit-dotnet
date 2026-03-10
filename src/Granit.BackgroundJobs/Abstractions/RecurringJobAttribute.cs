@@ -1,4 +1,4 @@
-namespace Granit.BackgroundJobs;
+namespace Granit.BackgroundJobs.Abstractions;
 
 /// <summary>
 /// Marks a message type as a Wolverine-scheduled recurring job.

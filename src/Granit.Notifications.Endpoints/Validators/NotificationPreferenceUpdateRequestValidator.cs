@@ -1,4 +1,5 @@
 using FluentValidation;
+using Granit.Notifications.Endpoints.Dtos;
 using Granit.Validation;
 
 namespace Granit.Notifications.Endpoints.Validators;

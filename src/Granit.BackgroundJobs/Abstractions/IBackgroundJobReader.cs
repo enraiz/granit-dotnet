@@ -1,4 +1,4 @@
-namespace Granit.BackgroundJobs;
+namespace Granit.BackgroundJobs.Abstractions;
 
 /// <summary>
 /// Read operations for background job status monitoring.

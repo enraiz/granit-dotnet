@@ -1,3 +1,4 @@
+using Granit.DocumentGeneration.Excel.Extensions;
 using Granit.Templating.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

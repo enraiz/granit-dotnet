@@ -1,3 +1,4 @@
+using Granit.Wolverine.Options;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Wolverine.Internal;

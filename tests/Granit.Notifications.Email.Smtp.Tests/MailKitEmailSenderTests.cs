@@ -7,6 +7,7 @@
 // Uses ISmtpTransportFactory + ISmtpTransport substitutes to avoid real SMTP.
 // =============================================================================
 
+using Granit.Notifications.Email.Smtp.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -35,7 +36,7 @@ public sealed class MailKitEmailSenderTests
         ISmtpTransport transport = Substitute.For<ISmtpTransport>();
 
         MailKitEmailSender sender = new(
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<MailKitEmailSender>.Instance,
             () => transport);
 
@@ -375,7 +376,7 @@ public sealed class MailKitEmailSenderTests
         var logger = Substitute.For<ILogger<MailKitEmailSender>>();
         logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
 
-        MailKitEmailSender sender = new(Options.Create(opts), logger, () => transport);
+        MailKitEmailSender sender = new(Microsoft.Extensions.Options.Options.Create(opts), logger, () => transport);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -395,7 +396,7 @@ public sealed class MailKitEmailSenderTests
     public void Constructor_WithNullFactory_UsesDefaultFactory()
     {
         SmtpOptions opts = new() { Host = "localhost", Port = 25, UseSsl = false };
-        MailKitEmailSender sender = new(Options.Create(opts), NullLogger<MailKitEmailSender>.Instance);
+        MailKitEmailSender sender = new(Microsoft.Extensions.Options.Options.Create(opts), NullLogger<MailKitEmailSender>.Instance);
 
         // Should not throw — default factory is used internally
         sender.ShouldNotBeNull();

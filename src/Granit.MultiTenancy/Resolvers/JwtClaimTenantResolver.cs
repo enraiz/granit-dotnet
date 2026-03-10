@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Granit.MultiTenancy.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 

@@ -1,4 +1,5 @@
-namespace Granit.BackgroundJobs;
+using Granit.BackgroundJobs.Domain;
+namespace Granit.BackgroundJobs.Abstractions;
 
 /// <summary>
 /// Immutable snapshot of the current state of a recurring job.

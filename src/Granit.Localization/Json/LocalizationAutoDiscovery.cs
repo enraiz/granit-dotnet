@@ -12,6 +12,7 @@
 
 using System.Reflection;
 using Granit.Core.Localization;
+using Granit.Localization.Options;
 
 namespace Granit.Localization.Json;
 

@@ -1,5 +1,6 @@
 using Granit.Persistence.DataSeeding;
 using Granit.ReferenceData.EntityFrameworkCore.Internal;
+using Granit.ReferenceData.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

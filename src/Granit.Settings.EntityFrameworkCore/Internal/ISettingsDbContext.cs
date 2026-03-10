@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Granit.Settings.EntityFrameworkCore;
+namespace Granit.Settings.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// Interface to implement on the host application's <see cref="DbContext"/>

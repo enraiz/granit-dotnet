@@ -1,3 +1,4 @@
+using Granit.Cookies.Endpoints.Options;
 using Shouldly;
 using Xunit;
 

@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Granit.BlobStorage.Internal;
+using Granit.BlobStorage.Options;
+using Granit.BlobStorage.S3.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 

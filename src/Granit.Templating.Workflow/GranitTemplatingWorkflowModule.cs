@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Templating.Workflow.Extensions;
 using Granit.Workflow;
 
 namespace Granit.Templating.Workflow;

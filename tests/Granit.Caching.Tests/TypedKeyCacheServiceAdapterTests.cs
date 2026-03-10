@@ -7,6 +7,7 @@
 // pour éviter d'exposer des types internes aux générateurs de proxy NSubstitute.
 // =============================================================================
 
+using Granit.Caching.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,7 @@ public sealed class TypedKeyCacheServiceAdapterTests
         services.AddDistributedMemoryCache();
         services.AddKeyedSingleton<IMemoryCache>(
             DistributedCacheService<DistributedCacheServiceTests.UserCacheItem>.LockCacheKey,
-            (_, _) => new MemoryCache(Options.Create(new MemoryCacheOptions { SizeLimit = 100 })));
+            (_, _) => new MemoryCache(Microsoft.Extensions.Options.Options.Create(new MemoryCacheOptions { SizeLimit = 100 })));
         services.AddSingleton<ICacheValueEncryptor, NullCacheValueEncryptor>();
         services.Configure<CachingOptions>(_ => { });
         services.AddSingleton(typeof(ICacheService<>), typeof(DistributedCacheService<>));

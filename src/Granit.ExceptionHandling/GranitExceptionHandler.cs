@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Granit.Core.Exceptions;
+using Granit.ExceptionHandling.Options;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

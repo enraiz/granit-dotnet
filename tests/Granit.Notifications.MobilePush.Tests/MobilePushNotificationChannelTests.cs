@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.MobilePush;
+using Granit.Notifications.MobilePush.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,7 @@ public sealed class MobilePushNotificationChannelTests
 
     public MobilePushNotificationChannelTests()
     {
-        _options = Options.Create(new MobilePushChannelOptions
+        _options = Microsoft.Extensions.Options.Options.Create(new MobilePushChannelOptions
         {
             Provider = "Fcm",
         });

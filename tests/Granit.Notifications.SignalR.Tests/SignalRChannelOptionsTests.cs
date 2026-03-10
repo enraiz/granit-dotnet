@@ -1,3 +1,4 @@
+using Granit.Notifications.SignalR.Options;
 using Shouldly;
 using Xunit;
 

@@ -1,4 +1,5 @@
-namespace Granit.BackgroundJobs;
+using Granit.BackgroundJobs.Domain;
+namespace Granit.BackgroundJobs.Internal;
 
 /// <summary>
 /// Write operations for the background job store.

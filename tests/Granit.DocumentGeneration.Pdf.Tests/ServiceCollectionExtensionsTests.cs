@@ -1,3 +1,5 @@
+using Granit.DocumentGeneration.Pdf.Extensions;
+using Granit.DocumentGeneration.Pdf.Options;
 using Granit.DocumentGeneration.Pipeline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

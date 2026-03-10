@@ -1,3 +1,4 @@
+using Granit.BackgroundJobs.Abstractions;
 using Granit.Core.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

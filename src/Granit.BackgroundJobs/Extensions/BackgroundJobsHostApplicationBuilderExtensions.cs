@@ -1,5 +1,8 @@
 using System.Reflection;
+using Granit.BackgroundJobs.Abstractions;
+using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
+using Granit.BackgroundJobs.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

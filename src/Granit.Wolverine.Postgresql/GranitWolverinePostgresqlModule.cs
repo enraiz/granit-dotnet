@@ -1,6 +1,7 @@
 using Granit.Core.Modularity;
 using Granit.Persistence;
 using Granit.Wolverine.Postgresql.Extensions;
+using Granit.Wolverine.Postgresql.Options;
 
 namespace Granit.Wolverine.Postgresql;
 

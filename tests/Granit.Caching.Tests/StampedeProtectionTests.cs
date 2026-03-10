@@ -6,6 +6,7 @@
 // Pattern : double-check locking + SemaphoreSlim stocké dans IMemoryCache.
 // =============================================================================
 
+using Granit.Caching.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -23,7 +24,7 @@ public sealed class StampedeProtectionTests
         services.AddDistributedMemoryCache();
         services.AddKeyedSingleton<IMemoryCache>(
             DistributedCacheService<ProductCacheItem>.LockCacheKey,
-            (_, _) => new MemoryCache(Options.Create(new MemoryCacheOptions { SizeLimit = 100 })));
+            (_, _) => new MemoryCache(Microsoft.Extensions.Options.Options.Create(new MemoryCacheOptions { SizeLimit = 100 })));
         services.AddSingleton<ICacheValueEncryptor, NullCacheValueEncryptor>();
         services.Configure<CachingOptions>(_ => { });
         services.AddSingleton(typeof(ICacheService<>), typeof(DistributedCacheService<>));

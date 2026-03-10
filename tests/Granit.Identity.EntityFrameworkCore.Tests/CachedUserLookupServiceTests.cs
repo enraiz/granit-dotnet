@@ -1,6 +1,7 @@
 using Granit.Core.MultiTenancy;
 using Granit.Identity.EntityFrameworkCore.Entities;
 using Granit.Identity.EntityFrameworkCore.Internal;
+using Granit.Identity.EntityFrameworkCore.Options;
 using Granit.Identity.Models;
 using Granit.Querying;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ public sealed class CachedUserLookupServiceTests
     private readonly IIdentityProvider _provider = Substitute.For<IIdentityProvider>();
     private readonly ICurrentTenant _tenant = Substitute.For<ICurrentTenant>();
     private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
-    private readonly IOptions<UserCacheOptions> _options = Options.Create(new UserCacheOptions
+    private readonly IOptions<UserCacheOptions> _options = Microsoft.Extensions.Options.Options.Create(new UserCacheOptions
     {
         StalenessThreshold = TimeSpan.FromHours(24)
     });

@@ -1,3 +1,5 @@
+using Granit.Localization.Internal;
+using Granit.Localization.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -25,7 +27,7 @@ public sealed class CachedLocalizationOverrideStoreTests
             CachedLocalizationOverrideStore.RawStoreKey, (_, _) => innerWriter);
 
         IMemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
-        IOptions<LocalizationOverridesCacheOptions> options = Options.Create(
+        IOptions<LocalizationOverridesCacheOptions> options = Microsoft.Extensions.Options.Options.Create(
             new LocalizationOverridesCacheOptions { CacheTtl = cacheTtl ?? TimeSpan.FromMinutes(5) });
 
         ServiceProvider sp = services.BuildServiceProvider();

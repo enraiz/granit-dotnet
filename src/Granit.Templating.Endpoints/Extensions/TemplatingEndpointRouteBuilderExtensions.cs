@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Granit.Core.Exceptions;
 using Granit.Security;
 using Granit.Templating.Endpoints.Dtos;
+using Granit.Templating.Endpoints.Options;
 using Granit.Templating.Endpoints.Permissions;
 using Granit.Templating.Exceptions;
 using Granit.Templating.GlobalContext;

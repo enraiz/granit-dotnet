@@ -7,6 +7,7 @@
 
 using Granit.Guids;
 using Granit.Notifications.Domain;
+using Granit.Notifications.EntityFrameworkCore.Internal;
 using Shouldly;
 using Xunit;
 

@@ -1,6 +1,8 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.EntityFrameworkCore.Internal;
 using Granit.Notifications.Internal;
 using Granit.Notifications.MobilePush;
+using Granit.Notifications.MobilePush.Internal;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

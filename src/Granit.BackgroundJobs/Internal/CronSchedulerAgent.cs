@@ -1,4 +1,5 @@
 using Cronos;
+using Granit.BackgroundJobs.Domain;
 using Granit.Timing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

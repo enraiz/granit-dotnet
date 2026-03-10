@@ -1,3 +1,4 @@
+using Granit.Notifications.Brevo.Options;
 using Shouldly;
 using Xunit;
 

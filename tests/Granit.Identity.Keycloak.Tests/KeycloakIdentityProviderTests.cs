@@ -1,5 +1,6 @@
 using System.Net;
 using Granit.Identity.Keycloak.Internal;
+using Granit.Identity.Keycloak.Options;
 using Granit.Identity.Models;
 using Granit.Timing;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -52,7 +53,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
 
         _tokenService = new KeycloakAdminTokenService(
             tokenFactory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             clock,
             NullLogger<KeycloakAdminTokenService>.Instance);
 
@@ -63,14 +64,14 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
 
         _tokenExchangeService = new KeycloakUserTokenExchangeService(
             exchangeFactory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             NullLogger<KeycloakUserTokenExchangeService>.Instance);
 
         _provider = new KeycloakIdentityProvider(
             _tokenService,
             _tokenExchangeService,
             _httpClientFactory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             NullLogger<KeycloakIdentityProvider>.Instance);
     }
 
@@ -529,14 +530,14 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
 
         KeycloakUserTokenExchangeService exchangeSvc = new(
             seqFactory,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<KeycloakUserTokenExchangeService>.Instance);
 
         KeycloakIdentityProvider provider = new(
             _tokenService,
             exchangeSvc,
             seqFactory,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         IReadOnlyList<IdentityDeviceActivity> result = await provider.GetUserDeviceActivityAsync(
@@ -933,7 +934,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenService,
             _tokenExchangeService,
             locationFactory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         IdentityUserCreate newUser = new("alice", "alice@test.com", "Alice", "Doe");
@@ -1098,7 +1099,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
 
         KeycloakAdminTokenService tokenSvc = new(
             seqFactory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             updateClock,
             NullLogger<KeycloakAdminTokenService>.Instance);
 
@@ -1106,7 +1107,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             tokenSvc,
             _tokenExchangeService,
             seqFactory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         IdentityUserUpdate update = new(Email: "newalice@test.com", FirstName: "Alicia");
@@ -1172,7 +1173,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenService,
             _tokenExchangeService,
             factory,
-            Options.Create(optionsWithDirect),
+            Microsoft.Extensions.Options.Options.Create(optionsWithDirect),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         bool result = await provider.VerifyUserCredentialsAsync("admin", "password123",
@@ -1212,7 +1213,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenService,
             _tokenExchangeService,
             factory,
-            Options.Create(optionsWithDirect),
+            Microsoft.Extensions.Options.Options.Create(optionsWithDirect),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         bool result = await provider.VerifyUserCredentialsAsync("admin", "wrong-password",

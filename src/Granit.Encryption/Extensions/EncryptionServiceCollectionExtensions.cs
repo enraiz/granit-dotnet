@@ -1,3 +1,4 @@
+using Granit.Encryption.Options;
 using Granit.Encryption.Providers;
 using Granit.Encryption.Services;
 using Microsoft.Extensions.DependencyInjection;

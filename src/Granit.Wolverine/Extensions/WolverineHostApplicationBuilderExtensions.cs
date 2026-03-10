@@ -4,6 +4,7 @@ using Granit.Wolverine.Behaviors;
 using Granit.Wolverine.Diagnostics;
 using Granit.Wolverine.Internal;
 using Granit.Wolverine.Middleware;
+using Granit.Wolverine.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

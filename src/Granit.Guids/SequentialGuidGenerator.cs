@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Granit.Guids.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
 

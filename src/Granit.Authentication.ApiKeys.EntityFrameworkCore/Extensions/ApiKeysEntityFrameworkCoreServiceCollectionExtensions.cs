@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.EntityFrameworkCore.Internal;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

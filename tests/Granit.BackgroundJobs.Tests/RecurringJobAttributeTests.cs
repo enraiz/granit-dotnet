@@ -1,3 +1,4 @@
+using Granit.BackgroundJobs.Abstractions;
 using Shouldly;
 using Xunit;
 

@@ -1,3 +1,4 @@
+using Granit.Persistence.Migrations.Abstractions;
 using Granit.Persistence.Migrations.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Wolverine;

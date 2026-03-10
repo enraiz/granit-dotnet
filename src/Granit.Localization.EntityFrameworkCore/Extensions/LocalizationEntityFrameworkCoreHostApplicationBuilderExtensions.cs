@@ -1,4 +1,5 @@
 using Granit.Localization.EntityFrameworkCore.Internal;
+using Granit.Localization.Internal;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

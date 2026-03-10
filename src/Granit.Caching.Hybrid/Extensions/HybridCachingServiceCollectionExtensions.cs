@@ -1,4 +1,6 @@
 using Granit.Caching;
+using Granit.Caching.Hybrid.Options;
+using Granit.Caching.Options;
 using Granit.Timing.Extensions;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;

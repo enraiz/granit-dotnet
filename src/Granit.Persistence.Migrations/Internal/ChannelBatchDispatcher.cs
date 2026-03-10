@@ -1,4 +1,5 @@
 using System.Threading.Channels;
+using Granit.Persistence.Migrations.Abstractions;
 using Granit.Persistence.Migrations.Messages;
 
 namespace Granit.Persistence.Migrations.Internal;

@@ -1,5 +1,6 @@
 using Granit.BlobStorage.Exceptions;
 using Granit.BlobStorage.Internal;
+using Granit.BlobStorage.Options;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
 using Granit.Timing;
@@ -38,7 +39,7 @@ public sealed class DefaultBlobStorageTests
             _guidGenerator,
             _clock,
             _currentTenant,
-            Options.Create(new BlobStorageOptions()));
+            Microsoft.Extensions.Options.Options.Create(new BlobStorageOptions()));
     }
 
     // ── InitiateUploadAsync ──────────────────────────────────────────────────
@@ -129,7 +130,7 @@ public sealed class DefaultBlobStorageTests
         DefaultBlobStorage sutWithCustomOptions = new(
             _reader, _writer, _keyStrategy, _storageClient,
             _guidGenerator, _clock, _currentTenant,
-            Options.Create(customOptions));
+            Microsoft.Extensions.Options.Options.Create(customOptions));
 
         // Act
         await sutWithCustomOptions.InitiateUploadAsync("docs", new BlobUploadRequest("file.pdf", "application/pdf", 1_000_000), TestContext.Current.CancellationToken);

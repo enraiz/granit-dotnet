@@ -1,3 +1,4 @@
+using Granit.Caching.Options;
 namespace Granit.Caching;
 
 /// <summary>

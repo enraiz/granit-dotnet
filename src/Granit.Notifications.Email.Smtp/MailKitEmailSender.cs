@@ -1,3 +1,4 @@
+using Granit.Notifications.Email.Smtp.Options;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

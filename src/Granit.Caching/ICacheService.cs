@@ -1,3 +1,4 @@
+using Granit.Caching.Options;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Granit.Caching;

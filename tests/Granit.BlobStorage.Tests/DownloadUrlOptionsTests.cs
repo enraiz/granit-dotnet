@@ -1,3 +1,4 @@
+using Granit.BlobStorage.Options;
 using Shouldly;
 using Xunit;
 

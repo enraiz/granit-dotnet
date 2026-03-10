@@ -1,5 +1,7 @@
 using Granit.Persistence.Extensions;
+using Granit.Persistence.MultiTenancy;
 using Granit.Wolverine.Postgresql.Internal;
+using Granit.Wolverine.Postgresql.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

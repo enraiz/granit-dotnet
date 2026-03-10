@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
+using Granit.Querying.Endpoints.Dtos;
 using Granit.Querying.SavedViews;
 using Granit.Timing;
 using Granit.Validation.AspNetCore;

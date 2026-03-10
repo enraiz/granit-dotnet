@@ -8,6 +8,7 @@
 // =============================================================================
 
 using Granit.Wolverine.Postgresql.Extensions;
+using Granit.Wolverine.Postgresql.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

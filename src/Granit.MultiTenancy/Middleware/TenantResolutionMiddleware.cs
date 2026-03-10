@@ -1,3 +1,4 @@
+using Granit.MultiTenancy.Options;
 using Granit.MultiTenancy.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;

@@ -1,3 +1,4 @@
+using Granit.Notifications.Zulip.Options;
 using Shouldly;
 using Xunit;
 

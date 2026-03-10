@@ -1,3 +1,4 @@
+using Granit.Notifications.MobilePush.Fcm.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Notifications.MobilePush.Fcm.Extensions;

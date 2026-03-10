@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Webhooks.Dtos;
+using Granit.Webhooks.Options;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Webhooks.Endpoints;

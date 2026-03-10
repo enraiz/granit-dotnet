@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.EntityFrameworkCore.Internal;
 using Granit.Querying;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;

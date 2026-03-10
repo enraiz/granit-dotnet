@@ -1,3 +1,4 @@
+using Granit.Wolverine.Postgresql.Options;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Wolverine.Postgresql.Internal;

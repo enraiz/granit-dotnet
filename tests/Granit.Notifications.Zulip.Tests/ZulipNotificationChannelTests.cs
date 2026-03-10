@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Zulip;
+using Granit.Notifications.Zulip.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,7 @@ public sealed class ZulipNotificationChannelTests
 
     public ZulipNotificationChannelTests()
     {
-        _options = Options.Create(new ZulipChannelOptions { DefaultStream = "test-alerts", DefaultTopic = "system" });
+        _options = Microsoft.Extensions.Options.Options.Create(new ZulipChannelOptions { DefaultStream = "test-alerts", DefaultTopic = "system" });
         _channel = new ZulipNotificationChannel(_sender, _options, NullLogger<ZulipNotificationChannel>.Instance);
     }
 
@@ -124,7 +125,7 @@ public sealed class ZulipNotificationChannelTests
     [Fact]
     public async Task SendAsync_WithCustomOptions_LogsStreamAndTopic()
     {
-        var customOptions = Options.Create(new ZulipChannelOptions
+        var customOptions = Microsoft.Extensions.Options.Options.Create(new ZulipChannelOptions
         {
             DefaultStream = "custom-stream",
             DefaultTopic = "custom-topic",

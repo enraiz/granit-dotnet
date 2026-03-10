@@ -1,8 +1,9 @@
+using Granit.BackgroundJobs.Abstractions;
 using Granit.BackgroundJobs.Events;
+using Granit.BackgroundJobs.Internal;
 using Granit.Core.Domain;
 using Granit.Core.Events;
-
-namespace Granit.BackgroundJobs;
+namespace Granit.BackgroundJobs.Domain;
 
 /// <summary>
 /// Persistent administrative record for a Wolverine recurring job.

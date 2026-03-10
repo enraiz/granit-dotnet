@@ -1,3 +1,4 @@
+using Granit.Caching.Options;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,7 +50,7 @@ public static class CachingServiceCollectionExtensions
         // IMemoryCache dédié aux verrous stampede (séparé du cache applicatif)
         services.AddKeyedSingleton<IMemoryCache>(
             DistributedCacheService<object>.LockCacheKey,
-            (_, _) => new MemoryCache(Options.Create(new MemoryCacheOptions
+            (_, _) => new MemoryCache(Microsoft.Extensions.Options.Options.Create(new MemoryCacheOptions
             {
                 // Limite à 10 000 verrous simultanés maximum
                 SizeLimit = 10_000

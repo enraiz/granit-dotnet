@@ -1,5 +1,7 @@
 using System.Reflection;
 using Cronos;
+using Granit.BackgroundJobs.Abstractions;
+using Granit.BackgroundJobs.Domain;
 using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using Wolverine;

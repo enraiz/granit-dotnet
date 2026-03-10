@@ -5,6 +5,7 @@
 // et le chiffrement AES opt-in via CacheEncryptedAttribute.
 // =============================================================================
 
+using Granit.Caching.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,7 @@ public sealed class DistributedCacheServiceTests
         where T : class
     {
         IDistributedCache distributedCache = cache ?? Substitute.For<IDistributedCache>();
-        IMemoryCache lockCache = new MemoryCache(Options.Create(new MemoryCacheOptions { SizeLimit = 100 }));
+        IMemoryCache lockCache = new MemoryCache(Microsoft.Extensions.Options.Options.Create(new MemoryCacheOptions { SizeLimit = 100 }));
         ICacheValueEncryptor cacheEncryptor = encryptor ?? new NullCacheValueEncryptor();
         CachingOptions cachingOptions = options ?? new CachingOptions();
 
@@ -33,7 +34,7 @@ public sealed class DistributedCacheServiceTests
             distributedCache,
             lockCache,
             cacheEncryptor,
-            Options.Create(cachingOptions),
+            Microsoft.Extensions.Options.Options.Create(cachingOptions),
             NullLogger<DistributedCacheService<T>>.Instance);
     }
 
@@ -44,7 +45,7 @@ public sealed class DistributedCacheServiceTests
         services.AddDistributedMemoryCache();
         services.AddKeyedSingleton<IMemoryCache>(
             DistributedCacheService<UserCacheItem>.LockCacheKey,
-            (_, _) => new MemoryCache(Options.Create(new MemoryCacheOptions { SizeLimit = 100 })));
+            (_, _) => new MemoryCache(Microsoft.Extensions.Options.Options.Create(new MemoryCacheOptions { SizeLimit = 100 })));
         services.AddSingleton<ICacheValueEncryptor, NullCacheValueEncryptor>();
         services.Configure<CachingOptions>(_ => { });
         services.AddSingleton(typeof(ICacheService<>), typeof(DistributedCacheService<>));
