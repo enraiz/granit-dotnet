@@ -16,9 +16,15 @@ namespace Granit.Persistence.MultiTenancy;
 ///   <item><see cref="OracleTenantSchemaActivator"/> — <c>ALTER SESSION SET CURRENT_SCHEMA = "schema"</c></item>
 /// </list>
 /// <para>
-/// <strong>SQL Server</strong> does not support session-level schema switching. Use the
-/// <c>DatabasePerTenant</c> or <c>SharedDatabase</c> isolation strategies instead.
+/// <strong>Unsupported providers</strong> — The following do not support session-level schema
+/// switching; use <c>DatabasePerTenant</c> or <c>SharedDatabase</c> instead:
 /// </para>
+/// <list type="bullet">
+///   <item><strong>SQL Server</strong> — no session-level <c>SET SCHEMA</c> equivalent.</item>
+///   <item><strong>SQLite</strong> — no schema concept (single-file database).</item>
+///   <item><strong>Azure Cosmos DB</strong> — NoSQL document store; isolate via container or
+///         partition key (<c>TenantId</c>), not schemas.</item>
+/// </list>
 /// <para>
 /// The default is <see cref="PostgresqlTenantSchemaActivator"/>, registered via
 /// <see cref="Extensions.PersistenceTenantExtensions"/> with <c>TryAddSingleton</c>.
