@@ -384,6 +384,7 @@ factory.WithWebHostBuilder(builder =>
 ## Voir aussi
 
 - [Compatibilité des fournisseurs EF Core](compatibilite-providers.md)
+- [Isolation SharedDatabase](isolation-shared-database.md)
 - [Isolation Tenant-per-Database](isolation-tenant-per-database.md)
 - [Isolation Tenant-per-Schema](isolation-tenant-per-schema.md)
 - [Sélection de stratégie d'isolation](isolation-strategie.md)

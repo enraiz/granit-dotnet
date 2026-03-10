@@ -77,13 +77,19 @@ public static class PersistenceTenantExtensions
     /// <remarks>
     /// <para>
     /// <strong>Connection pool safety</strong> — <see cref="TenantSchemaConnectionInterceptor"/>
-    /// runs unconditionally on every connection lease from the Npgsql pool, overwriting any
-    /// previous tenant's <c>search_path</c>. No bypass condition exists.
+    /// runs unconditionally on every connection lease from the pool, overwriting any
+    /// previous tenant's schema. No bypass condition exists.
     /// </para>
     /// <para>
     /// If no custom <see cref="ITenantSchemaProvider"/> is registered, the default
     /// <see cref="DefaultTenantSchemaProvider"/> is used (convention from
     /// <see cref="TenantSchemaOptions"/>).
+    /// </para>
+    /// <para>
+    /// If no custom <see cref="ITenantSchemaActivator"/> is registered, the default
+    /// <see cref="PostgresqlTenantSchemaActivator"/> is used. To use a different database
+    /// provider, register your <see cref="ITenantSchemaActivator"/> before calling this method
+    /// (e.g. <see cref="MySqlTenantSchemaActivator"/> or <see cref="OracleTenantSchemaActivator"/>).
     /// </para>
     /// </remarks>
     public static IServiceCollection AddTenantPerSchemaDbContext<TContext>(
@@ -96,6 +102,7 @@ public static class PersistenceTenantExtensions
             .Configure(configureTenantSchema ?? (_ => { }));
 
         services.TryAddSingleton<ITenantSchemaProvider, DefaultTenantSchemaProvider>();
+        services.TryAddSingleton<ITenantSchemaActivator, PostgresqlTenantSchemaActivator>();
 
         services.AddSingleton(new TenantPerSchemaDbContextOptions<TContext>
         {
@@ -208,6 +215,7 @@ public static class PersistenceTenantExtensions
                 .Configure(configureTenantSchema ?? (_ => { }));
 
             services.TryAddSingleton<ITenantSchemaProvider, DefaultTenantSchemaProvider>();
+            services.TryAddSingleton<ITenantSchemaActivator, PostgresqlTenantSchemaActivator>();
 
             TenantPerSchemaDbContextOptions<TContext> perSchemaOpts = new()
             {
@@ -218,6 +226,7 @@ public static class PersistenceTenantExtensions
                 (sp, _) => new TenantPerSchemaDbContextFactory<TContext>(
                     sp.GetRequiredService<ICurrentTenant>(),
                     sp.GetRequiredService<ITenantSchemaProvider>(),
+                    sp.GetRequiredService<ITenantSchemaActivator>(),
                     sp,
                     perSchemaOpts));
         }

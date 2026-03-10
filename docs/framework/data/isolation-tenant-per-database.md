@@ -149,6 +149,7 @@ de 3 ans.
 ## Voir aussi
 
 - [Compatibilité des fournisseurs EF Core](compatibilite-providers.md)
+- [Isolation SharedDatabase](isolation-shared-database.md)
 - [Isolation Tenant-per-Schema](isolation-tenant-per-schema.md)
 - [Sélection de stratégie d'isolation](isolation-strategie.md)
 - [Multi-tenancy — résolution du tenant](multi-tenancy.md)

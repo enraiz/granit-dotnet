@@ -39,6 +39,8 @@ public sealed class TenantPerSchemaDbContextFactoryTests
             .Returns(ValueTask.FromResult("tenant_stub"));
 #pragma warning restore CA2012
 
+        ITenantSchemaActivator schemaActivator = Substitute.For<ITenantSchemaActivator>();
+
         ServiceCollection services = new();
         IServiceProvider sp = services.BuildServiceProvider();
 
@@ -48,7 +50,7 @@ public sealed class TenantPerSchemaDbContextFactoryTests
         };
 
         return new TenantPerSchemaDbContextFactory<StubSchemaDbContext>(
-            currentTenant, schemaProvider, sp, opts);
+            currentTenant, schemaProvider, schemaActivator, sp, opts);
     }
 
     // -----------------------------------------------------------------------

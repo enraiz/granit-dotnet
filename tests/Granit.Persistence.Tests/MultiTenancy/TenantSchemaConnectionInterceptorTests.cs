@@ -1,10 +1,10 @@
 // =============================================================================
 // Tests - TenantSchemaConnectionInterceptor
 // =============================================================================
-// Vérifie que SET search_path est exécuté inconditionnellement à chaque ouverture
-// de connexion, y compris sur une connexion recyclée depuis le pool Npgsql.
+// Vérifie que ITenantSchemaActivator est invoqué inconditionnellement à chaque
+// ouverture de connexion, y compris sur une connexion recyclée depuis le pool.
 //
-// Les connexions et commandes sont mockées via NSubstitute — aucun PostgreSQL réel requis.
+// Les connexions et commandes sont mockées via NSubstitute — aucune base réelle requise.
 // =============================================================================
 
 using System.Data.Common;
@@ -12,7 +12,6 @@ using Granit.Core.MultiTenancy;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -46,16 +45,11 @@ public sealed class TenantSchemaConnectionInterceptorTests
         return provider;
     }
 
-    private static (DbConnection connection, DbCommand command) MakeConnection()
-    {
-        DbCommand cmd = Substitute.For<DbCommand>();
-        cmd.ExecuteNonQueryAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(0));
+    private static ITenantSchemaActivator MakeActivator() =>
+        Substitute.For<ITenantSchemaActivator>();
 
-        DbConnection conn = Substitute.For<DbConnection>();
-        conn.CreateCommand().Returns(cmd);
-
-        return (conn, cmd);
-    }
+    private static DbConnection MakeConnection() =>
+        Substitute.For<DbConnection>();
 
     private static ConnectionEndEventData MakeEventData()
     {
@@ -77,69 +71,75 @@ public sealed class TenantSchemaConnectionInterceptorTests
     }
 
     // -----------------------------------------------------------------------
-    // ConnectionOpenedAsync — tenant actif → SET search_path émis
+    // ConnectionOpenedAsync — tenant actif → ActivateSchemaAsync appelé
     // -----------------------------------------------------------------------
 
     [Fact]
-    public async Task ConnectionOpenedAsync_WhenTenantActive_ExecutesSetSearchPath()
+    public async Task ConnectionOpenedAsync_WhenTenantActive_CallsActivateSchemaAsync()
     {
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
-        (DbConnection conn, DbCommand cmd) = MakeConnection();
+        DbConnection conn = MakeConnection();
+        ITenantSchemaActivator activator = MakeActivator();
         TenantSchemaConnectionInterceptor interceptor = new(
             MakeTenant(TenantA),
-            MakeProvider(TenantA, "tenant_a"));
+            MakeProvider(TenantA, "tenant_a"),
+            activator);
 
         await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
-        cmd.CommandText.ShouldBe("SET search_path TO \"tenant_a\", public");
-        await cmd.Received(1).ExecuteNonQueryAsync(cancellationToken);
+        await activator.Received(1).ActivateSchemaAsync(conn, "tenant_a", cancellationToken);
     }
 
     // -----------------------------------------------------------------------
-    // Sécurité pool Npgsql — connexion recyclée (SET search_path ré-exécuté)
+    // Sécurité pool — connexion recyclée (ActivateSchemaAsync ré-exécuté)
     // -----------------------------------------------------------------------
 
     [Fact]
-    public async Task ConnectionOpenedAsync_RecycledConnection_ReExecutesSetSearchPath()
+    public async Task ConnectionOpenedAsync_RecycledConnection_ReExecutesActivateSchema()
     {
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        DbConnection conn = MakeConnection();
 
         // Tenant A utilise la connexion, puis elle retourne au pool.
-        (DbConnection conn, DbCommand cmd) = MakeConnection();
+        ITenantSchemaActivator activatorA = MakeActivator();
         TenantSchemaConnectionInterceptor interceptorA = new(
             MakeTenant(TenantA),
-            MakeProvider(TenantA, "tenant_a"));
+            MakeProvider(TenantA, "tenant_a"),
+            activatorA);
         await interceptorA.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
         // Tenant B récupère la même connexion physique depuis le pool.
+        ITenantSchemaActivator activatorB = MakeActivator();
         TenantSchemaConnectionInterceptor interceptorB = new(
             MakeTenant(TenantB),
-            MakeProvider(TenantB, "tenant_b"));
+            MakeProvider(TenantB, "tenant_b"),
+            activatorB);
         await interceptorB.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
-        // Le SET search_path doit avoir été émis deux fois — l'intercepteur
-        // ne peut pas sauter la seconde exécution même si la connexion est "déjà ouverte".
-        await cmd.Received(2).ExecuteNonQueryAsync(cancellationToken);
-        // Le search_path final correspond au tenant B.
-        cmd.CommandText.ShouldBe("SET search_path TO \"tenant_b\", public");
+        // Chaque intercepteur a invoqué son activateur exactement une fois.
+        await activatorA.Received(1).ActivateSchemaAsync(conn, "tenant_a", cancellationToken);
+        await activatorB.Received(1).ActivateSchemaAsync(conn, "tenant_b", cancellationToken);
     }
 
     // -----------------------------------------------------------------------
-    // Pas de tenant → aucun SET search_path
+    // Pas de tenant → aucun appel à l'activateur
     // -----------------------------------------------------------------------
 
     [Fact]
-    public async Task ConnectionOpenedAsync_WhenNoTenant_DoesNotExecuteCommand()
+    public async Task ConnectionOpenedAsync_WhenNoTenant_DoesNotCallActivator()
     {
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
-        (DbConnection conn, DbCommand cmd) = MakeConnection();
+        DbConnection conn = MakeConnection();
+        ITenantSchemaActivator activator = MakeActivator();
         TenantSchemaConnectionInterceptor interceptor = new(
             MakeTenant(null),
-            Substitute.For<ITenantSchemaProvider>());
+            Substitute.For<ITenantSchemaProvider>(),
+            activator);
 
         await interceptor.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
 
-        await cmd.DidNotReceiveWithAnyArgs().ExecuteNonQueryAsync(cancellationToken);
+        await activator.DidNotReceiveWithAnyArgs()
+            .ActivateSchemaAsync(Arg.Any<DbConnection>(), Arg.Any<string>(), cancellationToken);
     }
 
     // -----------------------------------------------------------------------
@@ -147,73 +147,33 @@ public sealed class TenantSchemaConnectionInterceptorTests
     // -----------------------------------------------------------------------
 
     [Fact]
-    public void ConnectionOpened_WhenTenantActive_ExecutesSetSearchPath()
+    public void ConnectionOpened_WhenTenantActive_CallsActivateSchema()
     {
-        (DbConnection conn, DbCommand cmd) = MakeConnection();
+        DbConnection conn = MakeConnection();
+        ITenantSchemaActivator activator = MakeActivator();
 
-        DefaultTenantSchemaProvider provider = new(
-            Options.Create(new TenantSchemaOptions { Prefix = "tenant_" }));
-
-        TenantSchemaConnectionInterceptor interceptor = new(MakeTenant(TenantA), provider);
+        TenantSchemaConnectionInterceptor interceptor = new(
+            MakeTenant(TenantA),
+            MakeProvider(TenantA, "tenant_a"),
+            activator);
         interceptor.ConnectionOpened(conn, MakeEventData());
 
-        cmd.CommandText.ShouldStartWith("SET search_path TO \"tenant_");
-        cmd.Received(1).ExecuteNonQuery();
+        activator.Received(1).ActivateSchema(conn, "tenant_a");
     }
 
     [Fact]
-    public void ConnectionOpened_WhenNoTenant_DoesNotExecuteCommand()
+    public void ConnectionOpened_WhenNoTenant_DoesNotCallActivator()
     {
-        (DbConnection conn, DbCommand cmd) = MakeConnection();
+        DbConnection conn = MakeConnection();
+        ITenantSchemaActivator activator = MakeActivator();
         TenantSchemaConnectionInterceptor interceptor = new(
             MakeTenant(null),
-            Substitute.For<ITenantSchemaProvider>());
+            Substitute.For<ITenantSchemaProvider>(),
+            activator);
 
         interceptor.ConnectionOpened(conn, MakeEventData());
 
-        cmd.DidNotReceiveWithAnyArgs().ExecuteNonQuery();
-    }
-
-    // -----------------------------------------------------------------------
-    // Validation du nom de schéma — protection injection SQL
-    // -----------------------------------------------------------------------
-
-    [Theory]
-    [InlineData("'; DROP TABLE users--")]
-    [InlineData("tenant_a, public; DROP SCHEMA other--")]
-    [InlineData("UPPERCASE_SCHEMA")]
-    [InlineData("123startswithdigit")]
-    [InlineData("")]
-    public async Task ConnectionOpenedAsync_WithInvalidSchemaName_ThrowsInvalidOperationException(
-        string badSchema)
-    {
-        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
-        (DbConnection conn, DbCommand _) = MakeConnection();
-        TenantSchemaConnectionInterceptor interceptor = new(
-            MakeTenant(TenantA),
-            MakeProvider(TenantA, badSchema));
-
-        Func<Task> act = () => interceptor.ConnectionOpenedAsync(conn, MakeEventData(), cancellationToken);
-
-        (await Should.ThrowAsync<InvalidOperationException>(act)).Message.ShouldContain("not a valid PostgreSQL identifier");
-    }
-
-    [Theory]
-    [InlineData("'; DROP TABLE users--")]
-    [InlineData("tenant_a, public; DROP SCHEMA other--")]
-    [InlineData("UPPERCASE_SCHEMA")]
-    [InlineData("123startswithdigit")]
-    [InlineData("")]
-    public void ConnectionOpened_WithInvalidSchemaName_ThrowsInvalidOperationException(
-        string badSchema)
-    {
-        (DbConnection conn, DbCommand _) = MakeConnection();
-        TenantSchemaConnectionInterceptor interceptor = new(
-            MakeTenant(TenantA),
-            MakeProvider(TenantA, badSchema));
-
-        Action act = () => interceptor.ConnectionOpened(conn, MakeEventData());
-
-        Should.Throw<InvalidOperationException>(act).Message.ShouldContain("not a valid PostgreSQL identifier");
+        activator.DidNotReceiveWithAnyArgs()
+            .ActivateSchema(Arg.Any<DbConnection>(), Arg.Any<string>());
     }
 }
