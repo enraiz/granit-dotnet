@@ -23,4 +23,8 @@ public sealed class CqrsConventionTests
     [Fact]
     public void Interfaces_should_start_with_I_prefix() =>
         NamingConventionRules.InterfacesShouldStartWithI(Architecture, "Granit.");
+
+    [Fact]
+    public void Exception_classes_should_end_with_Exception() =>
+        NamingConventionRules.ExceptionClassesShouldEndWithException(Architecture, "Granit.");
 }

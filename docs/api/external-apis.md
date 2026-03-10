@@ -11,7 +11,7 @@ appliquées.
 | Brevo | `Granit.Notifications.Brevo` | HTTPS REST | API key (header) | Standard (retry + circuit breaker) + Wolverine | Configurable (défaut 30 s) |
 | Keycloak Admin | `Granit.Identity.Keycloak` | HTTPS REST | OAuth 2.0 client\_credentials | Standard (retry + circuit breaker) | Configurable (défaut 30 s) |
 | SMTP | `Granit.Notifications.Email.Smtp` | TCP/TLS | Username/Password | Wolverine (via handler) | Configurable (défaut 30 s) |
-| Web Push (VAPID) | `Granit.Notifications.Push` | HTTPS | VAPID (P-256) | Wolverine (via handler) | PushServiceClient défaut |
+| Web Push (VAPID) | `Granit.Notifications.WebPush` | HTTPS | VAPID (P-256) | Wolverine (via handler) | PushServiceClient défaut |
 | Vault | `Granit.Vault` | HTTPS | Kubernetes JWT ou Token | Lease renewal avec fallback | CancellationToken caller |
 | S3 | `Granit.BlobStorage.S3` | HTTPS | AccessKey/SecretKey | AWS SDK intégré | AWS SDK défaut |
 | Webhook delivery | `Granit.Webhooks` | HTTPS | HMAC signature | Wolverine 6 niveaux (30 s → 12 h) | Configurable |
@@ -165,7 +165,7 @@ expiration.
 
 ## Web Push (VAPID / W3C)
 
-**Package** : `Granit.Notifications.Push`
+**Package** : `Granit.Notifications.WebPush`
 
 **Protocole** : HTTPS vers les endpoints push des navigateurs (Firebase, Mozilla, Apple)
 

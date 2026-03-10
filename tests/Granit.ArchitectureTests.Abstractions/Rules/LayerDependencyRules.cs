@@ -1,0 +1,130 @@
+using ArchUnitNET.Domain;
+using Shouldly;
+
+namespace Granit.ArchitectureTests.Abstractions.Rules;
+
+/// <summary>
+/// Reusable layered architecture rules: core/endpoints isolation from EF Core, IQueryable confinement,
+/// domain entity leak prevention.
+/// </summary>
+public static class LayerDependencyRules
+{
+    /// <summary>
+    /// Types in the given namespace prefix must not depend on EF Core.
+    /// </summary>
+    public static void TypesShouldNotDependOnEntityFrameworkCore(
+        ArchUnitNET.Domain.Architecture architecture,
+        string namespacePrefix,
+        string layerDescription)
+    {
+        IEnumerable<IType> types = architecture.Types
+            .Where(t => t.FullName.StartsWith(namespacePrefix, StringComparison.Ordinal));
+
+        IEnumerable<IType> efCoreDeps = types
+            .Where(t => t.Dependencies
+                .Any(d => d.Target.FullName.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.Ordinal)));
+
+        efCoreDeps.ShouldBeEmpty(
+            $"{layerDescription} must not depend on EF Core infrastructure. " +
+            $"Violators: {string.Join(", ", efCoreDeps.Select(t => t.FullName))}");
+    }
+
+    /// <summary>
+    /// Endpoint types (namespace containing ".Endpoints") must not depend on EF Core.
+    /// </summary>
+    public static void EndpointTypesShouldNotDependOnEntityFrameworkCore(ArchUnitNET.Domain.Architecture architecture)
+    {
+        IEnumerable<IType> endpointTypes = architecture.Types
+            .Where(t => t.Namespace.FullName.EndsWith(".Endpoints", StringComparison.Ordinal) ||
+                        t.Namespace.FullName.Contains(".Endpoints.", StringComparison.Ordinal));
+
+        IEnumerable<IType> efCoreDeps = endpointTypes
+            .Where(t => t.Dependencies
+                .Any(d => d.Target.FullName.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.Ordinal)));
+
+        efCoreDeps.ShouldBeEmpty(
+            "Endpoints must use abstractions (ports), not EF Core directly. " +
+            $"Violators: {string.Join(", ", efCoreDeps.Select(t => t.FullName))}");
+    }
+
+    /// <summary>
+    /// Types in endpoint namespaces must not inherit from domain entity base classes.
+    /// Endpoints may reference entities for internal mapping, but DTOs (Request/Response)
+    /// must never extend Entity, AggregateRoot, etc.
+    /// </summary>
+    public static void EndpointTypesShouldNotInheritFromDomainEntities(
+        ArchUnitNET.Domain.Architecture architecture,
+        params string[] domainBaseClassFullNames)
+    {
+        var domainBaseClasses = domainBaseClassFullNames.ToHashSet(StringComparer.Ordinal);
+
+        IEnumerable<Class> violations = architecture.Classes
+            .Where(c => (c.Namespace.FullName.EndsWith(".Endpoints", StringComparison.Ordinal) ||
+                         c.Namespace.FullName.Contains(".Endpoints.", StringComparison.Ordinal))
+                && c.Dependencies
+                    .Where(d => d is ArchUnitNET.Domain.Dependencies.InheritsBaseClassDependency)
+                    .Any(d => domainBaseClasses.Contains(d.Target.FullName)));
+
+        violations.ShouldBeEmpty(
+            "Endpoint types must not inherit from domain entity base classes — use standalone Request/Response DTOs. " +
+            $"Violators: {string.Join(", ", violations.Select(c => c.FullName))}");
+    }
+
+    /// <summary>
+    /// Exception classes must not reside in endpoint namespaces.
+    /// Exceptions are domain concerns and belong in Core, Domain, or module root packages.
+    /// </summary>
+    public static void ExceptionsShouldNotResideInEndpoints(ArchUnitNET.Domain.Architecture architecture)
+    {
+        IEnumerable<Class> violations = architecture.Classes
+            .Where(c => (c.Namespace.FullName.EndsWith(".Endpoints", StringComparison.Ordinal) ||
+                         c.Namespace.FullName.Contains(".Endpoints.", StringComparison.Ordinal))
+                && c.Name.EndsWith("Exception", StringComparison.Ordinal));
+
+        violations.ShouldBeEmpty(
+            "Exception classes must not reside in Endpoints namespaces — they are domain concerns. " +
+            $"Violators: {string.Join(", ", violations.Select(c => c.FullName))}");
+    }
+
+    /// <summary>
+    /// Exception classes must not depend on ASP.NET Core types — exceptions are domain concerns.
+    /// </summary>
+    public static void ExceptionsShouldNotDependOnAspNetCore(
+        ArchUnitNET.Domain.Architecture architecture,
+        string typePrefix)
+    {
+        IEnumerable<Class> exceptionClasses = architecture.Classes
+            .Where(c => c.FullName.StartsWith(typePrefix, StringComparison.Ordinal)
+                && c.Name.EndsWith("Exception", StringComparison.Ordinal));
+
+        IEnumerable<Class> violations = exceptionClasses
+            .Where(c => c.Dependencies
+                .Any(d => d.Target.FullName.StartsWith("Microsoft.AspNetCore", StringComparison.Ordinal)));
+
+        violations.ShouldBeEmpty(
+            "Exception classes must not depend on ASP.NET Core — they are domain concerns. " +
+            $"Violators: {string.Join(", ", violations.Select(c => c.FullName))}");
+    }
+
+    /// <summary>
+    /// IQueryable must not escape the persistence/data layer.
+    /// Types in the given allowed namespaces are exempt.
+    /// </summary>
+    public static void IQueryableShouldNotEscapePersistenceLayer(
+        ArchUnitNET.Domain.Architecture architecture,
+        params string[] allowedNamespaceFragments)
+    {
+        string[] defaultAllowed = ["EntityFrameworkCore", "Querying", "Persistence"];
+        string[] allAllowed = [.. defaultAllowed, .. allowedNamespaceFragments];
+
+        IEnumerable<IType> violators = architecture.Types
+            .Where(t => !allAllowed.Any(ns =>
+                t.Namespace.FullName.Contains(ns, StringComparison.Ordinal)))
+            .Where(t => t.Dependencies
+                .Any(d => d.Target.FullName.StartsWith("System.Linq.IQueryable", StringComparison.Ordinal)));
+
+        violators.ShouldBeEmpty(
+            "IQueryable<T> must not escape the persistence layer. " +
+            $"Violators: {string.Join(", ", violators.Select(t => t.FullName))}");
+    }
+}

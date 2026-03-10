@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Exclude source-generated code from coverage -->
+          <ExcludeByAttribute>ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+          <!-- Exclude ASP.NET OpenAPI source generator and compiler-generated interceptors -->
+          <Exclude>[*]Microsoft.AspNetCore.OpenApi.Generated*,[*]System.Runtime.CompilerServices.InterceptsLocationAttribute*</Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

@@ -1,0 +1,105 @@
+using Granit.Authentication.ApiKeys.EntityFrameworkCore.Extensions;
+using Granit.Core.MultiTenancy;
+using Granit.Guids;
+using Granit.Persistence.Interceptors;
+using Granit.Security;
+using Granit.Timing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
+using Shouldly;
+using Xunit;
+
+namespace Granit.Authentication.ApiKeys.EntityFrameworkCore.Tests;
+
+public sealed class ApiKeysEntityFrameworkCoreServiceCollectionExtensionsTests
+{
+    [Fact]
+    public void AddGranitApiKeysEntityFrameworkCore_RegistersRequiredServices()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+
+        services.AddGranitApiKeysEntityFrameworkCore(
+            options => options.UseSqlite("DataSource=:memory:"));
+
+        ServiceProvider provider = services.BuildServiceProvider();
+
+        provider.GetService<IDbContextFactory<ApiKeysDbContext>>().ShouldNotBeNull();
+        provider.GetService<IApiKeyStore>().ShouldNotBeNull();
+        provider.GetService<IApiKeyAdminStore>().ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitApiKeysEntityFrameworkCore_NullServices_ThrowsArgumentNullException()
+    {
+        IServiceCollection services = null!;
+
+        Should.Throw<ArgumentNullException>(
+            () => services.AddGranitApiKeysEntityFrameworkCore(_ => { }));
+    }
+
+    [Fact]
+    public void AddGranitApiKeysEntityFrameworkCore_NullConfigureAction_ThrowsArgumentNullException()
+    {
+        var services = new ServiceCollection();
+
+        Should.Throw<ArgumentNullException>(
+            () => services.AddGranitApiKeysEntityFrameworkCore(null!));
+    }
+
+    [Fact]
+    public void AddGranitApiKeysEntityFrameworkCore_DoesNotDuplicateOnSecondCall()
+    {
+        var services = new ServiceCollection();
+
+        services.AddGranitApiKeysEntityFrameworkCore(
+            options => options.UseSqlite("DataSource=:memory:"));
+        services.AddGranitApiKeysEntityFrameworkCore(
+            options => options.UseSqlite("DataSource=:memory:"));
+
+        // TryAddScoped should prevent duplicate store registrations
+        services.Count(s => s.ServiceType == typeof(IApiKeyStore)).ShouldBe(1);
+        services.Count(s => s.ServiceType == typeof(IApiKeyAdminStore)).ShouldBe(1);
+    }
+
+    [Fact]
+    public void AddGranitApiKeysEntityFrameworkCore_WithInterceptors_ResolvesFactory()
+    {
+        var services = new ServiceCollection();
+
+        // Register real interceptors with substituted dependencies
+        services.AddSingleton(new AuditedEntityInterceptor(
+            Substitute.For<ICurrentUserService>(),
+            Substitute.For<IClock>(),
+            Substitute.For<IGuidGenerator>(),
+            Substitute.For<ICurrentTenant>()));
+        services.AddSingleton(new SoftDeleteInterceptor(
+            Substitute.For<ICurrentUserService>(),
+            Substitute.For<IClock>()));
+
+        services.AddGranitApiKeysEntityFrameworkCore(
+            options => options.UseSqlite("DataSource=:memory:"));
+
+        ServiceProvider provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApiKeysDbContext>>();
+        factory.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitApiKeysEntityFrameworkCore_WithoutInterceptors_ResolvesFactory()
+    {
+        var services = new ServiceCollection();
+
+        // No interceptors registered — the null path in the extension method
+        services.AddGranitApiKeysEntityFrameworkCore(
+            options => options.UseSqlite("DataSource=:memory:"));
+
+        ServiceProvider provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApiKeysDbContext>>();
+        factory.ShouldNotBeNull();
+    }
+}

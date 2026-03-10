@@ -116,6 +116,48 @@ public sealed class InMemoryWebhookSubscriptionStoreTests
     }
 
     // -------------------------------------------------------------------------
+    // SuspendAsync
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SuspendAsync_SetsStatusToSuspended()
+    {
+        WebhookSubscription sub = BuildSubscription("test.event", Guid.NewGuid(), WebhookSubscriptionStatus.Active);
+        _store.Add(sub);
+
+        await _store.SuspendAsync(sub.Id, "too many failures", TestContext.Current.CancellationToken);
+
+        WebhookSubscription? updated = await _store.FindByIdAsync(sub.Id, TestContext.Current.CancellationToken);
+        updated!.Status.ShouldBe(WebhookSubscriptionStatus.Suspended);
+        updated.DeactivationReason.ShouldBe("too many failures");
+        updated.SuspendedAt.ShouldNotBeNull();
+        updated.SuspendedBy.ShouldBe("system");
+    }
+
+    [Fact]
+    public async Task SuspendAsync_UnknownId_DoesNotThrow()
+    {
+        Func<Task> act = () => _store.SuspendAsync(Guid.NewGuid(), "reason", TestContext.Current.CancellationToken);
+
+        await Should.NotThrowAsync(act);
+    }
+
+    [Fact]
+    public async Task SuspendAsync_SuspendedSubscription_NotReturnedByGetActive()
+    {
+        var tenantId = Guid.NewGuid();
+        WebhookSubscription sub = BuildSubscription("test.event", tenantId, WebhookSubscriptionStatus.Active);
+        _store.Add(sub);
+
+        await _store.SuspendAsync(sub.Id, "suspended", TestContext.Current.CancellationToken);
+
+        IReadOnlyList<WebhookSubscription> result =
+            await _store.GetActiveSubscriptionsAsync("test.event", tenantId, TestContext.Current.CancellationToken);
+
+        result.ShouldBeEmpty();
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 

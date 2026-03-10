@@ -1,6 +1,17 @@
+// =============================================================================
+// Tests - MailKitEmailSender
+// =============================================================================
+// Verifies the MailKit SMTP email sender: MimeMessage construction, sender
+// address resolution (FromOverride > Username > fallback), body builder,
+// authentication branching, and successful send/disconnect flow.
+// Uses ISmtpTransportFactory + ISmtpTransport substitutes to avoid real SMTP.
+// =============================================================================
+
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -9,18 +20,46 @@ namespace Granit.Notifications.Email.Smtp.Tests;
 public sealed class MailKitEmailSenderTests
 {
     // -------------------------------------------------------------------------
-    // MimeMessage construction tests
-    // MailKitEmailSender creates a new SmtpClient internally (sealed, no interface),
-    // so we test message construction logic by verifying the sender resolution
-    // and validate the class implements IEmailSender correctly.
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private static (MailKitEmailSender Sender, ISmtpTransport Transport) CreateSender(SmtpOptions? options = null)
+    {
+        SmtpOptions opts = options ?? new SmtpOptions
+        {
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = true,
+            TimeoutSeconds = 10,
+        };
+        ISmtpTransport transport = Substitute.For<ISmtpTransport>();
+
+        MailKitEmailSender sender = new(
+            Options.Create(opts),
+            NullLogger<MailKitEmailSender>.Instance,
+            () => transport);
+
+        return (sender, transport);
+    }
+
+    private static EmailMessage SimpleMessage(string? fromOverride = null, string? plainText = null) =>
+        new()
+        {
+            To = "recipient@example.com",
+            Subject = "Test subject",
+            HtmlBody = "<p>Hello</p>",
+            FromOverride = fromOverride,
+            PlainTextBody = plainText,
+        };
+
+    // -------------------------------------------------------------------------
+    // Class structure
     // -------------------------------------------------------------------------
 
     [Fact]
     public void Class_Implements_IEmailSender()
     {
-        SmtpOptions options = new() { Host = "localhost", Port = 25, UseSsl = false };
-        MailKitEmailSender sender = new(Options.Create(options), NullLogger<MailKitEmailSender>.Instance);
-
+        var (sender, _) = CreateSender();
         sender.ShouldBeAssignableTo<IEmailSender>();
     }
 
@@ -33,68 +72,332 @@ public sealed class MailKitEmailSenderTests
         typeof(MailKitEmailSender).IsNotPublic.ShouldBeTrue();
 
     // -------------------------------------------------------------------------
-    // Sender address resolution — tested via MailboxAddress.Parse behavior
+    // SendAsync — successful send (full code path)
     // -------------------------------------------------------------------------
 
     [Fact]
-    public void FromOverride_TakesPrecedence_OverUsername()
+    public async Task SendAsync_ConnectsAuthenticatesSendsAndDisconnects()
     {
-        // FromOverride is used for both name and email in the implementation:
-        // new MailboxAddress(message.FromOverride ?? ..., message.FromOverride ?? ...)
-        // So if FromOverride is "sender@example.com", both name and address use it.
-        var address = new MailboxAddress("sender@example.com", "sender@example.com");
-        address.Address.ShouldBe("sender@example.com");
-    }
-
-    [Fact]
-    public void Username_UsedWhen_FromOverrideIsNull()
-    {
-        // When FromOverride is null, Username is used for both name and address
-        string username = "user@mail.com";
-        var address = new MailboxAddress(username, username);
-        address.Address.ShouldBe("user@mail.com");
-    }
-
-    [Fact]
-    public void Fallback_ToNoreply_WhenBothNull()
-    {
-        // When both FromOverride and Username are null, falls back to "noreply" / "noreply@localhost"
-        var address = new MailboxAddress("noreply", "noreply@localhost");
-        address.Name.ShouldBe("noreply");
-        address.Address.ShouldBe("noreply@localhost");
-    }
-
-    [Fact]
-    public void MailboxAddress_Parse_ValidEmail_Succeeds()
-    {
-        var parsed = MailboxAddress.Parse("recipient@example.com");
-        parsed.Address.ShouldBe("recipient@example.com");
-    }
-
-    // -------------------------------------------------------------------------
-    // BodyBuilder construction
-    // -------------------------------------------------------------------------
-
-    [Fact]
-    public void BodyBuilder_WithHtmlOnly_ProducesValidBody()
-    {
-        BodyBuilder builder = new() { HtmlBody = "<p>Hello</p>" };
-        MimeEntity body = builder.ToMessageBody();
-
-        body.ShouldNotBeNull();
-    }
-
-    [Fact]
-    public void BodyBuilder_WithHtmlAndPlainText_ProducesMultipartBody()
-    {
-        BodyBuilder builder = new()
+        SmtpOptions opts = new()
         {
-            HtmlBody = "<p>Hello</p>",
-            TextBody = "Hello",
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = true,
+            Username = "user@mail.com",
+            Password = "test-password",
+            TimeoutSeconds = 15,
         };
-        MimeEntity body = builder.ToMessageBody();
+        var (sender, transport) = CreateSender(opts);
 
-        body.ShouldNotBeNull();
-        body.ShouldBeAssignableTo<Multipart>();
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        transport.Timeout.ShouldBe(15000);
+        await transport.Received(1).ConnectAsync(
+            "mail.example.com",
+            587,
+            MailKit.Security.SecureSocketOptions.StartTls,
+            Arg.Any<CancellationToken>());
+        await transport.Received(1).AuthenticateAsync(
+            "user@mail.com",
+            "test-password",
+            Arg.Any<CancellationToken>());
+        await transport.Received(1).SendAsync(
+            Arg.Any<MimeMessage>(),
+            Arg.Any<CancellationToken>());
+        await transport.Received(1).DisconnectAsync(
+            true,
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SendAsync_WithoutUseSsl_UsesNoneSocketOptions()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "localhost",
+            Port = 25,
+            UseSsl = false,
+            TimeoutSeconds = 5,
+        };
+        var (sender, transport) = CreateSender(opts);
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        await transport.Received(1).ConnectAsync(
+            "localhost",
+            25,
+            MailKit.Security.SecureSocketOptions.None,
+            Arg.Any<CancellationToken>());
+    }
+
+    // -------------------------------------------------------------------------
+    // Authentication branching
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithUsernameAndPassword_Authenticates()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = false,
+            Username = "user",
+            Password = "pass",
+            TimeoutSeconds = 5,
+        };
+        var (sender, transport) = CreateSender(opts);
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        await transport.Received(1).AuthenticateAsync("user", "pass", Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SendAsync_WithNullUsernameAndPassword_SkipsAuthentication()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = false,
+            Username = null,
+            Password = null,
+            TimeoutSeconds = 5,
+        };
+        var (sender, transport) = CreateSender(opts);
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        await transport.DidNotReceive().AuthenticateAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SendAsync_WithUsernameOnly_NullPassword_SkipsAuthentication()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = false,
+            Username = "user",
+            Password = null,
+            TimeoutSeconds = 5,
+        };
+        var (sender, transport) = CreateSender(opts);
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        await transport.DidNotReceive().AuthenticateAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SendAsync_WithPasswordOnly_NullUsername_SkipsAuthentication()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = false,
+            Username = null,
+            Password = "pass",
+            TimeoutSeconds = 5,
+        };
+        var (sender, transport) = CreateSender(opts);
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        await transport.DidNotReceive().AuthenticateAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    // -------------------------------------------------------------------------
+    // Sender address resolution
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithFromOverride_UsesSenderAddressFromOverride()
+    {
+        var (sender, transport) = CreateSender();
+        MimeMessage? captured = null;
+        await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(SimpleMessage(fromOverride: "custom@example.com"), TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        ((MailboxAddress)captured.From[0]).Address.ShouldBe("custom@example.com");
+    }
+
+    [Fact]
+    public async Task SendAsync_WithoutFromOverride_UsesUsername()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = false,
+            Username = "sender@example.com",
+            TimeoutSeconds = 5,
+        };
+        var (sender, transport) = CreateSender(opts);
+        MimeMessage? captured = null;
+        await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        ((MailboxAddress)captured.From[0]).Address.ShouldBe("sender@example.com");
+    }
+
+    [Fact]
+    public async Task SendAsync_WithoutFromOverrideOrUsername_FallsBackToNoreply()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "mail.example.com",
+            Port = 587,
+            UseSsl = false,
+            Username = null,
+            TimeoutSeconds = 5,
+        };
+        var (sender, transport) = CreateSender(opts);
+        MimeMessage? captured = null;
+        await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        ((MailboxAddress)captured.From[0]).Name.ShouldBe("noreply");
+        ((MailboxAddress)captured.From[0]).Address.ShouldBe("noreply@localhost");
+    }
+
+    // -------------------------------------------------------------------------
+    // Body construction
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithPlainTextBody_SetsTextBody()
+    {
+        var (sender, transport) = CreateSender();
+        MimeMessage? captured = null;
+        await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(
+            SimpleMessage(plainText: "Hello plain"),
+            TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.TextBody.ShouldBe("Hello plain");
+    }
+
+    [Fact]
+    public async Task SendAsync_WithNullPlainTextBody_SkipsTextBody()
+    {
+        var (sender, transport) = CreateSender();
+        MimeMessage? captured = null;
+        await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(
+            SimpleMessage(plainText: null),
+            TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.TextBody.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task SendAsync_SetsRecipientAndSubject()
+    {
+        var (sender, transport) = CreateSender();
+        MimeMessage? captured = null;
+        await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        ((MailboxAddress)captured.To[0]).Address.ShouldBe("recipient@example.com");
+        captured.Subject.ShouldBe("Test subject");
+    }
+
+    // -------------------------------------------------------------------------
+    // Timeout calculation
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_SetsTimeoutInMilliseconds()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "localhost",
+            Port = 25,
+            UseSsl = false,
+            TimeoutSeconds = 42,
+        };
+        var (sender, transport) = CreateSender(opts);
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        transport.Timeout.ShouldBe(42000);
+    }
+
+    // -------------------------------------------------------------------------
+    // Transport disposal
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_DisposesTransportAfterSend()
+    {
+        var (sender, transport) = CreateSender();
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        transport.Received(1).Dispose();
+    }
+
+    // -------------------------------------------------------------------------
+    // Logger message (exercises the source-generated LogEmailSent)
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_LogsEmailSent()
+    {
+        SmtpOptions opts = new()
+        {
+            Host = "smtp.test.com",
+            Port = 465,
+            UseSsl = false,
+            TimeoutSeconds = 5,
+        };
+        ISmtpTransport transport = Substitute.For<ISmtpTransport>();
+
+        var logger = Substitute.For<ILogger<MailKitEmailSender>>();
+        logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+
+        MailKitEmailSender sender = new(Options.Create(opts), logger, () => transport);
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        logger.Received().Log(
+            LogLevel.Information,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(o => o.ToString()!.Contains("recipient@example.com")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    // -------------------------------------------------------------------------
+    // Null transport factory fallback
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void Constructor_WithNullFactory_UsesDefaultFactory()
+    {
+        SmtpOptions opts = new() { Host = "localhost", Port = 25, UseSsl = false };
+        MailKitEmailSender sender = new(Options.Create(opts), NullLogger<MailKitEmailSender>.Instance);
+
+        // Should not throw — default factory is used internally
+        sender.ShouldNotBeNull();
     }
 }

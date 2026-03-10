@@ -180,6 +180,376 @@ public sealed class ClosedXmlExportWriterTests
         cell.Style.DateFormat.Format.ShouldBe("yyyy-MM-dd");
     }
 
+    // ---- SetCellValue: DateTime ----------------------------------------
+
+    [Fact]
+    public async Task WriteAsync_datetime_uses_default_date_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("CreatedAt", "DateTime", null, null, 0, false),
+        ];
+
+        var dt = new DateTime(2024, 3, 15, 10, 30, 0, DateTimeKind.Utc);
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["CreatedAt"] = dt },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<DateTime>().ShouldBe(dt);
+        cell.Style.DateFormat.Format.ShouldBe("dd/MM/yyyy");
+    }
+
+    [Fact]
+    public async Task WriteAsync_datetime_uses_custom_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("CreatedAt", "DateTime", null, "yyyy-MM-dd HH:mm:ss", 0, false),
+        ];
+
+        var dt = new DateTime(2024, 3, 15, 10, 30, 0, DateTimeKind.Utc);
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["CreatedAt"] = dt },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.Style.DateFormat.Format.ShouldBe("yyyy-MM-dd HH:mm:ss");
+    }
+
+    // ---- SetCellValue: DateTimeOffset -----------------------------------
+
+    [Fact]
+    public async Task WriteAsync_datetimeoffset_uses_default_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Timestamp", "DateTimeOffset", null, null, 0, false),
+        ];
+
+        var dto = new DateTimeOffset(2024, 3, 15, 10, 30, 0, TimeSpan.FromHours(2));
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Timestamp"] = dto },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<DateTime>().ShouldBe(dto.DateTime);
+        cell.Style.DateFormat.Format.ShouldBe("dd/MM/yyyy HH:mm");
+    }
+
+    [Fact]
+    public async Task WriteAsync_datetimeoffset_uses_custom_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Timestamp", "DateTimeOffset", null, "yyyy-MM-dd", 0, false),
+        ];
+
+        var dto = new DateTimeOffset(2024, 3, 15, 10, 30, 0, TimeSpan.FromHours(2));
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Timestamp"] = dto },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.Style.DateFormat.Format.ShouldBe("yyyy-MM-dd");
+    }
+
+    // ---- SetCellValue: DateOnly (default format) ------------------------
+
+    [Fact]
+    public async Task WriteAsync_dateonly_uses_default_format_when_no_custom()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("BirthDate", "DateOnly", null, null, 0, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["BirthDate"] = new DateOnly(1990, 6, 15) },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<DateTime>().ShouldBe(new DateTime(1990, 6, 15));
+        cell.Style.DateFormat.Format.ShouldBe("dd/MM/yyyy");
+    }
+
+    // ---- SetCellValue: decimal ------------------------------------------
+
+    [Fact]
+    public async Task WriteAsync_decimal_without_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Amount", "Decimal", null, null, 0, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Amount"] = 123.45m },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<decimal>().ShouldBe(123.45m);
+    }
+
+    [Fact]
+    public async Task WriteAsync_decimal_with_custom_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Amount", "Decimal", null, "#,##0.00", 0, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Amount"] = 1234.56m },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<decimal>().ShouldBe(1234.56m);
+        cell.Style.NumberFormat.Format.ShouldBe("#,##0.00");
+    }
+
+    // ---- SetCellValue: double -------------------------------------------
+
+    [Fact]
+    public async Task WriteAsync_double_without_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Rate", "Double", null, null, 0, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Rate"] = 3.14 },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<double>().ShouldBe(3.14);
+    }
+
+    [Fact]
+    public async Task WriteAsync_double_with_custom_format()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Rate", "Double", null, "0.000", 0, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Rate"] = 3.14159 },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<double>().ShouldBe(3.14159);
+        cell.Style.NumberFormat.Format.ShouldBe("0.000");
+    }
+
+    // ---- SetCellValue: long ---------------------------------------------
+
+    [Fact]
+    public async Task WriteAsync_long_value()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("BigId", "Int64", null, null, 0, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["BigId"] = 9_876_543_210L },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<long>().ShouldBe(9_876_543_210L);
+    }
+
+    // ---- SetCellValue: bool ---------------------------------------------
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task WriteAsync_bool_value(bool value)
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("IsActive", "Boolean", null, null, 0, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["IsActive"] = value },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetValue<bool>().ShouldBe(value);
+    }
+
+    // ---- SetCellValue: default (ToString) -------------------------------
+
+    [Fact]
+    public async Task WriteAsync_unknown_type_uses_tostring()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Id", "Guid", null, null, 0, false),
+        ];
+
+        var guid = Guid.NewGuid();
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Id"] = guid },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLCell cell = workbook.Worksheets.First().Cell(2, 1);
+        cell.GetString().ShouldBe(guid.ToString());
+    }
+
+    // ---- WriteAsync: missing key ----------------------------------------
+
+    [Fact]
+    public async Task WriteAsync_missing_key_in_row_writes_null()
+    {
+        // Arrange
+        List<ExportFieldDescriptor> fields =
+        [
+            new("Name", "String", null, null, 0, false),
+            new("Missing", "String", null, null, 1, false),
+        ];
+
+        List<IReadOnlyDictionary<string, object?>> rows =
+        [
+            new Dictionary<string, object?> { ["Name"] = "Alice" },
+        ];
+
+        using MemoryStream stream = new();
+
+        // Act
+        await Sut.WriteAsync(stream, fields, ToAsyncEnumerable(rows), TestContext.Current.CancellationToken);
+
+        // Assert
+        stream.Position = 0;
+        using XLWorkbook workbook = new(stream);
+        IXLWorksheet ws = workbook.Worksheets.First();
+        ws.Cell(2, 1).GetString().ShouldBe("Alice");
+        ws.Cell(2, 2).GetString().ShouldBeEmpty();
+    }
+
     // ---- Helpers -----------------------------------------------------
 
     private static async IAsyncEnumerable<IReadOnlyDictionary<string, object?>> ToAsyncEnumerable(

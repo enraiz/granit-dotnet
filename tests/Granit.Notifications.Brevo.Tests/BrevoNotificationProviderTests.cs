@@ -11,6 +11,7 @@ using System.Text.Json;
 using Granit.Notifications.Email;
 using Granit.Notifications.Sms;
 using Granit.Notifications.WhatsApp;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -44,8 +45,11 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             DefaultSmsSenderId = "TestApp",
         });
 
+        var enabledLogger = Substitute.For<ILogger<BrevoNotificationProvider>>();
+        enabledLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+
         _provider = new BrevoNotificationProvider(
-            _httpClientFactory, optionsMonitor, NullLogger<BrevoNotificationProvider>.Instance);
+            _httpClientFactory, optionsMonitor, enabledLogger);
     }
 
     // -------------------------------------------------------------------------
@@ -330,6 +334,219 @@ public sealed class BrevoNotificationProviderTests : IDisposable
         string body = _handler.Requests[0].Body;
         body.ShouldContain("\"language\":\"fr\"");
     }
+
+    [Fact]
+    public async Task SendWhatsAppAsync_UsesExplicitLanguage_WhenProvided()
+    {
+        IWhatsAppSender whatsAppSender = _provider;
+
+        await whatsAppSender.SendAsync(
+            new WhatsAppMessage
+            {
+                To = "+32470000000",
+                TemplateName = "welcome_template",
+                Language = "en",
+            },
+            TestContext.Current.CancellationToken);
+
+        string body = _handler.Requests[0].Body;
+        body.ShouldContain("\"language\":\"en\"");
+    }
+
+    [Fact]
+    public async Task SendWhatsAppAsync_ThrowsOnNon2xx()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.Forbidden;
+        _handler.ResponseBody = """{"code":"forbidden","message":"Access denied"}""";
+        IWhatsAppSender whatsAppSender = _provider;
+
+        HttpRequestException ex = await Should.ThrowAsync<HttpRequestException>(() => whatsAppSender.SendAsync(
+            new WhatsAppMessage
+            {
+                To = "+32470000000",
+                TemplateName = "welcome_template",
+            },
+            TestContext.Current.CancellationToken));
+
+        ex.Message.ShouldContain("Access denied");
+        ex.Message.ShouldContain("whatsapp/sendTemplate");
+        ex.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task SendWhatsAppAsync_OmitsSenderNumber_WhenNull()
+    {
+        IWhatsAppSender whatsAppSender = _provider;
+
+        await whatsAppSender.SendAsync(
+            new WhatsAppMessage
+            {
+                To = "+32470000000",
+                TemplateName = "welcome_template",
+            },
+            TestContext.Current.CancellationToken);
+
+        string body = _handler.Requests[0].Body;
+        using var doc = JsonDocument.Parse(body);
+        JsonElement root = doc.RootElement;
+
+        // senderNumber is null and DefaultIgnoreCondition is WhenWritingNull,
+        // but anonymous types serialize null as JsonValueKind.Null or may omit it.
+        // Check that body doesn't contain a non-null senderNumber value.
+        if (root.TryGetProperty("senderNumber", out JsonElement senderNumber))
+        {
+            senderNumber.ValueKind.ShouldBe(JsonValueKind.Null);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // EnsureSuccessAsync — error body parsing
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task EnsureSuccessAsync_IncludesErrorBody_WhenResponseHasNoContent()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.InternalServerError;
+        _handler.ResponseBody = null;
+        IEmailSender emailSender = _provider;
+
+        HttpRequestException ex = await Should.ThrowAsync<HttpRequestException>(() => emailSender.SendAsync(
+            new EmailMessage
+            {
+                To = "user@test.com",
+                Subject = "Test",
+                HtmlBody = "<p>Hi</p>",
+            },
+            TestContext.Current.CancellationToken));
+
+        // When no response body is returned, the error body is read as empty string.
+        ex.Message.ShouldContain("smtp/email");
+        ex.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
+    public async Task EnsureSuccessAsync_ThrowsWithNoBody_WhenContentReadThrows()
+    {
+        // Use a handler that returns non-2xx with content that throws on read,
+        // exercising the catch block in EnsureSuccessAsync (lines 111-113).
+        var throwingHandler = new ThrowOnReadHttpMessageHandler(HttpStatusCode.InternalServerError);
+        using var throwingClient = new HttpClient(throwingHandler)
+        {
+            BaseAddress = new Uri("https://api.brevo.com/v3/"),
+        };
+
+        var factory = Substitute.For<IHttpClientFactory>();
+        factory.CreateClient("Brevo").Returns(throwingClient);
+
+        IOptionsMonitor<BrevoOptions> optionsMonitor = Substitute.For<IOptionsMonitor<BrevoOptions>>();
+        optionsMonitor.CurrentValue.Returns(new BrevoOptions
+        {
+            ApiKey = "test-key",
+            DefaultSenderEmail = "default@test.com",
+            DefaultSenderName = "Test App",
+        });
+
+        var throwTestLogger = Substitute.For<ILogger<BrevoNotificationProvider>>();
+        throwTestLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+
+        var provider = new BrevoNotificationProvider(
+            factory, optionsMonitor, throwTestLogger);
+        IEmailSender emailSender = provider;
+
+        // The method should throw — either HttpRequestException from EnsureSuccessAsync
+        // (with "(no body)" if catch works) or an exception from content read failure.
+        await Should.ThrowAsync<Exception>(() => emailSender.SendAsync(
+            new EmailMessage
+            {
+                To = "user@test.com",
+                Subject = "Test",
+                HtmlBody = "<p>Hi</p>",
+            },
+            TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SendSmsAsync_ThrowsOnNon2xx_WithNoBody()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.InternalServerError;
+        _handler.ResponseBody = null;
+        ISmsSender smsSender = _provider;
+
+        HttpRequestException ex = await Should.ThrowAsync<HttpRequestException>(() => smsSender.SendAsync(
+            new SmsMessage
+            {
+                To = "+32470000000",
+                Body = "Hello SMS",
+            },
+            TestContext.Current.CancellationToken));
+
+        ex.Message.ShouldContain("transactionalSMS/sms");
+        ex.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
+    public async Task SendWhatsAppAsync_ThrowsOnNon2xx_WithErrorBody()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.Unauthorized;
+        _handler.ResponseBody = """{"code":"unauthorized","message":"Invalid API key"}""";
+        IWhatsAppSender whatsAppSender = _provider;
+
+        HttpRequestException ex = await Should.ThrowAsync<HttpRequestException>(() => whatsAppSender.SendAsync(
+            new WhatsAppMessage
+            {
+                To = "+32470000000",
+                TemplateName = "welcome_template",
+            },
+            TestContext.Current.CancellationToken));
+
+        ex.Message.ShouldContain("Invalid API key");
+        ex.Message.ShouldContain("whatsapp/sendTemplate");
+        ex.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task SendWhatsAppAsync_WithEmptyTemplateParameters_IncludesEmptyArray()
+    {
+        IWhatsAppSender whatsAppSender = _provider;
+
+        await whatsAppSender.SendAsync(
+            new WhatsAppMessage
+            {
+                To = "+32470000000",
+                TemplateName = "simple_template",
+                TemplateParameters = [],
+            },
+            TestContext.Current.CancellationToken);
+
+        string body = _handler.Requests[0].Body;
+        using var doc = JsonDocument.Parse(body);
+        JsonElement root = doc.RootElement;
+        root.GetProperty("params").GetArrayLength().ShouldBe(0);
+    }
+
+    // -------------------------------------------------------------------------
+    // Class structure
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void Class_IsSealed() =>
+        typeof(BrevoNotificationProvider).IsSealed.ShouldBeTrue();
+
+    [Fact]
+    public void Class_IsInternal() =>
+        typeof(BrevoNotificationProvider).IsNotPublic.ShouldBeTrue();
+
+    [Fact]
+    public void Class_ImplementsIEmailSender() =>
+        _provider.ShouldBeAssignableTo<IEmailSender>();
+
+    [Fact]
+    public void Class_ImplementsISmsSender() =>
+        _provider.ShouldBeAssignableTo<ISmsSender>();
+
+    [Fact]
+    public void Class_ImplementsIWhatsAppSender() =>
+        _provider.ShouldBeAssignableTo<IWhatsAppSender>();
 
     // -------------------------------------------------------------------------
     // IDisposable

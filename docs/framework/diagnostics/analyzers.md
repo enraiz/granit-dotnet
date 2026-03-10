@@ -63,6 +63,7 @@ HDS/RGPD. Elles sont toujours actives.
 | GRSEC001 | Warning | `DateTime.Now`, `DateTime.UtcNow`, `DateTimeOffset.Now`, `DateTimeOffset.UtcNow` — utiliser `IClock` |
 | GRSEC002 | Warning | `Guid.NewGuid()` — utiliser `IGuidGenerator.Create()` |
 | GRSEC003 | Error | Secret potentiellement codé en dur dans le code source |
+| GRSEC004 | Warning | Accès direct `IResponseCookies.Append/Delete` — utiliser `IGranitCookieManager` (opt-in : `Granit.Cookies`) |
 
 #### GRSEC001 — Accès direct à l'horloge système
 
@@ -119,6 +120,21 @@ string tokenHeader = "Authorization";
 #pragma warning restore GRSEC003
 ```
 
+#### GRSEC004 — Accès direct aux cookies
+
+L'accès direct à `IResponseCookies.Append()` ou `IResponseCookies.Delete()` contourne
+le registre strict de cookies et les vérifications de consentement RGPD. Cette règle
+s'active uniquement quand `Granit.Cookies.IGranitCookieManager` est présent dans la
+compilation (opt-in).
+
+```csharp
+// Interdit
+Response.Cookies.Append("session", value);
+
+// Correct
+await cookieManager.SetCookieAsync("session", value);
+```
+
 ### Entity Framework (GREF)
 
 | Règle | Sévérité | Description |
@@ -166,6 +182,7 @@ certaines règles.
 | GRSEC001 | Remplacer par injection `IClock` | Remplace l'expression, ajoute champ + constructeur + `using Granit.Timing` |
 | GRSEC002 | Remplacer par injection `IGuidGenerator` | Remplace l'expression, ajoute champ + constructeur + `using Granit.Guids` |
 | GRSEC003 | — | Pas de correction automatique (les secrets ne se corrigent pas automatiquement) |
+| GRSEC004 | Remplacer par injection `IGranitCookieManager` | Remplace l'appel, ajoute champ + constructeur + `using Granit.Cookies` |
 | GREF001 | Remplacer par `SaveChangesAsync()` | Ajoute `await`, transforme la méthode en `async`, ajoute `using System.Threading.Tasks` |
 
 ### Exemple — GRSEC001
@@ -220,10 +237,10 @@ corrections en cascade.
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | Aucun (analyseur Roslyn, pas de dépendance runtime) |
-| **Utilisé par** | `Granit.Analyzers.CodeFixes` |
+| Direction       | Modules                                             |
+| --------------- | --------------------------------------------------- |
+| **Dépend de**   | Aucun (analyseur Roslyn, pas de dépendance runtime) |
+| **Utilisé par** | `Granit.Analyzers.CodeFixes`                        |
 
 > Les analyseurs sont des packages indépendants qui s'exécutent au build.
 > Ils n'ont aucune dépendance runtime vers les autres modules Granit.

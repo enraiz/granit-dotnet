@@ -1,34 +1,24 @@
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
 namespace Granit.Authentication.ApiKeys.EntityFrameworkCore.Tests;
 
-public sealed class EfCoreApiKeyStoreTests : IAsyncLifetime
+public sealed class EfCoreApiKeyStoreTests : IDisposable
 {
-    private SqliteConnection _connection = null!;
-    private DbContextOptions<ApiKeysDbContext> _options = null!;
-    private EfCoreApiKeyStore _sut = null!;
+    private readonly TestDbContextFactory _factory;
+    private readonly EfCoreApiKeyStore _sut;
 
-    public async ValueTask InitializeAsync()
+    public EfCoreApiKeyStoreTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        await _connection.OpenAsync(TestContext.Current.CancellationToken);
-
-        _options = new DbContextOptionsBuilder<ApiKeysDbContext>()
-            .UseSqlite(_connection)
-            .Options;
-
-        await using var db = new ApiKeysDbContext(_options);
-        await db.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
-
-        var factory = new TestDbContextFactory(_options);
-        _sut = new EfCoreApiKeyStore(factory, NullLogger<EfCoreApiKeyStore>.Instance);
+        _factory = TestDbContextFactory.Create();
+        _sut = new EfCoreApiKeyStore(_factory, NullLogger<EfCoreApiKeyStore>.Instance);
     }
 
-    public async ValueTask DisposeAsync() => await _connection.DisposeAsync();
+    public void Dispose() => _factory.Dispose();
 
     [Fact]
     public async Task FindByHashAsync_ExistingKey_ReturnsEntry()
@@ -72,7 +62,7 @@ public sealed class EfCoreApiKeyStoreTests : IAsyncLifetime
         await _sut.UpdateLastUsedAsync(entry.Id, usedAt, TestContext.Current.CancellationToken);
 
         // Re-fetch with a fresh context to verify
-        await using ApiKeysDbContext db = new(_options);
+        await using ApiKeysDbContext db = _factory.CreateDbContext();
         ApiKeyEntry? updated = await db.ApiKeys
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(k => k.Id == entry.Id, TestContext.Current.CancellationToken);
@@ -80,9 +70,28 @@ public sealed class EfCoreApiKeyStoreTests : IAsyncLifetime
         updated.LastUsedAt.ShouldBe(usedAt);
     }
 
+    [Fact]
+    public async Task UpdateLastUsedAsync_DbUpdateException_DoesNotPropagate()
+    {
+        // Mock factory that throws DbUpdateException when creating a context
+        var mockFactory = Substitute.For<IDbContextFactory<ApiKeysDbContext>>();
+        mockFactory.CreateDbContextAsync(Arg.Any<CancellationToken>())
+            .Returns<ApiKeysDbContext>(_ => throw new DbUpdateException("Simulated failure"));
+
+        var logger = Substitute.For<ILogger<EfCoreApiKeyStore>>();
+        var failingSut = new EfCoreApiKeyStore(mockFactory, logger);
+
+        // Should not throw — the exception is caught and logged
+        await Should.NotThrowAsync(
+            () => failingSut.UpdateLastUsedAsync(
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow,
+                TestContext.Current.CancellationToken));
+    }
+
     private async Task SeedAsync(ApiKeyEntry entry)
     {
-        await using var db = new ApiKeysDbContext(_options);
+        await using ApiKeysDbContext db = _factory.CreateDbContext();
         db.ApiKeys.Add(entry);
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
@@ -101,12 +110,4 @@ public sealed class EfCoreApiKeyStoreTests : IAsyncLifetime
         CreatedBy = "test",
     };
 
-    /// <summary>
-    /// Factory that creates new DbContext instances sharing the same SQLite connection.
-    /// </summary>
-    private sealed class TestDbContextFactory(DbContextOptions<ApiKeysDbContext> options)
-        : IDbContextFactory<ApiKeysDbContext>
-    {
-        public ApiKeysDbContext CreateDbContext() => new(options);
-    }
 }

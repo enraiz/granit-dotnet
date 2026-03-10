@@ -20,7 +20,7 @@ namespace Granit.Core.Exceptions;
 /// throw new BusinessRuleViolationException("Prescription:QuotaExceeded", "Monthly prescription quota reached.");
 /// </code>
 /// </example>
-public class BusinessRuleViolationException : BusinessException
+public sealed class BusinessRuleViolationException : BusinessException
 {
     /// <summary>
     /// Initializes a new instance of <see cref="BusinessRuleViolationException"/>.

@@ -15,6 +15,7 @@ namespace Granit.Persistence.Extensions;
 /// </remarks>
 public static class DbContextPurgeExtensions
 {
+    // S3011: intentional — generic EF Core bulk-delete pattern requires reflection on private generic method
     private static readonly MethodInfo PurgeEntityMethod =
         typeof(DbContextPurgeExtensions)
             .GetMethod(nameof(PurgeEntityAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
@@ -39,15 +40,13 @@ public static class DbContextPurgeExtensions
 
         int totalDeleted = 0;
 
-        foreach (IEntityType entityType in context.Model.GetEntityTypes())
+        foreach (var clrType in context.Model.GetEntityTypes()
+            .Where(et => typeof(ISoftDeletable).IsAssignableFrom(et.ClrType))
+            .Select(et => et.ClrType))
         {
-            if (!typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
-            {
-                continue;
-            }
-
-            MethodInfo generic = PurgeEntityMethod.MakeGenericMethod(entityType.ClrType);
-            int deleted = await ((Task<int>)generic.Invoke(null, [context, cutoff, batchSize, cancellationToken])!).ConfigureAwait(false);
+            MethodInfo generic = PurgeEntityMethod.MakeGenericMethod(clrType);
+            int deleted = await ((Task<int>)generic.Invoke(null, [context, cutoff, batchSize, cancellationToken])!)
+                .ConfigureAwait(false);
             totalDeleted += deleted;
         }
 

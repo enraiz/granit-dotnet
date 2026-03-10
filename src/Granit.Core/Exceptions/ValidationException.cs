@@ -19,7 +19,7 @@ namespace Granit.Core.Exceptions;
 /// throw new ValidationException(errors);
 /// </code>
 /// </example>
-public class ValidationException : Exception, IHasValidationErrors, IUserFriendlyException
+public sealed class ValidationException : Exception, IHasValidationErrors, IUserFriendlyException
 {
     /// <inheritdoc/>
     public IReadOnlyDictionary<string, string[]> ValidationErrors { get; }

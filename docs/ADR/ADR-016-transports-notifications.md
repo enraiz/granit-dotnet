@@ -4,7 +4,7 @@
 - **Date** : 2026-02-28
 - **Issue** : [#375](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/375)
 - **Auteurs** : Équipe Digital Dynamics
-- **Portée** : granit-dotnet (Granit.Notifications.Email.Smtp, Granit.Notifications.Push)
+- **Portée** : granit-dotnet (Granit.Notifications.Email.Smtp, Granit.Notifications.WebPush)
 
 > Voir aussi : [IAC ADR-001 — Choix OVHcloud](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/iac/-/blob/main/docs/ADR/ADR-001-choix-fournisseur-cloud-ovhcloud.md)
 > (SMTP self-hosted sur OVHcloud — pas de SendGrid / Amazon SES)

@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.ArchitectureTests.Abstractions\Granit.ArchitectureTests.Abstractions.csproj" />
+    <ProjectReference Include="..\Granit.ArchitectureTests.Abstractions\Granit.ArchitectureTests.Abstractions.csproj" />
   </ItemGroup>
 
   <!-- Reference ALL src assemblies for architecture analysis
@@ -86,7 +86,7 @@
     <ProjectReference Include="..\..\src\Granit.Notifications.EntityFrameworkCore\Granit.Notifications.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\src\Granit.Notifications.MobilePush\Granit.Notifications.MobilePush.csproj" />
     <ProjectReference Include="..\..\src\Granit.Notifications.MobilePush.Fcm\Granit.Notifications.MobilePush.Fcm.csproj" />
-    <ProjectReference Include="..\..\src\Granit.Notifications.Push\Granit.Notifications.Push.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Notifications.WebPush\Granit.Notifications.WebPush.csproj" />
     <ProjectReference Include="..\..\src\Granit.Notifications.SignalR\Granit.Notifications.SignalR.csproj" />
     <ProjectReference Include="..\..\src\Granit.Notifications.Sms\Granit.Notifications.Sms.csproj" />
     <ProjectReference Include="..\..\src\Granit.Notifications.WhatsApp\Granit.Notifications.WhatsApp.csproj" />

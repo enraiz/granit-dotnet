@@ -192,7 +192,7 @@ flowchart LR
 
     NOTIF_SMS["Notifications.Sms"] --> NOTIF
     NOTIF_WA["Notifications.WhatsApp"] --> NOTIF
-    NOTIF_PUSH["Notifications.Push"] --> NOTIF
+    NOTIF_PUSH["Notifications.WebPush"] --> NOTIF
     NOTIF_SR["Notifications.SignalR"] --> NOTIF
 
     NOTIF_BREVO["Notifications.Brevo"] --> NOTIF_EMAIL

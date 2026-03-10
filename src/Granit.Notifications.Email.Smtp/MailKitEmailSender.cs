@@ -1,4 +1,3 @@
-using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,8 +11,11 @@ namespace Granit.Notifications.Email.Smtp;
 /// </summary>
 internal sealed partial class MailKitEmailSender(
     IOptions<SmtpOptions> options,
-    ILogger<MailKitEmailSender> logger) : IEmailSender
+    ILogger<MailKitEmailSender> logger,
+    Func<ISmtpTransport>? transportFactory = null) : IEmailSender
 {
+    private readonly Func<ISmtpTransport> _transportFactory = transportFactory ?? (() => new MailKitSmtpTransport());
+
     /// <inheritdoc />
     public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
     {
@@ -39,7 +41,7 @@ internal sealed partial class MailKitEmailSender(
 
         mimeMessage.Body = bodyBuilder.ToMessageBody();
 
-        using SmtpClient client = new();
+        using ISmtpTransport client = _transportFactory();
         client.Timeout = timeoutMs;
 
         SecureSocketOptions socketOptions = smtp.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
