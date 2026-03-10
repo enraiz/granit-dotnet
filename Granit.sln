@@ -343,7 +343,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.Endpoi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.EntityFrameworkCore", "src\Granit.Notifications.EntityFrameworkCore\Granit.Notifications.EntityFrameworkCore.csproj", "{7467A64A-5605-4F0E-8D7E-AB513D9A4014}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.Push", "src\Granit.Notifications.Push\Granit.Notifications.Push.csproj", "{0530F69F-5A2B-427E-8AFC-BEE52033DF0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.WebPush", "src\Granit.Notifications.WebPush\Granit.Notifications.WebPush.csproj", "{0530F69F-5A2B-427E-8AFC-BEE52033DF0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.DocumentGeneration.Pdf", "src\Granit.DocumentGeneration.Pdf\Granit.DocumentGeneration.Pdf.csproj", "{B48F5E76-52E3-4E1E-816B-5864BE1896F9}"
 EndProject
@@ -359,7 +359,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.Email.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.EntityFrameworkCore.Tests", "tests\Granit.Notifications.EntityFrameworkCore.Tests\Granit.Notifications.EntityFrameworkCore.Tests.csproj", "{3990CF4B-D069-41EA-8FB0-18FC21A6885B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.Push.Tests", "tests\Granit.Notifications.Push.Tests\Granit.Notifications.Push.Tests.csproj", "{A30BE15B-99DD-4211-A29F-0426DC4F2878}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.WebPush.Tests", "tests\Granit.Notifications.WebPush.Tests\Granit.Notifications.WebPush.Tests.csproj", "{A30BE15B-99DD-4211-A29F-0426DC4F2878}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Notifications.SignalR.Tests", "tests\Granit.Notifications.SignalR.Tests\Granit.Notifications.SignalR.Tests.csproj", "{2F4AD537-69BE-4F49-BC53-84BAEC8EBF99}"
 EndProject

@@ -3,7 +3,7 @@ using Granit.Notifications.Abstractions;
 using Lib.Net.Http.WebPush;
 using Microsoft.Extensions.Logging;
 
-namespace Granit.Notifications.Push;
+namespace Granit.Notifications.WebPush;
 
 /// <summary>
 /// <see cref="INotificationChannel"/> implementation for W3C Web Push (VAPID).

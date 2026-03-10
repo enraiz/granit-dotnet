@@ -1,4 +1,4 @@
-namespace Granit.Notifications.Push;
+namespace Granit.Notifications.WebPush;
 
 /// <summary>W3C Push API subscription received from the browser.</summary>
 public sealed record PushSubscriptionInfo

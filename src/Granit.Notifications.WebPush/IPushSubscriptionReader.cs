@@ -1,4 +1,4 @@
-namespace Granit.Notifications.Push;
+namespace Granit.Notifications.WebPush;
 
 /// <summary>Read operations for browser push subscriptions per user.</summary>
 public interface IPushSubscriptionReader

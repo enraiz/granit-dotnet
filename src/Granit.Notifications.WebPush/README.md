@@ -1,4 +1,4 @@
-# Granit.Notifications.Push
+# Granit.Notifications.WebPush
 
 W3C Web Push (VAPID) notification channel for `Granit.Notifications`.
 RFC 8030/8291/8292 compliant, no FCM/US cloud dependency -- European sovereignty.
@@ -11,7 +11,7 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 ## Installation
 
 ```bash
-dotnet add package Granit.Notifications.Push
+dotnet add package Granit.Notifications.WebPush
 ```
 
 ## Documentation

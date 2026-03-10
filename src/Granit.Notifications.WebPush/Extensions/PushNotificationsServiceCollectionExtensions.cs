@@ -1,10 +1,11 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.WebPush.Options;
 using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Granit.Notifications.Push.Extensions;
+namespace Granit.Notifications.WebPush.Extensions;
 
 /// <summary>Extension methods for Web Push notification channel registration.</summary>
 public static class PushNotificationsServiceCollectionExtensions

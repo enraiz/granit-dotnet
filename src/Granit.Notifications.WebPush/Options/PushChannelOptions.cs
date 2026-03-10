@@ -1,4 +1,4 @@
-namespace Granit.Notifications.Push;
+namespace Granit.Notifications.WebPush.Options;
 
 /// <summary>Web Push VAPID configuration options.</summary>
 public sealed class PushChannelOptions

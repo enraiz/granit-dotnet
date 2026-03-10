@@ -697,7 +697,7 @@
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
         }
       },
-      "granit.notifications.push": {
+      "granit.notifications.webpush": {
         "type": "Project",
         "dependencies": {
           "Granit.Notifications": "[0.1.0-dev, )",

@@ -18,7 +18,7 @@ using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Granit.Notifications.Push.Tests;
+namespace Granit.Notifications.WebPush.Tests;
 
 public sealed class PushNotificationChannelTests
 {

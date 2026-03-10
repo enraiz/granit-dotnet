@@ -8,7 +8,7 @@
 
 using System.Net;
 
-namespace Granit.Notifications.Push.Tests;
+namespace Granit.Notifications.WebPush.Tests;
 
 internal sealed class MockHttpMessageHandler : HttpMessageHandler
 {

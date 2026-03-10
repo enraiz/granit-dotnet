@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Granit.Notifications.Push;
+namespace Granit.Notifications.WebPush;
 
 /// <summary>In-memory push subscription store for development/testing.</summary>
 internal sealed class InMemoryPushSubscriptionStore : IPushSubscriptionReader, IPushSubscriptionWriter

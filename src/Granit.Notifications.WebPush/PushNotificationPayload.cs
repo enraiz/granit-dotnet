@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Granit.Notifications.Push;
+namespace Granit.Notifications.WebPush;
 
 /// <summary>Payload sent to the browser via Web Push.</summary>
 public sealed record PushNotificationPayload

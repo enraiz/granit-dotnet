@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>Granit.Notifications.Push</PackageId>
+    <PackageId>Granit.Notifications.WebPush</PackageId>
     <Description>W3C Web Push (VAPID) notification channel for Granit.Notifications. RFC 8030/8291/8292 compliant, no FCM/US cloud dependency — European sovereignty.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Granit.Notifications.Push.Tests" />
+    <InternalsVisibleTo Include="Granit.Notifications.WebPush.Tests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 

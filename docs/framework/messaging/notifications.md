@@ -17,7 +17,7 @@ Treize packages composables :
 | `Granit.Notifications.Sms` | Abstraction `ISmsSender` + canal SMS (Keyed Services) |
 | `Granit.Notifications.WhatsApp` | Abstraction `IWhatsAppSender` + canal WhatsApp (templates Meta pré-approuvés) |
 | `Granit.Notifications.Brevo` | Provider unifié Email + SMS + WhatsApp via API Brevo |
-| `Granit.Notifications.Push` | Web Push W3C VAPID (souveraineté, pas de FCM/APNs) |
+| `Granit.Notifications.WebPush` | Web Push W3C VAPID (souveraineté, pas de FCM/APNs) |
 | `Granit.Notifications.MobilePush` | Abstraction `IMobilePushSender` + canal MobilePush (Keyed Services), token store |
 | `Granit.Notifications.MobilePush.Fcm` | Provider Firebase Cloud Messaging v1 (clé `"Fcm"`) |
 | `Granit.Notifications.Zulip` | Canal Zulip Bot API pour alertes infra (self-hosted) |
@@ -829,6 +829,6 @@ Notification aux admins abonnés
 | Direction | Modules |
 | --- | --- |
 | **Dépend de** | `Granit.Core`, `Granit.Timing`, `Granit.Wolverine` |
-| **Utilisé par** | `Granit.Notifications.EntityFrameworkCore`, `Granit.Notifications.SignalR`, `Granit.Notifications.Endpoints`, `Granit.Notifications.Email`, `Granit.Notifications.Sms`, `Granit.Notifications.WhatsApp`, `Granit.Notifications.Push`, `Granit.Notifications.MobilePush`, `Granit.Notifications.Zulip` |
+| **Utilisé par** | `Granit.Notifications.EntityFrameworkCore`, `Granit.Notifications.SignalR`, `Granit.Notifications.Endpoints`, `Granit.Notifications.Email`, `Granit.Notifications.Sms`, `Granit.Notifications.WhatsApp`, `Granit.Notifications.WebPush`, `Granit.Notifications.MobilePush`, `Granit.Notifications.Zulip` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).
