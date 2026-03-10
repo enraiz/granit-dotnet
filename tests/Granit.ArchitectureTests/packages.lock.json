@@ -1487,13 +1487,6 @@
           "Microsoft.Extensions.Http.Resilience": "[10.*, )"
         }
       },
-      "granit.notifications.push": {
-        "type": "Project",
-        "dependencies": {
-          "Granit.Notifications": "[0.1.0-dev, )",
-          "Lib.Net.Http.WebPush": "[3.*, )"
-        }
-      },
       "granit.notifications.signalr": {
         "type": "Project",
         "dependencies": {
@@ -1505,6 +1498,13 @@
         "type": "Project",
         "dependencies": {
           "Granit.Notifications": "[0.1.0-dev, )"
+        }
+      },
+      "granit.notifications.webpush": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Notifications": "[0.1.0-dev, )",
+          "Lib.Net.Http.WebPush": "[3.*, )"
         }
       },
       "granit.notifications.whatsapp": {
