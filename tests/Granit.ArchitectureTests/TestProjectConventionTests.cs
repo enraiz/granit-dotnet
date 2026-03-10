@@ -48,6 +48,31 @@ public sealed class TestProjectConventionTests
             $"Missing: {string.Join(", ", missing)}");
     }
 
+    [Fact]
+    public void Every_src_package_should_have_a_README()
+    {
+        string srcDir = Path.Combine(RepoRoot, "src");
+
+        IEnumerable<string> srcPackages = Directory.GetDirectories(srcDir)
+            .Select(Path.GetFileName)
+            .Where(name => name!.StartsWith("Granit.", StringComparison.Ordinal))
+            .Cast<string>();
+
+        List<string> missing = [];
+        foreach (string package in srcPackages)
+        {
+            string readmePath = Path.Combine(srcDir, package, "README.md");
+            if (!File.Exists(readmePath))
+            {
+                missing.Add(package);
+            }
+        }
+
+        missing.ShouldBeEmpty(
+            "Every src package must have a README.md. " +
+            $"Missing: {string.Join(", ", missing)}");
+    }
+
     private static string FindRepoRoot()
     {
         string? dir = Path.GetDirectoryName(typeof(TestProjectConventionTests).Assembly.Location);

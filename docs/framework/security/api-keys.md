@@ -9,7 +9,7 @@ système-à-système. Inspiré des patterns Stripe (préfixes typés) et Slack (
 | --- | --- | --- |
 | `Granit.Security` | `ActorKind`, enrichissement `ICurrentUserService` | `GranitSecurityModule` |
 | `Granit.Authentication.ApiKeys` | Handler d'authentification, générateur, CIDR | `GranitAuthenticationApiKeysModule` |
-| `Granit.Authentication.ApiKeys.EntityFrameworkCore` | Store EF Core (PostgreSQL) | `GranitAuthenticationApiKeysEntityFrameworkCoreModule` |
+| `Granit.Authentication.ApiKeys.EntityFrameworkCore` | Store EF Core | `GranitAuthenticationApiKeysEntityFrameworkCoreModule` |
 | `Granit.Authentication.ApiKeys.Endpoints` | Endpoints CRUD d'administration | `GranitAuthenticationApiKeysEndpointsModule` |
 
 ## Architecture
@@ -110,6 +110,9 @@ public sealed class MyAppModule : GranitModule { ... }
 ```
 
 ### Program.cs (enregistrement direct)
+
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
 
 ```csharp
 // Services

@@ -177,7 +177,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     [Fact]
     public async Task UpdatePreference_Returns204()
     {
-        UpdatePreferenceRequest request = new()
+        NotificationPreferenceUpdateRequest request = new()
         {
             NotificationTypeName = "Order.Shipped",
             ChannelName = "Email",

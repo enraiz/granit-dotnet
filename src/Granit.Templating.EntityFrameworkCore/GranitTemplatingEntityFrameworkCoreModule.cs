@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Persistence;
 
 namespace Granit.Templating.EntityFrameworkCore;
 
@@ -14,5 +15,7 @@ namespace Granit.Templating.EntityFrameworkCore;
 /// must configure the database provider explicitly.
 /// </para>
 /// </remarks>
-[DependsOn(typeof(GranitTemplatingModule))]
+[DependsOn(
+    typeof(GranitTemplatingModule),
+    typeof(GranitPersistenceModule))]
 public sealed class GranitTemplatingEntityFrameworkCoreModule : GranitModule;

@@ -17,5 +17,5 @@ public sealed class GranitNotificationsEndpointsModule : GranitModule
 {
     /// <inheritdoc />
     public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitValidatorsFromAssemblyContaining<UpdatePreferenceRequestValidator>();
+        context.Services.AddGranitValidatorsFromAssemblyContaining<NotificationPreferenceUpdateRequestValidator>();
 }

@@ -1,3 +1,4 @@
+using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -21,7 +22,25 @@ public static class ApiKeysEntityFrameworkCoreServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configureDbContext);
 
-        services.AddDbContextFactory<ApiKeysDbContext>(configureDbContext);
+        services.AddDbContextFactory<ApiKeysDbContext>((sp, options) =>
+        {
+            configureDbContext(options);
+
+            AuditedEntityInterceptor? auditInterceptor =
+                sp.GetService<AuditedEntityInterceptor>();
+            if (auditInterceptor is not null)
+            {
+                options.AddInterceptors(auditInterceptor);
+            }
+
+            SoftDeleteInterceptor? softDeleteInterceptor =
+                sp.GetService<SoftDeleteInterceptor>();
+            if (softDeleteInterceptor is not null)
+            {
+                options.AddInterceptors(softDeleteInterceptor);
+            }
+        }, ServiceLifetime.Scoped);
+
         services.TryAddScoped<IApiKeyStore, EfCoreApiKeyStore>();
         services.TryAddScoped<IApiKeyAdminStore, EfCoreApiKeyAdminStore>();
 

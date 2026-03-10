@@ -5,7 +5,7 @@ namespace Granit.ArchitectureTests;
 
 /// <summary>
 /// Validates class design conventions: sealed DbContexts, internal Ef*Store implementations,
-/// no MVC controllers, sealed Options classes.
+/// no MVC controllers, sealed Options classes, EF configuration confinement.
 /// </summary>
 public sealed class ClassDesignTests
 {
@@ -26,4 +26,12 @@ public sealed class ClassDesignTests
     [Fact]
     public void Options_classes_should_be_sealed() =>
         ClassDesignRules.OptionsClassesShouldBeSealed(Architecture, "Granit.");
+
+    [Fact]
+    public void EntityTypeConfigurations_should_be_in_EfCore_layer() =>
+        ClassDesignRules.EntityTypeConfigurationsShouldBeInEfCoreLayer(Architecture, "Granit.");
+
+    [Fact]
+    public void Entity_configurations_should_not_be_public() =>
+        ClassDesignRules.EntityConfigurationsShouldNotBePublic(Architecture, "Granit.");
 }

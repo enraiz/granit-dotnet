@@ -5,11 +5,11 @@ using Xunit;
 
 namespace Granit.Notifications.Endpoints.Tests.Validators;
 
-public sealed class UpdatePreferenceRequestValidatorTests
+public sealed class NotificationPreferenceUpdateRequestValidatorTests
 {
-    private readonly UpdatePreferenceRequestValidator _validator = new();
+    private readonly NotificationPreferenceUpdateRequestValidator _validator = new();
 
-    private static UpdatePreferenceRequest ValidRequest() => new()
+    private static NotificationPreferenceUpdateRequest ValidRequest() => new()
     {
         NotificationTypeName = "Order.Shipped",
         ChannelName = "Email",
@@ -38,19 +38,19 @@ public sealed class UpdatePreferenceRequestValidatorTests
     [InlineData("   ")]
     public void Validate_EmptyNotificationTypeName_Fails(string? typeName)
     {
-        UpdatePreferenceRequest request = ValidRequest() with { NotificationTypeName = typeName! };
+        NotificationPreferenceUpdateRequest request = ValidRequest() with { NotificationTypeName = typeName! };
 
         ValidationResult result = _validator.Validate(request);
 
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == nameof(UpdatePreferenceRequest.NotificationTypeName));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(NotificationPreferenceUpdateRequest.NotificationTypeName));
     }
 
     [Fact]
     public void Validate_NotificationTypeNameExceedsMaxLength_Fails()
     {
-        string longName = new('x', UpdatePreferenceRequestValidator.MaxNotificationTypeNameLength + 1);
-        UpdatePreferenceRequest request = ValidRequest() with { NotificationTypeName = longName };
+        string longName = new('x', NotificationPreferenceUpdateRequestValidator.MaxNotificationTypeNameLength + 1);
+        NotificationPreferenceUpdateRequest request = ValidRequest() with { NotificationTypeName = longName };
 
         ValidationResult result = _validator.Validate(request);
 
@@ -67,19 +67,19 @@ public sealed class UpdatePreferenceRequestValidatorTests
     [InlineData("   ")]
     public void Validate_EmptyChannelName_Fails(string? channelName)
     {
-        UpdatePreferenceRequest request = ValidRequest() with { ChannelName = channelName! };
+        NotificationPreferenceUpdateRequest request = ValidRequest() with { ChannelName = channelName! };
 
         ValidationResult result = _validator.Validate(request);
 
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == nameof(UpdatePreferenceRequest.ChannelName));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(NotificationPreferenceUpdateRequest.ChannelName));
     }
 
     [Fact]
     public void Validate_ChannelNameExceedsMaxLength_Fails()
     {
-        string longName = new('x', UpdatePreferenceRequestValidator.MaxChannelNameLength + 1);
-        UpdatePreferenceRequest request = ValidRequest() with { ChannelName = longName };
+        string longName = new('x', NotificationPreferenceUpdateRequestValidator.MaxChannelNameLength + 1);
+        NotificationPreferenceUpdateRequest request = ValidRequest() with { ChannelName = longName };
 
         ValidationResult result = _validator.Validate(request);
 
@@ -93,7 +93,7 @@ public sealed class UpdatePreferenceRequestValidatorTests
     [Fact]
     public void Validate_MultipleInvalidFields_ReturnsAllErrors()
     {
-        UpdatePreferenceRequest request = ValidRequest() with
+        NotificationPreferenceUpdateRequest request = ValidRequest() with
         {
             NotificationTypeName = "",
             ChannelName = "",

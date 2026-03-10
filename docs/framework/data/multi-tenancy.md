@@ -370,10 +370,10 @@ factory.WithWebHostBuilder(builder =>
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core` |
-| **Utilisé par (soft dependency)** | `Persistence`, `Settings`, `Wolverine`, `Authorization`, `Idempotency`, `BackgroundJobs`, `Webhooks` — via `ICurrentTenant` de `Granit.Core.MultiTenancy` |
+- **Dépend de** : `Granit.Core`
+- **Utilisé par (soft dependency)** : `Persistence`, `Settings`, `Wolverine`,
+  `Authorization`, `Idempotency`, `BackgroundJobs`, `Webhooks` — via
+  `ICurrentTenant` de `Granit.Core.MultiTenancy`
 
 > `ICurrentTenant` vit dans `Granit.Core.MultiTenancy`. Les modules ci-dessus consomment
 > l'interface sans déclarer `[DependsOn(GranitMultiTenancyModule)]`. Seuls `BlobStorage`
@@ -383,6 +383,7 @@ factory.WithWebHostBuilder(builder =>
 
 ## Voir aussi
 
+- [Compatibilité des fournisseurs EF Core](compatibilite-providers.md)
 - [Isolation Tenant-per-Database](isolation-tenant-per-database.md)
 - [Isolation Tenant-per-Schema](isolation-tenant-per-schema.md)
 - [Sélection de stratégie d'isolation](isolation-strategie.md)

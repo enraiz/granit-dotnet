@@ -41,7 +41,7 @@ internal static class ImportExecutionEndpoints
         return group;
     }
 
-    private static async Task<Results<Accepted, NotFound, BadRequest<string>>> ExecuteAsync(
+    private static async Task<Results<Accepted, NotFound, ProblemHttpResult>> ExecuteAsync(
         Guid jobId,
         IImportJobReader jobReader,
         IImportCommandDispatcher dispatcher,
@@ -55,8 +55,9 @@ internal static class ImportExecutionEndpoints
 
         if (job.Status != ImportJobStatus.Mapped)
         {
-            return TypedResults.BadRequest(
-                $"Cannot execute import job in status '{job.Status}'. Expected: Mapped.");
+            return TypedResults.Problem(
+                detail: $"Cannot execute import job in status '{job.Status}'. Expected: Mapped.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         ExecuteImportCommand command = new(job.Id, job.DefinitionName);
@@ -65,7 +66,7 @@ internal static class ImportExecutionEndpoints
         return TypedResults.Accepted($"/{job.Id}");
     }
 
-    private static async Task<Results<Ok<ImportReportResponse>, NotFound, BadRequest<string>>> DryRunAsync(
+    private static async Task<Results<Ok<ImportReportResponse>, NotFound, ProblemHttpResult>> DryRunAsync(
         Guid jobId,
         IImportJobReader jobReader,
         IImportOrchestrator orchestrator,
@@ -79,8 +80,9 @@ internal static class ImportExecutionEndpoints
 
         if (job.Status != ImportJobStatus.Mapped)
         {
-            return TypedResults.BadRequest(
-                $"Cannot dry-run import job in status '{job.Status}'. Expected: Mapped.");
+            return TypedResults.Problem(
+                detail: $"Cannot dry-run import job in status '{job.Status}'. Expected: Mapped.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         ImportReport report = await orchestrator.DryRunAsync(jobId, cancellationToken).ConfigureAwait(false);
@@ -102,7 +104,7 @@ internal static class ImportExecutionEndpoints
         return TypedResults.Ok(ImportJobResponse.FromJob(job));
     }
 
-    private static async Task<Results<NoContent, NotFound, BadRequest<string>>> CancelAsync(
+    private static async Task<Results<NoContent, NotFound, ProblemHttpResult>> CancelAsync(
         Guid jobId,
         IImportJobReader jobReader,
         IImportJobWriter jobWriter,
@@ -118,8 +120,9 @@ internal static class ImportExecutionEndpoints
         if (job.Status is ImportJobStatus.Executing or ImportJobStatus.Completed
             or ImportJobStatus.PartiallyCompleted or ImportJobStatus.Failed)
         {
-            return TypedResults.BadRequest(
-                $"Cannot cancel import job in status '{job.Status}'.");
+            return TypedResults.Problem(
+                detail: $"Cannot cancel import job in status '{job.Status}'.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         job.Status = ImportJobStatus.Cancelled;

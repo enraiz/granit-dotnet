@@ -1,4 +1,4 @@
-# ADR-004 : Redis via StackExchange.Redis — Cache distribué
+# ADR-003 : Redis via StackExchange.Redis — Cache distribué
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21

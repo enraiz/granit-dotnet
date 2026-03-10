@@ -54,8 +54,11 @@ public sealed class MyAppModule : GranitModule { }
 public sealed class MyAppModule : GranitModule { }
 ```
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```csharp
-// Startup — connexion au provider PostgreSQL
+// Startup — connexion au provider (exemple PostgreSQL)
 builder.AddGranitPersistenceMigrations(opts => opts.UseNpgsql(connectionString));
 ```
 

@@ -9,7 +9,7 @@
 
 | Critère | SharedDatabase | SchemaPerTenant | DatabasePerTenant |
 | --- | --- | --- | --- |
-| **Isolation physique** | Aucune (filtre SQL) | Schéma PostgreSQL dédié | Base de données dédiée |
+| **Isolation physique** | Aucune (filtre SQL) | Schéma dédié | Base de données dédiée |
 | **Isolation logique** | Filtre global `TenantId` | `SET search_path` | Connexion dédiée |
 | **Coût infrastructure** | Très faible | Faible | Élevé (N bases) |
 | **Nombre de tenants** | Illimité | ≤ ~1 000 par base | ≤ ~200 (PgBouncer conseillé) |
@@ -57,6 +57,9 @@ Une valeur invalide déclenche une `OptionsValidationException` au démarrage de
 (fail-fast).
 
 ## Installation
+
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
 
 ### Une seule stratégie fixe
 
@@ -182,6 +185,7 @@ builder.Services.AddGranitIsolatedDbContext<AppDbContext>(...);
 
 ## Voir aussi
 
+- [Compatibilité des fournisseurs EF Core](compatibilite-providers.md)
 - [Isolation Tenant-per-Database](isolation-tenant-per-database.md)
 - [Isolation Tenant-per-Schema](isolation-tenant-per-schema.md)
 - [Multi-tenancy — résolution du tenant](multi-tenancy.md)

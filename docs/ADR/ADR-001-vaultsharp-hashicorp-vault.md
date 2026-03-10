@@ -1,4 +1,4 @@
-# ADR-002 : HashiCorp Vault via VaultSharp — Gestion des secrets
+# ADR-001 : HashiCorp Vault via VaultSharp — Gestion des secrets
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
@@ -6,7 +6,7 @@
 - **Auteurs** : Équipe Digital Dynamics
 - **Portée** : granit-dotnet (Granit.Vault)
 
-> Voir aussi : [IAC ADR-003 — Vault sur Kubernetes](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/iac/-/blob/main/docs/ADR/ADR-003-vault-sur-kubernetes.md)
+> Voir aussi : [IAC ADR-002 — Vault sur Kubernetes](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/iac/-/blob/main/docs/ADR/ADR-002-vault-sur-kubernetes.md)
 > (déploiement Vault HA Raft sur OVHcloud MKS)
 
 ## Contexte
@@ -102,6 +102,6 @@ Ce choix devrait être réévalué si :
 
 - Commit initial : `52f1444` (2026-02-21)
 - Issue : [#9 — Granit.Vault](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/9)
-- IAC ADR-003 : [Vault sur Kubernetes](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/iac/-/blob/main/docs/ADR/ADR-003-vault-sur-kubernetes.md)
-- IAC ADR-004 : [External Secrets Operator](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/iac/-/blob/main/docs/ADR/ADR-004-external-secrets-operator.md)
+- IAC ADR-002 : [Vault sur Kubernetes](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/iac/-/blob/main/docs/ADR/ADR-002-vault-sur-kubernetes.md)
+- IAC ADR-003 : [External Secrets Operator](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/iac/-/blob/main/docs/ADR/ADR-003-external-secrets-operator.md)
 - VaultSharp : <https://github.com/rajanadar/VaultSharp>

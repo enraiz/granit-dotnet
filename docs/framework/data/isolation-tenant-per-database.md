@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Le pattern **Tenant-per-Database** attribue une base de données PostgreSQL physiquement
+Le pattern **Tenant-per-Database** attribue une base de données physiquement
 distincte à chaque tenant. C'est le niveau d'isolation le plus fort disponible dans Granit :
 chaque tenant possède son propre schéma, ses propres index et ses propres credentials.
 
@@ -38,6 +38,9 @@ flowchart TD
 - Une implémentation de `ITenantConnectionStringProvider`
 
 ## Installation
+
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
 
 ```csharp
 // Program.cs
@@ -119,6 +122,20 @@ factory lorsqu'il est présent dans le conteneur DI (enregistré par `AddGranitP
 Cela garantit le suivi des opérations par tenant, conformément à l'exigence HDS de rétention
 de 3 ans.
 
+## Compatibilité par fournisseur de base de données
+
+| Fournisseur         | Support | Notes                                                                |
+| ------------------- | ------- | -------------------------------------------------------------------- |
+| **PostgreSQL**      | Oui     | HDS. Credentials dynamiques via Vault.                               |
+| **SQL Server**      | Oui     | Un catalogue par tenant. Compatible Azure SQL.                       |
+| **MySQL / MariaDB** | Oui     | Une base par tenant (synonyme de schema en MySQL).                   |
+| **Oracle**          | Oui     | Un schema/user ou un PDB par tenant (multitenant Oracle).            |
+| **SQLite**          | Oui     | Un fichier `.db` par tenant. Tests ou apps embarquees.               |
+| **Cosmos DB**       | Oui     | Un container ou une database par tenant via connection string.       |
+
+> `DatabasePerTenant` est la stratégie la plus universelle : tout provider EF Core la
+> supporte, car il suffit de fournir une connection string différente par tenant.
+
 ## Considérations infrastructure
 
 | Aspect | Recommandation |
@@ -131,6 +148,7 @@ de 3 ans.
 
 ## Voir aussi
 
+- [Compatibilité des fournisseurs EF Core](compatibilite-providers.md)
 - [Isolation Tenant-per-Schema](isolation-tenant-per-schema.md)
 - [Sélection de stratégie d'isolation](isolation-strategie.md)
 - [Multi-tenancy — résolution du tenant](multi-tenancy.md)

@@ -76,6 +76,9 @@ guard « déjà configuré » constituerait une **faille HDS critique** (cross-t
 
 ## Installation
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core supportant les schémas est compatible.
+
 ```csharp
 // Program.cs
 builder.Services.AddTenantPerSchemaDbContext<ApplicationDbContext>(
@@ -173,6 +176,21 @@ await ctx.Database.MigrateAsync();
 Configurer un pipeline de migration par tenant lors du provisionnement (onboarding) ;
 chaque tenant déclenche une migration ciblée sur son schéma.
 
+## Compatibilité par fournisseur de base de données
+
+| Fournisseur         | SchemaPerTenant    | Mécanisme                          | Notes                                                                           |
+| ------------------- | ------------------ | ---------------------------------- | ------------------------------------------------------------------------------- |
+| **PostgreSQL**      | Supporté (défaut)  | `SET search_path`                  | Recommandé. Compatible PgBouncer (mode transaction).                            |
+| **MySQL / MariaDB** | Supporté           | `USE database`                     | En MySQL, schema = database (synonymes).                                        |
+| **Oracle**          | Supporté           | `ALTER SESSION SET CURRENT_SCHEMA` | Le compte applicatif doit avoir des grants sur chaque schéma tenant.            |
+| **SQL Server**      | **Non supporté**   | —                                  | Pas de bascule de schéma au niveau session. Utiliser `DatabasePerTenant`.       |
+| **SQLite**          | **Non supporté**   | —                                  | Pas de concept de schéma. Utiliser `DatabasePerTenant` (un fichier par tenant). |
+| **Cosmos DB**       | **Non supporté**   | —                                  | NoSQL document store. Isoler via container ou partition key (`TenantId`).       |
+
+> Pour les fournisseurs non supportés, voir
+> [Sélection de stratégie d'isolation](isolation-strategie.md) pour les alternatives
+> (`DatabasePerTenant`, `SharedDatabase`).
+
 ## Considérations infrastructure
 
 | Aspect | Recommandation |
@@ -186,6 +204,7 @@ chaque tenant déclenche une migration ciblée sur son schéma.
 
 ## Voir aussi
 
+- [Compatibilité des fournisseurs EF Core](compatibilite-providers.md)
 - [Isolation Tenant-per-Database](isolation-tenant-per-database.md)
 - [Sélection de stratégie d'isolation](isolation-strategie.md)
 - [Multi-tenancy — résolution du tenant](multi-tenancy.md)

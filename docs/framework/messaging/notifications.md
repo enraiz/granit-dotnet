@@ -9,7 +9,7 @@ Treize packages composables :
 | Package | Rôle |
 | --- | --- |
 | `Granit.Notifications` | Core : abstractions, définitions, fan-out Wolverine, canal InApp, stores InMemory |
-| `Granit.Notifications.EntityFrameworkCore` | Stores durables PostgreSQL + intercepteur de suivi d'entités |
+| `Granit.Notifications.EntityFrameworkCore` | Stores durables EF Core + intercepteur de suivi d'entités |
 | `Granit.Notifications.SignalR` | Temps réel browser via hub SignalR + Redis backplane K8s |
 | `Granit.Notifications.Endpoints` | API REST Minimal API (inbox, préférences, followers, tokens push) |
 | `Granit.Notifications.Email` | Abstraction `IEmailSender` + canal Email (Keyed Services) |
@@ -77,6 +77,9 @@ public sealed class MyAppModule : GranitModule { }
 ```
 
 L'enregistrement EF Core se fait via l'extension `AddGranitNotificationsEntityFrameworkCore` :
+
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
 
 ```csharp
 builder.AddGranitNotificationsEntityFrameworkCore(

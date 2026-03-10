@@ -1,4 +1,4 @@
-# ADR-013 : Scriban — Moteur de templates texte
+# ADR-012 : Scriban — Moteur de templates texte
 
 - **Statut** : Accepté
 - **Date** : 2026-02-27

@@ -1,4 +1,4 @@
-# ADR-006 : Stack de test — xUnit v3, NSubstitute et Bogus
+# ADR-005 : Stack de test — xUnit v3, NSubstitute et Bogus
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
@@ -61,7 +61,7 @@ Les besoins sont :
 - Inconvénient : projet jeune (v1.x), mainteneur unique, écosystème restreint
   (Testcontainers, Verify ciblent principalement xUnit/NUnit)
 - Réévaluation prévue via un ADR futur quand le projet aura atteint une maturité
-  suffisante (cf. [ADR-018](ADR-018-migration-shouldly.md))
+  suffisante (cf. [ADR-017](ADR-017-migration-shouldly.md))
 
 ### Mocking
 

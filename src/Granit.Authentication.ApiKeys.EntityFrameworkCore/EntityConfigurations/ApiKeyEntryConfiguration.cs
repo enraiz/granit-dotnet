@@ -36,15 +36,5 @@ internal sealed class ApiKeyEntryConfiguration : IEntityTypeConfiguration<ApiKey
 
         builder.Property(e => e.Type).HasConversion<string>().HasMaxLength(20);
         builder.Property(e => e.CacheBehavior).HasConversion<string>().HasMaxLength(20);
-
-        // JSON columns for collections (PostgreSQL jsonb)
-        builder.Property(e => e.Permissions)
-            .HasColumnType("jsonb");
-
-        builder.Property(e => e.AllowedCidrs)
-            .HasColumnType("jsonb");
-
-        // Soft delete query filter
-        builder.HasQueryFilter(e => !e.IsDeleted);
     }
 }

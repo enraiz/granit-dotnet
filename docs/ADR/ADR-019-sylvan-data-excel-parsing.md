@@ -1,4 +1,4 @@
-# ADR-020 : Sylvan.Data.Excel — Lecture streaming de fichiers Excel
+# ADR-019 : Sylvan.Data.Excel — Lecture streaming de fichiers Excel
 
 - **Statut** : Accepté
 - **Date** : 2026-03-01
