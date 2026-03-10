@@ -13,14 +13,13 @@ namespace Granit.Idempotency.Redis;
 /// Uses atomic SET NX PX / SET XX PX to manage the idempotency state machine.
 /// All entries are encrypted with <see cref="ICacheValueEncryptor"/> (AES-256-CBC in production).
 /// </summary>
-internal sealed class RedisIdempotencyStore(
+internal sealed partial class RedisIdempotencyStore(
     IConnectionMultiplexer redis,
     ICacheValueEncryptor encryptor,
     ILogger<RedisIdempotencyStore> logger) : IIdempotencyStore
 {
     private readonly IDatabase _db = redis.GetDatabase();
     private readonly ICacheValueEncryptor _encryptor = encryptor;
-    private readonly ILogger<RedisIdempotencyStore> _logger = logger;
 
     /// <inheritdoc/>
     public async Task<bool> TryAcquireAsync(string key, IdempotencyEntry entry, TimeSpan ttl, CancellationToken cancellationToken)
@@ -50,9 +49,7 @@ internal sealed class RedisIdempotencyStore(
 
         if (!updated)
         {
-            _logger.LogWarning(
-                "SetCompletedAsync: key {Key} no longer exists (InProgress TTL may have expired before response completed).",
-                key);
+            LogKeyExpiredBeforeCompletion(key);
         }
     }
 
@@ -78,4 +75,7 @@ internal sealed class RedisIdempotencyStore(
         byte[] decrypted = _encryptor.Decrypt(bytes);
         return JsonSerializer.Deserialize(decrypted, IdempotencyJsonContext.Default.IdempotencyEntry);
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "SetCompletedAsync: key {Key} no longer exists (InProgress TTL may have expired before response completed).")]
+    private partial void LogKeyExpiredBeforeCompletion(string key);
 }

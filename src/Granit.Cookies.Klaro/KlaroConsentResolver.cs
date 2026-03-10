@@ -20,7 +20,7 @@ namespace Granit.Cookies.Klaro;
 ///   <item>If no services are mapped for the category, return <c>false</c> (fail-safe).</item>
 /// </list>
 /// </remarks>
-internal sealed class KlaroConsentResolver(
+internal sealed partial class KlaroConsentResolver(
     IOptions<KlaroOptions> options,
     IThirdPartyServiceRegistry serviceRegistry,
     ILogger<KlaroConsentResolver> logger) : IConsentResolver
@@ -48,9 +48,7 @@ internal sealed class KlaroConsentResolver(
 
         if (serviceNames.Count == 0)
         {
-            logger.LogDebug(
-                "No third-party services mapped to category {Category}; returning false (fail-safe)",
-                category);
+            LogNoServicesForCategory(category);
             return Task.FromResult(false);
         }
 
@@ -81,11 +79,14 @@ internal sealed class KlaroConsentResolver(
         }
         catch (JsonException ex)
         {
-            logger.LogWarning(
-                ex,
-                "Failed to parse Klaro cookie for category {Category}; returning false (fail-safe)",
-                category);
+            LogKlaroCookieParseError(ex, category);
             return false;
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "No third-party services mapped to category {Category}; returning false (fail-safe)")]
+    private partial void LogNoServicesForCategory(CookieCategory category);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to parse Klaro cookie for category {Category}; returning false (fail-safe)")]
+    private partial void LogKlaroCookieParseError(Exception exception, CookieCategory category);
 }

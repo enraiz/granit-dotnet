@@ -46,7 +46,7 @@ public sealed partial class VaultCredentialLeaseManager(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("Starting Vault dynamic credential manager");
+        LogStartingCredentialManager();
 
         await ObtainCredentialsAsync(stoppingToken).ConfigureAwait(false);
 
@@ -65,16 +65,13 @@ public sealed partial class VaultCredentialLeaseManager(
             }
             catch (Exception ex)
             {
-                logger.LogWarning(
-                    ex,
-                    "Lease renewal failed for {LeaseId}, obtaining new credentials",
-                    _leaseId);
+                LogLeaseRenewalFailed(ex, _leaseId);
 
                 await ObtainCredentialsAsync(stoppingToken).ConfigureAwait(false);
             }
         }
 
-        logger.LogInformation("Stopping Vault dynamic credential manager");
+        LogStoppingCredentialManager();
     }
 
     private async Task ObtainCredentialsAsync(CancellationToken cancellationToken)
@@ -108,6 +105,15 @@ public sealed partial class VaultCredentialLeaseManager(
 
         LogLeaseRenewed(logger, _leaseId, _leaseDurationSeconds);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Starting Vault dynamic credential manager")]
+    private partial void LogStartingCredentialManager();
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Stopping Vault dynamic credential manager")]
+    private partial void LogStoppingCredentialManager();
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Lease renewal failed for {LeaseId}, obtaining new credentials")]
+    private partial void LogLeaseRenewalFailed(Exception exception, string leaseId);
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Next lease renewal in {Delay}")]
     private static partial void LogNextRenewalIn(ILogger logger, TimeSpan delay);

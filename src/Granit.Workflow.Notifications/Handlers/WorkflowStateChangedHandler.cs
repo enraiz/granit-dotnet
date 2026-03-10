@@ -9,7 +9,7 @@ namespace Granit.Workflow.Notifications.Handlers;
 /// Wolverine handler that processes <see cref="WorkflowStateChangedEvent"/> domain events
 /// by notifying entity followers via <see cref="INotificationPublisher"/>.
 /// </summary>
-public sealed class WorkflowStateChangedHandler(
+public sealed partial class WorkflowStateChangedHandler(
     INotificationPublisher notificationPublisher,
     ILogger<WorkflowStateChangedHandler> logger)
 {
@@ -35,11 +35,9 @@ public sealed class WorkflowStateChangedHandler(
             relatedEntity,
             cancellationToken).ConfigureAwait(false);
 
-        logger.LogInformation(
-            "Workflow state change notification sent for {EntityType} {EntityId}: {PreviousState} -> {NewState}",
-            message.EntityType,
-            message.EntityId,
-            message.PreviousState,
-            message.NewState);
+        LogWorkflowStateChangeNotificationSent(message.EntityType, message.EntityId, message.PreviousState, message.NewState);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Workflow state change notification sent for {EntityType} {EntityId}: {PreviousState} -> {NewState}")]
+    private partial void LogWorkflowStateChangeNotificationSent(string entityType, string entityId, string previousState, string newState);
 }

@@ -22,58 +22,98 @@ ILogger<MyService>  →   Microsoft.Extensions.Logging  →  Serilog → OTLP �
 Le code applicatif n'a jamais de dépendance directe sur Serilog — uniquement sur
 `ILogger<T>`. L'implémentation peut être remplacée sans modifier le code métier.
 
-## Utilisation
+## `[LoggerMessage]` source-generated — OBLIGATOIRE
 
-### Dans un service (injection par constructeur)
+Tout le logging dans Granit utilise l'attribut `[LoggerMessage]` (source generator
+introduit dans .NET 6). Les appels directs `logger.LogInformation(...)`,
+`logger.LogWarning(...)`, etc. sont **interdits** dans le code `src/`.
+
+### Pourquoi
+
+- **Zéro allocation** quand le log level est désactivé (pas de boxing, pas
+  d'interpolation, pas de tableau `params object[]`)
+- **Structured logging garanti** — les paramètres sont des champs typés, pas du texte
+- **Validation compile-time** — erreurs si le message template et les paramètres ne
+  correspondent pas
+
+> **Référence Microsoft** :
+> [Génération source de journalisation au moment de la compilation](https://learn.microsoft.com/fr-fr/dotnet/core/extensions/logger-message-generator)
+
+### Pattern standard
+
+1. La classe **doit** être `partial`
+2. Déclarer des méthodes `private partial void Log...(...)` annotées `[LoggerMessage]`
+3. Appeler ces méthodes au lieu des méthodes d'extension `ILogger`
 
 ```csharp
-public class PatientService
+internal sealed partial class PatientService(
+    ILogger<PatientService> logger,
+    AppDbContext db)
 {
-    private readonly ILogger<PatientService> _logger;
-    private readonly AppDbContext _db;
-
-    public PatientService(ILogger<PatientService> logger, AppDbContext db)
-    {
-        _logger = logger;
-        _db = db;
-    }
-
     public async Task<Guid> CreateAsync(CreatePatientCommand command,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating patient record for tenant {TenantId}",
-            command.TenantId);
+        LogCreatingPatient(command.TenantId);
 
         // ...
 
-        _logger.LogInformation("Patient record created: {PatientId}", patient.Id);
+        LogPatientCreated(patient.Id);
         return patient.Id;
     }
+
+    [LoggerMessage(Level = LogLevel.Information,
+        Message = "Creating patient record for tenant {TenantId}")]
+    private partial void LogCreatingPatient(Guid tenantId);
+
+    [LoggerMessage(Level = LogLevel.Information,
+        Message = "Patient record created: {PatientId}")]
+    private partial void LogPatientCreated(Guid patientId);
 }
 ```
 
-### Dans un handler Wolverine (method injection)
+### Avec exception
 
-Wolverine supporte l'injection de dépendances directement dans les paramètres de
-méthode `Handle` :
+Le premier paramètre `Exception` est automatiquement reconnu par le source generator
+comme l'exception à attacher au log (pas besoin de `{Exception}` dans le template) :
 
 ```csharp
-public static async Task<PatientCreated> Handle(
-    CreatePatient command,
+[LoggerMessage(Level = LogLevel.Warning,
+    Message = "Failed to get user {UserId} from Keycloak. Returning null")]
+private partial void LogGetUserFailed(Exception exception, string userId);
+```
+
+### Dans un handler Wolverine
+
+Wolverine supporte l'injection par constructeur primaire. Le handler doit être
+`partial` pour utiliser `[LoggerMessage]` :
+
+```csharp
+public sealed partial class CreatePatientHandler(
     AppDbContext db,
-    ILogger<CreatePatient> logger,
-    CancellationToken cancellationToken)
+    ILogger<CreatePatientHandler> logger)
 {
-    logger.LogInformation("Handling CreatePatient for tenant {TenantId}",
-        command.TenantId);
+    public async Task<PatientCreated> HandleAsync(
+        CreatePatient command,
+        CancellationToken cancellationToken)
+    {
+        LogHandlingCreatePatient(command.TenantId);
 
-    // ...
+        // ...
 
-    return new PatientCreated(patientId);
+        return new PatientCreated(patientId);
+    }
+
+    [LoggerMessage(Level = LogLevel.Information,
+        Message = "Handling CreatePatient for tenant {TenantId}")]
+    private partial void LogHandlingCreatePatient(Guid tenantId);
 }
 ```
 
 ### Dans un module Granit
+
+Les modules Granit ne sont pas `partial` par convention. L'initialisation du module
+est un cas exceptionnel où un appel direct est toléré (code exécuté une seule fois
+au démarrage) :
 
 ```csharp
 public class MyAppAuthModule : GranitModule
@@ -106,34 +146,47 @@ public class MyAppAuthModule : GranitModule
 | `Error` | `LogError` | Erreurs impactant une opération |
 | `Critical` | `LogCritical` | Défaillances systémiques |
 
-**Convention Granit** :
+**Convention Granit** — tous ces exemples utilisent `[LoggerMessage]` :
 
 ```csharp
 // Information — événements métier normaux
-_logger.LogInformation("Patient {PatientId} discharged from {Ward}", id, ward);
+[LoggerMessage(Level = LogLevel.Information,
+    Message = "Patient {PatientId} discharged from {Ward}")]
+private partial void LogPatientDischarged(Guid patientId, string ward);
 
 // Warning — situation inattendue mais non bloquante
-_logger.LogWarning("Tenant {TenantId} not found, using default configuration", tenantId);
+[LoggerMessage(Level = LogLevel.Warning,
+    Message = "Tenant {TenantId} not found, using default configuration")]
+private partial void LogTenantNotFound(Guid tenantId);
 
 // Error — opération échouée, avec exception
-_logger.LogError(ex, "Failed to synchronize FHIR resource {ResourceId}", resourceId);
+[LoggerMessage(Level = LogLevel.Error,
+    Message = "Failed to synchronize FHIR resource {ResourceId}")]
+private partial void LogFhirSyncFailed(Exception exception, string resourceId);
 
 // Critical — service indisponible, intervention requise
-_logger.LogCritical("Vault connection lost — credential renewal will fail");
+[LoggerMessage(Level = LogLevel.Critical,
+    Message = "Vault connection lost — credential renewal will fail")]
+private partial void LogVaultConnectionLost();
 ```
 
 ## Logs structurés (message templates)
 
 Serilog utilise des **message templates** avec des paramètres nommés entre accolades.
-Ces paramètres sont indexés comme propriétés cherchables dans Loki — ne pas utiliser
-l'interpolation de chaînes `$"..."`.
+Ces paramètres sont indexés comme propriétés cherchables dans Loki. Avec
+`[LoggerMessage]`, les paramètres sont des arguments typés de la méthode :
 
 ```csharp
-// ✅ Correct — propriétés indexées dans Loki
+// ✅ Correct — [LoggerMessage] avec paramètres typés
+[LoggerMessage(Level = LogLevel.Information,
+    Message = "Consent recorded: patient={PatientId} type={ConsentType}")]
+private partial void LogConsentRecorded(Guid patientId, string consentType);
+
+// ❌ Interdit — appel direct sans source generator
 _logger.LogInformation("Consent recorded: patient={PatientId} type={ConsentType}",
     patientId, consentType);
 
-// ❌ Incorrect — perd la structure, non cherchable
+// ❌ Interdit — interpolation de chaînes, perd la structure
 _logger.LogInformation($"Consent recorded: patient={patientId} type={consentType}");
 ```
 
@@ -227,34 +280,32 @@ Les niveaux minimum sont configurés dans `appsettings.json` via la section `Ser
 
 ### Ce qui est INTERDIT dans les logs
 
-```csharp
-// ❌ INTERDIT — données patient (PII / données de santé)
-_logger.LogInformation("Patient {Name} diagnosed with {Diagnosis}", patient.Name, diagnosis);
+Ne jamais inclure ces données dans un message `[LoggerMessage]` :
 
-// ❌ INTERDIT — données personnelles identifiantes
-_logger.LogInformation("User email: {Email}", user.Email);
-
-// ❌ INTERDIT — secrets, tokens, credentials
-_logger.LogDebug("Vault token: {Token}", vaultToken);
-_logger.LogDebug("Connection string: {ConnectionString}", connectionString);
-
-// ❌ INTERDIT — clés de chiffrement
-_logger.LogDebug("Encryption key: {Key}", Convert.ToBase64String(key));
-```
+- Données patient (PII / données de santé) : nom, diagnostic, numéro de sécurité
+  sociale
+- Données personnelles identifiantes : email, nom, prénom
+- Secrets, tokens, credentials, connection strings
+- Clés de chiffrement
 
 ### Ce qui est autorisé
 
 ```csharp
 // ✅ Identifiants pseudonymisés (GUID non rattachable sans accès à la base)
-_logger.LogInformation("Patient record updated: {PatientId}", patient.Id);
+[LoggerMessage(Level = LogLevel.Information,
+    Message = "Patient record updated: {PatientId}")]
+private partial void LogPatientUpdated(Guid patientId);
 
 // ✅ Métriques techniques sans donnée personnelle
-_logger.LogInformation("FHIR resource synchronized: type={ResourceType} count={Count}",
-    resourceType, count);
+[LoggerMessage(Level = LogLevel.Information,
+    Message = "FHIR resource synchronized: type={ResourceType} count={Count}")]
+private partial void LogFhirResourceSynced(string resourceType, int count);
 
 // ✅ Erreurs avec code, sans donnée personnelle
-_logger.LogError(ex, "FHIR resource {ResourceId} failed validation: {ErrorCode}",
-    resourceId, errorCode);
+[LoggerMessage(Level = LogLevel.Error,
+    Message = "FHIR resource {ResourceId} failed validation: {ErrorCode}")]
+private partial void LogFhirValidationFailed(
+    Exception exception, string resourceId, string errorCode);
 ```
 
 **Règle** : les logs peuvent contenir des **identifiants pseudonymisés** (GUID, identifiants
@@ -307,15 +358,19 @@ var service = new PatientService(logger, db);
 
 ## Bonnes pratiques
 
-1. **Toujours utiliser `ILogger<T>`** — ne jamais appeler Serilog directement
+1. **`[LoggerMessage]` obligatoire** — toujours utiliser le source generator, jamais
+   d'appels directs `logger.LogInformation(...)` dans `src/`. La seule exception
+   tolérée est le code d'initialisation de module (`OnApplicationInitialization`)
+2. **Classe `partial`** — toute classe qui émet des logs doit être déclarée `partial`
+3. **`ILogger<T>` uniquement** — ne jamais appeler Serilog directement
    (`Log.Information(...)`) dans le code applicatif
-2. **Message templates** — toujours utiliser des paramètres nommés `{Property}`,
+4. **Message templates** — toujours utiliser des paramètres nommés `{Property}`,
    jamais l'interpolation `$"..."`
-3. **Pas de PII** — aucune donnée personnelle ou de santé dans les logs (RGPD + HDS)
-4. **Pas de secrets** — aucun token, mot de passe, clé dans les logs
-5. **Identifiants techniques** — utiliser les GUID des entités comme identifiants
+5. **Pas de PII** — aucune donnée personnelle ou de santé dans les logs (RGPD + HDS)
+6. **Pas de secrets** — aucun token, mot de passe, clé dans les logs
+7. **Identifiants techniques** — utiliser les GUID des entités comme identifiants
    dans les logs (pseudonymisation)
-6. **Niveau adapté** — `Information` pour les événements métier, `Warning` pour
+8. **Niveau adapté** — `Information` pour les événements métier, `Warning` pour
    les anomalies, `Error` avec exception pour les échecs
-7. **`NullLogger` dans les tests** — évite la configuration Serilog dans les tests
+9. **`NullLogger` dans les tests** — évite la configuration Serilog dans les tests
    unitaires ; NSubstitute pour vérifier les appels de log si nécessaire

@@ -38,7 +38,7 @@ namespace Granit.Webhooks.Handlers;
 /// and <see cref="SendWebhookCommand.DeliveryId"/> are used for correlation.
 /// </para>
 /// </remarks>
-public sealed class SendWebhookHandler(
+public sealed partial class SendWebhookHandler(
     IHttpClientFactory httpClientFactory,
     IWebhookDeliveryWriter deliveryWriter,
     IWebhookSecretProtector secretProtector,
@@ -82,10 +82,7 @@ public sealed class SendWebhookHandler(
             // Network timeout — not a cancellation from the application.
             stopwatch.Stop();
             string timeoutMessage = $"Timeout delivering to {command.TargetUrl}";
-            logger.LogWarning(
-                ex,
-                "Webhook delivery timeout for subscription {SubscriptionId} delivery {DeliveryId}",
-                command.SubscriptionId, command.DeliveryId);
+            LogWebhookTimeout(ex, command.SubscriptionId, command.DeliveryId);
 
             await deliveryWriter.RecordFailureAsync(
                 command, httpStatusCode: null, stopwatch.ElapsedMilliseconds, timeoutMessage, storedPayload, cancellationToken).ConfigureAwait(false);
@@ -98,9 +95,7 @@ public sealed class SendWebhookHandler(
 
         if (IsNonRetriable(response.StatusCode))
         {
-            logger.LogWarning(
-                "Non-retriable HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}",
-                statusCode, command.SubscriptionId, command.DeliveryId);
+            LogNonRetriableHttpError(statusCode, command.SubscriptionId, command.DeliveryId);
 
             await deliveryWriter.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds,
@@ -121,9 +116,7 @@ public sealed class SendWebhookHandler(
         {
             // Retriable: 429, 5xx.
             string retriableMessage = $"HTTP {statusCode} from {command.TargetUrl}";
-            logger.LogWarning(
-                "Retriable HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}",
-                statusCode, command.SubscriptionId, command.DeliveryId);
+            LogRetriableHttpError(statusCode, command.SubscriptionId, command.DeliveryId);
 
             await deliveryWriter.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds, retriableMessage, storedPayload, cancellationToken).ConfigureAwait(false);
@@ -132,9 +125,7 @@ public sealed class SendWebhookHandler(
         }
 
         // Success 2xx.
-        logger.LogDebug(
-            "Webhook delivered successfully HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}",
-            statusCode, command.SubscriptionId, command.DeliveryId);
+        LogWebhookDelivered(statusCode, command.SubscriptionId, command.DeliveryId);
 
         await deliveryWriter.RecordSuccessAsync(
             command, statusCode, stopwatch.ElapsedMilliseconds, payloadHash, storedPayload, cancellationToken).ConfigureAwait(false);
@@ -163,4 +154,16 @@ public sealed class SendWebhookHandler(
         HttpStatusCode.Forbidden or
         HttpStatusCode.NotFound or
         HttpStatusCode.Gone;
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Webhook delivery timeout for subscription {SubscriptionId} delivery {DeliveryId}")]
+    private partial void LogWebhookTimeout(Exception exception, Guid subscriptionId, Guid deliveryId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Non-retriable HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}")]
+    private partial void LogNonRetriableHttpError(int statusCode, Guid subscriptionId, Guid deliveryId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Retriable HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}")]
+    private partial void LogRetriableHttpError(int statusCode, Guid subscriptionId, Guid deliveryId);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Webhook delivered successfully HTTP {StatusCode} for subscription {SubscriptionId} delivery {DeliveryId}")]
+    private partial void LogWebhookDelivered(int statusCode, Guid subscriptionId, Guid deliveryId);
 }

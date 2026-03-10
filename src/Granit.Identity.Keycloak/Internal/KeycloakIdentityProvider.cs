@@ -19,7 +19,7 @@ namespace Granit.Identity.Keycloak.Internal;
 /// handle failures explicitly.
 /// </para>
 /// </remarks>
-internal sealed class KeycloakIdentityProvider(
+internal sealed partial class KeycloakIdentityProvider(
     KeycloakAdminTokenService tokenService,
     KeycloakUserTokenExchangeService tokenExchangeService,
     IHttpClientFactory httpClientFactory,
@@ -46,7 +46,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get users from Keycloak. Returning empty list");
+            LogKeycloakGetUsersFailed(ex);
             return [];
         }
     }
@@ -71,7 +71,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get user {UserId} from Keycloak. Returning null", userId);
+            LogKeycloakGetUserFailed(ex, userId);
             return null;
         }
     }
@@ -92,9 +92,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation(
-            "User {UserId} {Action} in Keycloak",
-            userId, enabled ? "enabled" : "disabled");
+        LogUserEnabledChanged(userId, enabled ? "enabled" : "disabled");
     }
 
     /// <inheritdoc/>
@@ -132,7 +130,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("User {UserId} profile updated in Keycloak", userId);
+        LogUserProfileUpdated(userId);
     }
 
     /// <inheritdoc/>
@@ -155,7 +153,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get sessions for user {UserId} from Keycloak. Returning empty list", userId);
+            LogKeycloakGetSessionsFailed(ex, userId);
             return [];
         }
     }
@@ -175,7 +173,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get device activity for user {UserId} from Keycloak. Returning empty list", userId);
+            LogKeycloakGetDeviceActivityFailed(ex, userId);
             return [];
         }
     }
@@ -205,7 +203,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get credentials for user {UserId} from Keycloak. Returning null", userId);
+            LogKeycloakGetCredentialsFailed(ex, userId);
             return null;
         }
     }
@@ -227,7 +225,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get roles from Keycloak. Returning empty list");
+            LogKeycloakGetRolesFailed(ex);
             return [];
         }
     }
@@ -252,10 +250,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(
-                ex,
-                "Failed to get members of role {RoleName} from Keycloak. Returning empty list",
-                roleName);
+            LogKeycloakGetRoleMembersFailed(ex, roleName);
             return [];
         }
     }
@@ -282,7 +277,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get roles for user {UserId} from Keycloak. Returning empty list", userId);
+            LogKeycloakGetUserRolesFailed(ex, userId);
             return [];
         }
     }
@@ -307,7 +302,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("Role {RoleName} assigned to user {UserId} in Keycloak", roleName, userId);
+        LogRoleAssigned(roleName, userId);
     }
 
     /// <inheritdoc/>
@@ -336,7 +331,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("Role {RoleName} removed from user {UserId} in Keycloak", roleName, userId);
+        LogRoleRemoved(roleName, userId);
     }
 
     // ──── Feature 2: Session termination ────
@@ -359,7 +354,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("Session {SessionId} terminated for user {UserId} in Keycloak", sessionId, userId);
+        LogSessionTerminated(sessionId, userId);
     }
 
     /// <inheritdoc/>
@@ -378,7 +373,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("All sessions terminated for user {UserId} in Keycloak", userId);
+        LogAllSessionsTerminated(userId);
     }
 
     // ──── Feature 3: Password reset ────
@@ -399,7 +394,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("Password reset email sent for user {UserId} via Keycloak", userId);
+        LogPasswordResetEmailSent(userId);
     }
 
     /// <inheritdoc/>
@@ -421,7 +416,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("Temporary password set for user {UserId} in Keycloak", userId);
+        LogTemporaryPasswordSet(userId);
     }
 
     // ──── Feature 4: User creation ────
@@ -464,7 +459,7 @@ internal sealed class KeycloakIdentityProvider(
                 .ConfigureAwait(false);
         }
 
-        logger.LogInformation("User {Username} created with ID {UserId} in Keycloak", user.Username, createdUserId);
+        LogUserCreated(user.Username, createdUserId);
 
         return new IdentityUser(
             createdUserId,
@@ -494,7 +489,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get groups from Keycloak. Returning empty list");
+            LogKeycloakGetGroupsFailed(ex);
             return [];
         }
     }
@@ -519,7 +514,7 @@ internal sealed class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            logger.LogWarning(ex, "Failed to get groups for user {UserId} from Keycloak. Returning empty list", userId);
+            LogKeycloakGetUserGroupsFailed(ex, userId);
             return [];
         }
     }
@@ -542,7 +537,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("User {UserId} added to group {GroupId} in Keycloak", userId, groupId);
+        LogUserAddedToGroup(userId, groupId);
     }
 
     /// <inheritdoc/>
@@ -563,7 +558,7 @@ internal sealed class KeycloakIdentityProvider(
 
         response.EnsureSuccessStatusCode();
 
-        logger.LogInformation("User {UserId} removed from group {GroupId} in Keycloak", userId, groupId);
+        LogUserRemovedFromGroup(userId, groupId);
     }
 
     private async Task<IReadOnlyList<IdentityDeviceActivity>> GetDeviceActivityViaAccountApiAsync(
@@ -708,12 +703,11 @@ internal sealed class KeycloakIdentityProvider(
 
         if (response.IsSuccessStatusCode)
         {
-            logger.LogDebug("Credential verification succeeded for user {Username}", username);
+            LogCredentialVerificationSucceeded(username);
             return true;
         }
 
-        logger.LogDebug("Credential verification failed for user {Username} (HTTP {StatusCode})",
-            username, (int)response.StatusCode);
+        LogCredentialVerificationFailed(username, (int)response.StatusCode);
         return false;
     }
 
@@ -723,4 +717,75 @@ internal sealed class KeycloakIdentityProvider(
             Name: group.Name,
             Path: group.Path,
             SubGroups: group.SubGroups?.ConvertAll(ToIdentityGroup) ?? []);
+
+    // -- Source-generated log messages --
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get users from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetUsersFailed(Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get user {UserId} from Keycloak. Returning null")]
+    private partial void LogKeycloakGetUserFailed(Exception exception, string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} {Action} in Keycloak")]
+    private partial void LogUserEnabledChanged(string userId, string action);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} profile updated in Keycloak")]
+    private partial void LogUserProfileUpdated(string userId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get sessions for user {UserId} from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetSessionsFailed(Exception exception, string userId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get device activity for user {UserId} from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetDeviceActivityFailed(Exception exception, string userId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get credentials for user {UserId} from Keycloak. Returning null")]
+    private partial void LogKeycloakGetCredentialsFailed(Exception exception, string userId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get roles from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetRolesFailed(Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get members of role {RoleName} from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetRoleMembersFailed(Exception exception, string roleName);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get roles for user {UserId} from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetUserRolesFailed(Exception exception, string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Role {RoleName} assigned to user {UserId} in Keycloak")]
+    private partial void LogRoleAssigned(string roleName, string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Role {RoleName} removed from user {UserId} in Keycloak")]
+    private partial void LogRoleRemoved(string roleName, string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Session {SessionId} terminated for user {UserId} in Keycloak")]
+    private partial void LogSessionTerminated(string sessionId, string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "All sessions terminated for user {UserId} in Keycloak")]
+    private partial void LogAllSessionsTerminated(string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Password reset email sent for user {UserId} via Keycloak")]
+    private partial void LogPasswordResetEmailSent(string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Temporary password set for user {UserId} in Keycloak")]
+    private partial void LogTemporaryPasswordSet(string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "User {Username} created with ID {UserId} in Keycloak")]
+    private partial void LogUserCreated(string username, string userId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get groups from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetGroupsFailed(Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to get groups for user {UserId} from Keycloak. Returning empty list")]
+    private partial void LogKeycloakGetUserGroupsFailed(Exception exception, string userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} added to group {GroupId} in Keycloak")]
+    private partial void LogUserAddedToGroup(string userId, string groupId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} removed from group {GroupId} in Keycloak")]
+    private partial void LogUserRemovedFromGroup(string userId, string groupId);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Credential verification succeeded for user {Username}")]
+    private partial void LogCredentialVerificationSucceeded(string username);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Credential verification failed for user {Username} (HTTP {StatusCode})")]
+    private partial void LogCredentialVerificationFailed(string username, int statusCode);
 }

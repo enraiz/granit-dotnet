@@ -13,7 +13,7 @@ namespace Granit.Identity.Keycloak.Internal;
 /// Thread-safe: uses a <see cref="SemaphoreSlim"/> to serialize token refresh.
 /// The token is cached until 30 seconds before its actual expiry.
 /// </remarks>
-internal sealed class KeycloakAdminTokenService(
+internal sealed partial class KeycloakAdminTokenService(
     IHttpClientFactory httpClientFactory,
     IOptions<KeycloakAdminOptions> options,
     ILogger<KeycloakAdminTokenService> logger) : IDisposable
@@ -69,9 +69,7 @@ internal sealed class KeycloakAdminTokenService(
             _cachedToken = token.AccessToken;
             _tokenExpiry = DateTimeOffset.UtcNow.AddSeconds(Math.Max(token.ExpiresIn - 30, 10));
 
-            logger.LogDebug(
-                "Keycloak admin token obtained, expires at {Expiry}",
-                _tokenExpiry);
+            LogAdminTokenObtained(_tokenExpiry);
 
             return _cachedToken;
         }
@@ -83,6 +81,9 @@ internal sealed class KeycloakAdminTokenService(
 
     /// <inheritdoc/>
     public void Dispose() => _semaphore.Dispose();
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Keycloak admin token obtained, expires at {Expiry}")]
+    private partial void LogAdminTokenObtained(DateTimeOffset expiry);
 
     private sealed record TokenResponse(
         [property: JsonPropertyName("access_token")] string AccessToken,

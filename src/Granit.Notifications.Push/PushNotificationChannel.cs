@@ -31,9 +31,7 @@ internal sealed partial class PushNotificationChannel(
 
         if (subscriptions.Count == 0)
         {
-            logger.LogDebug(
-                "No push subscriptions for user {UserId}, skipping",
-                context.RecipientUserId);
+            LogNoPushSubscriptions(context.RecipientUserId);
             return;
         }
 
@@ -86,6 +84,9 @@ internal sealed partial class PushNotificationChannel(
                 failures);
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "No push subscriptions for user {UserId}, skipping")]
+    private partial void LogNoPushSubscriptions(string userId);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Push subscription expired for endpoint {Endpoint}, removing")]
     private partial void LogSubscriptionExpired(string endpoint);
