@@ -1,4 +1,4 @@
-# ADR-007 : Asp.Versioning — Versionnement d'API REST
+# ADR-006 : Asp.Versioning — Versionnement d'API REST
 
 - **Statut** : Accepté
 - **Date** : 2026-02-22

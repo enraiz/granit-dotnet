@@ -1,4 +1,4 @@
-# ADR-017 : Transports de notifications — MailKit + Lib.Net.Http.WebPush
+# ADR-016 : Transports de notifications — MailKit + Lib.Net.Http.WebPush
 
 - **Statut** : Accepté
 - **Date** : 2026-02-28

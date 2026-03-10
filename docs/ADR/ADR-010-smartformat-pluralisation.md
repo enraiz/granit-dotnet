@@ -1,4 +1,4 @@
-# ADR-011 : SmartFormat.NET — Pluralisation CLDR
+# ADR-010 : SmartFormat.NET — Pluralisation CLDR
 
 - **Statut** : Accepté
 - **Date** : 2026-02-26

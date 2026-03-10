@@ -1,4 +1,4 @@
-# ADR-021 : Choix de TanStack Table pour le composant tableau React
+# ADR-020 : Choix de TanStack Table pour le composant tableau React
 
 - **Statut** : Accepté
 - **Date** : 2026-03-03

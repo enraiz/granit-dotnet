@@ -30,6 +30,9 @@ dotnet add package Granit.Querying.Endpoints
 
 ## Enregistrement DI
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```csharp
 // Socle (interfaces, NullSavedViewStore)
 services.AddGranitQuerying();
@@ -434,4 +437,4 @@ app.MapQueryEndpoints<Patient>(
 
 ## Voir aussi
 
-- [ADR-021 — Granit.Querying](../../ADR/ADR-021-granit-querying.md)
+- [ADR-020 — Granit.Querying](../../ADR/ADR-020-granit-querying.md)

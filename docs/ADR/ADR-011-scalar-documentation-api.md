@@ -1,4 +1,4 @@
-# ADR-012 : Scalar.AspNetCore — Documentation API interactive
+# ADR-011 : Scalar.AspNetCore — Documentation API interactive
 
 - **Statut** : Accepté
 - **Date** : 2026-02-26

@@ -1,4 +1,4 @@
-# ADR-016 : Magick.NET — Traitement d'images
+# ADR-015 : Magick.NET — Traitement d'images
 
 - **Statut** : Accepté
 - **Date** : 2026-02-28

@@ -5,10 +5,14 @@ et le soft delete RGPD.
 
 ## Ajouter les packages
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```bash
 dotnet add package Granit.Persistence
 dotnet add package Granit.Security
 dotnet add package Granit.Guids
+# Provider EF Core au choix (exemple PostgreSQL)
 dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 ```
 

@@ -57,6 +57,9 @@ public sealed class AppModule : GranitModule { }
 
 ### Enregistrement EF Core
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```csharp
 builder.AddGranitLocalizationEntityFrameworkCore(opt =>
     opt.UseNpgsql(connectionString));

@@ -1,4 +1,4 @@
-# ADR-014 : ClosedXML — Génération de tableurs Excel
+# ADR-013 : ClosedXML — Génération de tableurs Excel
 
 - **Statut** : Accepté
 - **Date** : 2026-02-27

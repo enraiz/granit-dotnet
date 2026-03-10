@@ -247,6 +247,9 @@ public sealed class MyAppModule : GranitModule { }
 
 ### 2 — Enregistrement des services
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```csharp
 // Moteur Scriban (ITemplateEngine + contextes globaux now.* et context.*)
 builder.Services.AddGranitTemplatingWithScriban();

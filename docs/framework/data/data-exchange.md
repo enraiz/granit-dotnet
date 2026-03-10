@@ -391,6 +391,9 @@ dotnet add package Granit.DataExchange.EntityFrameworkCore
 
 ### Enregistrement DI
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```csharp
 // Host builder — enregistre le DataExchangeDbContext isolé
 builder.AddGranitDataExchangeEntityFrameworkCore(opts =>
@@ -827,6 +830,6 @@ public static class ImportJobCompletedHandler
 
 ## Voir aussi
 
-- [ADR-019 — Sep pour le parsing CSV](../../ADR/ADR-019-sep-parsing-csv.md)
-- [ADR-020 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-020-sylvan-data-excel-parsing.md)
+- [ADR-018 — Sep pour le parsing CSV](../../ADR/ADR-018-sep-parsing-csv.md)
+- [ADR-019 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-019-sylvan-data-excel-parsing.md)
 - [Querying](querying.md) — module de filtrage/tri/pagination utilisé par l'export

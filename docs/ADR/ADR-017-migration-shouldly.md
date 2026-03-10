@@ -1,4 +1,4 @@
-# ADR-018 : Migrer FluentAssertions vers Shouldly
+# ADR-017 : Migrer FluentAssertions vers Shouldly
 
 - **Statut** : Accepté
 - **Date** : 2026-02-28

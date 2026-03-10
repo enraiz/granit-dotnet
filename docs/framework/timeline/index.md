@@ -101,6 +101,9 @@ services.AddGranitTimeline();
 
 ### Avec persistance EF Core
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```csharp
 builder.AddGranitTimelineEntityFrameworkCore(opts =>
     opts.UseNpgsql(connectionString));

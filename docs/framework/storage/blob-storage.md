@@ -111,6 +111,9 @@ public sealed class MyAppModule : GranitModule { }
 
 ### 3 — Enregistrement des services
 
+> **Note** : les exemples utilisent `UseNpgsql()` (PostgreSQL). Granit est agnostique :
+> tout provider EF Core est supporté (`UseSqlServer()`, `UseSqlite()`, etc.).
+
 ```csharp
 // Fournisseur S3 (obligatoire)
 builder.AddGranitBlobStorageS3();

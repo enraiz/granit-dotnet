@@ -1,4 +1,4 @@
-# ADR-005 : AWSSDK.S3 — Stockage objet S3-compatible
+# ADR-004 : AWSSDK.S3 — Stockage objet S3-compatible
 
 - **Statut** : Accepté
 - **Date** : 2026-02-24
