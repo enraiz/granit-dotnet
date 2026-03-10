@@ -21,6 +21,7 @@ public sealed class TestProjectConventionTests
         [
             "Granit.Analyzers",
             "Granit.Analyzers.CodeFixes",
+            "Granit.ArchitectureTests.Abstractions",
             "Granit.Localization.SourceGenerator",
         ];
 
