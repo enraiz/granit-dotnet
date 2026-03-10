@@ -1,6 +1,5 @@
 using Granit.Authorization.Abstractions;
 using Granit.Authorization.Endpoints.Permissions;
-using Granit.Authorization.EntityFrameworkCore;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,12 +11,12 @@ namespace Granit.Authorization.Endpoints;
 /// <remarks>
 /// Exposes permission management routes via
 /// <see cref="Extensions.AuthorizationEndpointRouteBuilderExtensions.MapAuthorizationEndpoints"/>.
-/// Requires both <see cref="GranitAuthorizationModule"/> (permission policy enforcement)
-/// and <see cref="GranitAuthorizationEntityFrameworkCoreModule"/> (<see cref="Abstractions.IPermissionManagerReader"/>/<see cref="Abstractions.IPermissionManagerWriter"/>).
+/// Requires <see cref="GranitAuthorizationModule"/> for permission policy enforcement.
+/// The application host must register an implementation of
+/// <see cref="Abstractions.IPermissionManagerReader"/>/<see cref="Abstractions.IPermissionManagerWriter"/>
+/// (e.g. via <c>[DependsOn(typeof(GranitAuthorizationEntityFrameworkCoreModule))]</c>).
 /// </remarks>
-[DependsOn(
-    typeof(GranitAuthorizationModule),
-    typeof(GranitAuthorizationEntityFrameworkCoreModule))]
+[DependsOn(typeof(GranitAuthorizationModule))]
 public sealed class GranitAuthorizationEndpointsModule : GranitModule
 {
     /// <inheritdoc />

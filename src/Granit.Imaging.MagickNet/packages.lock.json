@@ -5,16 +5,22 @@
       "Magick.NET-Q8-AnyCPU": {
         "type": "Direct",
         "requested": "[14.*, )",
-        "resolved": "14.10.3",
-        "contentHash": "gi7kRE4x4fBDBwgCFKM3KJbLRBoK332DdeaIu+xDE4syWRYG5oEU+iXqmHM1RihJH0N17F0qL44vZKs9V89bqw==",
+        "resolved": "14.10.4",
+        "contentHash": "CHUcm/MLCHr/gSYjhfroNU6344aYQICLD3u7wTb4Uii0eCQ/NMEV/XB28DO/hULcLWqOcdk69NDgta61vjhmqw==",
         "dependencies": {
-          "Magick.NET.Core": "14.10.3"
+          "Magick.NET.Core": "14.10.4"
         }
+      },
+      "Microsoft.CodeAnalysis.BannedApiAnalyzers": {
+        "type": "Direct",
+        "requested": "[3.*, )",
+        "resolved": "3.3.4",
+        "contentHash": "0k2Jwpc8eq0hjOtX6TxRkHm9clkJ2PAQ3heEHgqIJZcsfdFosC/iyz18nsgTVDDWpID80rC7aiYK7ripx+Qndg=="
       },
       "Magick.NET.Core": {
         "type": "Transitive",
-        "resolved": "14.10.3",
-        "contentHash": "Shb3KrAMFB49+j7nJ2uVbNBuGg+rEAoOpIDmR2A/sSbQ21l4vrPY8Py90chcndGcjzvhqZWk69SMmb8v5esOjA=="
+        "resolved": "14.10.4",
+        "contentHash": "2OvmKkpHoe3f8LlhngRSrRb2f4uB2AAc5MNT0aDW97SMdpkpWYnKG1zaeCaU0dmBp4FaZ0/FawhcalaOOlgbng=="
       },
       "granit.core": {
         "type": "Project"
