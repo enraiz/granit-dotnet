@@ -138,7 +138,6 @@ glab mr create \
 
    ## Compliance
 
-   - [ ] Données restent en Europe (OVHcloud FR)
    - [ ] Chiffrement au repos
    - [ ] Audit trail préservé
    EOF
@@ -169,8 +168,7 @@ glab -R "$PROJECT" issue create \
 
 ## Contraintes
 
-- [ ] HDS / RGPD / ISO 27001 / ISO 9001 : [contraintes spécifiques]
-- [ ] Souveraineté : OVHcloud FR uniquement
+- [ ] RGPD / ISO 27001 / ISO 9001 : [contraintes spécifiques]
 
 ## Critères de succès
 

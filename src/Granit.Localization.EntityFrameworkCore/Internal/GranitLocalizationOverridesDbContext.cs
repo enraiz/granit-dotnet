@@ -1,0 +1,38 @@
+using Granit.Core.DataFiltering;
+using Granit.Core.MultiTenancy;
+using Granit.Localization.EntityFrameworkCore.Entities;
+using Granit.Persistence.Extensions;
+using Microsoft.EntityFrameworkCore;
+
+namespace Granit.Localization.EntityFrameworkCore.Internal;
+
+/// <summary>
+/// Dedicated EF Core DbContext for Granit localization overrides.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Isolated from the host application's DbContext to avoid coupling.
+/// Stores only <see cref="LocalizationOverride"/> records — the base translations
+/// live in embedded JSON files resolved by <c>JsonStringLocalizer</c>.
+/// </para>
+/// <para>
+/// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, HDS compliant).
+/// </para>
+/// </remarks>
+internal sealed class GranitLocalizationOverridesDbContext(
+    DbContextOptions<GranitLocalizationOverridesDbContext> options,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null)
+    : DbContext(options)
+{
+    /// <summary>Translation overrides indexed by resource, culture, and key.</summary>
+    public DbSet<LocalizationOverride> LocalizationOverrides { get; set; } = null!;
+
+    /// <inheritdoc/>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new LocalizationOverrideConfiguration());
+        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
+    }
+}
