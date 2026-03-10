@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -13,9 +14,10 @@ namespace Granit.Identity.Keycloak.Internal;
 /// Thread-safe: uses a <see cref="SemaphoreSlim"/> to serialize token refresh.
 /// The token is cached until 30 seconds before its actual expiry.
 /// </remarks>
-internal sealed class KeycloakAdminTokenService(
+internal sealed partial class KeycloakAdminTokenService(
     IHttpClientFactory httpClientFactory,
     IOptions<KeycloakAdminOptions> options,
+    IClock clock,
     ILogger<KeycloakAdminTokenService> logger) : IDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -27,7 +29,7 @@ internal sealed class KeycloakAdminTokenService(
     /// </summary>
     public async Task<string> GetTokenAsync(CancellationToken cancellationToken)
     {
-        if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry)
+        if (_cachedToken is not null && clock.Now < _tokenExpiry)
         {
             return _cachedToken;
         }
@@ -36,7 +38,7 @@ internal sealed class KeycloakAdminTokenService(
         try
         {
             // Double-check after acquiring the lock.
-            if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry)
+            if (_cachedToken is not null && clock.Now < _tokenExpiry)
             {
                 return _cachedToken;
             }
@@ -67,11 +69,9 @@ internal sealed class KeycloakAdminTokenService(
 
             // Cache with a 30-second safety margin.
             _cachedToken = token.AccessToken;
-            _tokenExpiry = DateTimeOffset.UtcNow.AddSeconds(Math.Max(token.ExpiresIn - 30, 10));
+            _tokenExpiry = clock.Now.AddSeconds(Math.Max(token.ExpiresIn - 30, 10));
 
-            logger.LogDebug(
-                "Keycloak admin token obtained, expires at {Expiry}",
-                _tokenExpiry);
+            LogAdminTokenObtained(_tokenExpiry);
 
             return _cachedToken;
         }
@@ -83,6 +83,9 @@ internal sealed class KeycloakAdminTokenService(
 
     /// <inheritdoc/>
     public void Dispose() => _semaphore.Dispose();
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Keycloak admin token obtained, expires at {Expiry}")]
+    private partial void LogAdminTokenObtained(DateTimeOffset expiry);
 
     private sealed record TokenResponse(
         [property: JsonPropertyName("access_token")] string AccessToken,

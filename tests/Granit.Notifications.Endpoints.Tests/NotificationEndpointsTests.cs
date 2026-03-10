@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Granit.Core.MultiTenancy;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Endpoints.Extensions;
@@ -60,6 +61,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         builder.Services.AddSingleton(_definitionStore);
         builder.Services.AddSingleton(_currentTenant);
         builder.Services.AddSingleton(_clock);
+        builder.Services.AddSingleton<IGuidGenerator>(new SimpleGuidGenerator());
 
         _app = builder.Build();
         _app.MapGranitNotificationEndpoints();

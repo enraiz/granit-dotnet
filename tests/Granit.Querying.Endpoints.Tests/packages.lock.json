@@ -490,8 +490,8 @@
       "granit.apidocumentation": {
         "type": "Project",
         "dependencies": {
-          "Granit.ApiVersioning": "[0.1.0-dev.530, )",
-          "Granit.Security": "[0.1.0-dev.530, )",
+          "Granit.ApiVersioning": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.AspNetCore.OpenApi": "[10.*, )",
           "Scalar.AspNetCore": "[2.*, )"
         }
@@ -501,20 +501,20 @@
         "dependencies": {
           "Asp.Versioning.Mvc": "[10.0.0-preview.*, )",
           "Asp.Versioning.Mvc.ApiExplorer": "[10.0.0-preview.*, )",
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.authorization": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[0.1.0-dev.530, )",
-          "Granit.Security": "[0.1.0-dev.530, )"
+          "Granit.Caching": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )"
         }
       },
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Caching.Hybrid": "[10.*, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
@@ -530,13 +530,21 @@
       "granit.exceptionhandling": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
+      "granit.guids": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Options": "[10.*, )"
         }
       },
       "granit.localization": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.Caching.Memory": "[10.*, )",
           "Microsoft.Extensions.Localization": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
@@ -546,30 +554,41 @@
       "granit.querying": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.querying.endpoints": {
         "type": "Project",
         "dependencies": {
-          "Granit.ApiDocumentation": "[0.1.0-dev.530, )",
-          "Granit.Authorization": "[0.1.0-dev.530, )",
-          "Granit.Querying": "[0.1.0-dev.530, )",
-          "Granit.Validation": "[0.1.0-dev.530, )"
+          "Granit.ApiDocumentation": "[0.1.0-dev, )",
+          "Granit.Authorization": "[0.1.0-dev, )",
+          "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Granit.Validation": "[0.1.0-dev, )"
         }
       },
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
+      "granit.timing": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Options": "[10.*, )"
         }
       },
       "granit.validation": {
         "type": "Project",
         "dependencies": {
           "FluentValidation": "[12.*, )",
-          "Granit.ExceptionHandling": "[0.1.0-dev.530, )",
-          "Granit.Localization": "[0.1.0-dev.530, )"
+          "FluentValidation.DependencyInjectionExtensions": "[12.*, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Localization": "[0.1.0-dev, )"
         }
       },
       "Asp.Versioning.Mvc": {
@@ -595,6 +614,16 @@
         "requested": "[12.*, )",
         "resolved": "12.1.1",
         "contentHash": "EPpkIe1yh1a0OXyC100oOA8WMbZvqUu5plwhvYcb7oSELfyUZzfxV48BLhvs3kKo4NwG7MGLNgy1RJiYtT8Dpw=="
+      },
+      "FluentValidation.DependencyInjectionExtensions": {
+        "type": "CentralTransitive",
+        "requested": "[12.*, )",
+        "resolved": "12.1.1",
+        "contentHash": "D0VXh4dtjjX2aQizuaa0g6R8X3U1JaVqJPfGCvLwZX9t/O2h7tkpbitbadQMfwcgSPdDbI2vDxuwRMv/Uf9dHA==",
+        "dependencies": {
+          "FluentValidation": "12.1.1",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "2.1.0"
+        }
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "CentralTransitive",
@@ -715,8 +744,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.1",
-        "contentHash": "HxkQC71kWUQBdj/51GFyETO21pqmK5hfNpovAdIi4d/XEv/HIoMCNw3CGSwT0h5E8rG3CuaSm/Wz0xk7eLbu9A=="
+        "resolved": "2.13.3",
+        "contentHash": "py+bnF628jLbm63Q8VabQyzNNP0/jMJAVLrUaxhLMvU75GZVcN9LgdXRLk42Grpcih3rqZcRY+eSSkYO3+3QTQ=="
       },
       "SmartFormat": {
         "type": "CentralTransitive",

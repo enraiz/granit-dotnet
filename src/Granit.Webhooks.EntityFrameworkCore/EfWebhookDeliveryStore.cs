@@ -1,3 +1,4 @@
+using Granit.Guids;
 using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
@@ -14,7 +15,7 @@ namespace Granit.Webhooks.EntityFrameworkCore;
 /// HDS compliance: <see cref="WebhookDeliveryAttempt"/> records are INSERT-only.
 /// This store never updates or deletes them.
 /// </remarks>
-internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext> contextFactory, IClock clock)
+internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext> contextFactory, IClock clock, IGuidGenerator guidGenerator)
     : IWebhookDeliveryWriter, IWebhookDeliveryReader
 {
     public async Task<WebhookDeliveryAttempt?> FindByDeliveryIdAsync(
@@ -39,7 +40,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
 
         context.WebhookDeliveryAttempts.Add(new WebhookDeliveryAttempt
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             DeliveryId = command.DeliveryId,
             SubscriptionId = command.SubscriptionId,
             TenantId = command.Envelope.TenantId,
@@ -77,7 +78,7 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
 
         context.WebhookDeliveryAttempts.Add(new WebhookDeliveryAttempt
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             DeliveryId = command.DeliveryId,
             SubscriptionId = command.SubscriptionId,
             TenantId = command.Envelope.TenantId,

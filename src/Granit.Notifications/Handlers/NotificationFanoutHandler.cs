@@ -1,4 +1,5 @@
 using Granit.Core.MultiTenancy;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Messages;
 
@@ -12,6 +13,7 @@ public sealed class NotificationFanoutHandler(
     INotificationSubscriptionReader subscriptionReader,
     INotificationPreferenceReader preferenceReader,
     INotificationDefinitionStore definitionStore,
+    IGuidGenerator guidGenerator,
     ICurrentTenant currentTenant)
 {
     /// <summary>
@@ -69,7 +71,7 @@ public sealed class NotificationFanoutHandler(
 
                 commands.Add(new DeliverNotificationCommand
                 {
-                    DeliveryId = Guid.NewGuid(),
+                    DeliveryId = guidGenerator.Create(),
                     NotificationId = trigger.NotificationId,
                     NotificationTypeName = trigger.NotificationTypeName,
                     Severity = trigger.Severity,

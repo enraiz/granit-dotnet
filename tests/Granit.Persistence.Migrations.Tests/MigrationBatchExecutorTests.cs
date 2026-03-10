@@ -6,6 +6,7 @@
 // MigrationProgressDbContext uses the EF Core InMemory provider.
 // =============================================================================
 
+using Granit.Guids;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
@@ -66,6 +67,7 @@ public sealed class MigrationBatchExecutorTests : IDisposable
             _progressContext,
             _isolator,
             _clock,
+            new SimpleGuidGenerator(),
             NullLogger<MigrationBatchExecutor>.Instance);
 
     // -------------------------------------------------------------------------

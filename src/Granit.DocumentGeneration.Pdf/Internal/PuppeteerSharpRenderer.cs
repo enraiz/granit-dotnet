@@ -11,7 +11,7 @@ namespace Granit.DocumentGeneration.Pdf.Internal;
 /// <see cref="IDocumentRenderer"/> implementation that converts HTML to PDF
 /// using PuppeteerSharp (headless Chromium).
 /// </summary>
-internal sealed class PuppeteerSharpRenderer(
+internal sealed partial class PuppeteerSharpRenderer(
     ChromiumLifetimeService chromiumLifetime,
     IOptions<PdfRenderOptions> options,
     ILogger<PuppeteerSharpRenderer> logger) : IDocumentRenderer
@@ -61,10 +61,7 @@ internal sealed class PuppeteerSharpRenderer(
 
             byte[] pdfBytes = await page.PdfDataAsync(pdfOptions).ConfigureAwait(false);
 
-            logger.LogDebug(
-                "PDF rendered successfully ({Size} bytes, format={Format})",
-                pdfBytes.Length,
-                opts.PaperFormat);
+            LogPdfRendered(pdfBytes.Length, opts.PaperFormat);
 
             return new DocumentResult(pdfBytes, DocumentFormat.Pdf);
         }
@@ -93,4 +90,7 @@ internal sealed class PuppeteerSharpRenderer(
             "LEDGER" => PaperFormat.Ledger,
             _ => PaperFormat.A4,
         };
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "PDF rendered successfully ({Size} bytes, format={Format})")]
+    private partial void LogPdfRendered(int size, string format);
 }

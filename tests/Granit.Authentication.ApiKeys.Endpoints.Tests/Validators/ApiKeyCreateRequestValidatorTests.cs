@@ -1,6 +1,8 @@
 using FluentValidation.Results;
 using Granit.Authentication.ApiKeys.Endpoints.Dtos;
 using Granit.Authentication.ApiKeys.Endpoints.Validators;
+using Granit.Timing;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -8,7 +10,15 @@ namespace Granit.Authentication.ApiKeys.Endpoints.Tests.Validators;
 
 public sealed class ApiKeyCreateRequestValidatorTests
 {
-    private readonly ApiKeyCreateRequestValidator _validator = new();
+    private static readonly DateTimeOffset FixedNow = new(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
+    private readonly ApiKeyCreateRequestValidator _validator;
+
+    public ApiKeyCreateRequestValidatorTests()
+    {
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(FixedNow);
+        _validator = new ApiKeyCreateRequestValidator(clock);
+    }
 
     [Fact]
     public void Valid_Request_Passes()
@@ -27,7 +37,7 @@ public sealed class ApiKeyCreateRequestValidatorTests
             "live",
             ["Guava.Patients.Read", "Guava.Patients.Write"],
             ["10.0.0.0/24"],
-            DateTimeOffset.UtcNow.AddDays(30),
+            FixedNow.AddDays(30),
             CacheBehavior.NoCache);
         ValidationResult result = _validator.Validate(request);
         result.IsValid.ShouldBeTrue();
@@ -103,7 +113,7 @@ public sealed class ApiKeyCreateRequestValidatorTests
     {
         var request = new ApiKeyCreateRequest(
             "Key", ApiKeyType.Secret, "live",
-            ExpiresAt: DateTimeOffset.UtcNow.AddDays(-1));
+            ExpiresAt: FixedNow.AddDays(-1));
         ValidationResult result = _validator.Validate(request);
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == "ExpiresAt");

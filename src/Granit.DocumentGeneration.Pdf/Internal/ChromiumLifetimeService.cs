@@ -9,7 +9,7 @@ namespace Granit.DocumentGeneration.Pdf.Internal;
 /// Manages the lifecycle of the headless Chromium browser instance.
 /// Starts the browser on application startup and disposes it on shutdown.
 /// </summary>
-internal sealed class ChromiumLifetimeService(
+internal sealed partial class ChromiumLifetimeService(
     IOptions<PdfRenderOptions> options,
     ILogger<ChromiumLifetimeService> logger) : IHostedService, IAsyncDisposable
 {
@@ -34,7 +34,7 @@ internal sealed class ChromiumLifetimeService(
 
         if (string.IsNullOrEmpty(opts.ChromiumExecutablePath))
         {
-            logger.LogInformation("Downloading Chromium browser for PDF rendering...");
+            LogDownloadingChromium();
             BrowserFetcher fetcher = new();
             await fetcher.DownloadAsync().ConfigureAwait(false);
         }
@@ -50,9 +50,9 @@ internal sealed class ChromiumLifetimeService(
             launchOptions.ExecutablePath = opts.ChromiumExecutablePath;
         }
 
-        logger.LogInformation("Starting headless Chromium for PDF rendering...");
+        LogStartingChromium();
         _browser = await Puppeteer.LaunchAsync(launchOptions).ConfigureAwait(false);
-        logger.LogInformation("Headless Chromium started successfully");
+        LogChromiumStarted();
     }
 
     /// <inheritdoc/>
@@ -60,7 +60,7 @@ internal sealed class ChromiumLifetimeService(
     {
         if (_browser is not null)
         {
-            logger.LogInformation("Shutting down headless Chromium...");
+            LogShuttingDownChromium();
             await _browser.DisposeAsync().ConfigureAwait(false);
             _browser = null;
         }
@@ -77,4 +77,16 @@ internal sealed class ChromiumLifetimeService(
 
         _pageSemaphore.Dispose();
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Downloading Chromium browser for PDF rendering...")]
+    private partial void LogDownloadingChromium();
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Starting headless Chromium for PDF rendering...")]
+    private partial void LogStartingChromium();
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Headless Chromium started successfully")]
+    private partial void LogChromiumStarted();
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Shutting down headless Chromium...")]
+    private partial void LogShuttingDownChromium();
 }

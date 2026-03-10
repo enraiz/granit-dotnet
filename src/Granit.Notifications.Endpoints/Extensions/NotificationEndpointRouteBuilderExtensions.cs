@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Granit.Core.MultiTenancy;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Querying;
@@ -7,6 +8,7 @@ using Granit.Timing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.Notifications.Endpoints.Extensions;
@@ -94,7 +96,7 @@ public static class NotificationEndpointRouteBuilderExtensions
     private static async Task<NoContent> MarkAsReadAsync(
         Guid id,
         IUserNotificationWriter writer,
-        IClock clock)
+        [FromServices] IClock clock)
     {
         await writer.MarkAsReadAsync(id, clock.Now).ConfigureAwait(false);
         return TypedResults.NoContent();
@@ -104,7 +106,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         IUserNotificationWriter writer,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
-        IClock clock)
+        [FromServices] IClock clock)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
@@ -174,15 +176,16 @@ public static class NotificationEndpointRouteBuilderExtensions
     private static async Task<NoContent> UpdatePreferenceAsync(
         UpdatePreferenceRequest request,
         INotificationPreferenceWriter writer,
+        [FromServices] IGuidGenerator guidGenerator,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
-        IClock clock)
+        [FromServices] IClock clock)
     {
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         NotificationPreference preference = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             UserId = userId,
             NotificationTypeName = request.NotificationTypeName,
             ChannelName = request.ChannelName,

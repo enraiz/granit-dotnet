@@ -6,6 +6,8 @@
 // =============================================================================
 
 using System.Text.Json;
+using Granit.Guids;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Handlers;
@@ -20,11 +22,15 @@ public sealed class RetryWebhookHandlerTests
 {
     private readonly IWebhookDeliveryReader _deliveryReader = Substitute.For<IWebhookDeliveryReader>();
     private readonly IWebhookSubscriptionReader _subscriptionReader = Substitute.For<IWebhookSubscriptionReader>();
+    private readonly IGuidGenerator _guidGenerator = Substitute.For<IGuidGenerator>();
+    private readonly IClock _clock = Substitute.For<IClock>();
     private readonly RetryWebhookHandler _handler;
 
     public RetryWebhookHandlerTests()
     {
-        _handler = new RetryWebhookHandler(_deliveryReader, _subscriptionReader);
+        _guidGenerator.Create().Returns(_ => Guid.NewGuid());
+        _clock.Now.Returns(new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero));
+        _handler = new RetryWebhookHandler(_deliveryReader, _subscriptionReader, _guidGenerator, _clock);
     }
 
     // -------------------------------------------------------------------------
@@ -38,7 +44,7 @@ public sealed class RetryWebhookHandlerTests
         _deliveryReader.FindByDeliveryIdAsync(deliveryId, Arg.Any<CancellationToken>())
             .Returns((WebhookDeliveryAttempt?)null);
 
-        RetryWebhookResult result = await _handler.HandleAsync(deliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(deliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeFalse();
         result.ErrorKind.ShouldBe(RetryWebhookErrorKind.NotFound);
@@ -56,7 +62,7 @@ public sealed class RetryWebhookHandlerTests
         _deliveryReader.FindByDeliveryIdAsync(attempt.DeliveryId, Arg.Any<CancellationToken>())
             .Returns(attempt);
 
-        RetryWebhookResult result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeFalse();
         result.ErrorKind.ShouldBe(RetryWebhookErrorKind.InvalidRequest);
@@ -75,7 +81,7 @@ public sealed class RetryWebhookHandlerTests
         _subscriptionReader.FindByIdAsync(attempt.SubscriptionId, Arg.Any<CancellationToken>())
             .Returns((WebhookSubscription?)null);
 
-        RetryWebhookResult result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeFalse();
         result.ErrorKind.ShouldBe(RetryWebhookErrorKind.NotFound);
@@ -96,7 +102,7 @@ public sealed class RetryWebhookHandlerTests
         _subscriptionReader.FindByIdAsync(attempt.SubscriptionId, Arg.Any<CancellationToken>())
             .Returns(subscription);
 
-        RetryWebhookResult result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeFalse();
         result.ErrorKind.ShouldBe(RetryWebhookErrorKind.Conflict);
@@ -117,7 +123,7 @@ public sealed class RetryWebhookHandlerTests
         _subscriptionReader.FindByIdAsync(attempt.SubscriptionId, Arg.Any<CancellationToken>())
             .Returns(subscription);
 
-        RetryWebhookResult result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Command.ShouldNotBeNull();
@@ -138,7 +144,7 @@ public sealed class RetryWebhookHandlerTests
         _subscriptionReader.FindByIdAsync(attempt.SubscriptionId, Arg.Any<CancellationToken>())
             .Returns(subscription);
 
-        RetryWebhookResult result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         SendWebhookCommand command = result.Command!;
@@ -171,7 +177,7 @@ public sealed class RetryWebhookHandlerTests
         _subscriptionReader.FindByIdAsync(attempt.SubscriptionId, Arg.Any<CancellationToken>())
             .Returns(subscription);
 
-        RetryWebhookResult result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Command!.Envelope.Data.GetProperty("orderId").GetInt32().ShouldBe(42);
@@ -188,7 +194,7 @@ public sealed class RetryWebhookHandlerTests
         _subscriptionReader.FindByIdAsync(attempt.SubscriptionId, Arg.Any<CancellationToken>())
             .Returns(subscription);
 
-        RetryWebhookResult result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
+        var result = await _handler.HandleAsync(attempt.DeliveryId, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Command!.Envelope.Data.ValueKind.ShouldBe(JsonValueKind.Object);

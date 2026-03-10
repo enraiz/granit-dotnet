@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Exceptions;
@@ -12,9 +13,10 @@ namespace Granit.Notifications.Handlers;
 /// Wolverine handler that delivers a <see cref="DeliverNotificationCommand"/> via
 /// the appropriate <see cref="INotificationChannel"/>.
 /// </summary>
-public sealed class NotificationDeliveryHandler(
+public sealed partial class NotificationDeliveryHandler(
     IEnumerable<INotificationChannel> channels,
     INotificationDeliveryWriter deliveryWriter,
+    IGuidGenerator guidGenerator,
     IClock clock,
     ILogger<NotificationDeliveryHandler> logger)
 {
@@ -28,9 +30,7 @@ public sealed class NotificationDeliveryHandler(
 
         if (channel is null)
         {
-            logger.LogWarning(
-                "Notification channel '{ChannelName}' is not registered — skipping delivery {DeliveryId} for notification {NotificationId}",
-                command.ChannelName, command.DeliveryId, command.NotificationId);
+            LogChannelNotRegistered(command.ChannelName, command.DeliveryId, command.NotificationId);
             return;
         }
 
@@ -56,7 +56,7 @@ public sealed class NotificationDeliveryHandler(
 
             await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 DeliveryId = command.DeliveryId,
                 NotificationId = command.NotificationId,
                 NotificationTypeName = command.NotificationTypeName,
@@ -68,9 +68,7 @@ public sealed class NotificationDeliveryHandler(
                 IsSuccess = true,
             }, cancellationToken).ConfigureAwait(false);
 
-            logger.LogDebug(
-                "Notification delivered via '{ChannelName}' for delivery {DeliveryId} notification {NotificationId}",
-                command.ChannelName, command.DeliveryId, command.NotificationId);
+            LogNotificationDelivered(command.ChannelName, command.DeliveryId, command.NotificationId);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -78,7 +76,7 @@ public sealed class NotificationDeliveryHandler(
 
             await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 DeliveryId = command.DeliveryId,
                 NotificationId = command.NotificationId,
                 NotificationTypeName = command.NotificationTypeName,
@@ -91,12 +89,19 @@ public sealed class NotificationDeliveryHandler(
                 IsSuccess = false,
             }, cancellationToken).ConfigureAwait(false);
 
-            logger.LogWarning(ex,
-                "Notification delivery failed via '{ChannelName}' for delivery {DeliveryId} notification {NotificationId}",
-                command.ChannelName, command.DeliveryId, command.NotificationId);
+            LogNotificationDeliveryFailed(ex, command.ChannelName, command.DeliveryId, command.NotificationId);
 
             throw new NotificationDeliveryException(
                 $"Failed to deliver notification {command.NotificationId} via {command.ChannelName}", ex);
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Notification channel '{ChannelName}' is not registered — skipping delivery {DeliveryId} for notification {NotificationId}")]
+    private partial void LogChannelNotRegistered(string channelName, Guid deliveryId, Guid notificationId);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Notification delivered via '{ChannelName}' for delivery {DeliveryId} notification {NotificationId}")]
+    private partial void LogNotificationDelivered(string channelName, Guid deliveryId, Guid notificationId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Notification delivery failed via '{ChannelName}' for delivery {DeliveryId} notification {NotificationId}")]
+    private partial void LogNotificationDeliveryFailed(Exception exception, string channelName, Guid deliveryId, Guid notificationId);
 }

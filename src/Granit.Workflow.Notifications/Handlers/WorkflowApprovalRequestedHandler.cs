@@ -25,7 +25,7 @@ namespace Granit.Workflow.Notifications.Handlers;
 /// This follows the graceful degradation pattern.
 /// </para>
 /// </remarks>
-public sealed class WorkflowApprovalRequestedHandler(
+public sealed partial class WorkflowApprovalRequestedHandler(
     IApproverResolver approverResolver,
     INotificationPublisher notificationPublisher,
     ICurrentTenant currentTenant,
@@ -43,10 +43,7 @@ public sealed class WorkflowApprovalRequestedHandler(
 
         if (approverIds.Count == 0)
         {
-            logger.LogWarning(
-                "No approvers found for permission {Permission} on {EntityType} {EntityId}. " +
-                "The approval request will not be delivered",
-                message.RequiredPermission, message.EntityType, message.EntityId);
+            LogNoApproversFound(message.RequiredPermission, message.EntityType, message.EntityId);
             return;
         }
 
@@ -66,13 +63,12 @@ public sealed class WorkflowApprovalRequestedHandler(
             relatedEntity,
             cancellationToken).ConfigureAwait(false);
 
-        logger.LogInformation(
-            "Approval notification sent to {ApproverCount} approvers for {EntityType} {EntityId} " +
-            "(permission: {Permission}, tenant: {TenantId})",
-            approverIds.Count,
-            message.EntityType,
-            message.EntityId,
-            message.RequiredPermission,
-            currentTenant.IsAvailable ? currentTenant.Id : (Guid?)null);
+        LogApprovalNotificationSent(approverIds.Count, message.EntityType, message.EntityId, message.RequiredPermission, currentTenant.IsAvailable ? currentTenant.Id : null);
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "No approvers found for permission {Permission} on {EntityType} {EntityId}. The approval request will not be delivered")]
+    private partial void LogNoApproversFound(string permission, string entityType, string entityId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Approval notification sent to {ApproverCount} approvers for {EntityType} {EntityId} (permission: {Permission}, tenant: {TenantId})")]
+    private partial void LogApprovalNotificationSent(int approverCount, string entityType, string entityId, string permission, Guid? tenantId);
 }

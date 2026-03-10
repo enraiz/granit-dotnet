@@ -3,10 +3,12 @@ using Granit.DataExchange.Endpoints.Dtos.Import;
 using Granit.DataExchange.Endpoints.Internal.Export;
 using Granit.DataExchange.Endpoints.Internal.Import;
 using Granit.DataExchange.Export;
+using Granit.Timing;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.DataExchange.Endpoints.Endpoints.Export;
@@ -41,6 +43,7 @@ internal static class ExportExecutionEndpoints
         CreateExportJobRequest request,
         IExportOrchestrator orchestrator,
         IServiceProvider serviceProvider,
+        [FromServices] IClock clock,
         CancellationToken cancellationToken)
     {
         IExportDefinitionDescriptor? descriptor =
@@ -72,7 +75,7 @@ internal static class ExportExecutionEndpoints
         ExportJobResponse response = job is not null
             ? ExportJobResponse.FromJob(job)
             : new ExportJobResponse(result.JobId, request.DefinitionName, request.Format,
-                result.Status, null, null, null, DateTimeOffset.UtcNow, null);
+                result.Status, null, null, null, clock.Now, null);
 
         return TypedResults.Created($"/jobs/{result.JobId}", response);
     }

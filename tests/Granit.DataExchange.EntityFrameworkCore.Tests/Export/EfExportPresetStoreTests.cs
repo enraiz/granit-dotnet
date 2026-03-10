@@ -3,6 +3,7 @@ using Granit.DataExchange.EntityFrameworkCore.Internal.Export.Stores;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Stores;
 using Granit.DataExchange.EntityFrameworkCore.Tests.Infrastructure;
 using Granit.DataExchange.Export;
+using Granit.Guids;
 using Granit.Timing;
 using NSubstitute;
 using Shouldly;
@@ -171,6 +172,6 @@ public sealed class EfExportPresetStoreTests
             tenant.Id.Returns(tenantId.Value);
         }
 
-        return new EfExportPresetStore(factory, clock, tenant);
+        return new EfExportPresetStore(factory, clock, new SimpleGuidGenerator(), tenant);
     }
 }

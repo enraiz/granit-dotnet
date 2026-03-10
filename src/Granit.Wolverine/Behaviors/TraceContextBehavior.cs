@@ -31,7 +31,7 @@ namespace Granit.Wolverine.Behaviors;
 /// <c>Granit.Observability</c> registers it automatically.
 /// </para>
 /// </remarks>
-public sealed class TraceContextBehavior(ILogger<TraceContextBehavior> logger)
+public sealed partial class TraceContextBehavior(ILogger<TraceContextBehavior> logger)
 {
     private Activity? _activity;
 
@@ -49,10 +49,7 @@ public sealed class TraceContextBehavior(ILogger<TraceContextBehavior> logger)
 
         if (!ActivityContext.TryParse(traceParent, traceState: null, isRemote: true, out ActivityContext parentContext))
         {
-            logger.LogWarning(
-                "Wolverine envelope {EnvelopeId} contains a malformed traceparent header: {TraceParent}. Distributed trace context will not be restored.",
-                envelope.Id,
-                traceParent);
+            LogMalformedTraceparent(envelope.Id, traceParent);
             return;
         }
 
@@ -76,4 +73,7 @@ public sealed class TraceContextBehavior(ILogger<TraceContextBehavior> logger)
 
     /// <summary>Stops the bridge activity after the handler completes.</summary>
     public void After() => _activity?.Dispose();
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Wolverine envelope {EnvelopeId} contains a malformed traceparent header: {TraceParent}. Distributed trace context will not be restored.")]
+    private partial void LogMalformedTraceparent(Guid envelopeId, string traceParent);
 }

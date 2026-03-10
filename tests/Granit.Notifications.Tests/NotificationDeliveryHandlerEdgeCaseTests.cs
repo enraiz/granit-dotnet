@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Handlers;
@@ -32,7 +33,7 @@ public sealed class NotificationDeliveryHandlerEdgeCaseTests
             .Returns<Task>(_ => throw new OperationCanceledException());
 
         NotificationDeliveryHandler handler = new(
-            [channel], _deliveryWriter, _clock, NullLogger<NotificationDeliveryHandler>.Instance);
+            [channel], _deliveryWriter, new SimpleGuidGenerator(), _clock, NullLogger<NotificationDeliveryHandler>.Instance);
         DeliverNotificationCommand command = BuildCommand();
 
         // Act & Assert — should throw OperationCanceledException, NOT NotificationDeliveryException
@@ -61,7 +62,7 @@ public sealed class NotificationDeliveryHandlerEdgeCaseTests
             });
 
         NotificationDeliveryHandler handler = new(
-            [channel], _deliveryWriter, _clock, NullLogger<NotificationDeliveryHandler>.Instance);
+            [channel], _deliveryWriter, new SimpleGuidGenerator(), _clock, NullLogger<NotificationDeliveryHandler>.Instance);
         DeliverNotificationCommand command = BuildCommand();
 
         // Act
@@ -95,7 +96,7 @@ public sealed class NotificationDeliveryHandlerEdgeCaseTests
             });
 
         NotificationDeliveryHandler handler = new(
-            [channel], _deliveryWriter, _clock, NullLogger<NotificationDeliveryHandler>.Instance);
+            [channel], _deliveryWriter, new SimpleGuidGenerator(), _clock, NullLogger<NotificationDeliveryHandler>.Instance);
         DeliverNotificationCommand command = BuildCommand();
 
         // Act
@@ -130,7 +131,7 @@ public sealed class NotificationDeliveryHandlerEdgeCaseTests
             });
 
         NotificationDeliveryHandler handler = new(
-            [channel], _deliveryWriter, _clock, NullLogger<NotificationDeliveryHandler>.Instance);
+            [channel], _deliveryWriter, new SimpleGuidGenerator(), _clock, NullLogger<NotificationDeliveryHandler>.Instance);
         EntityReference entity = new("Patient", "pat-1");
         DeliverNotificationCommand command = BuildCommand(relatedEntity: entity);
 
@@ -158,7 +159,7 @@ public sealed class NotificationDeliveryHandlerEdgeCaseTests
             });
 
         NotificationDeliveryHandler handler = new(
-            [channel], _deliveryWriter, _clock, NullLogger<NotificationDeliveryHandler>.Instance);
+            [channel], _deliveryWriter, new SimpleGuidGenerator(), _clock, NullLogger<NotificationDeliveryHandler>.Instance);
         DeliverNotificationCommand command = BuildCommand(culture: "fr-BE");
 
         // Act
@@ -180,7 +181,7 @@ public sealed class NotificationDeliveryHandlerEdgeCaseTests
         email.Name.Returns(NotificationChannels.Email);
 
         NotificationDeliveryHandler handler = new(
-            [inApp, email], _deliveryWriter, _clock, NullLogger<NotificationDeliveryHandler>.Instance);
+            [inApp, email], _deliveryWriter, new SimpleGuidGenerator(), _clock, NullLogger<NotificationDeliveryHandler>.Instance);
         DeliverNotificationCommand command = BuildCommand(channelName: NotificationChannels.Email);
 
         // Act

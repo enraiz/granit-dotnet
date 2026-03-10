@@ -1,4 +1,7 @@
 using Granit.Core.Modularity;
+using Granit.ReferenceData.Endpoints.Validators;
+using Granit.Validation.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.ReferenceData.Endpoints;
 
@@ -12,4 +15,9 @@ namespace Granit.ReferenceData.Endpoints;
 /// </para>
 /// </remarks>
 [DependsOn(typeof(GranitReferenceDataModule))]
-public sealed class GranitReferenceDataEndpointsModule : GranitModule;
+public sealed class GranitReferenceDataEndpointsModule : GranitModule
+{
+    /// <inheritdoc />
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Services.AddGranitValidatorsFromAssemblyContaining<ReferenceDataCreateRequestValidator>();
+}

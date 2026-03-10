@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Granit.Core.MultiTenancy;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Handlers;
 using Granit.Notifications.Messages;
@@ -24,6 +25,7 @@ public sealed class NotificationFanoutHandlerEdgeCaseTests
             _subscriptionReader,
             _preferenceReader,
             _definitionStore,
+            new SimpleGuidGenerator(),
             _currentTenant);
     }
 

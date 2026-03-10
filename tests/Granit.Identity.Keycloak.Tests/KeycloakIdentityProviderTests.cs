@@ -1,6 +1,7 @@
 using System.Net;
 using Granit.Identity.Keycloak.Internal;
 using Granit.Identity.Models;
+using Granit.Timing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -46,9 +47,13 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         IHttpClientFactory tokenFactory = Substitute.For<IHttpClientFactory>();
         tokenFactory.CreateClient("KeycloakAdmin").Returns(tokenClient);
 
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(DateTimeOffset.UtcNow);
+
         _tokenService = new KeycloakAdminTokenService(
             tokenFactory,
             Options.Create(_options),
+            clock,
             NullLogger<KeycloakAdminTokenService>.Instance);
 
         // Token exchange service uses a dedicated factory that returns the user token.
@@ -1088,9 +1093,13 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         IHttpClientFactory seqFactory = Substitute.For<IHttpClientFactory>();
         seqFactory.CreateClient("KeycloakAdmin").Returns(seqClient);
 
+        IClock updateClock = Substitute.For<IClock>();
+        updateClock.Now.Returns(DateTimeOffset.UtcNow);
+
         KeycloakAdminTokenService tokenSvc = new(
             seqFactory,
             Options.Create(_options),
+            updateClock,
             NullLogger<KeycloakAdminTokenService>.Instance);
 
         KeycloakIdentityProvider provider = new(

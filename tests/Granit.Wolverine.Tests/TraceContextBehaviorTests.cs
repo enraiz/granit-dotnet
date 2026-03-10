@@ -22,7 +22,15 @@ public sealed class TraceContextBehaviorTests : IDisposable
     // Valid W3C traceparent: version(00)-traceId(32 hex)-parentId(16 hex)-flags(01)
     private const string ValidTraceParent = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
 
-    private readonly ILogger<TraceContextBehavior> _logger = Substitute.For<ILogger<TraceContextBehavior>>();
+    private readonly ILogger<TraceContextBehavior> _logger = CreateLogger();
+
+    private static ILogger<TraceContextBehavior> CreateLogger()
+    {
+        var logger = Substitute.For<ILogger<TraceContextBehavior>>();
+        // [LoggerMessage] source-generated methods guard with IsEnabled() — must return true.
+        logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+        return logger;
+    }
     private readonly List<Activity> _capturedActivities = [];
     private readonly ActivityListener _listener;
 
@@ -158,12 +166,13 @@ public sealed class TraceContextBehaviorTests : IDisposable
 
         behavior.Before(envelope);
 
-        _logger.ReceivedWithAnyArgs(1).Log(
-            LogLevel.Warning,
-            Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+        // [LoggerMessage] source-generates Log<TState> with a private struct — NSubstitute
+        // cannot match on the generic type, so we inspect ReceivedCalls() directly.
+        bool hasWarning = _logger.ReceivedCalls()
+            .Any(call =>
+                call.GetMethodInfo().Name == "Log"
+                && (LogLevel)call.GetArguments()[0]! == LogLevel.Warning);
+        hasWarning.ShouldBeTrue("expected a LogLevel.Warning call for malformed traceparent");
     }
 
     // -------------------------------------------------------------------------

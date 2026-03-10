@@ -207,6 +207,12 @@
       "granit.core": {
         "type": "Project"
       },
+      "granit.guids": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Timing": "[0.1.0-dev, )"
+        }
+      },
       "granit.security": {
         "type": "Project",
         "dependencies": {

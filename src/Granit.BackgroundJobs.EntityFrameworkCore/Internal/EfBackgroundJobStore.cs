@@ -1,3 +1,4 @@
+using Granit.Guids;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.BackgroundJobs.EntityFrameworkCore.Internal;
@@ -13,7 +14,8 @@ namespace Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 /// <see cref="Microsoft.Extensions.Hosting.IHostedService"/> consumers.
 /// </remarks>
 internal sealed class EfBackgroundJobStore(
-    IDbContextFactory<BackgroundJobsDbContext> contextFactory) : IBackgroundJobStoreReader, IBackgroundJobStoreWriter
+    IDbContextFactory<BackgroundJobsDbContext> contextFactory,
+    IGuidGenerator guidGenerator) : IBackgroundJobStoreReader, IBackgroundJobStoreWriter
 {
     /// <inheritdoc/>
     public async Task<BackgroundJobDefinition?> FindAsync(string jobName, CancellationToken cancellationToken = default)
@@ -50,7 +52,7 @@ internal sealed class EfBackgroundJobStore(
             {
                 context.Jobs.Add(new BackgroundJobDefinition
                 {
-                    Id = Guid.NewGuid(),
+                    Id = guidGenerator.Create(),
                     JobName = reg.JobName,
                     CronExpression = reg.CronExpression,
                     MessageType = reg.MessageType,

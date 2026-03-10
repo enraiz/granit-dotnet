@@ -1,3 +1,4 @@
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Timing;
@@ -10,6 +11,7 @@ namespace Granit.Notifications.Internal;
 /// </summary>
 internal sealed class InAppNotificationChannel(
     IUserNotificationWriter userNotificationWriter,
+    IGuidGenerator guidGenerator,
     IClock clock) : INotificationChannel
 {
     public string Name => NotificationChannels.InApp;
@@ -18,7 +20,7 @@ internal sealed class InAppNotificationChannel(
     {
         UserNotification notification = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             NotificationId = context.NotificationId,
             NotificationTypeName = context.NotificationTypeName,
             Severity = context.Severity,

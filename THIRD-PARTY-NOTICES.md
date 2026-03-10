@@ -48,7 +48,7 @@ Dernière mise à jour : 2026-03-03
 | Microsoft.Extensions.Options.ConfigurationExtensions | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.IO.RecyclableMemoryStream | 3.0.1 | (c) Microsoft Corporation |
 | PuppeteerSharp | 21.1.1 | PuppeteerSharp Contributors |
-| Scalar.AspNetCore | 2.12.50 | Scalar Contributors |
+| Scalar.AspNetCore | 2.13.3 | Scalar Contributors |
 | Sep | 0.12.2 | Copyright (c) 2023 nietras |
 | Sylvan.Data.Excel | 0.5.2 | Copyright (c) Mark Pflug |
 | SmartFormat | 3.6.1 | Copyright 2011-2025 SmartFormat Project |

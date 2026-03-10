@@ -2,6 +2,8 @@ using Granit.Authorization;
 using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
 using Granit.Identity.Endpoints.Permissions;
+using Granit.Identity.Endpoints.Validators;
+using Granit.Validation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Identity.Endpoints;
@@ -27,7 +29,10 @@ namespace Granit.Identity.Endpoints;
 public sealed class GranitIdentityEndpointsModule : GranitModule
 {
     /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
         context.Services.AddSingleton<IPermissionDefinitionProvider,
             IdentityPermissionDefinitionProvider>();
+        context.Services.AddGranitValidatorsFromAssemblyContaining<IdentityUserCacheListRequestValidator>();
+    }
 }

@@ -1,7 +1,9 @@
 using Granit.Authorization;
 using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
+using Granit.Validation.Extensions;
 using Granit.Workflow.Endpoints.Permissions;
+using Granit.Workflow.Endpoints.Validators;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Workflow.Endpoints;
@@ -30,7 +32,10 @@ namespace Granit.Workflow.Endpoints;
 public sealed class GranitWorkflowEndpointsModule : GranitModule
 {
     /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
         context.Services.AddSingleton<IPermissionDefinitionProvider,
             WorkflowPermissionDefinitionProvider>();
+        context.Services.AddGranitValidatorsFromAssemblyContaining<WorkflowTransitionRequestValidator>();
+    }
 }

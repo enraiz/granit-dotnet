@@ -193,6 +193,7 @@ Key rules for quick reference:
 - **Endpoint DTOs**: Module-specific DTOs must be prefixed with module context (`WorkflowTransitionRequest`, not `TransitionRequest`). OpenAPI flattens namespaces — generic names cause schema conflicts. Shared cross-cutting types (`PagedResult<T>`, `ProblemDetails`) are exempt.
 - **DTO suffixes**: `Request` for input bodies, `Response` for top-level returns. NEVER use `Dto` suffix. EF Core entities must NOT be returned directly — create a `*Response` record.
 - **Error responses**: Always `TypedResults.Problem(detail, statusCode)` (RFC 7807), never `TypedResults.BadRequest<string>()`. Return type: `ProblemHttpResult`.
+- **Validator registration**: Every module that defines `GranitValidator<T>` implementations MUST call `AddGranitValidatorsFromAssemblyContaining<TValidator>()` in its `ConfigureServices`. Without this, `FluentValidationEndpointFilter<T>` silently skips validation. One call per assembly suffices.
 
 **Isolated DbContext pattern — MANDATORY for all `*.EntityFrameworkCore` packages**:
 
@@ -317,6 +318,16 @@ rewrite code without understanding the original intent.
 - Simplify a complex condition without having tested the edge cases it covers
 - Replace a custom implementation with a standard library without verifying why
   the library was not used initially
+- Merge separate Reader/Writer interfaces into a combined Store interface — the framework
+  follows CQRS (Command Query Responsibility Segregation). `IBlobDescriptorReader` and
+  `IBlobDescriptorWriter` must stay separate in constructors, even if `IBlobDescriptorStore`
+  exists. The same applies to all `I*Reader` / `I*Writer` pairs.
+- Remove or change interface implementations on domain base classes (`ValueObject`,
+  `Entity`, `AggregateRoot`) to fix SonarQube warnings. These implement specific patterns
+  (e.g. `IEqualityComparer<T>` on `ValueObject`) by design. Mark the issue as won't fix.
+- Reduce constructor parameter count by introducing wrapper/bag types that don't represent
+  a real domain concept. If SonarQube flags `brain-overload` on an internal class, prefer
+  marking it as won't fix over creating artificial groupings that obscure dependencies.
 
 ## Expected behavior
 

@@ -6,6 +6,7 @@
 // Uses real MigrationBatchExecutor with mocked dependencies.
 // =============================================================================
 
+using Granit.Guids;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
@@ -60,6 +61,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
             _progressContext,
             Substitute.For<ITenantDbIsolator>(),
             clock,
+            new SimpleGuidGenerator(),
             NullLogger<MigrationBatchExecutor>.Instance);
 
         return new RunMigrationBatchHandler(executor);
@@ -113,6 +115,7 @@ public sealed class RunMigrationBatchHandlerTests : IDisposable
             _progressContext,
             Substitute.For<ITenantDbIsolator>(),
             clock,
+            new SimpleGuidGenerator(),
             NullLogger<MigrationBatchExecutor>.Instance);
 
         RunMigrationBatchHandler handler = new(executor);

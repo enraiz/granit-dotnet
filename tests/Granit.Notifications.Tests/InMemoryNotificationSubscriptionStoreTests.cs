@@ -5,8 +5,11 @@
 // listing, entity follow/unfollow, follower queries, tenant isolation.
 // =============================================================================
 
+using Granit.Guids;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Internal;
+using Granit.Timing;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -14,7 +17,16 @@ namespace Granit.Notifications.Tests;
 
 public sealed class InMemoryNotificationSubscriptionStoreTests
 {
-    private readonly InMemoryNotificationSubscriptionStore _store = new();
+    private readonly InMemoryNotificationSubscriptionStore _store;
+
+    public InMemoryNotificationSubscriptionStoreTests()
+    {
+        IGuidGenerator guidGenerator = Substitute.For<IGuidGenerator>();
+        guidGenerator.Create().Returns(_ => Guid.NewGuid());
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero));
+        _store = new InMemoryNotificationSubscriptionStore(guidGenerator, clock);
+    }
 
     // -------------------------------------------------------------------------
     // SubscribeAsync

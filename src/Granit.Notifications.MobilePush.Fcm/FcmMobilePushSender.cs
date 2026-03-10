@@ -110,7 +110,8 @@ internal sealed partial class FcmMobilePushSender(
     private partial void LogSendFailed(string token, Exception exception);
 }
 
-internal sealed class FcmTokenUnregisteredException(string token)
+/// <summary>Thrown when a device token is no longer registered with FCM.</summary>
+public sealed class FcmTokenUnregisteredException(string token)
     : Exception($"FCM token is unregistered: {token}");
 
 internal sealed record FcmPayload

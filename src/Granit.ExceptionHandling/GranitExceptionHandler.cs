@@ -48,7 +48,7 @@ internal sealed partial class GranitExceptionHandler(
         // No response is written; log at Information to avoid polluting error alerting.
         if (exception is OperationCanceledException)
         {
-            _logger.LogInformation("Request cancelled by client.");
+            LogRequestCancelled("OperationCanceledException");
             return true;
         }
 

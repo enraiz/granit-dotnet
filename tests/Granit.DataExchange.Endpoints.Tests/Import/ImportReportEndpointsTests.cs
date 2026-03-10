@@ -11,6 +11,7 @@ using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Parsing;
 using Granit.DataExchange.Import.Pipeline;
 using Granit.DataExchange.Import.Reporting;
+using Granit.Guids;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -67,6 +68,7 @@ public sealed class ImportReportEndpointsTests : IAsyncDisposable
         builder.Services.AddSingleton(Substitute.For<IFileParser>());
         builder.Services.AddSingleton(Substitute.For<IImportCommandDispatcher>());
         builder.Services.AddSingleton(Substitute.For<IImportOrchestrator>());
+        builder.Services.AddSingleton<IGuidGenerator>(new SimpleGuidGenerator());
 
         // Required by export endpoints (all endpoints are compiled at startup)
         builder.Services.AddSingleton(Substitute.For<IExportOrchestrator>());

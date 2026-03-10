@@ -26,12 +26,14 @@ namespace Granit.Identity.Keycloak.Internal;
 /// a fresh token exchange.
 /// </para>
 /// </remarks>
-internal sealed class KeycloakUserTokenExchangeService(
+internal sealed partial class KeycloakUserTokenExchangeService(
     IHttpClientFactory httpClientFactory,
     IOptions<KeycloakAdminOptions> options,
     ILogger<KeycloakUserTokenExchangeService> logger)
 {
+#pragma warning disable GRSEC003 // OAuth grant type URI constant, not a secret
     private const string TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange";
+#pragma warning restore GRSEC003
 
     /// <summary>
     /// Exchanges the service account credentials for a token representing the given user.
@@ -69,12 +71,13 @@ internal sealed class KeycloakUserTokenExchangeService(
                 $"Keycloak token exchange for user '{userId}' returned an empty access token.");
         }
 
-        logger.LogDebug(
-            "Token exchange succeeded for user {UserId}, expires in {ExpiresIn}s",
-            userId, token.ExpiresIn);
+        LogTokenExchangeSucceeded(userId, token.ExpiresIn);
 
         return token.AccessToken;
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Token exchange succeeded for user {UserId}, expires in {ExpiresIn}s")]
+    private partial void LogTokenExchangeSucceeded(string userId, int expiresIn);
 
     private sealed record TokenExchangeResponse(
         [property: JsonPropertyName("access_token")] string AccessToken,

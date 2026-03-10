@@ -7,6 +7,7 @@ using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Parsing;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Guids;
 using Granit.Timing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -49,7 +50,8 @@ internal static class ImportUploadEndpoints
         IServiceProvider serviceProvider,
         IImportFileProvider fileProvider,
         IImportJobWriter jobWriter,
-        IClock clock,
+        [FromServices] IGuidGenerator guidGenerator,
+        [FromServices] IClock clock,
         CancellationToken cancellationToken)
     {
         IImportDefinitionDescriptor? descriptor =
@@ -81,7 +83,7 @@ internal static class ImportUploadEndpoints
 
         ImportJob job = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             DefinitionName = descriptor.Name,
             EntityTypeName = descriptor.EntityType.Name,
             OriginalFileName = file.FileName,

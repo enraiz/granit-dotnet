@@ -1,5 +1,6 @@
 using Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 using Granit.BackgroundJobs.Internal;
+using Granit.Guids;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
@@ -28,7 +29,7 @@ public sealed class EfBackgroundJobStoreTests
     }
 
     private static EfBackgroundJobStore CreateStore(string dbName) =>
-        new(new InMemoryContextFactory(dbName));
+        new(new InMemoryContextFactory(dbName), new SimpleGuidGenerator());
 
     private static RecurringJobRegistration MakeRegistration(
         string jobName = "test-job",

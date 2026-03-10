@@ -1,4 +1,5 @@
 using Granit.BackgroundJobs.Internal;
+using Granit.Guids;
 using Granit.Security;
 using Granit.Timing;
 using JasperFx.Core;
@@ -41,7 +42,7 @@ public sealed class BackgroundJobsIntegrationTests
     public async Task AfterAsync_EndToEnd_SchedulesNextOccurrenceInStore()
     {
         // Arrange
-        InMemoryBackgroundJobStore store = new();
+        InMemoryBackgroundJobStore store = new(new SimpleGuidGenerator());
         await store.SeedJobsAsync([DailyRegistration()], TestContext.Current.CancellationToken);
 
         // Clock at 07:00 UTC — next "0 8 * * *" occurrence is at 08:00 same day
@@ -72,7 +73,7 @@ public sealed class BackgroundJobsIntegrationTests
     public async Task AfterAsync_AfterPause_DoesNotUpdateNextExecutionAt()
     {
         // Arrange
-        InMemoryBackgroundJobStore store = new();
+        InMemoryBackgroundJobStore store = new(new SimpleGuidGenerator());
         await store.SeedJobsAsync([DailyRegistration()], TestContext.Current.CancellationToken);
         await store.SetEnabledAsync(
             "fake-daily-report", false, TestContext.Current.CancellationToken);
@@ -102,7 +103,7 @@ public sealed class BackgroundJobsIntegrationTests
     public async Task TriggerNow_TriggeredByHeader_PersistedAfterBeforeAsync()
     {
         // Arrange
-        InMemoryBackgroundJobStore store = new();
+        InMemoryBackgroundJobStore store = new(new SimpleGuidGenerator());
         await store.SeedJobsAsync([DailyRegistration()], TestContext.Current.CancellationToken);
 
         IClock clock = Substitute.For<IClock>();
@@ -160,7 +161,7 @@ public sealed class BackgroundJobsIntegrationTests
     public async Task SeedJobsAsync_CalledTwice_DoesNotDuplicateJobs()
     {
         // Arrange
-        InMemoryBackgroundJobStore store = new();
+        InMemoryBackgroundJobStore store = new(new SimpleGuidGenerator());
         RecurringJobRegistration[] registrations =
         [
             new("job-a", "0 * * * *", typeof(FakeDailyReportMessage).AssemblyQualifiedName!),

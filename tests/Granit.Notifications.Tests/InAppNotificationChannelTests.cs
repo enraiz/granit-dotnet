@@ -6,6 +6,7 @@
 // =============================================================================
 
 using System.Text.Json;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Internal;
@@ -26,7 +27,7 @@ public sealed class InAppNotificationChannelTests
     {
         _clock = Substitute.For<IClock>();
         _clock.Now.Returns(_ => DateTimeOffset.UtcNow);
-        _channel = new InAppNotificationChannel(_userNotificationWriter, _clock);
+        _channel = new InAppNotificationChannel(_userNotificationWriter, new SimpleGuidGenerator(), _clock);
     }
 
     [Fact]

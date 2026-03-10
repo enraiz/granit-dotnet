@@ -1,5 +1,6 @@
 using FluentValidation;
 using Granit.Authentication.ApiKeys.Endpoints.Dtos;
+using Granit.Timing;
 using Granit.Validation;
 
 namespace Granit.Authentication.ApiKeys.Endpoints.Validators;
@@ -13,7 +14,7 @@ internal sealed class ApiKeyCreateRequestValidator : GranitValidator<ApiKeyCreat
     internal const int MaxPermissions = 100;
     internal const int MaxCidrs = 50;
 
-    public ApiKeyCreateRequestValidator()
+    public ApiKeyCreateRequestValidator(IClock clock)
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -46,7 +47,7 @@ internal sealed class ApiKeyCreateRequestValidator : GranitValidator<ApiKeyCreat
             .When(x => x.AllowedCidrs is { Count: > 0 });
 
         RuleFor(x => x.ExpiresAt)
-            .GreaterThan(DateTimeOffset.UtcNow)
+            .Must(expiresAt => expiresAt > clock.Now)
             .When(x => x.ExpiresAt.HasValue)
             .WithMessage("Expiration date must be in the future.");
 

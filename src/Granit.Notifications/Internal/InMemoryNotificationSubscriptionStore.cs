@@ -1,10 +1,12 @@
 using System.Collections.Concurrent;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
+using Granit.Timing;
 
 namespace Granit.Notifications.Internal;
 
-internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubscriptionReader, INotificationSubscriptionWriter
+internal sealed class InMemoryNotificationSubscriptionStore(IGuidGenerator guidGenerator, IClock clock) : INotificationSubscriptionReader, INotificationSubscriptionWriter
 {
     private readonly ConcurrentDictionary<string, NotificationSubscription> _subscriptions = new();
 
@@ -16,11 +18,11 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         string key = BuildKey(userId, notificationTypeName, tenantId);
         _subscriptions.TryAdd(key, new NotificationSubscription
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             UserId = userId,
             NotificationTypeName = notificationTypeName,
             TenantId = tenantId,
-            CreatedAt = DateTimeOffset.UtcNow,
+            CreatedAt = clock.Now,
         });
         return Task.CompletedTask;
     }
@@ -55,13 +57,13 @@ internal sealed class InMemoryNotificationSubscriptionStore : INotificationSubsc
         string key = BuildKey(userId, string.Empty, tenantId, entityType, entityId);
         _subscriptions.TryAdd(key, new NotificationSubscription
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             UserId = userId,
             NotificationTypeName = string.Empty,
             EntityType = entityType,
             EntityId = entityId,
             TenantId = tenantId,
-            CreatedAt = DateTimeOffset.UtcNow,
+            CreatedAt = clock.Now,
         });
         return Task.CompletedTask;
     }

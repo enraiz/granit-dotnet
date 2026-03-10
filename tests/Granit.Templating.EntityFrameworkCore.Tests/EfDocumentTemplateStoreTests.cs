@@ -1,9 +1,11 @@
 using Granit.Core.Exceptions;
+using Granit.Guids;
 using Granit.Templating.EntityFrameworkCore.Internal;
 using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
+using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,11 +48,25 @@ public sealed class EfDocumentTemplateStoreTests
         return hook;
     }
 
+    private static IGuidGenerator CreateGuidGenerator()
+    {
+        IGuidGenerator gen = Substitute.For<IGuidGenerator>();
+        gen.Create().Returns(_ => Guid.NewGuid());
+        return gen;
+    }
+
+    private static IClock CreateClock()
+    {
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(_ => DateTimeOffset.UtcNow);
+        return clock;
+    }
+
     private static EfDocumentTemplateStore CreateStore(string dbName) =>
-        new(new InMemoryContextFactory(dbName), CreateHybridCache(), CreateAllowAllHook());
+        new(new InMemoryContextFactory(dbName), CreateHybridCache(), CreateGuidGenerator(), CreateClock(), CreateAllowAllHook());
 
     private static EfDocumentTemplateStore CreateStore(string dbName, ITemplateTransitionHook hook) =>
-        new(new InMemoryContextFactory(dbName), CreateHybridCache(), hook);
+        new(new InMemoryContextFactory(dbName), CreateHybridCache(), CreateGuidGenerator(), CreateClock(), hook);
 
     private static string NewDb() => Guid.NewGuid().ToString();
 

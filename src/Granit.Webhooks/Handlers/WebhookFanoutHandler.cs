@@ -1,4 +1,5 @@
 using Granit.Core.MultiTenancy;
+using Granit.Guids;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Messages;
 
@@ -22,7 +23,8 @@ namespace Granit.Webhooks.Handlers;
 /// </remarks>
 public sealed class WebhookFanoutHandler(
     IWebhookSubscriptionReader subscriptionReader,
-    ICurrentTenant currentTenant)
+    ICurrentTenant currentTenant,
+    IGuidGenerator guidGenerator)
 {
     /// <summary>
     /// Resolves active subscribers and produces one <see cref="SendWebhookCommand"/> per subscriber.
@@ -57,7 +59,7 @@ public sealed class WebhookFanoutHandler(
 
         return subscriptions.Select(sub => new SendWebhookCommand
         {
-            DeliveryId = Guid.NewGuid(),
+            DeliveryId = guidGenerator.Create(),
             SubscriptionId = sub.Id,
             TargetUrl = sub.TargetUrl,
             SigningSecret = sub.SigningSecret,

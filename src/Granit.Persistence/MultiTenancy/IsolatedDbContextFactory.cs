@@ -24,7 +24,7 @@ namespace Granit.Persistence.MultiTenancy;
 /// </para>
 /// </remarks>
 /// <typeparam name="TContext">The <see cref="DbContext"/> type.</typeparam>
-internal sealed class IsolatedDbContextFactory<TContext>(
+internal sealed partial class IsolatedDbContextFactory<TContext>(
     ICurrentTenant currentTenant,
     ITenantIsolationStrategyProvider strategyProvider,
     IServiceProvider serviceProvider,
@@ -43,11 +43,7 @@ internal sealed class IsolatedDbContextFactory<TContext>(
             .GetStrategyAsync(currentTenant.IsAvailable ? currentTenant.Id : null, cancellationToken)
             .ConfigureAwait(false);
 
-        logger.LogDebug(
-            "Resolving DbContext<{ContextType}> using isolation strategy {Strategy} for tenant {TenantId}.",
-            typeof(TContext).Name,
-            strategy,
-            currentTenant.Id);
+        LogResolvingDbContext(typeof(TContext).Name, strategy, currentTenant.Id);
 
         IDbContextFactory<TContext> factory =
             serviceProvider.GetKeyedService<IDbContextFactory<TContext>>(strategy)
@@ -57,4 +53,7 @@ internal sealed class IsolatedDbContextFactory<TContext>(
 
         return await factory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Resolving DbContext<{ContextType}> using isolation strategy {Strategy} for tenant {TenantId}.")]
+    private partial void LogResolvingDbContext(string contextType, TenantIsolationStrategy strategy, Guid? tenantId);
 }

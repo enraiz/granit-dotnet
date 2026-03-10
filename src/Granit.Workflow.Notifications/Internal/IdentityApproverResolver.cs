@@ -25,7 +25,7 @@ namespace Granit.Workflow.Notifications.Internal;
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class IdentityApproverResolver(
+internal sealed partial class IdentityApproverResolver(
     IPermissionManagerReader permissionManagerReader,
     IIdentityProvider identityProvider,
     ICurrentTenant currentTenant,
@@ -43,9 +43,7 @@ internal sealed class IdentityApproverResolver(
 
         if (roles.Count == 0)
         {
-            logger.LogDebug(
-                "No roles found for permission {Permission} (tenant: {TenantId})",
-                requiredPermission, tenantId);
+            LogNoRolesForPermission(requiredPermission, tenantId);
             return [];
         }
 
@@ -62,10 +60,14 @@ internal sealed class IdentityApproverResolver(
             }
         }
 
-        logger.LogDebug(
-            "Resolved {UserCount} approvers for permission {Permission} across {RoleCount} roles",
-            userIds.Count, requiredPermission, roles.Count);
+        LogApproversResolved(userIds.Count, requiredPermission, roles.Count);
 
         return [.. userIds];
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "No roles found for permission {Permission} (tenant: {TenantId})")]
+    private partial void LogNoRolesForPermission(string permission, Guid? tenantId);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Resolved {UserCount} approvers for permission {Permission} across {RoleCount} roles")]
+    private partial void LogApproversResolved(int userCount, string permission, int roleCount);
 }

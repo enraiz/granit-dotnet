@@ -6,6 +6,7 @@
 // =============================================================================
 
 using System.Threading.Channels;
+using Granit.Guids;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
@@ -61,6 +62,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         scopeServices.AddSingleton(_progressContext);
         scopeServices.AddSingleton(Substitute.For<ITenantDbIsolator>());
         scopeServices.AddSingleton(_clock);
+        scopeServices.AddSingleton<IGuidGenerator>(new SimpleGuidGenerator());
         scopeServices.AddSingleton<ILogger<MigrationBatchExecutor>>(
             NullLogger<MigrationBatchExecutor>.Instance);
         scopeServices.AddScoped<MigrationBatchExecutor>();

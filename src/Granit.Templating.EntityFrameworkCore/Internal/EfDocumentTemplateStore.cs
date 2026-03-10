@@ -1,8 +1,10 @@
 using Granit.Core.Exceptions;
+using Granit.Guids;
 using Granit.Templating.Exceptions;
 using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
+using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 
@@ -28,6 +30,8 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 internal sealed class EfDocumentTemplateStore(
     IDbContextFactory<TemplatingDbContext> contextFactory,
     HybridCache cache,
+    IGuidGenerator guidGenerator,
+    IClock clock,
     ITemplateTransitionHook transitionHook) : IDocumentTemplateStoreReader, IDocumentTemplateStoreWriter
 {
     /// <inheritdoc/>
@@ -75,19 +79,19 @@ internal sealed class EfDocumentTemplateStore(
             existing.Content = content;
             existing.MimeType = mimeType;
             existing.CreatedBy = updatedBy;
-            existing.CreatedAt = DateTimeOffset.UtcNow;
+            existing.CreatedAt = clock.Now;
         }
         else
         {
             ctx.TemplateRevisions.Add(new TemplateRevisionEntity
             {
-                RevisionId = Guid.NewGuid(),
+                RevisionId = guidGenerator.Create(),
                 TemplateName = key.Name,
                 Culture = key.Culture,
                 Content = content,
                 MimeType = mimeType,
                 Status = TemplateLifecycleStatus.Draft,
-                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = clock.Now,
                 CreatedBy = updatedBy,
             });
         }
@@ -126,7 +130,7 @@ internal sealed class EfDocumentTemplateStore(
                         && r.Status == TemplateLifecycleStatus.Published)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        DateTimeOffset now = DateTimeOffset.UtcNow;
+        DateTimeOffset now = clock.Now;
         foreach (TemplateRevisionEntity published in currentlyPublished)
         {
             published.Status = TemplateLifecycleStatus.Archived;
@@ -176,7 +180,7 @@ internal sealed class EfDocumentTemplateStore(
             throw new TemplateTransitionDeniedException(TemplateLifecycleStatus.Published, TemplateLifecycleStatus.Archived);
         }
 
-        DateTimeOffset now = DateTimeOffset.UtcNow;
+        DateTimeOffset now = clock.Now;
         foreach (TemplateRevisionEntity entity in published)
         {
             entity.Status = TemplateLifecycleStatus.Archived;

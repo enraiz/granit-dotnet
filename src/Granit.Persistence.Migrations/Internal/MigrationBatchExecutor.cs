@@ -1,3 +1,4 @@
+using Granit.Guids;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +15,13 @@ namespace Granit.Persistence.Migrations.Internal;
 /// dependency on Wolverine — it can be consumed by a <see cref="MigrationBatchWorker"/>
 /// (Channel-based) or by a Wolverine handler in <c>Granit.Persistence.Migrations.Wolverine</c>.
 /// </remarks>
-internal sealed class MigrationBatchExecutor(
+internal sealed partial class MigrationBatchExecutor(
     IMigrationCycleRegistry registry,
     IServiceProvider serviceProvider,
     MigrationProgressDbContext progressContext,
     ITenantDbIsolator isolator,
     IClock clock,
+    IGuidGenerator guidGenerator,
     ILogger<MigrationBatchExecutor> logger)
 {
     /// <summary>
@@ -32,9 +34,7 @@ internal sealed class MigrationBatchExecutor(
         MigrationCycleRegistration? registration = registry.Find(command.CycleId);
         if (registration is null)
         {
-            logger.LogWarning(
-                "Migration cycle '{CycleId}' not found in registry. Message discarded.",
-                command.CycleId);
+            LogCycleNotFound(command.CycleId);
             return null;
         }
 
@@ -52,9 +52,7 @@ internal sealed class MigrationBatchExecutor(
 
         if (progress.Status == MigrationStatus.Completed)
         {
-            logger.LogInformation(
-                "Migration cycle '{CycleId}' already completed for tenant {TenantId}. Message discarded.",
-                command.CycleId, tenantId);
+            LogCycleAlreadyCompleted(command.CycleId, tenantId);
             return null;
         }
 
@@ -81,16 +79,11 @@ internal sealed class MigrationBatchExecutor(
         {
             progress.Status = MigrationStatus.Completed;
             progress.CompletedAt = clock.Now;
-            logger.LogInformation(
-                "Migration cycle '{CycleId}' completed for tenant {TenantId}. Total rows migrated: {ProcessedRows}.",
-                command.CycleId, tenantId, progress.ProcessedRows);
+            LogCycleCompleted(command.CycleId, tenantId, progress.ProcessedRows);
         }
         else
         {
-            logger.LogInformation(
-                "Migration batch processed for cycle '{CycleId}', tenant {TenantId}. "
-                    + "Rows this batch: {Count}. Next cursor: '{Cursor}'.",
-                command.CycleId, tenantId, result.ProcessedCount, result.NextCursor);
+            LogBatchProcessed(command.CycleId, tenantId, result.ProcessedCount, result.NextCursor);
         }
 
         await SaveProgressAsync(command.CycleId, tenantId, cancellationToken).ConfigureAwait(false);
@@ -115,7 +108,7 @@ internal sealed class MigrationBatchExecutor(
 
         MigrationProgress created = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             CycleId = command.CycleId,
             Phase = MigrationPhase.Migrate,
             Status = MigrationStatus.InProgress,
@@ -143,11 +136,22 @@ internal sealed class MigrationBatchExecutor(
         catch (Exception ex)
         {
             // Best-effort: progress tracking must not fail the migration batch.
-            logger.LogWarning(
-                ex,
-                "Failed to persist migration progress for cycle '{CycleId}', tenant {TenantId}. "
-                    + "Progress tracking may be stale.",
-                cycleId, tenantId);
+            LogProgressPersistenceFailed(ex, cycleId, tenantId);
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Migration cycle '{CycleId}' not found in registry. Message discarded.")]
+    private partial void LogCycleNotFound(string cycleId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Migration cycle '{CycleId}' already completed for tenant {TenantId}. Message discarded.")]
+    private partial void LogCycleAlreadyCompleted(string cycleId, Guid? tenantId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Migration cycle '{CycleId}' completed for tenant {TenantId}. Total rows migrated: {ProcessedRows}.")]
+    private partial void LogCycleCompleted(string cycleId, Guid? tenantId, long processedRows);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Migration batch processed for cycle '{CycleId}', tenant {TenantId}. Rows this batch: {Count}. Next cursor: '{Cursor}'.")]
+    private partial void LogBatchProcessed(string cycleId, Guid? tenantId, int count, string cursor);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to persist migration progress for cycle '{CycleId}', tenant {TenantId}. Progress tracking may be stale.")]
+    private partial void LogProgressPersistenceFailed(Exception exception, string cycleId, Guid? tenantId);
 }

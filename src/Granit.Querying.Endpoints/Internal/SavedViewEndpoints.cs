@@ -1,10 +1,13 @@
 using System.Security.Claims;
 using Granit.Core.MultiTenancy;
+using Granit.Guids;
 using Granit.Querying.SavedViews;
+using Granit.Timing;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.Querying.Endpoints.Internal;
@@ -36,10 +39,12 @@ internal static class SavedViewEndpoints
         savedViews.MapPost("/", (
             CreateSavedViewRequest request,
             ISavedViewStoreWriter store,
+            [FromServices] IGuidGenerator guidGenerator,
             ICurrentTenant tenant,
             ClaimsPrincipal user,
+            [FromServices] IClock clock,
             CancellationToken cancellationToken) =>
-            CreateAsync(request, store, entityType, tenant, user, cancellationToken))
+            CreateAsync(request, store, guidGenerator, entityType, tenant, user, clock, cancellationToken))
             .WithName($"CreateSavedView_{entityType}")
             .WithSummary("Creates a new saved view.")
             .ValidateBody<CreateSavedViewRequest>();
@@ -49,8 +54,9 @@ internal static class SavedViewEndpoints
             UpdateSavedViewRequest request,
             ISavedViewStoreReader reader,
             ISavedViewStoreWriter writer,
+            [FromServices] IClock clock,
             CancellationToken cancellationToken) =>
-            UpdateAsync(id, request, reader, writer, cancellationToken))
+            UpdateAsync(id, request, reader, writer, clock, cancellationToken))
             .WithName($"UpdateSavedView_{entityType}")
             .WithSummary("Updates an existing saved view.")
             .ValidateBody<UpdateSavedViewRequest>();
@@ -93,16 +99,18 @@ internal static class SavedViewEndpoints
     private static async Task<Created<SavedViewResponse>> CreateAsync(
         CreateSavedViewRequest request,
         ISavedViewStoreWriter store,
+        IGuidGenerator guidGenerator,
         string entityType,
         ICurrentTenant tenant,
         ClaimsPrincipal user,
+        IClock clock,
         CancellationToken cancellationToken)
     {
         string userId = GetUserId(user);
 
         SavedView view = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             EntityType = entityType,
             Name = request.Name,
             UserId = userId,
@@ -113,7 +121,7 @@ internal static class SavedViewEndpoints
             GroupByJson = request.GroupByJson,
             VisibleColumnsJson = request.VisibleColumnsJson,
             TenantId = tenant.IsAvailable ? tenant.Id : null,
-            CreatedAt = DateTimeOffset.UtcNow,
+            CreatedAt = clock.Now,
             CreatedBy = userId,
         };
 
@@ -126,6 +134,7 @@ internal static class SavedViewEndpoints
         UpdateSavedViewRequest request,
         ISavedViewStoreReader reader,
         ISavedViewStoreWriter writer,
+        IClock clock,
         CancellationToken cancellationToken)
     {
         SavedView? existing = await reader.GetAsync(id, cancellationToken).ConfigureAwait(false);
@@ -140,7 +149,7 @@ internal static class SavedViewEndpoints
         existing.SortJson = request.SortJson;
         existing.GroupByJson = request.GroupByJson;
         existing.VisibleColumnsJson = request.VisibleColumnsJson;
-        existing.ModifiedAt = DateTimeOffset.UtcNow;
+        existing.ModifiedAt = clock.Now;
 
         await writer.UpdateAsync(existing, cancellationToken).ConfigureAwait(false);
         return TypedResults.NoContent();

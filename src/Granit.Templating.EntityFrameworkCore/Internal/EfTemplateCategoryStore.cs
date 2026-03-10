@@ -1,5 +1,7 @@
 using Granit.Core.Exceptions;
+using Granit.Guids;
 using Granit.Templating.Store;
+using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Templating.EntityFrameworkCore.Internal;
@@ -8,7 +10,9 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// EF Core implementation of <see cref="ITemplateCategoryStoreReader"/> and <see cref="ITemplateCategoryStoreWriter"/>.
 /// </summary>
 internal sealed class EfTemplateCategoryStore(
-    IDbContextFactory<TemplatingDbContext> contextFactory)
+    IDbContextFactory<TemplatingDbContext> contextFactory,
+    IGuidGenerator guidGenerator,
+    IClock clock)
     : ITemplateCategoryStoreReader, ITemplateCategoryStoreWriter
 {
     /// <inheritdoc/>
@@ -90,12 +94,12 @@ internal sealed class EfTemplateCategoryStore(
 
         var entity = new TemplateCategoryEntity
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             Name = name,
             Description = description,
             Icon = icon,
             SortOrder = sortOrder,
-            CreatedAt = DateTimeOffset.UtcNow,
+            CreatedAt = clock.Now,
             CreatedBy = createdBy,
         };
 

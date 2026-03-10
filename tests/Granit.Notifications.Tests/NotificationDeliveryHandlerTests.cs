@@ -6,6 +6,7 @@
 // =============================================================================
 
 using System.Text.Json;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Exceptions;
@@ -121,7 +122,7 @@ public sealed class NotificationDeliveryHandlerTests
     // -------------------------------------------------------------------------
 
     private NotificationDeliveryHandler BuildHandler(IReadOnlyList<INotificationChannel> channels) =>
-        new(channels, _deliveryWriter, _clock, _logger);
+        new(channels, _deliveryWriter, new SimpleGuidGenerator(), _clock, _logger);
 
     private static DeliverNotificationCommand BuildCommand(string channelName = NotificationChannels.InApp) => new()
     {

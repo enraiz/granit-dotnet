@@ -413,14 +413,15 @@
       "granit.identity": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
-          "Granit.Querying": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev, )"
         }
       },
       "granit.identity.keycloak": {
         "type": "Project",
         "dependencies": {
-          "Granit.Identity": "[0.1.0-dev.530, )",
+          "Granit.Identity": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.Extensions.Http": "[10.*, )",
           "Microsoft.Extensions.Http.Resilience": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -429,7 +430,15 @@
       "granit.querying": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
+      "granit.timing": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Options": "[10.*, )"
         }
       },
       "Microsoft.Extensions.Configuration.Binder": {

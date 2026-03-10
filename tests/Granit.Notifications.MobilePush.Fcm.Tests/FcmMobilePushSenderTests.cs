@@ -19,7 +19,7 @@ public sealed class FcmMobilePushSenderTests
         FcmMobilePushSender sender = CreateSender(new DelegatingHandlerStub(_ => new HttpResponseMessage(HttpStatusCode.OK)));
         MobilePushMessage message = BuildMessage("token-1");
 
-        await sender.SendAsync(message, TestContext.Current.CancellationToken);
+        await Should.NotThrowAsync(() => sender.SendAsync(message, TestContext.Current.CancellationToken));
     }
 
     [Fact]

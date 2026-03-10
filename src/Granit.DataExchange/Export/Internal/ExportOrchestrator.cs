@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Granit.DataExchange.Export.Messages;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Guids;
 using Granit.Querying;
 using Granit.Timing;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ internal sealed partial class ExportOrchestrator(
     IExportCommandDispatcher dispatcher,
     IImportFileProvider fileProvider,
     IClock clock,
+    IGuidGenerator guidGenerator,
     IDataExchangeEventPublisher eventPublisher,
     ILogger<ExportOrchestrator> logger) : IExportOrchestrator
 {
@@ -38,7 +40,7 @@ internal sealed partial class ExportOrchestrator(
         // Create the job entity
         ExportJob job = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             DefinitionName = request.DefinitionName,
             Format = request.Format,
             RequestJson = JsonSerializer.Serialize(request),

@@ -7,6 +7,7 @@
 
 using System.Text.Json;
 using Granit.Core.MultiTenancy;
+using Granit.Guids;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Handlers;
@@ -26,7 +27,7 @@ public sealed class WebhookFanoutHandlerTests
     public WebhookFanoutHandlerTests()
     {
         _currentTenant.IsAvailable.Returns(false);
-        _handler = new WebhookFanoutHandler(_reader, _currentTenant);
+        _handler = new WebhookFanoutHandler(_reader, _currentTenant, new SimpleGuidGenerator());
     }
 
     [Fact]

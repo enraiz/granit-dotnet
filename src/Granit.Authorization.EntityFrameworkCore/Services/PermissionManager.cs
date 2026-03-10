@@ -4,6 +4,7 @@ using Granit.Authorization.EntityFrameworkCore.DbContext;
 using Granit.Authorization.EntityFrameworkCore.Entities;
 using Granit.Authorization.Services;
 using Granit.Caching;
+using Granit.Guids;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -14,10 +15,11 @@ namespace Granit.Authorization.EntityFrameworkCore.Services;
 /// Provides grant management with mandatory HDS audit logging on every mutation.
 /// Cache is invalidated after each <see cref="SetAsync"/> to maintain consistency.
 /// </summary>
-internal sealed class PermissionManager<TContext>(
+internal sealed partial class PermissionManager<TContext>(
     TContext context,
     IPermissionDefinitionManager definitionManager,
     ICacheService<PermissionGrantCacheItem> cache,
+    IGuidGenerator guidGenerator,
     ILogger<PermissionManager<TContext>> logger)
     : IPermissionManagerReader, IPermissionManagerWriter
     where TContext : Microsoft.EntityFrameworkCore.DbContext, IPermissionGrantDbContext
@@ -45,7 +47,7 @@ internal sealed class PermissionManager<TContext>(
         {
             context.PermissionGrants.Add(new PermissionGrant
             {
-                Id = Guid.NewGuid(), // overridden by AuditedEntityInterceptor in production
+                Id = guidGenerator.Create(),
                 Name = permissionName,
                 RoleName = roleName,
                 TenantId = tenantId
@@ -69,15 +71,7 @@ internal sealed class PermissionManager<TContext>(
 
         // HDS audit trail: emitted as structured log → Serilog → OTLP → Loki (3-year retention)
         // RGPD: no personal data — only role name, permission name, tenant scope
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation(
-                "[AUDIT] Permission {Change}: permission={PermissionName} role={RoleName} tenantId={TenantId}",
-                isGranted ? "Granted" : "Revoked",
-                permissionName,
-                roleName,
-                tenantId);
-        }
+        LogPermissionChange(isGranted ? "Granted" : "Revoked", permissionName, roleName, tenantId);
     }
 
     /// <inheritdoc />
@@ -113,4 +107,7 @@ internal sealed class PermissionManager<TContext>(
             .Where(g => g.TenantId == tenantId && g.Name == permissionName)
             .Select(g => g.RoleName)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "[AUDIT] Permission {Change}: permission={PermissionName} role={RoleName} tenantId={TenantId}")]
+    private partial void LogPermissionChange(string change, string permissionName, string roleName, Guid? tenantId);
 }

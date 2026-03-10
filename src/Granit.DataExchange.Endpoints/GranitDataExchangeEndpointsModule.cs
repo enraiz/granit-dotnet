@@ -2,6 +2,8 @@ using Granit.Authorization;
 using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
 using Granit.DataExchange.Endpoints.Permissions;
+using Granit.DataExchange.Endpoints.Validators;
+using Granit.Validation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.DataExchange.Endpoints;
@@ -21,7 +23,10 @@ namespace Granit.DataExchange.Endpoints;
 public sealed class GranitDataExchangeEndpointsModule : GranitModule
 {
     /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
         context.Services.AddSingleton<IPermissionDefinitionProvider,
             DataExchangePermissionDefinitionProvider>();
+        context.Services.AddGranitValidatorsFromAssemblyContaining<ConfirmMappingsRequestValidator>();
+    }
 }
