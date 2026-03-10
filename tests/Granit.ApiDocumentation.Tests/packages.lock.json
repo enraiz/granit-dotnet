@@ -480,8 +480,8 @@
       "granit.apidocumentation": {
         "type": "Project",
         "dependencies": {
-          "Granit.ApiVersioning": "[0.1.0-dev.530, )",
-          "Granit.Security": "[0.1.0-dev.530, )",
+          "Granit.ApiVersioning": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.AspNetCore.OpenApi": "[10.*, )",
           "Scalar.AspNetCore": "[2.*, )"
         }
@@ -491,7 +491,7 @@
         "dependencies": {
           "Asp.Versioning.Mvc": "[10.0.0-preview.*, )",
           "Asp.Versioning.Mvc.ApiExplorer": "[10.0.0-preview.*, )",
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.core": {
@@ -500,7 +500,7 @@
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "Asp.Versioning.Mvc": {
@@ -594,8 +594,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.1",
-        "contentHash": "HxkQC71kWUQBdj/51GFyETO21pqmK5hfNpovAdIi4d/XEv/HIoMCNw3CGSwT0h5E8rG3CuaSm/Wz0xk7eLbu9A=="
+        "resolved": "2.13.3",
+        "contentHash": "py+bnF628jLbm63Q8VabQyzNNP0/jMJAVLrUaxhLMvU75GZVcN9LgdXRLk42Grpcih3rqZcRY+eSSkYO3+3QTQ=="
       }
     }
   }
