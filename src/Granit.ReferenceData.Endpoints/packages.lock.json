@@ -51,6 +51,12 @@
           "Granit.Core": "[0.1.0-dev, )"
         }
       },
+      "granit.guids": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Timing": "[0.1.0-dev, )"
+        }
+      },
       "granit.localization": {
         "type": "Project",
         "dependencies": {
@@ -72,6 +78,12 @@
         }
       },
       "granit.security": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
+      "granit.timing": {
         "type": "Project",
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )"
@@ -131,8 +143,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.2",
-        "contentHash": "/FTdSYDnWJHPCuPtGE6WXsiy6Mj1iAhT0N4hVqe5mnsxqKrqgX3QQItdjB+25WAcyBLRfuoci7o286KB72dLcw=="
+        "resolved": "2.13.3",
+        "contentHash": "py+bnF628jLbm63Q8VabQyzNNP0/jMJAVLrUaxhLMvU75GZVcN9LgdXRLk42Grpcih3rqZcRY+eSSkYO3+3QTQ=="
       },
       "SmartFormat": {
         "type": "CentralTransitive",

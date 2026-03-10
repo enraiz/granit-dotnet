@@ -1,3 +1,4 @@
+using Granit.Guids;
 using Granit.Timing;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Messages;
@@ -26,7 +27,7 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
             .Options;
 
         _contextFactory = new TestWebhooksDbContextFactory(_options);
-        _sut = new EfWebhookDeliveryStore(_contextFactory, _clock);
+        _sut = new EfWebhookDeliveryStore(_contextFactory, _clock, new SimpleGuidGenerator());
     }
 
     public async ValueTask DisposeAsync()

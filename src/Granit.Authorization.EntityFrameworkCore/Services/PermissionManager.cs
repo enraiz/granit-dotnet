@@ -4,6 +4,7 @@ using Granit.Authorization.EntityFrameworkCore.DbContext;
 using Granit.Authorization.EntityFrameworkCore.Entities;
 using Granit.Authorization.Services;
 using Granit.Caching;
+using Granit.Guids;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -18,6 +19,7 @@ internal sealed partial class PermissionManager<TContext>(
     TContext context,
     IPermissionDefinitionManager definitionManager,
     ICacheService<PermissionGrantCacheItem> cache,
+    IGuidGenerator guidGenerator,
     ILogger<PermissionManager<TContext>> logger)
     : IPermissionManagerReader, IPermissionManagerWriter
     where TContext : Microsoft.EntityFrameworkCore.DbContext, IPermissionGrantDbContext
@@ -45,7 +47,7 @@ internal sealed partial class PermissionManager<TContext>(
         {
             context.PermissionGrants.Add(new PermissionGrant
             {
-                Id = Guid.NewGuid(), // overridden by AuditedEntityInterceptor in production
+                Id = guidGenerator.Create(),
                 Name = permissionName,
                 RoleName = roleName,
                 TenantId = tenantId

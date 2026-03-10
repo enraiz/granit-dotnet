@@ -1,4 +1,5 @@
 using Granit.BackgroundJobs.Internal;
+using Granit.Guids;
 using Shouldly;
 using Xunit;
 
@@ -6,7 +7,7 @@ namespace Granit.BackgroundJobs.Tests;
 
 public sealed class InMemoryBackgroundJobStoreTests
 {
-    private readonly InMemoryBackgroundJobStore _sut = new();
+    private readonly InMemoryBackgroundJobStore _sut = new(new SimpleGuidGenerator());
     private readonly DateTimeOffset _now = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
 
     private static RecurringJobRegistration MakeRegistration(

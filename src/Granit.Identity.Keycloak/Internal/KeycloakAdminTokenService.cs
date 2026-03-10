@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -16,6 +17,7 @@ namespace Granit.Identity.Keycloak.Internal;
 internal sealed partial class KeycloakAdminTokenService(
     IHttpClientFactory httpClientFactory,
     IOptions<KeycloakAdminOptions> options,
+    IClock clock,
     ILogger<KeycloakAdminTokenService> logger) : IDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -27,7 +29,7 @@ internal sealed partial class KeycloakAdminTokenService(
     /// </summary>
     public async Task<string> GetTokenAsync(CancellationToken cancellationToken)
     {
-        if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry)
+        if (_cachedToken is not null && clock.Now < _tokenExpiry)
         {
             return _cachedToken;
         }
@@ -36,7 +38,7 @@ internal sealed partial class KeycloakAdminTokenService(
         try
         {
             // Double-check after acquiring the lock.
-            if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry)
+            if (_cachedToken is not null && clock.Now < _tokenExpiry)
             {
                 return _cachedToken;
             }
@@ -67,7 +69,7 @@ internal sealed partial class KeycloakAdminTokenService(
 
             // Cache with a 30-second safety margin.
             _cachedToken = token.AccessToken;
-            _tokenExpiry = DateTimeOffset.UtcNow.AddSeconds(Math.Max(token.ExpiresIn - 30, 10));
+            _tokenExpiry = clock.Now.AddSeconds(Math.Max(token.ExpiresIn - 30, 10));
 
             LogAdminTokenObtained(_tokenExpiry);
 

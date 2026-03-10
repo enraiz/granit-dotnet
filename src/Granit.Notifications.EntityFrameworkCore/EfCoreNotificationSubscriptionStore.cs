@@ -1,3 +1,4 @@
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ namespace Granit.Notifications.EntityFrameworkCore;
 /// EF Core implementation of <see cref="INotificationSubscriptionReader"/> and
 /// <see cref="INotificationSubscriptionWriter"/> backed by PostgreSQL.
 /// </summary>
-internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationSubscriptionReader, INotificationSubscriptionWriter
+internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<NotificationDbContext> dbContextFactory, IGuidGenerator guidGenerator) : INotificationSubscriptionReader, INotificationSubscriptionWriter
 {
     /// <inheritdoc/>
     public async Task SubscribeAsync(string userId, string notificationTypeName, Guid? tenantId, CancellationToken cancellationToken = default)
@@ -19,7 +20,7 @@ internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<Noti
         {
             db.Subscriptions.Add(new NotificationSubscription
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 UserId = userId,
                 NotificationTypeName = notificationTypeName,
                 TenantId = tenantId,
@@ -66,7 +67,7 @@ internal sealed class EfCoreNotificationSubscriptionStore(IDbContextFactory<Noti
         {
             db.Subscriptions.Add(new NotificationSubscription
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 UserId = userId,
                 NotificationTypeName = string.Empty,
                 EntityType = entityType,

@@ -17,6 +17,7 @@ using Granit.Authorization.EntityFrameworkCore.Entities;
 using Granit.Authorization.EntityFrameworkCore.Services;
 using Granit.Authorization.Services;
 using Granit.Caching;
+using Granit.Guids;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -213,6 +214,7 @@ public sealed class PermissionManagerTests
             context,
             definitionManager,
             cache,
+            new SimpleGuidGenerator(),
             logger);
 
         return (context, manager, cache, logger);

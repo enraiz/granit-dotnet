@@ -35,7 +35,9 @@ public sealed class OutgoingContextMiddleware(
     internal const string UserFirstNameHeader = "X-User-FirstName";
     internal const string UserLastNameHeader = "X-User-LastName";
     internal const string ActorKindHeader = "X-Actor-Kind";
+#pragma warning disable GRSEC003 // HTTP header name constant, not a secret
     internal const string ApiKeyIdHeader = "X-Api-Key-Id";
+#pragma warning restore GRSEC003
     internal const string TraceParentHeader = "traceparent";
 
     /// <summary>

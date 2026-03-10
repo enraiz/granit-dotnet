@@ -1,5 +1,6 @@
 using System.Net;
 using Granit.Identity.Keycloak.Internal;
+using Granit.Timing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -19,11 +20,13 @@ public sealed class KeycloakAdminTokenServiceTests : IDisposable
     };
 
     private readonly MockHttpMessageHandler _handler = new();
+    private readonly IClock _clock = Substitute.For<IClock>();
     private readonly KeycloakAdminTokenService _service;
 
     public KeycloakAdminTokenServiceTests()
     {
         _handler.ResponseBody = """{"access_token":"test-token","expires_in":300}""";
+        _clock.Now.Returns(DateTimeOffset.UtcNow);
 
         HttpClient client = new(_handler) { BaseAddress = new Uri("https://keycloak.test/") };
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
@@ -32,6 +35,7 @@ public sealed class KeycloakAdminTokenServiceTests : IDisposable
         _service = new KeycloakAdminTokenService(
             factory,
             Options.Create(_options),
+            _clock,
             NullLogger<KeycloakAdminTokenService>.Instance);
     }
 
@@ -86,6 +90,7 @@ public sealed class KeycloakAdminTokenServiceTests : IDisposable
         using var service = new KeycloakAdminTokenService(
             factory,
             Options.Create(_options),
+            _clock,
             NullLogger<KeycloakAdminTokenService>.Instance);
 
         // First token is returned; it will be cached for at least 10 seconds.

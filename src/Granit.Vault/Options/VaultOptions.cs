@@ -21,7 +21,9 @@ public sealed class VaultOptions
     public string KubernetesRole { get; set; } = "my-backend";
 
     /// <summary>Path to the Kubernetes JWT for authentication. Default: /var/run/secrets/kubernetes.io/serviceaccount/token.</summary>
+#pragma warning disable GRSEC003 // Default file path constant, not a secret
     public string KubernetesTokenPath { get; set; } = "/var/run/secrets/kubernetes.io/serviceaccount/token";
+#pragma warning restore GRSEC003
 
     /// <summary>Mount point for the Database engine. Default: "database".</summary>
     public string DatabaseMountPoint { get; set; } = "database";

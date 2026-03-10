@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Granit.Guids;
 
 namespace Granit.BackgroundJobs.Internal;
 
@@ -8,7 +9,7 @@ namespace Granit.BackgroundJobs.Internal;
 /// Registered as a <b>Singleton</b> when <see cref="BackgroundJobsOptions.Mode"/> is
 /// <see cref="JobStoreMode.InMemory"/>. State is lost on application restart.
 /// </summary>
-internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IBackgroundJobStoreWriter
+internal sealed class InMemoryBackgroundJobStore(IGuidGenerator guidGenerator) : IBackgroundJobStoreReader, IBackgroundJobStoreWriter
 {
     private readonly ConcurrentDictionary<string, BackgroundJobDefinition> _jobs = new();
 
@@ -34,7 +35,7 @@ internal sealed class InMemoryBackgroundJobStore : IBackgroundJobStoreReader, IB
                 reg.JobName,
                 addValueFactory: _ => new BackgroundJobDefinition
                 {
-                    Id = Guid.NewGuid(),
+                    Id = guidGenerator.Create(),
                     JobName = reg.JobName,
                     CronExpression = reg.CronExpression,
                     MessageType = reg.MessageType,

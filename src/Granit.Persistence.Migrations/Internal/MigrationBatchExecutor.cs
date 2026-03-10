@@ -1,3 +1,4 @@
+using Granit.Guids;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ internal sealed partial class MigrationBatchExecutor(
     MigrationProgressDbContext progressContext,
     ITenantDbIsolator isolator,
     IClock clock,
+    IGuidGenerator guidGenerator,
     ILogger<MigrationBatchExecutor> logger)
 {
     /// <summary>
@@ -106,7 +108,7 @@ internal sealed partial class MigrationBatchExecutor(
 
         MigrationProgress created = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             CycleId = command.CycleId,
             Phase = MigrationPhase.Migrate,
             Status = MigrationStatus.InProgress,

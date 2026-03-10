@@ -38,4 +38,12 @@
     <None Include="$(MSBuildThisFileDirectory)docs/images/granit-icon.png" Pack="true" PackagePath="" Visible="false" />
     <None Include="$(MSBuildProjectDirectory)/README.md" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
+
+  <!-- Granit.Analyzers: enforce Granit conventions at build time (exclude analyzer projects themselves) -->
+  <ItemGroup Condition="!$(MSBuildProjectName.Contains('Analyzers'))">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)src/Granit.Analyzers/Granit.Analyzers.csproj"
+                      PrivateAssets="all"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
+  </ItemGroup>
 </Project>

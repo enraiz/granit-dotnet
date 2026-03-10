@@ -5,6 +5,7 @@
 // entity follow/unfollow, entity followers list.
 // =============================================================================
 
+using Granit.Guids;
 using Granit.Notifications.Domain;
 using Shouldly;
 using Xunit;
@@ -18,7 +19,7 @@ public sealed class EfCoreNotificationSubscriptionStoreTests : IDisposable
 
     public EfCoreNotificationSubscriptionStoreTests()
     {
-        _store = new EfCoreNotificationSubscriptionStore(_factory);
+        _store = new EfCoreNotificationSubscriptionStore(_factory, new SimpleGuidGenerator());
     }
 
     public void Dispose() => _factory.Dispose();

@@ -7,7 +7,9 @@ namespace Granit.Notifications.Messages;
 /// </summary>
 public sealed record NotificationTrigger
 {
+#pragma warning disable GRSEC002
     public Guid NotificationId { get; init; } = Guid.NewGuid();
+#pragma warning restore GRSEC002
     public required string NotificationTypeName { get; init; }
     public required NotificationSeverity Severity { get; init; }
     public required JsonElement Data { get; init; }

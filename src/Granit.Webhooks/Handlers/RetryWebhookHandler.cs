@@ -1,4 +1,6 @@
 using System.Text.Json;
+using Granit.Guids;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Messages;
@@ -21,7 +23,9 @@ namespace Granit.Webhooks.Handlers;
 /// </remarks>
 public sealed class RetryWebhookHandler(
     IWebhookDeliveryReader deliveryReader,
-    IWebhookSubscriptionReader subscriptionReader)
+    IWebhookSubscriptionReader subscriptionReader,
+    IGuidGenerator guidGenerator,
+    IClock clock)
 {
     /// <summary>
     /// Validates the retry request and builds a new <see cref="SendWebhookCommand"/>.
@@ -57,7 +61,7 @@ public sealed class RetryWebhookHandler(
 
         var command = new SendWebhookCommand
         {
-            DeliveryId = Guid.NewGuid(),
+            DeliveryId = guidGenerator.Create(),
             SubscriptionId = subscription.Id,
             TargetUrl = subscription.TargetUrl,
             SigningSecret = subscription.SigningSecret,
@@ -66,7 +70,7 @@ public sealed class RetryWebhookHandler(
                 EventId = attempt.DeliveryId,
                 EventType = attempt.EventType,
                 TenantId = attempt.TenantId,
-                Timestamp = DateTimeOffset.UtcNow,
+                Timestamp = clock.Now,
                 ApiVersion = WebhooksConstants.ApiVersion,
                 Data = DeserializePayloadData(attempt.Payload),
             },

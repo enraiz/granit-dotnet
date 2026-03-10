@@ -24,7 +24,9 @@ public sealed record WebhookTrigger
     /// Unique identifier of this webhook event.
     /// Shared across all delivery attempts for the same logical event.
     /// </summary>
+#pragma warning disable GRSEC002 // Wolverine message — default value needed for deserialization
     public Guid EventId { get; init; } = Guid.NewGuid();
+#pragma warning restore GRSEC002
 
     /// <summary>
     /// Logical event type (e.g., <c>"document.uploaded"</c>).

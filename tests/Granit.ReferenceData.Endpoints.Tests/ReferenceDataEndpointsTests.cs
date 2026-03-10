@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Granit.Guids;
 using Granit.Querying;
 using Granit.ReferenceData.Endpoints.Dtos;
 using Granit.ReferenceData.Endpoints.Extensions;
@@ -52,6 +53,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
         builder.Services.AddAuthorization();
         builder.Services.AddSingleton(_storeReader);
         builder.Services.AddSingleton(_storeWriter);
+        builder.Services.AddSingleton<IGuidGenerator>(new SimpleGuidGenerator());
 
         _app = builder.Build();
         _app.MapReferenceDataEndpoints<TestRefEntity>();

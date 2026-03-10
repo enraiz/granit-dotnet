@@ -283,16 +283,26 @@
       "granit.core": {
         "type": "Project"
       },
+      "granit.guids": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Options": "[10.*, )"
+        }
+      },
       "granit.templating": {
         "type": "Project",
         "dependencies": {
-          "Granit.Timing": "[0.1.0-dev.530, )"
+          "Granit.Timing": "[0.1.0-dev, )"
         }
       },
       "granit.templating.entityframeworkcore": {
         "type": "Project",
         "dependencies": {
-          "Granit.Templating": "[0.1.0-dev.530, )",
+          "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Templating": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )",
           "Microsoft.Extensions.Caching.Hybrid": "[10.*, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )"
@@ -301,7 +311,7 @@
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }

@@ -3,6 +3,7 @@ using Granit.Core.MultiTenancy;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Export.Entities;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Entities;
 using Granit.DataExchange.Import.Mapping;
+using Granit.Guids;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ namespace Granit.DataExchange.EntityFrameworkCore.Internal.Import.Stores;
 internal sealed class EfMappingStore(
     IDbContextFactory<DataExchangeDbContext> contextFactory,
     IClock clock,
+    IGuidGenerator guidGenerator,
     ICurrentTenant currentTenant) : IMappingReader, IMappingWriter
 {
     /// <inheritdoc/>
@@ -61,7 +63,7 @@ internal sealed class EfMappingStore(
         {
             context.SavedMappings.Add(new SavedMappingEntity
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 DefinitionName = definitionName,
                 TenantId = tenantId,
                 MappingsJson = json,

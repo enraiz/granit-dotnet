@@ -5,6 +5,7 @@ using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Parsing;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Guids;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -76,6 +77,7 @@ public sealed class ImportOptionsEndpointsTests
         builder.Services.AddSingleton(Substitute.For<IExportPresetReader>());
         builder.Services.AddSingleton(Substitute.For<IExportPresetWriter>());
         builder.Services.AddSingleton(Substitute.For<IExportJobReader>());
+        builder.Services.AddSingleton<IGuidGenerator>(new SimpleGuidGenerator());
 
         return builder.Build();
     }

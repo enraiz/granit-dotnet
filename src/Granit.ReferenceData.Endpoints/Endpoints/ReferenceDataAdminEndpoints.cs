@@ -1,7 +1,9 @@
+using Granit.Guids;
 using Granit.ReferenceData.Endpoints.Dtos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.ReferenceData.Endpoints.Endpoints;
@@ -44,12 +46,13 @@ internal static class ReferenceDataAdminEndpoints
     private static async Task<Created> CreateAsync<TEntity>(
         ReferenceDataCreateRequest request,
         IReferenceDataStoreWriter<TEntity> storeWriter,
+        [FromServices] IGuidGenerator guidGenerator,
         CancellationToken cancellationToken = default)
         where TEntity : ReferenceDataEntity, new()
     {
         TEntity entity = new()
         {
-            Id = Guid.NewGuid(),
+            Id = guidGenerator.Create(),
             Code = request.Code,
             LabelEn = request.LabelEn,
             LabelFr = request.LabelFr,

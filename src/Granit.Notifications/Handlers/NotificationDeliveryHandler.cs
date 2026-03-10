@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Exceptions;
@@ -15,6 +16,7 @@ namespace Granit.Notifications.Handlers;
 public sealed partial class NotificationDeliveryHandler(
     IEnumerable<INotificationChannel> channels,
     INotificationDeliveryWriter deliveryWriter,
+    IGuidGenerator guidGenerator,
     IClock clock,
     ILogger<NotificationDeliveryHandler> logger)
 {
@@ -54,7 +56,7 @@ public sealed partial class NotificationDeliveryHandler(
 
             await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 DeliveryId = command.DeliveryId,
                 NotificationId = command.NotificationId,
                 NotificationTypeName = command.NotificationTypeName,
@@ -74,7 +76,7 @@ public sealed partial class NotificationDeliveryHandler(
 
             await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 DeliveryId = command.DeliveryId,
                 NotificationId = command.NotificationId,
                 NotificationTypeName = command.NotificationTypeName,

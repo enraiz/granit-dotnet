@@ -743,12 +743,21 @@
       "granit.core": {
         "type": "Project"
       },
+      "granit.guids": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
+          "Microsoft.Extensions.Options": "[10.*, )"
+        }
+      },
       "granit.notifications": {
         "type": "Project",
         "dependencies": {
-          "Granit.Querying": "[0.1.0-dev.530, )",
-          "Granit.Timing": "[0.1.0-dev.530, )",
-          "Granit.Wolverine": "[0.1.0-dev.530, )",
+          "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Querying": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Granit.Wolverine": "[0.1.0-dev, )",
           "Microsoft.Extensions.Configuration.Binder": "[10.*, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
@@ -758,9 +767,9 @@
       "granit.notifications.brevo": {
         "type": "Project",
         "dependencies": {
-          "Granit.Notifications.Email": "[0.1.0-dev.530, )",
-          "Granit.Notifications.Sms": "[0.1.0-dev.530, )",
-          "Granit.Notifications.WhatsApp": "[0.1.0-dev.530, )",
+          "Granit.Notifications.Email": "[0.1.0-dev, )",
+          "Granit.Notifications.Sms": "[0.1.0-dev, )",
+          "Granit.Notifications.WhatsApp": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Http": "[10.*, )",
           "Microsoft.Extensions.Http.Resilience": "[10.*, )",
@@ -771,7 +780,7 @@
       "granit.notifications.email": {
         "type": "Project",
         "dependencies": {
-          "Granit.Notifications": "[0.1.0-dev.530, )",
+          "Granit.Notifications": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -780,7 +789,7 @@
       "granit.notifications.sms": {
         "type": "Project",
         "dependencies": {
-          "Granit.Notifications": "[0.1.0-dev.530, )",
+          "Granit.Notifications": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -789,7 +798,7 @@
       "granit.notifications.whatsapp": {
         "type": "Project",
         "dependencies": {
-          "Granit.Notifications": "[0.1.0-dev.530, )",
+          "Granit.Notifications": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
@@ -798,19 +807,19 @@
       "granit.querying": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.security": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )"
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev.530, )",
+          "Granit.Core": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }
@@ -818,7 +827,7 @@
       "granit.wolverine": {
         "type": "Project",
         "dependencies": {
-          "Granit.Security": "[0.1.0-dev.530, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "WolverineFx": "[5.17.*, )",
           "WolverineFx.FluentValidation": "[5.17.*, )"
         }

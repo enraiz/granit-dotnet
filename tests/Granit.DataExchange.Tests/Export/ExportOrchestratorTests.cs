@@ -4,6 +4,7 @@ using Granit.DataExchange.Export;
 using Granit.DataExchange.Export.Internal;
 using Granit.DataExchange.Export.Messages;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Guids;
 using Granit.Querying;
 using Granit.Querying.Meta;
 using Granit.Querying.SavedViews;
@@ -570,6 +571,7 @@ public sealed class ExportOrchestratorTests
             _dispatcher,
             _fileProvider,
             _clock,
+            new SimpleGuidGenerator(),
             _eventPublisher,
             NullLogger<ExportOrchestrator>.Instance);
 
@@ -677,6 +679,7 @@ public sealed class ExportOrchestratorTests
             _dispatcher,
             _fileProvider,
             _clock,
+            new SimpleGuidGenerator(),
             _eventPublisher,
             NullLogger<ExportOrchestrator>.Instance);
     }
@@ -702,6 +705,7 @@ public sealed class ExportOrchestratorTests
             _dispatcher,
             _fileProvider,
             _clock,
+            new SimpleGuidGenerator(),
             _eventPublisher,
             NullLogger<ExportOrchestrator>.Instance);
     }

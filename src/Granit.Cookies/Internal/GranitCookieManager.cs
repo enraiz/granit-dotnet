@@ -2,6 +2,8 @@ using Granit.Cookies.Exceptions;
 using Granit.Timing;
 using Microsoft.AspNetCore.Http;
 
+#pragma warning disable GRSEC004 // This IS the IGranitCookieManager implementation
+
 namespace Granit.Cookies.Internal;
 
 /// <summary>

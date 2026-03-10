@@ -6,6 +6,8 @@
 // =============================================================================
 
 using System.Text.Json;
+using Granit.Guids;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Handlers;
@@ -20,11 +22,15 @@ public sealed class RetryWebhookHandlerTests
 {
     private readonly IWebhookDeliveryReader _deliveryReader = Substitute.For<IWebhookDeliveryReader>();
     private readonly IWebhookSubscriptionReader _subscriptionReader = Substitute.For<IWebhookSubscriptionReader>();
+    private readonly IGuidGenerator _guidGenerator = Substitute.For<IGuidGenerator>();
+    private readonly IClock _clock = Substitute.For<IClock>();
     private readonly RetryWebhookHandler _handler;
 
     public RetryWebhookHandlerTests()
     {
-        _handler = new RetryWebhookHandler(_deliveryReader, _subscriptionReader);
+        _guidGenerator.Create().Returns(_ => Guid.NewGuid());
+        _clock.Now.Returns(new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero));
+        _handler = new RetryWebhookHandler(_deliveryReader, _subscriptionReader, _guidGenerator, _clock);
     }
 
     // -------------------------------------------------------------------------

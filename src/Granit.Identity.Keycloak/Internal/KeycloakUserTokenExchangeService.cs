@@ -31,7 +31,9 @@ internal sealed partial class KeycloakUserTokenExchangeService(
     IOptions<KeycloakAdminOptions> options,
     ILogger<KeycloakUserTokenExchangeService> logger)
 {
+#pragma warning disable GRSEC003 // OAuth grant type URI constant, not a secret
     private const string TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange";
+#pragma warning restore GRSEC003
 
     /// <summary>
     /// Exchanges the service account credentials for a token representing the given user.

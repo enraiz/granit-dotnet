@@ -7,6 +7,7 @@ using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Parsing;
 using Granit.DataExchange.Import.Pipeline;
+using Granit.Guids;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -70,6 +71,7 @@ public sealed class ExportDefinitionEndpointsTests : IAsyncDisposable
         builder.Services.AddSingleton(Substitute.For<IClock>());
         builder.Services.AddSingleton(Substitute.For<IImportDefinitionDescriptor>());
         builder.Services.AddSingleton(Substitute.For<IFileParser>());
+        builder.Services.AddSingleton<IGuidGenerator>(new SimpleGuidGenerator());
 
         _app = builder.Build();
         _app.MapDataExchangeEndpoints();

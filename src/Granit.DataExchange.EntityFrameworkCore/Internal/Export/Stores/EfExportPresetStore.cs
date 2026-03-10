@@ -3,6 +3,7 @@ using Granit.Core.MultiTenancy;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Export.Entities;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Entities;
 using Granit.DataExchange.Export;
+using Granit.Guids;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ namespace Granit.DataExchange.EntityFrameworkCore.Internal.Export.Stores;
 internal sealed class EfExportPresetStore(
     IDbContextFactory<DataExchangeDbContext> contextFactory,
     IClock clock,
+    IGuidGenerator guidGenerator,
     ICurrentTenant currentTenant) : IExportPresetReader, IExportPresetWriter
 {
     /// <inheritdoc/>
@@ -74,7 +76,7 @@ internal sealed class EfExportPresetStore(
         {
             context.ExportPresets.Add(new ExportPresetEntity
             {
-                Id = Guid.NewGuid(),
+                Id = guidGenerator.Create(),
                 DefinitionName = preset.DefinitionName,
                 PresetName = preset.PresetName,
                 TenantId = tenantId,
