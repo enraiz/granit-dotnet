@@ -3,7 +3,7 @@ namespace Granit.Notifications.Endpoints;
 /// <summary>
 /// Request body for updating a notification preference.
 /// </summary>
-public sealed record UpdatePreferenceRequest
+public sealed record NotificationPreferenceUpdateRequest
 {
     /// <summary>Notification type name to configure.</summary>
     public required string NotificationTypeName { get; init; }

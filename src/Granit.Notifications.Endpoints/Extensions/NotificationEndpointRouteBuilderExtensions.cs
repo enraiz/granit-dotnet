@@ -174,7 +174,7 @@ public static class NotificationEndpointRouteBuilderExtensions
     }
 
     private static async Task<NoContent> UpdatePreferenceAsync(
-        UpdatePreferenceRequest request,
+        NotificationPreferenceUpdateRequest request,
         INotificationPreferenceWriter writer,
         [FromServices] IGuidGenerator guidGenerator,
         ICurrentTenant tenant,

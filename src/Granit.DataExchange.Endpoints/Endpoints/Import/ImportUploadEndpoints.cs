@@ -44,7 +44,7 @@ internal static class ImportUploadEndpoints
         return group;
     }
 
-    private static async Task<Results<Created<ImportJobResponse>, BadRequest<string>>> UploadAsync(
+    private static async Task<Results<Created<ImportJobResponse>, ProblemHttpResult>> UploadAsync(
         IFormFile file,
         [FromForm] string definitionName,
         IServiceProvider serviceProvider,
@@ -58,24 +58,30 @@ internal static class ImportUploadEndpoints
             ImportDefinitionResolver.FindByName(serviceProvider, definitionName);
         if (descriptor is null)
         {
-            return TypedResults.BadRequest($"Unknown import definition '{definitionName}'.");
+            return TypedResults.Problem(
+                detail: $"Unknown import definition '{definitionName}'.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (file.Length == 0)
         {
-            return TypedResults.BadRequest("File is empty.");
+            return TypedResults.Problem(
+                detail: "File is empty.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (file.Length > descriptor.MaxFileSizeMb * 1024L * 1024L)
         {
-            return TypedResults.BadRequest(
-                $"File exceeds maximum allowed size of {descriptor.MaxFileSizeMb} MB.");
+            return TypedResults.Problem(
+                detail: $"File exceeds maximum allowed size of {descriptor.MaxFileSizeMb} MB.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (!descriptor.AllowedMimeTypes.Contains(file.ContentType))
         {
-            return TypedResults.BadRequest(
-                $"MIME type '{file.ContentType}' is not allowed. Allowed: {string.Join(", ", descriptor.AllowedMimeTypes)}.");
+            return TypedResults.Problem(
+                detail: $"MIME type '{file.ContentType}' is not allowed. Allowed: {string.Join(", ", descriptor.AllowedMimeTypes)}.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         await using Stream stream = file.OpenReadStream();
@@ -147,7 +153,7 @@ internal static class ImportUploadEndpoints
         return TypedResults.Ok(new ImportPreviewResponse(headers, previewRows, suggestions, fieldMetadata));
     }
 
-    private static async Task<Results<NoContent, NotFound, BadRequest<string>>> ConfirmMappingsAsync(
+    private static async Task<Results<NoContent, NotFound, ProblemHttpResult>> ConfirmMappingsAsync(
         Guid jobId,
         ConfirmMappingsRequest request,
         IImportJobReader jobReader,
@@ -162,7 +168,9 @@ internal static class ImportUploadEndpoints
 
         if (request.Mappings is null || request.Mappings.Count == 0)
         {
-            return TypedResults.BadRequest("At least one column mapping is required.");
+            return TypedResults.Problem(
+                detail: "At least one column mapping is required.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         job.MappingsJson = JsonSerializer.Serialize(request.Mappings);

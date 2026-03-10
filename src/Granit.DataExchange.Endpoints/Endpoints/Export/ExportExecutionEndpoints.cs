@@ -39,7 +39,7 @@ internal static class ExportExecutionEndpoints
         return group;
     }
 
-    private static async Task<Results<Created<ExportJobResponse>, BadRequest<string>>> CreateExportJobAsync(
+    private static async Task<Results<Created<ExportJobResponse>, ProblemHttpResult>> CreateExportJobAsync(
         CreateExportJobRequest request,
         IExportOrchestrator orchestrator,
         IServiceProvider serviceProvider,
@@ -50,13 +50,16 @@ internal static class ExportExecutionEndpoints
             ExportDefinitionResolver.FindByName(serviceProvider, request.DefinitionName);
         if (descriptor is null)
         {
-            return TypedResults.BadRequest($"Unknown export definition '{request.DefinitionName}'.");
+            return TypedResults.Problem(
+                detail: $"Unknown export definition '{request.DefinitionName}'.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (!descriptor.SupportedFormats.Contains(request.Format, StringComparer.OrdinalIgnoreCase))
         {
-            return TypedResults.BadRequest(
-                $"Format '{request.Format}' is not supported. Allowed: {string.Join(", ", descriptor.SupportedFormats)}.");
+            return TypedResults.Problem(
+                detail: $"Format '{request.Format}' is not supported. Allowed: {string.Join(", ", descriptor.SupportedFormats)}.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         ExportRequest exportRequest = new(
@@ -94,7 +97,7 @@ internal static class ExportExecutionEndpoints
         return TypedResults.Ok(ExportJobResponse.FromJob(job));
     }
 
-    private static async Task<Results<FileStreamHttpResult, NotFound, BadRequest<string>>> DownloadAsync(
+    private static async Task<Results<FileStreamHttpResult, NotFound, ProblemHttpResult>> DownloadAsync(
         Guid jobId,
         IExportOrchestrator orchestrator,
         CancellationToken cancellationToken)
@@ -107,8 +110,9 @@ internal static class ExportExecutionEndpoints
 
         if (job.Status != ExportJobStatus.Completed)
         {
-            return TypedResults.BadRequest(
-                $"Export job is not completed. Current status: '{job.Status}'.");
+            return TypedResults.Problem(
+                detail: $"Export job is not completed. Current status: '{job.Status}'.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         ExportDownload? download = await orchestrator.GetDownloadAsync(jobId, cancellationToken).ConfigureAwait(false);

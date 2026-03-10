@@ -54,7 +54,7 @@ internal static class ExportPresetEndpoints
         return TypedResults.Ok(response);
     }
 
-    private static async Task<Results<Created, BadRequest<string>>> SavePresetAsync(
+    private static async Task<Results<Created, ProblemHttpResult>> SavePresetAsync(
         SaveExportPresetRequest request,
         IExportPresetWriter presetWriter,
         IServiceProvider serviceProvider,
@@ -64,17 +64,23 @@ internal static class ExportPresetEndpoints
             ExportDefinitionResolver.FindByName(serviceProvider, request.DefinitionName);
         if (descriptor is null)
         {
-            return TypedResults.BadRequest($"Unknown export definition '{request.DefinitionName}'.");
+            return TypedResults.Problem(
+                detail: $"Unknown export definition '{request.DefinitionName}'.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (string.IsNullOrWhiteSpace(request.PresetName))
         {
-            return TypedResults.BadRequest("Preset name is required.");
+            return TypedResults.Problem(
+                detail: "Preset name is required.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (request.SelectedFields is null || request.SelectedFields.Count == 0)
         {
-            return TypedResults.BadRequest("At least one selected field is required.");
+            return TypedResults.Problem(
+                detail: "At least one selected field is required.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         ExportPreset preset = new(

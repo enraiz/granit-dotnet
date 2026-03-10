@@ -3,12 +3,12 @@ using Xunit;
 
 namespace Granit.Notifications.Endpoints.Tests;
 
-public sealed class UpdatePreferenceRequestTests
+public sealed class NotificationPreferenceUpdateRequestTests
 {
     [Fact]
     public void Properties_SetCorrectly()
     {
-        UpdatePreferenceRequest request = new()
+        NotificationPreferenceUpdateRequest request = new()
         {
             NotificationTypeName = "Order.Shipped",
             ChannelName = "Email",

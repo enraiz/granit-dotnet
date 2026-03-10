@@ -99,6 +99,73 @@ public sealed partial class IsolatedDbContextTests
             $"Violators: {string.Join(", ", violations)}");
     }
 
+    [Fact]
+    public void EfCore_modules_should_DependOn_GranitPersistenceModule()
+    {
+        string srcDir = Path.Combine(RepoRoot, "src");
+
+        List<string> violations = [];
+
+        foreach (string efProject in GetEfCoreProjectDirs(srcDir))
+        {
+            foreach (string csFile in Directory.GetFiles(efProject, "*Module.cs", SearchOption.TopDirectoryOnly))
+            {
+                string content = File.ReadAllText(csFile);
+
+                if (!content.Contains(": GranitModule", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (!content.Contains("GranitPersistenceModule", StringComparison.Ordinal))
+                {
+                    violations.Add(Path.GetRelativePath(RepoRoot, csFile));
+                }
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            "Every *.EntityFrameworkCore module must have [DependsOn(typeof(GranitPersistenceModule))]. " +
+            $"Violators: {string.Join(", ", violations)}");
+    }
+
+    [Fact]
+    public void EfCore_extension_methods_should_use_interceptor_DI_pattern()
+    {
+        string srcDir = Path.Combine(RepoRoot, "src");
+
+        List<string> violations = [];
+
+        foreach (string efProject in GetEfCoreProjectDirs(srcDir))
+        {
+            string extensionsDir = Path.Combine(efProject, "Extensions");
+            if (!Directory.Exists(extensionsDir))
+            {
+                continue;
+            }
+
+            foreach (string csFile in Directory.GetFiles(extensionsDir, "*.cs", SearchOption.AllDirectories))
+            {
+                string content = File.ReadAllText(csFile);
+
+                if (!content.Contains("AddDbContextFactory", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (!content.Contains("ServiceLifetime.Scoped", StringComparison.Ordinal))
+                {
+                    violations.Add(Path.GetRelativePath(RepoRoot, csFile));
+                }
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            "AddDbContextFactory must use the (sp, options) overload with ServiceLifetime.Scoped " +
+            "to resolve AuditedEntityInterceptor / SoftDeleteInterceptor. " +
+            $"Violators: {string.Join(", ", violations)}");
+    }
+
     private static IEnumerable<string> GetEfCoreProjectDirs(string srcDir) =>
         Directory.GetDirectories(srcDir)
             .Where(d => Path.GetFileName(d).EndsWith(".EntityFrameworkCore", StringComparison.Ordinal));

@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Persistence;
 
 namespace Granit.Querying.EntityFrameworkCore;
 
@@ -7,5 +8,7 @@ namespace Granit.Querying.EntityFrameworkCore;
 /// Provides <c>QueryingDbContext</c>, <c>IQueryEngine&lt;T&gt;</c>,
 /// and <c>EfCoreSavedViewStore</c>.
 /// </summary>
-[DependsOn(typeof(GranitQueryingModule))]
+[DependsOn(
+    typeof(GranitQueryingModule),
+    typeof(GranitPersistenceModule))]
 public sealed class GranitQueryingEntityFrameworkCoreModule : GranitModule;

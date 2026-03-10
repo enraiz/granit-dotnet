@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Persistence;
 
 namespace Granit.Authentication.ApiKeys.EntityFrameworkCore;
 
@@ -9,5 +10,7 @@ namespace Granit.Authentication.ApiKeys.EntityFrameworkCore;
 /// The <see cref="ApiKeysDbContext"/> must be configured by the host application
 /// (connection string). This module only registers the store implementations.
 /// </remarks>
-[DependsOn(typeof(GranitAuthenticationApiKeysModule))]
+[DependsOn(
+    typeof(GranitAuthenticationApiKeysModule),
+    typeof(GranitPersistenceModule))]
 public sealed class GranitAuthenticationApiKeysEntityFrameworkCoreModule : GranitModule;

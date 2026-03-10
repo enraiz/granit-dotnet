@@ -12,7 +12,7 @@ internal sealed class NotificationSchemaExampleProvider : ISchemaExampleProvider
     public IReadOnlyDictionary<Type, JsonNode> GetExamples() =>
         new Dictionary<Type, JsonNode>
         {
-            [typeof(UpdatePreferenceRequest)] = new JsonObject
+            [typeof(NotificationPreferenceUpdateRequest)] = new JsonObject
             {
                 ["notificationTypeName"] = "NewMessage",
                 ["channelName"] = "Email",

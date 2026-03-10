@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Persistence;
 
 namespace Granit.BackgroundJobs.EntityFrameworkCore;
 
@@ -6,5 +7,7 @@ namespace Granit.BackgroundJobs.EntityFrameworkCore;
 /// Granit module for EF Core persistence of background jobs.
 /// Registers <c>BackgroundJobsDbContext</c> and <c>EfBackgroundJobStore</c>.
 /// </summary>
-[DependsOn(typeof(GranitBackgroundJobsModule))]
+[DependsOn(
+    typeof(GranitBackgroundJobsModule),
+    typeof(GranitPersistenceModule))]
 public sealed class GranitBackgroundJobsEntityFrameworkCoreModule : GranitModule;

@@ -4,13 +4,13 @@ using Granit.Validation;
 namespace Granit.Notifications.Endpoints.Validators;
 
 /// <summary>
-/// Validates the <see cref="UpdatePreferenceRequest"/> body for notification preference updates.
+/// Validates the <see cref="NotificationPreferenceUpdateRequest"/> body for notification preference updates.
 /// </summary>
 /// <remarks>
 /// MaxLength values must match <c>NotificationPreferenceConfiguration</c>:
 /// NotificationTypeName = 256, ChannelName = 64.
 /// </remarks>
-internal sealed class UpdatePreferenceRequestValidator : GranitValidator<UpdatePreferenceRequest>
+internal sealed class NotificationPreferenceUpdateRequestValidator : GranitValidator<NotificationPreferenceUpdateRequest>
 {
     /// <summary>Maximum length for notification type name (must match <c>NotificationPreferenceConfiguration</c>).</summary>
     internal const int MaxNotificationTypeNameLength = 256;
@@ -18,7 +18,7 @@ internal sealed class UpdatePreferenceRequestValidator : GranitValidator<UpdateP
     /// <summary>Maximum length for channel name (must match <c>NotificationPreferenceConfiguration</c>).</summary>
     internal const int MaxChannelNameLength = 64;
 
-    public UpdatePreferenceRequestValidator()
+    public NotificationPreferenceUpdateRequestValidator()
     {
         RuleFor(x => x.NotificationTypeName)
             .NotEmpty()
