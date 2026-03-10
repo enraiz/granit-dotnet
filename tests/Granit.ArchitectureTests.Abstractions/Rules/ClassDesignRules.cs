@@ -107,18 +107,53 @@ public static class ClassDesignRules
     /// </summary>
     public static void PublicTypesShouldNotResideInInternalNamespaces(
         ArchUnitNET.Domain.Architecture architecture,
-        string typePrefix)
+        string typePrefix,
+        params string[] excludedTypeFullNames)
     {
+        var excluded = excludedTypeFullNames.ToHashSet(StringComparer.Ordinal);
+
         IEnumerable<IType> violations = architecture.Types
             .Where(t => t.FullName.StartsWith(typePrefix, StringComparison.Ordinal)
                 && (t.Namespace.FullName.Contains(".Internal.", StringComparison.Ordinal)
                     || t.Namespace.FullName.EndsWith(".Internal", StringComparison.Ordinal))
                 && t.Visibility == Visibility.Public
-                && t is not Class { IsAbstract: true });
+                && t is not Class { IsAbstract: true }
+                && !excluded.Contains(t.FullName));
 
         violations.ShouldBeEmpty(
             "Public types must not reside in *.Internal.* namespaces — they are implementation details. " +
             $"Violators: {string.Join(", ", violations.Select(t => t.FullName))}");
+    }
+
+    /// <summary>
+    /// Concrete exception classes must be sealed (unless they serve as base classes for other exceptions).
+    /// Abstract exceptions are excluded. Exception classes that are subclassed by other exceptions
+    /// (e.g. BusinessException) are also excluded.
+    /// </summary>
+    public static void ConcreteExceptionClassesShouldBeSealed(
+        ArchUnitNET.Domain.Architecture architecture,
+        string typePrefix)
+    {
+        IEnumerable<Class> exceptionClasses = architecture.Classes
+            .Where(c => c.Name.EndsWith("Exception", StringComparison.Ordinal)
+                && c.FullName.StartsWith(typePrefix, StringComparison.Ordinal)
+                && c.IsAbstract != true);
+
+        // Collect exception classes that are inherited by other exception classes
+        var baseExceptionClasses = architecture.Classes
+            .Where(c => c.Name.EndsWith("Exception", StringComparison.Ordinal))
+            .SelectMany(c => c.Dependencies
+                .Where(d => d is ArchUnitNET.Domain.Dependencies.InheritsBaseClassDependency
+                    && d.Target.Name.EndsWith("Exception", StringComparison.Ordinal))
+                .Select(d => d.Target.FullName))
+            .ToHashSet(StringComparer.Ordinal);
+
+        IEnumerable<Class> unsealed = exceptionClasses
+            .Where(c => c.IsSealed != true && !baseExceptionClasses.Contains(c.FullName));
+
+        unsealed.ShouldBeEmpty(
+            "Concrete exception classes must be sealed (unless they are base classes for other exceptions). " +
+            $"Violators: {string.Join(", ", unsealed.Select(c => c.FullName))}");
     }
 
     /// <summary>

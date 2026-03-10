@@ -47,4 +47,12 @@ public sealed class LayerDependencyTests
             "Granit.Core.Domain.CreationAuditedAggregateRoot",
             "Granit.Core.Domain.AuditedAggregateRoot",
             "Granit.Core.Domain.FullAuditedAggregateRoot");
+
+    [Fact]
+    public void Exceptions_should_not_reside_in_Endpoints() =>
+        LayerDependencyRules.ExceptionsShouldNotResideInEndpoints(Architecture);
+
+    [Fact]
+    public void Exceptions_should_not_depend_on_AspNetCore() =>
+        LayerDependencyRules.ExceptionsShouldNotDependOnAspNetCore(Architecture, "Granit.");
 }

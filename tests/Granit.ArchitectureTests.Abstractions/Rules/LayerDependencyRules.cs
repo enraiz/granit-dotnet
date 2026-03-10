@@ -71,6 +71,42 @@ public static class LayerDependencyRules
     }
 
     /// <summary>
+    /// Exception classes must not reside in endpoint namespaces.
+    /// Exceptions are domain concerns and belong in Core, Domain, or module root packages.
+    /// </summary>
+    public static void ExceptionsShouldNotResideInEndpoints(ArchUnitNET.Domain.Architecture architecture)
+    {
+        IEnumerable<Class> violations = architecture.Classes
+            .Where(c => (c.Namespace.FullName.EndsWith(".Endpoints", StringComparison.Ordinal) ||
+                         c.Namespace.FullName.Contains(".Endpoints.", StringComparison.Ordinal))
+                && c.Name.EndsWith("Exception", StringComparison.Ordinal));
+
+        violations.ShouldBeEmpty(
+            "Exception classes must not reside in Endpoints namespaces — they are domain concerns. " +
+            $"Violators: {string.Join(", ", violations.Select(c => c.FullName))}");
+    }
+
+    /// <summary>
+    /// Exception classes must not depend on ASP.NET Core types — exceptions are domain concerns.
+    /// </summary>
+    public static void ExceptionsShouldNotDependOnAspNetCore(
+        ArchUnitNET.Domain.Architecture architecture,
+        string typePrefix)
+    {
+        IEnumerable<Class> exceptionClasses = architecture.Classes
+            .Where(c => c.FullName.StartsWith(typePrefix, StringComparison.Ordinal)
+                && c.Name.EndsWith("Exception", StringComparison.Ordinal));
+
+        IEnumerable<Class> violations = exceptionClasses
+            .Where(c => c.Dependencies
+                .Any(d => d.Target.FullName.StartsWith("Microsoft.AspNetCore", StringComparison.Ordinal)));
+
+        violations.ShouldBeEmpty(
+            "Exception classes must not depend on ASP.NET Core — they are domain concerns. " +
+            $"Violators: {string.Join(", ", violations.Select(c => c.FullName))}");
+    }
+
+    /// <summary>
     /// IQueryable must not escape the persistence/data layer.
     /// Types in the given allowed namespaces are exempt.
     /// </summary>

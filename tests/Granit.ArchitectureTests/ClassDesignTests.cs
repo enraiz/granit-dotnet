@@ -37,5 +37,13 @@ public sealed class ClassDesignTests
 
     [Fact]
     public void Public_types_should_not_reside_in_Internal_namespaces() =>
-        ClassDesignRules.PublicTypesShouldNotResideInInternalNamespaces(Architecture, "Granit.");
+        ClassDesignRules.PublicTypesShouldNotResideInInternalNamespaces(
+            Architecture, "Granit.",
+            // Wolverine requires middleware constructor parameters to be public,
+            // even when the interface is an internal implementation detail.
+            "Granit.Wolverine.Internal.IWolverineUserContextSetter");
+
+    [Fact]
+    public void Concrete_exception_classes_should_be_sealed() =>
+        ClassDesignRules.ConcreteExceptionClassesShouldBeSealed(Architecture, "Granit.");
 }

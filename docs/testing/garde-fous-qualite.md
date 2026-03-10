@@ -76,6 +76,7 @@ assemblies compilées, et scans de code source via regex.
 | `EntityTypeConfigurations_should_be_in_EfCore_layer` | `IEntityTypeConfiguration<T>` hors persistence | ArchUnitNET |
 | `Entity_configurations_should_not_be_public` | `*Configuration` public dans EF Core | ArchUnitNET |
 | `Public_types_should_not_reside_in_Internal_namespaces` | Type `public` dans `*.Internal.*` | ArchUnitNET |
+| `Concrete_exception_classes_should_be_sealed` | Exception concrète non `sealed` (sauf base classes) | ArchUnitNET |
 
 ### Dépendances entre couches (LayerDependencyTests)
 
@@ -87,6 +88,8 @@ assemblies compilées, et scans de code source via regex.
 | `Endpoint_types_should_not_depend_on_EntityFrameworkCore` | Endpoints → EF Core | ArchUnitNET |
 | `IQueryable_should_not_appear_in_non_persistence_types` | `IQueryable<T>` hors persistence | ArchUnitNET |
 | `Endpoint_types_should_not_inherit_from_domain_entities` | DTO qui hérite de `Entity`/`AggregateRoot` | ArchUnitNET |
+| `Exceptions_should_not_reside_in_Endpoints` | Exception dans un namespace `*.Endpoints` | ArchUnitNET |
+| `Exceptions_should_not_depend_on_AspNetCore` | Exception dépend de `Microsoft.AspNetCore.*` | ArchUnitNET |
 
 ### Nommage et CQRS (CqrsConventionTests, DtoConventionTests)
 
@@ -96,6 +99,7 @@ assemblies compilées, et scans de code source via regex.
 | `Reader_interfaces_should_end_with_Reader` | `*Reader*` sans suffixe `Reader` | ArchUnitNET |
 | `Writer_interfaces_should_end_with_Writer` | `*Writer*` sans suffixe `Writer` | ArchUnitNET |
 | `Endpoint_types_should_not_use_Dto_suffix` | Suffixe `Dto` dans les endpoints | ArchUnitNET |
+| `Exception_classes_should_end_with_Exception` | Exception sans suffixe `Exception` | ArchUnitNET |
 
 ### Modules Granit (ModuleConventionTests)
 
@@ -143,12 +147,12 @@ assemblies compilées, et scans de code source via regex.
 | Sécurité & HDS | 4 GRSEC + 7 BannedAPIs | Compile-time |
 | Entity Framework | 1 GREF + 5 DbContext | Compile-time + Test |
 | Migrations zero-downtime | 4 GRMIGA | Compile-time |
-| Architecture en couches | 6 rules | Test (ArchUnitNET) |
-| Nommage & CQRS | 4 rules | Test (ArchUnitNET) |
-| Conception des classes | 7 rules | Test (ArchUnitNET) |
+| Architecture en couches | 8 rules | Test (ArchUnitNET) |
+| Nommage & CQRS | 5 rules | Test (ArchUnitNET) |
+| Conception des classes | 8 rules | Test (ArchUnitNET) |
 | Anti-patterns C# | 2 rules + 4 BannedAPIs | Test + Compile-time |
 | Modules & projets | 5 rules | Test |
-| **Total** | **49 règles** | |
+| **Total** | **53 règles** | |
 
 ---
 
@@ -174,6 +178,6 @@ Utiliser pour interdire un appel d'API spécifique (constructeur, méthode, prop
 
 Utiliser pour des contraintes structurelles (dépendances, nommage, patterns).
 
-1. Règle réutilisable → `src/Granit.ArchitectureTests.Abstractions/Rules/`
+1. Règle réutilisable → `tests/Granit.ArchitectureTests.Abstractions/Rules/`
 2. Test Granit-specific → `tests/Granit.ArchitectureTests/`
 3. Deux mécanismes : ArchUnitNET (analyse des assemblies) ou scan source (regex)

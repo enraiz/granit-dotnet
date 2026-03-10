@@ -21,7 +21,7 @@ namespace Granit.Core.Exceptions;
 /// throw new EntityNotFoundException(typeof(Appointment), appointmentId);
 /// </code>
 /// </example>
-public class EntityNotFoundException : Exception, IUserFriendlyException
+public sealed class EntityNotFoundException : Exception, IUserFriendlyException
 {
     /// <summary>The CLR type of the entity that was not found.</summary>
     public Type EntityType { get; }

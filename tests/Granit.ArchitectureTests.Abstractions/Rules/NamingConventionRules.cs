@@ -59,6 +59,20 @@ public static class NamingConventionRules
     }
 
     /// <summary>
+    /// All classes inheriting from <see cref="Exception"/> must have the "Exception" suffix.
+    /// </summary>
+    public static void ExceptionClassesShouldEndWithException(ArchUnitNET.Domain.Architecture architecture, string typePrefix)
+    {
+        IArchRule rule = Classes()
+            .That().AreAssignableTo(typeof(Exception))
+            .And().HaveFullNameStartingWith(typePrefix)
+            .Should().HaveNameEndingWith("Exception")
+            .Because("all exception classes must follow the .NET naming convention");
+
+        rule.Check(architecture);
+    }
+
+    /// <summary>
     /// Types in endpoint namespaces must not use the "Dto" suffix.
     /// </summary>
     public static void EndpointTypesShouldNotUseDtoSuffix(

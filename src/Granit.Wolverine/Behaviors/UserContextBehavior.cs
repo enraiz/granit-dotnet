@@ -25,7 +25,7 @@ namespace Granit.Wolverine.Behaviors;
 /// the default <c>ICurrentUserService</c> (returns null for background threads).
 /// </para>
 /// </remarks>
-internal sealed class UserContextBehavior(IWolverineUserContextSetter setter)
+public sealed class UserContextBehavior(IWolverineUserContextSetter setter)
 {
     private IDisposable? _scope;
 

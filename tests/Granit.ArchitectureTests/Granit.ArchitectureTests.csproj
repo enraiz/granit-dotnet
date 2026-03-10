@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.ArchitectureTests.Abstractions\Granit.ArchitectureTests.Abstractions.csproj" />
+    <ProjectReference Include="..\Granit.ArchitectureTests.Abstractions\Granit.ArchitectureTests.Abstractions.csproj" />
   </ItemGroup>
 
   <!-- Reference ALL src assemblies for architecture analysis

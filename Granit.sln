@@ -415,7 +415,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.ArchitectureTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.Cookies.Endpoints.Tests", "tests\Granit.Cookies.Endpoints.Tests\Granit.Cookies.Endpoints.Tests.csproj", "{80ACBDD0-7833-41FC-96A8-238172BEB264}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.ArchitectureTests.Abstractions", "src\Granit.ArchitectureTests.Abstractions\Granit.ArchitectureTests.Abstractions.csproj", "{C5110753-CEE2-4077-A473-DDC44D0137CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Granit.ArchitectureTests.Abstractions", "tests\Granit.ArchitectureTests.Abstractions\Granit.ArchitectureTests.Abstractions.csproj", "{C5110753-CEE2-4077-A473-DDC44D0137CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -3096,6 +3096,6 @@ Global
 		{C0F96E87-B4EF-4FB5-8FB6-8B0C725A5C9E} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{9881AD0E-44A1-4408-9297-B41E767B4313} = {A1B2C3D4-0002-0002-0002-000000000002}
 		{80ACBDD0-7833-41FC-96A8-238172BEB264} = {A1B2C3D4-0002-0002-0002-000000000002}
-		{C5110753-CEE2-4077-A473-DDC44D0137CB} = {A1B2C3D4-0001-0001-0001-000000000001}
+		{C5110753-CEE2-4077-A473-DDC44D0137CB} = {A1B2C3D4-0002-0002-0002-000000000002}
 	EndGlobalSection
 EndGlobal
