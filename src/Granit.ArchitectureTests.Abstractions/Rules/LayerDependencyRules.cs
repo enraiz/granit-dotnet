@@ -4,7 +4,8 @@ using Shouldly;
 namespace Granit.ArchitectureTests.Abstractions.Rules;
 
 /// <summary>
-/// Reusable layered architecture rules: core/endpoints isolation from EF Core, IQueryable confinement.
+/// Reusable layered architecture rules: core/endpoints isolation from EF Core, IQueryable confinement,
+/// domain entity leak prevention.
 /// </summary>
 public static class LayerDependencyRules
 {
@@ -44,6 +45,29 @@ public static class LayerDependencyRules
         efCoreDeps.ShouldBeEmpty(
             "Endpoints must use abstractions (ports), not EF Core directly. " +
             $"Violators: {string.Join(", ", efCoreDeps.Select(t => t.FullName))}");
+    }
+
+    /// <summary>
+    /// Types in endpoint namespaces must not inherit from domain entity base classes.
+    /// Endpoints may reference entities for internal mapping, but DTOs (Request/Response)
+    /// must never extend Entity, AggregateRoot, etc.
+    /// </summary>
+    public static void EndpointTypesShouldNotInheritFromDomainEntities(
+        ArchUnitNET.Domain.Architecture architecture,
+        params string[] domainBaseClassFullNames)
+    {
+        var domainBaseClasses = domainBaseClassFullNames.ToHashSet(StringComparer.Ordinal);
+
+        IEnumerable<Class> violations = architecture.Classes
+            .Where(c => (c.Namespace.FullName.EndsWith(".Endpoints", StringComparison.Ordinal) ||
+                         c.Namespace.FullName.Contains(".Endpoints.", StringComparison.Ordinal))
+                && c.Dependencies
+                    .Where(d => d is ArchUnitNET.Domain.Dependencies.InheritsBaseClassDependency)
+                    .Any(d => domainBaseClasses.Contains(d.Target.FullName)));
+
+        violations.ShouldBeEmpty(
+            "Endpoint types must not inherit from domain entity base classes — use standalone Request/Response DTOs. " +
+            $"Violators: {string.Join(", ", violations.Select(c => c.FullName))}");
     }
 
     /// <summary>

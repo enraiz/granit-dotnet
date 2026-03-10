@@ -14,12 +14,10 @@ internal sealed class RecurringJobRegistrationCollection
     {
         lock (_lock)
         {
-            foreach (RecurringJobRegistration registration in registrations)
+            foreach (var registration in registrations
+                .Where(r => !_registrations.Exists(existing => existing.JobName == r.JobName)))
             {
-                if (!_registrations.Exists(r => r.JobName == registration.JobName))
-                {
-                    _registrations.Add(registration);
-                }
+                _registrations.Add(registration);
             }
         }
     }

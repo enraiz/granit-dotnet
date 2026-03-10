@@ -27,7 +27,7 @@ namespace Granit.BackgroundJobs.Internal;
 /// <see cref="IBackgroundJobStoreWriter.SetTriggeredByAsync"/>.
 /// </para>
 /// </remarks>
-public sealed partial class RecurringJobSchedulingMiddleware(
+internal sealed partial class RecurringJobSchedulingMiddleware(
     IBackgroundJobStoreReader storeReader,
     IBackgroundJobStoreWriter storeWriter,
     IClock clock,

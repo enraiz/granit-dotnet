@@ -1,0 +1,79 @@
+// =============================================================================
+// Tests - EmailNotificationsServiceCollectionExtensions
+// =============================================================================
+// Verifies that AddGranitNotificationsEmail registers the expected services:
+// INotificationChannel (EmailNotificationChannel), EmailChannelOptions binding,
+// and correct handling of the optional configure delegate.
+// =============================================================================
+
+using Granit.Notifications.Abstractions;
+using Granit.Notifications.Email.Extensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Shouldly;
+using Xunit;
+
+namespace Granit.Notifications.Email.Tests;
+
+public sealed class EmailNotificationsServiceCollectionExtensionsTests
+{
+    [Fact]
+    public void AddGranitNotificationsEmail_RegistersNotificationChannel()
+    {
+        ServiceCollection services = new();
+        services.AddGranitNotificationsEmail();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(INotificationChannel) &&
+            d.ImplementationType == typeof(EmailNotificationChannel) &&
+            d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddGranitNotificationsEmail_RegistersEmailChannelOptions()
+    {
+        ServiceCollection services = new();
+        services.AddGranitNotificationsEmail();
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(IConfigureOptions<EmailChannelOptions>));
+    }
+
+    [Fact]
+    public void AddGranitNotificationsEmail_AppliesConfigureDelegate()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+        services.AddGranitNotificationsEmail(opts =>
+        {
+            opts.Provider = "Brevo";
+            opts.SenderAddress = "noreply@example.com";
+            opts.SenderName = "Test App";
+        });
+
+        ServiceProvider sp = services.BuildServiceProvider();
+        var options = sp.GetRequiredService<IOptions<EmailChannelOptions>>().Value;
+
+        options.Provider.ShouldBe("Brevo");
+        options.SenderAddress.ShouldBe("noreply@example.com");
+        options.SenderName.ShouldBe("Test App");
+    }
+
+    [Fact]
+    public void AddGranitNotificationsEmail_ReturnsServiceCollection()
+    {
+        ServiceCollection services = new();
+        IServiceCollection result = services.AddGranitNotificationsEmail();
+
+        result.ShouldBeSameAs(services);
+    }
+
+    [Fact]
+    public void AddGranitNotificationsEmail_WithNullConfigure_DoesNotThrow()
+    {
+        ServiceCollection services = new();
+
+        Should.NotThrow(() => services.AddGranitNotificationsEmail(configure: null));
+    }
+}

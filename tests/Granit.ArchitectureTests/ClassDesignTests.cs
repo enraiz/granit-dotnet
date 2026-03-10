@@ -34,4 +34,8 @@ public sealed class ClassDesignTests
     [Fact]
     public void Entity_configurations_should_not_be_public() =>
         ClassDesignRules.EntityConfigurationsShouldNotBePublic(Architecture, "Granit.");
+
+    [Fact]
+    public void Public_types_should_not_reside_in_Internal_namespaces() =>
+        ClassDesignRules.PublicTypesShouldNotResideInInternalNamespaces(Architecture, "Granit.");
 }

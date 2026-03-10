@@ -34,4 +34,17 @@ public sealed class LayerDependencyTests
     [Fact]
     public void IQueryable_should_not_appear_in_non_persistence_types() =>
         LayerDependencyRules.IQueryableShouldNotEscapePersistenceLayer(Architecture, "DataExchange");
+
+    [Fact]
+    public void Endpoint_types_should_not_inherit_from_domain_entities() =>
+        LayerDependencyRules.EndpointTypesShouldNotInheritFromDomainEntities(
+            Architecture,
+            "Granit.Core.Domain.Entity",
+            "Granit.Core.Domain.AggregateRoot",
+            "Granit.Core.Domain.CreationAuditedEntity",
+            "Granit.Core.Domain.AuditedEntity",
+            "Granit.Core.Domain.FullAuditedEntity",
+            "Granit.Core.Domain.CreationAuditedAggregateRoot",
+            "Granit.Core.Domain.AuditedAggregateRoot",
+            "Granit.Core.Domain.FullAuditedAggregateRoot");
 }

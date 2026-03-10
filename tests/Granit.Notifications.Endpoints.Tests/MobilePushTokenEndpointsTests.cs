@@ -1,0 +1,289 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
+using Granit.Core.MultiTenancy;
+using Granit.Notifications.Endpoints;
+using Granit.Notifications.MobilePush;
+using Granit.Timing;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NSubstitute;
+using Shouldly;
+using Xunit;
+
+namespace Granit.Notifications.Endpoints.Tests;
+
+public sealed class MobilePushTokenEndpointsTests : IAsyncDisposable
+{
+    private const string Prefix = "/api/notifications/mobile-push/tokens";
+
+    private readonly IMobilePushTokenWriter _tokenWriter = Substitute.For<IMobilePushTokenWriter>();
+    private readonly IMobilePushTokenReader _tokenReader = Substitute.For<IMobilePushTokenReader>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
+    private readonly IClock _clock = Substitute.For<IClock>();
+    private readonly WebApplication _app;
+    private readonly HttpClient _authClient;
+    private readonly HttpClient _anonClient;
+
+    public MobilePushTokenEndpointsTests()
+    {
+        _currentTenant.IsAvailable.Returns(false);
+        _clock.Now.Returns(new DateTimeOffset(2026, 3, 5, 12, 0, 0, TimeSpan.Zero));
+
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        builder.Services
+            .AddAuthentication(TestAuthHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                TestAuthHandler.SchemeName, _ => { });
+        builder.Services.AddAuthorization();
+
+        builder.Services.AddSingleton(_tokenWriter);
+        builder.Services.AddSingleton(_tokenReader);
+        builder.Services.AddSingleton(_currentTenant);
+        builder.Services.AddSingleton(_clock);
+
+        _app = builder.Build();
+        _app.MapMobilePushTokenEndpoints();
+        _app.StartAsync().GetAwaiter().GetResult();
+
+        _authClient = BuildClient("user-456");
+        _anonClient = _app.GetTestClient();
+    }
+
+    public async ValueTask DisposeAsync() => await _app.DisposeAsync();
+
+    // -- POST / (register) -- new token returns 201 --
+
+    [Fact]
+    public async Task RegisterToken_NewToken_Returns201Created()
+    {
+        _tokenReader.GetTokensAsync("user-456", null, Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<MobilePushTokenInfo>());
+
+        var request = new MobilePushTokenRegisterRequest
+        {
+            DeviceToken = "fcm-token-abc",
+            Platform = MobilePlatform.Android,
+        };
+
+        HttpResponseMessage response = await _authClient.PostAsJsonAsync(Prefix, request, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        await _tokenWriter.Received(1).RegisterAsync(
+            Arg.Is<MobilePushTokenInfo>(t =>
+                t.UserId == "user-456" &&
+                t.DeviceToken == "fcm-token-abc" &&
+                t.Platform == MobilePlatform.Android &&
+                t.TenantId == null),
+            Arg.Any<CancellationToken>());
+    }
+
+    // -- POST / (register) -- existing token returns 200 --
+
+    [Fact]
+    public async Task RegisterToken_ExistingToken_Returns200Ok()
+    {
+        var existing = new MobilePushTokenInfo
+        {
+            UserId = "user-456",
+            DeviceToken = "fcm-token-abc",
+            Platform = MobilePlatform.Android,
+            CreatedAt = DateTimeOffset.UtcNow,
+        };
+        _tokenReader.GetTokensAsync("user-456", null, Arg.Any<CancellationToken>())
+            .Returns(new List<MobilePushTokenInfo> { existing });
+
+        var request = new MobilePushTokenRegisterRequest
+        {
+            DeviceToken = "fcm-token-abc",
+            Platform = MobilePlatform.Android,
+        };
+
+        HttpResponseMessage response = await _authClient.PostAsJsonAsync(Prefix, request, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    // -- POST / (register) -- unauthenticated returns 401 --
+
+    [Fact]
+    public async Task RegisterToken_Unauthenticated_Returns401()
+    {
+        var request = new MobilePushTokenRegisterRequest
+        {
+            DeviceToken = "token",
+            Platform = MobilePlatform.Ios,
+        };
+
+        HttpResponseMessage response = await _anonClient.PostAsJsonAsync(Prefix, request, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    // -- DELETE /{deviceToken} --
+
+    [Fact]
+    public async Task RemoveToken_Returns204()
+    {
+        HttpResponseMessage response = await _authClient.DeleteAsync(
+            $"{Prefix}/my-device-token", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        await _tokenWriter.Received(1).RemoveAsync("my-device-token", null, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RemoveToken_Unauthenticated_Returns401()
+    {
+        HttpResponseMessage response = await _anonClient.DeleteAsync(
+            $"{Prefix}/my-device-token", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    // -- GET / (list tokens) --
+
+    [Fact]
+    public async Task GetTokens_ReturnsTokenList()
+    {
+        var tokens = new List<MobilePushTokenInfo>
+        {
+            new()
+            {
+                UserId = "user-456",
+                DeviceToken = "token-1",
+                Platform = MobilePlatform.Android,
+                CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
+            },
+            new()
+            {
+                UserId = "user-456",
+                DeviceToken = "token-2",
+                Platform = MobilePlatform.Ios,
+                CreatedAt = new DateTimeOffset(2026, 2, 1, 0, 0, 0, TimeSpan.Zero),
+            },
+        };
+        _tokenReader.GetTokensAsync("user-456", null, Arg.Any<CancellationToken>())
+            .Returns(tokens);
+
+        HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<List<MobilePushTokenResponse>>(
+            TestContext.Current.CancellationToken);
+        result.ShouldNotBeNull();
+        result!.Count.ShouldBe(2);
+        result[0].DeviceToken.ShouldBe("token-1");
+        result[0].Platform.ShouldBe(MobilePlatform.Android);
+        result[1].DeviceToken.ShouldBe("token-2");
+        result[1].Platform.ShouldBe(MobilePlatform.Ios);
+    }
+
+    [Fact]
+    public async Task GetTokens_Unauthenticated_Returns401()
+    {
+        HttpResponseMessage response = await _anonClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    // -- Multi-tenancy --
+
+    [Fact]
+    public async Task RegisterToken_WithTenant_PassesTenantId()
+    {
+        var tenantId = Guid.NewGuid();
+        _currentTenant.IsAvailable.Returns(true);
+        _currentTenant.Id.Returns(tenantId);
+        _tokenReader.GetTokensAsync("user-456", tenantId, Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<MobilePushTokenInfo>());
+
+        var request = new MobilePushTokenRegisterRequest
+        {
+            DeviceToken = "fcm-token-tenant",
+            Platform = MobilePlatform.Android,
+        };
+
+        HttpResponseMessage response = await _authClient.PostAsJsonAsync(Prefix, request, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        await _tokenWriter.Received(1).RegisterAsync(
+            Arg.Is<MobilePushTokenInfo>(t => t.TenantId == tenantId),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RemoveToken_WithTenant_PassesTenantId()
+    {
+        var tenantId = Guid.NewGuid();
+        _currentTenant.IsAvailable.Returns(true);
+        _currentTenant.Id.Returns(tenantId);
+
+        HttpResponseMessage response = await _authClient.DeleteAsync(
+            $"{Prefix}/my-token", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        await _tokenWriter.Received(1).RemoveAsync("my-token", tenantId, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetTokens_WithTenant_PassesTenantId()
+    {
+        var tenantId = Guid.NewGuid();
+        _currentTenant.IsAvailable.Returns(true);
+        _currentTenant.Id.Returns(tenantId);
+        _tokenReader.GetTokensAsync("user-456", tenantId, Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<MobilePushTokenInfo>());
+
+        HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        await _tokenReader.Received(1).GetTokensAsync("user-456", tenantId, Arg.Any<CancellationToken>());
+    }
+
+    // -- Helpers --
+
+    private HttpClient BuildClient(string userId)
+    {
+        HttpClient client = _app.GetTestClient();
+        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, userId);
+        return client;
+    }
+
+    internal sealed class TestAuthHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+    {
+        public const string SchemeName = "Test";
+        public const string RolesHeader = "X-Test-User";
+
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        {
+            if (!Request.Headers.TryGetValue(RolesHeader, out Microsoft.Extensions.Primitives.StringValues userHeader))
+            {
+                return Task.FromResult(AuthenticateResult.NoResult());
+            }
+
+            string userId = userHeader.ToString();
+            Claim[] claims =
+            [
+                new(ClaimTypes.NameIdentifier, userId),
+                new(ClaimTypes.Name, userId),
+            ];
+
+            ClaimsIdentity identity = new(claims, SchemeName);
+            ClaimsPrincipal principal = new(identity);
+            AuthenticationTicket ticket = new(principal, SchemeName);
+
+            return Task.FromResult(AuthenticateResult.Success(ticket));
+        }
+    }
+}

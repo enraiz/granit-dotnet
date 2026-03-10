@@ -51,9 +51,10 @@ classDiagram
 ## Implémentation dans Granit
 
 | Adaptateur | Fichier | Interface cible | Classe adaptée |
-|-----------|---------|-----------------|----------------|
+| --------- | ------- | --------------- | -------------- |
 | `TypedKeyCacheServiceAdapter<TCacheItem, TKey>` | `src/Granit.Caching/TypedKeyCacheServiceAdapter.cs` | `ICacheService<TCacheItem, TKey>` | `ICacheService<TCacheItem>` (clés string) |
 | `S3BlobClient` | `src/Granit.BlobStorage.S3/Internal/S3BlobClient.cs` | `IBlobStorageClient` | `AmazonS3Client` (AWS SDK) |
+| `MailKitSmtpTransport` | `src/Granit.Notifications.Email.Smtp/MailKitSmtpTransport.cs` | `ISmtpTransport` | `SmtpClient` (MailKit, sealed) |
 
 ## Justification
 

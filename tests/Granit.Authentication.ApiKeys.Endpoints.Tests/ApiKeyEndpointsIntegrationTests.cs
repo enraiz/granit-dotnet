@@ -307,8 +307,8 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task RotateApiKey_WhenExists_ReturnsOkWithNewSecret()
     {
-        Guid oldId = Guid.NewGuid();
-        Guid newId = Guid.NewGuid();
+        var oldId = Guid.NewGuid();
+        var newId = Guid.NewGuid();
         ApiKeyEntry existing = CreateSampleEntry(oldId);
 
         _adminStore.FindByIdAsync(oldId, Arg.Any<CancellationToken>())
@@ -351,7 +351,7 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task RotateApiKey_WhenAlreadyRevoked_Returns404()
     {
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
         ApiKeyEntry revoked = CreateSampleEntry(id);
         revoked.RevokedAt = DateTimeOffset.UtcNow.AddDays(-1);
 
@@ -368,8 +368,8 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task RotateApiKey_PreservesPermissionsAndCidrs()
     {
-        Guid oldId = Guid.NewGuid();
-        Guid newId = Guid.NewGuid();
+        var oldId = Guid.NewGuid();
+        var newId = Guid.NewGuid();
         ApiKeyEntry existing = CreateSampleEntry(oldId);
         existing.Permissions = ["Patients.Read", "Patients.Write"];
         existing.AllowedCidrs = ["10.0.0.0/24"];

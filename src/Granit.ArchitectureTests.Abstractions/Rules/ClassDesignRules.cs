@@ -9,7 +9,7 @@ namespace Granit.ArchitectureTests.Abstractions.Rules;
 
 /// <summary>
 /// Reusable class design rules: sealed DbContexts, internal EfStores, no MVC, sealed Options,
-/// internal Configurations, IEntityTypeConfiguration confinement.
+/// internal Configurations, IEntityTypeConfiguration confinement, Internal namespace visibility.
 /// </summary>
 public static class ClassDesignRules
 {
@@ -102,6 +102,26 @@ public static class ClassDesignRules
     }
 
     /// <summary>
+    /// Public types must not reside in namespaces containing "Internal" — these are implementation details.
+    /// Exceptions: abstract classes (intended as extension points) and types in test assemblies.
+    /// </summary>
+    public static void PublicTypesShouldNotResideInInternalNamespaces(
+        ArchUnitNET.Domain.Architecture architecture,
+        string typePrefix)
+    {
+        IEnumerable<IType> violations = architecture.Types
+            .Where(t => t.FullName.StartsWith(typePrefix, StringComparison.Ordinal)
+                && (t.Namespace.FullName.Contains(".Internal.", StringComparison.Ordinal)
+                    || t.Namespace.FullName.EndsWith(".Internal", StringComparison.Ordinal))
+                && t.Visibility == Visibility.Public
+                && t is not Class { IsAbstract: true });
+
+        violations.ShouldBeEmpty(
+            "Public types must not reside in *.Internal.* namespaces — they are implementation details. " +
+            $"Violators: {string.Join(", ", violations.Select(t => t.FullName))}");
+    }
+
+    /// <summary>
     /// Options classes must be sealed (unless they serve as base classes for other Options).
     /// </summary>
     public static void OptionsClassesShouldBeSealed(ArchUnitNET.Domain.Architecture architecture, string typePrefix)
@@ -112,7 +132,7 @@ public static class ClassDesignRules
                 && c.IsAbstract != true);
 
         // Collect names of classes that are inherited by other Options classes
-        HashSet<string> baseOptionClasses = architecture.Classes
+        var baseOptionClasses = architecture.Classes
             .Where(c => c.Name.EndsWith("Options", StringComparison.Ordinal))
             .SelectMany(c => c.Dependencies
                 .Where(d => d.Target.Name.EndsWith("Options", StringComparison.Ordinal))

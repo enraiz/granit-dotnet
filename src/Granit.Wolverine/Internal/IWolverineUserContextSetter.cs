@@ -6,7 +6,7 @@ namespace Granit.Wolverine.Internal;
 /// Internal contract for setting the current user context in a Wolverine handler scope.
 /// Implemented by <see cref="WolverineCurrentUserService"/>.
 /// </summary>
-public interface IWolverineUserContextSetter
+internal interface IWolverineUserContextSetter
 {
     /// <summary>
     /// Temporarily overrides the user context for the current async flow.
