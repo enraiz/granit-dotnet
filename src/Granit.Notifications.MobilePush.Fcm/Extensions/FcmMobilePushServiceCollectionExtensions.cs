@@ -25,8 +25,8 @@ public static class FcmMobilePushServiceCollectionExtensions
 
         services.AddHttpClient(HttpClientName, (sp, client) =>
             {
-                client.BaseAddress = new Uri("https://fcm.googleapis.com/");
                 FcmOptions opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<FcmOptions>>().Value;
+                client.BaseAddress = new Uri(opts.BaseAddress);
                 client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
             })
             .AddStandardResilienceHandler();

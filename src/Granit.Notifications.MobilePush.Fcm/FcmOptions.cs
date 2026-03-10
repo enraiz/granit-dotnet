@@ -19,6 +19,10 @@ public sealed class FcmOptions
     [Required]
     public string ServiceAccountJson { get; set; } = string.Empty;
 
+    /// <summary>FCM API base address.</summary>
+    [Required, Url]
+    public string BaseAddress { get; set; } = "https://fcm.googleapis.com/";
+
     /// <summary>Request timeout in seconds.</summary>
     public int TimeoutSeconds { get; set; } = 30;
 }
