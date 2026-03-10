@@ -108,6 +108,19 @@ public sealed class PersistenceTenantExtensionsTests
     }
 
     [Fact]
+    public void AddTenantPerSchemaDbContext_RegistersDefaultSchemaActivator()
+    {
+        ServiceCollection services = new();
+
+        services.AddTenantPerSchemaDbContext<TestDbContext>(opts =>
+            opts.UseInMemoryDatabase("shared-db"));
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(ITenantSchemaActivator) &&
+            d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [Fact]
     public void AddTenantPerSchemaDbContext_ReturnsServiceCollection_ForChaining()
     {
         ServiceCollection services = new();
@@ -185,6 +198,19 @@ public sealed class PersistenceTenantExtensionsTests
         // Should have multiple keyed registrations
         services.Count(d => d.ServiceType == typeof(IDbContextFactory<TestDbContext>))
                 .ShouldBeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public void AddGranitIsolatedDbContext_WithSchemaPerTenant_RegistersSchemaActivator()
+    {
+        ServiceCollection services = new();
+
+        services.AddGranitIsolatedDbContext<TestDbContext>(
+            configureShared: opts => opts.UseInMemoryDatabase("shared"),
+            configureSchemaPerTenant: opts => opts.UseInMemoryDatabase("schema-db"));
+
+        services.ShouldContain(d =>
+            d.ServiceType == typeof(ITenantSchemaActivator));
     }
 
     [Fact]

@@ -7,19 +7,21 @@ namespace Granit.Persistence.MultiTenancy;
 
 /// <summary>
 /// Scoped <see cref="IDbContextFactory{TContext}"/> that routes all EF Core queries
-/// to the current tenant's dedicated PostgreSQL schema via <see cref="TenantSchemaConnectionInterceptor"/>.
+/// to the current tenant's dedicated schema via <see cref="TenantSchemaConnectionInterceptor"/>
+/// and <see cref="ITenantSchemaActivator"/>.
 /// </summary>
 /// <remarks>
 /// <para>
 /// Unlike <see cref="TenantPerDatabaseDbContextFactory{TContext}"/>, this factory uses a
-/// shared database connection string. Physical isolation is achieved by switching the
-/// PostgreSQL <c>search_path</c> at connection open time. The EF Core compiled model is
-/// shared across all tenants — no per-tenant model recompilation, no memory leak.
+/// shared database connection string. Physical isolation is achieved by activating the
+/// tenant schema at connection open time via the provider-specific
+/// <see cref="ITenantSchemaActivator"/>. The EF Core compiled model is shared across
+/// all tenants — no per-tenant model recompilation, no memory leak.
 /// </para>
 /// <para>
 /// Throws <see cref="InvalidOperationException"/> when no tenant is active.
-/// There is no silent fallback: allowing a query to run without a <c>search_path</c>
-/// override would expose data from a previously-pooled tenant connection (HDS breach).
+/// There is no silent fallback: allowing a query to run without schema activation
+/// would expose data from a previously-pooled tenant connection (HDS breach).
 /// </para>
 /// <para>
 /// <see cref="AuditedEntityInterceptor"/> is wired automatically when available in DI,
@@ -30,6 +32,7 @@ namespace Granit.Persistence.MultiTenancy;
 internal sealed class TenantPerSchemaDbContextFactory<TContext>(
     ICurrentTenant currentTenant,
     ITenantSchemaProvider schemaProvider,
+    ITenantSchemaActivator schemaActivator,
     IServiceProvider serviceProvider,
     TenantPerSchemaDbContextOptions<TContext> options) : IDbContextFactory<TContext>
     where TContext : DbContext
@@ -57,7 +60,7 @@ internal sealed class TenantPerSchemaDbContextFactory<TContext>(
         DbContextOptionsBuilder<TContext> optionsBuilder = new();
         options.Configure(optionsBuilder);
 
-        TenantSchemaConnectionInterceptor schemaInterceptor = new(currentTenant, schemaProvider);
+        TenantSchemaConnectionInterceptor schemaInterceptor = new(currentTenant, schemaProvider, schemaActivator);
         optionsBuilder.AddInterceptors(schemaInterceptor);
 
         AuditedEntityInterceptor? auditInterceptor =

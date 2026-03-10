@@ -205,6 +205,7 @@ chaque tenant déclenche une migration ciblée sur son schéma.
 ## Voir aussi
 
 - [Compatibilité des fournisseurs EF Core](compatibilite-providers.md)
+- [Isolation SharedDatabase](isolation-shared-database.md)
 - [Isolation Tenant-per-Database](isolation-tenant-per-database.md)
 - [Sélection de stratégie d'isolation](isolation-strategie.md)
 - [Multi-tenancy — résolution du tenant](multi-tenancy.md)
