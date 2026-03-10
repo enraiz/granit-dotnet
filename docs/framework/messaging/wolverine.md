@@ -42,6 +42,13 @@ public sealed class GranitWolverineModule : GranitModule { ... }
 
 Configure :
 
+- **Auto-discovery des handler modules** — `IncludeHandlerModules = true` scanne les assemblies
+  décorées avec `[assembly: WolverineHandlerModule]`. Élimine les appels centralisés
+  `IncludeAssembly()` dans le module hôte.
+- **Auto-discovery des validateurs FluentValidation** — `AddGranitValidatorsFromWolverineHandlerModules()`
+  scanne les mêmes assemblies et enregistre tous les `IValidator<T>` en scoped.
+  Les modules sans handlers Wolverine (ex. CoreModule) doivent garder l'enregistrement manuel
+  via `AddGranitValidatorsFromAssemblyContaining<T>()`.
 - Routing local des `IDomainEvent` → queue `"domain-events"` (jamais routés vers des transports externes)
 - Politique de retry globale lue depuis `WolverineMessagingOptions`
 - Propagation de contexte : `OutgoingContextMiddleware`, `TenantContextBehavior`, `UserContextBehavior`, `TraceContextBehavior`
@@ -158,6 +165,35 @@ Remplace `ICurrentUserService` dans le conteneur DI. Résolution du `UserId` par
 Garantit que `AuditedEntityInterceptor` enregistre toujours un `ModifiedBy` non null dans
 la piste d'audit HDS, même depuis un handler background.
 
+## Enregistrement d'un module applicatif
+
+Chaque module applicatif contenant des handlers Wolverine doit se déclarer avec l'attribut
+`[assembly: WolverineHandlerModule]`. `AddGranitWolverine()` active automatiquement la
+découverte de ces assemblies (`IncludeHandlerModules = true`) et enregistre leurs validateurs
+FluentValidation.
+
+```csharp
+// AssemblyInfo.cs — dans le module applicatif
+using Wolverine.Attributes;
+
+[assembly: WolverineHandlerModule]
+```
+
+Cet attribut remplace les appels manuels `opts.Discovery.IncludeAssembly(typeof(MyModule).Assembly)`
+qui étaient auparavant centralisés dans le module hôte.
+
+### Validateurs FluentValidation
+
+Les validateurs (`GranitValidator<T>`) des assemblies `[WolverineHandlerModule]` sont
+enregistrés automatiquement en DI (scoped, y compris les types `internal`).
+
+Les modules **sans** handlers Wolverine (ex. un module Core qui ne fait que définir des
+entités et des validateurs) doivent garder l'enregistrement manuel :
+
+```csharp
+services.AddGranitValidatorsFromAssemblyContaining<MyValidator>();
+```
+
 ## Écrire un handler
 
 ```csharp
@@ -186,8 +222,8 @@ public sealed class OrderCreatedHandler
 ## Dépendances Granit
 
 | Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core`, `Granit.Security` |
+| --- | --- |
+| **Dépend de** | `Granit.Core`, `Granit.Security`, `Granit.Validation` |
 | **Utilisé par** | `Granit.BackgroundJobs`, `Granit.Webhooks`, `Granit.Wolverine.Postgresql`, `Granit.Persistence.Migrations` |
 | **Package PostgreSQL** | `Granit.Wolverine.Postgresql` → ajoute `Granit.Persistence` |
 

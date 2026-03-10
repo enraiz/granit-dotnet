@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
-
+    <ProjectReference Include="..\Granit.Validation\Granit.Validation.csproj" />
   </ItemGroup>
 
 </Project>

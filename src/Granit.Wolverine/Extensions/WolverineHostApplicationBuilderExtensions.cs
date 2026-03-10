@@ -69,8 +69,16 @@ public static class WolverineHostApplicationBuilderExtensions
         builder.Services.AddScoped<IWolverineUserContextSetter>(
             sp => sp.GetRequiredService<WolverineCurrentUserService>());
 
+        // FluentValidation — auto-discover validators from [WolverineHandlerModule] assemblies.
+        // Modules without Wolverine handlers must still register manually.
+        builder.Services.AddGranitValidatorsFromWolverineHandlerModules();
+
         builder.UseWolverine(opts =>
         {
+            // Auto-discover assemblies decorated with [assembly: WolverineHandlerModule].
+            // Application modules mark themselves, eliminating centralized IncludeAssembly() calls.
+            opts.Discovery.IncludeHandlerModules = true;
+
             // IDomainEvent — force local routing, never forward to external transports.
             // IIntegrationEvent routing is configured by the provider package.
             opts.PublishMessage<Core.Events.IDomainEvent>()
