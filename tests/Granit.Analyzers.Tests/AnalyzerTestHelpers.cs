@@ -136,6 +136,54 @@ internal static class AnalyzerTestHelpers
         """;
 
     /// <summary>
+    /// Minimal ASP.NET Core stubs for <c>Results</c>, <c>TypedResults</c>, <c>StatusCodes</c>,
+    /// and typed result types — used by GRAPI001 and GRAPI002 tests.
+    /// </summary>
+    internal const string MinimalApiResultsStub = """
+        namespace Microsoft.AspNetCore.Http
+        {
+            public static class StatusCodes
+            {
+                public const int Status400BadRequest = 400;
+                public const int Status404NotFound = 404;
+                public const int Status422UnprocessableEntity = 422;
+                public const int Status500InternalServerError = 500;
+            }
+
+            public static class Results
+            {
+                public static IResult Ok() => null;
+                public static IResult Ok<T>(T value) => null;
+                public static IResult BadRequest() => null;
+                public static IResult BadRequest<T>(T error) => null;
+                public static IResult NotFound() => null;
+                public static IResult NotFound<T>(T value) => null;
+                public static IResult Problem(string detail = null, int? statusCode = null) => null;
+            }
+
+            public static class TypedResults
+            {
+                public static Ok Ok() => null;
+                public static Ok<T> Ok<T>(T value) => null;
+                public static BadRequest BadRequest() => null;
+                public static BadRequest<T> BadRequest<T>(T error) => null;
+                public static NotFound NotFound() => null;
+                public static NotFound<T> NotFound<T>(T value) => null;
+                public static ProblemHttpResult Problem(string detail = null, int? statusCode = null) => null;
+            }
+
+            public interface IResult { }
+            public class Ok : IResult { }
+            public class Ok<T> : IResult { }
+            public class BadRequest : IResult { }
+            public class BadRequest<T> : IResult { }
+            public class NotFound : IResult { }
+            public class NotFound<T> : IResult { }
+            public class ProblemHttpResult : IResult { }
+        }
+        """;
+
+    /// <summary>
     /// Runs <typeparamref name="TAnalyzer"/> against the given <paramref name="source"/> code,
     /// compiled together with the EF Core stub and optionally the <c>MigrationCycleAttribute</c> stub.
     /// </summary>

@@ -1,5 +1,6 @@
 using Granit.Authentication.JwtBearer.Options;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -15,7 +16,7 @@ internal static partial class BackChannelLogoutEndpoint
     /// <summary>
     /// Handles the back-channel logout POST request from the identity provider.
     /// </summary>
-    public static async Task<IResult> HandleAsync(
+    public static async Task<Results<Ok, ProblemHttpResult>> HandleAsync(
         HttpRequest request,
         BackChannelLogoutTokenValidator validator,
         IRevokedSessionStore store,
@@ -26,7 +27,9 @@ internal static partial class BackChannelLogoutEndpoint
         if (!request.HasFormContentType)
         {
             LogInvalidContentType(logger);
-            return Results.BadRequest(new { error = "Expected application/x-www-form-urlencoded content type." });
+            return TypedResults.Problem(
+                detail: "Expected application/x-www-form-urlencoded content type.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         IFormCollection form = await request.ReadFormAsync(cancellationToken).ConfigureAwait(false);
@@ -35,13 +38,17 @@ internal static partial class BackChannelLogoutEndpoint
         if (string.IsNullOrEmpty(logoutToken))
         {
             LogMissingLogoutToken(logger);
-            return Results.BadRequest(new { error = "Missing 'logout_token' form parameter." });
+            return TypedResults.Problem(
+                detail: "Missing 'logout_token' form parameter.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         BackChannelLogoutResult result = await validator.ValidateAsync(logoutToken, cancellationToken).ConfigureAwait(false);
         if (!result.Success)
         {
-            return Results.BadRequest(new { error = result.Error });
+            return TypedResults.Problem(
+                detail: result.Error,
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         TimeSpan ttl = options.Value.BackChannelLogout.SessionRevocationTtl;
@@ -50,7 +57,7 @@ internal static partial class BackChannelLogoutEndpoint
         string sessionKey = result.SessionId ?? result.SubjectId!;
         await store.RevokeSessionAsync(sessionKey, ttl, cancellationToken).ConfigureAwait(false);
 
-        return Results.Ok();
+        return TypedResults.Ok();
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Back-channel logout request rejected: invalid content type.")]

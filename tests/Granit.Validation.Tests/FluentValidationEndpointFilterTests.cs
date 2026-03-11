@@ -8,6 +8,9 @@
 //   - Missing argument passes through
 // =============================================================================
 
+// Results.Ok() is used as a mock return value in EndpointFilterDelegate — not an endpoint.
+#pragma warning disable GRAPI001
+
 using FluentValidation;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Http;

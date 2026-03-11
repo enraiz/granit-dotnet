@@ -293,6 +293,19 @@
           "System.Composition.AttributedModel": "[9.*, )"
         }
       },
+      "granit.analyzers.tests": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Analyzers": "[0.1.0-dev, )",
+          "JunitXml.TestLogger": "[7.*, )",
+          "Microsoft.CodeAnalysis.CSharp": "[5.0.*, )",
+          "Microsoft.NET.Test.Sdk": "[18.*, )",
+          "Shouldly": "[4.*, )",
+          "coverlet.collector": "[8.*, )",
+          "xunit.runner.visualstudio": "[3.1.5, )",
+          "xunit.v3": "[3.1.0, )"
+        }
+      },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "CentralTransitive",
         "requested": "[3.*, )",
