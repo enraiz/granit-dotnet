@@ -376,6 +376,51 @@ multi-appareil) via `IPushSubscriptionStore`. Les souscriptions expirées
 
 La clé privée VAPID doit être stockée dans **Vault** en production.
 
+#### Génération des clés VAPID
+
+Les clés VAPID (Voluntary Application Server Identification) sont une paire de clés
+ECDSA P-256. Elles s'obtiennent via la CLI `web-push` :
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Résultat :
+
+```text
+=======================================
+
+Public Key:
+BBase64UrlSafePublicKey...
+
+Private Key:
+Base64UrlSafePrivateKey...
+
+=======================================
+```
+
+Reportez les valeurs dans la configuration :
+
+```json
+{
+  "Notifications": {
+    "Push": {
+      "VapidSubject": "mailto:admin@example.com",
+      "VapidPublicKey": "<valeur Public Key>",
+      "VapidPrivateKey": "vault://secret/vapid-private-key"
+    }
+  }
+}
+```
+
+> **ISO 27001 / Sécurité :** la clé privée VAPID **ne doit jamais** être commitée
+> dans le dépôt ni stockée en clair dans `appsettings.json`. En production, injectez-la
+> via **Vault** (`vault://secret/vapid-private-key`). La clé publique peut figurer dans
+> la configuration car elle est transmise au browser (elle est publique par design).
+
+La clé publique est également nécessaire côté frontend pour l'appel
+`PushManager.subscribe({ applicationServerKey })`.
+
 ### MobilePush (Capacitor / apps natives)
 
 Canal push pour les applications mobiles construites avec **Capacitor** (transformation
