@@ -11,6 +11,8 @@
     <PackageReference Include="TngTech.ArchUnitNET.xUnit" />
     <PackageReference Include="Shouldly" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <!-- Inherited from tests/Directory.Build.props — exclude from NuGet package -->
+    <PackageReference Update="JunitXml.TestLogger" PrivateAssets="all" ExcludeAssets="runtime;contentFiles;build;buildTransitive;native" />
   </ItemGroup>
 
 </Project>
