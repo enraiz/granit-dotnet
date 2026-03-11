@@ -119,11 +119,35 @@ internal sealed partial class KeycloakIdentityProvider(
             throw new HttpRequestException($"User {userId} not found in Keycloak.");
         }
 
+        // Merge custom attributes: apply only the keys provided in the update,
+        // preserving all other existing attributes on the Keycloak user.
+        Dictionary<string, List<string>>? mergedAttributes = current.Attributes;
+
+        if (update.Attributes is { Count: > 0 })
+        {
+            mergedAttributes = current.Attributes is not null
+                ? new Dictionary<string, List<string>>(current.Attributes, StringComparer.Ordinal)
+                : new Dictionary<string, List<string>>(StringComparer.Ordinal);
+
+            foreach (KeyValuePair<string, string?> attr in update.Attributes)
+            {
+                if (attr.Value is null)
+                {
+                    mergedAttributes.Remove(attr.Key);
+                }
+                else
+                {
+                    mergedAttributes[attr.Key] = [attr.Value];
+                }
+            }
+        }
+
         KeycloakUserRepresentation updated = current with
         {
             Email = update.Email ?? current.Email,
             FirstName = update.FirstName ?? current.FirstName,
             LastName = update.LastName ?? current.LastName,
+            Attributes = mergedAttributes,
         };
 
         using HttpResponseMessage response = await client.PutAsJsonAsync(
