@@ -34,16 +34,12 @@ public sealed class SseConnectionManagerTests : IDisposable
     }
 
     [Fact]
-    public void Connect_ThrowsOnNull()
-    {
+    public void Connect_ThrowsOnNull() =>
         Should.Throw<ArgumentNullException>(() => _manager.Connect(null!));
-    }
 
     [Fact]
-    public void GetConnectionCount_ReturnsZeroForUnknownUser()
-    {
+    public void GetConnectionCount_ReturnsZeroForUnknownUser() =>
         _manager.GetConnectionCount("unknown").ShouldBe(0);
-    }
 
     [Fact]
     public void GetConnectionCount_TracksMultipleConnections()
@@ -86,10 +82,8 @@ public sealed class SseConnectionManagerTests : IDisposable
     }
 
     [Fact]
-    public void Disconnect_ThrowsOnNull()
-    {
+    public void Disconnect_ThrowsOnNull() =>
         Should.Throw<ArgumentNullException>(() => _manager.Disconnect(null!));
-    }
 
     [Fact]
     public async Task SendToUserAsync_WritesToAllConnections()
@@ -107,11 +101,9 @@ public sealed class SseConnectionManagerTests : IDisposable
     }
 
     [Fact]
-    public async Task SendToUserAsync_SilentlyDropsForUnknownUser()
-    {
+    public async Task SendToUserAsync_SilentlyDropsForUnknownUser() =>
         // Should not throw — InApp channel persists the message
-        await _manager.SendToUserAsync("unknown", BuildMessage(), TestContext.Current.CancellationToken);
-    }
+        await Should.NotThrowAsync(async () => await _manager.SendToUserAsync("unknown", BuildMessage(), TestContext.Current.CancellationToken));
 
     [Fact]
     public async Task SendToUserAsync_SkipsCompletedChannels()

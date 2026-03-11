@@ -76,7 +76,7 @@ public sealed class DeprecationEndpointFilterTests
         await _filter.InvokeAsync(context, next);
 
         // Assert
-        httpContext.Response.Headers["Link"].ToString()
+        httpContext.Response.Headers.Link.ToString()
             .ShouldBe("<https://docs.example.com/migration/v1-to-v2>; rel=\"deprecation\"");
     }
 
@@ -99,7 +99,7 @@ public sealed class DeprecationEndpointFilterTests
         // Assert
         httpContext.Response.Headers["Deprecation"].ToString().ShouldBe("true");
         httpContext.Response.Headers["Sunset"].ToString().ShouldBe("Sun, 15 Jun 2025 00:00:00 GMT");
-        httpContext.Response.Headers["Link"].ToString()
+        httpContext.Response.Headers.Link.ToString()
             .ShouldBe("<https://docs.example.com/migration>; rel=\"deprecation\"");
     }
 
