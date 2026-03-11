@@ -113,7 +113,7 @@ Dernière mise à jour : 2026-03-03
 | Microsoft.NET.Test.Sdk | 18.3.0 | (c) Microsoft Corporation |
 | Testcontainers.PostgreSql | 4.10.0 | Copyright (c) 2019-2025 Andre Hofmeister |
 | coverlet.collector | 8.0.0 | (c) 2018 Toni Solarin-Sodara |
-| JunitXml.TestLogger | 8.0.0 | JunitXml.TestLogger Contributors |
+| JunitXml.TestLogger | 7.1.0 | JunitXml.TestLogger Contributors |
 
 ### Apache-2.0 (tests)
 
