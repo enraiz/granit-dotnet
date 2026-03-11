@@ -1,16 +1,18 @@
 # Messagerie — Granit.Notifications
 
 Moteur de notifications **multi-canal** pour les applications Granit.
-Publie des notifications aux utilisateurs via InApp, SignalR, Email, SMS, WhatsApp et Web Push.
+Publie des notifications aux utilisateurs via InApp, SSE, SignalR, Email, SMS, WhatsApp,
+Web Push, Mobile Push et Zulip.
 Basé sur Wolverine (Outbox at-least-once), conforme ISO 27001 (audit trail immuable) et RGPD.
 
-Treize packages composables :
+Quatorze packages composables :
 
 | Package | Rôle |
 | --- | --- |
 | `Granit.Notifications` | Core : abstractions, définitions, fan-out Wolverine, canal InApp, stores InMemory |
 | `Granit.Notifications.EntityFrameworkCore` | Stores durables EF Core + intercepteur de suivi d'entités |
 | `Granit.Notifications.SignalR` | Temps réel browser via hub SignalR + Redis backplane K8s |
+| `Granit.Notifications.Sse` | Temps réel browser via Server-Sent Events natif .NET 10, sans Redis |
 | `Granit.Notifications.Endpoints` | API REST Minimal API (inbox, préférences, followers, tokens push) |
 | `Granit.Notifications.Email` | Abstraction `IEmailSender` + canal Email (Keyed Services) |
 | `Granit.Notifications.Email.Smtp` | Provider MailKit SMTP (clé `"Smtp"`) |
@@ -37,7 +39,7 @@ flowchart TD
     E --> F["NotificationDeliveryHandler
     route vers le INotificationChannel correspondant"]
     F --> G["INotificationChannel.SendAsync
-    InApp | SignalR | Email | SMS | WhatsApp | Push | MobilePush | Zulip"]
+    InApp | SSE | SignalR | Email | SMS | WhatsApp | Push | MobilePush | Zulip"]
 ```
 
 Le fan-out et la livraison sont **entièrement découplés** : Wolverine publie les `N`
@@ -89,7 +91,10 @@ builder.AddGranitNotificationsEntityFrameworkCore(
 ### Ajout des canaux
 
 ```csharp
-// SignalR temps réel (avec Redis backplane pour K8s)
+// SSE temps réel (natif .NET 10, sans dépendance Redis)
+builder.Services.AddGranitNotificationsSse();
+
+// OU SignalR temps réel (avec Redis backplane pour K8s)
 builder.Services.AddGranitNotificationsSignalR(redisConnectionString);
 
 // Email via MailKit SMTP
@@ -120,6 +125,9 @@ builder.Services.AddGranitNotificationsBrevo();
 
 ```csharp
 app.MapGranitNotificationEndpoints();
+
+// SSE stream (si Granit.Notifications.Sse est installé)
+app.MapGranitSseNotificationEndpoints();
 ```
 
 Le préfixe par défaut est `notifications`. Le versioning est hérité du groupe
@@ -278,6 +286,49 @@ builder.Services.AddGranitNotificationsSignalR("redis:6379");
 ```
 
 Le préfixe du canal Redis est `granit-notifications` pour éviter les collisions.
+
+### SSE (Server-Sent Events)
+
+Alternative légère à SignalR pour le push unidirectionnel (Server→Client). Utilise
+`TypedResults.ServerSentEvents()` natif .NET 10 avec un `ISseConnectionManager` basé
+sur `Channel<T>` pour le routage par utilisateur.
+
+Chaque requête SSE (`GET /notifications/stream`) reste suspendue et reçoit les
+notifications en temps réel via le protocole SSE standard (`text/event-stream`).
+Le multi-onglet/multi-appareil est géré nativement : chaque connexion HTTP est
+indépendante.
+
+```csharp
+// Enregistrement DI
+builder.Services.AddGranitNotificationsSse();
+
+// Mapping de l'endpoint
+app.MapGranitSseNotificationEndpoints();
+```
+
+L'endpoint retourne un `RouteGroupBuilder` que l'application peut configurer
+(authentification, versioning, préfixe) :
+
+```csharp
+app.MapGranitSseNotificationEndpoints()
+    .RequireAuthorization();
+```
+
+Un heartbeat sentinel (`NotificationTypeName == "__heartbeat__"`) est envoyé toutes
+les 30 secondes (configurable) pour maintenir la connexion à travers les proxies.
+Les clients doivent filtrer ces messages.
+
+**Différences avec SignalR :**
+
+| Aspect | SignalR | SSE |
+| --- | --- | --- |
+| Protocole | WebSocket bidirectionnel | HTTP unidirectionnel |
+| Backplane K8s | Redis | Wolverine `ToAllPeers()` (pas de dépendance supplémentaire) |
+| Bundle npm | `@microsoft/signalr` (~45 kB) | `@microsoft/fetch-event-source` (~2 kB) |
+| Tests front | Stub `HubConnection` | Mock `fetch` standard |
+
+> **Note** : SignalR et SSE sont **mutuellement exclusifs**. N'enregistrez qu'un seul
+> canal temps réel dans votre application.
 
 ### Email
 
@@ -572,6 +623,10 @@ Exemple complet de configuration `appsettings.json` :
   "Notifications": {
     "MaxParallelDeliveries": 8,
 
+    "Sse": {
+      "HeartbeatIntervalSeconds": 30
+    },
+
     "SignalR": {
       "RedisConnectionString": "redis:6379"
     },
@@ -817,9 +872,9 @@ Notification aux admins abonnés
 
 | Événement | Package / Module | Destinataires | Canaux | Opt-out |
 | --- | --- | --- | --- | --- |
-| `WorkflowStateChangedEvent` | `Granit.Workflow.Notifications` | Entity followers | InApp, SignalR | Oui |
-| `ImportJobCompletedEvent` | MyApp.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
-| `ExportJobCompletedEvent` | MyApp.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
+| `WorkflowStateChangedEvent` | `Granit.Workflow.Notifications` | Entity followers | InApp, SSE/SignalR | Oui |
+| `ImportJobCompletedEvent` | MyApp.Modules.DataExchange | Entity followers | InApp, SSE/SignalR | Oui |
+| `ExportJobCompletedEvent` | MyApp.Modules.DataExchange | Entity followers | InApp, SSE/SignalR | Oui |
 | `PersonalDataDeletionRequestedEvent` | MyApp.Modules.Security | Demandeur | InApp, Email | Non |
 | `PersonalDataDeletedEvent` | MyApp.Modules.Security | Abonnés (admins/DPO) | InApp, Email | Non |
 | `IdentityUserDeletedEvent` | MyApp.Modules.Security | Abonnés (admins) | InApp, Email | Non |
@@ -829,6 +884,6 @@ Notification aux admins abonnés
 | Direction | Modules |
 | --- | --- |
 | **Dépend de** | `Granit.Core`, `Granit.Timing`, `Granit.Wolverine` |
-| **Utilisé par** | `Granit.Notifications.EntityFrameworkCore`, `Granit.Notifications.SignalR`, `Granit.Notifications.Endpoints`, `Granit.Notifications.Email`, `Granit.Notifications.Sms`, `Granit.Notifications.WhatsApp`, `Granit.Notifications.WebPush`, `Granit.Notifications.MobilePush`, `Granit.Notifications.Zulip` |
+| **Utilisé par** | `Granit.Notifications.EntityFrameworkCore`, `Granit.Notifications.SignalR`, `Granit.Notifications.Sse`, `Granit.Notifications.Endpoints`, `Granit.Notifications.Email`, `Granit.Notifications.Sms`, `Granit.Notifications.WhatsApp`, `Granit.Notifications.WebPush`, `Granit.Notifications.MobilePush`, `Granit.Notifications.Zulip` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

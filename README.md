@@ -21,16 +21,22 @@ compliant with **GDPR/ISO 27001** requirements.
 
 | Domain | What Granit provides |
 | --- | --- |
-| **Modularity** | Self-configuring module system, topological dependency sorting |
-| **Security** | JWT Keycloak, RBAC, Vault Transit encryption, dynamic credentials |
-| **Persistence** | EF Core interceptors: ISO 27001 audit trail (3 years), GDPR soft delete, multi-tenancy |
+| **Core & Modularity** | Self-configuring module system, topological dependency sorting, timing, GUID generation |
+| **Security** | JWT Bearer authentication, RBAC, Vault Transit encryption, dynamic credentials |
+| **Identity** | Identity provider abstractions, user cache (cache-aside, login-time sync, GDPR) |
+| **Persistence** | EF Core interceptors: audit trail (3 years), GDPR soft delete, multi-tenancy, settings, features |
 | **Multi-tenancy** | Schema or database isolation, automatic resolution, transparent filtering |
-| **Observability** | Serilog + OpenTelemetry → OTLP (Loki, Tempo, Mimir), health checks, metrics |
-| **Messaging** | WolverineFx transactional outbox, HMAC-SHA256 webhooks, cron jobs |
-| **API** | Versioning, OpenAPI Scalar, Stripe-style idempotency, ProblemDetails |
-| **Storage** | Sovereign S3 blob storage, pre-signed URLs, Crypto-Shredding |
+| **Caching** | Distributed caching (HybridCache, Redis), AES-256 value encryption |
+| **Observability** | Structured logging + distributed tracing → OTLP, health checks, metrics |
+| **Messaging** | Transactional outbox, HMAC-SHA256 webhooks, notifications (6 channels), cron jobs |
+| **API** | Versioning, OpenAPI Scalar, Stripe-style idempotency, ProblemDetails, CORS |
+| **Storage & Imaging** | S3-compatible blob storage, pre-signed URLs, Crypto-Shredding, image processing |
+| **Documents** | Template engine (Scriban), HTML→PDF rendering, Excel generation |
+| **Data Exchange** | Import (Extract→Map→Validate→Execute), Export (tabular Excel/CSV with presets) |
+| **Workflow** | FSM engine, publication lifecycle, approval routing |
+| **Localization** | i18n (9 cultures), override store, source-generated keys |
 | **SaaS** | Feature flags per commercial plan, quotas, Default → Plan → Tenant resolution |
-| **Quality** | Embedded Roslyn analyzers, FluentValidation (VAT, SIREN, NISS) |
+| **Quality** | Embedded Roslyn analyzers, Architecture Tests (ArchUnitNET), FluentValidation (VAT, SIREN, NISS) |
 
 ## Quick start
 
@@ -76,7 +82,7 @@ public sealed class MyAppModule : GranitModule
 | --- | --- |
 | [Framework](docs/framework/index.md) | Architecture, modules, security, data, API, messaging, storage |
 | [Tests](docs/testing/index.md) | xUnit conventions, mocking, assertions, EF Core integration |
-| [Package catalogue](docs/index.md) | Complete list of 41 packages with their roles |
+| [Package catalogue](docs/index.md) | Complete list of 100 packages with their roles |
 
 ## Contributing
 
