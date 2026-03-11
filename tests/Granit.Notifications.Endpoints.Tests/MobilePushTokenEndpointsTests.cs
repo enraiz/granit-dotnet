@@ -100,7 +100,7 @@ public sealed class MobilePushTokenEndpointsTests : IAsyncDisposable
             CreatedAt = DateTimeOffset.UtcNow,
         };
         _tokenReader.GetTokensAsync("user-456", null, Arg.Any<CancellationToken>())
-            .Returns(new List<MobilePushTokenInfo> { existing });
+            .Returns([existing]);
 
         var request = new MobilePushTokenRegisterRequest
         {

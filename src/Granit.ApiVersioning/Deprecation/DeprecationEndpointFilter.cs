@@ -38,7 +38,7 @@ internal sealed partial class DeprecationEndpointFilter(
 
         if (metadata.Link is not null)
         {
-            headers["Link"] = $"<{metadata.Link}>; rel=\"deprecation\"";
+            headers.Link = $"<{metadata.Link}>; rel=\"deprecation\"";
         }
 
         string path = context.HttpContext.Request.Path;

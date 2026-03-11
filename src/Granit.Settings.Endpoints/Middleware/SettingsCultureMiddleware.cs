@@ -36,7 +36,7 @@ public sealed class SettingsCultureMiddleware
 
             if (locale is not null && IsKnownCulture(locale))
             {
-                CultureInfo culture = CultureInfo.GetCultureInfo(locale);
+                var culture = CultureInfo.GetCultureInfo(locale);
                 CultureInfo.CurrentCulture = culture;
                 CultureInfo.CurrentUICulture = culture;
             }
@@ -64,7 +64,7 @@ public sealed class SettingsCultureMiddleware
     {
         try
         {
-            CultureInfo culture = CultureInfo.GetCultureInfo(name);
+            var culture = CultureInfo.GetCultureInfo(name);
 
             // .NET 8+ creates custom CultureInfo for unknown names instead of throwing.
             // A known culture has a non-empty LCID (0x1000 = unknown) or matches by name.

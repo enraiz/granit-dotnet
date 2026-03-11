@@ -162,7 +162,7 @@ public sealed class SettingsCultureMiddlewareTests
         DefaultHttpContext httpContext = new() { RequestServices = services.BuildServiceProvider() };
 
         // Should not throw — graceful skip.
-        await middleware.InvokeAsync(httpContext);
+        await Should.NotThrowAsync(() => middleware.InvokeAsync(httpContext));
     }
 
     [Fact]
