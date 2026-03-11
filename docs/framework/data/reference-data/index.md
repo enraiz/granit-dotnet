@@ -46,8 +46,15 @@ public sealed class Country : ReferenceDataEntity
 - `string LabelEs` — libellé espagnol
 - `string LabelIt` — libellé italien
 - `string LabelPt` — libellé portugais
+- `string LabelZh` — libellé chinois
+- `string LabelJa` — libellé japonais
+- `string LabelPl` — libellé polonais
+- `string LabelTr` — libellé turc
+- `string LabelKo` — libellé coréen
+- `string LabelSv` — libellé suédois
+- `string LabelCs` — libellé tchèque
 - `string Label` — propriété virtuelle `[NotMapped]`, résout automatiquement le
-  libellé selon `CultureInfo.CurrentUICulture` parmi les 7 langues supportées ;
+  libellé selon `CultureInfo.CurrentUICulture` parmi les 14 langues de base supportées ;
   retombe sur `LabelEn` si la traduction est vide ou la culture non supportée.
   Surchargeable pour une logique de résolution personnalisée
 - `bool IsActive` — activation/désactivation logique

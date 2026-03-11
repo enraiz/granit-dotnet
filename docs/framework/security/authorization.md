@@ -105,7 +105,7 @@ Plusieurs modules peuvent ajouter des permissions au même groupe (pattern GetOr
 
 Les `DisplayName` des groupes et permissions sont des `LocalizableString` : ils sont
 résolus à la volée par `IStringLocalizerFactory` selon la culture de la requête HTTP.
-Chaque module fournit ses propres fichiers JSON de localisation (7 langues obligatoires).
+Chaque module fournit ses propres fichiers JSON de localisation (14 langues de base obligatoires).
 
 ```csharp
 // 1. Marker class pour la localisation (auto-discovery par convention)
@@ -136,8 +136,10 @@ public sealed class InvoicesPermissionProvider : IPermissionDefinitionProvider
 }
 ```
 
-Fichiers JSON (7 cultures : `en`, `fr`, `nl`, `de`, `es`, `it`, `pt`) sous
-`Localization/InvoicesEndpoints/{culture}.json`, déclarés en `<EmbeddedResource>` :
+Fichiers JSON (14 langues de base : `en`, `fr`, `nl`, `de`, `es`, `it`, `pt`, `zh`,
+`ja`, `pl`, `tr`, `ko`, `sv`, `cs` + 3 variantes régionales : `fr-CA`, `en-GB`,
+`pt-BR`) sous `Localization/InvoicesEndpoints/{culture}.json`, déclarés en
+`<EmbeddedResource>` :
 
 ```json
 {
