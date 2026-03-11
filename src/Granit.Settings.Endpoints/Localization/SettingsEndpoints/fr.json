@@ -1,0 +1,10 @@
+{
+  "culture": "fr",
+  "texts": {
+    "PermissionGroup:Settings": "Paramètres",
+    "Permission:Settings.Global.Read": "Consulter les paramètres globaux",
+    "Permission:Settings.Global.Manage": "Gérer les paramètres globaux (consulter, créer, modifier)",
+    "Permission:Settings.Tenant.Read": "Consulter les paramètres du tenant",
+    "Permission:Settings.Tenant.Manage": "Gérer les paramètres du tenant (consulter, créer, modifier)"
+  }
+}

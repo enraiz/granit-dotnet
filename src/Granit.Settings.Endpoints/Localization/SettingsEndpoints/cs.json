@@ -1,0 +1,10 @@
+{
+  "culture": "cs",
+  "texts": {
+    "PermissionGroup:Settings": "Nastavení",
+    "Permission:Settings.Global.Read": "Zobrazit globální nastavení",
+    "Permission:Settings.Global.Manage": "Spravovat globální nastavení (zobrazit, vytvořit, upravit)",
+    "Permission:Settings.Tenant.Read": "Zobrazit nastavení nájemce",
+    "Permission:Settings.Tenant.Manage": "Spravovat nastavení nájemce (zobrazit, vytvořit, upravit)"
+  }
+}

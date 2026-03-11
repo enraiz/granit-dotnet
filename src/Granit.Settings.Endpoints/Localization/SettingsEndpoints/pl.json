@@ -1,0 +1,10 @@
+{
+  "culture": "pl",
+  "texts": {
+    "PermissionGroup:Settings": "Ustawienia",
+    "Permission:Settings.Global.Read": "Wyświetlanie ustawień globalnych",
+    "Permission:Settings.Global.Manage": "Zarządzanie ustawieniami globalnymi (wyświetlanie, tworzenie, edycja)",
+    "Permission:Settings.Tenant.Read": "Wyświetlanie ustawień najemcy",
+    "Permission:Settings.Tenant.Manage": "Zarządzanie ustawieniami najemcy (wyświetlanie, tworzenie, edycja)"
+  }
+}

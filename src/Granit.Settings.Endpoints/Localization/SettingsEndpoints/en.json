@@ -1,0 +1,10 @@
+{
+  "culture": "en",
+  "texts": {
+    "PermissionGroup:Settings": "Settings",
+    "Permission:Settings.Global.Read": "View global settings",
+    "Permission:Settings.Global.Manage": "Manage global settings (view, create, edit)",
+    "Permission:Settings.Tenant.Read": "View tenant settings",
+    "Permission:Settings.Tenant.Manage": "Manage tenant settings (view, create, edit)"
+  }
+}

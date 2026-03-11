@@ -1,0 +1,10 @@
+{
+  "culture": "ja",
+  "texts": {
+    "PermissionGroup:Settings": "設定",
+    "Permission:Settings.Global.Read": "グローバル設定の表示",
+    "Permission:Settings.Global.Manage": "グローバル設定の管理（表示、作成、編集）",
+    "Permission:Settings.Tenant.Read": "テナント設定の表示",
+    "Permission:Settings.Tenant.Manage": "テナント設定の管理（表示、作成、編集）"
+  }
+}
