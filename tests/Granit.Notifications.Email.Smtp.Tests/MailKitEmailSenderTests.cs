@@ -7,6 +7,7 @@
 // Uses ISmtpTransportFactory + ISmtpTransport substitutes to avoid real SMTP.
 // =============================================================================
 
+using Granit.Notifications.Email.Smtp.Internal;
 using Granit.Notifications.Email.Smtp.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;

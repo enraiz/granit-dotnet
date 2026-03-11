@@ -1,5 +1,6 @@
 using Granit.DataExchange.Export;
 using Granit.DataExchange.Export.Messages;
+using Granit.DataExchange.Wolverine.Internal;
 using NSubstitute;
 using Shouldly;
 using Xunit;

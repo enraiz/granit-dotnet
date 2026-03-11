@@ -1,3 +1,5 @@
+using Granit.Privacy.LegalAgreements.Domain;
+
 namespace Granit.Privacy.LegalAgreements;
 
 /// <summary>

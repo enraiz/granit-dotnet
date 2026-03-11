@@ -1,4 +1,5 @@
 using Granit.Querying.SavedViews;
+using Granit.Querying.SavedViews.Domain;
 using Shouldly;
 using Xunit;
 

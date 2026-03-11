@@ -1,5 +1,3 @@
-using Granit.Features.Checker;
-
 namespace Granit.Features.Wolverine;
 
 /// <summary>

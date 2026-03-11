@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Granit.Cookies.Klaro.Internal;
 using Granit.Cookies.Klaro.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

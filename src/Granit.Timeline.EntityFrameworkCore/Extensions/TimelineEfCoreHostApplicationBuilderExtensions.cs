@@ -23,7 +23,7 @@ public static class TimelineEfCoreHostApplicationBuilderExtensions
     /// <list type="bullet">
     ///   <item><see cref="EfCoreTimelineStore"/> — replaces <c>InMemoryTimelineStore</c>.</item>
     ///   <item><see cref="EfCoreTimelineQuery"/> — replaces <c>InMemoryTimelineQuery</c>.</item>
-    ///   <item><see cref="TimelineDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage.</item>
+    ///   <item><see cref="Internal.TimelineDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage.</item>
     /// </list>
     /// <para>
     /// SOVEREIGNTY: The connection string must point to a database hosted in Europe (OVHcloud FR).

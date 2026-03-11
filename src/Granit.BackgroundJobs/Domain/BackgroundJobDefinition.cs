@@ -1,4 +1,3 @@
-using Granit.BackgroundJobs.Abstractions;
 using Granit.BackgroundJobs.Events;
 using Granit.BackgroundJobs.Internal;
 using Granit.Core.Domain;

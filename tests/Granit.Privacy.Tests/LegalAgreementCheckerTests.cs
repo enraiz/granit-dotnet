@@ -1,4 +1,5 @@
 using Granit.Privacy.LegalAgreements;
+using Granit.Privacy.LegalAgreements.Domain;
 using Granit.Privacy.LegalAgreements.Internal;
 using NSubstitute;
 using Shouldly;

@@ -1,3 +1,5 @@
+using Granit.DataExchange.Export.Domain;
+
 namespace Granit.DataExchange.Export;
 
 /// <summary>

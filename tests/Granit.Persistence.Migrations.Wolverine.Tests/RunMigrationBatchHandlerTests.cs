@@ -9,6 +9,7 @@
 using Granit.Guids;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
+using Granit.Persistence.Migrations.Wolverine.Internal;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

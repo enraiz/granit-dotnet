@@ -1,4 +1,3 @@
-using Granit.Persistence.Migrations.Abstractions;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Persistence.Migrations.Options;
 using Microsoft.EntityFrameworkCore;

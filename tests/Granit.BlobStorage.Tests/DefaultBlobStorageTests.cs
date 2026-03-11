@@ -1,3 +1,4 @@
+using Granit.BlobStorage.Domain;
 using Granit.BlobStorage.Exceptions;
 using Granit.BlobStorage.Internal;
 using Granit.BlobStorage.Options;

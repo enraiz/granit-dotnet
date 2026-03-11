@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.Domain;
 using Granit.Authentication.ApiKeys.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

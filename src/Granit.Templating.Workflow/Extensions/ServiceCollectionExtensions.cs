@@ -1,4 +1,5 @@
 using Granit.Templating.Store;
+using Granit.Templating.Workflow.Internal;
 using Granit.Workflow.Definitions;
 using Granit.Workflow.Extensions;
 using Microsoft.Extensions.DependencyInjection;

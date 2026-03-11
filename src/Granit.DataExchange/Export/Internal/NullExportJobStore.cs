@@ -1,3 +1,4 @@
+using Granit.DataExchange.Export.Domain;
 using Granit.Querying;
 
 namespace Granit.DataExchange.Export.Internal;

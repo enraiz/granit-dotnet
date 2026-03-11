@@ -1,6 +1,5 @@
-using Granit.Features.Checker;
 using Granit.Features.Exceptions;
-using Granit.Features.Limits;
+using Granit.Features.Internal;
 using NSubstitute;
 using Shouldly;
 using Xunit;

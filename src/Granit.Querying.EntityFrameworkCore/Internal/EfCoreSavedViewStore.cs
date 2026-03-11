@@ -1,4 +1,5 @@
 using Granit.Querying.SavedViews;
+using Granit.Querying.SavedViews.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Querying.EntityFrameworkCore.Internal;

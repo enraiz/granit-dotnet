@@ -11,6 +11,7 @@ using Granit.Guids;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
 using Granit.Webhooks.Handlers;
+using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 using NSubstitute;
 using Shouldly;

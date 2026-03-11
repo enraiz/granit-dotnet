@@ -23,6 +23,7 @@ Ces conventions s'appliquent à **tous les projets** (backend et frontend).
 | --- | --- |
 | [Style et nommage](backend/style-et-nommage.md) | Nommage, `var`, style, organisation des fichiers, XML docs, commentaires |
 | [Architecture](backend/architecture.md) | Structure des projets, modèle domaine, DI, endpoints API, HttpClient |
+| [Structure des modules](backend/structure-modules.md) | Blueprint standard des dossiers d'un module Granit (Internal/, Domain/, Extensions/, etc.) |
 | [Implémentation](backend/implementation.md) | Async, temps, nullabilité, collections, records, exceptions, logging, regex, observabilité, EF Core |
 
 ## Conventions frontend (TypeScript / React)

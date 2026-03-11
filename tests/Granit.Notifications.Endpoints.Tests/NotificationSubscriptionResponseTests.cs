@@ -4,6 +4,7 @@
 // Vérifie que le record Response DTO expose les propriétés attendues.
 // =============================================================================
 
+using Granit.Notifications.Endpoints.Dtos;
 using Shouldly;
 using Xunit;
 

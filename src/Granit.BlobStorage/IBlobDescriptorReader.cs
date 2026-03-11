@@ -1,3 +1,5 @@
+using Granit.BlobStorage.Domain;
+
 namespace Granit.BlobStorage;
 
 /// <summary>

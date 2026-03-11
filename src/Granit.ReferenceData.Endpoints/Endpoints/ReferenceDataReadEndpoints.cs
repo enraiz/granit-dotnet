@@ -1,4 +1,5 @@
 using Granit.Querying;
+using Granit.ReferenceData.Domain;
 using Granit.ReferenceData.Endpoints.Dtos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

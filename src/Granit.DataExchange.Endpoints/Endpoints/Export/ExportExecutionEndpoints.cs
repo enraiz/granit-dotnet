@@ -3,6 +3,7 @@ using Granit.DataExchange.Endpoints.Dtos.Import;
 using Granit.DataExchange.Endpoints.Internal.Export;
 using Granit.DataExchange.Endpoints.Internal.Import;
 using Granit.DataExchange.Export;
+using Granit.DataExchange.Export.Domain;
 using Granit.Timing;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;

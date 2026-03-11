@@ -1,6 +1,7 @@
 using Granit.Templating.Extensions;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Scriban.GlobalContexts;
+using Granit.Templating.Scriban.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

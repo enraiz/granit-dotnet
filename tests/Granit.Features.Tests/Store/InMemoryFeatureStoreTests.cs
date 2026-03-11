@@ -1,4 +1,4 @@
-using Granit.Features.Store;
+using Granit.Features.Internal;
 using Shouldly;
 using Xunit;
 

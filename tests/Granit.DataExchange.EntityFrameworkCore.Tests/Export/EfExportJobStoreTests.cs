@@ -1,6 +1,7 @@
 using Granit.DataExchange.EntityFrameworkCore.Internal.Export.Stores;
 using Granit.DataExchange.EntityFrameworkCore.Tests.Infrastructure;
 using Granit.DataExchange.Export;
+using Granit.DataExchange.Export.Domain;
 using Shouldly;
 using Xunit;
 

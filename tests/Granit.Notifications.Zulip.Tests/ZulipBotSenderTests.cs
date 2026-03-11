@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using Granit.Notifications.Zulip.Internal;
 using Granit.Notifications.Zulip.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;

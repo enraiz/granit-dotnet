@@ -6,7 +6,6 @@
 // MigrationProgressDbContext uses the EF Core InMemory provider.
 // =============================================================================
 
-using Granit.Persistence.Migrations.Abstractions;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
 using Granit.Persistence.Migrations.Options;

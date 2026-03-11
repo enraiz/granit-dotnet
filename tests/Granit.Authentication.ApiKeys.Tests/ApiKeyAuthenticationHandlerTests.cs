@@ -1,6 +1,8 @@
 using System.Net;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Granit.Authentication.ApiKeys.Domain;
+using Granit.Authentication.ApiKeys.Internal;
 using Granit.Authentication.ApiKeys.Options;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;

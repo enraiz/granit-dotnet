@@ -1,6 +1,5 @@
 using Granit.Features.EntityFrameworkCore.Extensions;
 using Granit.Features.EntityFrameworkCore.Internal;
-using Granit.Features.Store;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

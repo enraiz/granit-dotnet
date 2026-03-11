@@ -1,4 +1,3 @@
-using Granit.Features.Checker;
 using Granit.Features.Exceptions;
 using Granit.Features.Wolverine;
 using NSubstitute;

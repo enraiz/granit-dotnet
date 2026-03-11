@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Granit.Notifications.MobilePush;
 using Granit.Notifications.MobilePush.Fcm;
+using Granit.Notifications.MobilePush.Fcm.Internal;
 using Granit.Notifications.MobilePush.Fcm.Options;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;

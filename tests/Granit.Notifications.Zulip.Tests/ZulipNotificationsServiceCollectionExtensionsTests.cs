@@ -1,5 +1,6 @@
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Zulip.Extensions;
+using Granit.Notifications.Zulip.Internal;
 using Granit.Notifications.Zulip.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

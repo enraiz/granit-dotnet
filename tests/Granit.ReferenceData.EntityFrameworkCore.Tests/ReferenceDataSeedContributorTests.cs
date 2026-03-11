@@ -1,4 +1,5 @@
 using Granit.Persistence.DataSeeding;
+using Granit.ReferenceData.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

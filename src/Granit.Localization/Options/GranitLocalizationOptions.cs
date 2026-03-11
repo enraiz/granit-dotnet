@@ -5,8 +5,6 @@
 // and listing available languages.
 // ---------------------------------------------------------------------------
 
-using Granit.Localization.Internal;
-
 namespace Granit.Localization.Options;
 
 /// <summary>

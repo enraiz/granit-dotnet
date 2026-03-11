@@ -5,6 +5,7 @@ using Granit.Guids;
 using Granit.Querying.Endpoints.Extensions;
 using Granit.Querying.Meta;
 using Granit.Querying.SavedViews;
+using Granit.Querying.SavedViews.Domain;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;

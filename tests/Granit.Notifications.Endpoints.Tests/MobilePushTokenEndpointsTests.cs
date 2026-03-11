@@ -4,6 +4,8 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Granit.Core.MultiTenancy;
 using Granit.Notifications.Endpoints;
+using Granit.Notifications.Endpoints.Dtos;
+using Granit.Notifications.Endpoints.Endpoints;
 using Granit.Notifications.MobilePush;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;

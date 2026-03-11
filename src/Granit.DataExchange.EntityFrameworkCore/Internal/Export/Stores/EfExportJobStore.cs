@@ -1,4 +1,5 @@
 using Granit.DataExchange.Export;
+using Granit.DataExchange.Export.Domain;
 using Granit.Querying;
 using Microsoft.EntityFrameworkCore;
 

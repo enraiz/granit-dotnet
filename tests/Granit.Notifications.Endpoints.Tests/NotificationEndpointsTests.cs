@@ -6,6 +6,7 @@ using Granit.Core.MultiTenancy;
 using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Domain;
+using Granit.Notifications.Endpoints.Dtos;
 using Granit.Notifications.Endpoints.Extensions;
 using Granit.Querying;
 using Granit.Timing;

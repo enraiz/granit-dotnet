@@ -1,4 +1,5 @@
 using Granit.Cookies.Endpoints.Dtos;
+using Granit.Cookies.Endpoints.Internal;
 using Granit.Cookies.Endpoints.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

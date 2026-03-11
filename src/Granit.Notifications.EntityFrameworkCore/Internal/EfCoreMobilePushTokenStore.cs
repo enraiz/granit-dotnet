@@ -1,3 +1,4 @@
+using Granit.Notifications.EntityFrameworkCore.Entities;
 using Granit.Notifications.MobilePush;
 using Microsoft.EntityFrameworkCore;
 

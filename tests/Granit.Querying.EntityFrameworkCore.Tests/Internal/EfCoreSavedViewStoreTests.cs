@@ -1,5 +1,6 @@
 using Granit.Querying.EntityFrameworkCore.Internal;
 using Granit.Querying.SavedViews;
+using Granit.Querying.SavedViews.Domain;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;

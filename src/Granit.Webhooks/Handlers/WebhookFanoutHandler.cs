@@ -1,6 +1,7 @@
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
 using Granit.Webhooks.Abstractions;
+using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 
 namespace Granit.Webhooks.Handlers;

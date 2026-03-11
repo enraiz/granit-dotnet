@@ -1,3 +1,4 @@
+using Granit.Settings.EntityFrameworkCore.Entities;
 using Granit.Settings.Values;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Granit.Guids;
 using Granit.Querying;
+using Granit.ReferenceData.Domain;
 using Granit.ReferenceData.Endpoints.Dtos;
 using Granit.ReferenceData.Endpoints.Extensions;
 using Microsoft.AspNetCore.Authentication;

@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.Domain;
 using Granit.Querying;
 using Microsoft.EntityFrameworkCore;
 

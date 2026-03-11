@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using Granit.Caching.Internal;
 using Granit.Caching.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;

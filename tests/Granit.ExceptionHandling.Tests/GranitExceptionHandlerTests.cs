@@ -15,6 +15,7 @@ using System.Diagnostics;
 using Granit.Core.Exceptions;
 using Granit.ExceptionHandling;
 using Granit.ExceptionHandling.Extensions;
+using Granit.ExceptionHandling.Internal;
 using Granit.ExceptionHandling.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

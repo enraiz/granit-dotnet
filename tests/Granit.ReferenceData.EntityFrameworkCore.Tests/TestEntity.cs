@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Granit.ReferenceData.Domain;
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

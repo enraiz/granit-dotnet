@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Reflection;
+using Granit.Localization.Internal;
 
 namespace Granit.Localization;
 

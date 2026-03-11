@@ -1,5 +1,4 @@
 using Granit.Features.AspNetCore;
-using Granit.Features.Checker;
 using Granit.Features.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

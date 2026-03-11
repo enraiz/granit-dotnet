@@ -1,5 +1,5 @@
 using System.Globalization;
-using Granit.Localization.Json;
+using Granit.Localization.Internal;
 using Granit.Localization.Options;
 using Granit.Localization.Tests.TestResources;
 using Microsoft.Extensions.DependencyInjection;

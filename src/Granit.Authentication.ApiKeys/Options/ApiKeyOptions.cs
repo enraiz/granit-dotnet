@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.Domain;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Granit.Authentication.ApiKeys.Options;

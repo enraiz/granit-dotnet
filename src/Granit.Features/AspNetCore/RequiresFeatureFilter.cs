@@ -1,4 +1,3 @@
-using Granit.Features.Checker;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Granit.Features.AspNetCore;

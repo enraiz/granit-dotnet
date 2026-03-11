@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Granit.Notifications.EntityFrameworkCore.Internal;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

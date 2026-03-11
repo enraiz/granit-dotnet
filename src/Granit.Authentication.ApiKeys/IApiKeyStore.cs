@@ -1,3 +1,5 @@
+using Granit.Authentication.ApiKeys.Domain;
+
 namespace Granit.Authentication.ApiKeys;
 
 /// <summary>

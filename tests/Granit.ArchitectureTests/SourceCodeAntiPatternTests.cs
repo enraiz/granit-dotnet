@@ -128,6 +128,78 @@ public sealed partial class SourceCodeAntiPatternTests
         return $"{projectName}.{subfolders}";
     }
 
+    /// <summary>
+    /// Isolated DbContext classes in <c>*.EntityFrameworkCore</c> packages must follow the canonical pattern:
+    /// <list type="bullet">
+    /// <item><c>internal sealed class</c> (not <c>public</c>)</item>
+    /// <item>Primary constructor with <c>DbContextOptions</c>, <c>ICurrentTenant?</c>, and <c>IDataFilter?</c></item>
+    /// <item>Call <c>ApplyGranitConventions</c> in <c>OnModelCreating</c></item>
+    /// </list>
+    /// </summary>
+    [Fact]
+    public void DbContext_classes_should_follow_canonical_pattern()
+    {
+        string srcDir = Path.Combine(RepoRoot, "src");
+
+        List<string> violations = [];
+
+        foreach (string csFile in Directory.GetFiles(srcDir, "*DbContext.cs", SearchOption.AllDirectories))
+        {
+            if (csFile.Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar)
+                || csFile.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar))
+            {
+                continue;
+            }
+
+            string fileName = Path.GetFileName(csFile);
+
+            // Skip interfaces (I*DbContext.cs), factories, options, and extensions
+            if (fileName.StartsWith('I')
+                || fileName.Contains("Factory", StringComparison.Ordinal)
+                || fileName.Contains("Options", StringComparison.Ordinal)
+                || fileName.Contains("Extensions", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            // Only check *.EntityFrameworkCore packages (not *.Migrations — system DbContext without domain entities)
+            string relativePath = Path.GetRelativePath(srcDir, csFile);
+            string moduleName = relativePath.Split(Path.DirectorySeparatorChar)[0];
+            if (!moduleName.Contains("EntityFrameworkCore", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            string content = File.ReadAllText(csFile);
+            string relPath = Path.GetRelativePath(RepoRoot, csFile);
+
+            // Must be internal sealed, not public
+            if (content.Contains("public sealed class", StringComparison.Ordinal)
+                || content.Contains("public class", StringComparison.Ordinal))
+            {
+                violations.Add($"{relPath} (must be 'internal sealed class', not 'public')");
+            }
+
+            // Must use primary constructor (no private fields for ICurrentTenant/IDataFilter)
+            if (content.Contains("private readonly ICurrentTenant", StringComparison.Ordinal)
+                || content.Contains("private readonly IDataFilter", StringComparison.Ordinal))
+            {
+                violations.Add($"{relPath} (use primary constructor instead of private fields for ICurrentTenant/IDataFilter)");
+            }
+
+            // Must call ApplyGranitConventions
+            if (!content.Contains("ApplyGranitConventions", StringComparison.Ordinal))
+            {
+                violations.Add($"{relPath} (must call modelBuilder.ApplyGranitConventions in OnModelCreating)");
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            "Isolated DbContext classes must follow the canonical pattern: " +
+            "internal sealed class, primary constructor with ICurrentTenant?/IDataFilter?, ApplyGranitConventions. " +
+            $"Violators: {string.Join("; ", violations)}");
+    }
+
     private static string FindRepoRoot()
     {
         string? dir = Path.GetDirectoryName(typeof(SourceCodeAntiPatternTests).Assembly.Location);

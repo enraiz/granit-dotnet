@@ -9,6 +9,7 @@
 using System.Text.Json;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.WhatsApp;
+using Granit.Notifications.WhatsApp.Internal;
 using Granit.Notifications.WhatsApp.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

@@ -1,4 +1,5 @@
 using Granit.DataExchange.Export;
+using Granit.DataExchange.Export.Domain;
 
 namespace Granit.DataExchange.Endpoints.Dtos.Export;
 

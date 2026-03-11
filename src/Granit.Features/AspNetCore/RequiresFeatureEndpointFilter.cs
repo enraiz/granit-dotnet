@@ -1,4 +1,3 @@
-using Granit.Features.Checker;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 

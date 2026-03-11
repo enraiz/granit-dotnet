@@ -1,4 +1,3 @@
-using Granit.BackgroundJobs.Abstractions;
 using Granit.Querying;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

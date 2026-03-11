@@ -2,6 +2,7 @@ using Granit.DataExchange.Export;
 using Granit.DataExchange.Export.Messages;
 using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Messages;
+using Granit.DataExchange.Wolverine.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Wolverine;

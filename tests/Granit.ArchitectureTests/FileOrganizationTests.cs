@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Shouldly;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace Granit.ArchitectureTests;
 /// must reside in the corresponding subfolder within their module.
 /// Uses filesystem scanning to correlate file names with directory structure.
 /// </summary>
-public sealed class FileOrganizationTests
+public sealed partial class FileOrganizationTests
 {
     private static readonly string RepoRoot = FindRepoRoot();
     private static readonly string SrcRoot = Path.Combine(RepoRoot, "src");
@@ -388,6 +389,12 @@ public sealed class FileOrganizationTests
                 continue;
             }
 
+            // LocalizationResourceStore is a typed registry/dictionary exposed via Options, not a data store
+            if (fileName == "LocalizationResourceStore.cs")
+            {
+                continue;
+            }
+
             if (IsAtModuleRoot(csFile))
             {
                 violations.Add(Path.GetRelativePath(SrcRoot, csFile));
@@ -399,6 +406,208 @@ public sealed class FileOrganizationTests
             "not at the module root. " +
             $"Violators: {string.Join(", ", violations)}");
     }
+
+    /// <summary>
+    /// In non-EntityFrameworkCore packages, types inheriting from domain base classes
+    /// (<c>Entity</c>, <c>AuditedEntity</c>, <c>AggregateRoot</c>, <c>ValueObject</c>, etc.)
+    /// must reside in a <c>Domain/</c> subfolder.
+    /// Granit.Core is excluded because it defines the base classes themselves.
+    /// </summary>
+    [Fact]
+    public void Domain_types_should_reside_in_Domain_folder()
+    {
+        List<string> violations = [];
+
+        foreach (string csFile in GetSrcCsFiles())
+        {
+            string moduleName = GetModuleName(csFile);
+
+            // Granit.Core defines the base classes — skip
+            if (moduleName == "Granit.Core")
+            {
+                continue;
+            }
+
+            // *.EntityFrameworkCore packages are covered by the Entities/ test
+            if (moduleName.Contains("EntityFrameworkCore", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            // Already in Domain/ — compliant
+            if (IsInFolder(csFile, "Domain"))
+            {
+                continue;
+            }
+
+            if (InheritsFromDomainBaseClass(csFile))
+            {
+                violations.Add(Path.GetRelativePath(SrcRoot, csFile));
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            "Types inheriting from domain base classes (Entity, AuditedEntity, AggregateRoot, ValueObject, etc.) " +
+            "must reside in a Domain/ subfolder. " +
+            $"Violators: {string.Join(", ", violations)}");
+    }
+
+    /// <summary>
+    /// In <c>*.EntityFrameworkCore</c> packages, types inheriting from domain base classes
+    /// must reside in an <c>Entities/</c> or <c>Internal/</c> subfolder.
+    /// </summary>
+    [Fact]
+    public void Entity_types_in_EfCore_packages_should_reside_in_Entities_folder()
+    {
+        List<string> violations = [];
+
+        foreach (string csFile in GetSrcCsFiles())
+        {
+            string moduleName = GetModuleName(csFile);
+
+            if (!moduleName.Contains("EntityFrameworkCore", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            // Already in Entities/ or Internal/ — compliant
+            if (IsInFolder(csFile, "Entities") || IsInFolder(csFile, "Internal"))
+            {
+                continue;
+            }
+
+            if (InheritsFromDomainBaseClass(csFile))
+            {
+                violations.Add(Path.GetRelativePath(SrcRoot, csFile));
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            "Types inheriting from domain base classes in *.EntityFrameworkCore packages " +
+            "must reside in an Entities/ or Internal/ subfolder. " +
+            $"Violators: {string.Join(", ", violations)}");
+    }
+
+    /// <summary>
+    /// Types declared as <c>internal</c> should not sit directly at the module root.
+    /// They must reside in <c>Internal/</c> or another purposeful subfolder
+    /// (e.g. <c>Validators/</c>, <c>Endpoints/</c>, <c>Configurations/</c>).
+    /// Module classes (<c>Granit*Module.cs</c>) are exempt — they must stay at root.
+    /// </summary>
+    [Fact]
+    public void Internal_types_should_not_be_at_module_root()
+    {
+        List<string> violations = [];
+
+        foreach (string csFile in GetSrcCsFiles())
+        {
+            string fileName = Path.GetFileName(csFile);
+
+            // Module classes must be at root — exempt
+            if (fileName.EndsWith("Module.cs", StringComparison.Ordinal)
+                && fileName.StartsWith("Granit", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (!IsAtModuleRoot(csFile))
+            {
+                continue;
+            }
+
+            if (ContainsInternalTypeDeclaration(csFile))
+            {
+                violations.Add(Path.GetRelativePath(SrcRoot, csFile));
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            "Internal types should not be at the module root. " +
+            "Move them to Internal/ or another purposeful subfolder. " +
+            $"Violators: {string.Join(", ", violations)}");
+    }
+
+    /// <summary>
+    /// In <c>*.EntityFrameworkCore</c> packages, <c>DbContext</c> classes must reside
+    /// in an <c>Internal/</c> subfolder (they are implementation details).
+    /// <c>I*DbContext</c> interfaces (host contracts) are exempt.
+    /// </summary>
+    [Fact]
+    public void DbContext_classes_should_reside_in_Internal_folder()
+    {
+        List<string> violations = [];
+
+        foreach (string csFile in GetSrcCsFiles())
+        {
+            string fileName = Path.GetFileName(csFile);
+
+            // Only check *DbContext.cs files (not I*DbContext.cs interfaces)
+            if (!fileName.EndsWith("DbContext.cs", StringComparison.Ordinal)
+                || fileName.StartsWith('I'))
+            {
+                continue;
+            }
+
+            string moduleName = GetModuleName(csFile);
+            if (!moduleName.Contains("EntityFrameworkCore", StringComparison.Ordinal)
+                && !moduleName.Contains("Migrations", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (!IsInFolder(csFile, "Internal"))
+            {
+                violations.Add(Path.GetRelativePath(SrcRoot, csFile));
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            "DbContext classes in *.EntityFrameworkCore packages must reside in an Internal/ subfolder. " +
+            $"Violators: {string.Join(", ", violations)}");
+    }
+
+    private static bool ContainsInternalTypeDeclaration(string filePath)
+    {
+        foreach (string line in File.ReadLines(filePath))
+        {
+            if (InternalTypeDeclaration().IsMatch(line))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    [GeneratedRegex(
+        @"^\s*internal\s+(?:sealed\s+|abstract\s+|static\s+|partial\s+)*(?:class|record|struct)\s+\w+",
+        RegexOptions.Multiline)]
+    private static partial Regex InternalTypeDeclaration();
+
+    private static bool InheritsFromDomainBaseClass(string filePath)
+    {
+        foreach (string line in File.ReadLines(filePath))
+        {
+            // Only match actual type declarations (class/record), not generic constraints (where T : Entity)
+            if ((line.Contains("class ", StringComparison.Ordinal)
+                || line.Contains("record ", StringComparison.Ordinal))
+                && DomainBaseClassInheritance().IsMatch(line))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    [GeneratedRegex(
+        @":\s*(" +
+        @"FullAuditedAggregateRoot|AuditedAggregateRoot|CreationAuditedAggregateRoot|AggregateRoot|" +
+        @"FullAuditedEntity|AuditedEntity|CreationAuditedEntity|Entity|" +
+        @"ValueObject|AuditedTranslation|Translation" +
+        @")\b",
+        RegexOptions.Multiline)]
+    private static partial Regex DomainBaseClassInheritance();
 
     private static IEnumerable<string> GetSrcCsFiles() =>
         Directory.EnumerateFiles(SrcRoot, "*.cs", SearchOption.AllDirectories)
