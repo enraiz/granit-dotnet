@@ -21,4 +21,7 @@ internal sealed class NullWebhookDeliveryWriter : IWebhookDeliveryWriter
 
     public Task SuspendSubscriptionAsync(Guid subscriptionId, string reason, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
+
+    public Task<int> DeleteBeforeAsync(DateTimeOffset cutoff, int batchSize, CancellationToken cancellationToken = default) =>
+        Task.FromResult(0);
 }

@@ -186,6 +186,34 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
     }
 
     // -------------------------------------------------------------------------
+    // CountBeforeAsync
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task CountBeforeAsync_ReturnsCountOfAttemptsBeforeCutoff()
+    {
+        DateTimeOffset old = new(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset recent = new(2026, 6, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2025, 6, 1, 0, 0, 0, TimeSpan.Zero);
+
+        await SeedDeliveryAttemptAsync(old);
+        await SeedDeliveryAttemptAsync(old);
+        await SeedDeliveryAttemptAsync(recent);
+
+        int count = await _sut.CountBeforeAsync(cutoff, TestContext.Current.CancellationToken);
+
+        count.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task CountBeforeAsync_ReturnsZeroWhenEmpty()
+    {
+        int count = await _sut.CountBeforeAsync(DateTimeOffset.UtcNow, TestContext.Current.CancellationToken);
+
+        count.ShouldBe(0);
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -200,6 +228,26 @@ public sealed class EfWebhookDeliveryStoreTests : IAsyncDisposable
             SigningSecret = "protected-secret",
             Status = WebhookSubscriptionStatus.Active,
             ConsecutiveFailureCount = consecutiveFailures,
+        });
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+
+    private async Task SeedDeliveryAttemptAsync(DateTimeOffset occurredAt)
+    {
+        await using WebhooksDbContext context = new(_options);
+        context.WebhookDeliveryAttempts.Add(new WebhookDeliveryAttempt
+        {
+            Id = Guid.NewGuid(),
+            DeliveryId = Guid.NewGuid(),
+            SubscriptionId = Guid.NewGuid(),
+            TenantId = Guid.NewGuid(),
+            EventType = "test.event",
+            TargetUrl = "https://example.com/hook",
+            HttpStatusCode = 200,
+            PayloadHash = "hash",
+            OccurredAt = occurredAt,
+            DurationMs = 50,
+            IsSuccess = true,
         });
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
@@ -229,4 +277,176 @@ internal sealed class TestWebhooksDbContextFactory(DbContextOptions<WebhooksDbCo
 
     public Task<WebhooksDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(new WebhooksDbContext(options));
+}
+
+// =============================================================================
+// DeleteBeforeAsync — requires SQLite (ExecuteDeleteAsync not supported by InMemory)
+// =============================================================================
+
+public sealed class EfWebhookDeliveryStoreDeleteTests : IDisposable
+{
+    private readonly TestWebhooksSqliteFactory _factory;
+    private readonly EfWebhookDeliveryStore _sut;
+
+    public EfWebhookDeliveryStoreDeleteTests()
+    {
+        IClock clock = Substitute.For<IClock>();
+        clock.Now.Returns(_ => new DateTimeOffset(2026, 3, 1, 12, 0, 0, TimeSpan.Zero));
+
+        _factory = TestWebhooksSqliteFactory.Create();
+        _sut = new EfWebhookDeliveryStore(_factory, clock, new SimpleGuidGenerator());
+    }
+
+    public void Dispose() => _factory.Dispose();
+
+    [Fact]
+    public async Task DeleteBeforeAsync_DeletesAttemptsBeforeCutoff()
+    {
+        DateTimeOffset old = new(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset recent = new(2026, 6, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2025, 6, 1, 0, 0, 0, TimeSpan.Zero);
+
+        await SeedDeliveryAttemptAsync(old);
+        await SeedDeliveryAttemptAsync(old);
+        await SeedDeliveryAttemptAsync(recent);
+
+        int deleted = await _sut.DeleteBeforeAsync(cutoff, 1000, TestContext.Current.CancellationToken);
+
+        deleted.ShouldBe(2);
+
+        await using WebhooksDbContext context = _factory.CreateDbContext();
+        int remaining = await context.WebhookDeliveryAttempts.CountAsync(TestContext.Current.CancellationToken);
+        remaining.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task DeleteBeforeAsync_RespectsPageSize()
+    {
+        DateTimeOffset old = new(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2025, 6, 1, 0, 0, 0, TimeSpan.Zero);
+
+        for (int i = 0; i < 5; i++)
+        {
+            await SeedDeliveryAttemptAsync(old);
+        }
+
+        int deleted = await _sut.DeleteBeforeAsync(cutoff, 3, TestContext.Current.CancellationToken);
+
+        deleted.ShouldBe(3);
+
+        await using WebhooksDbContext context = _factory.CreateDbContext();
+        int remaining = await context.WebhookDeliveryAttempts.CountAsync(TestContext.Current.CancellationToken);
+        remaining.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task DeleteBeforeAsync_ReturnsZeroWhenNothingToDelete()
+    {
+        int deleted = await _sut.DeleteBeforeAsync(DateTimeOffset.UtcNow, 1000, TestContext.Current.CancellationToken);
+
+        deleted.ShouldBe(0);
+    }
+
+    private async Task SeedDeliveryAttemptAsync(DateTimeOffset occurredAt)
+    {
+        await using WebhooksDbContext context = _factory.CreateDbContext();
+        context.WebhookDeliveryAttempts.Add(new WebhookDeliveryAttempt
+        {
+            Id = Guid.NewGuid(),
+            DeliveryId = Guid.NewGuid(),
+            SubscriptionId = Guid.NewGuid(),
+            TenantId = Guid.NewGuid(),
+            EventType = "test.event",
+            TargetUrl = "https://example.com/hook",
+            HttpStatusCode = 200,
+            PayloadHash = "hash",
+            OccurredAt = occurredAt,
+            DurationMs = 50,
+            IsSuccess = true,
+        });
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+    }
+}
+
+/// <summary>
+/// SQLite in-memory factory for tests requiring <c>ExecuteDeleteAsync</c>.
+/// </summary>
+internal sealed class TestWebhooksSqliteFactory : IDbContextFactory<WebhooksDbContext>, IDisposable
+{
+    private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
+    private readonly DbContextOptions<WebhooksDbContext> _options;
+
+    private TestWebhooksSqliteFactory(Microsoft.Data.Sqlite.SqliteConnection connection, DbContextOptions<WebhooksDbContext> options)
+    {
+        _connection = connection;
+        _options = options;
+    }
+
+    public static TestWebhooksSqliteFactory Create()
+    {
+        Microsoft.Data.Sqlite.SqliteConnection connection = new("DataSource=:memory:");
+        connection.Open();
+
+        DbContextOptionsBuilder<WebhooksDbContext> optionsBuilder = new();
+        optionsBuilder.UseSqlite(connection);
+        optionsBuilder.ReplaceService<Microsoft.EntityFrameworkCore.Infrastructure.IModelCustomizer, WebhooksSqliteModelCustomizer>();
+
+        DbContextOptions<WebhooksDbContext> options = optionsBuilder.Options;
+
+        using (WebhooksDbContext db = new(options))
+        {
+            db.Database.EnsureCreated();
+        }
+
+        return new TestWebhooksSqliteFactory(connection, options);
+    }
+
+    public WebhooksDbContext CreateDbContext() => new(_options);
+
+    public Task<WebhooksDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(CreateDbContext());
+
+    public void Dispose() => _connection.Dispose();
+}
+
+internal sealed class WebhooksSqliteModelCustomizer(
+    Microsoft.EntityFrameworkCore.Infrastructure.ModelCustomizerDependencies dependencies)
+    : Microsoft.EntityFrameworkCore.Infrastructure.RelationalModelCustomizer(dependencies)
+{
+    private static readonly Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTimeOffset, long> DateTimeOffsetConverter = new(
+        v => v.ToUnixTimeMilliseconds(),
+        v => DateTimeOffset.FromUnixTimeMilliseconds(v));
+
+    private static readonly Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTimeOffset?, long?> NullableDateTimeOffsetConverter = new(
+        v => v.HasValue ? v.Value.ToUnixTimeMilliseconds() : null,
+        v => v.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(v.Value) : null);
+
+    private static readonly Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<System.Text.Json.JsonElement, string> JsonElementConverter = new(
+        v => v.GetRawText(),
+        v => System.Text.Json.JsonDocument.Parse(v, default).RootElement);
+
+    public override void Customize(ModelBuilder modelBuilder, DbContext context)
+    {
+        base.Customize(modelBuilder, context);
+
+        foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableProperty property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTimeOffset))
+                {
+                    property.SetValueConverter(DateTimeOffsetConverter);
+                }
+                else if (property.ClrType == typeof(DateTimeOffset?))
+                {
+                    property.SetValueConverter(NullableDateTimeOffsetConverter);
+                }
+                else if (property.ClrType == typeof(System.Text.Json.JsonElement))
+                {
+                    property.SetColumnType("TEXT");
+                    property.SetValueConverter(JsonElementConverter);
+                }
+            }
+        }
+    }
 }

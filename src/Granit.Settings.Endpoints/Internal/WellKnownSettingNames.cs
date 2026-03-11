@@ -3,11 +3,15 @@ namespace Granit.Settings.Endpoints.Internal;
 /// <summary>
 /// Well-known setting names declared by the settings endpoints module.
 /// </summary>
-internal static class WellKnownSettingNames
+/// <remarks>
+/// Public so that application modules (e.g. Keycloak sync filters) can reference
+/// the canonical setting names without duplicating string constants.
+/// </remarks>
+public static class WellKnownSettingNames
 {
     /// <summary>Preferred locale (BCP 47 language tag, e.g. "fr", "en-GB").</summary>
-    internal const string PreferredCulture = "Granit.Localization.PreferredCulture";
+    public const string PreferredCulture = "Granit.Localization.PreferredCulture";
 
     /// <summary>Preferred timezone (IANA identifier, e.g. "Europe/Brussels").</summary>
-    internal const string PreferredTimezone = "Granit.Timing.PreferredTimezone";
+    public const string PreferredTimezone = "Granit.Timing.PreferredTimezone";
 }

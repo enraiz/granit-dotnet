@@ -59,4 +59,21 @@ internal sealed class EfBlobDescriptorStore(
             .Take(batchSize)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<BlobDescriptor>> FindByContainerBeforeAsync(
+        string containerName,
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken = default)
+    {
+        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.Blobs
+            .Where(b => b.ContainerName == containerName
+                        && b.Status == BlobStatus.Valid
+                        && b.CreatedAt < cutoff)
+            .OrderBy(b => b.CreatedAt)
+            .Take(batchSize)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

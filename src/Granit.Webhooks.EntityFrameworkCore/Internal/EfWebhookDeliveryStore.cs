@@ -123,4 +123,26 @@ internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public async Task<int> CountBeforeAsync(
+        DateTimeOffset cutoff,
+        CancellationToken cancellationToken = default)
+    {
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.WebhookDeliveryAttempts
+            .CountAsync(a => a.OccurredAt < cutoff, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<int> DeleteBeforeAsync(
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken = default)
+    {
+        await using WebhooksDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.WebhookDeliveryAttempts
+            .Where(a => a.OccurredAt < cutoff)
+            .OrderBy(a => a.OccurredAt)
+            .Take(batchSize)
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

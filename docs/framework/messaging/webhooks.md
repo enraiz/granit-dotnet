@@ -218,12 +218,18 @@ public interface IWebhookDeliveryWriter
     Task RecordFailureAsync(SendWebhookCommand command, int? httpStatusCode,
         long durationMs, string errorMessage, string? payload, CancellationToken cancellationToken = default);
     Task SuspendSubscriptionAsync(Guid subscriptionId, string reason, CancellationToken cancellationToken = default);
+
+    // RGPD Art. 5(1)(e) — suppression par lots après expiration de la rétention ISO 27001
+    Task<int> DeleteBeforeAsync(DateTimeOffset cutoff, int batchSize, CancellationToken cancellationToken = default);
 }
 
 // Lecture des tentatives de livraison (redelivery)
 public interface IWebhookDeliveryReader
 {
     Task<WebhookDeliveryAttempt?> FindByDeliveryIdAsync(Guid deliveryId, CancellationToken cancellationToken = default);
+
+    // Comptage des enregistrements éligibles à l'archivage (background jobs)
+    Task<int> CountBeforeAsync(DateTimeOffset cutoff, CancellationToken cancellationToken = default);
 }
 ```
 
