@@ -1,0 +1,10 @@
+{
+  "culture": "es",
+  "texts": {
+    "PermissionGroup:Settings": "Configuración",
+    "Permission:Settings.Global.Read": "Ver configuración global",
+    "Permission:Settings.Global.Manage": "Gestionar configuración global (ver, crear, editar)",
+    "Permission:Settings.Tenant.Read": "Ver configuración del inquilino",
+    "Permission:Settings.Tenant.Manage": "Gestionar configuración del inquilino (ver, crear, editar)"
+  }
+}

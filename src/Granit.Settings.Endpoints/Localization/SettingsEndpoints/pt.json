@@ -1,0 +1,10 @@
+{
+  "culture": "pt",
+  "texts": {
+    "PermissionGroup:Settings": "Definições",
+    "Permission:Settings.Global.Read": "Ver definições globais",
+    "Permission:Settings.Global.Manage": "Gerir definições globais (ver, criar, editar)",
+    "Permission:Settings.Tenant.Read": "Ver definições do inquilino",
+    "Permission:Settings.Tenant.Manage": "Gerir definições do inquilino (ver, criar, editar)"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "culture": "tr",
+  "texts": {
+    "PermissionGroup:Settings": "Ayarlar",
+    "Permission:Settings.Global.Read": "Genel ayarları görüntüle",
+    "Permission:Settings.Global.Manage": "Genel ayarları yönet (görüntüle, oluştur, düzenle)",
+    "Permission:Settings.Tenant.Read": "Kiracı ayarlarını görüntüle",
+    "Permission:Settings.Tenant.Manage": "Kiracı ayarlarını yönet (görüntüle, oluştur, düzenle)"
+  }
+}

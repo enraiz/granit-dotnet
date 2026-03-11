@@ -1,0 +1,10 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Settings": "Einstellungen",
+    "Permission:Settings.Global.Read": "Globale Einstellungen anzeigen",
+    "Permission:Settings.Global.Manage": "Globale Einstellungen verwalten (anzeigen, erstellen, bearbeiten)",
+    "Permission:Settings.Tenant.Read": "Mandanteneinstellungen anzeigen",
+    "Permission:Settings.Tenant.Manage": "Mandanteneinstellungen verwalten (anzeigen, erstellen, bearbeiten)"
+  }
+}
