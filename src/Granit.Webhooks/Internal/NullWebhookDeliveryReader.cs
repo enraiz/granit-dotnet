@@ -11,4 +11,7 @@ internal sealed class NullWebhookDeliveryReader : IWebhookDeliveryReader
 {
     public Task<WebhookDeliveryAttempt?> FindByDeliveryIdAsync(Guid deliveryId, CancellationToken cancellationToken = default) =>
         Task.FromResult<WebhookDeliveryAttempt?>(null);
+
+    public Task<int> CountBeforeAsync(DateTimeOffset cutoff, CancellationToken cancellationToken = default) =>
+        Task.FromResult(0);
 }

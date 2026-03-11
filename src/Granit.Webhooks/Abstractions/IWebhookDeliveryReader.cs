@@ -16,4 +16,15 @@ public interface IWebhookDeliveryReader
     /// Returns the delivery attempt with the given <paramref name="deliveryId"/>, or <c>null</c> if not found.
     /// </summary>
     Task<WebhookDeliveryAttempt?> FindByDeliveryIdAsync(Guid deliveryId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns the number of delivery attempts that occurred before <paramref name="cutoff"/>.
+    /// </summary>
+    /// <remarks>
+    /// Used by archival background jobs to determine the total number of records eligible
+    /// for deletion before starting the batch-delete loop.
+    /// </remarks>
+    /// <param name="cutoff">Only attempts that occurred before this instant are counted.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<int> CountBeforeAsync(DateTimeOffset cutoff, CancellationToken cancellationToken = default);
 }

@@ -33,4 +33,22 @@ public interface IBlobDescriptorReader
         DateTimeOffset cutoff,
         int batchSize,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns <see cref="BlobStatus.Valid"/> descriptors in the given <paramref name="containerName"/>
+    /// created before <paramref name="cutoff"/>, limited to <paramref name="batchSize"/> results.
+    /// </summary>
+    /// <remarks>
+    /// Used by RGPD cleanup background jobs to purge temporary containers (e.g. GDPR export archives)
+    /// after the retention period expires.
+    /// </remarks>
+    /// <param name="containerName">The blob container to search.</param>
+    /// <param name="cutoff">Only descriptors created before this instant are returned.</param>
+    /// <param name="batchSize">Maximum number of descriptors to return.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<IReadOnlyList<BlobDescriptor>> FindByContainerBeforeAsync(
+        string containerName,
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken = default);
 }

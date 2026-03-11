@@ -44,4 +44,18 @@ public interface IWebhookDeliveryWriter
         Guid subscriptionId,
         string reason,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes delivery attempts that occurred before <paramref name="cutoff"/>,
+    /// up to <paramref name="batchSize"/> rows per call.
+    /// </summary>
+    /// <remarks>
+    /// RGPD Art. 5(1)(e) data minimisation: after the ISO 27001 retention period (3 years),
+    /// delivery records must be purged. Called by archival background jobs in a batch-delete loop.
+    /// </remarks>
+    /// <returns>The number of rows actually deleted.</returns>
+    Task<int> DeleteBeforeAsync(
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken = default);
 }

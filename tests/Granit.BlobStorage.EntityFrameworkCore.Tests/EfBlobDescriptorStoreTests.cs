@@ -41,6 +41,16 @@ public sealed class EfBlobDescriptorStoreTests
         return tenant;
     }
 
+    private static async Task MarkAsValid(EfBlobDescriptorStore store, Guid blobId)
+    {
+        BlobDescriptor? d = await store.FindAsync(blobId, TestContext.Current.CancellationToken);
+        d!.MarkAsUploading();
+        await store.UpdateAsync(d, TestContext.Current.CancellationToken);
+        BlobDescriptor? u = await store.FindAsync(blobId, TestContext.Current.CancellationToken);
+        u!.MarkAsValid("application/pdf", 1024L, DateTimeOffset.UtcNow);
+        await store.UpdateAsync(u, TestContext.Current.CancellationToken);
+    }
+
     private static EfBlobDescriptorStore CreateStore(string dbName, Guid? tenantId = null) =>
         new(new InMemoryContextFactory(dbName, MakeTenant(tenantId ?? TenantId)));
 
@@ -347,5 +357,78 @@ public sealed class EfBlobDescriptorStoreTests
             cutoff, 100, TestContext.Current.CancellationToken);
 
         orphans.ShouldBeEmpty();
+    }
+
+    // =========================================================================
+    // FindByContainerBeforeAsync
+    // =========================================================================
+
+    [Fact]
+    public async Task FindByContainerBeforeAsync_FiltersContainerAndCutoff()
+    {
+        string db = Guid.NewGuid().ToString();
+        EfBlobDescriptorStore store = CreateStore(db);
+        DateTimeOffset old = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset recent = new(2026, 3, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2026, 2, 1, 0, 0, 0, TimeSpan.Zero);
+
+        // Old valid blob in target container — should be returned
+        BlobDescriptor match = MakeDescriptor(containerName: "prescriptions", createdAt: old);
+        await store.SaveAsync(match, TestContext.Current.CancellationToken);
+        await MarkAsValid(store, match.Id);
+
+        // Old valid blob in different container — should NOT be returned
+        BlobDescriptor otherContainer = MakeDescriptor(containerName: "avatars", createdAt: old);
+        await store.SaveAsync(otherContainer, TestContext.Current.CancellationToken);
+        await MarkAsValid(store, otherContainer.Id);
+
+        // Recent valid blob in target container — should NOT be returned (after cutoff)
+        BlobDescriptor recentBlob = MakeDescriptor(containerName: "prescriptions", createdAt: recent);
+        await store.SaveAsync(recentBlob, TestContext.Current.CancellationToken);
+        await MarkAsValid(store, recentBlob.Id);
+
+        // Old pending blob in target container — should NOT be returned (not Valid)
+        BlobDescriptor pendingBlob = MakeDescriptor(containerName: "prescriptions", createdAt: old);
+        await store.SaveAsync(pendingBlob, TestContext.Current.CancellationToken);
+
+        IReadOnlyList<BlobDescriptor> results = await store.FindByContainerBeforeAsync(
+            "prescriptions", cutoff, 100, TestContext.Current.CancellationToken);
+
+        results.Count.ShouldBe(1);
+        results[0].Id.ShouldBe(match.Id);
+    }
+
+    [Fact]
+    public async Task FindByContainerBeforeAsync_RespectsPageSize()
+    {
+        string db = Guid.NewGuid().ToString();
+        EfBlobDescriptorStore store = CreateStore(db);
+        DateTimeOffset old = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2026, 2, 1, 0, 0, 0, TimeSpan.Zero);
+
+        for (int i = 0; i < 5; i++)
+        {
+            BlobDescriptor blob = MakeDescriptor(containerName: "prescriptions", createdAt: old);
+            await store.SaveAsync(blob, TestContext.Current.CancellationToken);
+            await MarkAsValid(store, blob.Id);
+        }
+
+        IReadOnlyList<BlobDescriptor> results = await store.FindByContainerBeforeAsync(
+            "prescriptions", cutoff, 3, TestContext.Current.CancellationToken);
+
+        results.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task FindByContainerBeforeAsync_EmptyWhenNoMatch()
+    {
+        string db = Guid.NewGuid().ToString();
+        EfBlobDescriptorStore store = CreateStore(db);
+        DateTimeOffset cutoff = new(2026, 2, 1, 0, 0, 0, TimeSpan.Zero);
+
+        IReadOnlyList<BlobDescriptor> results = await store.FindByContainerBeforeAsync(
+            "prescriptions", cutoff, 100, TestContext.Current.CancellationToken);
+
+        results.ShouldBeEmpty();
     }
 }
