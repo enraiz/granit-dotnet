@@ -1,0 +1,6 @@
+{
+  "culture": "cs",
+  "texts": {
+    "Template:TransitionDenied": "Přechod životního cyklu šablony z '{0}' na '{1}' byl zamítnut."
+  }
+}

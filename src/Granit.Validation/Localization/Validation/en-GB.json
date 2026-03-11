@@ -1,8 +1,6 @@
 {
   "culture": "en-GB",
   "texts": {
-    "Granit:Validation:InvalidEmail": "'{PropertyName}' is not a valid email address.",
-    "Granit:Validation:EmailValidator": "'{PropertyName}' is not a valid email address.",
-    "Granit:Validation:CreditCardValidator": "'{PropertyName}' is not a valid credit card number."
+    "Granit:Validation:InvalidEmail": "'{PropertyName}' is not a valid email address."
   }
 }

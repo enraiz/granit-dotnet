@@ -1,0 +1,7 @@
+{
+  "culture": "pl",
+  "texts": {
+    "TemplateCategory:DuplicateName": "Kategoria o nazwie '{0}' już istnieje.",
+    "TemplateCategory:HasTemplates": "Nie można usunąć kategorii: {0} szablon(ów) jest nadal powiązanych."
+  }
+}

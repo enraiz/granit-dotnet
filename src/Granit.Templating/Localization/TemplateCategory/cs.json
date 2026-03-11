@@ -1,0 +1,7 @@
+{
+  "culture": "cs",
+  "texts": {
+    "TemplateCategory:DuplicateName": "Kategorie s názvem '{0}' již existuje.",
+    "TemplateCategory:HasTemplates": "Kategorii nelze smazat: {0} šablon(y) jsou stále přiřazeny."
+  }
+}

@@ -11,6 +11,13 @@ namespace Granit.ReferenceData.Endpoints.Dtos;
 /// <param name="LabelEs">Spanish display label.</param>
 /// <param name="LabelIt">Italian display label.</param>
 /// <param name="LabelPt">Portuguese display label.</param>
+/// <param name="LabelZh">Chinese display label.</param>
+/// <param name="LabelJa">Japanese display label.</param>
+/// <param name="LabelPl">Polish display label.</param>
+/// <param name="LabelTr">Turkish display label.</param>
+/// <param name="LabelKo">Korean display label.</param>
+/// <param name="LabelSv">Swedish display label.</param>
+/// <param name="LabelCs">Czech display label.</param>
 /// <param name="SortOrder">Display order (lower values first).</param>
 /// <param name="ValidFrom">Optional start of validity period.</param>
 /// <param name="ValidTo">Optional end of validity period.</param>
@@ -23,6 +30,13 @@ public sealed record ReferenceDataCreateRequest(
     string LabelEs = "",
     string LabelIt = "",
     string LabelPt = "",
+    string LabelZh = "",
+    string LabelJa = "",
+    string LabelPl = "",
+    string LabelTr = "",
+    string LabelKo = "",
+    string LabelSv = "",
+    string LabelCs = "",
     int SortOrder = 0,
     DateTimeOffset? ValidFrom = null,
     DateTimeOffset? ValidTo = null);

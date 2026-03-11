@@ -1,0 +1,7 @@
+{
+  "culture": "cs",
+  "texts": {
+    "BlobStorage:NotFound": "Požadovaný soubor nebyl nalezen.",
+    "BlobStorage:NotValid": "Soubor není dostupný ke stažení."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Templating": "Mallar",
+    "Permission:Templates.Manage": "Hantera mallar (visa, skapa, redigera, radera, publicera)"
+  }
+}

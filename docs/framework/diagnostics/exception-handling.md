@@ -237,8 +237,8 @@ public sealed class BlobStorageLocalizationResource;
 | `Granit.Cookies` | `Cookies` | `Cookies:Unregistered` | `UnregisteredCookieException` |
 
 > **Convention** : tout module qui lance une exception `IHasErrorCode` **doit** fournir
-> les fichiers de localisation correspondants dans les 9 cultures
-> (en, fr, nl, de, es, it, pt, en-GB, fr-CA). Sans ces fichiers, le handler
+> les fichiers de localisation correspondants dans les 17 cultures
+> (en, fr, nl, de, es, it, pt, zh, ja, pl, tr, ko, sv, cs, en-GB, fr-CA, pt-BR). Sans ces fichiers, le handler
 > utilise le `Message` de l'exception en fallback (non traduit).
 
 ## Contraintes RGPD/ISO 27001

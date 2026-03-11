@@ -121,7 +121,7 @@
 
 | Package | Role |
 | ------- | ---- |
-| `Granit.Localization` / `.Endpoints` / `.EntityFrameworkCore` / `.SourceGenerator` | i18n (9 cultures: 7 base + regional variants), override store, source-generated keys |
+| `Granit.Localization` / `.Endpoints` / `.EntityFrameworkCore` / `.SourceGenerator` | i18n (17 cultures: 14 base + 3 regional variants), override store, source-generated keys |
 
 ## Commands
 
@@ -146,13 +146,15 @@ See [`docs/guide/conventions/langues.md`](docs/guide/conventions/langues.md) for
 - **Code** (identifiers, XML docs, comments): **English**
 - **Docs, issues, commits**: **French** (with correct diacritics: é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
 - **`CLAUDE.md`, skills**: **English**
-- **Localization**: **9 cultures** — 7 base languages (en, fr, nl, de, es, it, pt) +
-  2 regional variants (fr-CA, en-GB). Every `src/*/Localization/**/*.json` must
-  exist for all 9 files. Regional files only contain keys that differ from the base.
-  No `en-US.json` needed — `en.json` is already US English (`en-US` → `en` fallback).
+- **Localization**: **17 cultures** — 14 base languages (en, fr, nl, de, es, it, pt,
+  zh, ja, pl, tr, ko, sv, cs) + 3 regional variants (fr-CA, en-GB, pt-BR). Every
+  `src/*/Localization/**/*.json` must exist for all 17 files. Regional files only
+  contain keys that differ from the base. No `en-US.json` needed — `en.json` is
+  already US English (`en-US` → `en` fallback).
 - `ReferenceDataEntity` translations: `LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`,
-  `LabelEs`, `LabelIt`, `LabelPt` (7 properties — regional variants use
-  `TwoLetterISOLanguageName` fallback: fr-CA → LabelFr, en-GB → LabelEn)
+  `LabelEs`, `LabelIt`, `LabelPt`, `LabelZh`, `LabelJa`, `LabelPl`, `LabelTr`,
+  `LabelKo`, `LabelSv`, `LabelCs` (14 properties — regional variants use
+  `TwoLetterISOLanguageName` fallback: fr-CA → LabelFr, en-GB → LabelEn, pt-BR → LabelPt)
 - **Governance**: [`docs/framework/utilities/localization/gouvernance.md`](docs/framework/utilities/localization/gouvernance.md) (framework)
   and [`docs/guide/gouvernance-traductions.md`](docs/guide/gouvernance-traductions.md) (application)
 

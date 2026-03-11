@@ -1,0 +1,8 @@
+{
+  "culture": "cs",
+  "texts": {
+    "PermissionGroup:DataExchange": "Výměna dat",
+    "Permission:DataExchange.Imports.Execute": "Spustit import dat (nahrání, mapování, provedení, reporty)",
+    "Permission:DataExchange.Exports.Execute": "Spustit export dat (definice, provedení, stažení, předvolby)"
+  }
+}

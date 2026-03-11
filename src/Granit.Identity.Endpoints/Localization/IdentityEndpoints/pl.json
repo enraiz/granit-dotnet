@@ -1,0 +1,9 @@
+{
+  "culture": "pl",
+  "texts": {
+    "PermissionGroup:Identity": "Tożsamość",
+    "Permission:Identity.UserCache.Read": "Wyświetlanie pamięci podręcznej użytkowników (lista, wyszukiwanie, wsadowe, statystyki)",
+    "Permission:Identity.UserCache.Sync": "Wymuszenie synchronizacji pamięci podręcznej użytkowników z dostawcy tożsamości",
+    "Permission:Identity.UserCache.Delete": "Usuwanie lub pseudonimizacja wpisów pamięci podręcznej użytkowników (RODO)"
+  }
+}

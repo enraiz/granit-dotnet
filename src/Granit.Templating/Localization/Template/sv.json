@@ -1,0 +1,6 @@
+{
+  "culture": "sv",
+  "texts": {
+    "Template:TransitionDenied": "Mallens livscykelövergång från '{0}' till '{1}' nekades."
+  }
+}

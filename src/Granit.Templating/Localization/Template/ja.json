@@ -1,0 +1,6 @@
+{
+  "culture": "ja",
+  "texts": {
+    "Template:TransitionDenied": "テンプレートのライフサイクル遷移（'{0}' から '{1}'）が拒否されました。"
+  }
+}

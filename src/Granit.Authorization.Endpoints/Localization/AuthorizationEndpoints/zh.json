@@ -1,0 +1,8 @@
+{
+  "culture": "zh",
+  "texts": {
+    "PermissionGroup:Authorization": "授权管理",
+    "Permission:Authorization.Definitions.Read": "查看所有已注册的权限定义和组",
+    "Permission:Authorization.Grants.Manage": "查看、授予和撤销角色权限"
+  }
+}

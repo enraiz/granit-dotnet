@@ -1,0 +1,11 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:ApiKeys": "API-nycklar",
+    "Permission:ApiKeys.Keys.Read": "Visa API-nycklar (lista, detaljer)",
+    "Permission:ApiKeys.Keys.Create": "Skapa nya API-nycklar",
+    "Permission:ApiKeys.Keys.Revoke": "Återkalla API-nycklar",
+    "Permission:ApiKeys.Keys.Rotate": "Rotera API-nycklar (återkalla och ersätt)",
+    "Permission:ApiKeys.Keys.UpdateScopes": "Uppdatera API-nyckelbehörigheter och CIDR-omfång"
+  }
+}

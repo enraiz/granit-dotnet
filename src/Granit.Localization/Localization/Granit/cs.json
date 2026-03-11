@@ -1,0 +1,10 @@
+{
+  "culture": "cs",
+  "texts": {
+    "Granit:EntityNotFound": "Entita typu {0} s identifikátorem {1} nebyla nalezena.",
+    "Granit:ValidationError": "Chyba validace.",
+    "Granit:Unauthorized": "Neoprávněný přístup.",
+    "Granit:Forbidden": "Přístup odepřen.",
+    "Granit:InternalError": "Došlo k interní chybě."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "culture": "pl",
+  "texts": {
+    "Granit:EntityNotFound": "Nie znaleziono encji typu {0} o identyfikatorze {1}.",
+    "Granit:ValidationError": "Błąd walidacji.",
+    "Granit:Unauthorized": "Nieautoryzowany dostęp.",
+    "Granit:Forbidden": "Dostęp zabroniony.",
+    "Granit:InternalError": "Wystąpił błąd wewnętrzny."
+  }
+}

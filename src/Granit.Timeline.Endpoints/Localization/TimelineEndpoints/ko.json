@@ -1,0 +1,8 @@
+{
+  "culture": "ko",
+  "texts": {
+    "PermissionGroup:Timeline": "타임라인",
+    "Permission:Timeline.Entries.Read": "활동 피드 및 감사 이력 보기",
+    "Permission:Timeline.Entries.Create": "댓글 작성 및 엔티티 팔로우/언팔로우"
+  }
+}

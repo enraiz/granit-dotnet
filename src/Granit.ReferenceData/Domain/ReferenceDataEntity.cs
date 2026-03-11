@@ -13,9 +13,10 @@ namespace Granit.ReferenceData.Domain;
 /// <remarks>
 /// <para>
 /// Each reference data entity has a unique <see cref="Code"/> (business key) and labels
-/// for the 7 supported locales (en, fr, nl, de, es, it, pt). The virtual <see cref="Label"/>
-/// property resolves the appropriate label based on <see cref="CultureInfo.CurrentUICulture"/>,
-/// falling back to <see cref="LabelEn"/> when the requested locale has no value.
+/// for the 14 supported locales (en, fr, nl, de, es, it, pt, zh, ja, pl, tr, ko, sv, cs).
+/// The virtual <see cref="Label"/> property resolves the appropriate label based on
+/// <see cref="CultureInfo.CurrentUICulture"/>, falling back to <see cref="LabelEn"/>
+/// when the requested locale has no value.
 /// Derived entities can override <see cref="Label"/> for custom resolution logic.
 /// </para>
 /// <para>
@@ -55,10 +56,31 @@ public abstract class ReferenceDataEntity : AuditedEntity, IActive
     /// <summary>Portuguese display label.</summary>
     public string LabelPt { get; set; } = string.Empty;
 
+    /// <summary>Chinese display label.</summary>
+    public string LabelZh { get; set; } = string.Empty;
+
+    /// <summary>Japanese display label.</summary>
+    public string LabelJa { get; set; } = string.Empty;
+
+    /// <summary>Polish display label.</summary>
+    public string LabelPl { get; set; } = string.Empty;
+
+    /// <summary>Turkish display label.</summary>
+    public string LabelTr { get; set; } = string.Empty;
+
+    /// <summary>Korean display label.</summary>
+    public string LabelKo { get; set; } = string.Empty;
+
+    /// <summary>Swedish display label.</summary>
+    public string LabelSv { get; set; } = string.Empty;
+
+    /// <summary>Czech display label.</summary>
+    public string LabelCs { get; set; } = string.Empty;
+
     /// <summary>
     /// Resolved display label for the current UI culture. Returns the locale-specific
     /// label when available, falling back to <see cref="LabelEn"/> when the translation
-    /// is empty or the culture is not in the supported set (fr, nl, de, es, it, pt).
+    /// is empty or the culture is not in the supported set.
     /// </summary>
     /// <remarks>
     /// This property is not mapped to the database. It is intended for use in application
@@ -74,6 +96,13 @@ public abstract class ReferenceDataEntity : AuditedEntity, IActive
         "es" when LabelEs.Length > 0 => LabelEs,
         "it" when LabelIt.Length > 0 => LabelIt,
         "pt" when LabelPt.Length > 0 => LabelPt,
+        "zh" when LabelZh.Length > 0 => LabelZh,
+        "ja" when LabelJa.Length > 0 => LabelJa,
+        "pl" when LabelPl.Length > 0 => LabelPl,
+        "tr" when LabelTr.Length > 0 => LabelTr,
+        "ko" when LabelKo.Length > 0 => LabelKo,
+        "sv" when LabelSv.Length > 0 => LabelSv,
+        "cs" when LabelCs.Length > 0 => LabelCs,
         _ => LabelEn,
     };
 

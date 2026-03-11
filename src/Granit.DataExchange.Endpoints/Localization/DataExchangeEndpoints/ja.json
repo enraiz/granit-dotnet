@@ -1,0 +1,8 @@
+{
+  "culture": "ja",
+  "texts": {
+    "PermissionGroup:DataExchange": "データ交換",
+    "Permission:DataExchange.Imports.Execute": "データインポートの実行（アップロード、マッピング、実行、レポート）",
+    "Permission:DataExchange.Exports.Execute": "データエクスポートの実行（定義、実行、ダウンロード、プリセット）"
+  }
+}

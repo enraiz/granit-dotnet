@@ -1,0 +1,10 @@
+{
+  "culture": "tr",
+  "texts": {
+    "Granit:EntityNotFound": "{0} türünde {1} tanımlayıcılı varlık bulunamadı.",
+    "Granit:ValidationError": "Doğrulama hatası.",
+    "Granit:Unauthorized": "Yetkisiz erişim.",
+    "Granit:Forbidden": "Erişim reddedildi.",
+    "Granit:InternalError": "Dahili bir hata oluştu."
+  }
+}

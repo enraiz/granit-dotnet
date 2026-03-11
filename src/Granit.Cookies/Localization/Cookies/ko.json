@@ -1,0 +1,6 @@
+{
+  "culture": "ko",
+  "texts": {
+    "Cookies:Unregistered": "쿠키 '{0}'이(가) 등록되지 않았습니다. 모든 쿠키는 시작 시 선언해야 합니다."
+  }
+}

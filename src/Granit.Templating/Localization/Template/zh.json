@@ -1,0 +1,6 @@
+{
+  "culture": "zh",
+  "texts": {
+    "Template:TransitionDenied": "模板生命周期从 '{0}' 到 '{1}' 的转换被拒绝。"
+  }
+}

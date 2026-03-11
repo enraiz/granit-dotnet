@@ -1,0 +1,8 @@
+{
+  "culture": "ja",
+  "texts": {
+    "PermissionGroup:Authorization": "認可管理",
+    "Permission:Authorization.Definitions.Read": "登録済みの権限定義とグループをすべて表示",
+    "Permission:Authorization.Grants.Manage": "ロールの権限を表示、付与、取消"
+  }
+}

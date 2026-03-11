@@ -1,0 +1,8 @@
+{
+  "culture": "pl",
+  "texts": {
+    "Features:NotEnabled": "Funkcja '{0}' nie jest włączona w bieżącej subskrypcji.",
+    "Features:LimitExceeded": "Osiągnięto limit funkcji '{0}' ({1}/{2}). Zaktualizuj subskrypcję, aby zwiększyć ten limit.",
+    "Features:InvalidValue": "Nieprawidłowa wartość '{0}' dla funkcji '{1}': {2}"
+  }
+}

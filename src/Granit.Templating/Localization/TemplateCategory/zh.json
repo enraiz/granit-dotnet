@@ -1,0 +1,7 @@
+{
+  "culture": "zh",
+  "texts": {
+    "TemplateCategory:DuplicateName": "名称为 '{0}' 的分类已存在。",
+    "TemplateCategory:HasTemplates": "无法删除分类：{0} 个模板仍然关联。"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "culture": "ko",
+  "texts": {
+    "Features:NotEnabled": "기능 '{0}'은(는) 현재 구독에서 활성화되어 있지 않습니다.",
+    "Features:LimitExceeded": "기능 '{0}'의 한도에 도달했습니다 ({1}/{2}). 이 한도를 늘리려면 구독을 업그레이드하세요.",
+    "Features:InvalidValue": "기능 '{1}'에 대한 값 '{0}'이(가) 올바르지 않습니다: {2}"
+  }
+}

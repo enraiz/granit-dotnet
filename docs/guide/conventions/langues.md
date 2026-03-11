@@ -12,14 +12,14 @@
 | Issues GitLab (titre, description, commentaires) | Français |
 | Commits (Conventional Commits) | Français |
 | `CLAUDE.md`, skills | Anglais |
-| Fichiers de localisation (`Localization/**/*.json`) | 9 cultures |
+| Fichiers de localisation (`Localization/**/*.json`) | 17 cultures |
 
 ## Diacritiques
 
 **Toujours** utiliser les accents français corrects (é, è, ê, à, â, ù, û, ô, î,
 ï, ç, œ) dans tout le contenu français (docs, issues, commits). Jamais dans le code.
 
-## Localisation — 9 cultures (7 langues de base + 2 variantes régionales)
+## Localisation — 17 cultures (14 langues de base + 3 variantes régionales)
 
 ### Langues de base
 
@@ -32,6 +32,13 @@
 | `es` | Español |
 | `it` | Italiano |
 | `pt` | Português |
+| `zh` | 中文 (Chinese) |
+| `ja` | 日本語 (Japanese) |
+| `pl` | Polski |
+| `tr` | Türkçe |
+| `ko` | 한국어 (Korean) |
+| `sv` | Svenska |
+| `cs` | Čeština |
 
 ### Variantes régionales
 
@@ -39,6 +46,7 @@
 | --- | --- | --- |
 | `fr-CA` | Français — Canada | `fr` |
 | `en-GB` | English — United Kingdom | `en` |
+| `pt-BR` | Português — Brasil | `pt` |
 
 Les fichiers de variantes régionales ne contiennent que les **clés qui diffèrent**
 de la langue de base. Le mécanisme de fallback natif .NET (`CultureInfo.Parent`)
@@ -50,15 +58,16 @@ Les applications existantes qui utilisent `"fr"` ou `"en"` continuent de
 fonctionner sans modification. Le code culture `"fr"` résout `fr.json`
 (= Français France), `"en"` résout `en.json` (= English US).
 
-Lors de l'ajout d'une clé de localisation, créez ou mettez à jour **les 7 fichiers
-de base** (`en`, `fr`, `nl`, `de`, `es`, `it`, `pt`). Les fichiers de variantes
-régionales (`fr-CA`, `en-GB`) ne doivent être modifiés que si la traduction
-diffère de la langue de base.
+Lors de l'ajout d'une clé de localisation, créez ou mettez à jour **les 14 fichiers
+de base** (`en`, `fr`, `nl`, `de`, `es`, `it`, `pt`, `zh`, `ja`, `pl`, `tr`, `ko`,
+`sv`, `cs`). Les fichiers de variantes régionales (`fr-CA`, `en-GB`, `pt-BR`) ne
+doivent être modifiés que si la traduction diffère de la langue de base.
 
 ### `ReferenceDataEntity`
 
-Les 7 propriétés de label restent inchangées :
-`LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`, `LabelEs`, `LabelIt`, `LabelPt`.
+Les 14 propriétés de label :
+`LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`, `LabelEs`, `LabelIt`, `LabelPt`,
+`LabelZh`, `LabelJa`, `LabelPl`, `LabelTr`, `LabelKo`, `LabelSv`, `LabelCs`.
 
 La propriété `Label` utilise `TwoLetterISOLanguageName`, ce qui fait que `fr-CA`
-résout `LabelFr` et `en-GB` résout `LabelEn`.
+résout `LabelFr`, `en-GB` résout `LabelEn` et `pt-BR` résout `LabelPt`.

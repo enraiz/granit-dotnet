@@ -27,6 +27,13 @@ internal sealed class ReferenceDataUpdateRequestValidator : GranitValidator<Refe
         RuleFor(x => x.LabelEs).MaximumLength(MaxLabelLength);
         RuleFor(x => x.LabelIt).MaximumLength(MaxLabelLength);
         RuleFor(x => x.LabelPt).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelZh).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelJa).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelPl).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelTr).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelKo).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelSv).MaximumLength(MaxLabelLength);
+        RuleFor(x => x.LabelCs).MaximumLength(MaxLabelLength);
 
         RuleFor(x => x.SortOrder)
             .GreaterThanOrEqualTo(0);

@@ -62,6 +62,13 @@ internal static class ReferenceDataAdminEndpoints
             LabelEs = request.LabelEs,
             LabelIt = request.LabelIt,
             LabelPt = request.LabelPt,
+            LabelZh = request.LabelZh,
+            LabelJa = request.LabelJa,
+            LabelPl = request.LabelPl,
+            LabelTr = request.LabelTr,
+            LabelKo = request.LabelKo,
+            LabelSv = request.LabelSv,
+            LabelCs = request.LabelCs,
             SortOrder = request.SortOrder,
             ValidFrom = request.ValidFrom,
             ValidTo = request.ValidTo,
@@ -94,6 +101,13 @@ internal static class ReferenceDataAdminEndpoints
         existing.LabelEs = request.LabelEs;
         existing.LabelIt = request.LabelIt;
         existing.LabelPt = request.LabelPt;
+        existing.LabelZh = request.LabelZh;
+        existing.LabelJa = request.LabelJa;
+        existing.LabelPl = request.LabelPl;
+        existing.LabelTr = request.LabelTr;
+        existing.LabelKo = request.LabelKo;
+        existing.LabelSv = request.LabelSv;
+        existing.LabelCs = request.LabelCs;
         existing.SortOrder = request.SortOrder;
         existing.IsActive = request.IsActive;
         existing.ValidFrom = request.ValidFrom;

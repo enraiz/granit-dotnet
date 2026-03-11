@@ -1,0 +1,8 @@
+{
+  "culture": "sv",
+  "texts": {
+    "Features:NotEnabled": "Funktionen '{0}' är inte aktiverad i din nuvarande prenumeration.",
+    "Features:LimitExceeded": "Gränsen för funktionen '{0}' har nåtts ({1}/{2}). Uppgradera din prenumeration för att öka denna gräns.",
+    "Features:InvalidValue": "Ogiltigt värde '{0}' för funktionen '{1}': {2}"
+  }
+}
