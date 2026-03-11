@@ -1,9 +1,9 @@
-# ADR-014 : PuppeteerSharp — Rendu HTML vers PDF
+# ADR-012 : PuppeteerSharp — Rendu HTML vers PDF
 
 - **Statut** : Accepté
 - **Date** : 2026-02-28
 - **Issue** : [#324](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/324)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.DocumentGeneration.Pdf)
 
 ## Contexte

@@ -7,21 +7,6 @@
 - **Compliance**: RGPD + ISO 27001 + ISO 9001
 - **Publication**: GitLab Package Registry (NuGet)
 
-## GitLab repositories
-
-| ID | Repo | Path |
-| -- | ---- | ---- |
-| 5 | governance-compliance | `digital-dynamics/governance-compliance` |
-| 6 | **granit-dotnet** | `digital-dynamics/granit-dotnet` |
-| 9 | granit-front | `digital-dynamics/granit-front` |
-| 10 | guava-admin | `digital-dynamics/guava-platform/applications/guava-admin` |
-| 4 | guava-app-template | `digital-dynamics/guava-platform/applications/guava-app-template` |
-| 7 | guava-backend | `digital-dynamics/guava-platform/applications/guava-backend` |
-| 1 | guava-front | `digital-dynamics/guava-platform/applications/guava-front` |
-| 3 | gitops | `digital-dynamics/guava-platform/infrastructure/gitops` |
-| 2 | iac | `digital-dynamics/guava-platform/infrastructure/iac` |
-| 8 | project-governance | `digital-dynamics/guava-platform/project-governance` |
-
 ## Stack & versions
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
@@ -224,7 +209,7 @@ and is available in every module without referencing `Granit.MultiTenancy`.
   multi-tenancy is not installed.
 - Hard dependency on `Granit.MultiTenancy` is allowed **only** when the module must enforce
   strict tenant isolation (example: BlobStorage — throws if no tenant context, RGPD).
-- Application modules (`GuavaHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
+- Application modules (`AppHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
   as usual when multi-tenancy is required in the application.
 
 ## Personas (user stories)

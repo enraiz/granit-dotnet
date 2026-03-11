@@ -1,9 +1,9 @@
-# ADR-008 : FluentValidation — Framework de validation métier
+# ADR-006 : FluentValidation — Framework de validation métier
 
 - **Statut** : Accepté
 - **Date** : 2026-02-24
 - **Issue** : [#183](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/183)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Validation, Granit.Wolverine)
 
 ## Contexte

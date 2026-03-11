@@ -1,9 +1,9 @@
-# ADR-010 : SmartFormat.NET — Pluralisation CLDR
+# ADR-008 : SmartFormat.NET — Pluralisation CLDR
 
 - **Statut** : Accepté
 - **Date** : 2026-02-26
 - **Issue** : [#23](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/23)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Localization)
 
 ## Contexte

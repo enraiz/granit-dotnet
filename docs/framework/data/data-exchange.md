@@ -802,7 +802,7 @@ L'enregistrement est automatique :
 
 Créer un handler Wolverine pour réagir aux événements. Exemple avec
 `INotificationPublisher` (pattern identique à `ExportCompletedHandler` dans
-guava-backend pour la RGPD) :
+le backend applicatif pour la RGPD) :
 
 ```csharp
 public static class ImportJobCompletedHandler
@@ -830,6 +830,6 @@ public static class ImportJobCompletedHandler
 
 ## Voir aussi
 
-- [ADR-018 — Sep pour le parsing CSV](../../ADR/ADR-018-sep-parsing-csv.md)
-- [ADR-019 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-019-sylvan-data-excel-parsing.md)
+- [ADR-015 — Sep pour le parsing CSV](../../ADR/ADR-015-sep-parsing-csv.md)
+- [ADR-016 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-016-sylvan-data-excel-parsing.md)
 - [Querying](querying.md) — module de filtrage/tri/pagination utilisé par l'export

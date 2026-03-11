@@ -26,7 +26,7 @@ public class ApiKeyEntry : AuditedEntity, ISoftDeletable, IMultiTenant
     /// <summary>Last four characters of the raw secret for identification.</summary>
     public string LastFourChars { get; set; } = string.Empty;
 
-    /// <summary>Permissions granted to this API key (e.g., <c>["Guava.Patients.Read"]</c>).</summary>
+    /// <summary>Permissions granted to this API key (e.g., <c>["MyApp.Patients.Read"]</c>).</summary>
     public List<string> Permissions { get; set; } = [];
 
     /// <summary>Allowed CIDR ranges for IP whitelisting. Empty means no restriction.</summary>

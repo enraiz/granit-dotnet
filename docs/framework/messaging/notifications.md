@@ -328,7 +328,7 @@ La clé privée VAPID doit être stockée dans **Vault** en production.
 ### MobilePush (Capacitor / apps natives)
 
 Canal push pour les applications mobiles construites avec **Capacitor** (transformation
-de Guava-Front en app iOS/Android). Utilise le pattern **Keyed Services** pour résoudre
+de app-front en app iOS/Android). Utilise le pattern **Keyed Services** pour résoudre
 le provider d'envoi (FCM, APNs, etc.) à l'exécution.
 
 Le canal résout les **device tokens** de l'utilisateur via `IMobilePushTokenReader`, puis
@@ -768,9 +768,9 @@ public sealed class MyAppModule : GranitModule { }
 > **HDS** : le payload ne contient pas de PII — uniquement des identifiants techniques
 > (`EntityId`, `TransitionedBy` sous forme d'ID utilisateur).
 
-### Câblage applicatif (niveau Guava)
+### Câblage applicatif (niveau application)
 
-Les événements suivants sont câblés **au niveau applicatif** (guava-backend) car les
+Les événements suivants sont câblés **au niveau applicatif** (backend consommateur) car les
 définitions de notification et les données métier sont spécifiques à l'application.
 
 #### RGPD — Suppression de données personnelles
@@ -818,11 +818,11 @@ Notification aux admins abonnés
 | Événement | Package / Module | Destinataires | Canaux | Opt-out |
 | --- | --- | --- | --- | --- |
 | `WorkflowStateChangedEvent` | `Granit.Workflow.Notifications` | Entity followers | InApp, SignalR | Oui |
-| `ImportJobCompletedEvent` | Guava.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
-| `ExportJobCompletedEvent` | Guava.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
-| `PersonalDataDeletionRequestedEvent` | Guava.Modules.Security | Demandeur | InApp, Email | Non |
-| `PersonalDataDeletedEvent` | Guava.Modules.Security | Abonnés (admins/DPO) | InApp, Email | Non |
-| `IdentityUserDeletedEvent` | Guava.Modules.Security | Abonnés (admins) | InApp, Email | Non |
+| `ImportJobCompletedEvent` | MyApp.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
+| `ExportJobCompletedEvent` | MyApp.Modules.DataExchange | Entity followers | InApp, SignalR | Oui |
+| `PersonalDataDeletionRequestedEvent` | MyApp.Modules.Security | Demandeur | InApp, Email | Non |
+| `PersonalDataDeletedEvent` | MyApp.Modules.Security | Abonnés (admins/DPO) | InApp, Email | Non |
+| `IdentityUserDeletedEvent` | MyApp.Modules.Security | Abonnés (admins) | InApp, Email | Non |
 
 ## Dépendances Granit
 

@@ -1,9 +1,9 @@
-# ADR-018 : Sep — Parsing CSV haute performance
+# ADR-015 : Sep — Parsing CSV haute performance
 
 - **Statut** : Accepté
 - **Date** : 2026-03-01
 - **Issue** : [#475](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/475)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.DataExchange.Csv)
 
 ## Contexte

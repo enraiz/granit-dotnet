@@ -1,15 +1,10 @@
-# ADR-002 : Stack d'observabilité — Serilog + OpenTelemetry
+# ADR-001 : Stack d'observabilité — Serilog + OpenTelemetry
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
 - **Issue** : [#10](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/10)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Observability)
-
-> Voir aussi :
->
-> - [GitOps ADR-005 — Stack LGTM](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/gitops/-/blob/main/docs/ADR/ADR-005-stack-lgtm-observabilite.md) (déploiement Loki/Grafana/Tempo/Mimir)
-> - [GitOps ADR-008 — OpenTelemetry instrumentation .NET](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/gitops/-/blob/main/docs/ADR/ADR-008-opentelemetry-instrumentation-dotnet.md) (configuration OTLP côté infrastructure)
 
 ## Contexte
 
@@ -122,7 +117,5 @@ Ce choix devrait être réévalué si :
 
 - Commit initial : `52f1444` (2026-02-21)
 - Issues : [#10 — Granit.Observability](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/10), [#222](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/222)
-- GitOps ADR-005 : [Stack LGTM](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/gitops/-/blob/main/docs/ADR/ADR-005-stack-lgtm-observabilite.md)
-- GitOps ADR-008 : [OpenTelemetry .NET](https://gitlab.digitaldynamics.be/digital-dynamics/guava-platform/infrastructure/gitops/-/blob/main/docs/ADR/ADR-008-opentelemetry-instrumentation-dotnet.md)
 - Serilog : <https://serilog.net/>
 - OpenTelemetry .NET : <https://opentelemetry.io/docs/languages/dotnet/>

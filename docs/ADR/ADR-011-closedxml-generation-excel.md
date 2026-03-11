@@ -1,9 +1,9 @@
-# ADR-013 : ClosedXML — Génération de tableurs Excel
+# ADR-011 : ClosedXML — Génération de tableurs Excel
 
 - **Statut** : Accepté
 - **Date** : 2026-02-27
 - **Issue** : [#326](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/326)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.DocumentGeneration.Excel)
 
 ## Contexte

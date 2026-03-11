@@ -1,9 +1,9 @@
-# ADR-007 : Wolverine + Cronos — Messaging, CQRS et scheduling
+# ADR-005 : Wolverine + Cronos — Messaging, CQRS et scheduling
 
 - **Statut** : Accepté
 - **Date** : 2026-02-22
 - **Issue** : [#115](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/115)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Wolverine, Granit.Wolverine.Postgresql, Granit.BackgroundJobs)
 
 ## Contexte

@@ -1,9 +1,9 @@
-# ADR-003 : Redis via StackExchange.Redis — Cache distribué
+# ADR-002 : Redis via StackExchange.Redis — Cache distribué
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
 - **Issue** : [#25](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/25)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Caching, Granit.Caching.StackExchangeRedis, Granit.Caching.Hybrid)
 
 ## Contexte

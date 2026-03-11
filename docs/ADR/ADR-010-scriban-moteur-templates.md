@@ -1,9 +1,9 @@
-# ADR-012 : Scriban — Moteur de templates texte
+# ADR-010 : Scriban — Moteur de templates texte
 
 - **Statut** : Accepté
 - **Date** : 2026-02-27
 - **Issue** : [#322](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/322)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Templating.Scriban)
 
 ## Contexte

@@ -1,9 +1,9 @@
-# ADR-009 : Testcontainers — Tests d'intégration conteneurisés
+# ADR-007 : Testcontainers — Tests d'intégration conteneurisés
 
 - **Statut** : Accepté
 - **Date** : 2026-02-24
 - **Issue** : [#117](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/117)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Wolverine.Postgresql.IntegrationTests)
 
 ## Contexte

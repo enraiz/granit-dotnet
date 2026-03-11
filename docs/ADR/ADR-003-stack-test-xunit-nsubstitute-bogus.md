@@ -1,9 +1,9 @@
-# ADR-005 : Stack de test — xUnit v3, NSubstitute et Bogus
+# ADR-003 : Stack de test — xUnit v3, NSubstitute et Bogus
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
 - **Issue** : [#4](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/4)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet, applications consommatrices
 
 ## Contexte
@@ -61,7 +61,7 @@ Les besoins sont :
 - Inconvénient : projet jeune (v1.x), mainteneur unique, écosystème restreint
   (Testcontainers, Verify ciblent principalement xUnit/NUnit)
 - Réévaluation prévue via un ADR futur quand le projet aura atteint une maturité
-  suffisante (cf. [ADR-017](ADR-017-migration-shouldly.md))
+  suffisante (cf. [ADR-014](ADR-014-migration-shouldly.md))
 
 ### Mocking
 

@@ -1,9 +1,9 @@
-# ADR-011 : Scalar.AspNetCore — Documentation API interactive
+# ADR-009 : Scalar.AspNetCore — Documentation API interactive
 
 - **Statut** : Accepté
 - **Date** : 2026-02-26
 - **Issue** : [#80](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/80)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.ApiDocumentation)
 
 ## Contexte

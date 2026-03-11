@@ -446,7 +446,7 @@ Le `ModuleLoader` utilise l'algorithme de Kahn pour le tri topologique :
 
 > Pour le blueprint complet des dossiers standard (Internal/, Domain/, Extensions/,
 > etc.) applicable à **tous** les modules Granit, voir
-> [Structure des modules](../../guide/conventions/backend/structure-modules.md).
+> [Structure des modules](../../guide/conventions/structure-modules.md).
 
 ```text
 Granit.Core

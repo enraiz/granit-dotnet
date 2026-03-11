@@ -1,9 +1,9 @@
-# ADR-015 : Magick.NET — Traitement d'images
+# ADR-013 : Magick.NET — Traitement d'images
 
 - **Statut** : Accepté
 - **Date** : 2026-02-28
 - **Issue** : [#363](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/363)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Imaging.MagickNet)
 
 ## Contexte

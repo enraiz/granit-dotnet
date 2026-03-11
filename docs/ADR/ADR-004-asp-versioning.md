@@ -1,9 +1,9 @@
-# ADR-006 : Asp.Versioning — Versionnement d'API REST
+# ADR-004 : Asp.Versioning — Versionnement d'API REST
 
 - **Statut** : Accepté
 - **Date** : 2026-02-22
 - **Issue** : [#78](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/78)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.ApiVersioning)
 
 ## Contexte

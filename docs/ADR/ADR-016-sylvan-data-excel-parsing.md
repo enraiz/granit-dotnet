@@ -1,9 +1,9 @@
-# ADR-019 : Sylvan.Data.Excel — Lecture streaming de fichiers Excel
+# ADR-016 : Sylvan.Data.Excel — Lecture streaming de fichiers Excel
 
 - **Statut** : Accepté
 - **Date** : 2026-03-01
 - **Issue** : [#476](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/476)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.DataExchange.Excel)
 
 ## Contexte
