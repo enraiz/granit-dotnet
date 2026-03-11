@@ -650,13 +650,13 @@
       "Microsoft.Extensions.Caching.Hybrid": {
         "type": "CentralTransitive",
         "requested": "[10.*, )",
-        "resolved": "10.3.0",
-        "contentHash": "M64quRgc0tSGs8aTj7XNr0sm4nsoqNuAaDDUohC2UGEPyMt3jhW4dHcCUUk/UBYfj+XPWDeycbDIUsdIO5mShw==",
+        "resolved": "10.4.0",
+        "contentHash": "4V+aMLQeU/p4VcIWIcvGro0L6HynmL2TrelL04Ce1iotP6T5+kjxuZQvl6P1ObSXIRPCbVXtQSt1NxK0fRIuag==",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "10.0.3",
-          "Microsoft.Extensions.Caching.Memory": "10.0.3",
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
-          "Microsoft.Extensions.Options": "10.0.3"
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.4",
+          "Microsoft.Extensions.Caching.Memory": "10.0.4",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.4",
+          "Microsoft.Extensions.Options": "10.0.4"
         }
       },
       "Microsoft.Extensions.Caching.Memory": {
@@ -748,8 +748,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.3",
-        "contentHash": "py+bnF628jLbm63Q8VabQyzNNP0/jMJAVLrUaxhLMvU75GZVcN9LgdXRLk42Grpcih3rqZcRY+eSSkYO3+3QTQ=="
+        "resolved": "2.13.5",
+        "contentHash": "4L+7LesEArm6+/ZfukTCT6aHK0XEyoDpPEm7Y8VU/gNHPTZ62/gQaljdACIemYmrAlot0ne/ozcxBCDVywD34A=="
       },
       "SmartFormat": {
         "type": "CentralTransitive",

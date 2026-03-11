@@ -47,11 +47,11 @@
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.*" />
   </ItemGroup>
   <ItemGroup Label="Wolverine">
-    <PackageVersion Include="WolverineFx" Version="5.17.*" />
-    <PackageVersion Include="WolverineFx.EntityFrameworkCore" Version="5.17.*" />
-    <PackageVersion Include="WolverineFx.Postgresql" Version="5.17.*" />
-    <PackageVersion Include="WolverineFx.FluentValidation" Version="5.17.*" />
-    <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="5.17.*" />
+    <PackageVersion Include="WolverineFx" Version="5.18.*" />
+    <PackageVersion Include="WolverineFx.EntityFrameworkCore" Version="5.18.*" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="5.18.*" />
+    <PackageVersion Include="WolverineFx.FluentValidation" Version="5.18.*" />
+    <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="5.18.*" />
   </ItemGroup>
   <ItemGroup Label="Blob Storage">
     <PackageVersion Include="AWSSDK.S3" Version="3.*" />

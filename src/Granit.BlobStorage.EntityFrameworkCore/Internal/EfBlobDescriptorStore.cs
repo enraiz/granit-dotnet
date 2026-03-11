@@ -44,4 +44,19 @@ internal sealed class EfBlobDescriptorStore(
         context.Blobs.Update(descriptor);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<BlobDescriptor>> FindOrphanedAsync(
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken = default)
+    {
+        await using BlobStorageDbContext context = await contextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await context.Blobs
+            .Where(b => (b.Status == BlobStatus.Pending || b.Status == BlobStatus.Uploading)
+                        && b.CreatedAt < cutoff)
+            .OrderBy(b => b.CreatedAt)
+            .Take(batchSize)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

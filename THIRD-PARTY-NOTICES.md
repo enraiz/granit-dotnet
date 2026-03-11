@@ -58,11 +58,11 @@ Dernière mise à jour : 2026-03-03
 | MailKit | 4.12.0 | Copyright (c) 2013-2026 .NET Foundation and Contributors |
 | Microsoft.AspNetCore.SignalR.StackExchangeRedis | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Http | 10.0.3 | (c) Microsoft Corporation |
-| WolverineFx | 5.17.0 | JasperFx Contributors |
-| WolverineFx.EntityFrameworkCore | 5.17.0 | JasperFx Contributors |
-| WolverineFx.FluentValidation | 5.17.0 | JasperFx Contributors |
-| WolverineFx.Http.FluentValidation | 5.17.0 | JasperFx Contributors |
-| WolverineFx.Postgresql | 5.17.0 | JasperFx Contributors |
+| WolverineFx | 5.18.1 | JasperFx Contributors |
+| WolverineFx.EntityFrameworkCore | 5.18.1 | JasperFx Contributors |
+| WolverineFx.FluentValidation | 5.18.1 | JasperFx Contributors |
+| WolverineFx.Http.FluentValidation | 5.18.1 | JasperFx Contributors |
+| WolverineFx.Postgresql | 5.18.1 | JasperFx Contributors |
 
 ### Apache-2.0
 

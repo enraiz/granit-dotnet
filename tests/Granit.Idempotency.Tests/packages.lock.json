@@ -267,8 +267,8 @@
       "Microsoft.Extensions.Caching.Hybrid": {
         "type": "CentralTransitive",
         "requested": "[10.*, )",
-        "resolved": "10.3.0",
-        "contentHash": "M64quRgc0tSGs8aTj7XNr0sm4nsoqNuAaDDUohC2UGEPyMt3jhW4dHcCUUk/UBYfj+XPWDeycbDIUsdIO5mShw=="
+        "resolved": "10.4.0",
+        "contentHash": "4V+aMLQeU/p4VcIWIcvGro0L6HynmL2TrelL04Ce1iotP6T5+kjxuZQvl6P1ObSXIRPCbVXtQSt1NxK0fRIuag=="
       },
       "Microsoft.IO.RecyclableMemoryStream": {
         "type": "CentralTransitive",

@@ -23,8 +23,8 @@
       "Microsoft.Extensions.TimeProvider.Testing": {
         "type": "Direct",
         "requested": "[10.*, )",
-        "resolved": "10.3.0",
-        "contentHash": "CKjS1u0JlMIA44o/0NV8nXRCaudpol3ERVlB9eu21kvq++EMt7fBavbPxWXN+nOpsdDhz/pb0MY2RBpk2/PGbA=="
+        "resolved": "10.4.0",
+        "contentHash": "uJ8n9WUEzux9I2CjZh7imGBgZadfwhAKlxuBq7GsNGL8FJF81aHXAYaRMnwW+9EvRFQNytu7xo1ffeuuTncAzg=="
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
