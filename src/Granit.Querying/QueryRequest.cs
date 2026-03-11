@@ -66,4 +66,12 @@ public sealed record QueryRequest
     /// <see cref="GroupedResult{T}"/> instead of <see cref="PagedResult{T}"/>.
     /// </summary>
     public string? GroupBy { get; init; }
+
+    /// <summary>
+    /// When <c>true</c>, the server skips the <c>COUNT(*)</c> query and returns
+    /// <c>null</c> for <see cref="PagedResult{T}.TotalCount"/>.
+    /// <see cref="PagedResult{T}.HasMore"/> is still computed by fetching <c>pageSize + 1</c> rows.
+    /// Useful for large datasets where counting is expensive.
+    /// </summary>
+    public bool SkipTotalCount { get; init; }
 }

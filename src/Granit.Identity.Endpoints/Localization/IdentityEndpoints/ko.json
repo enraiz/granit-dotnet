@@ -1,0 +1,9 @@
+{
+  "culture": "ko",
+  "texts": {
+    "PermissionGroup:Identity": "신원",
+    "Permission:Identity.UserCache.Read": "사용자 캐시 보기 (목록, 검색, 일괄, 통계)",
+    "Permission:Identity.UserCache.Sync": "ID 공급자에서 사용자 캐시 강제 동기화",
+    "Permission:Identity.UserCache.Delete": "사용자 캐시 항목 삭제 또는 가명화 (GDPR)"
+  }
+}

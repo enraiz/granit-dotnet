@@ -1,0 +1,9 @@
+{
+  "culture": "tr",
+  "texts": {
+    "PermissionGroup:Identity": "Kimlik",
+    "Permission:Identity.UserCache.Read": "Kullanıcı önbelleğini görüntüle (liste, arama, toplu, istatistikler)",
+    "Permission:Identity.UserCache.Sync": "Kimlik sağlayıcısından kullanıcı önbelleği eşitlemesini zorla",
+    "Permission:Identity.UserCache.Delete": "Kullanıcı önbellek girdilerini sil veya takma adlandır (KVKK)"
+  }
+}

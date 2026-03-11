@@ -1,0 +1,7 @@
+{
+  "culture": "zh",
+  "texts": {
+    "Vault:UnknownAuthMethod": "未知的 Vault 认证方式：'{0}'。允许的值：'Kubernetes'、'Token'。",
+    "Vault:TokenRequired": "Token 认证需要 Vault 令牌。请在配置中设置 Vault:Token。"
+  }
+}

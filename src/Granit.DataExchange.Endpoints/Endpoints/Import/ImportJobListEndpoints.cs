@@ -43,7 +43,8 @@ internal static class ImportJobListEndpoints
 
         PagedResult<ImportJobResponse> response = new(
             result.Items.Select(ImportJobResponse.FromJob).ToList(),
-            result.TotalCount);
+            result.TotalCount,
+            result.HasMore);
 
         return TypedResults.Ok(response);
     }

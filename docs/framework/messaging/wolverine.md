@@ -216,7 +216,7 @@ public sealed class OrderCreatedHandler
 - L'Outbox PostgreSQL garantit la livraison at-least-once sans perte de messages en cas de crash
 - `TransactionMiddlewareMode.Eager` assure l'atomicité entre le write EF Core et la mise en queue
 - La propagation `X-User-Id` garantit la traçabilité des opérations asynchrones dans l'audit trail
-- La chaîne de connexion doit pointer sur une base de données **sur infrastructure souveraine européenne**,
+- La chaîne de connexion doit pointer sur une base de données **en Europe**,
   jamais sur un service US (Cloud Act)
 
 ## Dépendances Granit

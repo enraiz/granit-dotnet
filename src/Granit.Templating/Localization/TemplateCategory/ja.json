@@ -1,0 +1,7 @@
+{
+  "culture": "ja",
+  "texts": {
+    "TemplateCategory:DuplicateName": "名前 '{0}' のカテゴリは既に存在します。",
+    "TemplateCategory:HasTemplates": "カテゴリを削除できません：{0} 件のテンプレートがまだ関連付けられています。"
+  }
+}

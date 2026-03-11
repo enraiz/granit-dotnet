@@ -70,6 +70,14 @@ public sealed class QueryRequestTests
     }
 
     [Fact]
+    public void Default_SkipTotalCount_Is_False()
+    {
+        QueryRequest request = new();
+
+        request.SkipTotalCount.ShouldBeFalse();
+    }
+
+    [Fact]
     public void Custom_Values_Are_Preserved()
     {
         Dictionary<string, string> filter = new()

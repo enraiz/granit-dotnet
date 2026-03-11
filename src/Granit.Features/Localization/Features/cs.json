@@ -1,0 +1,8 @@
+{
+  "culture": "cs",
+  "texts": {
+    "Features:NotEnabled": "Funkce '{0}' není povolena ve vašem aktuálním předplatném.",
+    "Features:LimitExceeded": "Byl dosažen limit funkce '{0}' ({1}/{2}). Upgradujte předplatné pro zvýšení tohoto limitu.",
+    "Features:InvalidValue": "Neplatná hodnota '{0}' pro funkci '{1}': {2}"
+  }
+}

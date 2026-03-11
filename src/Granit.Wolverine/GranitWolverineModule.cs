@@ -13,7 +13,7 @@ namespace Granit.Wolverine;
 /// <para>
 /// For durable messaging, add a provider module after this one:
 /// <list type="bullet">
-///   <item><c>GranitWolverinePostgresqlModule</c> — PostgreSQL Outbox (ISO 27001, infrastructure souveraine européenne)</item>
+///   <item><c>GranitWolverinePostgresqlModule</c> — PostgreSQL Outbox (ISO 27001)</item>
 /// </list>
 /// </para>
 /// </remarks>

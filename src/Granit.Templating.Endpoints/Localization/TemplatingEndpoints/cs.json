@@ -1,0 +1,7 @@
+{
+  "culture": "cs",
+  "texts": {
+    "PermissionGroup:Templating": "Šablony",
+    "Permission:Templates.Manage": "Správa šablon (zobrazení, vytvoření, úprava, smazání, publikování)"
+  }
+}

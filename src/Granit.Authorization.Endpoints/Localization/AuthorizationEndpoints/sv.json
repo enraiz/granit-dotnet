@@ -1,0 +1,8 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Authorization": "Behörighetshantering",
+    "Permission:Authorization.Definitions.Read": "Visa alla registrerade behörighetsdefinitioner och grupper",
+    "Permission:Authorization.Grants.Manage": "Visa, bevilja och återkalla behörigheter för roller"
+  }
+}

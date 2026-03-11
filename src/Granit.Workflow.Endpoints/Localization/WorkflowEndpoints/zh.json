@@ -1,0 +1,7 @@
+{
+  "culture": "zh",
+  "texts": {
+    "PermissionGroup:Workflow": "工作流",
+    "Permission:Workflow.History.Read": "查看工作流转换历史（审计跟踪）"
+  }
+}

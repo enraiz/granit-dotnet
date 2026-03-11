@@ -148,6 +148,50 @@ public sealed class QueryRequestBinderTests
     }
 
     [Fact]
+    public async Task BindAsync_parses_skipTotalCount_true()
+    {
+        HttpContext context = CreateContext("?page=1&pageSize=20&skipTotalCount=true");
+
+        QueryRequest? result = await QueryRequestBinder.BindAsync(context, null!);
+
+        result.ShouldNotBeNull();
+        result.SkipTotalCount.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task BindAsync_parses_skipTotalCount_case_insensitive()
+    {
+        HttpContext context = CreateContext("?skipTotalCount=TRUE");
+
+        QueryRequest? result = await QueryRequestBinder.BindAsync(context, null!);
+
+        result.ShouldNotBeNull();
+        result.SkipTotalCount.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task BindAsync_skipTotalCount_defaults_to_false_when_absent()
+    {
+        HttpContext context = CreateContext("?page=1");
+
+        QueryRequest? result = await QueryRequestBinder.BindAsync(context, null!);
+
+        result.ShouldNotBeNull();
+        result.SkipTotalCount.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task BindAsync_skipTotalCount_false_when_not_true()
+    {
+        HttpContext context = CreateContext("?skipTotalCount=false");
+
+        QueryRequest? result = await QueryRequestBinder.BindAsync(context, null!);
+
+        result.ShouldNotBeNull();
+        result.SkipTotalCount.ShouldBeFalse();
+    }
+
+    [Fact]
     public async Task BindAsync_full_complex_query_string()
     {
         HttpContext context = CreateContext(

@@ -1,0 +1,6 @@
+{
+  "culture": "ja",
+  "texts": {
+    "Cookies:Unregistered": "Cookie '{0}' は登録されていません。すべての Cookie は起動時に宣言する必要があります。"
+  }
+}

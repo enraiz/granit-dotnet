@@ -69,13 +69,20 @@ public abstract class ReferenceDataEntityTypeConfiguration<TEntity>
                .HasMaxLength(250)
                .IsRequired();
 
-        // Translation labels (6 supported locales besides English)
+        // Translation labels (13 supported locales besides English)
         builder.Property(e => e.LabelFr).HasMaxLength(250);
         builder.Property(e => e.LabelNl).HasMaxLength(250);
         builder.Property(e => e.LabelDe).HasMaxLength(250);
         builder.Property(e => e.LabelEs).HasMaxLength(250);
         builder.Property(e => e.LabelIt).HasMaxLength(250);
         builder.Property(e => e.LabelPt).HasMaxLength(250);
+        builder.Property(e => e.LabelZh).HasMaxLength(250);
+        builder.Property(e => e.LabelJa).HasMaxLength(250);
+        builder.Property(e => e.LabelPl).HasMaxLength(250);
+        builder.Property(e => e.LabelTr).HasMaxLength(250);
+        builder.Property(e => e.LabelKo).HasMaxLength(250);
+        builder.Property(e => e.LabelSv).HasMaxLength(250);
+        builder.Property(e => e.LabelCs).HasMaxLength(250);
 
         // IsActive — indexed for global query filter performance
         builder.HasIndex(e => e.IsActive)

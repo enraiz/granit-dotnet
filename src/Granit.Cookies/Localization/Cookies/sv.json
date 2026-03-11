@@ -1,0 +1,6 @@
+{
+  "culture": "sv",
+  "texts": {
+    "Cookies:Unregistered": "Cookien '{0}' är inte registrerad. Alla cookies måste deklareras vid start."
+  }
+}

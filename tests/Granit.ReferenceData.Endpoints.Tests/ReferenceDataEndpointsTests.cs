@@ -73,7 +73,7 @@ public sealed class ReferenceDataEndpointsTests : IAsyncDisposable
     {
         // Arrange
         PagedResult<TestRefEntity> result = new(
-            [new TestRefEntity { Code = "BE", LabelEn = "Belgium" }], 1);
+            [new TestRefEntity { Code = "BE", LabelEn = "Belgium" }], 1, HasMore: false);
         _storeReader.GetAllAsync(Arg.Any<ReferenceDataQuery?>(), Arg.Any<CancellationToken>())
             .Returns(result);
 

@@ -17,7 +17,7 @@ choix des bibliothèques d'instrumentation conditionne :
   messages Wolverine et appels HTTP
 - **Métriques** : supervision des performances et alerting
 - **Souveraineté** : aucune donnée de télémétrie ne doit quitter l'infrastructure
-  souveraine européenne
+  européenne
 
 Les données d'observabilité sont exportées via le protocole OTLP vers une stack
 Grafana self-hosted : **Loki** (logs), **Tempo** (traces), **Mimir** (métriques).
@@ -36,7 +36,7 @@ Grafana self-hosted : **Loki** (logs), **Tempo** (traces), **Mimir** (métriques
   sink OTLP pour unifier le pipeline
 - **Tracing** : OpenTelemetry — standard CNCF, instrumentation automatique
   (ASP.NET Core, HTTP, EF Core), propagation W3C Trace Context
-- **Export** : OTLP vers Loki/Tempo/Mimir (self-hosted sur infrastructure souveraine)
+- **Export** : OTLP vers Loki/Tempo/Mimir (self-hosted en Europe)
 
 ### Option 2 : Microsoft.Extensions.Logging + OpenTelemetry seul
 
@@ -93,7 +93,7 @@ Grafana self-hosted : **Loki** (logs), **Tempo** (traces), **Mimir** (métriques
 
 ### Positives
 
-- Conformité souveraineté : zéro donnée de télémétrie hors infrastructure souveraine européenne
+- Conformité souveraineté : zéro donnée de télémétrie hors hébergement européen
 - Standard CNCF : portabilité vers tout backend compatible OTLP
 - Corrélation complète : logs ↔ traces ↔ métriques via le même TraceId
 - Enrichissement contextuel Serilog : tenant, user, module, correlation-id
@@ -109,7 +109,7 @@ Grafana self-hosted : **Loki** (logs), **Tempo** (traces), **Mimir** (métriques
 
 Ce choix devrait être réévalué si :
 
-- Un service d'observabilité managé souverain européen émerge (certifié ISO 27001)
+- Un service d'observabilité managé européen émerge (certifié ISO 27001)
 - OpenTelemetry .NET SDK atteint la parité fonctionnelle avec Serilog pour le logging structuré
 - La charge de maintenance de la stack Grafana self-hosted devient disproportionnée
 

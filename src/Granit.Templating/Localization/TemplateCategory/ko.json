@@ -1,0 +1,7 @@
+{
+  "culture": "ko",
+  "texts": {
+    "TemplateCategory:DuplicateName": "이름이 '{0}'인 카테고리가 이미 존재합니다.",
+    "TemplateCategory:HasTemplates": "카테고리를 삭제할 수 없습니다: {0}개의 템플릿이 아직 연결되어 있습니다."
+  }
+}

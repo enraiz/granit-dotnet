@@ -1,0 +1,10 @@
+{
+  "culture": "sv",
+  "texts": {
+    "Granit:EntityNotFound": "Entiteten av typ {0} med identifierare {1} hittades inte.",
+    "Granit:ValidationError": "Valideringsfel.",
+    "Granit:Unauthorized": "Obehörig åtkomst.",
+    "Granit:Forbidden": "Åtkomst nekad.",
+    "Granit:InternalError": "Ett internt fel inträffade."
+  }
+}

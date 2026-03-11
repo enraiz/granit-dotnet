@@ -16,18 +16,39 @@ internal static class QueryablePaginationExtensions
         this IQueryable<T> source,
         int page,
         int pageSize,
+        bool skipTotalCount,
         CancellationToken cancellationToken)
     {
-        int totalCount = await source.CountAsync(cancellationToken).ConfigureAwait(false);
         int skip = (page - 1) * pageSize;
 
-        List<T> items = await source
+        if (skipTotalCount)
+        {
+            // Fetch pageSize + 1 to determine HasMore without COUNT(*)
+            List<T> items = await source
+                .Skip(skip)
+                .Take(pageSize + 1)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            bool hasMore = items.Count > pageSize;
+            if (hasMore)
+            {
+                items.RemoveAt(items.Count - 1);
+            }
+
+            return new PagedResult<T>(items, TotalCount: null, HasMore: hasMore);
+        }
+
+        int totalCount = await source.CountAsync(cancellationToken).ConfigureAwait(false);
+
+        List<T> pagedItems = await source
             .Skip(skip)
             .Take(pageSize)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return new PagedResult<T>(items, totalCount);
+        bool hasMorePages = skip + pagedItems.Count < totalCount;
+        return new PagedResult<T>(pagedItems, totalCount, HasMore: hasMorePages);
     }
 
     /// <summary>
@@ -48,7 +69,7 @@ internal static class QueryablePaginationExtensions
         if (property is null)
         {
             List<T> fallback = await source.Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false);
-            return new PagedResult<T>(fallback, fallback.Count);
+            return new PagedResult<T>(fallback, TotalCount: null, HasMore: false);
         }
 
         IQueryable<T> query = source;
@@ -83,7 +104,8 @@ internal static class QueryablePaginationExtensions
             .ConfigureAwait(false);
 
         string? nextCursor = null;
-        if (items.Count > pageSize)
+        bool hasMore = items.Count > pageSize;
+        if (hasMore)
         {
             items.RemoveAt(items.Count - 1);
             T lastItem = items[^1];
@@ -94,6 +116,6 @@ internal static class QueryablePaginationExtensions
             }
         }
 
-        return new PagedResult<T>(items, items.Count, nextCursor);
+        return new PagedResult<T>(items, TotalCount: null, HasMore: hasMore, NextCursor: nextCursor);
     }
 }

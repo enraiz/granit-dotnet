@@ -28,7 +28,7 @@ Autres solutions envisagées et raisons du choix.
 
 ## Compliance
 
-- [ ] Données restent sur infrastructure souveraine européenne
+- [ ] Données restent en Europe
 - [ ] Pas de PII dans les logs
 - [ ] Chiffrement conforme ISO 27001 (transit + repos)
 

@@ -1,0 +1,7 @@
+{
+  "culture": "sv",
+  "texts": {
+    "Vault:UnknownAuthMethod": "Okänd Vault-autentiseringsmetod: '{0}'. Tillåtna värden: 'Kubernetes', 'Token'.",
+    "Vault:TokenRequired": "Vault-token krävs för tokenautentisering. Konfigurera Vault:Token i konfigurationen."
+  }
+}

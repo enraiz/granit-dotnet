@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "texts": {
+    "BlobStorage:NotFound": "İstenen dosya bulunamadı.",
+    "BlobStorage:NotValid": "Dosya indirilebilir durumda değil."
+  }
+}

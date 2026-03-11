@@ -62,6 +62,13 @@ public sealed class ReferenceDataEntityTests
         entity.LabelEs.ShouldBe(string.Empty);
         entity.LabelIt.ShouldBe(string.Empty);
         entity.LabelPt.ShouldBe(string.Empty);
+        entity.LabelZh.ShouldBe(string.Empty);
+        entity.LabelJa.ShouldBe(string.Empty);
+        entity.LabelPl.ShouldBe(string.Empty);
+        entity.LabelTr.ShouldBe(string.Empty);
+        entity.LabelKo.ShouldBe(string.Empty);
+        entity.LabelSv.ShouldBe(string.Empty);
+        entity.LabelCs.ShouldBe(string.Empty);
     }
 
     [Fact]
@@ -121,11 +128,67 @@ public sealed class ReferenceDataEntityTests
     }
 
     [Fact]
+    public void Label_ChineseCulture_ReturnsLabelZh()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelZh = "比利时" };
+
+        RunWithCulture("zh-CN", () => entity.Label.ShouldBe("比利时"));
+    }
+
+    [Fact]
+    public void Label_JapaneseCulture_ReturnsLabelJa()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelJa = "ベルギー" };
+
+        RunWithCulture("ja-JP", () => entity.Label.ShouldBe("ベルギー"));
+    }
+
+    [Fact]
+    public void Label_PolishCulture_ReturnsLabelPl()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelPl = "Belgia" };
+
+        RunWithCulture("pl-PL", () => entity.Label.ShouldBe("Belgia"));
+    }
+
+    [Fact]
+    public void Label_TurkishCulture_ReturnsLabelTr()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelTr = "Belçika" };
+
+        RunWithCulture("tr-TR", () => entity.Label.ShouldBe("Belçika"));
+    }
+
+    [Fact]
+    public void Label_KoreanCulture_ReturnsLabelKo()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelKo = "벨기에" };
+
+        RunWithCulture("ko-KR", () => entity.Label.ShouldBe("벨기에"));
+    }
+
+    [Fact]
+    public void Label_SwedishCulture_ReturnsLabelSv()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelSv = "Belgien" };
+
+        RunWithCulture("sv-SE", () => entity.Label.ShouldBe("Belgien"));
+    }
+
+    [Fact]
+    public void Label_CzechCulture_ReturnsLabelCs()
+    {
+        TestEntity entity = new() { LabelEn = "Belgium", LabelCs = "Belgie" };
+
+        RunWithCulture("cs-CZ", () => entity.Label.ShouldBe("Belgie"));
+    }
+
+    [Fact]
     public void Label_UnsupportedCulture_FallsBackToEnglish()
     {
         TestEntity entity = new() { LabelEn = "Belgium", LabelFr = "Belgique" };
 
-        RunWithCulture("ja-JP", () => entity.Label.ShouldBe("Belgium"));
+        RunWithCulture("ar-SA", () => entity.Label.ShouldBe("Belgium"));
     }
 
     [Fact]
@@ -183,6 +246,13 @@ public sealed class ReferenceDataEntityTests
             LabelEs = "Bélgica",
             LabelIt = "Belgio",
             LabelPt = "Bélgica",
+            LabelZh = "比利时",
+            LabelJa = "ベルギー",
+            LabelPl = "Belgia",
+            LabelTr = "Belçika",
+            LabelKo = "벨기에",
+            LabelSv = "Belgien",
+            LabelCs = "Belgie",
             IsActive = false,
             SortOrder = 42,
             ValidFrom = now,
@@ -197,6 +267,13 @@ public sealed class ReferenceDataEntityTests
         entity.LabelEs.ShouldBe("Bélgica");
         entity.LabelIt.ShouldBe("Belgio");
         entity.LabelPt.ShouldBe("Bélgica");
+        entity.LabelZh.ShouldBe("比利时");
+        entity.LabelJa.ShouldBe("ベルギー");
+        entity.LabelPl.ShouldBe("Belgia");
+        entity.LabelTr.ShouldBe("Belçika");
+        entity.LabelKo.ShouldBe("벨기에");
+        entity.LabelSv.ShouldBe("Belgien");
+        entity.LabelCs.ShouldBe("Belgie");
         entity.IsActive.ShouldBeFalse();
         entity.SortOrder.ShouldBe(42);
         entity.ValidFrom.ShouldBe(now);

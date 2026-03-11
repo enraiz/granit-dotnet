@@ -1,0 +1,8 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:DataExchange": "Datautbyte",
+    "Permission:DataExchange.Imports.Execute": "Utför dataimport (uppladdning, mappning, körning, rapporter)",
+    "Permission:DataExchange.Exports.Execute": "Utför dataexport (definitioner, körning, nedladdning, förinställningar)"
+  }
+}

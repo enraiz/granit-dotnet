@@ -1,0 +1,8 @@
+{
+  "culture": "tr",
+  "texts": {
+    "PermissionGroup:DataExchange": "Veri Alışverişi",
+    "Permission:DataExchange.Imports.Execute": "Veri içe aktarmalarını çalıştır (yükleme, eşleme, yürütme, raporlar)",
+    "Permission:DataExchange.Exports.Execute": "Veri dışa aktarmalarını çalıştır (tanımlar, yürütme, indirme, ön ayarlar)"
+  }
+}

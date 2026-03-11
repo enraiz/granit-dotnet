@@ -34,7 +34,7 @@ compliant with **GDPR/ISO 27001** requirements.
 | **Documents** | Template engine (Scriban), HTML→PDF rendering, Excel generation |
 | **Data Exchange** | Import (Extract→Map→Validate→Execute), Export (tabular Excel/CSV with presets) |
 | **Workflow** | FSM engine, publication lifecycle, approval routing |
-| **Localization** | i18n (9 cultures), override store, source-generated keys |
+| **Localization** | i18n (17 cultures), override store, source-generated keys |
 | **SaaS** | Feature flags per commercial plan, quotas, Default → Plan → Tenant resolution |
 | **Quality** | Embedded Roslyn analyzers, Architecture Tests (ArchUnitNET), FluentValidation (VAT, SIREN, NISS) |
 

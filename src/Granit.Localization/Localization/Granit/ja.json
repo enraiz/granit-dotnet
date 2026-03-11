@@ -1,0 +1,10 @@
+{
+  "culture": "ja",
+  "texts": {
+    "Granit:EntityNotFound": "タイプ {0}、識別子 {1} のエンティティが見つかりませんでした。",
+    "Granit:ValidationError": "バリデーションエラー。",
+    "Granit:Unauthorized": "認証されていないアクセス。",
+    "Granit:Forbidden": "アクセスが拒否されました。",
+    "Granit:InternalError": "内部エラーが発生しました。"
+  }
+}

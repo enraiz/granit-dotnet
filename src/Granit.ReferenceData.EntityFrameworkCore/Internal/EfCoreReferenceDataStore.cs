@@ -93,7 +93,7 @@ internal sealed class EfCoreReferenceDataStore<TEntity, TDbContext>(
 
         List<TEntity> items = await queryable.ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return new PagedResult<TEntity>(items, totalCount);
+        return new PagedResult<TEntity>(items, totalCount, HasMore: skip + items.Count < totalCount);
     }
 
     /// <inheritdoc/>

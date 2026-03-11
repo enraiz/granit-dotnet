@@ -1,0 +1,6 @@
+{
+  "culture": "pl",
+  "texts": {
+    "Template:TransitionDenied": "Przejście cyklu życia szablonu z '{0}' do '{1}' zostało odrzucone."
+  }
+}

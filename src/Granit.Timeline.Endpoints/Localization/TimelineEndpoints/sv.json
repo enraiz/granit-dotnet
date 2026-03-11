@@ -1,0 +1,8 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Timeline": "Tidslinje",
+    "Permission:Timeline.Entries.Read": "Visa aktivitetsflöden och revisionshistorik",
+    "Permission:Timeline.Entries.Create": "Publicera kommentarer och följa/sluta följa entiteter"
+  }
+}

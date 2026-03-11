@@ -1,0 +1,6 @@
+{
+  "culture": "ko",
+  "texts": {
+    "Template:TransitionDenied": "템플릿 생명주기 전환이 '{0}'에서 '{1}'(으)로 거부되었습니다."
+  }
+}

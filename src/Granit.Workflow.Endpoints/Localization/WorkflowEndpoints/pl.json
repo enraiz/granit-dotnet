@@ -1,0 +1,7 @@
+{
+  "culture": "pl",
+  "texts": {
+    "PermissionGroup:Workflow": "Przepływ pracy",
+    "Permission:Workflow.History.Read": "Wyświetlanie historii przejść przepływu pracy (ścieżka audytu)"
+  }
+}

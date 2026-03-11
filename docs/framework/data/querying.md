@@ -131,6 +131,7 @@ public sealed record QueryRequest
     public IReadOnlyDictionary<string, string>? Presets { get; init; }
     public IReadOnlyList<string>? QuickFilters { get; init; }
     public string? GroupBy { get; init; }
+    public bool SkipTotalCount { get; init; }
 }
 ```
 
@@ -139,9 +140,13 @@ public sealed record QueryRequest
 ```csharp
 public sealed record PagedResult<T>(
     IReadOnlyList<T> Items,
-    int TotalCount,
+    int? TotalCount,
+    bool HasMore,
     string? NextCursor = null);
 ```
+
+- `TotalCount` est `null` quand `SkipTotalCount = true` ou en pagination cursor
+- `HasMore` est calculé via la stratégie `pageSize + 1` (sans `COUNT(*)` supplémentaire)
 
 ### GroupedResult
 
@@ -285,6 +290,7 @@ GET /api/patients?page=1&pageSize=20&search=Dupont
 | `presets[group]` | nom du preset | `presets[status]=Active` |
 | `quickFilters` | noms séparés par `,` | `quickFilters=MyItems,Unread` |
 | `groupBy` | nom de propriété | `groupBy=category` |
+| `skipTotalCount` | `true` / absent | `skipTotalCount=true` |
 
 ## Metadata endpoint
 

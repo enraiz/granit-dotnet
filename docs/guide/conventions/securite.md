@@ -29,8 +29,7 @@ Ces règles de sécurité s'appliquent à **tous les projets** (backend et front
 
 ### Souveraineté (Cloud Act)
 
-- Infrastructure **obligatoirement en Europe** sur infrastructure souveraine
-- **Ne jamais proposer** AWS, Azure ou GCP pour les données de santé
+- Infrastructure **en Europe**
 - Images Docker depuis le registre privé souverain uniquement
 
 ## Signaux d'alerte à remonter

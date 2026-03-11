@@ -61,7 +61,7 @@ classDiagram
 Le `TypedKeyCacheServiceAdapter` permet d'utiliser des clés fortement typées
 (Guid, int, composite) tout en déléguant au service de cache existant basé
 sur des clés string. Le `S3BlobClient` isole le framework du SDK AWS,
-permettant de changer de provider S3 (infrastructure souveraine européenne, MinIO) sans toucher au cœur.
+permettant de changer de provider S3 (hébergement européen, MinIO) sans toucher au cœur.
 
 ## Exemple d'usage
 

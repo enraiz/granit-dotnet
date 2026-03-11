@@ -71,6 +71,7 @@ internal sealed class EfCoreTimelineQuery(
             })
             .ToList();
 
-        return new PagedResult<TimelineStreamEntry>(items, totalCount);
+        int skip = (clampedPage - 1) * clampedPageSize;
+        return new PagedResult<TimelineStreamEntry>(items, totalCount, HasMore: skip + items.Count < totalCount);
     }
 }

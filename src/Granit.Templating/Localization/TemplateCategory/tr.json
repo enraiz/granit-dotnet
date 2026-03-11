@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "texts": {
+    "TemplateCategory:DuplicateName": "'{0}' adlı bir kategori zaten mevcut.",
+    "TemplateCategory:HasTemplates": "Kategori silinemez: {0} şablon hâlâ ilişkilendirilmiş durumda."
+  }
+}

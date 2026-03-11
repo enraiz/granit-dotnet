@@ -45,7 +45,7 @@ internal static class ApiKeyReadEndpoints
 
         var items = result.Items.Select(ApiKeyResponse.FromEntry).ToList();
 
-        return TypedResults.Ok(new PagedResult<ApiKeyResponse>(items, result.TotalCount));
+        return TypedResults.Ok(new PagedResult<ApiKeyResponse>(items, result.TotalCount, result.HasMore));
     }
 
     private static async Task<Results<Ok<ApiKeyResponse>, NotFound>> GetByIdAsync(

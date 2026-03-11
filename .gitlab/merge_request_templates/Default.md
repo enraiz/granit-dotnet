@@ -45,7 +45,7 @@
 - [ ] Aucun secret hardcodé (passwords, tokens, API keys)
 - [ ] Pas de PII (données de santé) dans les logs
 - [ ] Chiffrement conforme ISO 27001 (transit + repos)
-- [ ] Souveraineté européenne respectée sur infrastructure souveraine
+- [ ] Souveraineté européenne respectée en Europe
 
 ### Tests
 
@@ -61,7 +61,7 @@
 ### Compliance
 
 - [ ] Changements respectent RGPD/ISO 27001
-- [ ] Données restent sur infrastructure souveraine européenne
+- [ ] Données restent en Europe
 - [ ] Rétrocompatibilité NuGet vérifiée (ou breaking change documenté dans CHANGELOG)
 
 ---

@@ -1,0 +1,7 @@
+{
+  "culture": "pl",
+  "texts": {
+    "PermissionGroup:BackgroundJobs": "Zadania w tle",
+    "Permission:BackgroundJobs.Jobs.Manage": "Zarządzanie zadaniami w tle (lista, wstrzymanie, wznowienie, ręczne uruchomienie)"
+  }
+}

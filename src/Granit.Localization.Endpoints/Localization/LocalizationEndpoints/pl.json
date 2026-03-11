@@ -1,0 +1,7 @@
+{
+  "culture": "pl",
+  "texts": {
+    "PermissionGroup:Localization": "Lokalizacja",
+    "Permission:Localization.Overrides.Manage": "Zarządzanie nadpisaniami tłumaczeń (wyświetlanie, tworzenie, edycja, usuwanie)"
+  }
+}

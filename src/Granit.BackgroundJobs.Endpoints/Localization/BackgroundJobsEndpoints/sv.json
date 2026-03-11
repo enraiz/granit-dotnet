@@ -1,0 +1,7 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:BackgroundJobs": "Bakgrundsjobb",
+    "Permission:BackgroundJobs.Jobs.Manage": "Hantera bakgrundsjobb (lista, pausa, återuppta, manuell körning)"
+  }
+}

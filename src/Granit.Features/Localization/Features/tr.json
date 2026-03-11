@@ -1,0 +1,8 @@
+{
+  "culture": "tr",
+  "texts": {
+    "Features:NotEnabled": "'{0}' özelliği mevcut aboneliğinizde etkin değil.",
+    "Features:LimitExceeded": "'{0}' özelliğinin sınırına ulaşıldı ({1}/{2}). Bu sınırı artırmak için aboneliğinizi yükseltin.",
+    "Features:InvalidValue": "'{1}' özelliği için geçersiz değer '{0}': {2}"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "culture": "zh",
+  "texts": {
+    "PermissionGroup:Timeline": "时间线",
+    "Permission:Timeline.Entries.Read": "查看活动流和审计历史",
+    "Permission:Timeline.Entries.Create": "发表评论和关注/取消关注实体"
+  }
+}

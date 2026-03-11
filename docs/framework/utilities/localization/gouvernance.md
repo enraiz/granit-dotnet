@@ -25,25 +25,28 @@ voir le [guide de gouvernance applicative](../../../guide/gouvernance-traduction
 ### Langues de base (obligatoires)
 
 Chaque package Granit contenant un dossier `Localization/` doit fournir les
-**7 fichiers de base** : `en.json`, `fr.json`, `nl.json`, `de.json`, `es.json`,
-`it.json`, `pt.json`.
+**14 fichiers de base** : `en.json`, `fr.json`, `nl.json`, `de.json`, `es.json`,
+`it.json`, `pt.json`, `zh.json`, `ja.json`, `pl.json`, `tr.json`, `ko.json`,
+`sv.json`, `cs.json`.
 
 ### Variantes régionales
 
-Les fichiers `fr-CA.json` et `en-GB.json` ne contiennent que les **clés qui
-diffèrent** de la langue de base. Le fallback fait le reste.
+Les fichiers `fr-CA.json`, `en-GB.json` et `pt-BR.json` ne contiennent que les
+**clés qui diffèrent** de la langue de base. Le fallback fait le reste.
 
 | Base | Variantes | Défaut |
 | --- | --- | --- |
 | `en.json` (anglais américain) | `en-GB.json` | `en` = US |
 | `fr.json` (français de France) | `fr-CA.json` | `fr` = France |
+| `pt.json` (portugais) | `pt-BR.json` | `pt` = Portugal |
 
 ### `ReferenceDataEntity`
 
-Les 7 propriétés `Label*` (`LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`,
-`LabelEs`, `LabelIt`, `LabelPt`) restent inchangées. La propriété `Label`
-utilise `TwoLetterISOLanguageName` : `fr-CA` résout `LabelFr`, `en-GB`
-résout `LabelEn`.
+Les 14 propriétés `Label*` (`LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`,
+`LabelEs`, `LabelIt`, `LabelPt`, `LabelZh`, `LabelJa`, `LabelPl`, `LabelTr`,
+`LabelKo`, `LabelSv`, `LabelCs`). La propriété `Label` utilise
+`TwoLetterISOLanguageName` : `fr-CA` résout `LabelFr`, `en-GB` résout
+`LabelEn`, `pt-BR` résout `LabelPt`.
 
 ## Convention de nommage des clés
 
@@ -80,8 +83,8 @@ Features:LimitExceeded
 ### Ajout
 
 1. Vérifier qu'une clé équivalente n'existe pas déjà dans le même package
-2. Ajouter la clé dans les **7 fichiers de base** avec les traductions
-3. Si la traduction diffère pour `fr-CA` ou `en-GB`, ajouter la clé dans
+2. Ajouter la clé dans les **14 fichiers de base** avec les traductions
+3. Si la traduction diffère pour `fr-CA`, `en-GB` ou `pt-BR`, ajouter la clé dans
    le fichier régional correspondant
 4. Le source generator (`Granit.Localization.SourceGenerator`) génère
    automatiquement la constante typée
@@ -96,7 +99,7 @@ Features:LimitExceeded
 
 1. Vérifier que la clé n'est plus référencée dans le code du package
    (recherche `grep -r "CléÀSupprimer"`)
-2. Retirer la clé des 7 fichiers de base + fichiers régionaux
+2. Retirer la clé des 14 fichiers de base + fichiers régionaux
 3. Les overrides DB orphelins restent en base mais ne sont plus servis
    (pas de nettoyage automatique — la clé n'existe plus dans les JSON)
 
@@ -140,12 +143,12 @@ Les vérifications suivantes sont recommandées dans le pipeline CI :
 
 ### Cohérence des fichiers
 
-Vérifier que chaque dossier `Localization/` contient les 9 fichiers attendus
-(7 base + `fr-CA` + `en-GB`).
+Vérifier que chaque dossier `Localization/` contient les 17 fichiers attendus
+(14 base + `fr-CA` + `en-GB` + `pt-BR`).
 
 ### Cohérence des clés
 
-Vérifier que les 7 fichiers de base contiennent les mêmes clés. Une clé
+Vérifier que les 14 fichiers de base contiennent les mêmes clés. Une clé
 présente dans `en.json` mais absente de `fr.json` est une erreur.
 
 ### Doublons de valeurs

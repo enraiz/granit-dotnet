@@ -13,7 +13,7 @@ Description de l'architecture cible et des packages concernés.
 ## Contraintes
 
 - [ ] ISO 27001 / RGPD
-- [ ] Souveraineté souveraine européenne
+- [ ] Souveraineté européenne
 - [ ] Performance / SLA
 - [ ] Rétrocompatibilité NuGet (SemVer)
 - [ ] Budget

@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "texts": {
+    "PermissionGroup:Workflow": "İş Akışı",
+    "Permission:Workflow.History.Read": "İş akışı geçiş geçmişini görüntüle (denetim izi)"
+  }
+}

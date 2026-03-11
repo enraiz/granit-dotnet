@@ -1,0 +1,8 @@
+{
+  "culture": "ja",
+  "texts": {
+    "PermissionGroup:Timeline": "タイムライン",
+    "Permission:Timeline.Entries.Read": "アクティビティフィードと監査履歴を表示",
+    "Permission:Timeline.Entries.Create": "コメントの投稿とエンティティのフォロー/フォロー解除"
+  }
+}

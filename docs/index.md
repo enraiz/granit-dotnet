@@ -10,7 +10,7 @@ Granit fournit un socle modulaire de packages NuGet couvrant les besoins
 transversaux des applications métier : sécurité, persistance, observabilité,
 multi-tenancy, chiffrement, messaging et plus encore.
 
-Conçu pour un hébergement souverain (hébergement souverain européen) et conforme aux
+Conçu pour un hébergement souverain (hébergement européen) et conforme aux
 exigences **ISO 27001** et **RGPD**.
 
 ## Stack technique

@@ -27,10 +27,6 @@ public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
     /// <para>
     /// Must be called after <c>AddGranitFeatures()</c>.
     /// </para>
-    /// <para>
-    /// The connection string must point to a database hosted on European sovereign infrastructure.
-    /// Never use a service subject to the US Cloud Act for health data.
-    /// </para>
     /// </remarks>
     /// <param name="builder">The host application builder.</param>
     /// <param name="configure">EF Core <see cref="DbContextOptionsBuilder"/> configuration (provider + connection string).</param>

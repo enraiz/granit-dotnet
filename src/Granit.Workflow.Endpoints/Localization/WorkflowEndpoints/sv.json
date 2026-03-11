@@ -1,0 +1,7 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Workflow": "Arbetsflöde",
+    "Permission:Workflow.History.Read": "Visa arbetsflödets övergångshistorik (revisionsspår)"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "culture": "cs",
+  "texts": {
+    "PermissionGroup:Identity": "Identita",
+    "Permission:Identity.UserCache.Read": "Zobrazit mezipaměť uživatelů (seznam, hledání, dávkově, statistiky)",
+    "Permission:Identity.UserCache.Sync": "Vynutit synchronizaci mezipaměti uživatelů od poskytovatele identity",
+    "Permission:Identity.UserCache.Delete": "Smazat nebo pseudonymizovat záznamy mezipaměti uživatelů (GDPR)"
+  }
+}

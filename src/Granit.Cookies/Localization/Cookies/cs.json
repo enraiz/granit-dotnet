@@ -1,0 +1,6 @@
+{
+  "culture": "cs",
+  "texts": {
+    "Cookies:Unregistered": "Cookie '{0}' není registrováno. Všechny cookies musí být deklarovány při spuštění."
+  }
+}

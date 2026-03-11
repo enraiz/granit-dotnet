@@ -349,7 +349,7 @@ app.MapGranitWebhooksRedelivery();  // POST /webhooks/deliveries/{id}/retry
 - `WebhookDeliveryAttempt` est INSERT-only : aucune donnée d'audit ne peut être modifiée
 - Le `payload_hash` (SHA-256) permet la non-répudiation sans stocker de données de santé
 - Les secrets de signature doivent être **chiffrés via Vault** en production (pas de clair en base)
-- L'infrastructure de livraison doit rester **en Europe** sur infrastructure souveraine — jamais sur AWS/Azure/GCP
+- L'infrastructure de livraison doit rester **en Europe**
 - La durée de conservation des `WebhookDeliveryAttempt` est à paramétrer à **3 ans minimum** via
   une politique de purge applicative (pas de TTL automatique au niveau du module)
 

@@ -80,7 +80,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
         // Arrange
         ExportJob job = CreateJob(ExportJobStatus.Completed);
         _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ExportJob>([job], 1));
+            .Returns(new PagedResult<ExportJob>([job], 1, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -101,7 +101,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(ExportJobStatus.Failed, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ExportJob>([], 0));
+            .Returns(new PagedResult<ExportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -118,7 +118,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 2, 10, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ExportJob>([], 0));
+            .Returns(new PagedResult<ExportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -135,7 +135,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 1, 100, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ExportJob>([], 0));
+            .Returns(new PagedResult<ExportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -152,7 +152,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ExportJob>([], 0));
+            .Returns(new PagedResult<ExportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -169,7 +169,7 @@ public sealed class ExportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ExportJob>([], 0));
+            .Returns(new PagedResult<ExportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(

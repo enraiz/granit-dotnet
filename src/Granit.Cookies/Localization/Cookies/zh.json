@@ -1,0 +1,6 @@
+{
+  "culture": "zh",
+  "texts": {
+    "Cookies:Unregistered": "Cookie '{0}' 未注册。所有 Cookie 必须在启动时声明。"
+  }
+}

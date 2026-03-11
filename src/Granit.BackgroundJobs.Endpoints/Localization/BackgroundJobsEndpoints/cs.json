@@ -1,0 +1,7 @@
+{
+  "culture": "cs",
+  "texts": {
+    "PermissionGroup:BackgroundJobs": "Úlohy na pozadí",
+    "Permission:BackgroundJobs.Jobs.Manage": "Správa úloh na pozadí (seznam, pozastavení, obnovení, ruční spuštění)"
+  }
+}

@@ -15,7 +15,7 @@ namespace Granit.Features.EntityFrameworkCore.Internal;
 /// and default values live in code via <c>FeatureDefinitionProvider</c>.
 /// </para>
 /// <para>
-/// Compatible with PostgreSQL (ISO 27001 compliant, infrastructure souveraine européenneing).
+/// Compatible with PostgreSQL (ISO 27001 compliant).
 /// </para>
 /// </remarks>
 internal sealed class GranitFeaturesDbContext(

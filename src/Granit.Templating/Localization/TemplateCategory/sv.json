@@ -1,0 +1,7 @@
+{
+  "culture": "sv",
+  "texts": {
+    "TemplateCategory:DuplicateName": "En kategori med namnet '{0}' finns redan.",
+    "TemplateCategory:HasTemplates": "Kan inte ta bort kategori: {0} mall(ar) är fortfarande associerade."
+  }
+}

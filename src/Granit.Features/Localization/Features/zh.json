@@ -1,0 +1,8 @@
+{
+  "culture": "zh",
+  "texts": {
+    "Features:NotEnabled": "功能 '{0}' 在您当前的订阅中未启用。",
+    "Features:LimitExceeded": "功能 '{0}' 已达到上限（{1}/{2}）。升级您的订阅以提高此限制。",
+    "Features:InvalidValue": "功能 '{1}' 的值 '{0}' 无效：{2}"
+  }
+}

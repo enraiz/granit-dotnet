@@ -1,0 +1,9 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Identity": "Identitet",
+    "Permission:Identity.UserCache.Read": "Visa användarcache (lista, sök, batch, statistik)",
+    "Permission:Identity.UserCache.Sync": "Tvinga synkronisering av användarcache från identitetsleverantören",
+    "Permission:Identity.UserCache.Delete": "Radera eller pseudonymisera användarcacheposter (GDPR)"
+  }
+}

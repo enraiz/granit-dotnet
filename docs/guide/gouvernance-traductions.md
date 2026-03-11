@@ -97,7 +97,15 @@ my-app-backend/
         ├── de.json
         ├── es.json
         ├── it.json
-        └── pt.json
+        ├── pt.json
+        ├── pt-BR.json      # Portugais Brésil (overrides)
+        ├── zh.json
+        ├── ja.json
+        ├── pl.json
+        ├── tr.json
+        ├── ko.json
+        ├── sv.json
+        └── cs.json
 ```
 
 Les fichiers contiennent à la fois les clés backend **et** les clés frontend :
@@ -178,7 +186,7 @@ des fichiers React. Quand un fichier local est vide, il est supprimé.
 
 1. Chercher si une clé équivalente existe (`grep` dans les JSON)
 2. Déterminer la bonne catégorie (`Common`, module, `Admin`, `Front`)
-3. Ajouter dans les **7 fichiers de base** avec les 7 traductions
+3. Ajouter dans les **14 fichiers de base** avec les 14 traductions
 4. Si la traduction diffère pour `fr-CA` ou `en-GB`, ajouter dans le
    fichier régional
 5. Utiliser la clé dans le code (`.cs` ou `.tsx`)
@@ -211,7 +219,7 @@ exécute 4 vérifications automatiques dans le stage `quality` du pipeline :
 
 | Check | Niveau | Description |
 | --- | --- | --- |
-| Fichiers de base | Bloquant | Les 7 langues (en, fr, nl, de, es, it, pt) doivent exister par resource |
+| Fichiers de base | Bloquant | Les 14 langues (en, fr, nl, de, es, it, pt, zh, ja, pl, tr, ko, sv, cs) doivent exister par resource |
 | Cohérence inter-langues | Bloquant | Toutes les langues de base doivent contenir les mêmes clés |
 | Doublons sémantiques | Warning | Deux clés avec la même valeur dans une langue |
 | Clés orphelines | Warning | Clés non référencées dans les fichiers `.cs` |

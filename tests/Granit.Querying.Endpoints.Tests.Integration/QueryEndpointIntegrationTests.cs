@@ -71,7 +71,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
     {
         PagedResult<TestProduct> expected = new(
             [new TestProduct { Id = Guid.NewGuid(), Name = "Laptop", Price = 1000 }],
-            1);
+            1, HasMore: false);
 
         _engine.ExecuteAsync(
             Arg.Any<IQueryable<TestProduct>>(),
@@ -100,7 +100,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
             Arg.Any<IQueryable<TestProduct>>(),
             Arg.Any<QueryRequest>(),
             Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TestProduct>([], 0));
+            .Returns(new PagedResult<TestProduct>([], 0, HasMore: false));
 
         await _authClient.GetAsync(
             $"{Prefix}?page=2&pageSize=10&search=laptop&filter[Price.gte]=500",
@@ -354,7 +354,7 @@ public sealed class QueryEndpointIntegrationTests : IAsyncDisposable
             Arg.Any<IQueryable<TestProduct>>(),
             Arg.Any<QueryRequest>(),
             Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TestProduct>([], 0));
+            .Returns(new PagedResult<TestProduct>([], 0, HasMore: false));
 
         await using WebApplication customApp = builder.Build();
         customApp.MapQueryEndpoints<TestProduct>(

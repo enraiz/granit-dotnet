@@ -79,7 +79,7 @@ public sealed class ImportJobListEndpointsTests : IAsyncDisposable
         // Arrange
         ImportJob job = CreateJob(ImportJobStatus.Completed);
         _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ImportJob>([job], 1));
+            .Returns(new PagedResult<ImportJob>([job], 1, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -100,7 +100,7 @@ public sealed class ImportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(ImportJobStatus.Failed, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ImportJob>([], 0));
+            .Returns(new PagedResult<ImportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -117,7 +117,7 @@ public sealed class ImportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 2, 10, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ImportJob>([], 0));
+            .Returns(new PagedResult<ImportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -134,7 +134,7 @@ public sealed class ImportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 1, 100, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ImportJob>([], 0));
+            .Returns(new PagedResult<ImportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -151,7 +151,7 @@ public sealed class ImportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ImportJob>([], 0));
+            .Returns(new PagedResult<ImportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -168,7 +168,7 @@ public sealed class ImportJobListEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _jobReader.ListAsync(null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ImportJob>([], 0));
+            .Returns(new PagedResult<ImportJob>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(

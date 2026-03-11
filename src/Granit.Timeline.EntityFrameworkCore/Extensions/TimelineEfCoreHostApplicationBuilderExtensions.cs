@@ -15,7 +15,7 @@ public static class TimelineEfCoreHostApplicationBuilderExtensions
 {
     /// <summary>
     /// Replaces the default InMemory stores with durable EF Core implementations
-    /// backed by a PostgreSQL database hosted on European sovereign infrastructure.
+    /// backed by a PostgreSQL database.
     /// </summary>
     /// <remarks>
     /// Must be called after <c>AddGranitTimeline()</c>.
@@ -25,10 +25,6 @@ public static class TimelineEfCoreHostApplicationBuilderExtensions
     ///   <item><see cref="EfCoreTimelineQuery"/> — replaces <c>InMemoryTimelineQuery</c>.</item>
     ///   <item><see cref="Internal.TimelineDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage.</item>
     /// </list>
-    /// <para>
-    /// SOVEREIGNTY: The connection string must point to a database hosted on European sovereign infrastructure.
-    /// Never use AWS RDS, Azure SQL, or Google Cloud SQL for health data.
-    /// </para>
     /// </remarks>
     /// <param name="builder">The host application builder.</param>
     /// <param name="configure">EF Core <see cref="DbContextOptionsBuilder"/> configuration (provider + connection string).</param>

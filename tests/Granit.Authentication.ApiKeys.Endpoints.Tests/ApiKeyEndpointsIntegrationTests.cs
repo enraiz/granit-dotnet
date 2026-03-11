@@ -89,7 +89,7 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
         _adminStore.ListAsync(
                 null, null, null, false, 1, 20,
                 Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ApiKeyEntry>([entry], 1));
+            .Returns(new PagedResult<ApiKeyEntry>([entry], 1, HasMore: false));
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             Prefix,
@@ -121,7 +121,7 @@ public sealed class ApiKeyEndpointsIntegrationTests : IAsyncDisposable
         _adminStore.ListAsync(
                 "search", ApiKeyType.Secret, "live", true, 2, 10,
                 Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ApiKeyEntry>([], 0));
+            .Returns(new PagedResult<ApiKeyEntry>([], 0, HasMore: false));
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}?search=search&type=Secret&environment=live&includeRevoked=true&page=2&pageSize=10",

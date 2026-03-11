@@ -61,7 +61,7 @@ public sealed class WorkflowReadEndpointsTests : IAsyncDisposable
             [
                 new("Draft", "Submitted", DateTimeOffset.UtcNow.AddHours(-2), "user-1", null),
                 new("Submitted", "Approved", DateTimeOffset.UtcNow.AddHours(-1), "user-2", "LGTM"),
-            ], 2));
+            ], 2, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -85,7 +85,7 @@ public sealed class WorkflowReadEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _historyQuery.GetHistoryAsync("Order", "99", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TransitionHistoryResponse>([], 0));
+            .Returns(new PagedResult<TransitionHistoryResponse>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(
@@ -133,7 +133,7 @@ public sealed class WorkflowReadEndpointsTests : IAsyncDisposable
             .Returns(new PagedResult<TransitionHistoryResponse>(
             [
                 new("Draft", "Sent", DateTimeOffset.UtcNow, "user-1", null),
-            ], 1));
+            ], 1, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _adminClient.GetAsync(

@@ -43,6 +43,6 @@ internal sealed class DefaultWorkflowHistoryQuery<TDbContext>(TDbContext dbConte
                 r.Comment))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return new PagedResult<TransitionHistoryResponse>(items, totalCount);
+        return new PagedResult<TransitionHistoryResponse>(items, totalCount, HasMore: (clampedPage - 1) * clampedPageSize + items.Count < totalCount);
     }
 }

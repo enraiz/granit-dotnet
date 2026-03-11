@@ -1,0 +1,11 @@
+{
+  "culture": "tr",
+  "texts": {
+    "PermissionGroup:ApiKeys": "API Anahtarları",
+    "Permission:ApiKeys.Keys.Read": "API anahtarlarını görüntüle (liste, ayrıntılar)",
+    "Permission:ApiKeys.Keys.Create": "Yeni API anahtarları oluştur",
+    "Permission:ApiKeys.Keys.Revoke": "API anahtarlarını iptal et",
+    "Permission:ApiKeys.Keys.Rotate": "API anahtarlarını döndür (iptal et ve değiştir)",
+    "Permission:ApiKeys.Keys.UpdateScopes": "API anahtarı izinlerini ve CIDR kapsamlarını güncelle"
+  }
+}

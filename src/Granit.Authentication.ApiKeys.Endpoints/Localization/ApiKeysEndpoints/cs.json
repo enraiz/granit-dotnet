@@ -1,0 +1,11 @@
+{
+  "culture": "cs",
+  "texts": {
+    "PermissionGroup:ApiKeys": "API klíče",
+    "Permission:ApiKeys.Keys.Read": "Zobrazit API klíče (seznam, podrobnosti)",
+    "Permission:ApiKeys.Keys.Create": "Vytvořit nové API klíče",
+    "Permission:ApiKeys.Keys.Revoke": "Odvolat API klíče",
+    "Permission:ApiKeys.Keys.Rotate": "Rotovat API klíče (odvolat a nahradit)",
+    "Permission:ApiKeys.Keys.UpdateScopes": "Aktualizovat oprávnění a CIDR rozsahy API klíčů"
+  }
+}

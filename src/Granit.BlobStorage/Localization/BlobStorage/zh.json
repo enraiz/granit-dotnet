@@ -1,0 +1,7 @@
+{
+  "culture": "zh",
+  "texts": {
+    "BlobStorage:NotFound": "请求的文件未找到。",
+    "BlobStorage:NotValid": "该文件不可下载。"
+  }
+}

@@ -115,6 +115,53 @@ var apiVersionSet = app.NewApiVersionSet()
 la réponse. Les clients reçoivent un signal clair que la v1 est dépréciée et qu'ils
 doivent migrer vers la v2.
 
+### Headers de dépréciation par endpoint (RFC 8594)
+
+En plus de la dépréciation au niveau version (via `HasDeprecatedApiVersion()`), Granit
+permet de marquer des **endpoints individuels** comme dépréciés avec des headers standards.
+
+#### Minimal API — extension `.Deprecated()`
+
+```csharp
+api.MapGet("/patients/legacy", GetLegacyPatients)
+    .Deprecated(
+        sunsetDate: "2025-11-01",
+        link: "https://docs.example.com/migration/v1-to-v2");
+```
+
+Chaque réponse de cet endpoint inclura :
+
+```http
+Deprecation: true
+Sunset: Sat, 01 Nov 2025 00:00:00 GMT
+Link: <https://docs.example.com/migration/v1-to-v2>; rel="deprecation"
+```
+
+| Header | Format | Description |
+| ------ | ------ | ----------- |
+| `Deprecation` | `true` | Toujours présent quand l'endpoint est déprécié |
+| `Sunset` | HTTP-date (RFC 7231) | Date après laquelle l'endpoint sera retiré (optionnel) |
+| `Link` | `<url>; rel="deprecation"` | Lien vers la documentation de migration (optionnel) |
+
+#### Attribut `[Deprecated]` pour contrôleurs MVC
+
+```csharp
+[Deprecated(SunsetDate = "2025-11-01", Link = "https://docs.example.com/migration")]
+[HttpGet("legacy")]
+public IActionResult GetLegacy() => Ok();
+```
+
+#### Logging
+
+Un avertissement est émis dans les logs à chaque appel d'un endpoint déprécié :
+
+```text
+Deprecated endpoint called: /api/v1/patients/legacy (sunset: 2025-11-01)
+```
+
+Ce log utilise `[LoggerMessage]` source-generated et est visible dans les traces
+OpenTelemetry pour le suivi des appels aux endpoints dépréciés.
+
 ### Contrôleur MVC
 
 ```csharp
