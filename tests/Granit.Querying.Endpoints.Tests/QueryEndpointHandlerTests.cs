@@ -30,7 +30,7 @@ public sealed class QueryEndpointHandlerTests
     {
         var engine = Substitute.For<IQueryEngine<TestEntity>>();
         var pagedResult = new PagedResult<TestEntity>(
-            [new TestEntity { Name = "A" }], 1);
+            [new TestEntity { Name = "A" }], 1, HasMore: false);
         engine.ExecuteAsync(Arg.Any<IQueryable<TestEntity>>(), Arg.Any<QueryRequest>(), Arg.Any<CancellationToken>())
             .Returns(pagedResult);
 
@@ -67,7 +67,7 @@ public sealed class QueryEndpointHandlerTests
     public async Task QueryAsync_EmptyGroupBy_ReturnsPagedResult()
     {
         var engine = Substitute.For<IQueryEngine<TestEntity>>();
-        var pagedResult = new PagedResult<TestEntity>([], 0);
+        var pagedResult = new PagedResult<TestEntity>([], 0, HasMore: false);
         engine.ExecuteAsync(Arg.Any<IQueryable<TestEntity>>(), Arg.Any<QueryRequest>(), Arg.Any<CancellationToken>())
             .Returns(pagedResult);
 

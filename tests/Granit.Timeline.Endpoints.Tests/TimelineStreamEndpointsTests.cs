@@ -72,7 +72,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
         };
 
         _reader.GetStreamAsync("Patient", "42", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TimelineStreamEntry>([entry], 1));
+            .Returns(new PagedResult<TimelineStreamEntry>([entry], 1, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -94,7 +94,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _reader.GetStreamAsync("Invoice", "99", 1, QueryingDefaults.DefaultPageSize, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TimelineStreamEntry>([], 0));
+            .Returns(new PagedResult<TimelineStreamEntry>([], 0, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(
@@ -114,7 +114,7 @@ public sealed class TimelineStreamEndpointsTests : IAsyncDisposable
     {
         // Arrange
         _reader.GetStreamAsync("Patient", "1", 3, 10, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<TimelineStreamEntry>([], 50));
+            .Returns(new PagedResult<TimelineStreamEntry>([], 50, HasMore: false));
 
         // Act
         HttpResponseMessage response = await _authClient.GetAsync(

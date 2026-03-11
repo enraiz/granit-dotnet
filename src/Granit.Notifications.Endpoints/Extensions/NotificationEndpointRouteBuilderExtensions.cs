@@ -81,7 +81,7 @@ public static class NotificationEndpointRouteBuilderExtensions
         string userId = GetUserId(user);
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         PagedResult<UserNotification> result = await reader.GetListAsync(userId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
-        return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount));
+        return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount, result.HasMore));
     }
 
     private static async Task<Ok<UnreadCountResponse>> GetUnreadCountAsync(
@@ -139,7 +139,7 @@ public static class NotificationEndpointRouteBuilderExtensions
 
         Guid? tenantId = tenant.IsAvailable ? tenant.Id : null;
         PagedResult<UserNotification> result = await reader.GetByEntityAsync(entityType, entityId, tenantId, clampedPage, clampedPageSize).ConfigureAwait(false);
-        return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount));
+        return TypedResults.Ok(new PagedResult<UserNotificationResponse>(MapNotifications(result.Items), result.TotalCount, result.HasMore));
     }
 
     // -------------------------------------------------------------------------

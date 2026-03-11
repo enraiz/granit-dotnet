@@ -80,7 +80,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     public async Task GetNotifications_Authenticated_Returns200()
     {
         _userNotificationReader.GetListAsync("user-123", null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
+            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0, HasMore: false));
 
         HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
@@ -151,7 +151,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
     public async Task GetEntityActivityFeed_Returns200()
     {
         _userNotificationReader.GetByEntityAsync("Patient", "42", null, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
+            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0, HasMore: false));
 
         HttpResponseMessage response = await _authClient.GetAsync(
             $"{Prefix}/entity/Patient/42", TestContext.Current.CancellationToken);
@@ -302,7 +302,7 @@ public sealed class NotificationEndpointsTests : IAsyncDisposable
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
         _userNotificationReader.GetListAsync("user-123", tenantId, 1, 20, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0));
+            .Returns(new PagedResult<UserNotification>(Array.Empty<UserNotification>(), 0, HasMore: false));
 
         HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 

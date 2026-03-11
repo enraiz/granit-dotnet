@@ -153,7 +153,9 @@ internal sealed partial class CachedUserLookupService(
             .SearchAsync(searchTerm, tenantId, page, pageSize, cancellationToken)
             .ConfigureAwait(false);
 
-        return new PagedResult<IdentityUser>(entries.Select(ToIdentityUser).ToList(), totalCount);
+        var items = entries.Select(ToIdentityUser).ToList();
+        int skip = (Math.Max(page, 1) - 1) * Math.Clamp(pageSize, 1, QueryingDefaults.MaxPageSize);
+        return new PagedResult<IdentityUser>(items, totalCount, HasMore: skip + items.Count < totalCount);
     }
 
     // -- Sync --

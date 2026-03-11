@@ -44,7 +44,7 @@ internal sealed class QueryEngine<TEntity>(
             page = 1;
         }
 
-        return await query.ApplyOffsetPaginationAsync(page, pageSize, cancellationToken)
+        return await query.ApplyOffsetPaginationAsync(page, pageSize, request.SkipTotalCount, cancellationToken)
             .ConfigureAwait(false);
     }
 

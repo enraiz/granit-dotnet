@@ -15,7 +15,7 @@ internal sealed class NullExportJobStore : IExportJobReader, IExportJobWriter
 
     public Task<PagedResult<ExportJob>> ListAsync(
         ExportJobStatus? status = null, int page = 1, int pageSize = 20, CancellationToken cancellationToken = default) =>
-        Task.FromResult(new PagedResult<ExportJob>([], 0));
+        Task.FromResult(new PagedResult<ExportJob>([], 0, HasMore: false));
 
     public Task CreateAsync(ExportJob job, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;

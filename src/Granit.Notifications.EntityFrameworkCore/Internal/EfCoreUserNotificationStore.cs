@@ -45,7 +45,7 @@ internal sealed class EfCoreUserNotificationStore(IDbContextFactory<Notification
             .Take(clampedPageSize)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return new PagedResult<UserNotification>(items, totalCount);
+        return new PagedResult<UserNotification>(items, totalCount, HasMore: (clampedPage - 1) * clampedPageSize + items.Count < totalCount);
     }
 
     /// <inheritdoc/>
@@ -97,6 +97,6 @@ internal sealed class EfCoreUserNotificationStore(IDbContextFactory<Notification
             .Take(clampedPageSize)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return new PagedResult<UserNotification>(items, totalCount);
+        return new PagedResult<UserNotification>(items, totalCount, HasMore: (clampedPage - 1) * clampedPageSize + items.Count < totalCount);
     }
 }

@@ -1,7 +1,7 @@
 # Déploiement et exploitation
 
 Cette section couvre les aspects opérationnels de la mise en production
-d'une application Granit sur infrastructure souveraine infrastructure souveraine européenne.
+d'une application Granit sur infrastructure européenne.
 
 ## Audience
 
@@ -24,7 +24,7 @@ d'une application Granit sur infrastructure souveraine infrastructure souveraine
 Toute application Granit traitant des données de santé **doit** être hébergée
 sur infrastructure européenne conforme ISO 27001 :
 
-- **Compute** : Managed Kubernetes sur infrastructure souveraine
+- **Compute** : Managed Kubernetes en Europe
 - **Base de données** : PostgreSQL (managé ou autogéré)
 - **Cache** : Redis (managé ou autogéré)
 - **Secrets** : HashiCorp Vault (autogéré, stockage Raft)

@@ -37,6 +37,7 @@ public static class QueryRequestBinder
         string? search = query["search"].FirstOrDefault();
         string? sort = query["sort"].FirstOrDefault();
         string? groupBy = query["groupBy"].FirstOrDefault();
+        bool skipTotalCount = string.Equals(query["skipTotalCount"].FirstOrDefault(), "true", StringComparison.OrdinalIgnoreCase);
 
         Dictionary<string, string>? filter = ParseBracketedParams(query, "filter");
         Dictionary<string, string>? presets = ParseBracketedParams(query, "presets");
@@ -53,6 +54,7 @@ public static class QueryRequestBinder
             Presets = presets,
             QuickFilters = quickFilters,
             GroupBy = groupBy,
+            SkipTotalCount = skipTotalCount,
         };
 
         return ValueTask.FromResult<QueryRequest?>(request);

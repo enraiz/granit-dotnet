@@ -29,8 +29,7 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
     /// Must be called after <c>AddGranitTemplatingWithScriban()</c> (or any other engine registration).
     /// </para>
     /// <para>
-    /// <strong>Sovereignty:</strong> the connection string must point to a database hosted in Europe
-    /// sur infrastructure souveraine. Never use a service subject to the US Cloud Act for health data.
+    /// GDPR/ISO 27001 compliant — ensure your database hosting meets your compliance requirements.
     /// </para>
     /// </remarks>
     /// <param name="builder">The host application builder.</param>

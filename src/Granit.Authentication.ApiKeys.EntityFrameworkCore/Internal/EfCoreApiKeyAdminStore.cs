@@ -66,7 +66,7 @@ internal sealed class EfCoreApiKeyAdminStore(
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return new PagedResult<ApiKeyEntry>(items, totalCount);
+        return new PagedResult<ApiKeyEntry>(items, totalCount, HasMore: (page - 1) * pageSize + items.Count < totalCount);
     }
 
     /// <inheritdoc/>

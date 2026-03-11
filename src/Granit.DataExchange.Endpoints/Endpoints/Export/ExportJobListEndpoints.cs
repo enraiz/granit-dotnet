@@ -43,7 +43,8 @@ internal static class ExportJobListEndpoints
 
         PagedResult<ExportJobResponse> response = new(
             result.Items.Select(ExportJobResponse.FromJob).ToList(),
-            result.TotalCount);
+            result.TotalCount,
+            result.HasMore);
 
         return TypedResults.Ok(response);
     }

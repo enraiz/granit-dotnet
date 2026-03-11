@@ -18,7 +18,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
 {
     /// <summary>
     /// Replaces the default InMemory/no-op stores with durable EF Core implementations
-    /// backed by a PostgreSQL database hosted on European sovereign infrastructure.
+    /// backed by a PostgreSQL database.
     /// </summary>
     /// <remarks>
     /// Must be called after <c>AddGranitNotifications()</c>.
@@ -31,10 +31,6 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
     ///   <item><see cref="EfCoreMobilePushTokenStore"/> — replaces <c>InMemoryMobilePushTokenStore</c>.</item>
     ///   <item><see cref="Internal.NotificationDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
     /// </list>
-    /// <para>
-    /// SOVEREIGNTY: The connection string must point to a database hosted on European sovereign infrastructure.
-    /// Never use AWS RDS, Azure SQL, or Google Cloud SQL for health data.
-    /// </para>
     /// </remarks>
     /// <param name="builder">The host application builder.</param>
     /// <param name="configure">EF Core <see cref="DbContextOptionsBuilder"/> configuration (provider + connection string).</param>

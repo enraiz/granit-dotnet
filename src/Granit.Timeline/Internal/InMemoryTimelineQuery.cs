@@ -35,7 +35,8 @@ internal sealed class InMemoryTimelineQuery(InMemoryTimelineStore store) : ITime
             .Select(MapToStreamEntry)
             .ToList();
 
-        return Task.FromResult(new PagedResult<TimelineStreamEntry>(items, totalCount));
+        int skip = (clampedPage - 1) * clampedPageSize;
+        return Task.FromResult(new PagedResult<TimelineStreamEntry>(items, totalCount, HasMore: skip + items.Count < totalCount));
     }
 
     private TimelineStreamEntry MapToStreamEntry(TimelineEntry entry) =>

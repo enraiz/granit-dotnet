@@ -60,7 +60,7 @@ public sealed class IdentityUserCacheReadEndpointsTests : IAsyncDisposable
     {
         _lookupService.SearchAsync("john", 1, 20, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<IdentityUser>(
-                [new("user-1", "jdoe", "jdoe@test.com", "John", "Doe", true)], 1));
+                [new("user-1", "jdoe", "jdoe@test.com", "John", "Doe", true)], 1, HasMore: false));
 
         HttpResponseMessage response = await _adminClient.GetAsync(
             $"{Prefix}?search=john", TestContext.Current.CancellationToken);

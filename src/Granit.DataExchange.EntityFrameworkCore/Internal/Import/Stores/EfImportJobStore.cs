@@ -43,7 +43,7 @@ internal sealed class EfImportJobStore(
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return new PagedResult<ImportJob>(items, totalCount);
+        return new PagedResult<ImportJob>(items, totalCount, HasMore: (page - 1) * pageSize + items.Count < totalCount);
     }
 
     /// <inheritdoc/>

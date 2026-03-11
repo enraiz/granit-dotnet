@@ -26,10 +26,6 @@ public static class SettingsEntityFrameworkCoreHostApplicationBuilderExtensions
     /// to <typeparamref name="TDbContext"/> by the host application to ensure the ISO 27001
     /// 3-year audit trail is populated on every write.
     /// </para>
-    /// <para>
-    /// The connection string must point to a database hosted on European sovereign infrastructure.
-    /// Never use a service subject to the US Cloud Act for health data.
-    /// </para>
     /// </remarks>
     /// <typeparam name="TDbContext">
     /// The host application's DbContext implementing <see cref="ISettingsDbContext"/>.

@@ -17,7 +17,7 @@ mécanisme de crypto-shredding conforme RGPD.
 sequenceDiagram
     participant C as Client
     participant API as Granit API
-    participant S3 as S3 sur infrastructure souveraine
+    participant S3 as S3 en Europe
     participant V as Validation Pipeline
     participant DB as BlobDescriptorStore
 

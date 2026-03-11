@@ -29,12 +29,13 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
             .ToList();
 
         int totalCount = filtered.Count;
-        IReadOnlyList<UserNotification> items = filtered
-            .Skip((clampedPage - 1) * clampedPageSize)
+        int skip = (clampedPage - 1) * clampedPageSize;
+        List<UserNotification> items = filtered
+            .Skip(skip)
             .Take(clampedPageSize)
             .ToList();
 
-        return Task.FromResult(new PagedResult<UserNotification>(items, totalCount));
+        return Task.FromResult(new PagedResult<UserNotification>(items, totalCount, HasMore: skip + items.Count < totalCount));
     }
 
     public Task<int> GetUnreadCountAsync(string recipientUserId, Guid? tenantId, CancellationToken cancellationToken = default)
@@ -76,11 +77,12 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
             .ToList();
 
         int totalCount = filtered.Count;
-        IReadOnlyList<UserNotification> items = filtered
-            .Skip((clampedPage - 1) * clampedPageSize)
+        int skip = (clampedPage - 1) * clampedPageSize;
+        List<UserNotification> items = filtered
+            .Skip(skip)
             .Take(clampedPageSize)
             .ToList();
 
-        return Task.FromResult(new PagedResult<UserNotification>(items, totalCount));
+        return Task.FromResult(new PagedResult<UserNotification>(items, totalCount, HasMore: skip + items.Count < totalCount));
     }
 }

@@ -9,7 +9,7 @@ namespace Granit.BlobStorage.S3.Options;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>infrastructure souveraine européenne (production)</b>: set <see cref="ServiceUrl"/> to
+/// <b>S3-compatible provider</b>: set <see cref="ServiceUrl"/> to
 /// <c>https://s3.rbx.io.cloud.ovh.net</c> and <see cref="Region"/> to <c>rbx</c>.
 /// </para>
 /// <para>

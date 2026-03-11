@@ -257,7 +257,7 @@ Deux modes :
 ### Résilience
 
 - **AWS SDK intégré** : retry avec backoff exponentiel (configurable via `AmazonS3Config`)
-- **Souveraineté** : endpoint infrastructure souveraine européenne (FR) uniquement — jamais AWS/Azure/GCP pour
+- **Souveraineté** : endpoint européen pour
   les données de santé (contrainte ISO 27001)
 
 ## Webhook delivery (sortant)

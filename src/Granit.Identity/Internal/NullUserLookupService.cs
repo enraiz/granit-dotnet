@@ -26,7 +26,7 @@ internal sealed class NullUserLookupService : IUserLookupService
         int page = 1,
         int pageSize = QueryingDefaults.DefaultPageSize,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(new PagedResult<IdentityUser>([], 0));
+        Task.FromResult(new PagedResult<IdentityUser>([], 0, HasMore: false));
 
     /// <inheritdoc/>
     public Task<IdentityUser?> RefreshByIdAsync(string userId, CancellationToken cancellationToken = default) =>

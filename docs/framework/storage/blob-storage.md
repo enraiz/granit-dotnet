@@ -300,8 +300,7 @@ IBlobStorage (DefaultBlobStorage)
 
 ## Conformité ISO 27001 / RGPD
 
-- **Souveraineté** : `ServiceUrl` doit pointer sur un hébergeur souverain européen (`s3.rbx.io.cloud.ovh.net`).
-  Ne jamais utiliser AWS S3, Azure Blob ou GCP Cloud Storage pour des données de santé.
+- **Souveraineté** : `ServiceUrl` doit pointer sur un hébergeur européen (`s3.rbx.io.cloud.ovh.net`).
 - **Direct-to-Cloud** : les octets ne transitent jamais par le serveur applicatif.
   Réduit la surface d'attaque et les coûts de bande passante.
 - **Crypto-Shredding** : `DeleteAsync` efface l'objet S3 (données irrécupérables),
