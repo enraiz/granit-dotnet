@@ -18,7 +18,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
 {
     /// <summary>
     /// Replaces the default InMemory/no-op stores with durable EF Core implementations
-    /// backed by a PostgreSQL database hosted in Europe (OVHcloud FR).
+    /// backed by a PostgreSQL database hosted on European sovereign infrastructure.
     /// </summary>
     /// <remarks>
     /// Must be called after <c>AddGranitNotifications()</c>.
@@ -32,7 +32,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
     ///   <item><see cref="Internal.NotificationDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
     /// </list>
     /// <para>
-    /// SOVEREIGNTY: The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// SOVEREIGNTY: The connection string must point to a database hosted on European sovereign infrastructure.
     /// Never use AWS RDS, Azure SQL, or Google Cloud SQL for health data.
     /// </para>
     /// </remarks>

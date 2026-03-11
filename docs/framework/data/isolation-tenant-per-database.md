@@ -140,7 +140,7 @@ de 3 ans.
 
 | Aspect | Recommandation |
 | --- | --- |
-| Provisionnement | Terraform + module PostgreSQL OVHcloud FR |
+| Provisionnement | Terraform + module PostgreSQL souverain |
 | Credentials | HashiCorp Vault — credentials dynamiques, rotation automatique |
 | Migrations | Une migration EF Core par tenant, déclenchée au déploiement |
 | Connexions | PgBouncer recommandé si N tenants > 50 (réduction des connexions PostgreSQL) |

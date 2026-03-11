@@ -27,7 +27,7 @@ public static class SettingsEntityFrameworkCoreHostApplicationBuilderExtensions
     /// 3-year audit trail is populated on every write.
     /// </para>
     /// <para>
-    /// The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// The connection string must point to a database hosted on European sovereign infrastructure.
     /// Never use a service subject to the US Cloud Act for health data.
     /// </para>
     /// </remarks>

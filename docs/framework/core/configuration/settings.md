@@ -159,7 +159,7 @@ Pour les paramètres sensibles (`IsEncrypted = true`) :
 - Requiert `GranitEncryptionModule` avec une `PassPhrase` depuis Vault
 
 ```csharp
-context.Add(new SettingDefinition("Integrations.FhirApiKey")
+context.Add(new SettingDefinition("Integrations.ExternalApiKey")
 {
     IsEncrypted = true,
     IsVisibleToClients = false,

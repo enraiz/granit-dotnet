@@ -53,7 +53,7 @@ public sealed class TransitEncryptionServiceTests
         _vaultClient.V1.Secrets.Returns(secretsEngine);
 
         transitEngine.EncryptAsync(
-                "fhir-data",
+                "sensitive-data",
                 Arg.Is<EncryptRequestOptions>(r => r.Base64EncodedPlainText == expectedBase64),
                 "transit")
             .Returns(new VaultSharp.V1.Commons.Secret<EncryptionResponse>
@@ -62,7 +62,7 @@ public sealed class TransitEncryptionServiceTests
             });
 
         // Act
-        string result = await _sut.EncryptAsync("fhir-data", plaintext, TestContext.Current.CancellationToken);
+        string result = await _sut.EncryptAsync("sensitive-data", plaintext, TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldBe(ciphertext);
@@ -72,7 +72,7 @@ public sealed class TransitEncryptionServiceTests
     public async Task DecryptAsync_ReturnsDecodedPlaintext()
     {
         // Arrange
-        string originalText = "donnée de santé sensible";
+        string originalText = "donnée personnelle sensible";
         string base64Plaintext = Convert.ToBase64String(Encoding.UTF8.GetBytes(originalText));
         string ciphertext = "vault:v1:abc123encrypted";
 
@@ -83,7 +83,7 @@ public sealed class TransitEncryptionServiceTests
         _vaultClient.V1.Secrets.Returns(secretsEngine);
 
         transitEngine.DecryptAsync(
-                "fhir-data",
+                "sensitive-data",
                 Arg.Any<DecryptRequestOptions>(),
                 "transit")
             .Returns(new VaultSharp.V1.Commons.Secret<DecryptionResponse>
@@ -92,7 +92,7 @@ public sealed class TransitEncryptionServiceTests
             });
 
         // Act
-        string result = await _sut.DecryptAsync("fhir-data", ciphertext, TestContext.Current.CancellationToken);
+        string result = await _sut.DecryptAsync("sensitive-data", ciphertext, TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldBe(originalText);

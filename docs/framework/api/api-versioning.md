@@ -131,7 +131,7 @@ public sealed class PatientController : ControllerBase
 ## Considérations ISO 27001
 
 La stratégie URL (`/api/v1/patients`) garantit que la version de l'API figure
-systématiquement dans les access logs OVHcloud. Les logs d'audit ISO 27001 (3 ans de rétention)
+systématiquement dans les access logs. Les logs d'audit ISO 27001 (3 ans de rétention)
 peuvent ainsi identifier avec précision quelle version de l'API a traité une requête.
 
 Le fallback query string (`?api-version=1.0`) est également visible dans les access logs,

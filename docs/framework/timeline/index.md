@@ -205,4 +205,4 @@ L'auteur est automatiquement exclu des destinataires de ses propres notification
   (droit à l'effacement). Les données sont marquées comme supprimées mais restent
   disponibles pour la piste d'audit.
 - **Souveraineté** : La base de données doit être hébergée en Europe
-  (OVHcloud FR). Ne jamais utiliser AWS/Azure/GCP pour les données de santé.
+  sur infrastructure souveraine. Ne jamais utiliser AWS/Azure/GCP pour les données de santé.

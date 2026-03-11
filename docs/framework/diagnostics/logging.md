@@ -161,8 +161,8 @@ private partial void LogTenantNotFound(Guid tenantId);
 
 // Error — opération échouée, avec exception
 [LoggerMessage(Level = LogLevel.Error,
-    Message = "Failed to synchronize FHIR resource {ResourceId}")]
-private partial void LogFhirSyncFailed(Exception exception, string resourceId);
+    Message = "Failed to synchronize resource {ResourceId}")]
+private partial void LogResourceSyncFailed(Exception exception, string resourceId);
 
 // Critical — service indisponible, intervention requise
 [LoggerMessage(Level = LogLevel.Critical,
@@ -198,7 +198,7 @@ Les propriétés apparaissent dans Loki comme labels ou champs JSON :
   "Level": "Information",
   "MessageTemplate": "Consent recorded: patient={PatientId} type={ConsentType}",
   "PatientId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "ConsentType": "FHIR_SHARE",
+  "ConsentType": "DATA_SHARE",
   "SourceContext": "MyApp.Modules.Auth.Handlers.RecordConsentHandler",
   "TraceId": "abc123def456",
   "SpanId": "789xyz"
@@ -298,13 +298,13 @@ private partial void LogPatientUpdated(Guid patientId);
 
 // ✅ Métriques techniques sans donnée personnelle
 [LoggerMessage(Level = LogLevel.Information,
-    Message = "FHIR resource synchronized: type={ResourceType} count={Count}")]
-private partial void LogFhirResourceSynced(string resourceType, int count);
+    Message = "Resource synchronized: type={ResourceType} count={Count}")]
+private partial void LogResourceSynced(string resourceType, int count);
 
 // ✅ Erreurs avec code, sans donnée personnelle
 [LoggerMessage(Level = LogLevel.Error,
-    Message = "FHIR resource {ResourceId} failed validation: {ErrorCode}")]
-private partial void LogFhirValidationFailed(
+    Message = "Resource {ResourceId} failed validation: {ErrorCode}")]
+private partial void LogResourceValidationFailed(
     Exception exception, string resourceId, string errorCode);
 ```
 

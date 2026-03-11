@@ -28,7 +28,7 @@ Autres solutions envisagées et raisons du choix.
 
 ## Compliance
 
-- [ ] Données restent en Europe (OVHcloud FR)
+- [ ] Données restent sur infrastructure souveraine européenne
 - [ ] Pas de PII dans les logs
 - [ ] Chiffrement conforme ISO 27001 (transit + repos)
 

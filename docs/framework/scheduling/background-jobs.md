@@ -366,7 +366,7 @@ services.AddSingleton<IBackgroundJobStoreWriter, RedisBackgroundJobStore>();
 - La planification est **atomique** : le prochain message est dans l'Outbox Wolverine,
   même transaction que le handler. Pas de perte possible en cas de crash.
 - `TriggerNowAsync` trace l'opérateur via `X-Triggered-By` (champ `TriggeredBy` du store).
-- La chaîne de connexion du store durable doit pointer sur une base **en Europe (OVHcloud FR)**,
+- La chaîne de connexion du store durable doit pointer sur une base **sur infrastructure souveraine européenne**,
   jamais sur un service soumis au Cloud Act américain.
 - Les données de scheduling (cron, horodatages) ne contiennent aucune donnée de santé (DPS).
 

@@ -10,7 +10,7 @@ Granit fournit un socle modulaire de packages NuGet couvrant les besoins
 transversaux des applications métier : sécurité, persistance, observabilité,
 multi-tenancy, chiffrement, messaging et plus encore.
 
-Conçu pour un hébergement souverain (OVHcloud, Roubaix) et conforme aux
+Conçu pour un hébergement souverain (hébergement souverain européen) et conforme aux
 exigences **ISO 27001** et **RGPD**.
 
 ## Stack technique
@@ -92,7 +92,7 @@ Serilog · OpenTelemetry · WolverineFx
 | --- | --- |
 | `Granit.BlobStorage` | Abstractions stockage d'objets souverain |
 | `Granit.BlobStorage.EntityFrameworkCore` | Persistance EF Core des métadonnées |
-| `Granit.BlobStorage.S3` | Implémentation S3 (OVHcloud Object Storage) |
+| `Granit.BlobStorage.S3` | Implémentation S3 (S3-compatible object storage) |
 | `Granit.Features` | Feature Management (Toggle/Numeric/Selection), résolution par plan |
 | `Granit.Features.EntityFrameworkCore` | Persistance EF Core des features |
 

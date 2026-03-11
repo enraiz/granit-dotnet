@@ -30,7 +30,7 @@ public static class LocalizationEntityFrameworkCoreHostApplicationBuilderExtensi
     /// <c>GranitLocalizationEntityFrameworkCoreModule</c> is loaded).
     /// </para>
     /// <para>
-    /// The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// The connection string must point to a database hosted on European sovereign infrastructure.
     /// Never use a service subject to the US Cloud Act for health data.
     /// </para>
     /// </remarks>

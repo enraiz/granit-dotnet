@@ -7,7 +7,7 @@ Le package `Granit.DocumentGeneration.Pdf` fournit un `IDocumentRenderer` basé 
 Il convertit le HTML produit par le pipeline de templating en documents PDF avec un rendu
 CSS3 pixel-perfect.
 
-**Souveraineté** : Chromium tourne on-premise (OVHcloud FR) — aucun appel réseau externe
+**Souveraineté** : Chromium tourne on-premise sur infrastructure souveraine — aucun appel réseau externe
 pendant le rendu.
 
 ## Installation

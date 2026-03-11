@@ -9,7 +9,7 @@ namespace Granit.Wolverine.Postgresql.Options;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <c>TransportConnectionString</c> must point to the ISO 27001 PostgreSQL instance on OVHcloud FR.
+/// <c>TransportConnectionString</c> must point to the ISO 27001 PostgreSQL instance on European sovereign infrastructure.
 /// </para>
 /// <para>
 /// <c>TransactionMode</c> defaults to <see cref="TransactionMiddlewareMode.Eager"/>

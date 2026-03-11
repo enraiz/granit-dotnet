@@ -383,7 +383,7 @@ un **topic par défaut**. Le contenu est formaté en Markdown (syntaxe Zulip).
 L'authentification utilise un **bot Zulip** (email + API key) via Basic auth.
 Les credentials doivent être stockés dans **Vault** en production.
 
-> **Souveraineté :** Zulip est **self-hosted** sur l'infrastructure OVHcloud FR.
+> **Souveraineté :** Zulip est **self-hosted** sur l'infrastructure souveraine européenne.
 > Aucune dépendance envers un service cloud US (Slack, Teams, Discord).
 
 ## Architecture multi-provider (Keyed Services)
@@ -721,7 +721,7 @@ Propriétés enregistrées :
 - Les logs structurés incluent `NotificationId`, `ChannelName`, `RecipientUserId` — **jamais
   de PII** (email, téléphone, contenu de la notification)
 - Les secrets (clés VAPID, credentials SMTP, clés API Brevo) doivent être **chiffrés via Vault**
-- L'infrastructure doit rester **en Europe** (OVHcloud FR) — jamais sur AWS/Azure/GCP
+- L'infrastructure doit rester **en Europe** sur infrastructure souveraine — jamais sur AWS/Azure/GCP
 - Conservation des `NotificationDeliveryAttempt` : **3 ans minimum** (politique de purge applicative)
 
 ## Câblage des événements lifecycle

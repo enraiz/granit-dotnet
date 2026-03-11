@@ -261,7 +261,7 @@ Granit.Diagnostics
 | ISO 27001 - Pas d'exposition de données médicales | Réponses JSON sans PII ni stack trace |
 | ISO 27001 - Traçabilité | Endpoints exclus des traces OTEL (pas de pollution du journal d'audit) |
 | RGPD - Minimisation | Aucune donnée personnelle dans les payloads de santé |
-| Souveraineté OVHcloud | Pas de dépendance US Cloud Act — packages Microsoft officiels uniquement |
+| Hébergement souverain européen | Pas de dépendance US Cloud Act — packages Microsoft officiels uniquement |
 | Résilience K8s | Liveness sans dépendances externes — jamais de restart en cascade |
 | Anti-DDoS interne | Cache 10 s — 1 req/10 s par pod au lieu de ~16 req/s sans cache |
 

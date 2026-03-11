@@ -164,8 +164,8 @@ L'attribut `[CacheName("nom")]` permet de surcharger la convention.
 
 ### Principe
 
-Redis stocke les données en clair. Pour les données de santé (DMP, FHIR, données
-nominatives), le chiffrement AES-256-CBC est activé via `ICacheValueEncryptor`.
+Redis stocke les données en clair. Pour les données sensibles (données
+nominatives, données personnelles), le chiffrement AES-256-CBC est activé via `ICacheValueEncryptor`.
 
 ### Activation globale
 

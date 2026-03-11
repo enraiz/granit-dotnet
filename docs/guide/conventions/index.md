@@ -25,6 +25,7 @@ Ces conventions s'appliquent à **tous les projets** (backend et frontend).
 | [Architecture](architecture.md) | Structure des projets, modèle domaine, DI, endpoints API, HttpClient |
 | [Structure des modules](structure-modules.md) | Blueprint standard des dossiers d'un module Granit (Internal/, Domain/, Extensions/, etc.) |
 | [Implémentation](implementation.md) | Async, temps, nullabilité, collections, records, exceptions, logging, regex, observabilité, EF Core |
+| [API REST](api-rest.md) | Nommage JSON, formats, pagination (offset + cursor), filtres, tri, batch 207, dépréciation, cache |
 
 ## Conventions frontend (TypeScript / React)
 

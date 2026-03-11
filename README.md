@@ -7,16 +7,15 @@
 </p>
 
 <p align="center">
-  .NET 10 · C# 14 · EF Core 10 · PostgreSQL · Keycloak · Vault · Serilog · OpenTelemetry · WolverineFx
+  .NET 10 · C# 14 · EF Core 10 · CQRS · Vertical Slicing · Modular Architecture
 </p>
 
 ---
 
 Granit is a rock-solid, production-ready modular framework for .NET and React.
 Built with Vertical Slicing and zero compromises on Developer Experience.
-It provides **41 NuGet packages** organized as independent modules, designed for
-**sovereign European hosting** (OVHcloud) and compliant with
-**ISO 27001** and **GDPR** requirements.
+It provides **100 NuGet packages** organized as independent modules,
+compliant with **GDPR/ISO 27001** requirements.
 
 ## Features
 

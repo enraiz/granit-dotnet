@@ -28,7 +28,7 @@ public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
     /// Must be called after <c>AddGranitFeatures()</c>.
     /// </para>
     /// <para>
-    /// The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// The connection string must point to a database hosted on European sovereign infrastructure.
     /// Never use a service subject to the US Cloud Act for health data.
     /// </para>
     /// </remarks>

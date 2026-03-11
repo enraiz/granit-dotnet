@@ -2,14 +2,14 @@ namespace Granit.Vault;
 
 /// <summary>
 /// Service de chiffrement/dechiffrement via Vault Transit Engine.
-/// Utilise pour proteger les donnees FHIR sensibles au repos.
+/// Utilise pour proteger les donnees sensibles au repos.
 /// </summary>
 public interface ITransitEncryptionService
 {
     /// <summary>
     /// Chiffre un texte en clair via Vault Transit.
     /// </summary>
-    /// <param name="keyName">Nom de la cle Transit (ex: "fhir-data").</param>
+    /// <param name="keyName">Nom de la cle Transit (ex: "sensitive-data").</param>
     /// <param name="plaintext">Texte en clair a chiffrer.</param>
     /// <param name="cancellationToken">Token d'annulation.</param>
     /// <returns>Texte chiffre (format vault:v1:...).</returns>
@@ -18,7 +18,7 @@ public interface ITransitEncryptionService
     /// <summary>
     /// Dechiffre un texte chiffre via Vault Transit.
     /// </summary>
-    /// <param name="keyName">Nom de la cle Transit (ex: "fhir-data").</param>
+    /// <param name="keyName">Nom de la cle Transit (ex: "sensitive-data").</param>
     /// <param name="ciphertext">Texte chiffre (format vault:v1:...).</param>
     /// <param name="cancellationToken">Token d'annulation.</param>
     /// <returns>Texte en clair.</returns>

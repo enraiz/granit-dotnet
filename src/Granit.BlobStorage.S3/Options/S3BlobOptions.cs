@@ -9,7 +9,7 @@ namespace Granit.BlobStorage.S3.Options;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>OVHcloud (production)</b>: set <see cref="ServiceUrl"/> to
+/// <b>infrastructure souveraine européenne (production)</b>: set <see cref="ServiceUrl"/> to
 /// <c>https://s3.rbx.io.cloud.ovh.net</c> and <see cref="Region"/> to <c>rbx</c>.
 /// </para>
 /// <para>
@@ -38,7 +38,7 @@ public sealed class S3BlobOptions : BlobStorageOptions
 
     /// <summary>
     /// S3 region identifier used by the SDK for request signing.
-    /// For OVHcloud Roubaix: <c>rbx</c>. For MinIO: any non-empty value (e.g. <c>us-east-1</c>).
+    /// For sovereign European hosting: <c>rbx</c>. For MinIO: any non-empty value (e.g. <c>us-east-1</c>).
     /// </summary>
     public string Region { get; set; } = "us-east-1";
 

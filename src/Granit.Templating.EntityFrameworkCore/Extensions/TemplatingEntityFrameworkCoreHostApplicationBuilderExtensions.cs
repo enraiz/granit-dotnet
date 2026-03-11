@@ -30,7 +30,7 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
     /// </para>
     /// <para>
     /// <strong>Sovereignty:</strong> the connection string must point to a database hosted in Europe
-    /// (OVHcloud FR). Never use a service subject to the US Cloud Act for health data.
+    /// sur infrastructure souveraine. Never use a service subject to the US Cloud Act for health data.
     /// </para>
     /// </remarks>
     /// <param name="builder">The host application builder.</param>

@@ -150,6 +150,6 @@ public sealed class KeycloakServiceCollectionExtensionsTests
         AuthorizationOptions authOptions = sp.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
         authOptions.GetPolicy("Admin").ShouldNotBeNull();
         authOptions.GetPolicy("Authenticated").ShouldNotBeNull("inherited from Granit.Authentication.JwtBearer");
-        authOptions.GetPolicy("FhirAccess").ShouldBeNull("FhirAccess is application-specific, not part of Granit.Authentication.Keycloak");
+        authOptions.GetPolicy("DataAccess").ShouldBeNull("DataAccess is application-specific, not part of Granit.Authentication.Keycloak");
     }
 }
