@@ -10,7 +10,7 @@ namespace Granit.Timeline.Domain;
 /// <list type="bullet">
 ///   <item><see cref="TimelineEntryType.Comment"/> — human-authored, soft-deletable (RGPD).</item>
 ///   <item><see cref="TimelineEntryType.InternalNote"/> — human-authored, staff-only, soft-deletable.</item>
-///   <item><see cref="TimelineEntryType.SystemLog"/> — auto-generated, INSERT-only immutable (HDS).</item>
+///   <item><see cref="TimelineEntryType.SystemLog"/> — auto-generated, INSERT-only immutable (ISO 27001).</item>
 /// </list>
 /// </summary>
 public sealed class TimelineEntry : CreationAuditedEntity, ISoftDeletable, IMultiTenant, IDomainEventSource
@@ -75,7 +75,7 @@ public sealed class TimelineEntry : CreationAuditedEntity, ISoftDeletable, IMult
     {
         if (EntryType == TimelineEntryType.SystemLog)
         {
-            throw new InvalidOperationException("System log entries are immutable and cannot be deleted (HDS audit trail).");
+            throw new InvalidOperationException("System log entries are immutable and cannot be deleted (ISO 27001 audit trail).");
         }
 
         IsDeleted = true;

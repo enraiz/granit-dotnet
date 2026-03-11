@@ -1,7 +1,7 @@
 // =============================================================================
 // Tests - AuditLogEntry
 // =============================================================================
-// Vérifie que les propriétés de l'entrée d'audit HDS fonctionnent correctement.
+// Vérifie que les propriétés de l'entrée d'audit ISO 27001 fonctionnent correctement.
 // =============================================================================
 
 using Granit.Core.Domain;

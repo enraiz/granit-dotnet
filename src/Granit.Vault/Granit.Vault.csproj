@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Vault</PackageId>
-    <Description>Client VaultSharp, gestionnaire de credentials dynamiques et chiffrement Transit pour les applications .NET Digital Dynamics.</Description>
+    <Description>VaultSharp client, dynamic credentials manager and Transit encryption for Granit applications.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

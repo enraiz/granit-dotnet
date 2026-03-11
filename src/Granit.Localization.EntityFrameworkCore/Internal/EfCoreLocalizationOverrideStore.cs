@@ -6,7 +6,7 @@ namespace Granit.Localization.EntityFrameworkCore.Internal;
 /// <summary>
 /// EF Core implementation of <see cref="ILocalizationOverrideStoreReader"/> and <see cref="ILocalizationOverrideStoreWriter"/>.
 /// Persists translation overrides in PostgreSQL (table <c>i18n_localization_overrides</c>)
-/// with HDS audit trail.
+/// with ISO 27001 audit trail.
 /// </summary>
 /// <remarks>
 /// Registered as a keyed service (<c>"efcore-raw"</c>) and wrapped by

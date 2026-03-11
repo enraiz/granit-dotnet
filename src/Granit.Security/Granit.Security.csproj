@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Security</PackageId>
-    <Description>Abstractions de sécurité pour les applications .NET Digital Dynamics : ICurrentUserService.</Description>
+    <Description>Security abstractions for Granit applications: ICurrentUserService.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

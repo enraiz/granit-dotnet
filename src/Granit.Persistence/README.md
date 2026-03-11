@@ -1,6 +1,6 @@
 # Granit.Persistence
 
-EF Core interceptors for HDS audit trail and GDPR soft delete for Granit applications.
+EF Core interceptors for ISO 27001 audit trail and GDPR soft delete for Granit applications.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

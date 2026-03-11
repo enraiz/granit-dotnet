@@ -11,7 +11,7 @@ namespace Granit.Timeline.EntityFrameworkCore.Internal;
 /// </summary>
 /// <remarks>
 /// Isolated from the host application's DbContext to avoid coupling.
-/// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, HDS compliant).
+/// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, ISO 27001 compliant).
 /// </remarks>
 internal sealed class TimelineDbContext(
     DbContextOptions<TimelineDbContext> options,

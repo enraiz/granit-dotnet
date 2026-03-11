@@ -39,7 +39,7 @@ internal static class WebhookSignatureService
     }
 
     /// <summary>
-    /// Computes the SHA-256 hex digest of a string, used for the HDS payload hash.
+    /// Computes the SHA-256 hex digest of a string, used for the ISO 27001 payload hash.
     /// </summary>
     internal static string ComputePayloadHash(string bodyJson) =>
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(bodyJson))).ToLowerInvariant();

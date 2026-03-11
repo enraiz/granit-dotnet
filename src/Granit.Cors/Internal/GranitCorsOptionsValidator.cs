@@ -6,7 +6,7 @@ namespace Granit.Cors.Internal;
 
 /// <summary>
 /// Validates <see cref="GranitCorsOptions"/> at startup.
-/// Enforces HDS-compliant CORS rules.
+/// Enforces ISO 27001-compliant CORS rules.
 /// </summary>
 internal sealed class GranitCorsOptionsValidator(
     IHostEnvironment environment) : IValidateOptions<GranitCorsOptions>
@@ -28,7 +28,7 @@ internal sealed class GranitCorsOptionsValidator(
         {
             errors.Add(
                 $"{nameof(GranitCorsOptions.AllowedOrigins)} must not contain wildcard ('*') " +
-                "in non-development environments (HDS compliance).");
+                "in non-development environments (ISO 27001 compliance).");
         }
 
         if (hasWildcard && options.AllowCredentials)

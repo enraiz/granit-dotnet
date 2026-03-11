@@ -1,8 +1,8 @@
 # Messagerie — Granit.Webhooks
 
-Moteur de webhooks **sortants** pour les applications Digital Dynamics.
+Moteur de webhooks **sortants** pour les applications Granit.
 Notifie des systèmes tiers via HTTP POST lorsqu'un événement métier survient.
-Basé sur Wolverine (Outbox at-least-once), conforme HDS (audit trail immuable).
+Basé sur Wolverine (Outbox at-least-once), conforme ISO 27001 (audit trail immuable).
 
 Deux packages composables :
 
@@ -22,7 +22,7 @@ flowchart TD
     C -- "cascade Wolverine — même transaction Outbox" --> D["SendWebhookCommand × N
     un par abonné, enqueue dans la queue webhook-delivery"]
     D --> E["SendWebhookHandler
-    HTTP POST + signature HMAC-SHA256 + audit HDS"]
+    HTTP POST + signature HMAC-SHA256 + audit ISO 27001"]
 ```
 
 Le fan-out et l'envoi sont **entièrement découplés** : Wolverine publie les `N` commandes
@@ -148,7 +148,7 @@ Wolverine pour investigation manuelle. L'audit trail conserve chaque tentative.
 > **Pourquoi Wolverine plutôt que Polly ?**
 > Polly travaille en mémoire : un crash entre deux tentatives perd la livraison.
 > Wolverine persiste chaque replanification dans l'Outbox PostgreSQL → garantie
-> at-least-once conforme HDS même après redémarrage de l'application.
+> at-least-once conforme ISO 27001 même après redémarrage de l'application.
 
 ## Options de configuration
 
@@ -160,7 +160,7 @@ Wolverine pour investigation manuelle. L'audit trail conserve chaque tentative.
 | `MaxParallelDeliveries` | `int` | `20` | 1 – 100 | Parallélisme de la queue `webhook-delivery` |
 | `StorePayload` | `bool` | `false` | — | Stocker le body JSON complet dans chaque tentative de livraison |
 
-> **Attention RGPD/HDS :** activer `StorePayload` persiste les données de santé en clair dans
+> **Attention RGPD/ISO 27001 :** activer `StorePayload` persiste les données de santé en clair dans
 > la table d'audit. Vérifier que le chiffrement au repos est activé sur la base et que le DPO
 > a validé ce paramétrage avant activation en production.
 
@@ -188,7 +188,7 @@ Pour utiliser Vault en production, enregistrer une implémentation personnalisé
 builder.Services.Replace(ServiceDescriptor.Scoped<IWebhookSecretProtector, VaultWebhookSecretProtector>());
 ```
 
-> **Important HDS :** ne jamais stocker de secret de signature en clair en base de données
+> **Important ISO 27001 :** ne jamais stocker de secret de signature en clair en base de données
 > de production. Utiliser `Granit.Vault` ou un KMS conforme.
 
 ## Stores d'abonnements et de livraisons
@@ -210,7 +210,7 @@ public interface IWebhookSubscriptionStoreWriter
     Task DeactivateAsync(Guid subscriptionId, string reason, CancellationToken cancellationToken = default);
 }
 
-// Enregistre les tentatives de livraison (audit trail HDS)
+// Enregistre les tentatives de livraison (audit trail ISO 27001)
 public interface IWebhookDeliveryWriter
 {
     Task RecordSuccessAsync(SendWebhookCommand command, int httpStatusCode,
@@ -261,10 +261,10 @@ CREATE INDEX ON webhook_subscriptions (event_type, tenant_id, status);
 | `last_success_at` | `timestamptz?` | Dernière livraison réussie |
 | `suspended_at` | `timestamptz?` | Date de suspension automatique |
 | `suspended_by` | `varchar?` | Raison de la suspension |
-| `created_at` | `timestamptz` | Audit HDS — création |
-| `created_by` | `varchar?` | Audit HDS — auteur création |
-| `last_modified_at` | `timestamptz?` | Audit HDS — dernière modification |
-| `last_modified_by` | `varchar?` | Audit HDS — auteur modification |
+| `created_at` | `timestamptz` | Audit ISO 27001 — création |
+| `created_by` | `varchar?` | Audit ISO 27001 — auteur création |
+| `last_modified_at` | `timestamptz?` | Audit ISO 27001 — dernière modification |
+| `last_modified_by` | `varchar?` | Audit ISO 27001 — auteur modification |
 
 ### `webhook_delivery_attempts`
 
@@ -286,7 +286,7 @@ Table **INSERT-only** (pas de soft delete, pas de cascade delete) — piste d'au
 | `error_message` | `text?` | Message d'erreur (timeout, exception réseau) |
 | `is_success` | `bool` | true si code 2xx |
 
-> **HDS :** `payload_hash` stocke l'empreinte SHA-256 du payload JSON envoyé, pas le payload
+> **ISO 27001 :** `payload_hash` stocke l'empreinte SHA-256 du payload JSON envoyé, pas le payload
 > lui-même. Cela permet de prouver qu'un payload spécifique a été transmis sans stocker de
 > données de santé dans la table d'audit.
 
@@ -343,7 +343,7 @@ app.MapGranitWebhooksConfig();      // GET /webhooks/config
 app.MapGranitWebhooksRedelivery();  // POST /webhooks/deliveries/{id}/retry
 ```
 
-## Conformité HDS
+## Conformité ISO 27001
 
 - L'Outbox Wolverine garantit la livraison **at-least-once** sans perte en cas de crash
 - `WebhookDeliveryAttempt` est INSERT-only : aucune donnée d'audit ne peut être modifiée

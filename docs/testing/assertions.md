@@ -34,7 +34,7 @@ guids.Count().ShouldBe(10_000, "tous les GUID doivent être uniques");
 
 // Message contextuel (raison)
 now.Offset.ShouldBe(TimeSpan.Zero,
-    "le Clock doit toujours retourner UTC (conformité HDS)");
+    "le Clock doit toujours retourner UTC (conformité ISO 27001)");
 ```
 
 > Toujours ajouter un message contextuel (`customMessage`) pour les assertions

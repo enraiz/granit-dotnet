@@ -8,7 +8,7 @@ namespace Granit.Webhooks.Domain;
 /// </summary>
 /// <remarks>
 /// <para>
-/// HDS compliance: this entity is INSERT-only. It must never be modified or deleted.
+/// ISO 27001 compliance: this entity is INSERT-only. It must never be modified or deleted.
 /// Do NOT use <see cref="AuditedEntity"/> or <see cref="FullAuditedEntity"/> — soft-delete
 /// is explicitly prohibited to preserve the 3-year audit trail.
 /// </para>
@@ -49,7 +49,7 @@ public sealed class WebhookDeliveryAttempt : Entity
 
     /// <summary>
     /// SHA-256 hex digest of the serialized webhook envelope body.
-    /// Allows integrity verification without storing health data in clear text (HDS).
+    /// Allows integrity verification without storing health data in clear text (ISO 27001).
     /// Maximum length: 64 characters.
     /// </summary>
     public string PayloadHash { get; set; } = string.Empty;

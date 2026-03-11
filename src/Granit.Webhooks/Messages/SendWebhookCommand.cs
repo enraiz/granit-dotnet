@@ -20,7 +20,7 @@ public sealed record SendWebhookCommand
     /// <summary>
     /// Unique identifier of this delivery attempt.
     /// Distinct from <see cref="WebhookEnvelope.EventId"/> — one event produces N delivery IDs.
-    /// Used as the primary key in <see cref="Domain.WebhookDeliveryAttempt"/> (HDS audit trail).
+    /// Used as the primary key in <see cref="Domain.WebhookDeliveryAttempt"/> (ISO 27001 audit trail).
     /// </summary>
     public required Guid DeliveryId { get; init; }
 

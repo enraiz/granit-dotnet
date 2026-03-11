@@ -1,7 +1,7 @@
 # Vault
 
 `Granit.Vault` fournit l'intégration HashiCorp Vault pour les
-applications .NET Digital Dynamics : credentials dynamiques PostgreSQL, chiffrement
+applications .NET Granit : credentials dynamiques PostgreSQL, chiffrement
 Transit et gestion automatique des leases.
 
 ## Installation
@@ -95,7 +95,7 @@ public interface IDatabaseCredentialProvider
 
 Le `DbContext` utilise ce provider pour construire sa connection string dynamiquement.
 
-### Conformité HDS
+### Conformité ISO 27001
 
 Aucun mot de passe statique en production. Les credentials sont :
 

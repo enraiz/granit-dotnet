@@ -18,7 +18,7 @@ namespace Granit.BlobStorage.Domain;
 /// <c>Pending -> Uploading -> Rejected</c>.
 /// </para>
 /// <para>
-/// RGPD / HDS: records are <b>never deleted from the database</b>.
+/// RGPD /ISO 27001: records are <b>never deleted from the database</b>.
 /// <see cref="BlobStatus.Deleted"/> means the S3 bytes are gone; the audit row remains for 3 years.
 /// </para>
 /// </remarks>
@@ -177,7 +177,7 @@ public sealed class BlobDescriptor : IDomainEventSource, IMultiTenant
     /// <summary>
     /// Transitions from <see cref="BlobStatus.Valid"/> to <see cref="BlobStatus.Deleted"/>.
     /// The S3 object must be physically deleted by the caller before invoking this method.
-    /// The record is retained in the database for HDS audit compliance.
+    /// The record is retained in the database for ISO 27001 audit compliance.
     /// </summary>
     /// <param name="deletedAt">UTC instant of deletion.</param>
     /// <param name="reason">Optional human-readable reason (e.g. "RGPD Art. 17 erasure request").</param>

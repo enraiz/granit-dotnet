@@ -33,7 +33,7 @@ problèmes :
 
 ### DateTimeOffset plutôt que DateTime
 
-Digital Dynamics utilise `DateTimeOffset` (et non `DateTime`) comme type de référence
+Granit utilise `DateTimeOffset` (et non `DateTime`) comme type de référence
 pour les dates et heures. `DateTimeOffset` embarque toujours l'offset UTC, éliminant
 toute ambiguïté sur le fuseau horaire représenté. C'est aussi le type recommandé par
 PostgreSQL (`timestamptz`).
@@ -117,7 +117,7 @@ et ajoute les opérations timezone que `TimeProvider` ne couvre pas :
 
 `IClock` est un surensemble de `TimeProvider`. Pour le code qui n'a besoin que de
 l'heure courante sans conversion de fuseau, `TimeProvider` suffit. Pour le code
-applicatif Digital Dynamics, préférer `IClock` pour sa cohérence et ses capacités
+applicatif Granit, préférer `IClock` pour sa cohérence et ses capacités
 de conversion.
 
 ## Now

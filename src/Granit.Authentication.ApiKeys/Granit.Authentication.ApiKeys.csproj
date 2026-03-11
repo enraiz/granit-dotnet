@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Authentication.ApiKeys</PackageId>
-    <Description>Authentification M2M par clés API pour les applications .NET Digital Dynamics. ApiKeyAuthenticationHandler, IApiKeyStore, IApiKeyGenerator, CIDR whitelisting.</Description>
+    <Description>M2M API key authentication for Granit applications. ApiKeyAuthenticationHandler, IApiKeyStore, IApiKeyGenerator, CIDR whitelisting.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

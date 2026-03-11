@@ -81,7 +81,7 @@ l'approche utilisée :
 // =============================================================================
 // Tests - AuditedEntityInterceptor
 // =============================================================================
-// Vérifie que les champs d'audit HDS sont correctement remplis
+// Vérifie que les champs d'audit ISO 27001 sont correctement remplis
 // lors de la création et modification des entités.
 //
 // Approche : on enregistre l'intercepteur dans le DbContext et on appelle

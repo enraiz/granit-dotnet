@@ -69,7 +69,7 @@ La valeur doit-elle changer sans redéploiement ?
 | --- | --- |
 | [sources.md](sources.md) | Sources de configuration (appsettings.json, env vars, Vault), surcharge par environnement, convention `SectionName` |
 | [options.md](options.md) | Pattern `IOptions<T>`, déclaration, binding, validation, `PostConfigure`, bonnes pratiques |
-| [settings.md](settings.md) | Paramètres dynamiques (`ISettingProvider`/`ISettingManager`), cascade U > T > G > C > D, chiffrement HDS, persistance EF Core |
+| [settings.md](settings.md) | Paramètres dynamiques (`ISettingProvider`/`ISettingManager`), cascade U > T > G > C > D, chiffrement ISO 27001, persistance EF Core |
 | [module-config.md](module-config.md) | Pattern `IModuleConfigProvider<T>`, endpoint `GET /{module}/config`, personnalisation, implémentations existantes |
 
 ## Règles importantes

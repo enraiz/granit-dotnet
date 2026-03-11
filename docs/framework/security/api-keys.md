@@ -199,7 +199,7 @@ var request = new ApiKeyCreateRequest(
 | Valeur | Description |
 | --- | --- |
 | `Normal` | Cache standard avec TTL configurable (défaut 5 min) |
-| `NoCache` | Aucun cache — lookup systématique. Pour les clés HDS critiques |
+| `NoCache` | Aucun cache — lookup systématique. Pour les clés critiques |
 
 ## Endpoints d'administration
 
@@ -233,7 +233,7 @@ via les headers d'enveloppe :
 | `X-Api-Key-Id` | GUID de la clé API | Omis si absent |
 
 `UserContextBehavior` restaure ces valeurs côté handler, garantissant que
-l'`AuditedEntityInterceptor` enregistre le bon `ActorKind` dans la piste d'audit HDS.
+l'`AuditedEntityInterceptor` enregistre le bon `ActorKind` dans la piste d'audit ISO 27001.
 
 ## Entité ApiKeyEntry
 
@@ -272,7 +272,7 @@ public class ApiKeyEntry : AuditedEntity, ISoftDeletable, IMultiTenant
 | `ApiKeyRotatedEvent` | Rotation | Invalidation cache + audit |
 | `ApiKeyScopesUpdatedEvent` | Mise à jour des scopes | Invalidation cache |
 
-## Conformité HDS / RGPD
+## Conformité ISO 27001 / RGPD
 
 | Exigence | Implémentation |
 | --- | --- |

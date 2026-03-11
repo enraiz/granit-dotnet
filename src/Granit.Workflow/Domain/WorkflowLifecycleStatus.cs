@@ -20,7 +20,7 @@ public enum WorkflowLifecycleStatus
 
     /// <summary>
     /// Former published version, superseded by a newer publication.
-    /// Preserved indefinitely for HDS audit trail (3-year retention).
+    /// Preserved indefinitely for ISO 27001 audit trail (3-year retention).
     /// </summary>
     Archived = 3,
 }

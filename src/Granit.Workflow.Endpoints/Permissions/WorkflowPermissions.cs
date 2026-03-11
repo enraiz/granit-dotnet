@@ -14,7 +14,7 @@ public static class WorkflowPermissions
     public static class History
     {
         /// <summary>
-        /// Grants read access to the workflow transition history endpoint (HDS audit trail).
+        /// Grants read access to the workflow transition history endpoint (ISO 27001 audit trail).
         /// </summary>
         public const string Read = "Workflow.History.Read";
     }

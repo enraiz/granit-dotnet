@@ -121,7 +121,7 @@ builder.Services.AddOpenTelemetry()
 
 Le `traceparent` est un **identifiant opaque** (UUID de trace + UUID de span).
 Il ne contient aucune donnée de santé ni aucune donnée personnelle. Sa propagation
-ne crée pas de risque RGPD ni HDS.
+ne crée pas de risque RGPD ni ISO 27001.
 
 Les logs de Warning pour les headers malformés ne contiennent que l'ID de l'enveloppe
 (GUID interne) et la valeur du header — jamais de PII.

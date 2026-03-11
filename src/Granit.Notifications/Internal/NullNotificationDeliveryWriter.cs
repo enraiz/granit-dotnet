@@ -4,7 +4,7 @@ using Granit.Notifications.Domain;
 namespace Granit.Notifications.Internal;
 
 /// <summary>
-/// No-op delivery store for development. Replaced by EF Core store in production (HDS audit).
+/// No-op delivery store for development. Replaced by EF Core store in production (ISO 27001 audit).
 /// </summary>
 internal sealed class NullNotificationDeliveryWriter : INotificationDeliveryWriter
 {

@@ -15,7 +15,7 @@ namespace Granit.Persistence.MultiTenancy;
 /// do not close physical connections after use: they return them to the connection pool.
 /// A connection that previously served tenant A retains the previous schema setting.
 /// If tenant B acquires that connection and this interceptor did not run, tenant B
-/// would read tenant A's data — a catastrophic HDS data breach.
+/// would read tenant A's data — a catastrophic ISO 27001 data breach.
 /// </para>
 /// <para>
 /// To prevent this, both <see cref="ConnectionOpened"/> and <see cref="ConnectionOpenedAsync"/>

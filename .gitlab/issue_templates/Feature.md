@@ -30,6 +30,6 @@ Autres solutions envisagées et raisons du choix.
 
 - [ ] Données restent en Europe (OVHcloud FR)
 - [ ] Pas de PII dans les logs
-- [ ] Chiffrement conforme HDS (transit + repos)
+- [ ] Chiffrement conforme ISO 27001 (transit + repos)
 
 /label ~"Type::Feature" ~"Priority::Medium"

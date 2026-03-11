@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Templating.Workflow</PackageId>
-    <Description>Optional bridge between Granit.Templating and Granit.Workflow. Replaces the default NullTemplateTransitionHook with a Workflow-aware implementation providing FSM validation, approval routing, unified HDS audit trail (WorkflowTransitionRecord) and domain events.</Description>
+    <Description>Optional bridge between Granit.Templating and Granit.Workflow. Replaces the default NullTemplateTransitionHook with a Workflow-aware implementation providing FSM validation, approval routing, unified ISO 27001 audit trail (WorkflowTransitionRecord) and domain events.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

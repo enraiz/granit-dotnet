@@ -564,8 +564,8 @@ public async Task AddGranitAsync_RegistersGranitApplicationAsSingleton()
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail | Modules chargés dans un ordre déterministe et reproductible |
-| HDS - Traçabilité | `GranitApplication.GetModuleTypes()` expose la liste des modules chargés (diagnostics) |
+| ISO 27001 - Audit trail | Modules chargés dans un ordre déterministe et reproductible |
+| ISO 27001 - Traçabilité | `GranitApplication.GetModuleTypes()` expose la liste des modules chargés (diagnostics) |
 | ISO 9001 - Reproductibilité | Tri topologique = même ordre à chaque démarrage |
 | Sécurité - Least privilege | Chaque module n'enregistre que ses propres services |
 

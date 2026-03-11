@@ -137,11 +137,11 @@ public async Task<IActionResult> ErasePersonalData(
 }
 ```
 
-## Considérations HDS
+## Considérations ISO 27001
 
 - **Audit trail** : les codes de retour sont enregistrés dans les traces
   OpenTelemetry (`http.response.status_code`). Un code précis facilite
-  l'analyse post-incident et les audits HDS.
+  l'analyse post-incident et les audits ISO 27001.
 - **Export RGPD (article 20)** : doit utiliser 202 car l'export est asynchrone
   (collecte multi-module, génération de fichier, chiffrement). Le consommateur
   reçoit un identifiant pour suivre l'avancement.

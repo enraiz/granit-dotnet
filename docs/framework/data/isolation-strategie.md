@@ -3,7 +3,7 @@
 ## Vue d'ensemble
 
 `Granit.Persistence` propose trois patterns d'isolation des données tenant. Ce guide aide
-à choisir le bon pattern selon les contraintes métier, HDS et coût d'infrastructure.
+à choisir le bon pattern selon les contraintes métier, ISO 27001 et coût d'infrastructure.
 
 ## Tableau comparatif
 
@@ -16,7 +16,7 @@
 | **Migration données** | Un seul schéma | Par tenant (onboarding) | Par tenant (onboarding) |
 | **Sauvegardes** | Base entière | Base entière (pg\_dump -n) | Par base |
 | **Fuite de données** | Risque si filtre absent | Risque si pool non sécurisé | Impossible |
-| **Certif. HDS isolée** | Non recommandé | Possible (avec audit) | Recommandé |
+| **Certif. ISO 27001 isolée** | Non recommandé | Possible (avec audit) | Recommandé |
 
 ## Arbre de décision
 
@@ -24,7 +24,7 @@
 flowchart TD
     START([Choisir une stratégie])
 
-    START --> Q1{Contrat HDS<br/>isolation physique<br/>requise ?}
+    START --> Q1{Contrat ISO 27001<br/>isolation physique<br/>requise ?}
     Q1 -->|Oui| DB[DatabasePerTenant]
     Q1 -->|Non| Q2{Nombre de tenants<br/>> 1 000 ?}
     Q2 -->|Oui| SHARED[SharedDatabase]
@@ -174,7 +174,7 @@ builder.Services.AddScoped<ITenantIsolationStrategyProvider, CatalogTenantIsolat
 builder.Services.AddGranitIsolatedDbContext<AppDbContext>(...);
 ```
 
-## Considérations de sécurité HDS
+## Considérations de sécurité ISO 27001
 
 | Point de vigilance | SharedDatabase | SchemaPerTenant | DatabasePerTenant |
 | --- | --- | --- | --- |

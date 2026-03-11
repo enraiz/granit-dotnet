@@ -183,7 +183,7 @@ using VaultSharp;
 - `<summary>` bref (1 ligne), `<remarks>` pour le détail
 - `<inheritdoc/>` pour les implémentations d'interface
 - `<param>` et `<returns>` pour les méthodes publiques
-- Contexte HDS/RGPD dans `<remarks>` quand pertinent
+- Contexte RGPD/ISO 27001 dans `<remarks>` quand pertinent
 
 ```csharp
 /// <summary>

@@ -11,9 +11,9 @@ une seule base de données, mais une séparation logique forte entre tenants. Il
 aux plateformes SaaS à fort nombre de tenants (> 100) dont les contrats n'exigent pas
 d'isolation physique.
 
-> **Avertissement HDS** — Dans un contexte de données de santé, évaluer si l'isolation
+> **Avertissement ISO 27001** — Dans un contexte de données de santé, évaluer si l'isolation
 > logique par schéma est suffisante au regard du contrat client et du niveau de risque.
-> Pour les établissements soumis à audit externe ou hébergement HDS certifié, privilégier
+> Pour les établissements soumis à audit externe ou hébergement ISO 27001 certifié, privilégier
 > le pattern [Tenant-per-Database](isolation-tenant-per-database.md).
 
 ## Architecture
@@ -65,7 +65,7 @@ sequenceDiagram
 
 Le `TenantSchemaConnectionInterceptor` exécute `SET search_path` à **chaque** ouverture
 de connexion depuis le pool, sans condition. Toute tentative d'ajouter un cache ou un
-guard « déjà configuré » constituerait une **faille HDS critique** (cross-tenant data leak).
+guard « déjà configuré » constituerait une **faille ISO 27001 critique** (cross-tenant data leak).
 
 ## Prérequis
 

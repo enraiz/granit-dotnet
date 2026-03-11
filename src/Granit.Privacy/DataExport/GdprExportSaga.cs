@@ -23,7 +23,7 @@ namespace Granit.Privacy.DataExport;
 /// </list>
 /// </para>
 /// <para>
-/// HDS compliance: fragments are referenced by <c>BlobReferenceId</c> only — raw personal data
+/// ISO 27001 compliance: fragments are referenced by <c>BlobReferenceId</c> only — raw personal data
 /// is never stored in the Saga state or event payloads.
 /// </para>
 /// <para>
@@ -43,7 +43,7 @@ public sealed class GdprExportSaga : Saga
     /// <summary>Number of fragments expected (from <see cref="IDataProviderRegistry.Count"/>).</summary>
     public int ExpectedCount { get; set; }
 
-    /// <summary>Fragments received from data providers (BlobReferenceId only — HDS).</summary>
+    /// <summary>Fragments received from data providers (BlobReferenceId only — ISO 27001).</summary>
     public List<ReceivedFragment> ReceivedFragments { get; set; } = [];
 
     /// <summary>Provider names that have not yet responded.</summary>

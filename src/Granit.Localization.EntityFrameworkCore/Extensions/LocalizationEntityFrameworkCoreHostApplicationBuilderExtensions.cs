@@ -22,7 +22,7 @@ public static class LocalizationEntityFrameworkCoreHostApplicationBuilderExtensi
     /// (<see cref="CachedLocalizationOverrideStore.RawStoreKey"/>). The Singleton
     /// <see cref="CachedLocalizationOverrideStore"/> — registered by
     /// <c>GranitLocalizationModule</c> — resolves it via
-    /// <c>IServiceScopeFactory</c> per DB operation, ensuring HDS audit compliance
+    /// <c>IServiceScopeFactory</c> per DB operation, ensuring ISO 27001 audit compliance
     /// through <see cref="AuditedEntityInterceptor"/> on write operations.
     /// </para>
     /// <para>
@@ -45,7 +45,7 @@ public static class LocalizationEntityFrameworkCoreHostApplicationBuilderExtensi
         {
             configure(options);
 
-            // Automatically wire the HDS audit interceptor when Granit.Persistence is present.
+            // Automatically wire the ISO 27001 audit interceptor when Granit.Persistence is present.
             // The interceptor is Scoped — using ServiceLifetime.Scoped for the factory ensures
             // it is resolved from the current request/message scope on write operations.
             AuditedEntityInterceptor? auditInterceptor =

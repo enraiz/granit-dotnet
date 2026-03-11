@@ -9,7 +9,7 @@ namespace Granit.Webhooks.Internal;
 /// </summary>
 /// <remarks>
 /// Production applications must replace this with a durable store via
-/// <c>AddGranitWebhooksEntityFrameworkCore()</c> to satisfy HDS audit trail requirements.
+/// <c>AddGranitWebhooksEntityFrameworkCore()</c> to satisfy ISO 27001 audit trail requirements.
 /// </remarks>
 internal sealed class NullWebhookDeliveryWriter : IWebhookDeliveryWriter
 {

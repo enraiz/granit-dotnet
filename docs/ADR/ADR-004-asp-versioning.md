@@ -10,7 +10,7 @@
 
 Les API REST de la plateforme doivent supporter le versionnement pour
 permettre l'évolution des contrats sans casser les clients existants. Ce besoin
-est particulièrement critique dans un contexte santé (HDS) où les intégrateurs
+est particulièrement critique dans un contexte santé (ISO 27001) où les intégrateurs
 tiers (laboratoires, DPI) ont des cycles de mise à jour longs.
 
 Le versionnement doit être :

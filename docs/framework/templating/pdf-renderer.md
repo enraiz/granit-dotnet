@@ -175,7 +175,7 @@ nécessaire pour :
 
 - **Factur-X** (NF Z 55-140) : facturation électronique obligatoire en France
   à partir de septembre 2026
-- **Archivage HDS** : conservation long terme de documents médicaux
+- **Archivage ISO 27001** : conservation long terme de documents médicaux
 
 ```csharp
 public interface IPdfAConverter
@@ -192,7 +192,7 @@ Niveaux de conformité supportés :
 | Niveau   | Usage                                    |
 | -------- | ---------------------------------------- |
 | `PdfA3b` | Factur-X (PDF/A-3b + XML ZUGFeRD inclus) |
-| `PdfA2a` | Archivage long terme documents HDS       |
+| `PdfA2a` | Archivage long terme documents ISO 27001       |
 
 L'implémentation concrète nécessite une bibliothèque PDF/A (ex. iText7).
 La question de licence (AGPL vs commerciale) est en cours de validation.
@@ -204,4 +204,4 @@ Le renderer utilise `ILogger<PuppeteerSharpRenderer>` pour journaliser :
 - Taille du PDF généré (niveau Debug)
 - Format de papier utilisé (niveau Debug)
 
-Aucun contenu HTML n'est journalisé (conformité HDS/RGPD).
+Aucun contenu HTML n'est journalisé (conformité RGPD/ISO 27001).

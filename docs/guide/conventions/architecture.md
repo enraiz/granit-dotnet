@@ -27,7 +27,7 @@ Chaque package possède son projet de tests miroir (`tests/Granit.Vault.Tests/`)
 ## Modèle domaine
 
 Granit fournit une hiérarchie d'entités avec audit trail intégré, conforme aux
-exigences HDS. Choisissez le niveau d'audit adapté au besoin réglementaire.
+exigences ISO 27001. Choisissez le niveau d'audit adapté au besoin réglementaire.
 
 | Classe | Champs ajoutés | Usage |
 | --- | --- | --- |

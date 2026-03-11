@@ -52,7 +52,7 @@ public sealed class ClockTests
         DateTimeOffset now = _clock.Now;
 
         // Assert
-        now.Offset.ShouldBe(TimeSpan.Zero, "Clock must always return UTC (HDS compliance)");
+        now.Offset.ShouldBe(TimeSpan.Zero, "Clock must always return UTC (ISO 27001 compliance)");
     }
 
     [Fact]

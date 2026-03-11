@@ -11,7 +11,7 @@ public interface IClock
 
     /// <summary>
     /// Indicates whether the Clock supports multiple timezones.
-    /// Returns <c>true</c> when the Clock operates in UTC (standard HDS case).
+    /// Returns <c>true</c> when the Clock operates in UTC (standard ISO 27001 case).
     /// </summary>
     bool SupportsMultipleTimezone { get; }
 

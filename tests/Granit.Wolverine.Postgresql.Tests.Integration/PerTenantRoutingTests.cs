@@ -272,7 +272,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
             .Where(r => r.Value == "only-in-a")
             .ToListAsync(cancellationToken);
 
-        rowsInB.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
+        rowsInB.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (ISO 27001)");
     }
 
     [Fact]
@@ -293,7 +293,7 @@ public sealed class PerTenantRoutingTests(TwoPostgresContainersFixture fixture)
             .Where(r => r.Value == "only-in-b")
             .ToListAsync(cancellationToken);
 
-        rowsInA.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (HDS)");
+        rowsInA.ShouldBeEmpty("tenant isolation must prevent cross-tenant data leaks (ISO 27001)");
     }
 
     // -----------------------------------------------------------------------

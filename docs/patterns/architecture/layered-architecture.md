@@ -121,8 +121,8 @@ public sealed class Patient : FullAuditedEntity, IMultiTenant
 
 // FullAuditedEntity fournit automatiquement :
 // - Id (Guid, séquentiel via IGuidGenerator)
-// - CreatedAt, CreatedBy (audit HDS — création)
-// - ModifiedAt, ModifiedBy (audit HDS — modification)
+// - CreatedAt, CreatedBy (audit ISO 27001 — création)
+// - ModifiedAt, ModifiedBy (audit ISO 27001 — modification)
 // - IsDeleted, DeletedAt, DeletedBy (soft delete RGPD)
 // - TenantId (isolation multi-tenant via IMultiTenant)
 ```

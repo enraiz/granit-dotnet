@@ -102,6 +102,6 @@ public sealed class WolverinePostgresqlOptionsTests
         ValidateOptionsResult result = validator.Validate(null, options);
 
         result.Failed.ShouldBeTrue();
-        result.Failures.ShouldContain(x => x.Contains("HDS"));
+        result.Failures.ShouldContain(x => x.Contains("ISO 27001"));
     }
 }

@@ -3,7 +3,7 @@
 ## Problème
 
 Des données de santé (NIR, diagnostics, coordonnées de patients) doivent être
-chiffrées au repos (HDS) et en transit. Le chiffrement doit être transparent
+chiffrées au repos (ISO 27001) et en transit. Le chiffrement doit être transparent
 pour le code métier, y compris dans le cache distribué.
 
 ## Solution
@@ -140,7 +140,7 @@ sequenceDiagram
 
 | Niveau | Mécanisme | Usage |
 | --- | --- | --- |
-| **Champ** | `IStringEncryptionService` → Vault Transit | NIR, diagnostics, données nominatives HDS |
+| **Champ** | `IStringEncryptionService` → Vault Transit | NIR, diagnostics, données nominatives sensibles |
 | **Cache** | `[CacheEncrypted]` → AES-256 local | Valeurs en cache Redis contenant des données sensibles |
 
 ### Configuration Vault Transit

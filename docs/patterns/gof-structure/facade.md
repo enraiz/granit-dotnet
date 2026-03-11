@@ -56,7 +56,7 @@ descripteur, la génération d'URL pré-signée et la validation — à chaque
 opération. La façade encapsule cette complexité en 3 méthodes publiques.
 
 `GranitExceptionHandler` centralise la conversion d'exceptions en
-`ProblemDetails` RFC 7807, masquant la chaîne de mappers et les règles HDS
+`ProblemDetails` RFC 7807, masquant la chaîne de mappers et les règles ISO 27001
 (masquage des détails internes en production).
 
 ## Exemple d'usage

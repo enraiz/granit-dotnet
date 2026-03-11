@@ -1,7 +1,7 @@
 # Diagnostics
 
 `Granit.Diagnostics` fournit l'infrastructure de health checks
-production-ready pour les applications Digital Dynamics déployées sur Kubernetes :
+production-ready pour les applications Granit déployées sur Kubernetes :
 exposition des trois sondes (`/health/live`, `/health/ready`, `/health/startup`),
 cache anti-stampede et format de réponse JSON structuré pour l'observabilité.
 
@@ -140,7 +140,7 @@ Les endpoints retournent un payload structuré, utile pour les alertes et dashbo
 }
 ```
 
-> **Conformité HDS/RGPD** : les réponses ne contiennent jamais de stack trace, de
+> **Conformité RGPD/ISO 27001** : les réponses ne contiennent jamais de stack trace, de
 > chaîne de connexion, de token ni de donnée médicale ou personnelle.
 
 ## Health checks par module
@@ -258,8 +258,8 @@ Granit.Diagnostics
 
 | Exigence | Mécanisme |
 | -------- | --------- |
-| HDS - Pas d'exposition de données médicales | Réponses JSON sans PII ni stack trace |
-| HDS - Traçabilité | Endpoints exclus des traces OTEL (pas de pollution du journal d'audit) |
+| ISO 27001 - Pas d'exposition de données médicales | Réponses JSON sans PII ni stack trace |
+| ISO 27001 - Traçabilité | Endpoints exclus des traces OTEL (pas de pollution du journal d'audit) |
 | RGPD - Minimisation | Aucune donnée personnelle dans les payloads de santé |
 | Souveraineté OVHcloud | Pas de dépendance US Cloud Act — packages Microsoft officiels uniquement |
 | Résilience K8s | Liveness sans dépendances externes — jamais de restart en cascade |

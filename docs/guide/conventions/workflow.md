@@ -51,7 +51,7 @@ est une **obligation légale** pour les licences permissives (MIT, Apache-2.0, B
    licences change.
 3. **Mettre à jour la date** `Dernière mise à jour`.
 4. **Signaler immédiatement** toute dépendance sous licence **non-permissive**
-   (GPL, LGPL, AGPL, SSPL, ou restriction commerciale). Le contexte HDS/commercial
+   (GPL, LGPL, AGPL, SSPL, ou restriction commerciale). Le contexte ISO 27001/commercial
    exige une revue juridique avant intégration.
 
 **Ne jamais** ajouter ou mettre à jour une dépendance sans modifier

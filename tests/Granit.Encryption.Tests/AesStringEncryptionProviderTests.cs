@@ -13,7 +13,7 @@ namespace Granit.Encryption.Tests;
 
 public sealed class AesStringEncryptionProviderTests
 {
-    private static AesStringEncryptionProvider CreateProvider(string passPhrase = "P@ssw0rdVaultSecret!HDS2026")
+    private static AesStringEncryptionProvider CreateProvider(string passPhrase = "P@ssw0rdVaultSecret!ISO270012026")
     {
         IOptions<StringEncryptionOptions> options = Microsoft.Extensions.Options.Options.Create(new StringEncryptionOptions
         {

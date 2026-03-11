@@ -19,7 +19,7 @@ public static class PersistenceServiceCollectionExtensions
     /// <summary>
     /// Adds Granit EF Core services:
     /// <list type="bullet">
-    ///   <item>HDS audit interceptor (<see cref="AuditedEntityInterceptor"/>)</item>
+    ///   <item>ISO 27001 audit interceptor (<see cref="AuditedEntityInterceptor"/>)</item>
     ///   <item>Versioning interceptor (<see cref="VersioningInterceptor"/>)</item>
     ///   <item>GDPR soft delete interceptor (<see cref="SoftDeleteInterceptor"/>)</item>
     ///   <item>

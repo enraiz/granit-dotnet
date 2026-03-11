@@ -1,7 +1,7 @@
 namespace Granit.Core.Domain;
 
 /// <summary>
-/// Base class for all entities with an HDS audit trail.
+/// Base class for all entities with an ISO 27001 audit trail.
 /// Provides creation/modification traceability fields.
 /// </summary>
 public abstract class AuditableEntity

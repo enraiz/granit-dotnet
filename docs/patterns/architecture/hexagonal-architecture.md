@@ -117,7 +117,7 @@ classDiagram
 | -------- | -------- |
 | Couplage à un fournisseur cloud (S3, Azure Blob) | Les ports permettent de changer d'adaptateur sans toucher au cœur |
 | Tests unitaires nécessitant une base de données | `InMemoryFeatureStore` et `InMemoryBackgroundJobStore` implémentent les interfaces Reader/Writer et remplacent EF Core en test |
-| Conformité HDS — pouvoir migrer d'OVHcloud S3 vers un autre provider souverain | Implémenter `IBlobStorageClient` pour le nouveau provider suffit |
+| Conformité ISO 27001 — pouvoir migrer d'OVHcloud S3 vers un autre provider souverain | Implémenter `IBlobStorageClient` pour le nouveau provider suffit |
 | Packages NuGet indépendants | Le cœur (`Granit.BlobStorage`) n'a aucune dépendance sur EF Core ou AWS SDK |
 
 ## Exemple d'usage

@@ -15,7 +15,7 @@ internal sealed class WolverinePostgresqlOptionsValidator : IValidateOptions<Wol
         {
             return ValidateOptionsResult.Fail(
                 $"{nameof(options.TransportConnectionString)} must be non-empty. " +
-                "A valid PostgreSQL connection string is required for the Wolverine Outbox (HDS compliance).");
+                "A valid PostgreSQL connection string is required for the Wolverine Outbox (ISO 27001 compliance).");
         }
 
         return ValidateOptionsResult.Success;

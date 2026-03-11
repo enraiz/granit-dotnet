@@ -76,7 +76,7 @@ Les besoins sont :
 - Bibliothèque historique la plus populaire
 - **Problème de licence** : SponsorLink (v4.20+) a injecté du code de télémétrie
   dans les builds, créant un risque de conformité et une crise de confiance
-  communautaire. Incompatible avec la politique de sécurité HDS/RGPD
+  communautaire. Incompatible avec la politique de sécurité RGPD/ISO 27001
 
 #### FakeItEasy
 

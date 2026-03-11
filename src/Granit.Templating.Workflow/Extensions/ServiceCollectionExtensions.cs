@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Replaces the default <see cref="NullTemplateTransitionHook"/> with a Workflow-aware
-    /// implementation that provides FSM validation, approval routing, and unified HDS audit trail.
+    /// implementation that provides FSM validation, approval routing, and unified ISO 27001 audit trail.
     /// </summary>
     /// <remarks>
     /// <see cref="IWorkflowTransitionRecorder"/> must be registered separately,

@@ -18,7 +18,7 @@ namespace Granit.Wolverine.Behaviors;
 /// <para>
 /// Without this behavior, <c>ICurrentUserService.UserId</c> returns null in background
 /// handlers (no <c>HttpContext</c>), causing the EF Core audit interceptor to record
-/// <c>ModifiedBy = null</c> in the HDS audit trail.
+/// <c>ModifiedBy = null</c> in the ISO 27001 audit trail.
 /// </para>
 /// <para>
 /// If the header is absent, no override is applied and the handler executes with

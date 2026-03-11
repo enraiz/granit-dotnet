@@ -276,7 +276,7 @@ Les niveaux minimum sont configurés dans `appsettings.json` via la section `Ser
 }
 ```
 
-## Règles HDS et RGPD
+## Règles ISO 27001 et RGPD
 
 ### Ce qui est INTERDIT dans les logs
 
@@ -312,7 +312,7 @@ private partial void LogFhirValidationFailed(
 techniques) mais jamais des données directement identifiantes (nom, prénom, email, numéro
 de sécurité sociale, diagnostic, etc.).
 
-> **HDS EXI-04** : les traces d'audit contenant des données de santé transitent par
+> **ISO 27001** : les traces d'audit contenant des données de santé transitent par
 > les intercepteurs EF Core (voir [persistence.md](../data/persistence.md)), pas par les logs
 > applicatifs. Les logs Serilog sont des logs **techniques**, pas des logs d'audit.
 
@@ -366,7 +366,7 @@ var service = new PatientService(logger, db);
    (`Log.Information(...)`) dans le code applicatif
 4. **Message templates** — toujours utiliser des paramètres nommés `{Property}`,
    jamais l'interpolation `$"..."`
-5. **Pas de PII** — aucune donnée personnelle ou de santé dans les logs (RGPD + HDS)
+5. **Pas de PII** — aucune donnée personnelle ou de santé dans les logs (RGPD + ISO 27001)
 6. **Pas de secrets** — aucun token, mot de passe, clé dans les logs
 7. **Identifiants techniques** — utiliser les GUID des entités comme identifiants
    dans les logs (pseudonymisation)

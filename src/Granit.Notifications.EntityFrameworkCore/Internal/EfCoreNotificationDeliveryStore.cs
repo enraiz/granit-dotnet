@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Notifications.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// INSERT-only HDS-compliant audit store for delivery attempts.
+/// INSERT-only ISO 27001-compliant audit store for delivery attempts.
 /// </summary>
 /// <remarks>
-/// HDS compliance: <see cref="NotificationDeliveryAttempt"/> records are INSERT-only.
+/// ISO 27001 compliance: <see cref="NotificationDeliveryAttempt"/> records are INSERT-only.
 /// This store never updates or deletes them.
 /// </remarks>
 internal sealed class EfCoreNotificationDeliveryStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationDeliveryWriter

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Localization.EntityFrameworkCore</PackageId>
-    <Description>EF Core implementation of ILocalizationOverrideStore for Granit.Localization. Persists translation overrides in PostgreSQL (table granit_localization_overrides) with HDS audit trail and multi-tenant isolation.</Description>
+    <Description>EF Core implementation of ILocalizationOverrideStore for Granit.Localization. Persists translation overrides in PostgreSQL (table granit_localization_overrides) with ISO 27001 audit trail and multi-tenant isolation.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

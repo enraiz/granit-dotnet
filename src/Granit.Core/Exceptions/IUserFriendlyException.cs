@@ -9,7 +9,7 @@ namespace Granit.Core.Exceptions;
 /// <summary>
 /// Marker interface indicating that the exception message is safe to expose to end users.
 /// <para>
-/// <b>HDS / Security rule:</b> only exceptions explicitly implementing this interface
+/// <b>ISO 27001 / Security rule:</b> only exceptions explicitly implementing this interface
 /// may have their message included in the HTTP response body. Any exception that does
 /// NOT implement <see cref="IUserFriendlyException"/> will have its message replaced
 /// by a generic, non-sensitive title in production environments.

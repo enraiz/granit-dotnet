@@ -8,11 +8,11 @@ namespace Granit.Workflow;
 /// <remarks>
 /// The <c>WorkflowTransitionInterceptor</c> reads <see cref="Current"/> during
 /// <c>SaveChanges</c> to populate the <see cref="Domain.WorkflowTransitionRecord.Comment"/>
-/// field of the HDS audit trail.
+/// field of the ISO 27001 audit trail.
 /// </remarks>
 /// <example>
 /// <code>
-/// using (WorkflowTransitionContext.SetComment("Validated by medical director per HDS protocol"))
+/// using (WorkflowTransitionContext.SetComment("Validated by medical director per ISO 27001 protocol"))
 /// {
 ///     invoice.Status = InvoiceStatus.Approved;
 ///     await dbContext.SaveChangesAsync(cancellationToken);

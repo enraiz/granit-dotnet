@@ -23,7 +23,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// and <c>UnpublishAsync</c> to prevent stale reads after lifecycle transitions.
 /// </para>
 /// <para>
-/// <strong>HDS compliance:</strong> only <c>Draft</c> revisions are physically deleted.
+/// <strong>ISO 27001 compliance:</strong> only <c>Draft</c> revisions are physically deleted.
 /// <c>Published</c> → <c>Archived</c> transitions are always preserved for the 3-year audit trail.
 /// </para>
 /// </remarks>
@@ -123,7 +123,7 @@ internal sealed class EfDocumentTemplateStore(
                 $"Cannot publish template '{key.Name}' (culture: {key.Culture ?? "neutral"}): no draft exists.");
         }
 
-        // Archive any currently published revision (HDS: row is kept, status changes)
+        // Archive any currently published revision (ISO 27001: row is kept, status changes)
         List<TemplateRevisionEntity> currentlyPublished = await ctx.TemplateRevisions
             .Where(r => r.TemplateName == key.Name
                         && r.Culture == key.Culture
@@ -218,7 +218,7 @@ internal sealed class EfDocumentTemplateStore(
                 $"Cannot delete draft for template '{key.Name}' (culture: {key.Culture ?? "neutral"}): no draft exists.");
         }
 
-        // Only drafts are physically deleted. Published/archived rows are kept (HDS).
+        // Only drafts are physically deleted. Published/archived rows are kept (ISO 27001).
         ctx.TemplateRevisions.Remove(draft);
         await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }

@@ -6,7 +6,7 @@ Le pattern **Tenant-per-Database** attribue une base de données physiquement
 distincte à chaque tenant. C'est le niveau d'isolation le plus fort disponible dans Granit :
 chaque tenant possède son propre schéma, ses propres index et ses propres credentials.
 
-Ce pattern est recommandé pour les applications HDS traitant des données de santé sensibles,
+Ce pattern est recommandé pour les applications ISO 27001 traitant des données de santé sensibles,
 ou pour les tenants dont le contrat exige une isolation physique (ex : CHU, établissements
 soumis à des audits externes).
 
@@ -60,7 +60,7 @@ est conservée sans modification.
 
 ## Implémenter ITenantConnectionStringProvider
 
-### Avec HashiCorp Vault (recommandé en production HDS)
+### Avec HashiCorp Vault (recommandé en production ISO 27001)
 
 > `TenantDatabaseOptions`, `GetEncryptedCredential` et `BuildConnectionString` sont des
 > exemples d'implémentation côté application — à adapter à votre configuration Vault et
@@ -95,7 +95,7 @@ services.AddSingleton<ITenantConnectionStringProvider>(
 
 Si `ICurrentTenant.IsAvailable` est `false` (aucun tenant résolu), la factory lève une
 `InvalidOperationException` immédiatement, sans aucun fallback silencieux. Ce comportement
-est intentionnel : accéder aux données sans contexte tenant violerait l'isolation HDS/RGPD.
+est intentionnel : accéder aux données sans contexte tenant violerait l'isolation RGPD/ISO 27001.
 
 ```text
 InvalidOperationException: No active tenant context. Ensure the tenant is resolved before
@@ -115,18 +115,18 @@ builder.Services.AddSingleton<ITenantConnectionStringProvider, VaultTenantConnec
 builder.AddGranitWolverineWithPostgresqlPerTenant<ApplicationDbContext>();
 ```
 
-## Audit trail HDS
+## Audit trail ISO 27001
 
 `AuditedEntityInterceptor` est câblé automatiquement dans chaque `DbContext` créé par la
 factory lorsqu'il est présent dans le conteneur DI (enregistré par `AddGranitPersistence()`).
-Cela garantit le suivi des opérations par tenant, conformément à l'exigence HDS de rétention
+Cela garantit le suivi des opérations par tenant, conformément à l'exigence ISO 27001 de rétention
 de 3 ans.
 
 ## Compatibilité par fournisseur de base de données
 
 | Fournisseur         | Support | Notes                                                                |
 | ------------------- | ------- | -------------------------------------------------------------------- |
-| **PostgreSQL**      | Oui     | HDS. Credentials dynamiques via Vault.                               |
+| **PostgreSQL**      | Oui     | ISO 27001. Credentials dynamiques via Vault.                               |
 | **SQL Server**      | Oui     | Un catalogue par tenant. Compatible Azure SQL.                       |
 | **MySQL / MariaDB** | Oui     | Une base par tenant (synonyme de schema en MySQL).                   |
 | **Oracle**          | Oui     | Un schema/user ou un PDB par tenant (multitenant Oracle).            |

@@ -2,7 +2,7 @@
 
 ## Project
 
-- **Type**: Shared NuGet packages for Digital Dynamics .NET applications
+- **Type**: Rock-solid, production-ready modular framework for .NET and React
 - **Repo**: `granit-dotnet` (company-level, not product-specific)
 - **Compliance**: RGPD + ISO 27001 + ISO 9001
 - **Publication**: GitLab Package Registry (NuGet)

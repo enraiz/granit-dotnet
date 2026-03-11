@@ -25,7 +25,7 @@ internal sealed class NotificationDbContext(
     /// <summary>User notification preferences (opt-in/opt-out per channel).</summary>
     public DbSet<NotificationPreference> Preferences => Set<NotificationPreference>();
 
-    /// <summary>Immutable HDS audit trail of delivery attempts.</summary>
+    /// <summary>Immutable ISO 27001 audit trail of delivery attempts.</summary>
     public DbSet<NotificationDeliveryAttempt> DeliveryAttempts => Set<NotificationDeliveryAttempt>();
 
     /// <summary>Mobile push device tokens.</summary>

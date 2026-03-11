@@ -21,11 +21,11 @@ namespace Granit.Persistence.MultiTenancy;
 /// <para>
 /// Throws <see cref="InvalidOperationException"/> when no tenant is active.
 /// There is no silent fallback: allowing a query to run without schema activation
-/// would expose data from a previously-pooled tenant connection (HDS breach).
+/// would expose data from a previously-pooled tenant connection (ISO 27001 breach).
 /// </para>
 /// <para>
 /// <see cref="AuditedEntityInterceptor"/> is wired automatically when available in DI,
-/// satisfying the 3-year HDS audit trail requirement.
+/// satisfying the 3-year ISO 27001 audit trail requirement.
 /// </para>
 /// </remarks>
 /// <typeparam name="TContext">The <see cref="DbContext"/> type shared across tenants.</typeparam>

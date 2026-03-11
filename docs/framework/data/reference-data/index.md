@@ -2,7 +2,7 @@
 
 `Granit.ReferenceData` fournit un cadre générique pour gérer les données
 référentielles (pays, devises, langues, types de documents, etc.) avec
-audit HDS, filtrage automatique des entrées inactives et cache mémoire.
+audit ISO 27001, filtrage automatique des entrées inactives et cache mémoire.
 
 ## Architecture
 
@@ -34,7 +34,7 @@ public sealed class Country : ReferenceDataEntity
 }
 ```
 
-`ReferenceDataEntity` hérite de `AuditedEntity` (audit HDS 3 ans) et implémente
+`ReferenceDataEntity` hérite de `AuditedEntity` (audit ISO 27001 3 ans) et implémente
 `IActive` (filtre global EF Core automatique). Propriétés fournies :
 
 - `Guid Id` — identifiant unique (hérité de `Entity`)

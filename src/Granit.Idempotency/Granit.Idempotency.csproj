@@ -4,7 +4,7 @@
     <PackageId>Granit.Idempotency</PackageId>
     <Description>Middleware d'idempotence HTTP pour les API publiques (style Stripe).
     Stockage atomique via Redis SET NX PX. Machine à états Absent → InProgress → Completed.
-    Chiffrement AES-256 opt-in via ICacheValueEncryptor. Conforme HDS/RGPD.</Description>
+    Chiffrement AES-256 opt-in via ICacheValueEncryptor. Conforme GDPR/ISO 27001.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

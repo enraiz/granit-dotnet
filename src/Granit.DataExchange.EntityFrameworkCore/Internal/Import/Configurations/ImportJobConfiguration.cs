@@ -31,7 +31,7 @@ internal sealed class ImportJobConfiguration : IEntityTypeConfiguration<ImportJo
         builder.Property(e => e.CompletedAt);
         builder.Property(e => e.TenantId);
 
-        // Audit trail (HDS)
+        // Audit trail (ISO 27001)
         builder.Property(e => e.CreatedAt).IsRequired();
         builder.Property(e => e.CreatedBy).HasMaxLength(200).IsRequired();
         builder.Property(e => e.ModifiedAt);

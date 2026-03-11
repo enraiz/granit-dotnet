@@ -1,14 +1,14 @@
-# Tests de conformité HDS / RGPD
+# Tests de conformité ISO 27001 / RGPD
 
 [← Index des tests](index.md)
 
 Certains tests vérifient directement des exigences réglementaires. Ils constituent
 une preuve d'audit : leur suppression ou modification doit être tracée et justifiée.
 
-## Audit trail HDS
+## Audit trail ISO 27001
 
 Les tests de `AuditedEntityInterceptor` vérifient que les champs d'audit sont
-correctement remplis, conformément à l'exigence HDS de traçabilité sur 3 ans :
+correctement remplis, conformément à l'exigence ISO 27001 de traçabilité sur 3 ans :
 
 ```csharp
 [Fact]
@@ -59,7 +59,7 @@ public async Task SaveChangesAsync_OnDelete_ConvertToSoftDelete()
 
 ## UTC uniquement
 
-Les tests de `Clock` vérifient que l'horloge retourne toujours UTC (conformité HDS) :
+Les tests de `Clock` vérifient que l'horloge retourne toujours UTC (conformité ISO 27001) :
 
 ```csharp
 [Fact]
@@ -67,6 +67,6 @@ public void Now_IsAlwaysUtc()
 {
     DateTimeOffset now = _clock.Now;
     now.Offset.ShouldBe(TimeSpan.Zero,
-        "le Clock doit toujours retourner UTC (conformité HDS)");
+        "le Clock doit toujours retourner UTC (conformité ISO 27001)");
 }
 ```

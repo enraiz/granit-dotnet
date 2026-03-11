@@ -1,6 +1,6 @@
 # Granit.Webhooks.EntityFrameworkCore
 
-EF Core persistence layer for Granit.Webhooks. Provides EfWebhookSubscriptionStore and EfWebhookDeliveryStore with HDS audit trail.
+EF Core persistence layer for Granit.Webhooks. Provides EfWebhookSubscriptionStore and EfWebhookDeliveryStore with ISO 27001 audit trail.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

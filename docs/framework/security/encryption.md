@@ -54,7 +54,7 @@ public sealed class PatientService(IStringEncryptionService encryption)
 Le service est injecté via `IStringEncryptionService`. Il délègue au provider
 sélectionné par `StringEncryptionOptions.ProviderName`.
 
-## Sécurité HDS (CWE-329)
+## Sécurité ISO 27001 (CWE-329)
 
 L'IV (vecteur d'initialisation) est **généré aléatoirement** à chaque chiffrement
 via `RandomNumberGenerator.GetBytes(16)`. Il n'est **pas** configurable.
@@ -67,7 +67,7 @@ Base64( IV_bytes[16] || CipherText_bytes[N] )
 
 L'IV est relu automatiquement lors du déchiffrement depuis les 16 premiers octets.
 Un IV statique permettrait à un attaquant d'identifier des motifs dans les données
-de santé (violation HDS).
+de santé (violation ISO 27001).
 
 ## Dérivation de clé
 

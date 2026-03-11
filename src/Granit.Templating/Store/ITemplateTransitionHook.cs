@@ -11,7 +11,7 @@ namespace Granit.Templating.Store;
 /// <para>
 /// Install the <c>Granit.Templating.Workflow</c> bridge package to replace this with a
 /// Workflow-aware implementation that provides FSM validation, approval routing,
-/// unified HDS audit trail and domain events.
+/// unified ISO 27001 audit trail and domain events.
 /// </para>
 /// </remarks>
 public interface ITemplateTransitionHook

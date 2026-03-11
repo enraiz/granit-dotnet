@@ -12,7 +12,7 @@ Granit.Authorization
 Granit.Authorization.EntityFrameworkCore
   ├── Entité : PermissionGrant (AuditedEntity + IMultiTenant)
   ├── Store : EfCorePermissionGrantStore
-  ├── Manager : PermissionManager (cache + audit HDS)
+  ├── Manager : PermissionManager (cache + audit ISO 27001)
   └── DependsOn : Granit.Authorization, Persistence
 ```
 
@@ -300,7 +300,7 @@ IReadOnlyList<string> roles =
 1. Valide que la permission est définie dans `IPermissionDefinitionManager`
 2. Upsert ou supprime le `PermissionGrant` en base
 3. Invalide l'entrée de cache correspondante
-4. Émet un log structuré `[AUDIT]` → Serilog → Loki (rétention 3 ans, obligation HDS)
+4. Émet un log structuré `[AUDIT]` → Serilog → Loki (rétention 3 ans, obligation ISO 27001)
 
 ```text
 [AUDIT] Permission Granted: permission=Invoices.Delete role=accountant tenantId=<guid>
@@ -359,11 +359,11 @@ CREATE TABLE security_permission_grants (
 
 ## Sécurité et conformité
 
-### HDS — Audit trail
+### ISO 27001 — Audit trail
 
 Chaque modification de grant via `IPermissionManager.SetAsync` émet un log structuré
 capturé par Serilog puis routé vers Loki. La politique de rétention Loki doit être
-configurée à **3 ans minimum** pour satisfaire l'obligation HDS.
+configurée à **3 ans minimum** pour satisfaire l'obligation ISO 27001.
 
 ### RGPD — Minimisation des données
 

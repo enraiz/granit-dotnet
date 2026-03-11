@@ -15,7 +15,7 @@ attestations, et documents réglementaires.
 Les exigences sont :
 
 - **Fidélité CSS** : rendu pixel-perfect du HTML/CSS (flexbox, grid, @media print)
-- **PDF/A-3b** : conformité pour l'archivage long terme (HDS) et Factur-X
+- **PDF/A-3b** : conformité pour l'archivage long terme (ISO 27001) et Factur-X
 - **Headers/footers** : en-têtes et pieds de page dynamiques (pagination, date)
 - **Performance** : génération en < 2 secondes pour un document standard
 
@@ -84,7 +84,7 @@ Les exigences sont :
 
 - Fidélité CSS parfaite : le PDF est identique au rendu navigateur
 - Pipeline unifié : Scriban (template) → HTML → PuppeteerSharp (PDF)
-- Support PDF/A-3b via post-processing pour l'archivage HDS et Factur-X
+- Support PDF/A-3b via post-processing pour l'archivage ISO 27001 et Factur-X
 - MIT : pas de contrainte de licence
 - API async .NET native avec gestion du lifecycle Chromium
 

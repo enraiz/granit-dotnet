@@ -1,6 +1,6 @@
 # CORS
 
-`Granit.Cors` fournit une configuration CORS standardisée et conforme HDS
+`Granit.Cors` fournit une configuration CORS standardisée et conforme ISO 27001
 pour les applications Granit. Les origines autorisées sont déclarées dans
 `appsettings.json` et validées au démarrage.
 
@@ -45,7 +45,7 @@ L'application doit aussi appeler `app.UseCors()` dans le pipeline HTTP.
 | `AllowedOrigins` | `string[]` | `[]` (requis) | Origines autorisées. Au moins une obligatoire. |
 | `AllowCredentials` | `bool` | `false` | Inclure `Access-Control-Allow-Credentials: true`. |
 
-## Règles de validation HDS
+## Règles de validation ISO 27001
 
 Le module valide la configuration au démarrage et échoue immédiatement
 (fail-fast) si une règle est violée :

@@ -12,7 +12,7 @@ Le framework Granit fournit le module `Granit.Observability` qui encapsule la
 configuration du logging structuré, du tracing distribué et des métriques. Le
 choix des bibliothèques d'instrumentation conditionne :
 
-- **Traçabilité HDS** : logs structurés horodatés conservés 3 ans
+- **Traçabilité ISO 27001** : logs structurés horodatés conservés 3 ans
 - **Tracing distribué** : corrélation des requêtes à travers les modules,
   messages Wolverine et appels HTTP
 - **Métriques** : supervision des performances et alerting
@@ -73,7 +73,7 @@ Grafana self-hosted : **Loki** (logs), **Tempo** (traces), **Mimir** (métriques
 | Sink OTLP natif | Oui | Non | Partiel | N/A | N/A |
 | Communauté .NET | Très large | Standard | Moyenne | Large | Moyenne |
 | Coût | Infra seule | Infra seule | Infra seule | Variable | Élevé |
-| Conformité HDS | Oui | Oui | Oui | Risque | Risque |
+| Conformité ISO 27001 | Oui | Oui | Oui | Risque | Risque |
 
 ## Packages utilisés
 
@@ -109,7 +109,7 @@ Grafana self-hosted : **Loki** (logs), **Tempo** (traces), **Mimir** (métriques
 
 Ce choix devrait être réévalué si :
 
-- Un service d'observabilité managé souverain européen émerge (certifié HDS)
+- Un service d'observabilité managé souverain européen émerge (certifié ISO 27001)
 - OpenTelemetry .NET SDK atteint la parité fonctionnelle avec Serilog pour le logging structuré
 - La charge de maintenance de la stack Grafana self-hosted devient disproportionnée
 

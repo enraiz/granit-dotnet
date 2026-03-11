@@ -1,11 +1,11 @@
 # Idempotency
 
 `Granit.Idempotency` implémente l'idempotence HTTP style Stripe
-pour les API publiques Digital Dynamics. Un client peut renvoyer la même requête
+pour les API publiques Granit. Un client peut renvoyer la même requête
 (panne réseau, timeout, double-clic) et obtenir la réponse originale sans
 ré-exécution de la logique métier.
 
-> **Conformité HDS** : les entrées d'idempotence stockées dans Redis contiennent
+> **Conformité ISO 27001** : les entrées d'idempotence stockées dans Redis contiennent
 > potentiellement des données de santé (corps de réponse). Elles sont chiffrées
 > avec `ICacheValueEncryptor` (AES-256-CBC) via le module
 > `Granit.Caching`.
@@ -221,7 +221,7 @@ partagé entre tous les threads, ce qui est son mode d'utilisation normal.
   incluse dans la clé Redis, évitant toute injection de caractères spéciaux.
 - Les entrées Redis sont **chiffrées AES-256-CBC** via `ICacheValueEncryptor`
   (fourni par `Granit.Caching`) — obligatoire pour la
-  conformité HDS sur les corps de réponse contenant des données de santé.
+  conformité ISO 27001 sur les corps de réponse contenant des données de santé.
 - Le middleware n'est **jamais déclenché** sur les endpoints sans `[Idempotent]`
   (vérification via `IIdempotencyMetadata` dans les endpoint metadata).
 

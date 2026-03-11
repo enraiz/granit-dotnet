@@ -7,7 +7,7 @@ namespace Granit.Authorization.EntityFrameworkCore;
 /// <summary>
 /// Granit module for EF Core authorization grant persistence.
 /// Provides <see cref="Entities.PermissionGrant"/> entity, <see cref="DbContext.IPermissionGrantDbContext"/>,
-/// and <see cref="Abstractions.IPermissionManagerReader"/>/<see cref="Abstractions.IPermissionManagerWriter"/> with HDS audit logging.
+/// and <see cref="Abstractions.IPermissionManagerReader"/>/<see cref="Abstractions.IPermissionManagerWriter"/> with ISO 27001 audit logging.
 /// </summary>
 /// <remarks>
 /// Registration of the generic store requires the application DbContext type. Call

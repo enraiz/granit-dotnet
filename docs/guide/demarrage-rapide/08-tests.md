@@ -191,7 +191,7 @@ Tous les tests doivent passer avant de pousser du code.
 En 8 étapes, nous avons construit une API complète avec :
 
 - **Système de modules** : architecture modulaire avec chargement topologique
-- **Modèle domaine** : entités avec audit trail HDS automatique
+- **Modèle domaine** : entités avec audit trail ISO 27001 automatique
 - **Persistance** : EF Core + PostgreSQL + intercepteurs Granit
 - **Endpoints** : Minimal API avec le pattern `MapXxxEndpoints()`
 - **Sécurité** : JWT Keycloak + `ICurrentUserService`

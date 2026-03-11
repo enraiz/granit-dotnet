@@ -2,7 +2,7 @@
 
 Bridge optionnel entre `Granit.Templating` et `Granit.Workflow`. Remplace le
 `NullTemplateTransitionHook` par défaut par une implémentation Workflow qui fournit
-la validation FSM, le routage d'approbation, l'audit HDS unifié (`WorkflowTransitionRecord`)
+la validation FSM, le routage d'approbation, l'audit ISO 27001 unifié (`WorkflowTransitionRecord`)
 et les domain events.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.

@@ -105,7 +105,7 @@ via `Granit.ExceptionHandling`.
 
 | Contexte | Exception | HTTP | Message visible UI |
 | --- | --- | --- | --- |
-| Erreur de programmeur | `ArgumentNullException.ThrowIfNull()` | 500 | Non (masqué HDS) |
+| Erreur de programmeur | `ArgumentNullException.ThrowIfNull()` | 500 | Non (masqué ISO 27001) |
 | Champ manquant / invalide | `ValidationException` | 422 | Oui (par champ) |
 | Règle métier violée | `BusinessException` | 400 | Oui (errorCode) |
 | Entité introuvable | `EntityNotFoundException` | 404 | Oui |

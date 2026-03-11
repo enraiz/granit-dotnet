@@ -53,7 +53,7 @@ propriétés simples que EF Core traite comme des paramètres SQL.
 ## Justification
 
 Les interceptors EF Core permettent d'appliquer des règles transversales
-(audit HDS, soft delete RGPD) de manière transparente sans polluer les
+(audit ISO 27001, soft delete RGPD) de manière transparente sans polluer les
 handlers applicatifs. Le `FilterProxy` résout une limitation technique
 d'EF Core tout en gardant les filtres dynamiques.
 

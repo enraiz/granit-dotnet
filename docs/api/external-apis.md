@@ -258,7 +258,7 @@ Deux modes :
 
 - **AWS SDK intégré** : retry avec backoff exponentiel (configurable via `AmazonS3Config`)
 - **Souveraineté** : endpoint OVHcloud (FR) uniquement — jamais AWS/Azure/GCP pour
-  les données de santé (contrainte HDS)
+  les données de santé (contrainte ISO 27001)
 
 ## Webhook delivery (sortant)
 

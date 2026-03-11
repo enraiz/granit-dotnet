@@ -1,7 +1,7 @@
 # API Documentation
 
 `Granit.ApiDocumentation` génère les documents OpenAPI et expose
-l'UI Scalar multi-version pour toutes les APIs Digital Dynamics. Il dépend de
+l'UI Scalar multi-version pour toutes les APIs Granit. Il dépend de
 `Granit.ApiVersioning`.
 
 > **Voir aussi** : [api-versioning.md](api-versioning.md) pour la configuration du
@@ -40,7 +40,7 @@ app.Run();
   "ApiDocumentation": {
     "Title": "My API",
     "MajorVersions": [1],
-    "Description": "API clinique — données de santé HDS",
+    "Description": "API clinique — données sensibles ISO 27001",
     "ContactEmail": "api@digitaldynamics.be",
     "LogoUrl": "/logo.svg",
     "FaviconUrl": "/favicon.svg",
@@ -581,7 +581,7 @@ internal sealed class ReferenceDataSchemaExampleProvider : ISchemaExampleProvide
 Les packages `*.Endpoints` sans type Request (Authorization, BackgroundJobs, Cookies,
 Timeline) n'ont pas de provider — c'est attendu.
 
-## Considérations HDS
+## Considérations ISO 27001
 
 ### UI en production
 
@@ -603,7 +603,7 @@ et `/scalar/*` :
 | `""` (chaîne vide) | Accès anonyme explicite (`.AllowAnonymous()`) |
 | `"PolicyName"` | Accès protégé par la policy nommée (`.RequireAuthorization()`) |
 
-#### Portail développeur interne (HDS)
+#### Portail développeur interne (ISO 27001)
 
 ```json
 {

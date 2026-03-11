@@ -90,7 +90,7 @@ public sealed class AppDbContext : DbContext
 > filtres sont toujours appliqués. Les DbContexts existants n'ont pas besoin d'être
 > modifiés.
 
-## Exemple : service de purge HDS
+## Exemple : service de purge ISO 27001
 
 ```csharp
 public sealed class PurgeService(IDataFilter dataFilter, AppDbContext context)
@@ -147,5 +147,5 @@ propre implémentation.
 
 | Exigence | Mécanisme |
 | --- | --- |
-| Maintenance HDS | `Disable<ISoftDeletable>()` — accès aux données supprimées en scope contrôlé |
+| Maintenance ISO 27001 | `Disable<ISoftDeletable>()` — accès aux données supprimées en scope contrôlé |
 | Isolation tenant | `Disable<IMultiTenant>()` — réservé aux opérations système autorisées |

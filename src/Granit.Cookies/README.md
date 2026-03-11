@@ -1,7 +1,7 @@
 # Granit.Cookies
 
 HTTP cookie management with Strict Registry Pattern for Granit. GDPR-compliant by design:
-fail-fast on unregistered cookies, per-category consent enforcement. HDS/GDPR compliant.
+fail-fast on unregistered cookies, per-category consent enforcement. GDPR/ISO 27001 compliant.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

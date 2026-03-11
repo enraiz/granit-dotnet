@@ -9,7 +9,7 @@ namespace Granit.Workflow.EntityFrameworkCore.Configurations;
 /// Table: <c>workflow_transition_records</c>.
 /// </summary>
 /// <remarks>
-/// HDS compliance: this table is INSERT-only. No UPDATE or DELETE operations
+/// ISO 27001 compliance: this table is INSERT-only. No UPDATE or DELETE operations
 /// should ever be performed. Records must be retained for 3 years minimum.
 /// </remarks>
 internal sealed class WorkflowTransitionRecordConfiguration

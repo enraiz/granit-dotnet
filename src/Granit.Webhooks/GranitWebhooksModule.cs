@@ -14,7 +14,7 @@ namespace Granit.Webhooks;
 /// Default registrations use in-memory and no-op stores suitable for development and tests.
 /// For production, call <c>AddGranitWebhooksEntityFrameworkCore()</c>
 /// from <c>Granit.Webhooks.EntityFrameworkCore</c> to enable durable persistence and
-/// the HDS-compliant audit trail.
+/// the ISO 27001-compliant audit trail.
 /// </para>
 /// </remarks>
 [DependsOn(typeof(GranitTimingModule))]

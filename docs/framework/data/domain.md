@@ -10,7 +10,7 @@ using Granit.Core.Domain;
 ## Hiérarchie d'entités
 
 Les entités persistées héritent d'une hiérarchie de classes abstraites qui ajoute
-progressivement les champs d'audit HDS. Les champs sont remplis automatiquement par
+progressivement les champs d'audit ISO 27001. Les champs sont remplis automatiquement par
 `AuditedEntityInterceptor` du package [Persistence](persistence.md).
 
 ```text
@@ -61,7 +61,7 @@ public abstract class CreationAuditedEntity : Entity
 ### AuditedEntity
 
 Ajoute les champs de traçabilité de modification. C'est le choix par défaut pour la
-plupart des entités nécessitant un audit trail HDS.
+plupart des entités nécessitant un audit trail ISO 27001.
 
 ```csharp
 using Granit.Core.Domain;
@@ -74,7 +74,7 @@ public abstract class AuditedEntity : CreationAuditedEntity
 ```
 
 Toute entité persistée nécessitant un audit trail complet **doit** hériter de cette
-classe (ou de `FullAuditedEntity`) pour garantir la traçabilité HDS.
+classe (ou de `FullAuditedEntity`) pour garantir la traçabilité ISO 27001.
 
 ```csharp
 using Granit.Core.Domain;
@@ -221,7 +221,7 @@ Deux classes de base sont fournies :
 | Classe | Hérite de | Usage |
 | --- | --- | --- |
 | `Translation<TParent>` | `Entity` | Traduction sans audit |
-| `AuditedTranslation<TParent>` | `AuditedEntity` | Traduction avec audit HDS |
+| `AuditedTranslation<TParent>` | `AuditedEntity` | Traduction avec audit ISO 27001 |
 
 Exemple :
 
@@ -247,7 +247,7 @@ Voir [translations.md](translations.md) pour la documentation complète.
 
 ## AuditLogEntry
 
-Classe scellée représentant une entrée de l'audit trail HDS. Enregistre qui a fait
+Classe scellée représentant une entrée de l'audit trail ISO 27001. Enregistre qui a fait
 quoi, quand et sur quelle entité.
 
 ```csharp
@@ -265,7 +265,7 @@ public sealed class AuditLogEntry
 }
 ```
 
-Conformité HDS : les entrées d'audit sont conservées 3 ans.
+Conformité ISO 27001 : les entrées d'audit sont conservées 3 ans.
 
 ## Architecture
 
@@ -282,7 +282,7 @@ Granit.Core
     ├── ITranslatable.cs            (entité parente traduisible)
     ├── ITranslation.cs             (interface de traduction, Culture BCP 47)
     ├── Translation.cs              (classe de base traduction, hérite Entity)
-    ├── AuditedTranslation.cs       (classe de base traduction HDS, hérite AuditedEntity)
+    ├── AuditedTranslation.cs       (classe de base traduction ISO 27001, hérite AuditedEntity)
     ├── TranslatableExtensions.cs   (résolution in-memory, fallback / strict)
     └── AuditLogEntry.cs            (entrée d'audit trail)
 ```
@@ -291,7 +291,7 @@ Granit.Core
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail 3 ans | Hiérarchie `AuditedEntity` / `FullAuditedEntity` + `AuditLogEntry` |
+| ISO 27001 - Audit trail 3 ans | Hiérarchie `AuditedEntity` / `FullAuditedEntity` + `AuditLogEntry` |
 | RGPD - Droit à l'oubli | `ISoftDeletable` (suppression logique) |
 | RGPD - Isolation tenant | `IMultiTenant` + query filter (`ApplyGranitConventions`) |
 | RGPD - Pseudonymisation | `TenantId` GUID — jamais de données nominatives dans ce champ |

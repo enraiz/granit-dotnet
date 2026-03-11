@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Encryption</PackageId>
-    <Description>Chiffrement/déchiffrement de chaînes avec providers AES-256-CBC et Vault Transit pour les applications .NET Digital Dynamics.</Description>
+    <Description>String encryption/decryption with AES-256-CBC and Vault Transit providers for Granit applications.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

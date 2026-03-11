@@ -16,7 +16,7 @@ public sealed record MobilePushMessage
 
     /// <summary>
     /// Optional data payload (key/value). Must NOT contain PII or health data —
-    /// the push serves as a wake-up signal only (HDS compliance).
+    /// the push serves as a wake-up signal only (ISO 27001 compliance).
     /// </summary>
     public JsonElement? Data { get; init; }
 }

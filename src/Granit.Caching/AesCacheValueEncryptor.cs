@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 namespace Granit.Caching;
 
 /// <summary>
-/// Implémentation AES-256-CBC de <see cref="ICacheValueEncryptor"/> pour la conformité HDS.
+/// Implémentation AES-256-CBC de <see cref="ICacheValueEncryptor"/> pour la conformité ISO 27001.
 /// </summary>
 /// <remarks>
 /// Caractéristiques de sécurité :

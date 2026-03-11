@@ -2,6 +2,6 @@
   "culture": "pt",
   "texts": {
     "PermissionGroup:Workflow": "Fluxo de trabalho",
-    "Permission:Workflow.History.Read": "Ver o histórico de transições do fluxo de trabalho (trilha de auditoria HDS)"
+    "Permission:Workflow.History.Read": "Ver o histórico de transições do fluxo de trabalho (Trilha de auditoria)"
   }
 }

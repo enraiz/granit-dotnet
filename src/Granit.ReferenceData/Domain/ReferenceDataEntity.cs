@@ -7,7 +7,7 @@ namespace Granit.ReferenceData.Domain;
 
 /// <summary>
 /// Abstract base class for all reference data entities (countries, currencies, languages, etc.).
-/// Inherits HDS audit trail from <see cref="AuditedEntity"/> and participates in the
+/// Inherits ISO 27001 audit trail from <see cref="AuditedEntity"/> and participates in the
 /// <see cref="IActive"/> global query filter registered by <c>ApplyGranitConventions()</c>.
 /// </summary>
 /// <remarks>

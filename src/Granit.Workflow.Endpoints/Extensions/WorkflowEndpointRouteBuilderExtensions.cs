@@ -26,7 +26,7 @@ public static class WorkflowEndpointRouteBuilderExtensions
     /// </para>
     /// <para>Registers the following routes:</para>
     /// <list type="bullet">
-    ///   <item><c>GET /{entityType}/{entityId}/history</c> — HDS audit trail</item>
+    ///   <item><c>GET /{entityType}/{entityId}/history</c> — ISO 27001 audit trail</item>
     /// </list>
     /// <para>Call this from your application route registration:</para>
     /// <code>

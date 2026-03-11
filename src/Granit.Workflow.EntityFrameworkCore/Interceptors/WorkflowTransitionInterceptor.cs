@@ -18,7 +18,7 @@ namespace Granit.Workflow.EntityFrameworkCore.Interceptors;
 /// </summary>
 /// <remarks>
 /// <para>
-/// HDS compliance: transition records are INSERT-only and immutable. They capture who
+/// ISO 27001 compliance: transition records are INSERT-only and immutable. They capture who
 /// changed the state, when, and provide an optional comment field for regulatory justification
 /// read from <see cref="WorkflowTransitionContext.Current"/>.
 /// </para>

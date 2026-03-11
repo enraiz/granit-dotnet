@@ -1,6 +1,6 @@
 # Granit.Wolverine
 
-WolverineFx integration for Granit. Transactional outbox, HDS context propagation, and distributed tracing.
+WolverineFx integration for Granit. Transactional outbox, ISO 27001 context propagation, and distributed tracing.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

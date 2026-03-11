@@ -34,7 +34,7 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
     /// <para>
     /// Configures:
     /// <list type="bullet">
-    ///   <item>PostgreSQL Outbox — durable at-least-once delivery (HDS-compliant).</item>
+    ///   <item>PostgreSQL Outbox — durable at-least-once delivery (ISO 27001-compliant).</item>
     ///   <item>EF Core transaction integration — message dispatch atomic with DB write.</item>
     ///   <item><see cref="WolverinePostgresqlOptions.TransactionMode"/> applied to all handlers.</item>
     /// </list>
@@ -81,7 +81,7 @@ public static class WolverinePostgresqlHostApplicationBuilderExtensions
 
     /// <summary>
     /// Adds per-tenant database support for Wolverine: each tenant has its own isolated
-    /// PostgreSQL database, required for the strictest HDS/RGPD physical isolation mandates.
+    /// PostgreSQL database, required for the strictest RGPD/ISO 27001 physical isolation mandates.
     /// </summary>
     /// <typeparam name="TContext">The tenant-specific <see cref="DbContext"/> type.</typeparam>
     /// <param name="builder">The host application builder.</param>

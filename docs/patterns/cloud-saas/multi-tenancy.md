@@ -88,7 +88,7 @@ Guid? tenantId = currentTenant?.IsAvailable == true ? currentTenant.Id : null;
 
 | Problème | Solution |
 |----------|----------|
-| RGPD/HDS : isolation stricte des données de santé par organisation | 3 stratégies d'isolation couvrent tous les cas (coût vs sécurité) |
+| RGPD/ISO 27001 : isolation stricte des données de santé par organisation | 3 stratégies d'isolation couvrent tous les cas (coût vs sécurité) |
 | Modules qui lisent le tenant sans dépendre de `Granit.MultiTenancy` | Soft dependency via `Granit.Core.MultiTenancy` + `NullTenantContext` |
 | Perte du contexte tenant dans les traitements asynchrones | Propagation via headers Wolverine + restauration par behaviors |
 | Besoin de changer temporairement de tenant (admin cross-tenant) | `ICurrentTenant.Change()` retourne un `IDisposable` scope |

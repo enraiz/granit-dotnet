@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Authentication.ApiKeys.EntityFrameworkCore</PackageId>
-    <Description>EF Core persistence for Granit.Authentication.ApiKeys. PostgreSQL store for API keys, HDS-compliant audit trail with soft delete.</Description>
+    <Description>EF Core persistence for Granit.Authentication.ApiKeys. PostgreSQL store for API keys, ISO 27001-compliant audit trail with soft delete.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

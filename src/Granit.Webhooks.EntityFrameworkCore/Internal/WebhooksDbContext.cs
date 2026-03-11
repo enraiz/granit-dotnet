@@ -23,7 +23,7 @@ internal sealed class WebhooksDbContext(
     /// <summary>Webhook subscriptions.</summary>
     public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();
 
-    /// <summary>Immutable HDS audit trail of delivery attempts.</summary>
+    /// <summary>Immutable ISO 27001 audit trail of delivery attempts.</summary>
     public DbSet<WebhookDeliveryAttempt> WebhookDeliveryAttempts => Set<WebhookDeliveryAttempt>();
 
     /// <inheritdoc/>

@@ -32,7 +32,7 @@ namespace Granit.Caching.Hybrid;
 /// Protection stampede : native dans <c>HybridCache</c>, aucune <c>SemaphoreSlim</c> nécessaire.
 /// </para>
 /// <para>
-/// Chiffrement HDS : non supporté par ce fournisseur. <c>HybridCache</c> gère la sérialisation
+/// Chiffrement ISO 27001 : non supporté par ce fournisseur. <c>HybridCache</c> gère la sérialisation
 /// vers L2 en interne — il n'est pas possible d'y intercaler un chiffrement <c>byte[]</c>.
 /// Pour les données sensibles nécessitant un chiffrement au repos, utiliser
 /// <c>GranitCachingRedisModule</c> (fournisseur Redis pur avec <see cref="ICacheValueEncryptor"/>).

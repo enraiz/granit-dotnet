@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.Authorization</PackageId>
-    <Description>RBAC (Role-Based Access Control) permission system for Digital Dynamics Granit applications. Provides permission definitions, ASP.NET Core integration, and caching-aware permission checks.</Description>
+    <Description>RBAC (Role-Based Access Control) permission system for Granit applications. Provides permission definitions, ASP.NET Core integration, and caching-aware permission checks.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

@@ -36,7 +36,7 @@ internal sealed class LocalizationOverrideConfiguration
                .HasMaxLength(4000)
                .IsRequired();
 
-        // HDS audit columns — populated by AuditedEntityInterceptor
+        // ISO 27001 audit columns — populated by AuditedEntityInterceptor
         builder.Property(e => e.CreatedAt)
                .IsRequired();
 

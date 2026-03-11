@@ -14,7 +14,7 @@ nécessite un backend de cache distribué pour :
 - **Performance** : réduire la latence des lectures fréquentes (settings, traductions,
   templates, permissions)
 - **Scalabilité** : cache partagé entre les instances Kubernetes (sticky sessions
-  impossibles en contexte HDS — haute disponibilité requise)
+  impossibles en contexte ISO 27001 — haute disponibilité requise)
 - **Idempotence** : stockage des clés d'idempotence HTTP
 - **SignalR** : backplane Redis pour les notifications temps réel
 
@@ -50,7 +50,7 @@ combiné avec `Microsoft.Extensions.Caching.Hybrid` pour le pattern L1+L2.
 
 - **Avantage** : compatible Redis protocol, performances supérieures
 - **Inconvénient** : projet récent (2024), pas de managed service, risque
-  de stabilité pour un usage production HDS
+  de stabilité pour un usage production ISO 27001
 
 ## Justification
 

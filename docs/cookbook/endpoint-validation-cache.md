@@ -96,7 +96,7 @@ sequenceDiagram
   `CreatedBy`, `Id` sans code manuel.
 - **Invalidation ciblée** : `RemoveAsync` supprime uniquement la clé concernée.
   Pour une invalidation groupée, utiliser un préfixe de clé et `RemoveByPrefixAsync`.
-- **Cache chiffré** : si l'entité contient des données HDS, annoter le type cache
+- **Cache chiffré** : si l'entité contient des données sensibles, annoter le type cache
   avec `[CacheEncrypted]` pour un chiffrement AES-256 transparent.
 
 ## Variante : invalidation via événement

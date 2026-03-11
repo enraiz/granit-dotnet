@@ -25,7 +25,7 @@ public enum TemplateLifecycleStatus
 
     /// <summary>
     /// Former published version, superseded by a newer publication.
-    /// Preserved indefinitely for HDS audit trail — never physically deleted.
+    /// Preserved indefinitely for ISO 27001 audit trail — never physically deleted.
     /// </summary>
     Archived = 3,
 }

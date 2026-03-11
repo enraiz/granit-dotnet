@@ -1,12 +1,12 @@
 # Workflow — Granit.Workflow
 
 Machine à états finis (FSM) générique pour la gestion du cycle de vie des entités
-métier dans les applications Digital Dynamics.
+métier dans les applications Granit.
 
 | Package | Rôle |
 | --- | --- |
 | `Granit.Workflow` | Moteur FSM générique, définitions fluent, événements domaine |
-| `Granit.Workflow.EntityFrameworkCore` | Intercepteur EF Core, piste d'audit HDS, filtre `IPublishable` |
+| `Granit.Workflow.EntityFrameworkCore` | Intercepteur EF Core, piste d'audit ISO 27001, filtre `IPublishable` |
 | `Granit.Workflow.Notifications` | Pont approbation → `Granit.Notifications` |
 | `Granit.Workflow.Endpoints` | API REST Minimal API (historique, transitions) |
 | `@granit/workflow` | Composants React headless (StatusBar, hooks) |
@@ -22,7 +22,7 @@ flowchart TD
     --> C["WorkflowTransitionInterceptor
     détection automatique via EF Core SaveChanges"]
     --> D["WorkflowTransitionRecord
-    piste d'audit HDS immutable (INSERT-only)"]
+    piste d'audit ISO 27001 immutable (INSERT-only)"]
 ```
 
 ## Concepts clés
@@ -98,11 +98,11 @@ Configuration requise pour Keycloak (`appsettings.json`) :
 Le service account doit disposer du rôle `realm-management:view-users`.
 Le secret doit être injecté depuis Vault — jamais en clair dans la configuration.
 
-### Piste d'audit HDS
+### Piste d'audit ISO 27001
 
 Le `WorkflowTransitionInterceptor` crée automatiquement un `WorkflowTransitionRecord`
 à chaque changement d'état détecté dans `SaveChanges`. Ce record est **INSERT-only**
-(jamais modifié ni supprimé) — conformité HDS 3 ans minimum.
+(jamais modifié ni supprimé) — conformité ISO 27001 3 ans minimum.
 
 Informations capturées :
 

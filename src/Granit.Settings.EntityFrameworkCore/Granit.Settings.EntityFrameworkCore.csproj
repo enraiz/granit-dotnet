@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Settings.EntityFrameworkCore</PackageId>
-    <Description>Persistance EF Core pour Granit.Settings. L'application cliente implémente ISettingsDbContext sur son DbContext existant et appelle modelBuilder.ConfigureSettingsModule() — aucun DbContext dédié, zéro connexion supplémentaire. Audit HDS automatique via AuditedEntityInterceptor.</Description>
+    <Description>Persistance EF Core pour Granit.Settings. L'application cliente implémente ISettingsDbContext sur son DbContext existant et appelle modelBuilder.ConfigureSettingsModule() — aucun DbContext dédié, zéro connexion supplémentaire. Audit ISO 27001 automatique via AuditedEntityInterceptor.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

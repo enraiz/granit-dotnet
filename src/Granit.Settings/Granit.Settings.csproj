@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Settings</PackageId>
-    <Description>Système de paramètres dynamiques avec résolution en cascade (User → Tenant → Global → Configuration → Default) pour les applications .NET Digital Dynamics.</Description>
+    <Description>Dynamic settings system with cascading resolution (User → Tenant → Global → Configuration → Default) for Granit applications.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

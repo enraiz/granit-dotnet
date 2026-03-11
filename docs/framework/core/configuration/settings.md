@@ -149,7 +149,7 @@ par les valeurs Global, Tenant et User stockées en base.
 | `DisplayName` | `string?` | `null` | Libellé UI |
 | `Description` | `string?` | `null` | Description longue |
 
-## Chiffrement HDS
+## Chiffrement ISO 27001
 
 Pour les paramètres sensibles (`IsEncrypted = true`) :
 
@@ -247,8 +247,8 @@ La migration crée la table `core_setting_records` avec un index unique sur
 | `ProviderName` | `varchar(4)` | NOT NULL (`"G"`, `"T"`, `"U"`) |
 | `ProviderKey` | `varchar(256)` | NULL (null = global) |
 | `Value` | `text` | NULL |
-| `CreatedAt` | `timestamptz` | NOT NULL — audit HDS |
-| `CreatedBy` | `varchar(256)` | NOT NULL — audit HDS |
+| `CreatedAt` | `timestamptz` | NOT NULL — audit ISO 27001 |
+| `CreatedBy` | `varchar(256)` | NOT NULL — audit ISO 27001 |
 | `ModifiedAt` | `timestamptz` | NULL |
 | `ModifiedBy` | `varchar(256)` | NULL |
 

@@ -1,6 +1,6 @@
 # Granit.Settings.EntityFrameworkCore
 
-EF Core persistence for Granit.Settings. The consuming application implements ISettingsDbContext on its existing DbContext — zero additional connections. HDS audit via AuditedEntityInterceptor.
+EF Core persistence for Granit.Settings. The consuming application implements ISettingsDbContext on its existing DbContext — zero additional connections. ISO 27001 audit via AuditedEntityInterceptor.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

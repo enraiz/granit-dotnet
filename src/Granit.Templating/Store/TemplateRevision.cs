@@ -5,7 +5,7 @@ namespace Granit.Templating.Store;
 /// </summary>
 /// <remarks>
 /// Revisions are immutable after publication and preserved indefinitely to satisfy the
-/// HDS 3-year audit trail requirement. The <see cref="RevisionId"/> is propagated through
+/// ISO 27001 3-year audit trail requirement. The <see cref="RevisionId"/> is propagated through
 /// the rendering pipeline into the final document output for traceability.
 /// </remarks>
 public sealed class TemplateRevision

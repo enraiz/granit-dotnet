@@ -4,14 +4,14 @@
 
 # granit
 
-Framework .NET partagé pour les applications Digital Dynamics.
+Framework .NET partagé pour les applications Granit.
 
 Granit fournit un socle modulaire de packages NuGet couvrant les besoins
 transversaux des applications métier : sécurité, persistance, observabilité,
 multi-tenancy, chiffrement, messaging et plus encore.
 
 Conçu pour un hébergement souverain (OVHcloud, Roubaix) et conforme aux
-exigences **HDS** et **RGPD**.
+exigences **ISO 27001** et **RGPD**.
 
 ## Stack technique
 
@@ -49,7 +49,7 @@ Serilog · OpenTelemetry · WolverineFx
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.Persistence` | Intercepteurs EF Core (audit HDS, soft delete RGPD) |
+| `Granit.Persistence` | Intercepteurs EF Core (audit ISO 27001, soft delete RGPD) |
 | `Granit.Persistence.Migrations` | Infrastructure de migrations multi-tenant |
 | `Granit.MultiTenancy` | Isolation par tenant, résolution, filtrage automatique |
 | `Granit.Caching` | Abstractions de cache distribué |
@@ -71,9 +71,9 @@ Serilog · OpenTelemetry · WolverineFx
 
 | Package | Rôle |
 | --- | --- |
-| `Granit.Wolverine` | WolverineFx, outbox transactionnelle, contexte HDS |
+| `Granit.Wolverine` | WolverineFx, outbox transactionnelle, contexte ISO 27001 |
 | `Granit.Wolverine.Postgresql` | Transport PostgreSQL pour Wolverine |
-| `Granit.Webhooks` | Webhooks sortants, fan-out, HMAC-SHA256, audit HDS |
+| `Granit.Webhooks` | Webhooks sortants, fan-out, HMAC-SHA256, audit ISO 27001 |
 | `Granit.Webhooks.EntityFrameworkCore` | Persistance EF Core des webhooks |
 | `Granit.BackgroundJobs` | Jobs récurrents cron via outbox Wolverine |
 | `Granit.BackgroundJobs.Endpoints` | Endpoints HTTP d'administration des jobs |
@@ -106,7 +106,7 @@ Serilog · OpenTelemetry · WolverineFx
 | [Déploiement](deployment/index.md) | Observabilité, Vault, Kubernetes, checklist production |
 | [Référence API](api/index.md) | Documentation C# générée par DocFX |
 | [Patterns](patterns/index.md) | 39 design patterns identifiés dans Granit |
-| [Tests](testing/index.md) | Conventions, mocking, assertions, intégration EF Core, conformité HDS/RGPD |
+| [Tests](testing/index.md) | Conventions, mocking, assertions, intégration EF Core, conformité RGPD/ISO 27001 |
 
 ## Démarrage rapide
 
@@ -128,6 +128,6 @@ dotnet format --verify-no-changes
 
 | Norme | Couverture |
 | --- | --- |
-| **HDS** | Audit trail 3 ans, chiffrement at rest et in transit, traçabilité des accès |
+| **ISO 27001** | Audit trail 3 ans, chiffrement at rest et in transit, traçabilité des accès |
 | **RGPD** | Minimisation, droit à l'effacement (soft delete), pseudonymisation |
 | **ISO 27001** | Gestion des secrets (Vault), rotation automatique, zéro secret en clair |

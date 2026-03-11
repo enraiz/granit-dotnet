@@ -1,7 +1,7 @@
 # Granit.Timeline.EntityFrameworkCore
 
 EF Core persistence for Granit.Timeline. Provides PostgreSQL-backed `EfCoreTimelineStore`
-and `EfCoreTimelineQuery` with HDS-compliant INSERT-only audit trail for system logs.
+and `EfCoreTimelineQuery` with ISO 27001-compliant INSERT-only audit trail for system logs.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

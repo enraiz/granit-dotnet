@@ -6,8 +6,8 @@
 //   - EntityNotFoundException → 404, traceId in extensions
 //   - BusinessException → 400, errorCode in extensions
 //   - ValidationException → 422, errors in extensions
-//   - HDS security: 5xx message masked in production (ExposeInternalErrorDetails = false)
-//   - HDS security: 5xx message exposed in development (ExposeInternalErrorDetails = true)
+//   - ISO 27001 security: 5xx message masked in production (ExposeInternalErrorDetails = false)
+//   - ISO 27001 security: 5xx message exposed in development (ExposeInternalErrorDetails = true)
 //   - traceId always present in extensions
 // =============================================================================
 
@@ -187,7 +187,7 @@ public sealed class GranitExceptionHandlerTests
     }
 
     // -------------------------------------------------------------------------
-    // HDS security: 5xx masking in production
+    // ISO 27001 security: 5xx masking in production
     // -------------------------------------------------------------------------
 
     [Fact]

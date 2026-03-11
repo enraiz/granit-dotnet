@@ -16,7 +16,7 @@ namespace Granit.Localization.Internal;
 /// <para>
 /// An <see cref="AsyncServiceScope"/> is created per DB operation so that the underlying store
 /// (Scoped) is resolved with its full dependency graph, including <c>AuditedEntityInterceptor</c>
-/// for HDS audit compliance on write operations.
+/// for ISO 27001 audit compliance on write operations.
 /// </para>
 /// <para>
 /// Cache is invalidated on every write or delete.

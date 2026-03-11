@@ -6,7 +6,7 @@ namespace Granit.DataExchange.Export.Domain;
 /// Represents an export job with its lifecycle state and metadata.
 /// </summary>
 /// <remarks>
-/// Inherits <see cref="AuditedEntity"/> for HDS-compliant audit trail
+/// Inherits <see cref="AuditedEntity"/> for ISO 27001-compliant audit trail
 /// (CreatedAt, CreatedBy, ModifiedAt, ModifiedBy).
 /// </remarks>
 public sealed class ExportJob : AuditedEntity

@@ -29,7 +29,7 @@ public sealed class WebhooksOptions
     /// <summary>
     /// When <c>true</c>, the serialized JSON body of each delivery attempt is persisted
     /// alongside the <see cref="Domain.WebhookDeliveryAttempt"/> record, enabling manual redelivery.
-    /// Default: <c>false</c> (only the SHA-256 hash is stored — HDS-safe minimum).
+    /// Default: <c>false</c> (only the SHA-256 hash is stored — ISO 27001-safe minimum).
     /// </summary>
     /// <remarks>
     /// Enabling this option stores health data in clear text in the audit trail.

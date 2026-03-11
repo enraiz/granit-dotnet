@@ -30,7 +30,7 @@ internal sealed class SettingRecordConfiguration : IEntityTypeConfiguration<Sett
 
         builder.Property(e => e.Value);
 
-        // HDS audit columns — populated automatically by AuditedEntityInterceptor
+        // ISO 27001 audit columns — populated automatically by AuditedEntityInterceptor
         builder.Property(e => e.CreatedAt)
                .IsRequired();
 

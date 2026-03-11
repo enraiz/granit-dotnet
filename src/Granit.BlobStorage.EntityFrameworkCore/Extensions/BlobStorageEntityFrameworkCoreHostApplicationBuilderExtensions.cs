@@ -20,7 +20,7 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
     /// and binds <see cref="IBlobDescriptorStore"/> to <c>EfBlobDescriptorStore</c>.
     /// <para>
     /// <see cref="AuditedEntityInterceptor"/> is added automatically when
-    /// <c>Granit.Persistence</c> is configured, enabling the HDS 3-year audit trail.
+    /// <c>Granit.Persistence</c> is configured, enabling the ISO 27001 3-year audit trail.
     /// </para>
     /// <para>
     /// Must be called after <c>AddGranitBlobStorageS3()</c> (or any other blob storage provider).
@@ -41,7 +41,7 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
         {
             configure(options);
 
-            // Automatically wire the HDS audit interceptor when Granit.Persistence is present.
+            // Automatically wire the ISO 27001 audit interceptor when Granit.Persistence is present.
             AuditedEntityInterceptor? auditInterceptor =
                 sp.GetService<AuditedEntityInterceptor>();
             if (auditInterceptor is not null)

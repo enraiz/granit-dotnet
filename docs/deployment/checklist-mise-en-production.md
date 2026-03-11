@@ -1,7 +1,7 @@
 # Checklist de mise en production
 
 Cette checklist couvre les vérifications obligatoires avant le déploiement
-d'une application Granit en production HDS.
+d'une application Granit en production ISO 27001.
 
 ## Sécurité
 
@@ -14,7 +14,7 @@ d'une application Granit en production HDS.
 - [ ] Permissions RBAC définies et attribuées par tenant
 - [ ] Pas d'endpoint de debug ou de diagnostic exposé publiquement
 
-## Conformité HDS
+## Conformité ISO 27001
 
 - [ ] Audit trail activé : `AuditedEntityInterceptor` enregistré
 - [ ] `CreatedBy`, `ModifiedBy` remplis automatiquement via `ICurrentUserService`

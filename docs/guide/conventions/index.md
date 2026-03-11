@@ -3,7 +3,7 @@
 [← Index des guides](../index.md)
 
 Ce guide centralise les conventions de nommage, le style de code, les bonnes pratiques
-et le workflow pour les projets Digital Dynamics. Il fait référence : si une convention
+et le workflow pour les projets Granit. Il fait référence : si une convention
 existante diverge de ces documents, c'est ce guide qui prévaut.
 
 ## Conventions transversales

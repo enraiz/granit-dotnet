@@ -10,7 +10,7 @@ namespace Granit.Features.EntityFrameworkCore.Internal;
 /// <remarks>
 /// Audit fields (<c>CreatedAt</c>, <c>CreatedBy</c>, <c>ModifiedAt</c>, <c>ModifiedBy</c>) are
 /// populated automatically by <c>AuditedEntityInterceptor</c> from <c>Granit.Persistence</c>,
-/// satisfying the HDS 3-year audit trail requirement.
+/// satisfying the ISO 27001 3-year audit trail requirement.
 /// <c>TenantId</c> is injected automatically by the same interceptor on insert.
 /// </remarks>
 internal sealed class TenantFeatureOverride : AuditedEntity, IMultiTenant

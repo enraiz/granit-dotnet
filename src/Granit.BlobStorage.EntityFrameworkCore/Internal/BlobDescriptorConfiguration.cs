@@ -57,7 +57,7 @@ internal sealed class BlobDescriptorConfiguration : IEntityTypeConfiguration<Blo
 
         builder.Property(e => e.DeletedAt);
 
-        // HDS audit: rejection and deletion reasons are retained for 3 years.
+        // ISO 27001 audit: rejection and deletion reasons are retained for 3 years.
         builder.Property(e => e.RejectionReason)
             .HasMaxLength(500);
 

@@ -19,7 +19,7 @@ public interface ITimelineWriter
     /// <summary>
     /// Soft-deletes a comment or internal note (RGPD right to erasure).
     /// Throws <see cref="InvalidOperationException"/> for <see cref="TimelineEntryType.SystemLog"/>
-    /// entries because they are immutable (HDS audit trail).
+    /// entries because they are immutable (ISO 27001 audit trail).
     /// </summary>
     Task DeleteEntryAsync(Guid entryId, CancellationToken cancellationToken = default);
 

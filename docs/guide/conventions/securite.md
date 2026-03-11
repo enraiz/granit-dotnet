@@ -20,9 +20,9 @@ Ces règles de sécurité s'appliquent à **tous les projets** (backend et front
 - Minimisation des données (RGPD) — ne collecter que ce qui est strictement nécessaire
 - Pseudonymisation quand possible
 
-### Chiffrement (HDS)
+### Chiffrement (ISO 27001)
 
-- Chiffrement obligatoire **au repos et en transit** (exigence HDS)
+- Chiffrement obligatoire **au repos et en transit** (exigence ISO 27001)
 - Utilisez `ITransitEncryptionService` (Granit.Vault) pour le chiffrement des
   données sensibles côté backend
 - TLS obligatoire pour toutes les communications

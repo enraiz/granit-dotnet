@@ -11,7 +11,7 @@ namespace Granit.BackgroundJobs;
 /// <see cref="BackgroundJobsOptions.Mode"/> store and survive application restarts
 /// (in <see cref="JobStoreMode.Durable"/> mode).
 /// <para>
-/// HDS compliance: <see cref="TriggerNowAsync"/> propagates the caller's identity
+/// ISO 27001 compliance: <see cref="TriggerNowAsync"/> propagates the caller's identity
 /// via the <c>X-Triggered-By</c> Wolverine envelope header, which is persisted
 /// in <see cref="BackgroundJobDefinition.TriggeredBy"/> by the scheduling middleware.
 /// </para>
@@ -40,7 +40,7 @@ public interface IBackgroundJobWriter
     /// Triggers an immediate execution of a job, independent of its scheduled cycle.
     /// The next scheduled execution is not affected.
     /// The caller's identity (<see cref="Granit.Security.ICurrentUserService.UserId"/>)
-    /// is propagated for HDS audit trail.
+    /// is propagated for ISO 27001 audit trail.
     /// </summary>
     /// <exception cref="Granit.Core.Exceptions.EntityNotFoundException">
     /// Thrown when no job with <paramref name="jobName"/> exists in the store.

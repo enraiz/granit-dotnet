@@ -42,7 +42,7 @@ La classe de base configure automatiquement :
 - Colonnes `Code` (50 car.), `LabelEn` (250 car., obligatoire), `SortOrder` (défaut 0)
 - Colonnes de traduction : `LabelFr`, `LabelNl`, `LabelDe`, `LabelEs`, `LabelIt`,
   `LabelPt` (250 car. chacune, optionnelles)
-- Colonnes d'audit HDS (`CreatedAt`, `CreatedBy`, `ModifiedAt`, `ModifiedBy`)
+- Colonnes d'audit ISO 27001 (`CreatedAt`, `CreatedBy`, `ModifiedAt`, `ModifiedBy`)
 
 > **Migration** : l'ajout des 6 colonnes de traduction nécessite une migration
 > EF Core pour chaque table référentielle existante. Les colonnes acceptent les

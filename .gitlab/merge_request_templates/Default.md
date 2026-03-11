@@ -44,7 +44,7 @@
 
 - [ ] Aucun secret hardcodé (passwords, tokens, API keys)
 - [ ] Pas de PII (données de santé) dans les logs
-- [ ] Chiffrement conforme HDS (transit + repos)
+- [ ] Chiffrement conforme ISO 27001 (transit + repos)
 - [ ] Souveraineté européenne respectée (OVHcloud FR)
 
 ### Tests
@@ -60,7 +60,7 @@
 
 ### Compliance
 
-- [ ] Changements respectent HDS/RGPD
+- [ ] Changements respectent RGPD/ISO 27001
 - [ ] Données restent en Europe (OVHcloud FR)
 - [ ] Rétrocompatibilité NuGet vérifiée (ou breaking change documenté dans CHANGELOG)
 

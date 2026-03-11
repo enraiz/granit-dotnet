@@ -1,7 +1,7 @@
 namespace Granit.Workflow;
 
 /// <summary>
-/// Request object for recording a workflow state transition (HDS audit trail).
+/// Request object for recording a workflow state transition (ISO 27001 audit trail).
 /// </summary>
 public sealed record RecordTransitionRequest
 {
@@ -34,7 +34,7 @@ public sealed record RecordTransitionRequest
 public interface IWorkflowTransitionRecorder
 {
     /// <summary>
-    /// Records a workflow state transition for auditing (HDS audit trail).
+    /// Records a workflow state transition for auditing (ISO 27001 audit trail).
     /// </summary>
     /// <param name="request">Transition data to record.</param>
     /// <param name="cancellationToken">Cancellation token.</param>

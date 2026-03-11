@@ -8,7 +8,7 @@ namespace Granit.Webhooks.Abstractions;
 /// <remarks>
 /// The default registration is <c>NullWebhookDeliveryReader</c> (always returns <c>null</c>).
 /// Production applications must call <c>AddGranitWebhooksEntityFrameworkCore()</c> to enable
-/// durable queries against the HDS audit trail.
+/// durable queries against the ISO 27001 audit trail.
 /// </remarks>
 public interface IWebhookDeliveryReader
 {

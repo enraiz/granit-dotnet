@@ -1,7 +1,7 @@
 # API Versioning
 
 `Granit.ApiVersioning` gère le versioning HTTP pour toutes les
-APIs Digital Dynamics. Il peut être utilisé seul dans les services inter-services
+APIs Granit. Il peut être utilisé seul dans les services inter-services
 qui n'ont pas besoin d'une UI de documentation.
 
 > **Voir aussi** : [api-documentation.md](api-documentation.md) pour la génération
@@ -45,7 +45,7 @@ La version peut être spécifiée de deux façons par les clients :
 - **Query string** (fallback) : `GET /api/patients?api-version=1.0`
 
 Le header `X-Api-Version` n'est pas supporté intentionnellement : les headers sont souvent
-omis des access logs et ne garantissent pas la traçabilité dans les audits HDS.
+omis des access logs et ne garantissent pas la traçabilité dans les audits ISO 27001.
 
 ### Minimal API (recommandé)
 
@@ -128,10 +128,10 @@ public sealed class PatientController : ControllerBase
 }
 ```
 
-## Considérations HDS
+## Considérations ISO 27001
 
 La stratégie URL (`/api/v1/patients`) garantit que la version de l'API figure
-systématiquement dans les access logs OVHcloud. Les logs d'audit HDS (3 ans de rétention)
+systématiquement dans les access logs OVHcloud. Les logs d'audit ISO 27001 (3 ans de rétention)
 peuvent ainsi identifier avec précision quelle version de l'API a traité une requête.
 
 Le fallback query string (`?api-version=1.0`) est également visible dans les access logs,

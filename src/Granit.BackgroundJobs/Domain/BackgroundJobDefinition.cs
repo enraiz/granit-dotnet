@@ -14,7 +14,7 @@ namespace Granit.BackgroundJobs.Domain;
 /// state that persists across application restarts.
 /// </para>
 /// <para>
-/// HDS compliance: <see cref="LastExecutedAt"/> and <see cref="TriggeredBy"/> are write-once
+/// ISO 27001 compliance: <see cref="LastExecutedAt"/> and <see cref="TriggeredBy"/> are write-once
 /// per execution cycle and preserved for audit purposes.
 /// </para>
 /// </remarks>
@@ -69,7 +69,7 @@ public sealed class BackgroundJobDefinition : Entity, IDomainEventSource
     /// <summary>
     /// UserId (not PII) of the operator who manually triggered this job via
     /// <see cref="IBackgroundJobWriter.TriggerNowAsync"/>.
-    /// Null for scheduled executions. HDS audit field.
+    /// Null for scheduled executions. ISO 27001 audit field.
     /// Maximum length: 450 characters.
     /// </summary>
     public string? TriggeredBy { get; set; }

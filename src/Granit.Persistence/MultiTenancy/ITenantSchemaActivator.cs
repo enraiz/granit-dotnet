@@ -34,7 +34,7 @@ namespace Granit.Persistence.MultiTenancy;
 /// <para>
 /// <strong>Connection pool safety (critical)</strong> — implementations MUST execute the
 /// schema switch unconditionally on every call. Pooled connections retain the previous
-/// tenant's schema; skipping activation would cause a cross-tenant data breach (HDS).
+/// tenant's schema; skipping activation would cause a cross-tenant data breach (ISO 27001).
 /// </para>
 /// </remarks>
 public interface ITenantSchemaActivator

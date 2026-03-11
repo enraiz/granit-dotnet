@@ -1,8 +1,8 @@
 # Messagerie — Granit.Notifications
 
-Moteur de notifications **multi-canal** pour les applications Digital Dynamics.
+Moteur de notifications **multi-canal** pour les applications Granit.
 Publie des notifications aux utilisateurs via InApp, SignalR, Email, SMS, WhatsApp et Web Push.
-Basé sur Wolverine (Outbox at-least-once), conforme HDS (audit trail immuable) et RGPD.
+Basé sur Wolverine (Outbox at-least-once), conforme ISO 27001 (audit trail immuable) et RGPD.
 
 Treize packages composables :
 
@@ -334,7 +334,7 @@ le provider d'envoi (FCM, APNs, etc.) à l'exécution.
 Le canal résout les **device tokens** de l'utilisateur via `IMobilePushTokenReader`, puis
 délègue l'envoi au provider enregistré (`IMobilePushSender`).
 
-> **HDS / Sécurité :** le payload push est un **wake-up notification** uniquement
+> **ISO 27001 / Sécurité :** le payload push est un **wake-up notification** uniquement
 > (titre + corps générique). Aucune donnée de santé (PII) ne transite dans le payload
 > FCM/APNs. Le contenu complet est récupéré par l'application via l'API REST sécurisée.
 
@@ -579,7 +579,7 @@ Exemple complet de configuration `appsettings.json` :
     "Email": {
       "Provider": "Brevo",
       "SenderAddress": "noreply@example.com",
-      "SenderName": "Mon Application HDS"
+      "SenderName": "Mon Application"
     },
 
     "Smtp": {
@@ -638,7 +638,7 @@ Exemple complet de configuration `appsettings.json` :
 }
 ```
 
-> **HDS / Sécurité :** les valeurs sensibles (`ApiKey`, `VapidPrivateKey`, `Password`)
+> **ISO 27001 / Sécurité :** les valeurs sensibles (`ApiKey`, `VapidPrivateKey`, `Password`)
 > doivent être injectées depuis **Vault** en production. Ne jamais les stocker en clair
 > dans les fichiers de configuration.
 
@@ -668,7 +668,7 @@ chaque tentative (succès ou échec).
 > **Pourquoi Wolverine plutôt que Polly ?**
 > Polly travaille en mémoire : un crash entre deux tentatives perd la livraison.
 > Wolverine persiste chaque replanification dans l'Outbox PostgreSQL, ce qui garantit
-> la livraison at-least-once conforme HDS même après un redémarrage de l'application.
+> la livraison at-least-once conforme ISO 27001 même après un redémarrage de l'application.
 
 ## Observabilité
 
@@ -692,7 +692,7 @@ Exemple de requête LogQL :
 {app="mon-application"} |= "NotificationDeliveryHandler" | json | ChannelName="Email"
 ```
 
-### Audit trail HDS
+### Audit trail ISO 27001
 
 L'entité `NotificationDeliveryAttempt` est **INSERT-only** : aucune donnée d'audit ne
 peut être modifiée ou supprimée. En mode InMemory (`NullNotificationDeliveryStore`),
@@ -714,7 +714,7 @@ Propriétés enregistrées :
 | `ErrorMessage` | Message d'erreur (null si succès) |
 | `IsSuccess` | Résultat de la tentative |
 
-## Conformité HDS
+## Conformité ISO 27001
 
 - L'Outbox Wolverine garantit la livraison **at-least-once** sans perte en cas de crash
 - `NotificationDeliveryAttempt` est INSERT-only : aucune donnée d'audit ne peut être modifiée
@@ -765,7 +765,7 @@ Installation :
 public sealed class MyAppModule : GranitModule { }
 ```
 
-> **HDS** : le payload ne contient pas de PII — uniquement des identifiants techniques
+> **ISO 27001** : le payload ne contient pas de PII — uniquement des identifiants techniques
 > (`EntityId`, `TransitionedBy` sous forme d'ID utilisateur).
 
 ### Câblage applicatif (niveau application)
@@ -810,7 +810,7 @@ Notification aux admins abonnés
 - **`IdentityUserDeletedEvent`** → notifie les administrateurs abonnés qu'un utilisateur
   a été supprimé du fournisseur d'identité. Canal : InApp + Email. `AllowUserOptOut = false`.
 
-> **HDS** : notification obligatoire pour la piste d'audit. Le payload ne contient que
+> **ISO 27001** : notification obligatoire pour la piste d'audit. Le payload ne contient que
 > l'identifiant technique (`UserId`), jamais de données nominatives.
 
 ### Tableau récapitulatif

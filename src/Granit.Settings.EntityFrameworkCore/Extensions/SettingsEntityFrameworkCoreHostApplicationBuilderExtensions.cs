@@ -23,7 +23,7 @@ public static class SettingsEntityFrameworkCoreHostApplicationBuilderExtensions
     /// </para>
     /// <para>
     /// The <c>AuditedEntityInterceptor</c> from <c>Granit.Persistence</c> must be wired
-    /// to <typeparamref name="TDbContext"/> by the host application to ensure the HDS
+    /// to <typeparamref name="TDbContext"/> by the host application to ensure the ISO 27001
     /// 3-year audit trail is populated on every write.
     /// </para>
     /// <para>

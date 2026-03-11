@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.ApiDocumentation</PackageId>
-    <Description>OpenAPI documentation and Scalar UI for Digital Dynamics Granit applications. Generates one OpenAPI document per declared API version, with JWT Bearer security scheme and [InternalApi] endpoint filtering.</Description>
+    <Description>OpenAPI documentation and Scalar UI for Granit applications. Generates one OpenAPI document per declared API version, with JWT Bearer security scheme and [InternalApi] endpoint filtering.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.ApiVersioning</PackageId>
-    <Description>URL-based API versioning for Digital Dynamics Granit applications. Registers Asp.Versioning with URL + query string readers and sensible defaults.</Description>
+    <Description>URL-based API versioning for Granit applications. Registers Asp.Versioning with URL + query string readers and sensible defaults.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

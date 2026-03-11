@@ -12,7 +12,7 @@ namespace Granit.Authorization.EntityFrameworkCore.Services;
 
 /// <summary>
 /// EF Core implementation of <see cref="IPermissionManagerReader"/> and <see cref="IPermissionManagerWriter"/>.
-/// Provides grant management with mandatory HDS audit logging on every mutation.
+/// Provides grant management with mandatory ISO 27001 audit logging on every mutation.
 /// Cache is invalidated after each <see cref="SetAsync"/> to maintain consistency.
 /// </summary>
 internal sealed partial class PermissionManager<TContext>(
@@ -69,7 +69,7 @@ internal sealed partial class PermissionManager<TContext>(
             PermissionChecker.BuildCacheKey(tenantId, roleName, permissionName),
             cancellationToken).ConfigureAwait(false);
 
-        // HDS audit trail: emitted as structured log → Serilog → OTLP → Loki (3-year retention)
+        // ISO 27001 audit trail: emitted as structured log → Serilog → OTLP → Loki (3-year retention)
         // RGPD: no personal data — only role name, permission name, tenant scope
         LogPermissionChange(isGranted ? "Granted" : "Revoked", permissionName, roleName, tenantId);
     }

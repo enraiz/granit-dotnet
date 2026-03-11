@@ -3,7 +3,7 @@
 `Granit.Caching` fournit une abstraction de cache typée
 (`ICacheService<T>`) au-dessus de `IDistributedCache` avec trois fournisseurs
 interchangeables, une protection stampede sans fuite mémoire, et un chiffrement
-AES-256 opt-in pour la conformité HDS/RGPD.
+AES-256 opt-in pour la conformité RGPD/ISO 27001.
 
 ## Fournisseurs disponibles
 
@@ -65,7 +65,7 @@ public sealed class AppModule : GranitModule { }
 }
 ```
 
-### Production (Redis + chiffrement HDS)
+### Production (Redis + chiffrement ISO 27001)
 
 ```json
 {
@@ -160,7 +160,7 @@ Exemples :
 La convention supprime automatiquement le suffixe `CacheItem` du nom du type.
 L'attribut `[CacheName("nom")]` permet de surcharger la convention.
 
-## Chiffrement HDS/RGPD
+## Chiffrement RGPD/ISO 27001
 
 ### Principe
 

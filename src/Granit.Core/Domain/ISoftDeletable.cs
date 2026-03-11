@@ -3,7 +3,7 @@ namespace Granit.Core.Domain;
 /// <summary>
 /// Interface for GDPR soft deletion.
 /// Marked entities are no longer returned by standard queries
-/// but remain in the database for the HDS audit trail.
+/// but remain in the database for the ISO 27001 audit trail.
 /// </summary>
 public interface ISoftDeletable
 {

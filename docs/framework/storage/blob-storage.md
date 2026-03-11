@@ -1,6 +1,6 @@
 # Stockage de fichiers — Granit.BlobStorage
 
-Stockage d'objets souverain, Direct-to-Cloud, conforme HDS et RGPD.
+Stockage d'objets souverain, Direct-to-Cloud, conforme ISO 27001 et RGPD.
 Le serveur applicatif ne transite jamais les octets — seuls les métadonnées et les URL pré-signées
 sont échangés entre le client, le serveur et OVHcloud Object Storage.
 
@@ -59,7 +59,7 @@ stateDiagram-v2
 | `Rejected` | Un validateur a échoué — objet S3 déjà supprimé |
 | `Deleted` | `DeleteAsync()` — Crypto-Shredding RGPD |
 
-> **HDS / RGPD** : le `BlobDescriptor` n'est **jamais supprimé de la base**.
+> **ISO 27001 / RGPD** : le `BlobDescriptor` n'est **jamais supprimé de la base**.
 > `Deleted` signifie que les octets S3 sont effacés ; la piste d'audit reste 3 ans.
 
 ### Isolation multi-tenant
@@ -294,18 +294,18 @@ IBlobStorage (DefaultBlobStorage)
 | #173 | ✅ Terminé | `IBlobStorage.CreateDownloadUrlAsync` — URL de téléchargement sécurisée |
 | #174 | ✅ Terminé | `IBlobKeyStrategy` — isolation multi-tenant par préfixe `{tenantId}/` |
 | #175 | ✅ Terminé | Pipeline `IBlobValidator` — magic bytes, taille, extensible |
-| #176 | ✅ Terminé | `IBlobDescriptorStoreReader` / `IBlobDescriptorStoreWriter` — persistance EF Core, isolation tenant, piste HDS |
+| #176 | ✅ Terminé | `IBlobDescriptorStoreReader` / `IBlobDescriptorStoreWriter` — persistance EF Core, isolation tenant, piste ISO 27001 |
 | #177 | ✅ Terminé | `IBlobStorage.DeleteAsync` — Crypto-Shredding RGPD, conservation audit |
 | #178 | ✅ Terminé | `S3BlobOptions` — configuration OVHcloud / MinIO, validation au démarrage |
 
-## Conformité HDS / RGPD
+## Conformité ISO 27001 / RGPD
 
 - **Souveraineté** : `ServiceUrl` doit pointer sur OVHcloud FR (`s3.rbx.io.cloud.ovh.net`).
   Ne jamais utiliser AWS S3, Azure Blob ou GCP Cloud Storage pour des données de santé.
 - **Direct-to-Cloud** : les octets ne transitent jamais par le serveur applicatif.
   Réduit la surface d'attaque et les coûts de bande passante.
 - **Crypto-Shredding** : `DeleteAsync` efface l'objet S3 (données irrécupérables),
-  puis conserve le `BlobDescriptor` 3 ans pour la piste d'audit HDS.
+  puis conserve le `BlobDescriptor` 3 ans pour la piste d'audit ISO 27001.
 - **Isolation tenant** : `EfBlobDescriptorStore.FindAsync` (via `IBlobDescriptorStoreReader`) filtre par `TenantId` du tenant actif —
   un tenant ne peut pas accéder aux blobs d'un autre, même avec un `BlobId` valide.
 - **Credentials** : `AccessKey` et `SecretKey` ne doivent jamais apparaître en clair.

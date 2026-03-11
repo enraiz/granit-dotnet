@@ -89,7 +89,7 @@ public abstract class ReferenceDataEntityTypeConfiguration<TEntity>
         builder.Property(e => e.ValidFrom);
         builder.Property(e => e.ValidTo);
 
-        // HDS audit columns — populated by AuditedEntityInterceptor
+        // ISO 27001 audit columns — populated by AuditedEntityInterceptor
         builder.Property(e => e.CreatedAt)
                .IsRequired();
 

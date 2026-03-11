@@ -8,7 +8,7 @@ namespace Granit.Templating.Workflow.Internal;
 /// <summary>
 /// Workflow-aware implementation of <see cref="ITemplateTransitionHook"/>.
 /// Delegates transition validation to <see cref="IWorkflowManager{TState}"/> and
-/// persists transition records via <see cref="IWorkflowTransitionRecorder"/> for unified HDS audit trail.
+/// persists transition records via <see cref="IWorkflowTransitionRecorder"/> for unified ISO 27001 audit trail.
 /// </summary>
 internal sealed class WorkflowTemplateTransitionHook(
     IWorkflowManager<WorkflowLifecycleStatus> workflowManager,

@@ -7,7 +7,7 @@ namespace Granit.Workflow.EntityFrameworkCore;
 /// <summary>
 /// Granit module for EF Core persistence of workflow transition records.
 /// Registers <see cref="Interceptors.WorkflowTransitionInterceptor"/> for automatic
-/// HDS-compliant audit trail creation during <c>SaveChanges</c>.
+/// ISO 27001-compliant audit trail creation during <c>SaveChanges</c>.
 /// </summary>
 /// <remarks>
 /// <para>

@@ -15,7 +15,7 @@ test (`*.Tests`) de granit-dotnet et des applications consommatrices.
 et a changé de licence : passage de **MIT** à la **Xceed Community License Agreement**.
 Cette nouvelle licence **interdit l'usage commercial** sans achat d'une licence payante.
 
-La plateforme est un produit commercial (santé, certification HDS). L'utilisation
+La plateforme est un produit commercial (santé, certification ISO 27001). L'utilisation
 de FluentAssertions 8.x dans ce contexte constitue une **non-conformité de licence**.
 
 ## Décision
@@ -85,7 +85,7 @@ migration xUnit → TUnit sur base de données concrètes
 | Effort de migration | Moyen | Nul | Très élevé | Nul |
 | Pérennité | Maintenance active | Fin de vie | Récent | Dépendance vendor |
 | Compatibilité xUnit | Totale | Totale | Incompatible | Totale |
-| Conformité HDS/RGPD | Oui | Risque (EOL) | Oui | Oui |
+| Conformité RGPD/ISO 27001 | Oui | Risque (EOL) | Oui | Oui |
 
 Shouldly offre le meilleur rapport conformité / effort de migration / pérennité.
 
@@ -118,7 +118,7 @@ Shouldly offre le meilleur rapport conformité / effort de migration / pérennit
 ### Positives
 
 - Conformité de licence restaurée (Apache-2.0)
-- Élimination d'un risque d'audit ISO 27001 / HDS
+- Élimination d'un risque d'audit ISO 27001
 - Bibliothèque activement maintenue
 
 ### Négatives

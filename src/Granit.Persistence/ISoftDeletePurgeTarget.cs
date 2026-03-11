@@ -1,7 +1,7 @@
 namespace Granit.Persistence;
 
 /// <summary>
-/// Marker interface for services that can purge soft-deleted records past the HDS retention period.
+/// Marker interface for services that can purge soft-deleted records past the ISO 27001 retention period.
 /// </summary>
 /// <remarks>
 /// Each module that owns a <see cref="Microsoft.EntityFrameworkCore.DbContext"/> containing
