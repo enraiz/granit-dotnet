@@ -10,9 +10,9 @@
       },
       "JunitXml.TestLogger": {
         "type": "Direct",
-        "requested": "[7.*, )",
-        "resolved": "7.1.0",
-        "contentHash": "Iu3dSnhJ+gzjlOtpIPZgHvJbmvmPbIGjxT7h5pNxxMiNTXKfxgi0O0eehnZ29qlC5bElAM0o9dSrjzjydCaGiA=="
+        "requested": "[8.*, )",
+        "resolved": "8.0.0",
+        "contentHash": "rO2ugKcbVy8SHNKeqfX/DshUcTtolnEUwMKehVB6gh5/YoL+U07zoACCyGRvgMtzq7fr9o6GLkXOmVj9WMgx+w=="
       },
       "Microsoft.CodeAnalysis.BannedApiAnalyzers": {
         "type": "Direct",
@@ -400,13 +400,13 @@
       "Microsoft.Extensions.Caching.Hybrid": {
         "type": "CentralTransitive",
         "requested": "[10.*, )",
-        "resolved": "10.3.0",
-        "contentHash": "M64quRgc0tSGs8aTj7XNr0sm4nsoqNuAaDDUohC2UGEPyMt3jhW4dHcCUUk/UBYfj+XPWDeycbDIUsdIO5mShw==",
+        "resolved": "10.4.0",
+        "contentHash": "4V+aMLQeU/p4VcIWIcvGro0L6HynmL2TrelL04Ce1iotP6T5+kjxuZQvl6P1ObSXIRPCbVXtQSt1NxK0fRIuag==",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "10.0.3",
-          "Microsoft.Extensions.Caching.Memory": "10.0.3",
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
-          "Microsoft.Extensions.Options": "10.0.3"
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.4",
+          "Microsoft.Extensions.Caching.Memory": "10.0.4",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.4",
+          "Microsoft.Extensions.Options": "10.0.4"
         }
       },
       "Microsoft.Extensions.Caching.Memory": {

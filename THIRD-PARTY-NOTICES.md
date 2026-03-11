@@ -58,11 +58,11 @@ Dernière mise à jour : 2026-03-03
 | MailKit | 4.12.0 | Copyright (c) 2013-2026 .NET Foundation and Contributors |
 | Microsoft.AspNetCore.SignalR.StackExchangeRedis | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Http | 10.0.3 | (c) Microsoft Corporation |
-| WolverineFx | 5.17.0 | JasperFx Contributors |
-| WolverineFx.EntityFrameworkCore | 5.17.0 | JasperFx Contributors |
-| WolverineFx.FluentValidation | 5.17.0 | JasperFx Contributors |
-| WolverineFx.Http.FluentValidation | 5.17.0 | JasperFx Contributors |
-| WolverineFx.Postgresql | 5.17.0 | JasperFx Contributors |
+| WolverineFx | 5.18.1 | JasperFx Contributors |
+| WolverineFx.EntityFrameworkCore | 5.18.1 | JasperFx Contributors |
+| WolverineFx.FluentValidation | 5.18.1 | JasperFx Contributors |
+| WolverineFx.Http.FluentValidation | 5.18.1 | JasperFx Contributors |
+| WolverineFx.Postgresql | 5.18.1 | JasperFx Contributors |
 
 ### Apache-2.0
 
@@ -113,7 +113,7 @@ Dernière mise à jour : 2026-03-03
 | Microsoft.NET.Test.Sdk | 18.3.0 | (c) Microsoft Corporation |
 | Testcontainers.PostgreSql | 4.10.0 | Copyright (c) 2019-2025 Andre Hofmeister |
 | coverlet.collector | 8.0.0 | (c) 2018 Toni Solarin-Sodara |
-| JunitXml.TestLogger | 7.1.0 | JunitXml.TestLogger Contributors |
+| JunitXml.TestLogger | 8.0.0 | JunitXml.TestLogger Contributors |
 
 ### Apache-2.0 (tests)
 

@@ -10,9 +10,9 @@
       },
       "JunitXml.TestLogger": {
         "type": "Direct",
-        "requested": "[7.*, )",
-        "resolved": "7.1.0",
-        "contentHash": "Iu3dSnhJ+gzjlOtpIPZgHvJbmvmPbIGjxT7h5pNxxMiNTXKfxgi0O0eehnZ29qlC5bElAM0o9dSrjzjydCaGiA=="
+        "requested": "[8.*, )",
+        "resolved": "8.0.0",
+        "contentHash": "rO2ugKcbVy8SHNKeqfX/DshUcTtolnEUwMKehVB6gh5/YoL+U07zoACCyGRvgMtzq7fr9o6GLkXOmVj9WMgx+w=="
       },
       "Microsoft.AspNetCore.Mvc.Testing": {
         "type": "Direct",
@@ -600,8 +600,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.3",
-        "contentHash": "py+bnF628jLbm63Q8VabQyzNNP0/jMJAVLrUaxhLMvU75GZVcN9LgdXRLk42Grpcih3rqZcRY+eSSkYO3+3QTQ=="
+        "resolved": "2.13.5",
+        "contentHash": "4L+7LesEArm6+/ZfukTCT6aHK0XEyoDpPEm7Y8VU/gNHPTZ62/gQaljdACIemYmrAlot0ne/ozcxBCDVywD34A=="
       }
     }
   }

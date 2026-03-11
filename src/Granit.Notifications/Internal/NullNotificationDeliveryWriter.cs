@@ -10,4 +10,7 @@ internal sealed class NullNotificationDeliveryWriter : INotificationDeliveryWrit
 {
     public Task RecordAsync(NotificationDeliveryAttempt attempt, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
+
+    public Task<int> DeleteBeforeAsync(DateTimeOffset cutoff, int batchSize, CancellationToken cancellationToken = default) =>
+        Task.FromResult(0);
 }

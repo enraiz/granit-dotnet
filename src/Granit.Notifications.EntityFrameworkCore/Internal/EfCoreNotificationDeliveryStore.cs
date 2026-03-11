@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.Notifications.EntityFrameworkCore.Internal;
 
 /// <summary>
-/// INSERT-only ISO 27001-compliant audit store for delivery attempts.
+/// ISO 27001-compliant audit store for delivery attempts.
 /// </summary>
 /// <remarks>
-/// ISO 27001 compliance: <see cref="NotificationDeliveryAttempt"/> records are INSERT-only.
-/// This store never updates or deletes them.
+/// <para>
+/// Records are INSERT-only during the HDS retention period. After retention expires,
+/// <see cref="DeleteBeforeAsync"/> enables RGPD-compliant data minimization.
+/// </para>
 /// </remarks>
 internal sealed class EfCoreNotificationDeliveryStore(IDbContextFactory<NotificationDbContext> dbContextFactory) : INotificationDeliveryWriter
 {
@@ -19,5 +21,19 @@ internal sealed class EfCoreNotificationDeliveryStore(IDbContextFactory<Notifica
         await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         db.DeliveryAttempts.Add(attempt);
         await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<int> DeleteBeforeAsync(
+        DateTimeOffset cutoff,
+        int batchSize,
+        CancellationToken cancellationToken = default)
+    {
+        await using NotificationDbContext db = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        return await db.DeliveryAttempts
+            .Where(a => a.OccurredAt < cutoff)
+            .OrderBy(a => a.OccurredAt)
+            .Take(batchSize)
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
     }
 }

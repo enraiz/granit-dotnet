@@ -47,7 +47,8 @@ public sealed class EfBlobDescriptorStoreTests
     private static BlobDescriptor MakeDescriptor(
         Guid? id = null,
         Guid? tenantId = null,
-        string containerName = "prescriptions")
+        string containerName = "prescriptions",
+        DateTimeOffset? createdAt = null)
     {
         Guid tid = tenantId ?? TenantId;
         Guid bid = id ?? Guid.NewGuid();
@@ -57,7 +58,7 @@ public sealed class EfBlobDescriptorStoreTests
             containerName: containerName,
             objectKey: $"{tid}/{containerName}/2026/02/{bid}",
             request: new BlobUploadRequest("prescription.pdf", "application/pdf", 5_000_000L),
-            createdAt: new DateTimeOffset(2026, 2, 23, 10, 0, 0, TimeSpan.Zero));
+            createdAt: createdAt ?? new DateTimeOffset(2026, 2, 23, 10, 0, 0, TimeSpan.Zero));
     }
 
     // =========================================================================
@@ -268,5 +269,83 @@ public sealed class EfBlobDescriptorStoreTests
             Guid.NewGuid(), TestContext.Current.CancellationToken);
 
         result.ShouldBeNull("no blob exists with matching TenantId");
+    }
+
+    // =========================================================================
+    // FindOrphanedAsync
+    // =========================================================================
+
+    [Fact]
+    public async Task FindOrphanedAsync_ReturnsPendingAndUploadingBeforeCutoff()
+    {
+        string db = Guid.NewGuid().ToString();
+        EfBlobDescriptorStore store = CreateStore(db);
+        DateTimeOffset old = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset recent = new(2026, 3, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2026, 2, 1, 0, 0, 0, TimeSpan.Zero);
+
+        // Old pending blob — should be returned
+        BlobDescriptor oldPending = MakeDescriptor(createdAt: old);
+        await store.SaveAsync(oldPending, TestContext.Current.CancellationToken);
+
+        // Old uploading blob — should be returned
+        BlobDescriptor oldUploading = MakeDescriptor(createdAt: old);
+        await store.SaveAsync(oldUploading, TestContext.Current.CancellationToken);
+        BlobDescriptor? toUpload = await store.FindAsync(oldUploading.Id, TestContext.Current.CancellationToken);
+        toUpload!.MarkAsUploading();
+        await store.UpdateAsync(toUpload, TestContext.Current.CancellationToken);
+
+        // Recent pending blob — should NOT be returned (after cutoff)
+        BlobDescriptor recentPending = MakeDescriptor(createdAt: recent);
+        await store.SaveAsync(recentPending, TestContext.Current.CancellationToken);
+
+        // Old valid blob — should NOT be returned (not orphaned)
+        BlobDescriptor oldValid = MakeDescriptor(createdAt: old);
+        await store.SaveAsync(oldValid, TestContext.Current.CancellationToken);
+        BlobDescriptor? toValidate = await store.FindAsync(oldValid.Id, TestContext.Current.CancellationToken);
+        toValidate!.MarkAsUploading();
+        await store.UpdateAsync(toValidate, TestContext.Current.CancellationToken);
+        BlobDescriptor? uploading = await store.FindAsync(oldValid.Id, TestContext.Current.CancellationToken);
+        uploading!.MarkAsValid("application/pdf", 1024L, old);
+        await store.UpdateAsync(uploading, TestContext.Current.CancellationToken);
+
+        IReadOnlyList<BlobDescriptor> orphans = await store.FindOrphanedAsync(
+            cutoff, 100, TestContext.Current.CancellationToken);
+
+        orphans.Count.ShouldBe(2);
+        orphans.ShouldAllBe(b => b.Status == BlobStatus.Pending || b.Status == BlobStatus.Uploading);
+        orphans.ShouldAllBe(b => b.CreatedAt < cutoff);
+    }
+
+    [Fact]
+    public async Task FindOrphanedAsync_RespectsPageSize()
+    {
+        string db = Guid.NewGuid().ToString();
+        EfBlobDescriptorStore store = CreateStore(db);
+        DateTimeOffset old = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2026, 2, 1, 0, 0, 0, TimeSpan.Zero);
+
+        for (int i = 0; i < 5; i++)
+        {
+            await store.SaveAsync(MakeDescriptor(createdAt: old), TestContext.Current.CancellationToken);
+        }
+
+        IReadOnlyList<BlobDescriptor> orphans = await store.FindOrphanedAsync(
+            cutoff, 3, TestContext.Current.CancellationToken);
+
+        orphans.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task FindOrphanedAsync_EmptyWhenNoOrphans()
+    {
+        string db = Guid.NewGuid().ToString();
+        EfBlobDescriptorStore store = CreateStore(db);
+        DateTimeOffset cutoff = new(2026, 2, 1, 0, 0, 0, TimeSpan.Zero);
+
+        IReadOnlyList<BlobDescriptor> orphans = await store.FindOrphanedAsync(
+            cutoff, 100, TestContext.Current.CancellationToken);
+
+        orphans.ShouldBeEmpty();
     }
 }

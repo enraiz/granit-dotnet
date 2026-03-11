@@ -65,6 +65,61 @@ public sealed class EfCoreNotificationDeliveryStoreTests : IDisposable
     }
 
     // -------------------------------------------------------------------------
+    // DeleteBeforeAsync
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task DeleteBeforeAsync_DeletesAttemptsBeforeCutoff()
+    {
+        DateTimeOffset old = new(2022, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset recent = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+        await _store.RecordAsync(BuildAttempt(occurredAt: old), TestContext.Current.CancellationToken);
+        await _store.RecordAsync(BuildAttempt(occurredAt: old), TestContext.Current.CancellationToken);
+        await _store.RecordAsync(BuildAttempt(occurredAt: recent), TestContext.Current.CancellationToken);
+
+        int deleted = await _store.DeleteBeforeAsync(cutoff, 1000, TestContext.Current.CancellationToken);
+
+        deleted.ShouldBe(2);
+
+        await using NotificationDbContext db = _factory.CreateDbContext();
+        List<NotificationDeliveryAttempt> remaining = await db.DeliveryAttempts
+            .ToListAsync(TestContext.Current.CancellationToken);
+        remaining.Count.ShouldBe(1);
+        remaining[0].OccurredAt.ShouldBe(recent);
+    }
+
+    [Fact]
+    public async Task DeleteBeforeAsync_RespectsPageSize()
+    {
+        DateTimeOffset old = new(2022, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset cutoff = new(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+        for (int i = 0; i < 5; i++)
+        {
+            await _store.RecordAsync(BuildAttempt(occurredAt: old), TestContext.Current.CancellationToken);
+        }
+
+        int deleted = await _store.DeleteBeforeAsync(cutoff, 3, TestContext.Current.CancellationToken);
+
+        deleted.ShouldBe(3);
+
+        await using NotificationDbContext db = _factory.CreateDbContext();
+        int remaining = await db.DeliveryAttempts.CountAsync(TestContext.Current.CancellationToken);
+        remaining.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task DeleteBeforeAsync_ReturnsZeroWhenNothingToDelete()
+    {
+        int deleted = await _store.DeleteBeforeAsync(
+            DateTimeOffset.UtcNow, 1000, TestContext.Current.CancellationToken);
+
+        deleted.ShouldBe(0);
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -72,7 +127,8 @@ public sealed class EfCoreNotificationDeliveryStoreTests : IDisposable
         Guid? notificationId = null,
         string channelName = "email",
         bool isSuccess = true,
-        string? errorMessage = null) => new()
+        string? errorMessage = null,
+        DateTimeOffset? occurredAt = null) => new()
         {
             Id = Guid.NewGuid(),
             DeliveryId = Guid.NewGuid(),
@@ -81,7 +137,7 @@ public sealed class EfCoreNotificationDeliveryStoreTests : IDisposable
             ChannelName = channelName,
             RecipientUserId = "user-1",
             TenantId = Guid.NewGuid(),
-            OccurredAt = DateTimeOffset.UtcNow,
+            OccurredAt = occurredAt ?? DateTimeOffset.UtcNow,
             DurationMs = 150,
             IsSuccess = isSuccess,
             ErrorMessage = errorMessage,
