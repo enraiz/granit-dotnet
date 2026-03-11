@@ -88,6 +88,80 @@ public sealed class QueryablePaginationExtensionsTests : IAsyncLifetime
         result.TotalCount.ShouldBe(5);
     }
 
+    [Fact]
+    public async Task ApplyOffsetPagination_hasMore_true_when_more_pages()
+    {
+        IQueryable<TestProduct> source = _db.Products.OrderBy(p => p.Name);
+
+        PagedResult<TestProduct> result = await source.ApplyOffsetPaginationAsync(
+            1, 2, skipTotalCount: false, TestContext.Current.CancellationToken);
+
+        result.HasMore.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task ApplyOffsetPagination_hasMore_false_on_last_page()
+    {
+        IQueryable<TestProduct> source = _db.Products.OrderBy(p => p.Name);
+
+        PagedResult<TestProduct> result = await source.ApplyOffsetPaginationAsync(
+            3, 2, skipTotalCount: false, TestContext.Current.CancellationToken);
+
+        result.HasMore.ShouldBeFalse();
+    }
+
+    // ── Offset pagination — skipTotalCount ────────────────────────────
+
+    [Fact]
+    public async Task ApplyOffsetPagination_skipTotalCount_returns_null_totalCount()
+    {
+        IQueryable<TestProduct> source = _db.Products.OrderBy(p => p.Name);
+
+        PagedResult<TestProduct> result = await source.ApplyOffsetPaginationAsync(
+            1, 2, skipTotalCount: true, TestContext.Current.CancellationToken);
+
+        result.TotalCount.ShouldBeNull();
+        result.Items.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task ApplyOffsetPagination_skipTotalCount_hasMore_true_when_more_items()
+    {
+        IQueryable<TestProduct> source = _db.Products.OrderBy(p => p.Name);
+
+        PagedResult<TestProduct> result = await source.ApplyOffsetPaginationAsync(
+            1, 2, skipTotalCount: true, TestContext.Current.CancellationToken);
+
+        result.HasMore.ShouldBeTrue();
+        result.Items.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task ApplyOffsetPagination_skipTotalCount_hasMore_false_on_last_page()
+    {
+        IQueryable<TestProduct> source = _db.Products.OrderBy(p => p.Name);
+
+        PagedResult<TestProduct> result = await source.ApplyOffsetPaginationAsync(
+            3, 2, skipTotalCount: true, TestContext.Current.CancellationToken);
+
+        result.HasMore.ShouldBeFalse();
+        result.Items.Count.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task ApplyOffsetPagination_skipTotalCount_exact_page_has_no_more()
+    {
+        IQueryable<TestProduct> source = _db.Products.OrderBy(p => p.Name);
+
+        // 5 items, pageSize=5 => no extra item fetched
+        PagedResult<TestProduct> result = await source.ApplyOffsetPaginationAsync(
+            1, 5, skipTotalCount: true, TestContext.Current.CancellationToken);
+
+        result.HasMore.ShouldBeFalse();
+        result.Items.Count.ShouldBe(5);
+        result.TotalCount.ShouldBeNull();
+    }
+
     // ── Cursor pagination ────────────────────────────────────────────
 
     [Fact]
@@ -99,6 +173,8 @@ public sealed class QueryablePaginationExtensionsTests : IAsyncLifetime
             null, 2, "Price", TestContext.Current.CancellationToken);
 
         result.Items.Count.ShouldBe(2);
+        result.TotalCount.ShouldBeNull();
+        result.HasMore.ShouldBeTrue();
         result.NextCursor.ShouldNotBeNull();
     }
 
@@ -122,6 +198,7 @@ public sealed class QueryablePaginationExtensionsTests : IAsyncLifetime
             null, 10, "Price", TestContext.Current.CancellationToken);
 
         result.Items.Count.ShouldBe(5);
+        result.HasMore.ShouldBeFalse();
         result.NextCursor.ShouldBeNull();
     }
 
