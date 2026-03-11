@@ -36,7 +36,7 @@ public sealed class Document : AuditedEntity, ITranslatable<DocumentTranslation>
 Deux classes de base sont disponibles :
 
 - **`Translation<TParent>`** — minimale (hérite de `Entity`, pas d'audit)
-- **`AuditedTranslation<TParent>`** — avec audit HDS (hérite de `AuditedEntity`,
+- **`AuditedTranslation<TParent>`** — avec audit ISO 27001 (hérite de `AuditedEntity`,
   champs `CreatedAt/By`, `ModifiedAt/By` remplis automatiquement)
 
 ```csharp
@@ -46,7 +46,7 @@ public sealed class CategoryTranslation : Translation<Category>
     public string Name { get; set; } = string.Empty;
 }
 
-// Avec audit HDS (recommandé pour les données de santé)
+// Avec audit ISO 27001 (recommandé pour les données de santé)
 public sealed class DocumentTranslation : AuditedTranslation<Document>
 {
     public string Title { get; set; } = string.Empty;
@@ -166,7 +166,7 @@ query.Where(e => e.Translations.Any(
 Quand l'entité parente implémente `ISoftDeletable`, la suppression logique
 (`IsDeleted = true`) **ne déclenche pas** le cascade delete. Les traductions
 restent liées au parent et sont exclues des requêtes par le query filter du
-parent. C'est le comportement correct pour la conformité HDS (conservation
+parent. C'est le comportement correct pour la conformité ISO 27001 (conservation
 3 ans).
 
 ## Approches alternatives écartées

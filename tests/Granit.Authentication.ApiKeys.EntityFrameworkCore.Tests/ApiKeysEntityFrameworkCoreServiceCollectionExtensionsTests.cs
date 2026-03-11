@@ -84,8 +84,8 @@ public sealed class ApiKeysEntityFrameworkCoreServiceCollectionExtensionsTests
             options => options.UseSqlite("DataSource=:memory:"));
 
         ServiceProvider provider = services.BuildServiceProvider();
-        using var scope = provider.CreateScope();
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApiKeysDbContext>>();
+        using IServiceScope scope = provider.CreateScope();
+        IDbContextFactory<ApiKeysDbContext> factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApiKeysDbContext>>();
         factory.ShouldNotBeNull();
     }
 
@@ -99,8 +99,8 @@ public sealed class ApiKeysEntityFrameworkCoreServiceCollectionExtensionsTests
             options => options.UseSqlite("DataSource=:memory:"));
 
         ServiceProvider provider = services.BuildServiceProvider();
-        using var scope = provider.CreateScope();
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApiKeysDbContext>>();
+        using IServiceScope scope = provider.CreateScope();
+        IDbContextFactory<ApiKeysDbContext> factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApiKeysDbContext>>();
         factory.ShouldNotBeNull();
     }
 }

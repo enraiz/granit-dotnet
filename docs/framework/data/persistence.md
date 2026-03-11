@@ -1,7 +1,7 @@
 # Persistence
 
 `Granit.Persistence` fournit les intercepteurs EF Core pour
-l'audit trail HDS et la suppression logique RGPD.
+l'audit trail ISO 27001 et la suppression logique RGPD.
 
 ## Installation
 
@@ -165,7 +165,7 @@ Quand une entité `ISoftDeletable` est marquée `EntityState.Deleted` :
 3. `DeletedAt` est positionné à `IClock.Now` (UTC)
 4. `DeletedBy` est positionné à `ICurrentUserService.UserId`
 
-L'entité reste en base de données pour l'audit trail HDS (3 ans de rétention).
+L'entité reste en base de données pour l'audit trail ISO 27001 (3 ans de rétention).
 
 ### Exemple de suppression logique
 
@@ -380,7 +380,7 @@ public sealed class AppDbContext : DbContext
 Usage — désactiver un filtre dans un scope applicatif :
 
 ```csharp
-// Job de purge HDS : accès aux enregistrements supprimés logiquement
+// Job de purge ISO 27001 : accès aux enregistrements supprimés logiquement
 using IDisposable scope = _dataFilter.Disable<ISoftDeletable>();
 List<DossierPatient> aArchiver = await _context.Dossiers
     .Where(d => d.IsDeleted)
@@ -493,7 +493,7 @@ Granit.Persistence
 │   ├── DataSeeder.cs                       (interne : résolution DI + résilience)
 │   └── DataSeedingHostedService.cs         (interne : IHostedService au démarrage)
 ├── Interceptors/
-│   ├── AuditedEntityInterceptor.cs         (audit HDS : CreatedAt/By, ModifiedAt/By)
+│   ├── AuditedEntityInterceptor.cs         (audit ISO 27001 : CreatedAt/By, ModifiedAt/By)
 │   ├── VersioningInterceptor.cs            (versionnement : BusinessId, Version)
 │   └── SoftDeleteInterceptor.cs            (soft delete RGPD : IsDeleted, DeletedAt/By)
 └── Extensions/
@@ -551,14 +551,14 @@ AuditedEntityInterceptor interceptor = new(currentUser, clock, guidGenerator, cu
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail | `AuditedEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
-| HDS - Versionnement | `VersioningInterceptor` (BusinessId, Version — traçabilité des révisions) |
-| HDS - Horodatage UTC | `IClock.Now` (jamais `DateTimeOffset.UtcNow`) |
+| ISO 27001 - Audit trail | `AuditedEntityInterceptor` (CreatedAt/By, ModifiedAt/By) |
+| ISO 27001 - Versionnement | `VersioningInterceptor` (BusinessId, Version — traçabilité des révisions) |
+| ISO 27001 - Horodatage UTC | `IClock.Now` (jamais `DateTimeOffset.UtcNow`) |
 | RGPD - Droit à l'oubli | `SoftDeleteInterceptor` (suppression logique) |
 | RGPD - Minimisation | Query filters (entités supprimées et inactives exclues par défaut) |
 | RGPD - Isolation tenant | Query filter multi-tenant (`ApplyGranitConventions(currentTenant)`) |
 | RGPD - Pseudonymisation | `TenantId` GUID — jamais de données nominatives dans ce champ |
-| Maintenance HDS | `IDataFilter.Disable<ISoftDeletable>()` — accès aux données supprimées en scope contrôlé |
+| Maintenance ISO 27001 | `IDataFilter.Disable<ISoftDeletable>()` — accès aux données supprimées en scope contrôlé |
 
 ## Isolation multi-tenant — patterns avancés
 
@@ -580,7 +580,7 @@ d'isolation physique :
 
 > **5 dépendances directes** — c'est le module avec le plus de dépendances dans le
 > framework. Ce couplage est justifié : `Timing` fournit `IClock` pour l'horodatage
-> HDS, `Guids` fournit les identifiants séquentiels, `Security` fournit
+> ISO 27001, `Guids` fournit les identifiants séquentiels, `Security` fournit
 > `ICurrentUserService` pour l'audit trail, et `ExceptionHandling` fournit les
 > exceptions métier pour les violations de contraintes.
 >

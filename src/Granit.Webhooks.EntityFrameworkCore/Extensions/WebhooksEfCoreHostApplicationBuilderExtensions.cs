@@ -15,18 +15,18 @@ public static class WebhooksEfCoreHostApplicationBuilderExtensions
 {
     /// <summary>
     /// Replaces the default InMemory/no-op stores with durable EF Core implementations
-    /// backed by a PostgreSQL database hosted in Europe (OVHcloud FR).
+    /// backed by a PostgreSQL database hosted on European sovereign infrastructure.
     /// </summary>
     /// <remarks>
     /// Must be called after <c>AddGranitWebhooks()</c>.
     /// Registers:
     /// <list type="bullet">
     ///   <item><see cref="EfWebhookSubscriptionStore"/> — replaces <c>InMemoryWebhookSubscriptionStore</c> for both <see cref="IWebhookSubscriptionReader"/> and <see cref="IWebhookSubscriptionWriter"/>.</item>
-    ///   <item><see cref="EfWebhookDeliveryStore"/> — replaces <c>NullWebhookDeliveryWriter</c> (enables HDS audit trail).</item>
+    ///   <item><see cref="EfWebhookDeliveryStore"/> — replaces <c>NullWebhookDeliveryWriter</c> (enables ISO 27001 audit trail).</item>
     ///   <item><see cref="Internal.WebhooksDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
     /// </list>
     /// <para>
-    /// SOVEREIGNTY: The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// SOVEREIGNTY: The connection string must point to a database hosted on European sovereign infrastructure.
     /// Never use AWS RDS, Azure SQL, or Google Cloud SQL for health data.
     /// </para>
     /// </remarks>

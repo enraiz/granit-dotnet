@@ -23,7 +23,7 @@ internal sealed class NullableIntSchemaOperationTransformer : IOpenApiOperationT
             return Task.CompletedTask;
         }
 
-        foreach (var parameter in operation.Parameters)
+        foreach (IOpenApiParameter parameter in operation.Parameters)
         {
             if (parameter.Schema is not OpenApiSchema schema)
             {

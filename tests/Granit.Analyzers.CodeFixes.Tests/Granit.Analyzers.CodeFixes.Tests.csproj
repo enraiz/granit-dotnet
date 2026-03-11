@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Granit.Analyzers\Granit.Analyzers.csproj" />
     <ProjectReference Include="..\..\src\Granit.Analyzers.CodeFixes\Granit.Analyzers.CodeFixes.csproj" />
+    <ProjectReference Include="..\Granit.Analyzers.Tests\Granit.Analyzers.Tests.csproj" />
   </ItemGroup>
 
 </Project>

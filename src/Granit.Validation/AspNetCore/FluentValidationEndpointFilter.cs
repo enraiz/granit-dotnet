@@ -64,8 +64,12 @@ internal sealed class FluentValidationEndpointFilter<T> : IEndpointFilter
             return await next(context).ConfigureAwait(false);
         }
 
+        // TypedResults.ValidationProblem does not support a statusCode parameter.
+        // Results.ValidationProblem is needed here to enforce 422 (not 400).
+#pragma warning disable GRAPI001
         return Results.ValidationProblem(
             result.ToDictionary(),
             statusCode: StatusCodes.Status422UnprocessableEntity);
+#pragma warning restore GRAPI001
     }
 }

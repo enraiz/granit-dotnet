@@ -25,7 +25,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     [Fact]
     public async Task FindByIdAsync_ExistingKey_ReturnsEntry()
     {
-        var entry = CreateEntry();
+        ApiKeyEntry entry = CreateEntry();
         await SeedAsync(entry);
 
         ApiKeyEntry? result = await _sut.FindByIdAsync(entry.Id, TestContext.Current.CancellationToken);
@@ -48,7 +48,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     [Fact]
     public async Task CreateAsync_PersistsEntry()
     {
-        var entry = CreateEntry();
+        ApiKeyEntry entry = CreateEntry();
 
         await _sut.CreateAsync(entry, TestContext.Current.CancellationToken);
 
@@ -73,7 +73,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     [Fact]
     public async Task RevokeAsync_ExistingActiveKey_ReturnsTrue()
     {
-        var entry = CreateEntry();
+        ApiKeyEntry entry = CreateEntry();
         await SeedAsync(entry);
         var revokedAt = new DateTimeOffset(2026, 3, 10, 12, 0, 0, TimeSpan.Zero);
 
@@ -92,7 +92,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     [Fact]
     public async Task RevokeAsync_AlreadyRevokedKey_ReturnsFalse()
     {
-        var entry = CreateEntry();
+        ApiKeyEntry entry = CreateEntry();
         entry.RevokedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
         await SeedAsync(entry);
 
@@ -120,7 +120,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     [Fact]
     public async Task UpdateScopesAsync_ExistingKey_UpdatesAndReturnsTrue()
     {
-        var entry = CreateEntry();
+        ApiKeyEntry entry = CreateEntry();
         await SeedAsync(entry);
 
         var newPermissions = new List<string> { "Read", "Write" };
@@ -213,7 +213,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     public async Task ListAsync_ExcludesRevokedByDefault()
     {
         await SeedAsync(CreateEntry("hash1", "Active Key"));
-        var revoked = CreateEntry("hash2", "Revoked Key");
+        ApiKeyEntry revoked = CreateEntry("hash2", "Revoked Key");
         revoked.RevokedAt = DateTimeOffset.UtcNow;
         await SeedAsync(revoked);
 
@@ -228,7 +228,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     public async Task ListAsync_IncludeRevoked_ReturnsAll()
     {
         await SeedAsync(CreateEntry("hash1", "Active Key"));
-        var revoked = CreateEntry("hash2", "Revoked Key");
+        ApiKeyEntry revoked = CreateEntry("hash2", "Revoked Key");
         revoked.RevokedAt = DateTimeOffset.UtcNow;
         await SeedAsync(revoked);
 
@@ -259,11 +259,11 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     [Fact]
     public async Task ListAsync_OrdersByCreatedAtDescending()
     {
-        var older = CreateEntry("hash1", "Older Key");
+        ApiKeyEntry older = CreateEntry("hash1", "Older Key");
         older.CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
         await SeedAsync(older);
 
-        var newer = CreateEntry("hash2", "Newer Key");
+        ApiKeyEntry newer = CreateEntry("hash2", "Newer Key");
         newer.CreatedAt = new DateTimeOffset(2026, 3, 1, 0, 0, 0, TimeSpan.Zero);
         await SeedAsync(newer);
 

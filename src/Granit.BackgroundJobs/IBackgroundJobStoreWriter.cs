@@ -26,6 +26,6 @@ public interface IBackgroundJobStoreWriter
     /// <summary>Sets <see cref="BackgroundJobDefinition.IsEnabled"/>.</summary>
     Task SetEnabledAsync(string jobName, bool enabled, CancellationToken cancellationToken = default);
 
-    /// <summary>Sets <see cref="BackgroundJobDefinition.TriggeredBy"/> for HDS audit.</summary>
+    /// <summary>Sets <see cref="BackgroundJobDefinition.TriggeredBy"/> for ISO 27001 audit.</summary>
     Task SetTriggeredByAsync(string jobName, string? triggeredBy, CancellationToken cancellationToken = default);
 }

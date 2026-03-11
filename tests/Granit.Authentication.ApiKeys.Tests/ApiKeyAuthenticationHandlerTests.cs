@@ -36,11 +36,11 @@ public sealed class ApiKeyAuthenticationHandlerTests
         IPAddress? remoteIp = null,
         IApiKeyCacheService? cacheService = null)
     {
-        var optionsMonitor = Substitute.For<IOptionsMonitor<ApiKeyOptions>>();
+        IOptionsMonitor<ApiKeyOptions> optionsMonitor = Substitute.For<IOptionsMonitor<ApiKeyOptions>>();
         optionsMonitor.Get(ApiKeyAuthenticationDefaults.AuthenticationScheme).Returns(_options);
         optionsMonitor.CurrentValue.Returns(_options);
 
-        var loggerFactory = NullLoggerFactory.Instance;
+        NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
 
         var handler = new ApiKeyAuthenticationHandler(
             optionsMonitor,
@@ -78,7 +78,7 @@ public sealed class ApiKeyAuthenticationHandlerTests
         HashedKey = result.HashedKey,
         Prefix = result.Prefix,
         LastFourChars = result.LastFourChars,
-        Permissions = ["Guava.Patients.Read", "Guava.Patients.Write"],
+        Permissions = ["MyApp.Patients.Read", "MyApp.Patients.Write"],
         AllowedCidrs = [],
     };
 
@@ -308,8 +308,8 @@ public sealed class ApiKeyAuthenticationHandlerTests
 
         // Permissions
         var permissions = principal.FindAll(ApiKeyClaimTypes.Permission).Select(c => c.Value).ToList();
-        permissions.ShouldContain("Guava.Patients.Read");
-        permissions.ShouldContain("Guava.Patients.Write");
+        permissions.ShouldContain("MyApp.Patients.Read");
+        permissions.ShouldContain("MyApp.Patients.Write");
         permissions.Count.ShouldBe(2);
     }
 

@@ -5,7 +5,7 @@
 Le pattern Soft Delete remplace la suppression physique par une mise à jour
 d'un flag `IsDeleted`. L'enregistrement reste en base mais est masqué par
 les query filters. Ce pattern est **obligatoire** dans Granit pour la
-conformité HDS (piste d'audit 3 ans) et RGPD (traçabilité de l'effacement).
+conformité ISO 27001 (piste d'audit 3 ans) et RGPD (traçabilité de l'effacement).
 
 ## Schéma
 
@@ -50,7 +50,7 @@ sequenceDiagram
 Le `BlobStorage` est un cas particulier : la suppression est **hybride** :
 
 1. **Suppression physique** de l'objet S3 (crypto-shredding RGPD Art. 17)
-2. **Soft delete** du `BlobDescriptor` en DB (piste d'audit HDS)
+2. **Soft delete** du `BlobDescriptor` en DB (piste d'audit ISO 27001)
 
 ```
 src/Granit.BlobStorage/Internal/DefaultBlobStorage.cs:
@@ -62,7 +62,7 @@ src/Granit.BlobStorage/Internal/DefaultBlobStorage.cs:
 
 | Exigence réglementaire | Réponse du pattern |
 |------------------------|-------------------|
-| HDS — piste d'audit 3 ans | `DeletedAt` + `DeletedBy` conservés en DB |
+| ISO 27001 — piste d'audit 3 ans | `DeletedAt` + `DeletedBy` conservés en DB |
 | RGPD Art. 17 — droit à l'effacement | Crypto-shredding : données binaires détruites, métadonnées conservées |
 | RGPD Art. 15 — droit d'accès | L'historique complet est consultable (qui, quand, quoi) |
 | Audit interne — traçabilité | `ICurrentUserService.UserId` capture l'acteur de la suppression |

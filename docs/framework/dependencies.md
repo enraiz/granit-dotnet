@@ -305,7 +305,7 @@ flowchart LR
 
 ### Timeline
 
-Audit trail HDS (flux d'activité, commentaires, suivi).
+Audit trail ISO 27001 (flux d'activité, commentaires, suivi).
 
 ```mermaid
 flowchart LR
@@ -447,7 +447,7 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 | Rouge | Persistence — couche transversale critique |
 | Violet | Wolverine — messaging et Outbox |
 | Orange | BlobStorage — stockage objet |
-| Orange foncé | Timeline — audit HDS |
+| Orange foncé | Timeline — audit ISO 27001 |
 | Vert sarcelle | Templating & DocumentGeneration |
 | Rouge foncé | Notifications — fan-out multi-canal |
 | Bleu acier | Querying — recherche, filtrage, tri, pagination |
@@ -509,7 +509,7 @@ du `DbContext` applicatif géré par `Granit.Persistence` :
 - `Granit.Webhooks.EntityFrameworkCore`
 - `Granit.BlobStorage.EntityFrameworkCore`
 
-**Justification** : ces modules sont INSERT-only (audit HDS) ou gèrent des
+**Justification** : ces modules sont INSERT-only (audit ISO 27001) ou gèrent des
 données d'infrastructure, pas des entités métier. Ils utilisent
 `IDbContextFactory` pour la thread safety (handlers Wolverine parallèles) et
 n'ont besoin ni de `AuditedEntityInterceptor` ni de `SoftDeleteInterceptor`.

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Workflow.EntityFrameworkCore</PackageId>
-    <Description>EF Core integration for Granit.Workflow. WorkflowTransitionInterceptor for automatic HDS audit trail, IWorkflowDbContext for host integration, IPublishable query filter synchronization, and versioned entity support.</Description>
+    <Description>EF Core integration for Granit.Workflow. WorkflowTransitionInterceptor for automatic ISO 27001 audit trail, IWorkflowDbContext for host integration, IPublishable query filter synchronization, and versioned entity support.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

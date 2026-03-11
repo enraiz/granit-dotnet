@@ -2,7 +2,7 @@
 
 Minimal API endpoints for `Granit.Cookies`: exposes registered cookies and third-party
 service definitions to the front-end for CMP configuration. Public, anonymous endpoint.
-RGPD/HDS compliant.
+RGPD/ISO 27001 compliant.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

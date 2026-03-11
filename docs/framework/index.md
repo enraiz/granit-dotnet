@@ -23,7 +23,7 @@ Modélisation, accès, isolation et performance de la donnée.
 | Document | Description |
 | --- | --- |
 | [domain.md](data/domain.md) | Hiérarchie d'entités, ISoftDeletable, IMultiTenant, IActive |
-| [persistence.md](data/persistence.md) | EF Core interceptors, audit trail HDS, soft delete RGPD, data seeding |
+| [persistence.md](data/persistence.md) | EF Core interceptors, audit trail ISO 27001, soft delete RGPD, data seeding |
 | [data-filtering.md](data/data-filtering.md) | IDataFilter, bypass des query filters globaux |
 | [caching.md](data/caching.md) | Cache distribué, invalidation, chiffrement des valeurs |
 | [multi-tenancy.md](data/multi-tenancy.md) | Isolation par tenant, résolution, filtrage automatique |
@@ -40,7 +40,7 @@ Identité, droits d'accès et protection des secrets.
 | [identity.md](security/identity.md) | `IIdentityProvider` — users, sessions, device activity, enable/disable, mot de passe |
 | [encryption.md](security/encryption.md) | Chiffrement Transit via Vault |
 | [vault.md](security/vault.md) | VaultSharp, credentials dynamiques PostgreSQL, leases |
-| [cors.md](security/cors.md) | Configuration CORS standardisée, validation HDS au démarrage |
+| [cors.md](security/cors.md) | Configuration CORS standardisée, validation ISO 27001 au démarrage |
 
 ## Diagnostics
 
@@ -48,7 +48,7 @@ Surveillance, débogage et exposition du comportement de l'application.
 
 | Document | Description |
 | --- | --- |
-| [logging.md](diagnostics/logging.md) | Serilog, enrichisseurs, bonnes pratiques HDS |
+| [logging.md](diagnostics/logging.md) | Serilog, enrichisseurs, bonnes pratiques ISO 27001 |
 | [observability.md](diagnostics/observability.md) | OpenTelemetry, OTLP, Loki/Tempo/Mimir |
 | [wolverine-tracing.md](diagnostics/wolverine-tracing.md) | Traçage distribué Wolverine — propagation W3C Trace Context dans l'Outbox |
 | [diagnostics.md](diagnostics/diagnostics.md) | Health checks, métriques, ActivitySource |
@@ -63,8 +63,8 @@ Contrat HTTP : versioning des routes et documentation OpenAPI.
 | --- | --- |
 | [api-versioning.md](api/api-versioning.md) | Versioning HTTP par URL et query string |
 | [api-documentation.md](api/api-documentation.md) | OpenAPI natif .NET 10, UI Scalar multi-version |
-| [http-responses.md](api/http-responses.md) | Codes de retour HTTP — conventions 200/201/202/204, pattern asynchrone, HDS |
-| [idempotency.md](api/idempotency.md) | Idempotence HTTP style Stripe, Redis SET NX PX, conformité HDS |
+| [http-responses.md](api/http-responses.md) | Codes de retour HTTP — conventions 200/201/202/204, pattern asynchrone, ISO 27001 |
+| [idempotency.md](api/idempotency.md) | Idempotence HTTP style Stripe, Redis SET NX PX, conformité ISO 27001 |
 
 ## Messaging
 
@@ -72,8 +72,8 @@ Messagerie asynchrone et outbox transactionnelle.
 
 | Document | Description |
 | --- | --- |
-| [wolverine.md](messaging/wolverine.md) | WolverineFx, Outbox PostgreSQL, propagation de contexte HDS |
-| [webhooks.md](messaging/webhooks.md) | Webhooks sortants, fan-out Wolverine, HMAC-SHA256, audit trail HDS |
+| [wolverine.md](messaging/wolverine.md) | WolverineFx, Outbox PostgreSQL, propagation de contexte ISO 27001 |
+| [webhooks.md](messaging/webhooks.md) | Webhooks sortants, fan-out Wolverine, HMAC-SHA256, audit trail ISO 27001 |
 | [notifications.md](messaging/notifications.md) | Notifications multi-canal (InApp, SignalR, Email, SMS, WhatsApp, Push), fan-out Wolverine, entity tracking Odoo-style |
 
 ## Scheduling
@@ -102,7 +102,7 @@ Manipulation d'images : redimensionnement, recadrage, compression, conversion et
 
 ## Storage
 
-Stockage d'objets souverain, Direct-to-Cloud, conforme HDS et RGPD.
+Stockage d'objets souverain, Direct-to-Cloud, conforme ISO 27001 et RGPD.
 
 | Document | Description |
 | --- | --- |

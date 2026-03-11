@@ -20,18 +20,18 @@ Ces règles de sécurité s'appliquent à **tous les projets** (backend et front
 - Minimisation des données (RGPD) — ne collecter que ce qui est strictement nécessaire
 - Pseudonymisation quand possible
 
-### Chiffrement (HDS)
+### Chiffrement (ISO 27001)
 
-- Chiffrement obligatoire **au repos et en transit** (exigence HDS)
+- Chiffrement obligatoire **au repos et en transit** (exigence ISO 27001)
 - Utilisez `ITransitEncryptionService` (Granit.Vault) pour le chiffrement des
   données sensibles côté backend
 - TLS obligatoire pour toutes les communications
 
 ### Souveraineté (Cloud Act)
 
-- Infrastructure **obligatoirement en Europe** (OVHcloud FR)
+- Infrastructure **obligatoirement en Europe** sur infrastructure souveraine
 - **Ne jamais proposer** AWS, Azure ou GCP pour les données de santé
-- Images Docker depuis le registre privé OVHcloud uniquement
+- Images Docker depuis le registre privé souverain uniquement
 
 ## Signaux d'alerte à remonter
 

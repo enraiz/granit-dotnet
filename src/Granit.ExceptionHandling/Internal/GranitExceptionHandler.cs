@@ -24,7 +24,7 @@ namespace Granit.ExceptionHandling.Internal;
 ///   <item>Writes the response via <see cref="IProblemDetailsService.TryWriteAsync"/>.</item>
 /// </list>
 /// <para>
-/// <b>HDS security rule:</b> messages of non-<see cref="IUserFriendlyException"/> exceptions
+/// <b>ISO 27001 security rule:</b> messages of non-<see cref="IUserFriendlyException"/> exceptions
 /// are NEVER forwarded to the client in production. The original exception is always logged.
 /// </para>
 /// </remarks>

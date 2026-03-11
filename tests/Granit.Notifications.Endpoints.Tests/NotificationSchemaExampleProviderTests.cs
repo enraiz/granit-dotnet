@@ -13,7 +13,7 @@ public sealed class NotificationSchemaExampleProviderTests
     {
         var provider = new NotificationSchemaExampleProvider();
 
-        var examples = provider.GetExamples();
+        IReadOnlyDictionary<Type, JsonNode> examples = provider.GetExamples();
 
         examples.ShouldContainKey(typeof(NotificationPreferenceUpdateRequest));
     }
@@ -23,7 +23,7 @@ public sealed class NotificationSchemaExampleProviderTests
     {
         var provider = new NotificationSchemaExampleProvider();
 
-        var examples = provider.GetExamples();
+        IReadOnlyDictionary<Type, JsonNode> examples = provider.GetExamples();
         JsonNode? example = examples[typeof(NotificationPreferenceUpdateRequest)];
 
         example.ShouldNotBeNull();
@@ -37,7 +37,7 @@ public sealed class NotificationSchemaExampleProviderTests
     {
         var provider = new NotificationSchemaExampleProvider();
 
-        var examples = provider.GetExamples();
+        IReadOnlyDictionary<Type, JsonNode> examples = provider.GetExamples();
 
         examples.Count.ShouldBe(1);
     }

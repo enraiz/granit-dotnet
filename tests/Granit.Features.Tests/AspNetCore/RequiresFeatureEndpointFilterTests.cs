@@ -42,7 +42,7 @@ public sealed class RequiresFeatureEndpointFilterTests
         EndpointFilterDelegate next = _ =>
         {
             nextCalled = true;
-            return ValueTask.FromResult<object?>(Results.Ok());
+            return ValueTask.FromResult<object?>(TypedResults.Ok());
         };
 
         await filter.InvokeAsync(context, next);
@@ -63,7 +63,7 @@ public sealed class RequiresFeatureEndpointFilterTests
         EndpointFilterDelegate next = _ =>
         {
             nextCalled = true;
-            return ValueTask.FromResult<object?>(Results.Ok());
+            return ValueTask.FromResult<object?>(TypedResults.Ok());
         };
 
         Func<Task> act = async () => await filter.InvokeAsync(context, next);

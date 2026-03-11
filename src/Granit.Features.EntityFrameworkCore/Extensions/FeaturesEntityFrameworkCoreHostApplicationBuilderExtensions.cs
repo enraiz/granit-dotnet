@@ -21,14 +21,14 @@ public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
     /// backed by <see cref="GranitFeaturesDbContext"/> (table <c>feature_overrides</c>).
     /// <para>
     /// <see cref="AuditedEntityInterceptor"/> is added automatically when
-    /// <c>Granit.Persistence</c> is configured, enabling the HDS 3-year audit trail
+    /// <c>Granit.Persistence</c> is configured, enabling the ISO 27001 3-year audit trail
     /// (<c>created_at</c>, <c>created_by</c>, <c>modified_at</c>, <c>modified_by</c>).
     /// </para>
     /// <para>
     /// Must be called after <c>AddGranitFeatures()</c>.
     /// </para>
     /// <para>
-    /// The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// The connection string must point to a database hosted on European sovereign infrastructure.
     /// Never use a service subject to the US Cloud Act for health data.
     /// </para>
     /// </remarks>
@@ -43,7 +43,7 @@ public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
         {
             configure(options);
 
-            // Automatically wire the HDS audit interceptor when Granit.Persistence is present.
+            // Automatically wire the ISO 27001 audit interceptor when Granit.Persistence is present.
             // The interceptor is Scoped — using a Scoped factory (ServiceLifetime.Scoped)
             // ensures it is resolved from the current request/message scope.
             AuditedEntityInterceptor? auditInterceptor =

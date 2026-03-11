@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Authentication.JwtBearer</PackageId>
-    <Description>Authentification JWT Bearer générique (OIDC) pour les applications .NET Digital Dynamics. ICurrentUserService, JwtBearerAuthOptions, policy Authenticated.</Description>
+    <Description>Generic JWT Bearer authentication (OIDC) for Granit applications. ICurrentUserService, JwtBearerAuthOptions, Authenticated policy.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

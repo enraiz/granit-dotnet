@@ -7,7 +7,7 @@ namespace Granit.Cors.Options;
 /// Bound from the <c>"Cors"</c> section of <c>appsettings.json</c>.
 /// </summary>
 /// <remarks>
-/// HDS compliance: wildcard (<c>*</c>) origins are rejected in non-development
+/// ISO 27001 compliance: wildcard (<c>*</c>) origins are rejected in non-development
 /// environments by the startup validator.
 /// </remarks>
 public sealed class GranitCorsOptions
@@ -17,7 +17,7 @@ public sealed class GranitCorsOptions
 
     /// <summary>
     /// Allowed CORS origins. At least one origin must be configured.
-    /// Wildcard (<c>*</c>) is forbidden in non-development environments (HDS compliance).
+    /// Wildcard (<c>*</c>) is forbidden in non-development environments (ISO 27001 compliance).
     /// </summary>
     /// <example>
     /// <code>["https://app.example.com", "https://admin.example.com"]</code>

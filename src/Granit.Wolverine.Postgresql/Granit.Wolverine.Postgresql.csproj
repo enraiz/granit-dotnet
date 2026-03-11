@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Granit.Wolverine.Postgresql</PackageId>
     <Description>Intégration Wolverine + PostgreSQL pour Granit : Outbox durable, transport PostgreSQL et
-    intégration EF Core. Conçu pour OVHcloud FR (souveraineté HDS, RGPD).</Description>
+    intégration EF Core. Conçu pour OVHcloud FR (ISO 27001 compliance, RGPD).</Description>
     <IsPackable>true</IsPackable>
     <!--
       NU1608: WolverineFx.EntityFrameworkCore 5.x depends on EF Core Design 10.0.0 which pulls

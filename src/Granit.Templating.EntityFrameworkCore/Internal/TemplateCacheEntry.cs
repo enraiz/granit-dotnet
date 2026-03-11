@@ -8,7 +8,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// <param name="IsFound">Whether a published template was found in the store.</param>
 /// <param name="Content">Template content (null when <paramref name="IsFound"/> is false).</param>
 /// <param name="MimeType">Template MIME type (null when <paramref name="IsFound"/> is false).</param>
-/// <param name="RevisionId">Revision identifier for HDS traceability.</param>
+/// <param name="RevisionId">Revision identifier for ISO 27001 traceability.</param>
 internal sealed record TemplateCacheEntry(
     bool IsFound,
     string? Content,

@@ -3,42 +3,48 @@
 </p>
 
 <p align="center">
-  <strong>Framework .NET modulaire pour applications métier souveraines</strong>
+  <strong>Solid by design. Modular by nature.</strong>
 </p>
 
 <p align="center">
-  .NET 10 · C# 14 · EF Core 10 · PostgreSQL · Keycloak · Vault · Serilog · OpenTelemetry · WolverineFx
+  .NET 10 · C# 14 · EF Core 10 · CQRS · Vertical Slicing · Modular Architecture
 </p>
 
 ---
 
-Granit est le socle technique partagé des applications .NET de Digital Dynamics.
-Il regroupe **41 packages NuGet** organisés en modules indépendants, conçus pour
-un hébergement **souverain européen** (OVHcloud, Roubaix) et conformes aux
-exigences **HDS** et **RGPD**.
+Granit is a rock-solid, production-ready modular framework for .NET and React.
+Built with Vertical Slicing and zero compromises on Developer Experience.
+It provides **100 NuGet packages** organized as independent modules,
+compliant with **GDPR/ISO 27001** requirements.
 
-## Fonctionnalités
+## Features
 
-| Domaine | Ce que Granit apporte |
+| Domain | What Granit provides |
 | --- | --- |
-| **Modularité** | Système de modules auto-configurés, tri topologique des dépendances |
-| **Sécurité** | JWT Keycloak, RBAC, chiffrement Transit Vault, credentials dynamiques |
-| **Persistance** | Intercepteurs EF Core : audit trail HDS 3 ans, soft delete RGPD, multi-tenancy |
-| **Multi-tenancy** | Isolation par schéma ou par base, résolution automatique, filtrage transparent |
-| **Observabilité** | Serilog + OpenTelemetry → OTLP (Loki, Tempo, Mimir), health checks, métriques |
-| **Messaging** | Outbox transactionnelle WolverineFx, webhooks HMAC-SHA256, jobs cron |
-| **API** | Versioning, OpenAPI Scalar, idempotence Stripe-style, ProblemDetails |
-| **Stockage** | Blob storage S3 souverain, URL pré-signées, Crypto-Shredding |
-| **SaaS** | Feature flags par plan commercial, quotas, résolution Default → Plan → Tenant |
-| **Qualité** | Analyseurs Roslyn embarqués, validation FluentValidation (TVA, SIREN, NISS) |
+| **Core & Modularity** | Self-configuring module system, topological dependency sorting, timing, GUID generation |
+| **Security** | JWT Bearer authentication, RBAC, Vault Transit encryption, dynamic credentials |
+| **Identity** | Identity provider abstractions, user cache (cache-aside, login-time sync, GDPR) |
+| **Persistence** | EF Core interceptors: audit trail (3 years), GDPR soft delete, multi-tenancy, settings, features |
+| **Multi-tenancy** | Schema or database isolation, automatic resolution, transparent filtering |
+| **Caching** | Distributed caching (HybridCache, Redis), AES-256 value encryption |
+| **Observability** | Structured logging + distributed tracing → OTLP, health checks, metrics |
+| **Messaging** | Transactional outbox, HMAC-SHA256 webhooks, notifications (6 channels), cron jobs |
+| **API** | Versioning, OpenAPI Scalar, Stripe-style idempotency, ProblemDetails, CORS |
+| **Storage & Imaging** | S3-compatible blob storage, pre-signed URLs, Crypto-Shredding, image processing |
+| **Documents** | Template engine (Scriban), HTML→PDF rendering, Excel generation |
+| **Data Exchange** | Import (Extract→Map→Validate→Execute), Export (tabular Excel/CSV with presets) |
+| **Workflow** | FSM engine, publication lifecycle, approval routing |
+| **Localization** | i18n (9 cultures), override store, source-generated keys |
+| **SaaS** | Feature flags per commercial plan, quotas, Default → Plan → Tenant resolution |
+| **Quality** | Embedded Roslyn analyzers, Architecture Tests (ArchUnitNET), FluentValidation (VAT, SIREN, NISS) |
 
-## Démarrage rapide
+## Quick start
 
 ```bash
-# Ajouter le package fondation à votre projet
+# Add the foundation package to your project
 dotnet add package Granit.Core
 
-# Ajouter les modules nécessaires
+# Add the modules you need
 dotnet add package Granit.Persistence
 dotnet add package Granit.Security
 dotnet add package Granit.Observability
@@ -64,28 +70,28 @@ public sealed class MyAppModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        // Les modules Granit sont déjà configurés automatiquement.
-        // Ajoutez ici la configuration spécifique à votre application.
+        // Granit modules are already configured automatically.
+        // Add your application-specific configuration here.
     }
 }
 ```
 
 ## Documentation
 
-| Section | Contenu |
+| Section | Content |
 | --- | --- |
-| [Framework](docs/framework/index.md) | Architecture, modules, sécurité, données, API, messaging, stockage |
-| [Tests](docs/testing/index.md) | Conventions xUnit, mocking, assertions, intégration EF Core |
-| [Catalogue des packages](docs/index.md) | Liste complète des 41 packages avec leur rôle |
+| [Framework](docs/framework/index.md) | Architecture, modules, security, data, API, messaging, storage |
+| [Tests](docs/testing/index.md) | xUnit conventions, mocking, assertions, EF Core integration |
+| [Package catalogue](docs/index.md) | Complete list of 100 packages with their roles |
 
-## Contribuer
+## Contributing
 
-Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions et le workflow de contribution.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for conventions and contribution workflow.
 
 ## Changelog
 
-Les changements sont documentés dans [CHANGELOG.md](CHANGELOG.md).
+Changes are documented in [CHANGELOG.md](CHANGELOG.md).
 
-## Licence
+## License
 
-Propriétaire — Digital Dynamics. Tous droits réservés. Voir [LICENSE](LICENSE).
+Proprietary. All rights reserved. See [LICENSE](LICENSE).

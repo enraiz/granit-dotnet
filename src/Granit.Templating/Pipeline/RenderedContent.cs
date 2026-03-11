@@ -22,7 +22,7 @@ public abstract record RenderedContent
 {
     /// <summary>
     /// Identifier of the template revision that produced this content.
-    /// Propagated from <see cref="TemplateDescriptor.RevisionId"/> for HDS traceability.
+    /// Propagated from <see cref="TemplateDescriptor.RevisionId"/> for ISO 27001 traceability.
     /// </summary>
     public Guid? RevisionId { get; init; }
 }

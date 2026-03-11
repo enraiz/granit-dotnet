@@ -10,7 +10,7 @@ namespace Granit.Webhooks.EntityFrameworkCore.Configurations;
 /// Table: <c>webhook_delivery_attempts</c>.
 /// </summary>
 /// <remarks>
-/// HDS compliance: this table is INSERT-only. No cascade deletes are configured from
+/// ISO 27001 compliance: this table is INSERT-only. No cascade deletes are configured from
 /// <c>webhook_subscriptions</c> — delivery records must be retained for 3 years
 /// even after the subscription is deactivated.
 /// </remarks>

@@ -20,8 +20,8 @@ public sealed class ApiKeyServiceCollectionExtensionsTests
 
         services.AddGranitApiKeyAuthentication();
 
-        using var provider = services.BuildServiceProvider();
-        var generator = provider.GetService<IApiKeyGenerator>();
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IApiKeyGenerator? generator = provider.GetService<IApiKeyGenerator>();
 
         generator.ShouldNotBeNull();
         generator.ShouldBeOfType<ApiKeyGenerator>();
@@ -36,9 +36,9 @@ public sealed class ApiKeyServiceCollectionExtensionsTests
 
         services.AddGranitApiKeyAuthentication();
 
-        await using var provider = services.BuildServiceProvider();
-        var schemeProvider = provider.GetRequiredService<IAuthenticationSchemeProvider>();
-        var scheme = await schemeProvider.GetSchemeAsync(ApiKeyAuthenticationDefaults.AuthenticationScheme);
+        await using ServiceProvider provider = services.BuildServiceProvider();
+        IAuthenticationSchemeProvider schemeProvider = provider.GetRequiredService<IAuthenticationSchemeProvider>();
+        AuthenticationScheme? scheme = await schemeProvider.GetSchemeAsync(ApiKeyAuthenticationDefaults.AuthenticationScheme);
 
         scheme.ShouldNotBeNull();
         scheme.Name.ShouldBe(ApiKeyAuthenticationDefaults.AuthenticationScheme);
@@ -57,9 +57,9 @@ public sealed class ApiKeyServiceCollectionExtensionsTests
             options.TrackLastUsed = false;
         });
 
-        using var provider = services.BuildServiceProvider();
-        var optionsMonitor = provider.GetRequiredService<IOptionsMonitor<ApiKeyOptions>>();
-        var options = optionsMonitor.Get(ApiKeyAuthenticationDefaults.AuthenticationScheme);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IOptionsMonitor<ApiKeyOptions> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<ApiKeyOptions>>();
+        ApiKeyOptions options = optionsMonitor.Get(ApiKeyAuthenticationDefaults.AuthenticationScheme);
 
         options.CacheDuration.ShouldBe(TimeSpan.FromMinutes(30));
         options.TrackLastUsed.ShouldBeFalse();
@@ -74,9 +74,9 @@ public sealed class ApiKeyServiceCollectionExtensionsTests
 
         services.AddGranitApiKeyAuthentication(configureOptions: null);
 
-        using var provider = services.BuildServiceProvider();
-        var optionsMonitor = provider.GetRequiredService<IOptionsMonitor<ApiKeyOptions>>();
-        var options = optionsMonitor.Get(ApiKeyAuthenticationDefaults.AuthenticationScheme);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IOptionsMonitor<ApiKeyOptions> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<ApiKeyOptions>>();
+        ApiKeyOptions options = optionsMonitor.Get(ApiKeyAuthenticationDefaults.AuthenticationScheme);
 
         options.CacheDuration.ShouldBe(TimeSpan.FromMinutes(5));
         options.TrackLastUsed.ShouldBeTrue();
@@ -113,7 +113,7 @@ public sealed class ApiKeyServiceCollectionExtensionsTests
         services.AddLogging();
         services.AddAuthentication();
 
-        var returned = services.AddGranitApiKeyAuthentication();
+        IServiceCollection returned = services.AddGranitApiKeyAuthentication();
 
         returned.ShouldBeSameAs(services);
     }

@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 namespace Granit.Persistence.Extensions;
 
 /// <summary>
-/// Extension methods for purging soft-deleted records past the HDS retention period.
+/// Extension methods for purging soft-deleted records past the ISO 27001 retention period.
 /// </summary>
 /// <remarks>
 /// These methods perform <b>hard deletes</b> and bypass EF Core change tracking and interceptors.
-/// They are intended exclusively for post-retention archival (records older than 3 years per HDS).
+/// They are intended exclusively for post-retention archival (records older than 3 years per ISO 27001).
 /// Provider-agnostic: uses EF Core's <c>ExecuteDeleteAsync</c> (works with PostgreSQL, SQL Server, SQLite).
 /// </remarks>
 public static class DbContextPurgeExtensions
@@ -40,7 +40,7 @@ public static class DbContextPurgeExtensions
 
         int totalDeleted = 0;
 
-        foreach (var clrType in context.Model.GetEntityTypes()
+        foreach (Type? clrType in context.Model.GetEntityTypes()
             .Where(et => typeof(ISoftDeletable).IsAssignableFrom(et.ClrType))
             .Select(et => et.ClrType))
         {

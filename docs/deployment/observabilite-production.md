@@ -55,7 +55,7 @@ flowchart LR
 # Activité d'un tenant spécifique
 {service_name="my-backend"} | json | TenantId = "tenant-123"
 
-# Erreurs d'un utilisateur spécifique (audit HDS)
+# Erreurs d'un utilisateur spécifique (audit ISO 27001)
 {service_name="my-backend"} | json | UserId = "john.doe" | Level = "Error"
 
 # Corrélation avec un TraceId
@@ -137,13 +137,13 @@ Canaux de notification recommandés :
 
 ## Rétention
 
-| Signal | Rétention recommandée | Exigence HDS |
+| Signal | Rétention recommandée | Exigence ISO 27001 |
 | --- | --- | --- |
 | Logs | 90 jours (hot) + 3 ans (cold) | 3 ans minimum |
 | Traces | 30 jours | Non requis |
 | Métriques | 1 an | Non requis |
 
-> **HDS** : l'audit trail (logs d'accès aux données de santé) doit être
+> **ISO 27001** : l'audit trail (logs d'accès aux données de santé) doit être
 > conservé **3 ans minimum**. Configurer la rétention Loki en conséquence.
 
 ## Liens

@@ -156,14 +156,14 @@ public sealed class GdprExportSagaTests
     }
 
     // -------------------------------------------------------------------------
-    // Scénario 4 : conformité HDS — les events ne transportent que des BlobReferenceId
+    // Scénario 4 : conformité ISO 27001 — les events ne transportent que des BlobReferenceId
     // -------------------------------------------------------------------------
 
     [Fact]
     public void PersonalDataPreparedEvent_ContainsOnlyBlobReferenceId_NotRawData()
     {
         // Structural contract: the event record only carries a BlobReferenceId,
-        // never raw personal data — enforced by the type definition (HDS compliance).
+        // never raw personal data — enforced by the type definition (ISO 27001 compliance).
         PersonalDataPreparedEvent evt = new(
             Guid.NewGuid(), "patients", "blob-ref-123", "application/json");
 

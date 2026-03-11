@@ -88,7 +88,7 @@ Trois jobs parallèles :
 #### Tests d'intégration
 
 Le job `integration-test` utilise Testcontainers .NET pour démarrer deux
-conteneurs PostgreSQL et valider l'isolation physique par tenant (HDS).
+conteneurs PostgreSQL et valider l'isolation physique par tenant (ISO 27001).
 
 Le runner Docker dispose du socket Docker monté nativement — pas besoin de
 DinD (`docker:27-dind`). Testcontainers se connecte au daemon local et les

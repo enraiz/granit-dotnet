@@ -220,9 +220,9 @@ public sealed class EfBlobDescriptorStoreTests
         valid!.MarkAsDeleted(deletedAt, "RGPD Art. 17 erasure request");
         await store.UpdateAsync(valid, TestContext.Current.CancellationToken);
 
-        // RGPD / HDS: the audit row must remain in the database after deletion.
+        // RGPD /ISO 27001: the audit row must remain in the database after deletion.
         BlobDescriptor? deleted = await store.FindAsync(blobId, TestContext.Current.CancellationToken);
-        deleted.ShouldNotBeNull("HDS requires the audit record to be retained for 3 years");
+        deleted.ShouldNotBeNull("ISO 27001 requires the audit record to be retained for 3 years");
         deleted!.Status.ShouldBe(BlobStatus.Deleted);
         deleted.DeletedAt.ShouldBe(deletedAt);
         deleted.DeletionReason.ShouldBe("RGPD Art. 17 erasure request");

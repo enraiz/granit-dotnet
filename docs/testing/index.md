@@ -157,7 +157,7 @@ Des packages spécifiques sont ajoutés selon les besoins :
 | [Mocking](mocking.md) | NSubstitute : interfaces, IOptions, IHttpContextAccessor, stratégie |
 | [Assertions et temps](assertions.md) | Shouldly, FakeTimeProvider, déterminisme temporel |
 | [Tests d'intégration EF Core](integration.md) | DbContext in-memory, entités de test internes |
-| [Conformité HDS / RGPD](hds-rgpd.md) | Audit trail, soft delete, UTC |
+| [Conformité ISO 27001 / RGPD](hds-rgpd.md) | Audit trail, soft delete, UTC |
 | [Garde-fous qualité](garde-fous-qualite.md) | Référence complète : analyseurs Roslyn, API interdites, tests d'architecture |
 
 ## Bonnes pratiques

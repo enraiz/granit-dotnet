@@ -28,6 +28,6 @@ namespace Granit.Workflow.EntityFrameworkCore;
 /// </example>
 public interface IWorkflowDbContext
 {
-    /// <summary>Immutable HDS audit trail of workflow state transitions.</summary>
+    /// <summary>Immutable ISO 27001 audit trail of workflow state transitions.</summary>
     DbSet<WorkflowTransitionRecord> WorkflowTransitionRecords { get; }
 }

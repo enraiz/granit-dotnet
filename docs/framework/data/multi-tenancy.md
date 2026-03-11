@@ -377,7 +377,7 @@ factory.WithWebHostBuilder(builder =>
 
 > `ICurrentTenant` vit dans `Granit.Core.MultiTenancy`. Les modules ci-dessus consomment
 > l'interface sans déclarer `[DependsOn(GranitMultiTenancyModule)]`. Seuls `BlobStorage`
-> et ses sous-packages ont une **dépendance forte** (isolation tenant obligatoire RGPD/HDS).
+> et ses sous-packages ont une **dépendance forte** (isolation tenant obligatoire RGPD/ISO 27001).
 >
 > Voir le [graphe de dépendances complet](../dependencies.md).
 

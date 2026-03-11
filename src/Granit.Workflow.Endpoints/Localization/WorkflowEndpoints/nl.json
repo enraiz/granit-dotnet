@@ -2,6 +2,6 @@
   "culture": "nl",
   "texts": {
     "PermissionGroup:Workflow": "Workflow",
-    "Permission:Workflow.History.Read": "Workflow-transitiegeschiedenis bekijken (HDS-auditspoor)"
+    "Permission:Workflow.History.Read": "Workflow-transitiegeschiedenis bekijken (Auditspoor)"
   }
 }

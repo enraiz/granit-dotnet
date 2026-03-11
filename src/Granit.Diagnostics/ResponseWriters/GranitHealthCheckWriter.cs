@@ -11,7 +11,7 @@ namespace Granit.Diagnostics.ResponseWriters;
 /// </summary>
 /// <remarks>
 /// The response never contains stack traces, connection strings, tokens, or any PII,
-/// in compliance with HDS and RGPD constraints.
+/// in compliance with ISO 27001 and RGPD constraints.
 /// </remarks>
 public static class GranitHealthCheckWriter
 {

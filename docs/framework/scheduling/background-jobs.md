@@ -143,7 +143,7 @@ la prochaine occurrence après la prochaine exécution.
 via l'`IMessageBus`.
 
 **`TriggerNowAsync`** : publie le message immédiatement (sans délai). Injecte le header
-`X-Triggered-By` avec le `UserId` de l'opérateur pour la piste d'audit HDS.
+`X-Triggered-By` avec le `UserId` de l'opérateur pour la piste d'audit ISO 27001.
 
 ### BackgroundJobStatus
 
@@ -159,7 +159,7 @@ public sealed record BackgroundJobStatus(
     string? LastError);
 ```
 
-## Piste d'audit HDS
+## Piste d'audit ISO 27001
 
 | Champ | Source | Valeur |
 | --- | --- | --- |
@@ -361,12 +361,12 @@ services.AddSingleton<IBackgroundJobStoreWriter, RedisBackgroundJobStore>();
 | #144 | ✅ Terminé | 17 tests d'intégration — 401/403/404, désérialisation JSON, custom role |
 | #134 | ✅ Terminé | `DeadLetterCount` via `IMessageStore` — `BackgroundJobManager.GetAllAsync()` intègre les stats DLQ Wolverine (dégradation gracieuse si `IMessageStore` absent) |
 
-## Conformité HDS
+## Conformité ISO 27001
 
 - La planification est **atomique** : le prochain message est dans l'Outbox Wolverine,
   même transaction que le handler. Pas de perte possible en cas de crash.
 - `TriggerNowAsync` trace l'opérateur via `X-Triggered-By` (champ `TriggeredBy` du store).
-- La chaîne de connexion du store durable doit pointer sur une base **en Europe (OVHcloud FR)**,
+- La chaîne de connexion du store durable doit pointer sur une base **sur infrastructure souveraine européenne**,
   jamais sur un service soumis au Cloud Act américain.
 - Les données de scheduling (cron, horodatages) ne contiennent aucune donnée de santé (DPS).
 

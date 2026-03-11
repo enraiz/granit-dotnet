@@ -51,9 +51,9 @@ classDiagram
     FullAuditedEntity ..|> ISoftDeletable
 
     note for Entity "Identité seule"
-    note for CreationAuditedEntity "HDS : qui a créé"
-    note for AuditedEntity "HDS : qui a modifié"
-    note for FullAuditedEntity "HDS + RGPD :<br/>qui a supprimé"
+    note for CreationAuditedEntity "ISO 27001 : qui a créé"
+    note for AuditedEntity "ISO 27001 : qui a modifié"
+    note for FullAuditedEntity "ISO 27001 + RGPD :<br/>qui a supprimé"
 ```
 
 ## Implémentation dans Granit
@@ -77,7 +77,7 @@ comportement approprié.
 
 La hiérarchie progressive permet de choisir le niveau d'audit requis par
 entité. Une entité de référence (code postal) n'a besoin que de `Entity`.
-Une entité médicale HDS a besoin de `FullAuditedEntity` + `IMultiTenant`.
+Une entité médicale ISO 27001 a besoin de `FullAuditedEntity` + `IMultiTenant`.
 Les interceptors traitent toutes les entités uniformément.
 
 ## Exemple d'usage
@@ -89,7 +89,7 @@ public sealed class Country : Entity { }
 // Entité avec audit de création
 public sealed class Invitation : CreationAuditedEntity { }
 
-// Entité avec audit complet HDS + isolation tenant + soft delete RGPD
+// Entité avec audit complet ISO 27001 + isolation tenant + soft delete RGPD
 public sealed class MedicalRecord : FullAuditedEntity, IMultiTenant
 {
     public Guid? TenantId { get; set; }

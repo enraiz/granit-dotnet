@@ -49,11 +49,11 @@ public static class WebhookRedeliveryEndpoint
                 _ => StatusCodes.Status400BadRequest,
             };
 
-            return Results.Problem(detail: result.Error, statusCode: statusCode);
+            return TypedResults.Problem(detail: result.Error, statusCode: statusCode);
         }
 
         await messageBus.SendAsync(result.Command!).ConfigureAwait(false);
 
-        return Results.Accepted();
+        return TypedResults.Accepted(string.Empty);
     }
 }

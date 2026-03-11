@@ -13,7 +13,7 @@ namespace Granit.Notifications.MobilePush.Fcm.Internal;
 /// Registered as Keyed Service with key "Fcm".
 /// </summary>
 /// <remarks>
-/// The push payload must NOT contain PII or health data (HDS compliance).
+/// The push payload must NOT contain PII or health data (ISO 27001 compliance).
 /// It serves as a wake-up signal — the actual content is fetched from the Granit API.
 /// </remarks>
 internal sealed partial class FcmMobilePushSender(

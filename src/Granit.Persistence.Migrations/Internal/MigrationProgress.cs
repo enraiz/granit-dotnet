@@ -24,7 +24,7 @@ internal sealed class MigrationProgress
     /// <summary>
     /// Optional total row estimate for progress monitoring.
     /// Never computed automatically — set manually if needed.
-    /// A <c>COUNT(*)</c> on a large HDS table can take several seconds and partially lock the table.
+    /// A <c>COUNT(*)</c> on a large ISO 27001 table can take several seconds and partially lock the table.
     /// </summary>
     public long? TotalRows { get; set; }
 

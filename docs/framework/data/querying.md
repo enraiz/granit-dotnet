@@ -437,4 +437,4 @@ app.MapQueryEndpoints<Patient>(
 
 ## Voir aussi
 
-- [ADR-020 — Granit.Querying](../../ADR/ADR-020-granit-querying.md)
+- [ADR-007 — TanStack Table](https://gitlab.digitaldynamics.be/digital-dynamics/granit-front/-/blob/develop/docs/ADR/ADR-007-tanstack-table.md) (granit-front)

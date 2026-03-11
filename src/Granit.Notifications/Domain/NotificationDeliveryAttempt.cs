@@ -3,7 +3,7 @@ using Granit.Core.Domain;
 namespace Granit.Notifications.Domain;
 
 /// <summary>
-/// INSERT-only HDS audit record for a notification delivery attempt.
+/// INSERT-only ISO 27001 audit record for a notification delivery attempt.
 /// Never modified or deleted.
 /// </summary>
 public sealed class NotificationDeliveryAttempt : Entity

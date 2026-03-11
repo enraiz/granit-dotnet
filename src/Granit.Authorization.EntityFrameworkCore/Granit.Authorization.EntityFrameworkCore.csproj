@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.Authorization.EntityFrameworkCore</PackageId>
-    <Description>EF Core persistence for Granit.Authorization permission grants. Provides PermissionGrant entity, IPermissionGrantDbContext, and IPermissionManagerReader/IPermissionManagerWriter with HDS audit logging.</Description>
+    <Description>EF Core persistence for Granit.Authorization permission grants. Provides PermissionGrant entity, IPermissionGrantDbContext, and IPermissionManagerReader/IPermissionManagerWriter with ISO 27001 audit logging.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

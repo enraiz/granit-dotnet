@@ -7,7 +7,7 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// </summary>
 /// <remarks>
 /// Revisions are append-only once promoted beyond <c>Draft</c>.
-/// Published and archived revisions are preserved indefinitely (HDS audit trail).
+/// Published and archived revisions are preserved indefinitely (ISO 27001 audit trail).
 /// </remarks>
 internal sealed class TemplateRevisionEntity
 {

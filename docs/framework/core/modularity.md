@@ -446,7 +446,7 @@ Le `ModuleLoader` utilise l'algorithme de Kahn pour le tri topologique :
 
 > Pour le blueprint complet des dossiers standard (Internal/, Domain/, Extensions/,
 > etc.) applicable à **tous** les modules Granit, voir
-> [Structure des modules](../../guide/conventions/backend/structure-modules.md).
+> [Structure des modules](../../guide/conventions/structure-modules.md).
 
 ```text
 Granit.Core
@@ -564,8 +564,8 @@ public async Task AddGranitAsync_RegistersGranitApplicationAsSingleton()
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail | Modules chargés dans un ordre déterministe et reproductible |
-| HDS - Traçabilité | `GranitApplication.GetModuleTypes()` expose la liste des modules chargés (diagnostics) |
+| ISO 27001 - Audit trail | Modules chargés dans un ordre déterministe et reproductible |
+| ISO 27001 - Traçabilité | `GranitApplication.GetModuleTypes()` expose la liste des modules chargés (diagnostics) |
 | ISO 9001 - Reproductibilité | Tri topologique = même ordre à chaque démarrage |
 | Sécurité - Least privilege | Chaque module n'enregistre que ses propres services |
 

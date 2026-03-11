@@ -230,7 +230,7 @@ public sealed class OverrideTenantFeatureHandler(IFeatureStoreWriter store, IMes
 
 `GranitFeaturesEntityFrameworkCoreModule` remplace `InMemoryFeatureStore` par
 `EfCoreFeatureStore` (implémente `IFeatureStoreReader` et `IFeatureStoreWriter`). Les overrides sont stockés dans la table `saas_feature_overrides`
-avec une piste d'audit HDS complète (créé par, modifié par, horodatages).
+avec une piste d'audit ISO 27001 complète (créé par, modifié par, horodatages).
 
 ```csharp
 // Ajouter la migration dans le DbContext de l'application

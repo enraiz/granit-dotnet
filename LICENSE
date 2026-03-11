@@ -23,11 +23,11 @@ Ce code et cette documentation sont la propriété exclusive de **Digital Dynami
 
 ---
 
-## Données de santé
+## Protection des données
 
-Ce système gère des **données de santé à caractère personnel** soumises à :
+Ce système gère des **données à caractère personnel** soumises à :
 
-- **Hébergement de Données de Santé (HDS)** — Certification française
+- **ISO 27001** — Système de management de la sécurité de l'information
 - **Règlement Général sur la Protection des Données (RGPD)** — Réglementation européenne
 
 Toute utilisation non autorisée peut entraîner des sanctions administratives et pénales (amendes RGPD jusqu'à 4% du CA annuel mondial ou 20M EUR).

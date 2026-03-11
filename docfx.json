@@ -39,7 +39,7 @@
     "template": ["default", "modern"],
     "globalMetadata": {
       "_appTitle": "Granit",
-      "_appFooter": "Digital Dynamics — Documentation Granit",
+      "_appFooter": "Granit — Documentation",
       "_enableSearch": true,
       "_appLogoPath": "docs/images/granit-icon.svg"
     }

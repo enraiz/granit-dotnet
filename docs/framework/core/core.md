@@ -116,7 +116,7 @@ avant d'utiliser `Id` — ce comportement était déjà attendu avant ce changem
 Les modules `Granit.BlobStorage`, `Granit.BlobStorage.S3` et
 `Granit.BlobStorage.EntityFrameworkCore` conservent une dépendance **explicite** sur
 `Granit.MultiTenancy` : le stockage de blobs impose une isolation tenant stricte pour
-des raisons RGPD/HDS. Tenter de les utiliser sans contexte tenant lève une exception.
+des raisons RGPD/ISO 27001. Tenter de les utiliser sans contexte tenant lève une exception.
 
 ## Migration depuis Abstractions
 
@@ -164,11 +164,11 @@ des raisons RGPD/HDS. Tenter de les utiliser sans contexte tenant lève une exce
 
 | Exigence | Mécanisme |
 | --- | --- |
-| HDS - Audit trail 3 ans | Hiérarchie `AuditedEntity` / `FullAuditedEntity` + `AuditLogEntry` |
+| ISO 27001 - Audit trail 3 ans | Hiérarchie `AuditedEntity` / `FullAuditedEntity` + `AuditLogEntry` |
 | RGPD - Droit à l'oubli | `ISoftDeletable` (suppression logique) |
-| HDS - Chiffrement au repos | `ITransitEncryptionService` (dans package Vault) |
-| HDS - Traçabilité utilisateur | `ICurrentUserService` (dans package Security) |
-| HDS - Horodatage UTC | `IClock` (dans package Timing) |
+| ISO 27001 - Chiffrement au repos | `ITransitEncryptionService` (dans package Vault) |
+| ISO 27001 - Traçabilité utilisateur | `ICurrentUserService` (dans package Security) |
+| ISO 27001 - Horodatage UTC | `IClock` (dans package Timing) |
 
 ## Dépendances
 

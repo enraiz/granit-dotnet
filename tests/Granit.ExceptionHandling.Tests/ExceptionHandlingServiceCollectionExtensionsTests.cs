@@ -80,7 +80,7 @@ public sealed class ExceptionHandlingServiceCollectionExtensionsTests
         using ServiceProvider sp = services.BuildServiceProvider();
 
         ExceptionHandlingOptions opts = sp.GetRequiredService<IOptions<ExceptionHandlingOptions>>().Value;
-        opts.ExposeInternalErrorDetails.ShouldBeFalse("internal error details must never be exposed by default (HDS production rule)");
+        opts.ExposeInternalErrorDetails.ShouldBeFalse("internal error details must never be exposed by default (ISO 27001 production rule)");
     }
 
     [Fact]

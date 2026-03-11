@@ -8,12 +8,12 @@ un filtre global EF Core sur la colonne `TenantId`, appliqué automatiquement à
 toutes les entités implémentant `IMultiTenant`.
 
 Ce pattern est adapté aux plateformes SaaS à très fort nombre de tenants (> 1 000)
-où les contraintes HDS n'exigent pas d'isolation physique ni de sauvegarde par tenant.
+où les contraintes ISO 27001 n'exigent pas d'isolation physique ni de sauvegarde par tenant.
 
-> **Avertissement HDS** — Le filtre SQL est la seule barrière entre les données
+> **Avertissement ISO 27001** — Le filtre SQL est la seule barrière entre les données
 > des tenants. Un oubli de filtre (requête SQL brute, projection LINQ sans
 > `ApplyGranitConventions`) expose les données de tous les tenants. Pour les
-> applications HDS, privilégier
+> applications ISO 27001, privilégier
 > [Tenant-per-Schema](isolation-tenant-per-schema.md) ou
 > [Tenant-per-Database](isolation-tenant-per-database.md).
 

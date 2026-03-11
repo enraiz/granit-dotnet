@@ -62,6 +62,9 @@ public static class QueryEndpointRouteBuilderExtensions
         }
 
         // GET / — paginated or grouped query
+        // Lambda returns different typed results (Ok<GroupedResult<T>> / Ok<PagedResult<T>>)
+        // depending on the query mode — IResult is the only common type.
+#pragma warning disable GRAPI001 // Results.Ok is needed here for polymorphic return
         group.MapGet("/", async (
             [FromServices] IQueryEngine<TEntity> engine,
             BindableQueryRequest request,
@@ -83,6 +86,7 @@ public static class QueryEndpointRouteBuilderExtensions
                 .ConfigureAwait(false);
             return Results.Ok(paged);
         })
+#pragma warning restore GRAPI001
         .WithName($"Query{entityName}")
         .WithSummary($"Returns a filtered, sorted, and paginated list of {entityName} entries.");
 

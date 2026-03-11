@@ -8,7 +8,7 @@ d'ABP Framework.
 
 ## Pourquoi utiliser des GUID comme clés primaires ?
 
-Le GUID est le type de clé primaire par défaut pour les modules Digital Dynamics
+Le GUID est le type de clé primaire par défaut pour les modules Granit
 Granit. Ce choix repose sur plusieurs avantages :
 
 - **Compatibilité universelle** : utilisable avec tous les fournisseurs de bases de
@@ -119,7 +119,7 @@ public enum SequentialGuidType
 | `SequentialAsBinary` | Oracle | Tableau d'octets (`ToByteArray()`) |
 | `SequentialAtEnd` | SQL Server | 6 derniers octets du bloc Data4 |
 
-**Pour Digital Dynamics** : PostgreSQL est la base standard, donc le défaut est
+**Pour Granit** : PostgreSQL est la base standard, donc le défaut est
 `SequentialAsString`.
 
 ## SequentialGuidGenerator

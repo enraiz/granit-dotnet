@@ -227,7 +227,7 @@ Deux modes :
 - **Sécurité** : les tokens et secrets ne sont jamais exposés dans les logs ou
   les health checks
 
-## S3 (OVHcloud Object Storage)
+## S3 (S3-compatible object storage)
 
 **Package** : `Granit.BlobStorage.S3`
 
@@ -257,8 +257,8 @@ Deux modes :
 ### Résilience
 
 - **AWS SDK intégré** : retry avec backoff exponentiel (configurable via `AmazonS3Config`)
-- **Souveraineté** : endpoint OVHcloud (FR) uniquement — jamais AWS/Azure/GCP pour
-  les données de santé (contrainte HDS)
+- **Souveraineté** : endpoint infrastructure souveraine européenne (FR) uniquement — jamais AWS/Azure/GCP pour
+  les données de santé (contrainte ISO 27001)
 
 ## Webhook delivery (sortant)
 

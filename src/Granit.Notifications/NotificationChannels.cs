@@ -10,5 +10,6 @@ public static class NotificationChannels
     public const string WhatsApp = "WhatsApp";
     public const string Push = "Push";
     public const string MobilePush = "MobilePush";
+    public const string Sse = "Sse";
     public const string Zulip = "Zulip";
 }

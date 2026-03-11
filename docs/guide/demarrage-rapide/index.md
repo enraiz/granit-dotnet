@@ -8,7 +8,7 @@ avec Granit, étape par étape.
 Une API de gestion de tâches (*task management*) avec :
 
 - Un modèle domaine audité (création, modification)
-- Une persistance PostgreSQL avec intercepteurs HDS
+- Une persistance PostgreSQL avec intercepteurs ISO 27001
 - Des endpoints CRUD en Minimal API
 - Une authentification JWT Keycloak
 - Une observabilité Serilog + OpenTelemetry

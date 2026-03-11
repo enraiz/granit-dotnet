@@ -7,7 +7,7 @@ namespace Granit.Workflow.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core implementation of <see cref="IWorkflowTransitionRecorder"/>.
-/// Persists <see cref="WorkflowTransitionRecord"/> entries for unified HDS audit trail.
+/// Persists <see cref="WorkflowTransitionRecord"/> entries for unified ISO 27001 audit trail.
 /// </summary>
 internal sealed class EfWorkflowTransitionRecorder<TDbContext>(
     IDbContextFactory<TDbContext> contextFactory,

@@ -61,7 +61,7 @@ public sealed class MailKitEmailSenderTests
     [Fact]
     public void Class_Implements_IEmailSender()
     {
-        var (sender, _) = CreateSender();
+        (MailKitEmailSender? sender, ISmtpTransport _) = CreateSender();
         sender.ShouldBeAssignableTo<IEmailSender>();
     }
 
@@ -89,7 +89,7 @@ public sealed class MailKitEmailSenderTests
             Password = "test-password",
             TimeoutSeconds = 15,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -121,7 +121,7 @@ public sealed class MailKitEmailSenderTests
             UseSsl = false,
             TimeoutSeconds = 5,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -148,7 +148,7 @@ public sealed class MailKitEmailSenderTests
             Password = "pass",
             TimeoutSeconds = 5,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -167,7 +167,7 @@ public sealed class MailKitEmailSenderTests
             Password = null,
             TimeoutSeconds = 5,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -187,7 +187,7 @@ public sealed class MailKitEmailSenderTests
             Password = null,
             TimeoutSeconds = 5,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -207,7 +207,7 @@ public sealed class MailKitEmailSenderTests
             Password = "pass",
             TimeoutSeconds = 5,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -222,7 +222,7 @@ public sealed class MailKitEmailSenderTests
     [Fact]
     public async Task SendAsync_WithFromOverride_UsesSenderAddressFromOverride()
     {
-        var (sender, transport) = CreateSender();
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender();
         MimeMessage? captured = null;
         await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
 
@@ -243,7 +243,7 @@ public sealed class MailKitEmailSenderTests
             Username = "sender@example.com",
             TimeoutSeconds = 5,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
         MimeMessage? captured = null;
         await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
 
@@ -264,7 +264,7 @@ public sealed class MailKitEmailSenderTests
             Username = null,
             TimeoutSeconds = 5,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
         MimeMessage? captured = null;
         await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
 
@@ -282,7 +282,7 @@ public sealed class MailKitEmailSenderTests
     [Fact]
     public async Task SendAsync_WithPlainTextBody_SetsTextBody()
     {
-        var (sender, transport) = CreateSender();
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender();
         MimeMessage? captured = null;
         await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
 
@@ -297,7 +297,7 @@ public sealed class MailKitEmailSenderTests
     [Fact]
     public async Task SendAsync_WithNullPlainTextBody_SkipsTextBody()
     {
-        var (sender, transport) = CreateSender();
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender();
         MimeMessage? captured = null;
         await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
 
@@ -312,7 +312,7 @@ public sealed class MailKitEmailSenderTests
     [Fact]
     public async Task SendAsync_SetsRecipientAndSubject()
     {
-        var (sender, transport) = CreateSender();
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender();
         MimeMessage? captured = null;
         await transport.SendAsync(Arg.Do<MimeMessage>(m => captured = m), Arg.Any<CancellationToken>());
 
@@ -337,7 +337,7 @@ public sealed class MailKitEmailSenderTests
             UseSsl = false,
             TimeoutSeconds = 42,
         };
-        var (sender, transport) = CreateSender(opts);
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender(opts);
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -351,7 +351,7 @@ public sealed class MailKitEmailSenderTests
     [Fact]
     public async Task SendAsync_DisposesTransportAfterSend()
     {
-        var (sender, transport) = CreateSender();
+        (MailKitEmailSender? sender, ISmtpTransport? transport) = CreateSender();
 
         await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
 
@@ -374,7 +374,7 @@ public sealed class MailKitEmailSenderTests
         };
         ISmtpTransport transport = Substitute.For<ISmtpTransport>();
 
-        var logger = Substitute.For<ILogger<MailKitEmailSender>>();
+        ILogger<MailKitEmailSender> logger = Substitute.For<ILogger<MailKitEmailSender>>();
         logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
 
         MailKitEmailSender sender = new(Microsoft.Extensions.Options.Options.Create(opts), logger, () => transport);

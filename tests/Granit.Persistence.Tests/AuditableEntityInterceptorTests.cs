@@ -1,7 +1,7 @@
 // =============================================================================
 // Tests - AuditedEntityInterceptor
 // =============================================================================
-// Verifies that HDS audit fields are correctly populated
+// Verifies that ISO 27001 audit fields are correctly populated
 // when entities are created and modified.
 //
 // Approach: the interceptor is registered in the DbContext and

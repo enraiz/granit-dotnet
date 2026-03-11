@@ -16,7 +16,7 @@ namespace Granit.Localization.EntityFrameworkCore.Internal;
 /// live in embedded JSON files resolved by <c>JsonStringLocalizer</c>.
 /// </para>
 /// <para>
-/// Compatible with PostgreSQL (OVHcloud FR — European sovereignty, HDS compliant).
+/// Compatible with PostgreSQL (ISO 27001 compliant, infrastructure souveraine européenneing).
 /// </para>
 /// </remarks>
 internal sealed class GranitLocalizationOverridesDbContext(

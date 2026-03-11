@@ -1,7 +1,7 @@
 # Templating et génération documentaire — Granit.Templating
 
 Moteur de rendu de templates et génération de documents (PDF, Excel) pour les applications
-Digital Dynamics.
+Granit.
 
 | Package | Rôle |
 | --- | --- |
@@ -192,10 +192,10 @@ stateDiagram-v2
 | `Draft` | Éditable ; jamais utilisé par le pipeline de rendu |
 | `PendingReview` | Soumis pour validation ; uniquement si `Granit.Templating.Workflow` est installé |
 | `Published` | Version active ; une seule par clé à un instant donné |
-| `Archived` | Conservé pour la piste d'audit HDS — **jamais supprimé physiquement** |
+| `Archived` | Conservé pour la piste d'audit ISO 27001 — **jamais supprimé physiquement** |
 
 Seuls les brouillons (`Draft`) peuvent être supprimés physiquement. Les révisions dépréciées
-sont conservées sans limite de durée (obligation HDS, article L. 1111-8 CSP — 3 ans minimum).
+sont conservées sans limite de durée (obligation ISO 27001, article L. 1111-8 CSP — 3 ans minimum).
 
 ### Hook de transition (ITemplateTransitionHook)
 
@@ -208,7 +208,7 @@ enregistré par défaut avec un no-op (`NullTemplateTransitionHook`) :
 Sans module externe, seules les transitions simples (Draft → Published, Published → Archived,
 Published → Draft) sont autorisées. `Granit.Templating.Workflow` remplace ce hook par
 `WorkflowTemplateTransitionHook` qui délègue au `IWorkflowManager<WorkflowLifecycleStatus>`
-et persiste un `WorkflowTransitionRecord` pour la piste d'audit HDS unifiée.
+et persiste un `WorkflowTransitionRecord` pour la piste d'audit ISO 27001 unifiée.
 
 Ce patron est identique à `ICurrentTenant` / `NullTenantContext` dans `Granit.Core` :
 aucune dépendance forte vers le module Workflow n'est nécessaire dans les packages Templating.
@@ -382,7 +382,7 @@ public sealed class TemplateAdminService(
     public Task PublishAsync(TemplateKey key, CancellationToken cancellationToken)
         => storeWriter.PublishAsync(key, "admin@digitaldynamics.be", ct);
 
-    // Consulter l'historique complet (audit HDS)
+    // Consulter l'historique complet (audit ISO 27001)
     public Task<IReadOnlyList<TemplateRevision>> GetHistoryAsync(
         TemplateKey key, CancellationToken cancellationToken)
         => storeReader.GetHistoryAsync(key, ct);
@@ -422,7 +422,7 @@ app.MapGranitTemplatingAdmin(opts =>
 | `GET /{name}/lifecycle` | État du cycle de vie | Statut actuel, workflow actif, transitions disponibles |
 | `POST /{name}/preview` | Preview du brouillon | Rendu HTML du brouillon avec données test. 501 si pas de moteur, 422 si erreur de rendu |
 | `GET /{name}/variables` | Variables disponibles | Introspection des variables globales (`now.*`, `context.*`, …) pour autocomplétion |
-| `GET /{name}/history` | Historique des révisions | Paginé (`page`, `pageSize`), sans contenu. HDS audit trail |
+| `GET /{name}/history` | Historique des révisions | Paginé (`page`, `pageSize`), sans contenu. ISO 27001 audit trail |
 | `GET /{name}/history/{revisionId}` | Détail d'une révision | Contenu complet inclus, pour diff entre versions |
 | `GET /categories` | Liste des catégories | Triées par `SortOrder` puis `Name`, avec le compteur de templates |
 | `POST /categories` | Créer une catégorie | Corps : `SaveTemplateCategoryRequest` (name, description, icon, sortOrder) |
@@ -493,9 +493,9 @@ Flux selon le type de moteur :
 | #327 | ✅ Terminé | Interfaces du pipeline (`ITextTemplateRenderer`, `ITemplateEngine`, `ITemplateResolver`) |
 | #328 | ✅ Terminé | Types de template fortement typés (`TextTemplateType<TData>`, `DocumentTemplateType<TData>`) |
 | #329 | ✅ Terminé | Rendu Scriban 6 sandboxé — scalaires, collections, conditions, snake_case |
-| #331 | ✅ Terminé | Store EF Core — cycle de vie Draft/Published/Archived + historique audit HDS |
+| #331 | ✅ Terminé | Store EF Core — cycle de vie Draft/Published/Archived + historique audit ISO 27001 |
 | #332 | ✅ Terminé | Cache hybride des templates résolus avec invalidation sur publication |
-| #333 | ✅ Terminé | Traçabilité HDS — `RevisionId` propagé du store jusqu'au `DocumentResult` |
+| #333 | ✅ Terminé | Traçabilité ISO 27001 — `RevisionId` propagé du store jusqu'au `DocumentResult` |
 | #334 | ✅ Terminé | `Granit.DocumentGeneration.Excel` — tableurs *.xlsx* via ClosedXML |
 | #335 | ✅ Terminé | Documentation complète |
 | #336 | ✅ Terminé | Variables globales Scriban : `NowGlobalContext` et `ExecutionContextGlobalContext` |
@@ -505,7 +505,7 @@ Flux selon le type de moteur :
 | #330 | 🔜 Planifié | `PuppeteerSharpRenderer` — HTML → PDF via Chromium sans tête |
 | #340 | ⏸ Différé | PDF/A-3b — Factur-X (loi e-facture sept. 2026, licence iText7 en attente) |
 
-## Conformité HDS / RGPD
+## Conformité ISO 27001 / RGPD
 
 - **Piste d'audit** : `TemplateRevision.RevisionId` est propagé dans `RenderedContent.RevisionId`,
   permettant de tracer quelle version du template a produit chaque document.

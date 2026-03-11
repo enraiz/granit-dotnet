@@ -128,7 +128,7 @@ Les colonnes déjà matchées par un niveau supérieur sont exclues des niveaux 
 | 3. Fuzzy | Distance de Levenshtein normalisée (seuil configurable, défaut 0.8) | `Fuzzy` |
 | 4. Sémantique | `ISemanticMappingService` (IA optionnelle) | `Semantic` |
 
-> **Garantie RGPD/HDS** : l'interface `ISemanticMappingService` ne reçoit que les
+> **Garantie RGPD/ISO 27001** : l'interface `ISemanticMappingService` ne reçoit que les
 > **en-têtes** de colonnes et les **métadonnées de schéma** (`FieldMetadata`).
 > Aucune donnée métier (`RawImportRow.Values`) ne traverse la frontière IA.
 
@@ -780,7 +780,7 @@ logique réactive côté applicatif.
 | `ImportJobCompletedEvent` | Import terminé (Completed, PartiallyCompleted, Failed) | `ImportJobId`, `DefinitionName`, `Status`, `UserId`, compteurs (Total/Succeeded/Failed/Inserted/Updated/Skipped) |
 | `ExportJobCompletedEvent` | Export terminé (Completed, Failed) | `ExportJobId`, `DefinitionName`, `Status`, `UserId`, `RowCount`, `ErrorMessage` |
 
-Aucune donnée personnelle (PII) n'est incluse dans les événements (HDS-compliant).
+Aucune donnée personnelle (PII) n'est incluse dans les événements (ISO 27001-compliant).
 
 ### Publication
 
@@ -802,7 +802,7 @@ L'enregistrement est automatique :
 
 Créer un handler Wolverine pour réagir aux événements. Exemple avec
 `INotificationPublisher` (pattern identique à `ExportCompletedHandler` dans
-guava-backend pour la RGPD) :
+le backend applicatif pour la RGPD) :
 
 ```csharp
 public static class ImportJobCompletedHandler
@@ -830,6 +830,6 @@ public static class ImportJobCompletedHandler
 
 ## Voir aussi
 
-- [ADR-018 — Sep pour le parsing CSV](../../ADR/ADR-018-sep-parsing-csv.md)
-- [ADR-019 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-019-sylvan-data-excel-parsing.md)
+- [ADR-015 — Sep pour le parsing CSV](../../ADR/ADR-015-sep-parsing-csv.md)
+- [ADR-016 — Sylvan.Data.Excel pour le parsing Excel](../../ADR/ADR-016-sylvan-data-excel-parsing.md)
 - [Querying](querying.md) — module de filtrage/tri/pagination utilisé par l'export

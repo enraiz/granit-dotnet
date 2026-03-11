@@ -1,6 +1,6 @@
 # Gestion des cookies
 
-Package de gestion des cookies HTTP conforme RGPD/HDS. Repose sur le
+Package de gestion des cookies HTTP conforme RGPD/ISO 27001. Repose sur le
 **Strict Registry Pattern** : chaque cookie doit être déclaré au démarrage,
 toute tentative d'écrire un cookie non déclaré provoque une exception immédiate (fail-fast).
 
@@ -41,7 +41,7 @@ Tous les cookies doivent être déclarés au démarrage via `GranitCookiesBuilde
 
 Ce pattern garantit :
 
-- Un **inventaire exhaustif** des cookies pour l'audit HDS/RGPD
+- Un **inventaire exhaustif** des cookies pour l'audit RGPD/ISO 27001
 - La traçabilité du **but** (`Purpose`) de chaque cookie
 - Le contrôle de la **durée de rétention** (`RetentionDays`)
 - L'impossibilité d'écrire un cookie sans déclaration préalable

@@ -432,7 +432,7 @@ public sealed class EfDocumentTemplateStoreTests
             r => r.TemplateName == key.Name && r.Status == TemplateLifecycleStatus.Archived,
             TestContext.Current.CancellationToken);
 
-        archivedCount.ShouldBe(1, "archived revision must be preserved for HDS audit trail");
+        archivedCount.ShouldBe(1, "archived revision must be preserved for ISO 27001 audit trail");
     }
 
     // -------------------------------------------------------------------------

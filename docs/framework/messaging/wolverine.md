@@ -1,6 +1,6 @@
 # Messagerie — Granit.Wolverine
 
-Intégration de [WolverineFx](https://wolverinefx.net/) pour les applications Digital Dynamics.
+Intégration de [WolverineFx](https://wolverinefx.net/) pour les applications Granit.
 Deux packages composables :
 
 | Package | Rôle |
@@ -63,7 +63,7 @@ public sealed class GranitWolverinePostgresqlModule : GranitModule { ... }
 
 Ajoute :
 
-- Outbox PostgreSQL durable (at-least-once delivery, conforme HDS)
+- Outbox PostgreSQL durable (at-least-once delivery, conforme ISO 27001)
 - Intégration transactionnelle EF Core (`UseEntityFrameworkCoreTransactions`)
 - Application automatique des transactions sur tous les handlers (`AutoApplyTransactions`)
 
@@ -86,7 +86,7 @@ Ajoute :
 | `TransportConnectionString` | `string` | — | Chaîne de connexion PostgreSQL (obligatoire) |
 | `TransactionMode` | `TransactionMiddlewareMode` | `Eager` | Mode de transaction EF Core |
 
-`TransactionMiddlewareMode.Eager` est le mode HDS-conforme : la transaction est ouverte
+`TransactionMiddlewareMode.Eager` est le mode ISO 27001-conforme : la transaction est ouverte
 explicitement avant tout write. Ne pas utiliser `Lightweight` en production.
 
 ## Propagation du contexte
@@ -163,7 +163,7 @@ Remplace `ICurrentUserService` dans le conteneur DI. Résolution du `UserId` par
 2. **Fallback `IHttpContextAccessor`** — claims JWT pour les requêtes HTTP normales
 
 Garantit que `AuditedEntityInterceptor` enregistre toujours un `ModifiedBy` non null dans
-la piste d'audit HDS, même depuis un handler background.
+la piste d'audit ISO 27001, même depuis un handler background.
 
 ## Enregistrement d'un module applicatif
 
@@ -211,12 +211,12 @@ public sealed class OrderCreatedHandler
 }
 ```
 
-## Conformité HDS
+## Conformité ISO 27001
 
 - L'Outbox PostgreSQL garantit la livraison at-least-once sans perte de messages en cas de crash
 - `TransactionMiddlewareMode.Eager` assure l'atomicité entre le write EF Core et la mise en queue
 - La propagation `X-User-Id` garantit la traçabilité des opérations asynchrones dans l'audit trail
-- La chaîne de connexion doit pointer sur une base de données **en Europe (OVHcloud FR)**,
+- La chaîne de connexion doit pointer sur une base de données **sur infrastructure souveraine européenne**,
   jamais sur un service US (Cloud Act)
 
 ## Dépendances Granit

@@ -12,7 +12,7 @@ public static class ArchitectureLoader
     /// Loads all assemblies matching the given prefix from the output directory of the calling assembly.
     /// Excludes test, analyzer, and source generator assemblies.
     /// </summary>
-    /// <param name="assemblyPrefix">Assembly name prefix (e.g. "Granit.", "Guava.").</param>
+    /// <param name="assemblyPrefix">Assembly name prefix (e.g. "Granit.", "MyApp.").</param>
     /// <param name="callerAssembly">The test assembly whose output directory to scan.</param>
     /// <param name="additionalExclusions">Extra name fragments to exclude (e.g. "CodeFixes").</param>
     public static ArchUnitNET.Domain.Architecture Load(

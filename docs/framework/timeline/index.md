@@ -1,7 +1,7 @@
 # Timeline — Granit.Timeline
 
 Flux d'activité unifié (inspiré Odoo Chatter) pour les entités métier
-des applications Digital Dynamics. Fusionne historique technique (logs système,
+des applications Granit. Fusionne historique technique (logs système,
 transitions) et communication humaine (commentaires, notes internes, pièces jointes).
 
 | Package | Rôle |
@@ -49,11 +49,11 @@ Trois types coexistent dans la même table `timeline_entries` :
 | Type | Usage | Modifiable | Supprimable |
 | --- | --- | --- | --- |
 | `Comment` | Commentaire humain, visible par les followers | Non | Oui (soft-delete RGPD) |
-| `SystemLog` | Log auto-généré (audit) | Non | Non (INSERT-only, HDS) |
+| `SystemLog` | Log auto-généré (audit) | Non | Non (INSERT-only, ISO 27001) |
 | `InternalNote` | Note interne, visible uniquement par le staff | Non | Oui (soft-delete RGPD) |
 
 La suppression d'un `SystemLog` lève une `InvalidOperationException` — conformité
-HDS (piste d'audit immutable, rétention 3 ans minimum).
+ISO 27001 (piste d'audit immutable, rétention 3 ans minimum).
 
 ### Pièces jointes
 
@@ -197,12 +197,12 @@ Index : `(EntryId)` — recherche rapide des pièces jointes par entrée.
 
 L'auteur est automatiquement exclu des destinataires de ses propres notifications.
 
-## Conformité HDS / RGPD
+## Conformité ISO 27001 / RGPD
 
-- **HDS** : Les entrées `SystemLog` sont INSERT-only immutables. La suppression
+- **ISO 27001** : Les entrées `SystemLog` sont INSERT-only immutables. La suppression
   lève `InvalidOperationException`. Rétention 3 ans minimum.
 - **RGPD** : Les entrées `Comment` et `InternalNote` supportent le soft-delete
   (droit à l'effacement). Les données sont marquées comme supprimées mais restent
   disponibles pour la piste d'audit.
 - **Souveraineté** : La base de données doit être hébergée en Europe
-  (OVHcloud FR). Ne jamais utiliser AWS/Azure/GCP pour les données de santé.
+  sur infrastructure souveraine. Ne jamais utiliser AWS/Azure/GCP pour les données de santé.

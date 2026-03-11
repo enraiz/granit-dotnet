@@ -8,6 +8,6 @@ public enum CacheBehavior
     /// <summary>Standard caching with configurable TTL (default).</summary>
     Normal,
 
-    /// <summary>No caching — always lookup from the store. Use for HDS-critical keys.</summary>
+    /// <summary>No caching — always lookup from the store. Use for ISO 27001-critical keys.</summary>
     NoCache,
 }

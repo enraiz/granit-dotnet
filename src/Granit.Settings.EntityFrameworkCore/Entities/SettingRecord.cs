@@ -13,7 +13,7 @@ namespace Granit.Settings.EntityFrameworkCore.Entities;
 /// <para>
 /// Audit fields (<c>CreatedAt</c>, <c>CreatedBy</c>, <c>ModifiedAt</c>, <c>ModifiedBy</c>) are
 /// populated automatically by <c>AuditedEntityInterceptor</c> from <c>Granit.Persistence</c>,
-/// satisfying the HDS 3-year audit trail requirement.
+/// satisfying the ISO 27001 3-year audit trail requirement.
 /// </para>
 /// </remarks>
 public sealed class SettingRecord : AuditedEntity

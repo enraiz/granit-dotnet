@@ -1,7 +1,7 @@
 // =============================================================================
 // Tests - AuditedEntityInterceptor
 // =============================================================================
-// Vérifie que les champs d'audit HDS sont correctement remplis
+// Vérifie que les champs d'audit ISO 27001 sont correctement remplis
 // lors de la création et modification des entités, pour chaque niveau
 // de la hiérarchie (CreationAuditedEntity, AuditedEntity, FullAuditedEntity).
 // Vérifie également l'injection automatique du TenantId sur les entités

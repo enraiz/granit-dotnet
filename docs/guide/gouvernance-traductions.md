@@ -202,7 +202,7 @@ des fichiers React. Quand un fichier local est vide, il est supprimé.
 - **Créer** une nouvelle clé (les clés sont définies dans le code)
 - **Supprimer** une clé (les clés sont gérées par le cycle de vie du code)
 - **Utiliser une traduction automatique** sans validation humaine
-  (contexte médical/HDS)
+  (contexte médical/ISO 27001)
 
 ## Vérification en CI
 

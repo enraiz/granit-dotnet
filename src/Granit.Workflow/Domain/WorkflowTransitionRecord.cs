@@ -7,7 +7,7 @@ namespace Granit.Workflow.Domain;
 /// </summary>
 /// <remarks>
 /// <para>
-/// HDS compliance: this entity is INSERT-only. It must never be modified or deleted.
+/// ISO 27001 compliance: this entity is INSERT-only. It must never be modified or deleted.
 /// Do NOT implement <see cref="ISoftDeletable"/> or use <c>AuditedEntity</c> — soft-delete
 /// is explicitly prohibited to preserve the 3-year audit trail.
 /// </para>

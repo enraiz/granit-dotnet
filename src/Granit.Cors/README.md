@@ -1,6 +1,6 @@
 # Granit.Cors
 
-Standardized CORS configuration for Granit applications. HDS-compliant:
+Standardized CORS configuration for Granit applications. ISO 27001-compliant:
 wildcard origins blocked in production, validated `AllowCredentials` usage.
 Configurable via `appsettings.json`.
 

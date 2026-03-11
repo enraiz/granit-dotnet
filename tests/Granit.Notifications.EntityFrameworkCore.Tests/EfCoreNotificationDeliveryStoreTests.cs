@@ -1,7 +1,7 @@
 // =============================================================================
 // Tests - EfCoreNotificationDeliveryStore
 // =============================================================================
-// Verifies INSERT-only HDS audit trail: record single attempt,
+// Verifies INSERT-only ISO 27001 audit trail: record single attempt,
 // record multiple attempts for the same notification.
 // =============================================================================
 

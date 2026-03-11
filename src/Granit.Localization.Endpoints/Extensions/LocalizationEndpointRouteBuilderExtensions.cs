@@ -17,6 +17,7 @@ using Granit.Localization.Options;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
@@ -135,7 +136,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
         if (!string.IsNullOrWhiteSpace(cultureName) && !Bcp47Pattern().IsMatch(cultureName))
         {
-            return Results.Problem(
+            return TypedResults.Problem(
                 detail: $"Culture name '{cultureName}' is not supported.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
@@ -163,7 +164,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         context.Response.Headers.CacheControl = "public, max-age=3600";
         context.Response.Headers.Vary = "Accept-Language";
 
-        return Results.Ok(new ApplicationLocalizationResponse(culture.Name, resources, languages));
+        return TypedResults.Ok(new ApplicationLocalizationResponse(culture.Name, resources, languages));
     }
 
     // -------------------------------------------------------------------------
@@ -186,7 +187,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
         if (string.IsNullOrWhiteSpace(resourceName) || string.IsNullOrWhiteSpace(cultureName))
         {
-            return Results.Problem(
+            return TypedResults.Problem(
                 detail: "Query parameters 'resourceName' and 'cultureName' are required.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
@@ -202,7 +203,7 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         IReadOnlyDictionary<string, string> overrides =
             await storeReader.GetOverridesAsync(resourceName, cultureName, cancellationToken).ConfigureAwait(false);
 
-        return Results.Ok(overrides);
+        return TypedResults.Ok(overrides);
     }
 
     private static async Task<IResult> HandlePutOverrideAsync(
@@ -232,20 +233,20 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
 
         if (string.IsNullOrWhiteSpace(body.Value))
         {
-            return Results.Problem(
+            return TypedResults.Problem(
                 detail: "Override value must not be empty.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (body.Value.Length > MaxValueLength)
         {
-            return Results.Problem(
+            return TypedResults.Problem(
                 detail: $"value must not exceed {MaxValueLength} characters.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
         await storeWriter.SetOverrideAsync(resourceName, cultureName, key, body.Value, cancellationToken).ConfigureAwait(false);
-        return Results.NoContent();
+        return TypedResults.NoContent();
     }
 
     private static async Task<IResult> HandleDeleteOverrideAsync(
@@ -273,29 +274,29 @@ public static partial class LocalizationEndpointRouteBuilderExtensions
         }
 
         await storeWriter.RemoveOverrideAsync(resourceName, cultureName, key, cancellationToken).ConfigureAwait(false);
-        return Results.NoContent();
+        return TypedResults.NoContent();
     }
 
     // -------------------------------------------------------------------------
     // Shared validation helpers
     // -------------------------------------------------------------------------
 
-    private static IResult StoreNotRegistered() =>
-        Results.Problem(
+    private static ProblemHttpResult StoreNotRegistered() =>
+        TypedResults.Problem(
             detail: "No localization override store is registered. Add GranitLocalizationDatabaseSourceEntityFrameworkCoreModule.",
             statusCode: StatusCodes.Status501NotImplemented);
 
-    private static IResult? ValidateBcp47(string cultureName) =>
+    private static ProblemHttpResult? ValidateBcp47(string cultureName) =>
         Bcp47Pattern().IsMatch(cultureName)
             ? null
-            : Results.Problem(
+            : TypedResults.Problem(
                 detail: $"Culture name '{cultureName}' is not a valid BCP 47 tag.",
                 statusCode: StatusCodes.Status400BadRequest);
 
-    private static IResult? ValidateMaxLength(string value, string paramName, int maxLength) =>
+    private static ProblemHttpResult? ValidateMaxLength(string value, string paramName, int maxLength) =>
         value.Length <= maxLength
             ? null
-            : Results.Problem(
+            : TypedResults.Problem(
                 detail: $"{paramName} must not exceed {maxLength} characters.",
                 statusCode: StatusCodes.Status400BadRequest);
 

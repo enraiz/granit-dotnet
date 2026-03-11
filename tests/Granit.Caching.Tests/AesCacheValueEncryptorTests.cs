@@ -50,7 +50,7 @@ public sealed class AesCacheValueEncryptorTests
     {
         // Arrange — IV aléatoire par opération (Gemini: jamais de IV hardcodé)
         AesCacheValueEncryptor encryptor = CreateEncryptor();
-        byte[] plaintext = "test stampede HDS"u8.ToArray();
+        byte[] plaintext = "test stampede ISO27001"u8.ToArray();
 
         // Act
         byte[] cipher1 = encryptor.Encrypt(plaintext);

@@ -46,11 +46,11 @@ public sealed class BackChannelLogoutEndpointTests
             .Returns(new BackChannelLogoutResult(true, "session-123", "user-456", null));
 
         // Act
-        IResult result = await BackChannelLogoutEndpoint.HandleAsync(
+        Results<Ok, ProblemHttpResult> result = await BackChannelLogoutEndpoint.HandleAsync(
             request, _validator, _store, _options, _logger, TestContext.Current.CancellationToken);
 
         // Assert
-        result.ShouldBeOfType<Ok>();
+        result.Result.ShouldBeOfType<Ok>();
     }
 
     [Fact]
@@ -98,11 +98,11 @@ public sealed class BackChannelLogoutEndpointTests
         HttpRequest request = CreateFormRequest("other_field", "value");
 
         // Act
-        IResult result = await BackChannelLogoutEndpoint.HandleAsync(
+        Results<Ok, ProblemHttpResult> result = await BackChannelLogoutEndpoint.HandleAsync(
             request, _validator, _store, _options, _logger, TestContext.Current.CancellationToken);
 
         // Assert
-        result.ShouldBeAssignableTo<IStatusCodeHttpResult>()!
+        result.Result.ShouldBeAssignableTo<IStatusCodeHttpResult>()!
             .StatusCode.ShouldBe(400);
     }
 
@@ -115,11 +115,11 @@ public sealed class BackChannelLogoutEndpointTests
             .Returns(new BackChannelLogoutResult(false, null, null, "Token validation failed."));
 
         // Act
-        IResult result = await BackChannelLogoutEndpoint.HandleAsync(
+        Results<Ok, ProblemHttpResult> result = await BackChannelLogoutEndpoint.HandleAsync(
             request, _validator, _store, _options, _logger, TestContext.Current.CancellationToken);
 
         // Assert
-        result.ShouldBeAssignableTo<IStatusCodeHttpResult>()!
+        result.Result.ShouldBeAssignableTo<IStatusCodeHttpResult>()!
             .StatusCode.ShouldBe(400);
     }
 

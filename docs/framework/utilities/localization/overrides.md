@@ -99,10 +99,10 @@ Colonnes de la table `i18n_localization_overrides` :
 | `culture_name` | `varchar(20)` | BCP 47 : `"fr"`, `"en-US"` |
 | `key` | `varchar(500)` | Clé de traduction |
 | `value` | `varchar(4000)` | Valeur de remplacement |
-| `created_at` | `timestamptz` | Audit HDS |
-| `created_by` | `varchar(450)` | Audit HDS |
-| `modified_at` | `timestamptz?` | Audit HDS |
-| `modified_by` | `varchar(450)?` | Audit HDS |
+| `created_at` | `timestamptz` | Audit ISO 27001 |
+| `created_by` | `varchar(450)` | Audit ISO 27001 |
+| `modified_at` | `timestamptz?` | Audit ISO 27001 |
+| `modified_by` | `varchar(450)?` | Audit ISO 27001 |
 
 Index unique sur `(tenant_id, resource_name, culture_name, key)`.
 
@@ -219,7 +219,7 @@ Les surcharges sont isolées par tenant via `ICurrentTenant` :
 Le cache L1 est segmenté par tenant :
 `localization:{tenantId|"host"}:{resourceName}:{culture}`.
 
-## Audit HDS
+## Audit ISO 27001
 
 Chaque write (`SetOverrideAsync`, `RemoveOverrideAsync`) passe par
 `AuditedEntityInterceptor` (Scoped) qui renseigne automatiquement :

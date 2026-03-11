@@ -136,5 +136,5 @@ Dernière mise à jour : 2026-03-03
 ### AWSSDK.S3
 
 Ce SDK est utilisé uniquement pour la compatibilité S3 avec un stockage objet
-hébergé en Europe (OVHcloud Object Storage, API S3-compatible). Aucune donnée
+hébergé en Europe (S3-compatible object storage, API S3-compatible). Aucune donnée
 de santé ne transite par l'infrastructure AWS.

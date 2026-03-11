@@ -281,7 +281,7 @@ standard .NET, permettant `[Authorize(Roles = "admin")]` et `User.IsInRole("admi
 | --- | --- |
 | `Admin` | Rôle configuré dans `KeycloakOptions.AdminRole` (défaut : `admin`) |
 
-> Les policies métier (`FhirAccess`, `PractitionerOnly`…) sont à définir dans
+> Les policies métier (`DataAccess`, `ManagerOnly`…) sont à définir dans
 > l'application, pas dans Granit.
 
 ---

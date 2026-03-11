@@ -7,7 +7,7 @@ using Granit.Timing;
 namespace Granit.Persistence;
 
 /// <summary>
-/// Module Granit pour les intercepteurs EF Core (audit HDS + soft delete RGPD).
+/// Module Granit pour les intercepteurs EF Core (audit ISO 27001 + soft delete RGPD).
 /// Dépend de Timing (IClock), Guids (IGuidGenerator) et Security (ICurrentUserService).
 /// ICurrentTenant est résolu via Granit.Core.MultiTenancy — Granit.MultiTenancy
 /// n'est pas une dépendance directe de ce module.

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.MultiTenancy</PackageId>
-    <Description>Gestion multi-tenant avec résolution du tenant courant depuis JWT/Header, AsyncLocal context et middleware ASP.NET Core pour les applications .NET Digital Dynamics.</Description>
+    <Description>Multi-tenant management with current tenant resolution from JWT/Header, AsyncLocal context and ASP.NET Core middleware for Granit applications.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

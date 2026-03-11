@@ -6,7 +6,7 @@ namespace Granit.DataExchange.Export.Messages;
 /// </summary>
 /// <remarks>
 /// Consumed by notification handlers, audit loggers, etc.
-/// No PII — only identifiers and aggregate counts (HDS-compliant).
+/// No PII — only identifiers and aggregate counts (ISO 27001-compliant).
 /// </remarks>
 /// <param name="ExportJobId">The export job identifier.</param>
 /// <param name="DefinitionName">The export definition name.</param>

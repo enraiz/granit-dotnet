@@ -1,12 +1,12 @@
 namespace Granit.Core.Domain;
 
 /// <summary>
-/// Translation with full creation and modification audit trail (HDS compliant).
+/// Translation with full creation and modification audit trail (ISO 27001 compliant).
 /// Inherits from <see cref="AuditedEntity"/> and implements <see cref="ITranslation{TParent}"/>.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Use this base class for translations on entities subject to HDS 3-year audit
+/// Use this base class for translations on entities subject to ISO 27001 3-year audit
 /// trail requirements. Fields <c>CreatedAt</c>, <c>CreatedBy</c>, <c>ModifiedAt</c>,
 /// <c>ModifiedBy</c> are populated automatically by <c>AuditedEntityInterceptor</c>.
 /// </para>

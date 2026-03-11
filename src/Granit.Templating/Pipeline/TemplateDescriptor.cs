@@ -6,7 +6,7 @@ namespace Granit.Templating.Pipeline;
 /// <remarks>
 /// Passed as-is to <see cref="ITemplateEngine.RenderAsync{TData}"/> for merging with data.
 /// The <see cref="RevisionId"/> is propagated through the pipeline into the final output
-/// to satisfy the HDS audit trail requirement (template traceability).
+/// to satisfy the ISO 27001 audit trail requirement (template traceability).
 /// </remarks>
 public sealed class TemplateDescriptor
 {

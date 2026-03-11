@@ -13,7 +13,7 @@ public sealed class ExceptionHandlingOptions
     /// or staging environments.
     /// </para>
     /// <para>
-    /// <b>HDS rule:</b> NEVER set to <c>true</c> in production. Internal error messages
+    /// <b>ISO 27001 rule:</b> NEVER set to <c>true</c> in production. Internal error messages
     /// may contain PHI, SQL fragments, or internal paths.
     /// </para>
     /// </summary>

@@ -1,6 +1,6 @@
 # Étape 4 — Persistance EF Core
 
-Granit enrichit EF Core avec des intercepteurs automatiques pour l'audit HDS
+Granit enrichit EF Core avec des intercepteurs automatiques pour l'audit ISO 27001
 et le soft delete RGPD.
 
 ## Ajouter les packages
@@ -81,7 +81,7 @@ public sealed class TaskManagementModule : GranitModule
         {
             options.UseNpgsql(context.Configuration.GetConnectionString("Default"));
 
-            // Intercepteurs Granit : audit HDS + soft delete RGPD
+            // Intercepteurs Granit : audit ISO 27001 + soft delete RGPD
             options.AddInterceptors(
                 serviceProvider.GetRequiredService<AuditedEntityInterceptor>(),
                 serviceProvider.GetRequiredService<SoftDeleteInterceptor>());

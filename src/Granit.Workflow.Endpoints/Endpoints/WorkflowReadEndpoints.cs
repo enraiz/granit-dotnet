@@ -20,7 +20,7 @@ internal static class WorkflowReadEndpoints
     {
         group.MapGet("/{entityType}/{entityId}/history", GetTransitionHistoryAsync)
             .WithName("GetWorkflowTransitionHistory")
-            .WithSummary("Returns the HDS-compliant audit trail of workflow transitions for an entity.");
+            .WithSummary("Returns the ISO 27001-compliant audit trail of workflow transitions for an entity.");
 
         return group;
     }

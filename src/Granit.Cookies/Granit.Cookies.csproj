@@ -4,7 +4,7 @@
     <PackageId>Granit.Cookies</PackageId>
     <Description>Gestion centralisee des cookies HTTP avec Strict Registry Pattern.
     Consentement RGPD by design, fail-fast sur cookies non enregistres.
-    Conforme HDS/RGPD.</Description>
+    Conforme GDPR/ISO 27001.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

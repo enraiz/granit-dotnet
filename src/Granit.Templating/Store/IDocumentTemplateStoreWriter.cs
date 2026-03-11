@@ -14,7 +14,7 @@ namespace Granit.Templating.Store;
 ///   <item><see cref="UnpublishAsync"/> — archive the published revision without promoting a new one.</item>
 ///   <item><see cref="DeleteDraftAsync"/> — physically delete a draft (only allowed for drafts).</item>
 /// </list>
-/// Published and archived revisions are never physically deleted (HDS requirement).
+/// Published and archived revisions are never physically deleted (ISO 27001 requirement).
 /// </remarks>
 public interface IDocumentTemplateStoreWriter
 {
@@ -66,7 +66,7 @@ public interface IDocumentTemplateStoreWriter
     /// </summary>
     /// <remarks>
     /// Only drafts may be deleted. Published and archived revisions are preserved
-    /// permanently for HDS compliance.
+    /// permanently for ISO 27001 compliance.
     /// </remarks>
     /// <param name="key">Template key.</param>
     /// <param name="deletedBy">Identity of the user performing the deletion.</param>

@@ -51,7 +51,7 @@ internal sealed class TemplateRevisionEntityConfiguration
         builder.Property(e => e.PublishedBy)
             .HasMaxLength(200);
 
-        // HDS: archival metadata retained for 3-year audit trail.
+        //ISO 27001: archival metadata retained for 3-year audit trail.
         builder.Property(e => e.ArchivedAt);
 
         builder.Property(e => e.ArchivedBy)

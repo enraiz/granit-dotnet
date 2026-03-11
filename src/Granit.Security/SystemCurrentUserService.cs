@@ -9,7 +9,7 @@ namespace Granit.Security;
 /// <para>
 /// Sets <see cref="ICurrentUserService.ActorKind"/> to <see cref="Security.ActorKind.System"/>
 /// and provides <c>"system"</c> as <see cref="UserId"/> so that EF Core audit
-/// interceptors record a non-null <c>ModifiedBy</c> value in the HDS trail.
+/// interceptors record a non-null <c>ModifiedBy</c> value in the ISO 27001 trail.
 /// </para>
 /// </remarks>
 public sealed class SystemCurrentUserService : ICurrentUserService

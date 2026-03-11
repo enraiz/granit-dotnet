@@ -162,7 +162,7 @@ assemblies compilées, et scans de code source via regex.
 
 | Catégorie | Nb règles | Couche |
 | --------- | --------- | ------ |
-| Sécurité & HDS | 4 GRSEC + 7 BannedAPIs | Compile-time |
+| Sécurité & ISO 27001 | 4 GRSEC + 7 BannedAPIs | Compile-time |
 | Entity Framework | 1 GREF + 5 DbContext | Compile-time + Test |
 | Migrations zero-downtime | 4 GRMIGA | Compile-time |
 | Architecture en couches | 8 rules | Test (ArchUnitNET) |

@@ -110,7 +110,7 @@ public sealed class TenantPerDatabaseDbContextFactoryTests
     }
 
     // -----------------------------------------------------------------------
-    // CreateDbContextAsync — missing tenant guard (HDS: no silent fallback)
+    // CreateDbContextAsync — missing tenant guard (ISO 27001: no silent fallback)
     // -----------------------------------------------------------------------
 
     [Fact]

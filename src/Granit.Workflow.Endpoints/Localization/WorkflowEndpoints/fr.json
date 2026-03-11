@@ -2,6 +2,6 @@
   "culture": "fr",
   "texts": {
     "PermissionGroup:Workflow": "Workflow",
-    "Permission:Workflow.History.Read": "Consulter l'historique des transitions workflow (piste d'audit HDS)"
+    "Permission:Workflow.History.Read": "Consulter l'historique des transitions workflow (Piste d'audit)"
   }
 }

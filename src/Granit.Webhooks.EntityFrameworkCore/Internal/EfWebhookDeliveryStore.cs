@@ -12,7 +12,7 @@ namespace Granit.Webhooks.EntityFrameworkCore.Internal;
 /// backed by PostgreSQL.
 /// </summary>
 /// <remarks>
-/// HDS compliance: <see cref="WebhookDeliveryAttempt"/> records are INSERT-only.
+/// ISO 27001 compliance: <see cref="WebhookDeliveryAttempt"/> records are INSERT-only.
 /// This store never updates or deletes them.
 /// </remarks>
 internal sealed class EfWebhookDeliveryStore(IDbContextFactory<WebhooksDbContext> contextFactory, IClock clock, IGuidGenerator guidGenerator)

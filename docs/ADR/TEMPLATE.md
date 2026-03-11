@@ -3,7 +3,7 @@
 - **Statut** : Accepté | Proposé | Déprécié | Remplacé par [ADR-NNN](ADR-NNN-xxx.md)
 - **Date** : YYYY-MM-DD
 - **Issue** : [#NNN](URL) (si applicable)
-- **Auteurs** : Équipe Digital Dynamics
+- **Auteurs** : Jean-François Meyers
 - **Portée** : repo-name (packages ou modules concernés)
 
 > Voir aussi : [Titre ADR lié](URL) (si référence croisée inter-repo nécessaire)

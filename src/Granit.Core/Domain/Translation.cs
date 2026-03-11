@@ -6,8 +6,8 @@ namespace Granit.Core.Domain;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Inherit from this class for translations that do not require an HDS audit trail.
-/// For HDS-compliant translations with <c>CreatedAt/By</c> and <c>ModifiedAt/By</c>,
+/// Inherit from this class for translations that do not require an ISO 27001 audit trail.
+/// For ISO 27001-compliant translations with <c>CreatedAt/By</c> and <c>ModifiedAt/By</c>,
 /// use <see cref="AuditedTranslation{TParent}"/> instead.
 /// </para>
 /// <para>

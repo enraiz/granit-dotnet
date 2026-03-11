@@ -10,13 +10,13 @@ sans interruption de service, basé sur le patron **Expand & Contract**.
 | **Interruption de service** | Nécessaire (arrêt pendant la migration) | Aucune — déployable en rolling update |
 | **Complexité** | Faible | Élevée (3 phases, suivi de progression) |
 | **Volume de données** | Adapté à tous volumes | Obligatoire pour les grands volumes |
-| **Compliance HDS** | Acceptable pour les systèmes non critiques | Requis pour les services 24h/24 |
+| **Compliance ISO 27001** | Acceptable pour les systèmes non critiques | Requis pour les services 24h/24 |
 | **Rollback** | Difficile si données modifiées | Naturel — les deux colonnes coexistent en phase Migrate |
 | **Cas d'usage** | Nouvelles tables, colonnes facultatives, petits volumes | Renommage de colonnes, changements de type, millions de lignes |
 
 > **Règle** : les migrations EF Core classiques restent valides pour les
 > applications non critiques (outils internes, services à faible disponibilité).
-> Pour les services HDS soumis à des SLA élevés, préférez Expand & Contract.
+> Pour les services ISO 27001 soumis à des SLA élevés, préférez Expand & Contract.
 
 ## Le patron Expand & Contract
 
@@ -254,7 +254,7 @@ Au prochain démarrage, `MigrationStartupService` reprend depuis le `LastCursor`
 - **Durabilité (Wolverine)** : la cascade est persistée dans l'Outbox PostgreSQL ;
   une panne redémarre le batch suivant automatiquement (at-least-once).
 - **Pas de `COUNT(*)`** : `TotalRows` n'est jamais calculé automatiquement
-  (risque de lock sur les grandes tables HDS). Setter manuellement si nécessaire.
+  (risque de lock sur les grandes tables ISO 27001). Setter manuellement si nécessaire.
 
 ## Analyseurs Roslyn
 

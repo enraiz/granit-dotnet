@@ -18,4 +18,8 @@
     <ProjectReference Include="..\..\src\Granit.Analyzers\Granit.Analyzers.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Analyzers.CodeFixes.Tests" />
+  </ItemGroup>
+
 </Project>

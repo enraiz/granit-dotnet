@@ -24,7 +24,7 @@ public static class CorsHostApplicationBuilderExtensions
     /// Origins are restricted to <see cref="GranitCorsOptions.AllowedOrigins"/>.
     /// </para>
     /// <para>
-    /// HDS compliance: wildcard origins are rejected in non-development environments
+    /// ISO 27001 compliance: wildcard origins are rejected in non-development environments
     /// at startup via options validation.
     /// </para>
     /// </remarks>

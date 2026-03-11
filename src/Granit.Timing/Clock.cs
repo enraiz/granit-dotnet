@@ -18,7 +18,7 @@ public sealed class Clock(TimeProvider timeProvider, ICurrentTimezoneProvider ti
 
     /// <inheritdoc />
     public DateTimeOffset Normalize(DateTimeOffset dateTime) =>
-        // Conformite HDS : tout est converti en UTC avant persistance.
+        // Conformite ISO 27001 : tout est converti en UTC avant persistance.
         // Meme un DateTimeOffset avec offset local (+02:00) sera normalise en UTC (+00:00).
         dateTime.ToUniversalTime();
 

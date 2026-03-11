@@ -55,7 +55,7 @@ public sealed class EmailNotificationsServiceCollectionExtensionsTests
         });
 
         ServiceProvider sp = services.BuildServiceProvider();
-        var options = sp.GetRequiredService<IOptions<EmailChannelOptions>>().Value;
+        EmailChannelOptions options = sp.GetRequiredService<IOptions<EmailChannelOptions>>().Value;
 
         options.Provider.ShouldBe("Brevo");
         options.SenderAddress.ShouldBe("noreply@example.com");

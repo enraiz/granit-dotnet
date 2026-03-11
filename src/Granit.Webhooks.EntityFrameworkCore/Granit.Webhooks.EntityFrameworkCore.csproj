@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Webhooks.EntityFrameworkCore</PackageId>
-    <Description>EF Core persistence layer for Granit.Webhooks. Provides EfWebhookSubscriptionStore and EfWebhookDeliveryStore (HDS audit trail) for PostgreSQL. Replaces the default InMemory stores registered by AddGranitWebhooks().</Description>
+    <Description>EF Core persistence layer for Granit.Webhooks. Provides EfWebhookSubscriptionStore and EfWebhookDeliveryStore (ISO 27001 audit trail) for PostgreSQL. Replaces the default InMemory stores registered by AddGranitWebhooks().</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

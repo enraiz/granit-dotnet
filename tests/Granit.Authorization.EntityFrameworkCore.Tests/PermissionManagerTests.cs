@@ -56,7 +56,7 @@ public sealed class PermissionManagerTests
             PermissionChecker.BuildCacheKey(TenantId, "accountant", DefinedPermission),
             Arg.Any<CancellationToken>());
 
-        // Assert — HDS audit log emitted
+        // Assert — ISO 27001 audit log emitted
         logger.Received(1).Log(
             LogLevel.Information,
             Arg.Any<EventId>(),

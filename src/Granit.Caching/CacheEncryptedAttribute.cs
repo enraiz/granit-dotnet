@@ -17,7 +17,7 @@ namespace Granit.Caching;
 /// </remarks>
 /// <example>
 /// <code>
-/// // Toujours chiffré — données médicales HDS
+/// // Toujours chiffré — données sensibles ISO 27001
 /// [CacheEncrypted]
 /// public sealed class PatientCacheItem { ... }
 ///

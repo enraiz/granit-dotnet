@@ -1,6 +1,6 @@
 # Granit.ReferenceData
 
-Generic reference data management for Digital Dynamics .NET applications.
+Generic reference data management for Granit applications.
 Provides `ReferenceDataEntity` base class, `IReferenceDataStore<T>` and
 `IReferenceDataSeeder<T>` abstractions, with built-in caching support via
 `ReferenceDataOptions`.

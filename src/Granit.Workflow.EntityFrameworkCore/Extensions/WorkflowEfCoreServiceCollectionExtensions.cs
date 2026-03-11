@@ -13,7 +13,7 @@ public static class WorkflowEfCoreServiceCollectionExtensions
 {
     /// <summary>
     /// Registers the <see cref="WorkflowTransitionInterceptor"/> as a scoped service
-    /// for automatic HDS audit trail creation on workflow state transitions.
+    /// for automatic ISO 27001 audit trail creation on workflow state transitions.
     /// Also registers <see cref="IWorkflowHistoryQuery"/> and
     /// <see cref="IWorkflowTransitionRecorder"/> backed by <typeparamref name="TDbContext"/>.
     /// </summary>

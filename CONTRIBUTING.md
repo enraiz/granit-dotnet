@@ -107,7 +107,7 @@ dotnet test --collect:"XPlat Code Coverage"
 - [ ] Format vérifié (`dotnet format --verify-no-changes`)
 - [ ] Pas de PII dans les logs
 - [ ] CHANGELOG.md mis à jour
-- [ ] Changements respectent HDS/RGPD
+- [ ] Changements respectent RGPD/ISO 27001
 
 ---
 

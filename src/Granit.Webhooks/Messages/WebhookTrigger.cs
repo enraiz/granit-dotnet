@@ -14,7 +14,7 @@ namespace Granit.Webhooks.Messages;
 /// </para>
 /// <para>
 /// The <see cref="Payload"/> is opaque to the engine — it can hold a thin payload
-/// (ResourceId + fetch URL, for HDS) or a fat payload (a full DTO) serialized by
+/// (ResourceId + fetch URL, for ISO 27001) or a fat payload (a full DTO) serialized by
 /// <see cref="Abstractions.IWebhookPublisher"/>. The engine signs and forwards it as-is.
 /// </para>
 /// </remarks>

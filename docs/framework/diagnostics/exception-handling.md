@@ -8,7 +8,7 @@ et retourne une réponse JSON standardisée au format **RFC 7807 Problem Details
 
 Sans ce module, chaque contrôleur doit gérer ses propres erreurs, et les exceptions
 non gérées exposent potentiellement des stack traces contenant des données médicales
-(violation HDS). Ce module garantit :
+(violation ISO 27001). Ce module garantit :
 
 - Les erreurs 5xx ne révèlent jamais d'informations internes en production
 - Chaque réponse d'erreur contient un `traceId` pour la corrélation dans Grafana/Loki
@@ -66,7 +66,7 @@ La configuration se fait via `appsettings.json` :
 ```
 
 > `ExposeInternalErrorDetails` doit être `true` uniquement en développement — jamais en
-> production (règle HDS). Utiliser la surcharge par environnement
+> production (règle ISO 27001). Utiliser la surcharge par environnement
 > (`appsettings.Development.json`) pour activer cette option localement.
 
 ## Exceptions disponibles
@@ -241,7 +241,7 @@ public sealed class BlobStorageLocalizationResource;
 > (en, fr, nl, de, es, it, pt, en-GB, fr-CA). Sans ces fichiers, le handler
 > utilise le `Message` de l'exception en fallback (non traduit).
 
-## Contraintes HDS/RGPD
+## Contraintes RGPD/ISO 27001
 
 ### Règle fondamentale : masquage des erreurs 5xx
 

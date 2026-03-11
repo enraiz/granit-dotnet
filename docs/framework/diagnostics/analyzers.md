@@ -56,7 +56,7 @@ public class RemoveOldColumn : Migration
 ### Sécurité (GRSEC)
 
 Ces règles renforcent les bonnes pratiques de sécurité et la conformité
-HDS/RGPD. Elles sont toujours actives.
+RGPD/ISO 27001. Elles sont toujours actives.
 
 | Règle | Sévérité | Description |
 | ----- | -------- | ----------- |
@@ -229,8 +229,8 @@ corrections en cascade.
 
 | Exigence | Mécanisme |
 | -------- | --------- |
-| HDS — Traçabilité | GRSEC001 impose `IClock` pour un horodatage déterministe |
-| HDS — Expand & Contract | GRMIGA001–004 empêchent les interruptions de service |
+| ISO 27001 — Traçabilité | GRSEC001 impose `IClock` pour un horodatage déterministe |
+| ISO 27001 — Expand & Contract | GRMIGA001–004 empêchent les interruptions de service |
 | RGPD — Pas de secrets exposés | GRSEC003 détecte les secrets codés en dur |
 | Performance | GREF001 impose l'asynchrone pour `SaveChanges` |
 | Qualité des index | GRSEC002 impose les GUID séquentiels |

@@ -23,7 +23,7 @@ public sealed class IdempotencyJsonContextTests
         };
 
         byte[] json = JsonSerializer.SerializeToUtf8Bytes(entry, IdempotencyJsonContext.Default.IdempotencyEntry);
-        var deserialized = JsonSerializer.Deserialize(json, IdempotencyJsonContext.Default.IdempotencyEntry);
+        IdempotencyEntry? deserialized = JsonSerializer.Deserialize(json, IdempotencyJsonContext.Default.IdempotencyEntry);
 
         deserialized.ShouldNotBeNull();
         deserialized.State.ShouldBe(IdempotencyState.InProgress);
@@ -62,7 +62,7 @@ public sealed class IdempotencyJsonContextTests
         };
 
         byte[] json = JsonSerializer.SerializeToUtf8Bytes(entry, IdempotencyJsonContext.Default.IdempotencyEntry);
-        var deserialized = JsonSerializer.Deserialize(json, IdempotencyJsonContext.Default.IdempotencyEntry);
+        IdempotencyEntry? deserialized = JsonSerializer.Deserialize(json, IdempotencyJsonContext.Default.IdempotencyEntry);
 
         deserialized.ShouldNotBeNull();
         deserialized.State.ShouldBe(IdempotencyState.Completed);
@@ -134,7 +134,7 @@ public sealed class IdempotencyJsonContextTests
         };
 
         byte[] json = JsonSerializer.SerializeToUtf8Bytes(headers, IdempotencyJsonContext.Default.DictionaryStringStringArray);
-        var deserialized = JsonSerializer.Deserialize(json, IdempotencyJsonContext.Default.DictionaryStringStringArray);
+        Dictionary<string, string[]>? deserialized = JsonSerializer.Deserialize(json, IdempotencyJsonContext.Default.DictionaryStringStringArray);
 
         deserialized.ShouldNotBeNull();
         deserialized["Content-Type"].ShouldBe(["text/plain"]);

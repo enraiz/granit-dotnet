@@ -1,7 +1,7 @@
 namespace Granit.Core.Domain;
 
 /// <summary>
-/// Audit trail entry for HDS compliance.
+/// Audit trail entry for ISO 27001 compliance.
 /// Records who did what, when, and on which entity.
 /// </summary>
 public sealed class AuditLogEntry

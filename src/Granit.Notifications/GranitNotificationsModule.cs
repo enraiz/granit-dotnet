@@ -11,7 +11,7 @@ namespace Granit.Notifications;
 /// <remarks>
 /// Default registrations use in-memory stores suitable for development and tests.
 /// For production, call <c>AddGranitNotificationsEntityFrameworkCore()</c>
-/// to enable durable persistence and the HDS-compliant audit trail.
+/// to enable durable persistence and the ISO 27001-compliant audit trail.
 /// </remarks>
 [DependsOn(typeof(GranitTimingModule))]
 [DependsOn(typeof(GranitWolverineModule))]

@@ -22,14 +22,14 @@
 
   <!-- NuGet Package Metadata -->
   <PropertyGroup>
-    <Authors>Digital Dynamics</Authors>
-    <Company>Digital Dynamics</Company>
-    <Copyright>Copyright (c) 2026 Digital Dynamics. All rights reserved.</Copyright>
+    <Authors>Jean-François Meyers</Authors>
+    <Company>Granit</Company>
+    <Copyright>Copyright (c) 2026 Jean-François Meyers. All rights reserved.</Copyright>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</RepositoryUrl>
     <PackageProjectUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</PackageProjectUrl>
-    <Description>Granit - Packages partagés pour les applications .NET Digital Dynamics</Description>
+    <Description>Granit - Rock-solid, production-ready modular framework for .NET. Built with Vertical Slicing and zero compromises on Developer Experience.</Description>
     <PackageIcon>granit-icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

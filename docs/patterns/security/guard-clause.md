@@ -44,7 +44,7 @@ Toutes les exceptions sont interceptées par `GranitExceptionHandler`
 (`src/Granit.ExceptionHandling/GranitExceptionHandler.cs`) et converties en
 `ProblemDetails` RFC 7807.
 
-### Règle HDS
+### Règle ISO 27001
 
 Les exceptions qui n'implémentent pas `IUserFriendlyException` ont leur
 message masqué en production (« An unexpected error occurred ») pour ne pas

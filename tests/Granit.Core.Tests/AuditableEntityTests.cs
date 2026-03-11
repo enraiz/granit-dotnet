@@ -2,7 +2,7 @@
 // Tests - AuditableEntity
 // =============================================================================
 // Vérifie les valeurs par défaut et l'assignation des propriétés de l'entité
-// auditable de base (trail HDS : créé/modifié).
+// auditable de base (trail ISO 27001 : créé/modifié).
 // =============================================================================
 
 using Granit.Core.Domain;

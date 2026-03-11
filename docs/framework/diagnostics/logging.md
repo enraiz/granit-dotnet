@@ -161,8 +161,8 @@ private partial void LogTenantNotFound(Guid tenantId);
 
 // Error — opération échouée, avec exception
 [LoggerMessage(Level = LogLevel.Error,
-    Message = "Failed to synchronize FHIR resource {ResourceId}")]
-private partial void LogFhirSyncFailed(Exception exception, string resourceId);
+    Message = "Failed to synchronize resource {ResourceId}")]
+private partial void LogResourceSyncFailed(Exception exception, string resourceId);
 
 // Critical — service indisponible, intervention requise
 [LoggerMessage(Level = LogLevel.Critical,
@@ -198,7 +198,7 @@ Les propriétés apparaissent dans Loki comme labels ou champs JSON :
   "Level": "Information",
   "MessageTemplate": "Consent recorded: patient={PatientId} type={ConsentType}",
   "PatientId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "ConsentType": "FHIR_SHARE",
+  "ConsentType": "DATA_SHARE",
   "SourceContext": "MyApp.Modules.Auth.Handlers.RecordConsentHandler",
   "TraceId": "abc123def456",
   "SpanId": "789xyz"
@@ -276,7 +276,7 @@ Les niveaux minimum sont configurés dans `appsettings.json` via la section `Ser
 }
 ```
 
-## Règles HDS et RGPD
+## Règles ISO 27001 et RGPD
 
 ### Ce qui est INTERDIT dans les logs
 
@@ -298,13 +298,13 @@ private partial void LogPatientUpdated(Guid patientId);
 
 // ✅ Métriques techniques sans donnée personnelle
 [LoggerMessage(Level = LogLevel.Information,
-    Message = "FHIR resource synchronized: type={ResourceType} count={Count}")]
-private partial void LogFhirResourceSynced(string resourceType, int count);
+    Message = "Resource synchronized: type={ResourceType} count={Count}")]
+private partial void LogResourceSynced(string resourceType, int count);
 
 // ✅ Erreurs avec code, sans donnée personnelle
 [LoggerMessage(Level = LogLevel.Error,
-    Message = "FHIR resource {ResourceId} failed validation: {ErrorCode}")]
-private partial void LogFhirValidationFailed(
+    Message = "Resource {ResourceId} failed validation: {ErrorCode}")]
+private partial void LogResourceValidationFailed(
     Exception exception, string resourceId, string errorCode);
 ```
 
@@ -312,7 +312,7 @@ private partial void LogFhirValidationFailed(
 techniques) mais jamais des données directement identifiantes (nom, prénom, email, numéro
 de sécurité sociale, diagnostic, etc.).
 
-> **HDS EXI-04** : les traces d'audit contenant des données de santé transitent par
+> **ISO 27001** : les traces d'audit contenant des données de santé transitent par
 > les intercepteurs EF Core (voir [persistence.md](../data/persistence.md)), pas par les logs
 > applicatifs. Les logs Serilog sont des logs **techniques**, pas des logs d'audit.
 
@@ -366,7 +366,7 @@ var service = new PatientService(logger, db);
    (`Log.Information(...)`) dans le code applicatif
 4. **Message templates** — toujours utiliser des paramètres nommés `{Property}`,
    jamais l'interpolation `$"..."`
-5. **Pas de PII** — aucune donnée personnelle ou de santé dans les logs (RGPD + HDS)
+5. **Pas de PII** — aucune donnée personnelle ou de santé dans les logs (RGPD + ISO 27001)
 6. **Pas de secrets** — aucun token, mot de passe, clé dans les logs
 7. **Identifiants techniques** — utiliser les GUID des entités comme identifiants
    dans les logs (pseudonymisation)

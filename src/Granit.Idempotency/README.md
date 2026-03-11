@@ -1,6 +1,6 @@
 # Granit.Idempotency
 
-HTTP idempotency middleware for Granit APIs. Stripe-style Idempotency-Key header, Redis SET NX PX deduplication, and HDS-compliant audit trail.
+HTTP idempotency middleware for Granit APIs. Stripe-style Idempotency-Key header, Redis SET NX PX deduplication, and ISO 27001-compliant audit trail.
 
 Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
 

@@ -12,8 +12,8 @@ Description de l'architecture cible et des packages concernés.
 
 ## Contraintes
 
-- [ ] HDS / RGPD
-- [ ] Souveraineté européenne (OVHcloud FR)
+- [ ] ISO 27001 / RGPD
+- [ ] Souveraineté souveraine européenne
 - [ ] Performance / SLA
 - [ ] Rétrocompatibilité NuGet (SemVer)
 - [ ] Budget

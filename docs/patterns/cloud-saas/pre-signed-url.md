@@ -17,7 +17,7 @@ mécanisme de crypto-shredding conforme RGPD.
 sequenceDiagram
     participant C as Client
     participant API as Granit API
-    participant S3 as S3 (OVHcloud)
+    participant S3 as S3 sur infrastructure souveraine
     participant V as Validation Pipeline
     participant DB as BlobDescriptorStore
 
@@ -82,7 +82,7 @@ sequenceDiagram
 
 1. Supprime **physiquement** l'objet S3 (`storageClient.DeleteObjectAsync`)
 2. Marque le `BlobDescriptor` comme `Deleted` (soft delete)
-3. Conserve la métadonnée en DB pour la **piste d'audit HDS** (3 ans)
+3. Conserve la métadonnée en DB pour la **piste d'audit ISO 27001** (3 ans)
 
 ## Justification
 
@@ -90,7 +90,7 @@ sequenceDiagram
 |----------|----------|
 | Fichiers médicaux volumineux (IRM, scanners) saturent le serveur | Upload direct client → S3, le serveur ne voit jamais le binaire |
 | Validation du type MIME côté client n'est pas fiable | Validation serveur post-upload via magic bytes |
-| RGPD droit à l'effacement + HDS piste d'audit (contradictoires) | Crypto-shredding : binaire détruit, métadonnée conservée en soft delete |
+| RGPD droit à l'effacement + ISO 27001 piste d'audit (contradictoires) | Crypto-shredding : binaire détruit, métadonnée conservée en soft delete |
 | Isolation multi-tenant dans le bucket S3 | Clé préfixée par `tenantId` + vérification `TryExtractTenantId()` |
 | Sécurité : le client ne doit pas avoir les credentials S3 | Pre-signed URL avec expiration courte, contraintes de type MIME |
 

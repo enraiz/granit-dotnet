@@ -8,13 +8,13 @@ namespace Granit.Identity.EntityFrameworkCore.Entities;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Inherits <see cref="AuditedEntity"/> for HDS audit trail (CreatedAt, CreatedBy, ModifiedAt, ModifiedBy).
+/// Inherits <see cref="AuditedEntity"/> for ISO 27001 audit trail (CreatedAt, CreatedBy, ModifiedAt, ModifiedBy).
 /// Implements <see cref="IMultiTenant"/> for tenant isolation — the same external user may have
 /// a cache entry per tenant in shared-realm deployments.
 /// </para>
 /// <para>
 /// No <c>ISoftDeletable</c>: cache entries are hard-deleted on RGPD erasure requests.
-/// The audit fields on <see cref="AuditedEntity"/> satisfy HDS requirements for the cache entry itself.
+/// The audit fields on <see cref="AuditedEntity"/> satisfy ISO 27001 requirements for the cache entry itself.
 /// </para>
 /// </remarks>
 public sealed class UserCacheEntry : AuditedEntity, IMultiTenant

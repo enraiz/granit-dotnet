@@ -4,7 +4,7 @@
 
 Quand un événement métier se produit (nouveau patient, rendez-vous confirmé),
 il faut notifier des systèmes externes via HTTP POST avec garantie de livraison,
-signature HMAC pour l'authenticité, et audit trail HDS.
+signature HMAC pour l'authenticité, et audit trail ISO 27001.
 
 ## Solution
 
@@ -109,7 +109,7 @@ sequenceDiagram
   backoff exponentiel. Après épuisement des tentatives, le message
   est envoyé en Dead Letter Queue.
 - **Audit trail** : chaque tentative d'envoi est enregistrée (statut HTTP,
-  durée, erreur éventuelle) pour conformité HDS.
+  durée, erreur éventuelle) pour conformité ISO 27001.
 
 ### Configuration
 

@@ -81,7 +81,7 @@ public sealed class TenantPerSchemaDbContextFactoryTests
     }
 
     // -----------------------------------------------------------------------
-    // Guard — pas de tenant → exception (HDS : pas de fallback silencieux)
+    // Guard — pas de tenant → exception (ISO 27001 : pas de fallback silencieux)
     // -----------------------------------------------------------------------
 
     [Fact]

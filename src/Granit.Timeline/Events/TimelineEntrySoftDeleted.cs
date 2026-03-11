@@ -4,7 +4,7 @@ namespace Granit.Timeline.Events;
 
 /// <summary>
 /// Raised when a timeline entry is soft-deleted (RGPD right to erasure).
-/// System log entries cannot be deleted (HDS audit trail).
+/// System log entries cannot be deleted (ISO 27001 audit trail).
 /// </summary>
 public sealed record TimelineEntrySoftDeleted(
     Guid EntryId,

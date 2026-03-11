@@ -13,7 +13,7 @@ namespace Granit.Encryption.Providers;
 /// </para>
 /// <para>
 /// The HMAC tag guarantees ciphertext integrity and authenticity, preventing
-/// padding oracle attacks and silent data corruption (HDS requirement).
+/// padding oracle attacks and silent data corruption (ISO 27001 requirement).
 /// </para>
 /// Designed for frequent operations (&lt; 1 ms after startup).
 /// </summary>

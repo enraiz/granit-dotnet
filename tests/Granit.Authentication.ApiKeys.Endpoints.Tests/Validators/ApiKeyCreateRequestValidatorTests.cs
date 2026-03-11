@@ -35,7 +35,7 @@ public sealed class ApiKeyCreateRequestValidatorTests
             "My Key",
             ApiKeyType.Secret,
             "live",
-            ["Guava.Patients.Read", "Guava.Patients.Write"],
+            ["MyApp.Patients.Read", "MyApp.Patients.Write"],
             ["10.0.0.0/24"],
             FixedNow.AddDays(30),
             CacheBehavior.NoCache);

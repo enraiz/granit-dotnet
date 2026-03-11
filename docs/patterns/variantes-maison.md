@@ -4,7 +4,7 @@
 
 Certains patterns implémentés dans Granit sont des variantes ou des hybrides
 de patterns classiques, adaptés aux contraintes spécifiques du framework
-(HDS/RGPD, multi-tenancy, Wolverine). Ce document catalogue les 10
+(RGPD/ISO 27001, multi-tenancy, Wolverine). Ce document catalogue les 10
 principales variantes « maison ».
 
 ## 1. Singleton AsyncLocal (contexte thread-safe)

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Cors</PackageId>
-    <Description>Configuration CORS standardisée pour Granit. Conforme HDS : wildcard interdit
+    <Description>Configuration CORS standardisée pour Granit. ISO 27001 compliant : wildcard interdit
     en production, validation AllowCredentials. Configurable via appsettings.json.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>

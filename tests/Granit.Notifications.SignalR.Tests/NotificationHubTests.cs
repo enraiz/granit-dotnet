@@ -44,10 +44,10 @@ public sealed class NotificationHubTests
     public async Task OnConnectedAsync_WithUserId_AddsToGroup()
     {
         NotificationHub hub = new();
-        var context = Substitute.For<HubCallerContext>();
+        HubCallerContext context = Substitute.For<HubCallerContext>();
         context.UserIdentifier.Returns("user-42");
         context.ConnectionId.Returns("conn-1");
-        var groups = Substitute.For<IGroupManager>();
+        IGroupManager groups = Substitute.For<IGroupManager>();
 
         SetHubContext(hub, context, groups);
 
@@ -60,10 +60,10 @@ public sealed class NotificationHubTests
     public async Task OnConnectedAsync_WithNullUserId_DoesNotAddToGroup()
     {
         NotificationHub hub = new();
-        var context = Substitute.For<HubCallerContext>();
+        HubCallerContext context = Substitute.For<HubCallerContext>();
         context.UserIdentifier.Returns((string?)null);
         context.ConnectionId.Returns("conn-1");
-        var groups = Substitute.For<IGroupManager>();
+        IGroupManager groups = Substitute.For<IGroupManager>();
 
         SetHubContext(hub, context, groups);
 
@@ -81,10 +81,10 @@ public sealed class NotificationHubTests
     public async Task OnDisconnectedAsync_WithUserId_RemovesFromGroup()
     {
         NotificationHub hub = new();
-        var context = Substitute.For<HubCallerContext>();
+        HubCallerContext context = Substitute.For<HubCallerContext>();
         context.UserIdentifier.Returns("user-42");
         context.ConnectionId.Returns("conn-1");
-        var groups = Substitute.For<IGroupManager>();
+        IGroupManager groups = Substitute.For<IGroupManager>();
 
         SetHubContext(hub, context, groups);
 
@@ -97,10 +97,10 @@ public sealed class NotificationHubTests
     public async Task OnDisconnectedAsync_WithNullUserId_DoesNotRemoveFromGroup()
     {
         NotificationHub hub = new();
-        var context = Substitute.For<HubCallerContext>();
+        HubCallerContext context = Substitute.For<HubCallerContext>();
         context.UserIdentifier.Returns((string?)null);
         context.ConnectionId.Returns("conn-1");
-        var groups = Substitute.For<IGroupManager>();
+        IGroupManager groups = Substitute.For<IGroupManager>();
 
         SetHubContext(hub, context, groups);
 
@@ -114,10 +114,10 @@ public sealed class NotificationHubTests
     public async Task OnDisconnectedAsync_WithException_StillRemovesFromGroup()
     {
         NotificationHub hub = new();
-        var context = Substitute.For<HubCallerContext>();
+        HubCallerContext context = Substitute.For<HubCallerContext>();
         context.UserIdentifier.Returns("user-42");
         context.ConnectionId.Returns("conn-1");
-        var groups = Substitute.For<IGroupManager>();
+        IGroupManager groups = Substitute.For<IGroupManager>();
 
         SetHubContext(hub, context, groups);
 

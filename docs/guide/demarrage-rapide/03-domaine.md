@@ -1,7 +1,7 @@
 # Étape 3 — Modèle domaine
 
 Granit fournit une hiérarchie d'entités avec audit trail intégré,
-conforme aux exigences HDS.
+conforme aux exigences ISO 27001.
 
 ## Hiérarchie d'entités
 
@@ -47,7 +47,7 @@ namespace TaskManagement.Api.Domain;
 
 /// <summary>
 /// A task item in the task management system.
-/// Uses <see cref="AuditedEntity"/> for HDS-compliant audit trail.
+/// Uses <see cref="AuditedEntity"/> for ISO 27001-compliant audit trail.
 /// </summary>
 public sealed class TaskItem : AuditedEntity
 {

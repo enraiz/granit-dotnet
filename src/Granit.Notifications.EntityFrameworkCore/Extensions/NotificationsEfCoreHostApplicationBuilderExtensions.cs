@@ -18,7 +18,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
 {
     /// <summary>
     /// Replaces the default InMemory/no-op stores with durable EF Core implementations
-    /// backed by a PostgreSQL database hosted in Europe (OVHcloud FR).
+    /// backed by a PostgreSQL database hosted on European sovereign infrastructure.
     /// </summary>
     /// <remarks>
     /// Must be called after <c>AddGranitNotifications()</c>.
@@ -27,12 +27,12 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
     ///   <item><see cref="EfCoreUserNotificationStore"/> — replaces <c>InMemoryUserNotificationStore</c>.</item>
     ///   <item><see cref="EfCoreNotificationPreferenceStore"/> — replaces <c>InMemoryNotificationPreferenceStore</c>.</item>
     ///   <item><see cref="EfCoreNotificationSubscriptionStore"/> — replaces <c>InMemoryNotificationSubscriptionStore</c>.</item>
-    ///   <item><see cref="EfCoreNotificationDeliveryStore"/> — replaces <c>NullNotificationDeliveryStore</c> (enables HDS audit trail).</item>
+    ///   <item><see cref="EfCoreNotificationDeliveryStore"/> — replaces <c>NullNotificationDeliveryStore</c> (enables ISO 27001 audit trail).</item>
     ///   <item><see cref="EfCoreMobilePushTokenStore"/> — replaces <c>InMemoryMobilePushTokenStore</c>.</item>
     ///   <item><see cref="Internal.NotificationDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
     /// </list>
     /// <para>
-    /// SOVEREIGNTY: The connection string must point to a database hosted in Europe (OVHcloud FR).
+    /// SOVEREIGNTY: The connection string must point to a database hosted on European sovereign infrastructure.
     /// Never use AWS RDS, Azure SQL, or Google Cloud SQL for health data.
     /// </para>
     /// </remarks>
@@ -86,7 +86,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
         builder.Services.Replace(
             ServiceDescriptor.Singleton<INotificationSubscriptionWriter>(sp => sp.GetRequiredService<EfCoreNotificationSubscriptionStore>()));
 
-        // Delivery store — write-only (HDS audit)
+        // Delivery store — write-only (ISO 27001 audit)
         builder.Services.Replace(
             ServiceDescriptor.Scoped<INotificationDeliveryWriter, EfCoreNotificationDeliveryStore>());
 

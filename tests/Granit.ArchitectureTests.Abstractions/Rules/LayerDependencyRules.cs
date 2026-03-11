@@ -56,7 +56,7 @@ public static class LayerDependencyRules
         ArchUnitNET.Domain.Architecture architecture,
         params string[] domainBaseClassFullNames)
     {
-        var domainBaseClasses = domainBaseClassFullNames.ToHashSet(StringComparer.Ordinal);
+        HashSet<string> domainBaseClasses = domainBaseClassFullNames.ToHashSet(StringComparer.Ordinal);
 
         IEnumerable<Class> violations = architecture.Classes
             .Where(c => (c.Namespace.FullName.EndsWith(".Endpoints", StringComparison.Ordinal) ||

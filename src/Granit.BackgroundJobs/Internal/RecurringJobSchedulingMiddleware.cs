@@ -23,7 +23,7 @@ namespace Granit.BackgroundJobs.Internal;
 /// the current message — the "next" message was never inserted, so no duplicate is created.
 /// </para>
 /// <para>
-/// <b>HDS audit:</b> <see cref="BeforeAsync"/> reads the <c>X-Triggered-By</c> header
+/// <b>ISO 27001 audit:</b> <see cref="BeforeAsync"/> reads the <c>X-Triggered-By</c> header
 /// (set by <see cref="IBackgroundJobWriter.TriggerNowAsync"/>) and persists it via
 /// <see cref="IBackgroundJobStoreWriter.SetTriggeredByAsync"/>.
 /// </para>
@@ -34,11 +34,11 @@ internal sealed partial class RecurringJobSchedulingMiddleware(
     IClock clock,
     ILogger<RecurringJobSchedulingMiddleware> logger)
 {
-    /// <summary>Header name carrying the admin identity for manual triggers (HDS audit).</summary>
+    /// <summary>Header name carrying the admin identity for manual triggers (ISO 27001 audit).</summary>
     internal const string TriggeredByHeader = "X-Triggered-By";
 
     /// <summary>
-    /// Records the execution start and captures the <c>X-Triggered-By</c> header for HDS audit.
+    /// Records the execution start and captures the <c>X-Triggered-By</c> header for ISO 27001 audit.
     /// </summary>
     public async Task BeforeAsync(Envelope envelope, CancellationToken cancellationToken)
     {

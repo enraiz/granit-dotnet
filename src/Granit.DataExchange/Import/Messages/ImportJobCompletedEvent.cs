@@ -9,7 +9,7 @@ namespace Granit.DataExchange.Import.Messages;
 /// </summary>
 /// <remarks>
 /// Consumed by notification handlers, audit loggers, etc.
-/// No PII — only identifiers and aggregate counts (HDS-compliant).
+/// No PII — only identifiers and aggregate counts (ISO 27001-compliant).
 /// </remarks>
 /// <param name="ImportJobId">The import job identifier.</param>
 /// <param name="DefinitionName">The import definition name.</param>

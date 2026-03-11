@@ -272,7 +272,7 @@ public sealed class DefaultBlobStorageTests
     [Fact]
     public async Task DeleteAsync_ShouldPreserveAuditRecord_AfterS3Delete()
     {
-        // Arrange — validates the RGPD/HDS constraint: the DB row must survive deletion
+        // Arrange — validates the RGPD/ISO 27001 constraint: the DB row must survive deletion
         var blobId = Guid.NewGuid();
         BlobDescriptor descriptor = BuildValidDescriptor(blobId);
         _reader.FindAsync(blobId, Arg.Any<CancellationToken>()).Returns(descriptor);

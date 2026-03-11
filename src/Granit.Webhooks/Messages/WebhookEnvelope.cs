@@ -38,7 +38,7 @@ public sealed record WebhookEnvelope
     public required string ApiVersion { get; init; }
 
     /// <summary>
-    /// Event payload. Either a thin payload (ResourceId + fetch URL, for HDS compliance)
+    /// Event payload. Either a thin payload (ResourceId + fetch URL, for ISO 27001 compliance)
     /// or a fat payload (full DTO). The structure depends on the event type and the
     /// application configuration.
     /// </summary>

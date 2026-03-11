@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.ReferenceData</PackageId>
-    <Description>Generic reference data management for Digital Dynamics .NET applications. Provides base entity, store and seeder abstractions with built-in caching support.</Description>
+    <Description>Generic reference data management for Granit applications. Provides base entity, store and seeder abstractions with built-in caching support.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

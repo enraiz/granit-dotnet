@@ -76,7 +76,7 @@ Voir [ITenantSchemaActivator](isolation-tenant-per-schema.md) pour les détails.
 - `SchemaPerTenant` non supporté : pas de `SET SCHEMA` session-level
 - Alternative : `DatabasePerTenant` ou `SharedDatabase` avec filtre `TenantId`
 - Wolverine transactional outbox via `WolverineFx.SqlServer`
-- Attention Cloud Act pour données de santé (HDS)
+- Attention Cloud Act pour données de santé (ISO 27001)
 
 **MySQL / MariaDB** :
 
@@ -101,7 +101,7 @@ Voir [ITenantSchemaActivator](isolation-tenant-per-schema.md) pour les détails.
 - NoSQL document store, pas de DDL classique
 - Isolation par container (partition key `TenantId`) ou database par tenant
 - Pas de migrations EF Core, pas de transactions multi-documents
-- Attention Cloud Act pour données de santé (HDS)
+- Attention Cloud Act pour données de santé (ISO 27001)
 
 ## Recommandations par contexte
 
@@ -110,7 +110,7 @@ Granit fonctionne avec tous les providers EF Core listés ci-dessus.
 
 | Contexte              | Stratégie recommandée |
 | --------------------- | --------------------- |
-| SaaS HDS (santé)      | DatabasePerTenant     |
+| SaaS ISO 27001 (santé)      | DatabasePerTenant     |
 | SaaS (> 100 tenants)  | SchemaPerTenant       |
 | SaaS (> 1 000 tenants)| SharedDatabase        |
 | Application interne   | SharedDatabase        |

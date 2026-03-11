@@ -2,7 +2,7 @@ namespace Granit.Authorization.Abstractions;
 
 /// <summary>
 /// Administrative service for mutating role → permission grants.
-/// Each call to <see cref="SetAsync"/> emits an HDS audit log entry and invalidates the cache.
+/// Each call to <see cref="SetAsync"/> emits an ISO 27001 audit log entry and invalidates the cache.
 /// Available only when <c>Granit.Authorization.EntityFrameworkCore</c> is registered.
 /// </summary>
 public interface IPermissionManagerWriter

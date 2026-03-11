@@ -5,7 +5,7 @@ namespace Granit.Features.EntityFrameworkCore.Internal;
 /// <summary>
 /// EF Core implementation of <see cref="IFeatureStoreReader"/> and <see cref="IFeatureStoreWriter"/>.
 /// Persists tenant-level feature overrides in the <c>feature_overrides</c> table
-/// with full HDS audit trail.
+/// with full ISO 27001 audit trail.
 /// </summary>
 /// <remarks>
 /// Registered as the replacement for <c>InMemoryFeatureStore</c> when

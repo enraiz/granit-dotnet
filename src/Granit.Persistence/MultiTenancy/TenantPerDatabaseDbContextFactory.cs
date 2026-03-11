@@ -19,11 +19,11 @@ namespace Granit.Persistence.MultiTenancy;
 /// <para>
 /// Throws <see cref="InvalidOperationException"/> when no tenant is active.
 /// There is no silent fallback: accessing data without a tenant context would violate
-/// HDS/RGPD inter-tenant isolation requirements.
+/// RGPD/ISO 27001 inter-tenant isolation requirements.
 /// </para>
 /// <para>
 /// <see cref="AuditedEntityInterceptor"/> is wired automatically when available in DI,
-/// satisfying the 3-year HDS audit trail requirement.
+/// satisfying the 3-year ISO 27001 audit trail requirement.
 /// </para>
 /// <para>
 /// Prefer <see cref="CreateDbContextAsync"/> over <see cref="CreateDbContext"/>: the synchronous

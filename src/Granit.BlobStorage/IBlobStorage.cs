@@ -58,7 +58,7 @@ public interface IBlobStorage
     /// </summary>
     /// <remarks>
     /// The <see cref="BlobDescriptor"/> record is <b>retained</b> in the database
-    /// for the HDS 3-year audit trail. Only the binary content is erased.
+    /// for the ISO 27001 3-year audit trail. Only the binary content is erased.
     /// Idempotent: calling on an already-deleted blob is a no-op.
     /// </remarks>
     /// <param name="containerName">Logical container the blob belongs to.</param>

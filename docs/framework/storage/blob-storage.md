@@ -1,8 +1,8 @@
 # Stockage de fichiers — Granit.BlobStorage
 
-Stockage d'objets souverain, Direct-to-Cloud, conforme HDS et RGPD.
+Stockage d'objets souverain, Direct-to-Cloud, conforme ISO 27001 et RGPD.
 Le serveur applicatif ne transite jamais les octets — seuls les métadonnées et les URL pré-signées
-sont échangés entre le client, le serveur et OVHcloud Object Storage.
+sont échangés entre le client, le serveur et S3-compatible object storage.
 
 | Package | Rôle |
 | --- | --- |
@@ -18,7 +18,7 @@ sont échangés entre le client, le serveur et OVHcloud Object Storage.
 sequenceDiagram
     participant C as Client
     participant S as Serveur (Granit)
-    participant O as OVHcloud S3
+    participant O as S3-compatible storage
 
     C->>S: POST /upload
     S->>S: InitiateUploadAsync()<br/>crée BlobDescriptor
@@ -59,7 +59,7 @@ stateDiagram-v2
 | `Rejected` | Un validateur a échoué — objet S3 déjà supprimé |
 | `Deleted` | `DeleteAsync()` — Crypto-Shredding RGPD |
 
-> **HDS / RGPD** : le `BlobDescriptor` n'est **jamais supprimé de la base**.
+> **ISO 27001 / RGPD** : le `BlobDescriptor` n'est **jamais supprimé de la base**.
 > `Deleted` signifie que les octets S3 sont effacés ; la piste d'audit reste 3 ans.
 
 ### Isolation multi-tenant
@@ -100,12 +100,12 @@ public sealed class MyAppModule : GranitModule { }
 | `ServiceUrl` | `string` | — | Endpoint S3 (obligatoire) |
 | `AccessKey` | `string` | — | Clé d'accès — injecter depuis Granit.Vault |
 | `SecretKey` | `string` | — | Clé secrète — injecter depuis Granit.Vault |
-| `Region` | `string` | `us-east-1` | Région S3. OVHcloud Roubaix : `rbx` |
+| `Region` | `string` | `us-east-1` | Région S3. sovereign European hosting : `rbx` |
 | `DefaultBucket` | `string` | — | Bucket S3 par défaut (obligatoire) |
 | `ForcePathStyle` | `bool` | `true` | Activer pour MinIO et certains providers |
 | `TenantIsolation` | `BlobTenantIsolation` | `Prefix` | Stratégie d'isolation : `Prefix` (1 bucket, préfixe tenant) |
 
-> **Production OVHcloud** : `ServiceUrl = https://s3.rbx.io.cloud.ovh.net`, `Region = rbx`, `ForcePathStyle = false`.
+> **Production (sovereign S3)** : `ServiceUrl = https://s3.rbx.io.cloud.ovh.net`, `Region = rbx`, `ForcePathStyle = false`.
 >
 > **Développement MinIO** : `ServiceUrl = http://localhost:9000`, `ForcePathStyle = true`.
 
@@ -294,18 +294,18 @@ IBlobStorage (DefaultBlobStorage)
 | #173 | ✅ Terminé | `IBlobStorage.CreateDownloadUrlAsync` — URL de téléchargement sécurisée |
 | #174 | ✅ Terminé | `IBlobKeyStrategy` — isolation multi-tenant par préfixe `{tenantId}/` |
 | #175 | ✅ Terminé | Pipeline `IBlobValidator` — magic bytes, taille, extensible |
-| #176 | ✅ Terminé | `IBlobDescriptorStoreReader` / `IBlobDescriptorStoreWriter` — persistance EF Core, isolation tenant, piste HDS |
+| #176 | ✅ Terminé | `IBlobDescriptorStoreReader` / `IBlobDescriptorStoreWriter` — persistance EF Core, isolation tenant, piste ISO 27001 |
 | #177 | ✅ Terminé | `IBlobStorage.DeleteAsync` — Crypto-Shredding RGPD, conservation audit |
-| #178 | ✅ Terminé | `S3BlobOptions` — configuration OVHcloud / MinIO, validation au démarrage |
+| #178 | ✅ Terminé | `S3BlobOptions` — configuration souveraine S3 / MinIO, validation au démarrage |
 
-## Conformité HDS / RGPD
+## Conformité ISO 27001 / RGPD
 
-- **Souveraineté** : `ServiceUrl` doit pointer sur OVHcloud FR (`s3.rbx.io.cloud.ovh.net`).
+- **Souveraineté** : `ServiceUrl` doit pointer sur un hébergeur souverain européen (`s3.rbx.io.cloud.ovh.net`).
   Ne jamais utiliser AWS S3, Azure Blob ou GCP Cloud Storage pour des données de santé.
 - **Direct-to-Cloud** : les octets ne transitent jamais par le serveur applicatif.
   Réduit la surface d'attaque et les coûts de bande passante.
 - **Crypto-Shredding** : `DeleteAsync` efface l'objet S3 (données irrécupérables),
-  puis conserve le `BlobDescriptor` 3 ans pour la piste d'audit HDS.
+  puis conserve le `BlobDescriptor` 3 ans pour la piste d'audit ISO 27001.
 - **Isolation tenant** : `EfBlobDescriptorStore.FindAsync` (via `IBlobDescriptorStoreReader`) filtre par `TenantId` du tenant actif —
   un tenant ne peut pas accéder aux blobs d'un autre, même avec un `BlobId` valide.
 - **Credentials** : `AccessKey` et `SecretKey` ne doivent jamais apparaître en clair.
