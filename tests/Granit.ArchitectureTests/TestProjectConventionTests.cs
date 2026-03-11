@@ -21,13 +21,13 @@ public sealed class TestProjectConventionTests
         [
             "Granit.Analyzers",
             "Granit.Analyzers.CodeFixes",
-            "Granit.ArchitectureTests.Abstractions",
             "Granit.Localization.SourceGenerator",
         ];
 
         IEnumerable<string> srcPackages = Directory.GetDirectories(srcDir)
             .Select(Path.GetFileName)
             .Where(name => name!.StartsWith("Granit.", StringComparison.Ordinal))
+            .Where(name => File.Exists(Path.Combine(srcDir, name!, $"{name}.csproj")))
             .Where(name => !excluded.Contains(name!))
             .Cast<string>();
 
@@ -56,6 +56,7 @@ public sealed class TestProjectConventionTests
         IEnumerable<string> srcPackages = Directory.GetDirectories(srcDir)
             .Select(Path.GetFileName)
             .Where(name => name!.StartsWith("Granit.", StringComparison.Ordinal))
+            .Where(name => File.Exists(Path.Combine(srcDir, name!, $"{name}.csproj")))
             .Cast<string>();
 
         List<string> missing = [];
