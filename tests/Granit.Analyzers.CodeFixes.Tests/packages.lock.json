@@ -10,9 +10,9 @@
       },
       "JunitXml.TestLogger": {
         "type": "Direct",
-        "requested": "[8.*, )",
-        "resolved": "8.0.0",
-        "contentHash": "rO2ugKcbVy8SHNKeqfX/DshUcTtolnEUwMKehVB6gh5/YoL+U07zoACCyGRvgMtzq7fr9o6GLkXOmVj9WMgx+w=="
+        "requested": "[7.*, )",
+        "resolved": "7.1.0",
+        "contentHash": "Iu3dSnhJ+gzjlOtpIPZgHvJbmvmPbIGjxT7h5pNxxMiNTXKfxgi0O0eehnZ29qlC5bElAM0o9dSrjzjydCaGiA=="
       },
       "Microsoft.CodeAnalysis.CSharp": {
         "type": "Direct",
@@ -297,7 +297,7 @@
         "type": "Project",
         "dependencies": {
           "Granit.Analyzers": "[0.1.0-dev, )",
-          "JunitXml.TestLogger": "[8.*, )",
+          "JunitXml.TestLogger": "[7.*, )",
           "Microsoft.CodeAnalysis.CSharp": "[5.0.*, )",
           "Microsoft.NET.Test.Sdk": "[18.*, )",
           "Shouldly": "[4.*, )",
