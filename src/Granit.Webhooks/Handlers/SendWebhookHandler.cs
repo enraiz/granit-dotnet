@@ -7,6 +7,7 @@ using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Exceptions;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
+using Granit.Webhooks.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

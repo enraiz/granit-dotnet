@@ -11,6 +11,7 @@
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Granit.Notifications.WebPush.Internal;
 using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;
 using Microsoft.Extensions.Logging;

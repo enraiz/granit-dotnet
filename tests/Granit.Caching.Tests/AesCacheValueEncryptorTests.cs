@@ -8,6 +8,7 @@
 // =============================================================================
 
 using System.Security.Cryptography;
+using Granit.Caching.Options;
 using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;
@@ -26,7 +27,7 @@ public sealed class AesCacheValueEncryptorTests
         }
 
         CacheEncryptionOptions encryptionOptions = new() { Key = keyBase64 };
-        return new AesCacheValueEncryptor(Options.Create(encryptionOptions));
+        return new AesCacheValueEncryptor(Microsoft.Extensions.Options.Options.Create(encryptionOptions));
     }
 
     [Fact]
@@ -82,7 +83,7 @@ public sealed class AesCacheValueEncryptorTests
         CacheEncryptionOptions opts = new() { Key = Convert.ToBase64String(shortKey) };
 
         // Act
-        Action act = () => _ = new AesCacheValueEncryptor(Options.Create(opts));
+        Action act = () => _ = new AesCacheValueEncryptor(Microsoft.Extensions.Options.Options.Create(opts));
 
         // Assert
         Should.Throw<ArgumentException>(act).Message.ShouldContain("256");
@@ -95,7 +96,7 @@ public sealed class AesCacheValueEncryptorTests
         CacheEncryptionOptions opts = new() { Key = null };
 
         // Act
-        Action act = () => _ = new AesCacheValueEncryptor(Options.Create(opts));
+        Action act = () => _ = new AesCacheValueEncryptor(Microsoft.Extensions.Options.Options.Create(opts));
 
         // Assert
         Should.Throw<InvalidOperationException>(act);

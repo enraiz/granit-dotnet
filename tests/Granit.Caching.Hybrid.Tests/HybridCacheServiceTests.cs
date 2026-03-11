@@ -1,4 +1,5 @@
 using Granit.Caching;
+using Granit.Caching.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -81,7 +82,7 @@ public sealed class HybridCacheServiceTests
         clock.Now.Returns(_ => DateTimeOffset.UtcNow);
         return new HybridCacheService<TestCacheItem>(
             cache,
-            Options.Create(options),
+            Microsoft.Extensions.Options.Options.Create(options),
             NullLogger<HybridCacheService<TestCacheItem>>.Instance,
             clock);
     }

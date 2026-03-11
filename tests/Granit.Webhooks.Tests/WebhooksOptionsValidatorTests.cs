@@ -4,6 +4,7 @@
 // Verifies boundary validation for HttpTimeoutSeconds and MaxParallelDeliveries.
 // =============================================================================
 
+using Granit.Webhooks.Options;
 using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;

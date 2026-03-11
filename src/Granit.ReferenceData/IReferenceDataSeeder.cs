@@ -1,3 +1,5 @@
+using Granit.ReferenceData.Domain;
+
 namespace Granit.ReferenceData;
 
 /// <summary>

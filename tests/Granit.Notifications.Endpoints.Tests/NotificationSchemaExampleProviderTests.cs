@@ -1,4 +1,6 @@
 using System.Text.Json.Nodes;
+using Granit.Notifications.Endpoints.Dtos;
+using Granit.Notifications.Endpoints.Internal;
 using Shouldly;
 using Xunit;
 

@@ -124,6 +124,24 @@ assemblies compilées, et scans de code source via regex.
 | ---- | ------- | --------- |
 | `Async_void_methods_should_not_exist_in_src` | `async void` (crash du process) | Scan source |
 | `Throw_ex_should_not_be_used_in_src` | `throw ex;` (perte de stack trace) | Scan source |
+| `Namespace_should_match_folder_structure_in_src` | Namespace ≠ chemin du fichier sur disque | Scan source |
+
+### Organisation des fichiers (FileOrganizationTests)
+
+| Test | Détecte | Mécanisme |
+| ---- | ------- | --------- |
+| `Module_classes_should_be_at_module_root` | `Granit*Module.cs` dans un sous-dossier | Scan filesystem |
+| `Extension_classes_should_not_be_at_module_root` | `*Extensions.cs` à la racine du module | Scan filesystem |
+| `Exception_classes_should_reside_in_Exceptions_folder` | `*Exception.cs` hors `Exceptions/` | Scan filesystem |
+| `Options_classes_should_not_be_at_module_root` | `*Options.cs` à la racine du module | Scan filesystem |
+| `Endpoint_classes_should_reside_in_Endpoints_folder` | `*Endpoints.cs` hors `Endpoints/` ou `Internal/` | Scan filesystem |
+| `Dto_classes_should_reside_in_Dtos_folder` | `*Request.cs`/`*Response.cs` hors `Dtos/` | Scan filesystem |
+| `EfCore_configurations_should_reside_in_Configurations_folder` | `*Configuration.cs` hors `Configurations/` | Scan filesystem |
+| `HealthCheck_classes_should_not_be_at_module_root` | `*HealthCheck.cs` à la racine du module | Scan filesystem |
+| `Interceptor_classes_should_not_be_at_module_root` | `*Interceptor.cs` à la racine du module | Scan filesystem |
+| `Endpoint_validators_should_reside_in_Validators_folder` | `*Validator.cs` hors `Validators/` ou `Internal/` | Scan filesystem |
+| `Permission_definitions_should_reside_in_Permissions_folder` | `*Permissions.cs` hors `Permissions/` | Scan filesystem |
+| `Store_classes_should_not_be_at_module_root` | `*Store.cs` (implémentation) à la racine du module | Scan filesystem |
 
 ### Dépendances projet (ProjectDependencyTests)
 
@@ -150,9 +168,10 @@ assemblies compilées, et scans de code source via regex.
 | Architecture en couches | 8 rules | Test (ArchUnitNET) |
 | Nommage & CQRS | 5 rules | Test (ArchUnitNET) |
 | Conception des classes | 8 rules | Test (ArchUnitNET) |
-| Anti-patterns C# | 2 rules + 4 BannedAPIs | Test + Compile-time |
+| Anti-patterns C# | 3 rules + 4 BannedAPIs | Test + Compile-time |
+| Organisation des fichiers | 12 rules | Test (scan filesystem) |
 | Modules & projets | 5 rules | Test |
-| **Total** | **53 règles** | |
+| **Total** | **66 règles** | |
 
 ---
 

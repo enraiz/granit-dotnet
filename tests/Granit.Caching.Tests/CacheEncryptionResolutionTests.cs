@@ -7,6 +7,8 @@
 //   - Pas d'attribut → suit CachingOptions.EncryptValues
 // =============================================================================
 
+using Granit.Caching.Internal;
+using Granit.Caching.Options;
 using Shouldly;
 using Xunit;
 

@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.EntityFrameworkCore.Internal;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,10 +12,10 @@ namespace Granit.Authentication.ApiKeys.EntityFrameworkCore.Extensions;
 public static class ApiKeysEntityFrameworkCoreServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers the EF Core API key store and <see cref="ApiKeysDbContext"/>.
+    /// Registers the EF Core API key store and <see cref="Internal.ApiKeysDbContext"/>.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="configureDbContext">Action to configure the <see cref="ApiKeysDbContext"/> options (e.g., connection string).</param>
+    /// <param name="configureDbContext">Action to configure the <see cref="Internal.ApiKeysDbContext"/> options (e.g., connection string).</param>
     public static IServiceCollection AddGranitApiKeysEntityFrameworkCore(
         this IServiceCollection services,
         Action<DbContextOptionsBuilder> configureDbContext)

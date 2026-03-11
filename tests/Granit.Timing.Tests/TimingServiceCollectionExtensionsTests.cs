@@ -5,6 +5,7 @@
 // =============================================================================
 
 using Granit.Timing.Extensions;
+using Granit.Timing.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;

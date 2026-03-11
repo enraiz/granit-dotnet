@@ -1,4 +1,5 @@
 using Granit.Persistence.Migrations.Messages;
+using Granit.Persistence.Migrations.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

@@ -9,6 +9,7 @@
 
 using Granit.Core.Exceptions;
 using Granit.ExceptionHandling;
+using Granit.ExceptionHandling.Internal;
 using Microsoft.AspNetCore.Http;
 using Shouldly;
 using Xunit;

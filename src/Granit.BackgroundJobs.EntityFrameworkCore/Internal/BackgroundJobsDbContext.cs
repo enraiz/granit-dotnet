@@ -1,3 +1,4 @@
+using Granit.BackgroundJobs.Domain;
 using Granit.Core.DataFiltering;
 using Granit.Core.MultiTenancy;
 using Granit.Persistence.Extensions;
@@ -18,24 +19,12 @@ namespace Granit.BackgroundJobs.EntityFrameworkCore.Internal;
 /// Compatible with SQL Server and PostgreSQL.
 /// </para>
 /// </remarks>
-internal sealed class BackgroundJobsDbContext : DbContext
+internal sealed class BackgroundJobsDbContext(
+    DbContextOptions<BackgroundJobsDbContext> options,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null)
+    : DbContext(options)
 {
-    private readonly ICurrentTenant? _currentTenant;
-    private readonly IDataFilter? _dataFilter;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="BackgroundJobsDbContext"/>.
-    /// </summary>
-    public BackgroundJobsDbContext(
-        DbContextOptions<BackgroundJobsDbContext> options,
-        ICurrentTenant? currentTenant = null,
-        IDataFilter? dataFilter = null)
-        : base(options)
-    {
-        _currentTenant = currentTenant;
-        _dataFilter = dataFilter;
-    }
-
     /// <summary>Administrative records for all registered recurring jobs.</summary>
     public DbSet<BackgroundJobDefinition> Jobs { get; set; } = null!;
 
@@ -44,6 +33,6 @@ internal sealed class BackgroundJobsDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new BackgroundJobDefinitionConfiguration());
-        modelBuilder.ApplyGranitConventions(_currentTenant, _dataFilter);
+        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
     }
 }

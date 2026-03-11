@@ -3,6 +3,7 @@
 // =============================================================================
 
 using Granit.Encryption;
+using Granit.Encryption.Options;
 using Granit.Encryption.Services;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -14,7 +15,7 @@ namespace Granit.Encryption.Tests;
 public sealed class DefaultStringEncryptionServiceTests
 {
     private static IOptions<StringEncryptionOptions> OptionsFor(string providerName) =>
-        Options.Create(new StringEncryptionOptions { ProviderName = providerName });
+        Microsoft.Extensions.Options.Options.Create(new StringEncryptionOptions { ProviderName = providerName });
 
     [Fact]
     public void Encrypt_Delegates_To_Selected_Provider()

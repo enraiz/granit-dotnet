@@ -1,6 +1,7 @@
 using Granit.Guids;
 using Granit.Timing;
 using Granit.Webhooks.Domain;
+using Granit.Webhooks.EntityFrameworkCore.Internal;
 using Granit.Webhooks.Messages;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;

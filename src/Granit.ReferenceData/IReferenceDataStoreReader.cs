@@ -1,4 +1,5 @@
 using Granit.Querying;
+using Granit.ReferenceData.Domain;
 
 namespace Granit.ReferenceData;
 

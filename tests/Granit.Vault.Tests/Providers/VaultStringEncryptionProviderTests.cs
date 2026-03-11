@@ -1,4 +1,5 @@
 using Granit.Encryption;
+using Granit.Encryption.Options;
 using Granit.Vault.Providers;
 using Microsoft.Extensions.Options;
 using NSubstitute;

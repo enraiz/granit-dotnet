@@ -4,6 +4,7 @@ using Granit.Querying;
 using Granit.Workflow.Dtos;
 using Granit.Workflow.Endpoints.Extensions;
 using Granit.Workflow.Endpoints.Internal;
+using Granit.Workflow.Endpoints.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;

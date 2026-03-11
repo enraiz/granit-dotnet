@@ -1,3 +1,4 @@
+using Granit.DocumentGeneration.Pdf.Options;
 using Shouldly;
 using Xunit;
 

@@ -9,6 +9,7 @@ using System.Threading.Channels;
 using Granit.Guids;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
+using Granit.Persistence.Migrations.Options;
 using Granit.Timing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,7 +74,7 @@ public sealed class MigrationBatchWorkerTests : IDisposable
         return new MigrationBatchWorker(
             _channel,
             scopeFactory,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<MigrationBatchWorker>.Instance);
     }
 

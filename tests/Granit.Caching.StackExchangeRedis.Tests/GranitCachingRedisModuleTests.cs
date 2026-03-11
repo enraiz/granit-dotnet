@@ -5,6 +5,7 @@
 // et que les dépendances de modules sont respectées.
 // =============================================================================
 
+using Granit.Caching.StackExchangeRedis.Options;
 using Granit.Core.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

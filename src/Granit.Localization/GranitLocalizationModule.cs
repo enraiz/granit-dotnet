@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Localization.Extensions;
+using Granit.Localization.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Localization;

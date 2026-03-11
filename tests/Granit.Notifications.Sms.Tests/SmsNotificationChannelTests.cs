@@ -8,6 +8,8 @@
 using System.Text.Json;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Sms;
+using Granit.Notifications.Sms.Internal;
+using Granit.Notifications.Sms.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -26,7 +28,7 @@ public sealed class SmsNotificationChannelTests
 
     public SmsNotificationChannelTests()
     {
-        _options = Options.Create(new SmsChannelOptions
+        _options = Microsoft.Extensions.Options.Options.Create(new SmsChannelOptions
         {
             Provider = "Brevo",
             SenderId = "MyApp",

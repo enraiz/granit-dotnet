@@ -1,5 +1,6 @@
 using Granit.Timeline.Endpoints.Endpoints;
 using Granit.Timeline.Endpoints.Internal;
+using Granit.Timeline.Endpoints.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

@@ -1,5 +1,6 @@
 using Granit.Authorization.Abstractions;
 using Granit.Core.Localization;
+using Granit.Timeline.Endpoints.Internal;
 
 namespace Granit.Timeline.Endpoints.Permissions;
 

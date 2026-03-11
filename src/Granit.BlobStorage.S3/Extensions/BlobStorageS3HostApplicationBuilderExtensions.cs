@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Granit.BlobStorage.Internal;
+using Granit.BlobStorage.Options;
 using Granit.BlobStorage.S3.Internal;
+using Granit.BlobStorage.S3.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;

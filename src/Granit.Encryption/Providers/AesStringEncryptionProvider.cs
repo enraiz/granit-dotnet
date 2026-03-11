@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Granit.Encryption;
+using Granit.Encryption.Options;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Encryption.Providers;

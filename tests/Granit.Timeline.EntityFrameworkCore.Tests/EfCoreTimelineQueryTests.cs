@@ -11,6 +11,7 @@ using Granit.Querying;
 using Granit.Security;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.Domain;
+using Granit.Timeline.EntityFrameworkCore.Internal;
 using Granit.Timing;
 using NSubstitute;
 using Shouldly;

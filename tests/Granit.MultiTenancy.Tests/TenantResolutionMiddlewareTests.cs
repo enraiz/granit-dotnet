@@ -5,6 +5,7 @@
 using Granit.Core.MultiTenancy;
 using Granit.MultiTenancy;
 using Granit.MultiTenancy.Middleware;
+using Granit.MultiTenancy.Options;
 using Granit.MultiTenancy.Pipeline;
 using Granit.MultiTenancy.Resolvers;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +23,7 @@ public sealed class TenantResolutionMiddlewareTests
         TenantResolverPipeline pipeline,
         bool isEnabled = true)
     {
-        IOptions<MultiTenancyOptions> options = Options.Create(new MultiTenancyOptions
+        IOptions<MultiTenancyOptions> options = Microsoft.Extensions.Options.Options.Create(new MultiTenancyOptions
         {
             IsEnabled = isEnabled
         });

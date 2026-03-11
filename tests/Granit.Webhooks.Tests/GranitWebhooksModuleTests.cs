@@ -8,6 +8,7 @@
 using Granit.Core.Modularity;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Extensions;
+using Granit.Webhooks.Options;
 using Granit.Wolverine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

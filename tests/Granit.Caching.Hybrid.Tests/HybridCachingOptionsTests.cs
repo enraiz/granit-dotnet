@@ -6,6 +6,7 @@
 //   - La section de configuration est correcte
 // =============================================================================
 
+using Granit.Caching.Hybrid.Options;
 using Shouldly;
 using Xunit;
 

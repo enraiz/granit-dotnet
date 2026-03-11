@@ -5,6 +5,7 @@
 // the correct domain events, ClearDomainEvents resets the collection.
 // =============================================================================
 
+using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Events;
 using Granit.Core.Events;
 using Shouldly;

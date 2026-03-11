@@ -1,6 +1,8 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.EntityFrameworkCore.Internal;
 using Granit.Notifications.Internal;
 using Granit.Notifications.MobilePush;
+using Granit.Notifications.MobilePush.Internal;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +29,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
     ///   <item><see cref="EfCoreNotificationSubscriptionStore"/> — replaces <c>InMemoryNotificationSubscriptionStore</c>.</item>
     ///   <item><see cref="EfCoreNotificationDeliveryStore"/> — replaces <c>NullNotificationDeliveryStore</c> (enables HDS audit trail).</item>
     ///   <item><see cref="EfCoreMobilePushTokenStore"/> — replaces <c>InMemoryMobilePushTokenStore</c>.</item>
-    ///   <item><see cref="NotificationDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
+    ///   <item><see cref="Internal.NotificationDbContext"/> — registered via <c>IDbContextFactory</c> for thread-safe usage in Wolverine handlers.</item>
     /// </list>
     /// <para>
     /// SOVEREIGNTY: The connection string must point to a database hosted in Europe (OVHcloud FR).

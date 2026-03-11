@@ -1,3 +1,5 @@
+using Granit.Notifications.Email.Smtp.Internal;
+using Granit.Notifications.Email.Smtp.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Notifications.Email.Smtp.Extensions;

@@ -1,3 +1,4 @@
+using Granit.Diagnostics.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Diagnostics.Extensions;

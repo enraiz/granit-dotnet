@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Granit.Caching.Options;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Caching;

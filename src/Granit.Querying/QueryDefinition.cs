@@ -1,3 +1,4 @@
+using Granit.Querying.Options;
 namespace Granit.Querying;
 
 /// <summary>

@@ -1,4 +1,7 @@
 using Granit.Caching;
+using Granit.Caching.Hybrid.Options;
+using Granit.Caching.Internal;
+using Granit.Caching.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;

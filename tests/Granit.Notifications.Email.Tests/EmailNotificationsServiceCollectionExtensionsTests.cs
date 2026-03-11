@@ -8,6 +8,8 @@
 
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Email.Extensions;
+using Granit.Notifications.Email.Internal;
+using Granit.Notifications.Email.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

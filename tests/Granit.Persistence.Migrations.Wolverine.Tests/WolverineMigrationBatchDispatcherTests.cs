@@ -6,6 +6,7 @@
 // =============================================================================
 
 using Granit.Persistence.Migrations.Messages;
+using Granit.Persistence.Migrations.Wolverine.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;

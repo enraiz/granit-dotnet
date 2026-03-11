@@ -1,3 +1,4 @@
+using Granit.BlobStorage.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.BlobStorage.EntityFrameworkCore.Internal;

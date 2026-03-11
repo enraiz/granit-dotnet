@@ -9,6 +9,8 @@
 using System.Text.Json;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.WhatsApp;
+using Granit.Notifications.WhatsApp.Internal;
+using Granit.Notifications.WhatsApp.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -27,7 +29,7 @@ public sealed class WhatsAppNotificationChannelTests
 
     public WhatsAppNotificationChannelTests()
     {
-        _options = Options.Create(new WhatsAppChannelOptions
+        _options = Microsoft.Extensions.Options.Options.Create(new WhatsAppChannelOptions
         {
             Provider = "Brevo",
         });

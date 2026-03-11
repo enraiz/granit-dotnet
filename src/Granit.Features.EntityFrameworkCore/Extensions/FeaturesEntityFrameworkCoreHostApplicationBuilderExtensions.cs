@@ -1,5 +1,4 @@
 using Granit.Features.EntityFrameworkCore.Internal;
-using Granit.Features.Store;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

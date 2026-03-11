@@ -15,7 +15,7 @@ Read the relevant template file before creating an issue to align with its struc
 | Tech Debt | `Tech_Debt.md` | Technical debt with impact and risks |
 | Infrastructure | `Infrastructure.md` | Infra changes with deployment plan and rollback |
 | Incident | `Incident.md` | Production incidents with timeline and RCA |
-| Vault Secret | `VaultSecret.md` | Secret management with HDS/RGPD compliance |
+| Vault Secret | `VaultSecret.md` | Secret management with RGPD/ISO 27001 compliance |
 
 ## Usage with glab
 
@@ -56,7 +56,7 @@ EOF
 
 - `## Objectif`
 - `## Features` (placeholder for links)
-- `## Contraintes` (HDS/RGPD/ISO)
+- `## Contraintes` (RGPD/ISO 27001/ISO 9001)
 - `## Critères de succès`
 
 ### Bug — required sections

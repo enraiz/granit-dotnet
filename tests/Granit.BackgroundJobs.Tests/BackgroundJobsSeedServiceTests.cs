@@ -1,3 +1,4 @@
+using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
 using NSubstitute;
 using Shouldly;

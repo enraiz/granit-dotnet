@@ -4,8 +4,7 @@
 
 - **Type**: Shared NuGet packages for Digital Dynamics .NET applications
 - **Repo**: `granit-dotnet` (company-level, not product-specific)
-- **Cloud**: OVHcloud (Roubaix, FR) — European sovereignty
-- **Compliance**: HDS + RGPD | Criticality: HIGH
+- **Compliance**: RGPD + ISO 27001 + ISO 9001
 - **Publication**: GitLab Package Registry (NuGet)
 
 ## GitLab repositories
@@ -64,7 +63,7 @@
 
 | Package | Role |
 | ------- | ---- |
-| `Granit.Persistence` / `.Migrations` / `.Migrations.Wolverine` | EF Core interceptors (HDS audit, soft delete), migrations |
+| `Granit.Persistence` / `.Migrations` / `.Migrations.Wolverine` | EF Core interceptors (audit, soft delete), migrations |
 | `Granit.Caching` / `.Hybrid` / `.StackExchangeRedis` | Distributed caching (IDistributedCache, HybridCache, Redis) |
 | `Granit.MultiTenancy` | Tenant isolation, ICurrentTenant |
 | `Granit.Settings` / `.EntityFrameworkCore` | Application settings management |
@@ -118,7 +117,7 @@
 | ------- | ---- |
 | `Granit.Observability` | Serilog + OpenTelemetry → OTLP → Loki/Tempo/Mimir |
 | `Granit.Diagnostics` | Health checks, readiness probes |
-| `Granit.Timeline` / `.Endpoints` / `.EntityFrameworkCore` / `.Notifications` | Audit timeline (HDS) |
+| `Granit.Timeline` / `.Endpoints` / `.EntityFrameworkCore` / `.Notifications` | Audit timeline |
 
 ### Storage & imaging
 
@@ -148,13 +147,12 @@ dotnet pack -c Release -o ./nupkgs   # local NuGet pack
 dotnet format --verify-no-changes
 ```
 
-## Regulatory constraints — CRITICAL
+## Compliance constraints
 
-1. **Sovereignty**: Infrastructure MUST stay in Europe (OVHcloud FR)
-2. **US Cloud Act**: NEVER use AWS/Azure/GCP for health data
-3. **HDS**: 3-year audit trail, encryption at rest and in transit
-4. **RGPD**: Minimization, right to erasure, pseudonymization
-5. **Secrets**: No plaintext secrets, mandatory rotation
+1. **RGPD**: Minimization, right to erasure, pseudonymization
+2. **ISO 27001**: Audit trail, encryption at rest and in transit
+3. **ISO 9001**: Quality management, traceability
+4. **Secrets**: No plaintext secrets, mandatory rotation
 
 ## Language
 
@@ -225,7 +223,7 @@ and is available in every module without referencing `Granit.MultiTenancy`.
 - Always check `IsAvailable` before using `Id` — the null object is the normal state when
   multi-tenancy is not installed.
 - Hard dependency on `Granit.MultiTenancy` is allowed **only** when the module must enforce
-  strict tenant isolation (example: BlobStorage — throws if no tenant context, RGPD/HDS).
+  strict tenant isolation (example: BlobStorage — throws if no tenant context, RGPD).
 - Application modules (`GuavaHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
   as usual when multi-tenancy is required in the application.
 
@@ -292,7 +290,6 @@ See [`docs/guide/conventions/securite.md`](docs/guide/conventions/securite.md) f
 
 **NEVER:**
 
-- Propose US cloud solutions (AWS/Azure/GCP) for health data
 - Store secrets in plain text
 - Disable audit logging
 - Propose quick fixes that create technical debt
@@ -300,7 +297,7 @@ See [`docs/guide/conventions/securite.md`](docs/guide/conventions/securite.md) f
 ## Refactoring — mandatory rules
 
 Code that looks "weird" almost always exists for a reason: production fix, regulatory
-edge case, HDS/RGPD constraint, third-party limitation workaround. Never remove or
+edge case, RGPD/ISO 27001 constraint, third-party limitation workaround. Never remove or
 rewrite code without understanding the original intent.
 
 **Before any refactoring:**
@@ -331,7 +328,7 @@ rewrite code without understanding the original intent.
 
 ## Expected behavior
 
-- Understand HDS, RGPD, ISO 27001 and ISO 9001 context before responding
+- Understand RGPD, ISO 27001 and ISO 9001 context before responding
 - Challenge security bad practices
 - Propose alternatives when a request compromises security
 - Explain the "why" behind best practices

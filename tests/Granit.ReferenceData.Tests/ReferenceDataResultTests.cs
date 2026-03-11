@@ -1,4 +1,5 @@
 using Granit.Querying;
+using Granit.ReferenceData.Domain;
 using Shouldly;
 using Xunit;
 

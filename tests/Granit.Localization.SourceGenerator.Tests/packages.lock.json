@@ -16,7 +16,7 @@
       },
       "Microsoft.CodeAnalysis.CSharp": {
         "type": "Direct",
-        "requested": "[5.*, )",
+        "requested": "[5.0.*, )",
         "resolved": "5.0.0",
         "contentHash": "5DSyJ9bk+ATuDy7fp2Zt0mJStDVKbBoiz1DyfAwSa+k4H4IwykAUcV3URelw5b8/iVbfSaOwkwmPUZH6opZKCw==",
         "dependencies": {
@@ -210,7 +210,7 @@
       "granit.localization.sourcegenerator": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.CodeAnalysis.CSharp": "[5.*, )"
+          "Microsoft.CodeAnalysis.CSharp": "[5.0.*, )"
         }
       },
       "Microsoft.CodeAnalysis.Analyzers": {

@@ -1,6 +1,7 @@
-using Granit.Querying.Endpoints.Binding;
+using Granit.Querying.Endpoints.Dtos;
 using Granit.Querying.Meta;
 using Granit.Querying.SavedViews;
+using Granit.Querying.SavedViews.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 

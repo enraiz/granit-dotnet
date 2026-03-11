@@ -1,4 +1,5 @@
 using Granit.Notifications.MobilePush;
+using Granit.Notifications.MobilePush.Internal;
 using Shouldly;
 using Xunit;
 

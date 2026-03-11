@@ -5,6 +5,7 @@ using Granit.DataExchange.EntityFrameworkCore.Internal.Export.Entities;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Configurations;
 using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Entities;
 using Granit.DataExchange.Export;
+using Granit.DataExchange.Export.Domain;
 using Granit.DataExchange.Import.Domain;
 using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;

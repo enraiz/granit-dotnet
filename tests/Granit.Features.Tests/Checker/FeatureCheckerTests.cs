@@ -1,8 +1,7 @@
 using Granit.Core.MultiTenancy;
-using Granit.Features.Checker;
 using Granit.Features.Definitions;
 using Granit.Features.Exceptions;
-using Granit.Features.Store;
+using Granit.Features.Internal;
 using Granit.Features.ValueProviders;
 using Granit.Features.ValueTypes;
 using Microsoft.Extensions.Caching.Hybrid;

@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.Options;
 using Shouldly;
 using Xunit;
 

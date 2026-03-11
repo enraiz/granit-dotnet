@@ -1,4 +1,5 @@
 using Granit.DataExchange.Export.Messages;
+using Granit.DataExchange.Wolverine.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;

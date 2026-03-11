@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.DataExchange.Csv.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.DataExchange.Csv;

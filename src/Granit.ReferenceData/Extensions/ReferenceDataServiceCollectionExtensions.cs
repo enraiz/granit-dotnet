@@ -1,3 +1,4 @@
+using Granit.ReferenceData.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.ReferenceData.Extensions;

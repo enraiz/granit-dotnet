@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Querying.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Querying;

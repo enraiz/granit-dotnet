@@ -1,4 +1,5 @@
 using Granit.Cors.Internal;
+using Granit.Cors.Options;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Options;
 using Shouldly;
@@ -15,7 +16,7 @@ public sealed class ConfigureCorsPolicyOptionsTests
         {
             AllowedOrigins = ["https://app.example.com", "https://admin.example.com"],
         };
-        ConfigureCorsPolicyOptions sut = new(Options.Create(granitOptions));
+        ConfigureCorsPolicyOptions sut = new(Microsoft.Extensions.Options.Options.Create(granitOptions));
         CorsOptions corsOptions = new();
 
         sut.Configure(corsOptions);
@@ -31,7 +32,7 @@ public sealed class ConfigureCorsPolicyOptionsTests
     public void Configure_WithWildcardOrigin_SetsAllowAnyOrigin()
     {
         GranitCorsOptions granitOptions = new() { AllowedOrigins = ["*"] };
-        ConfigureCorsPolicyOptions sut = new(Options.Create(granitOptions));
+        ConfigureCorsPolicyOptions sut = new(Microsoft.Extensions.Options.Options.Create(granitOptions));
         CorsOptions corsOptions = new();
 
         sut.Configure(corsOptions);
@@ -48,7 +49,7 @@ public sealed class ConfigureCorsPolicyOptionsTests
         {
             AllowedOrigins = ["https://app.example.com"],
         };
-        ConfigureCorsPolicyOptions sut = new(Options.Create(granitOptions));
+        ConfigureCorsPolicyOptions sut = new(Microsoft.Extensions.Options.Options.Create(granitOptions));
         CorsOptions corsOptions = new();
 
         sut.Configure(corsOptions);
@@ -67,7 +68,7 @@ public sealed class ConfigureCorsPolicyOptionsTests
             AllowedOrigins = ["https://app.example.com"],
             AllowCredentials = true,
         };
-        ConfigureCorsPolicyOptions sut = new(Options.Create(granitOptions));
+        ConfigureCorsPolicyOptions sut = new(Microsoft.Extensions.Options.Options.Create(granitOptions));
         CorsOptions corsOptions = new();
 
         sut.Configure(corsOptions);
@@ -85,7 +86,7 @@ public sealed class ConfigureCorsPolicyOptionsTests
             AllowedOrigins = ["https://app.example.com"],
             AllowCredentials = false,
         };
-        ConfigureCorsPolicyOptions sut = new(Options.Create(granitOptions));
+        ConfigureCorsPolicyOptions sut = new(Microsoft.Extensions.Options.Options.Create(granitOptions));
         CorsOptions corsOptions = new();
 
         sut.Configure(corsOptions);

@@ -1,4 +1,5 @@
 using System.Reflection;
+using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
 using Shouldly;
 using Xunit;

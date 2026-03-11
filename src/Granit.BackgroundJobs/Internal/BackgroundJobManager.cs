@@ -1,4 +1,5 @@
 using Cronos;
+using Granit.BackgroundJobs.Domain;
 using Granit.Core.Exceptions;
 using Granit.Security;
 using Granit.Timing;

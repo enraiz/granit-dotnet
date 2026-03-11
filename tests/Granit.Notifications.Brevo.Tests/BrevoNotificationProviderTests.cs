@@ -8,6 +8,8 @@
 
 using System.Net;
 using System.Text.Json;
+using Granit.Notifications.Brevo.Internal;
+using Granit.Notifications.Brevo.Options;
 using Granit.Notifications.Email;
 using Granit.Notifications.Sms;
 using Granit.Notifications.WhatsApp;

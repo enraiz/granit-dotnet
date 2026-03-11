@@ -1,3 +1,4 @@
+using Granit.ReferenceData.Endpoints.Options;
 using Shouldly;
 using Xunit;
 

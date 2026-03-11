@@ -1,3 +1,4 @@
+using Granit.Notifications.Endpoints.Dtos;
 using Shouldly;
 using Xunit;
 

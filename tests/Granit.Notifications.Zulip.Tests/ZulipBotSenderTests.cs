@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text;
+using Granit.Notifications.Zulip.Internal;
+using Granit.Notifications.Zulip.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -11,7 +13,7 @@ namespace Granit.Notifications.Zulip.Tests;
 
 public sealed class ZulipBotSenderTests
 {
-    private readonly IOptions<ZulipBotOptions> _options = Options.Create(new ZulipBotOptions
+    private readonly IOptions<ZulipBotOptions> _options = Microsoft.Extensions.Options.Options.Create(new ZulipBotOptions
     {
         BaseUrl = "https://zulip.example.com",
         BotEmail = "bot@example.com",

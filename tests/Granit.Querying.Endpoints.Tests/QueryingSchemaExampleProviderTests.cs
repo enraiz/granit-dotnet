@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using Granit.Querying.Endpoints.Internal;
 using Granit.Querying.SavedViews;
 using Shouldly;
 using Xunit;

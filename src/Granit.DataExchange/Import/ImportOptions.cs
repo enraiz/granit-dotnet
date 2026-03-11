@@ -1,4 +1,4 @@
-namespace Granit.DataExchange;
+namespace Granit.DataExchange.Import;
 
 /// <summary>
 /// Configuration options for the data exchange import subsystem.

@@ -1,4 +1,6 @@
+using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Extensions;
+using Granit.BackgroundJobs.Options;
 using Granit.Core.Modularity;
 using Granit.Wolverine;
 

@@ -6,6 +6,7 @@
 
 using Granit.Webhooks.Dtos;
 using Granit.Webhooks.Endpoints;
+using Granit.Webhooks.Options;
 using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;
@@ -17,7 +18,7 @@ public sealed class WebhookModuleConfigProviderTests
     [Fact]
     public void GetConfig_StorePayloadFalse_ReturnsFalse()
     {
-        IOptions<WebhooksOptions> options = Options.Create(new WebhooksOptions { StorePayload = false });
+        IOptions<WebhooksOptions> options = Microsoft.Extensions.Options.Options.Create(new WebhooksOptions { StorePayload = false });
         WebhookModuleConfigProvider provider = new(options);
 
         WebhookModuleConfigResponse result = provider.GetConfig();
@@ -28,7 +29,7 @@ public sealed class WebhookModuleConfigProviderTests
     [Fact]
     public void GetConfig_StorePayloadTrue_ReturnsTrue()
     {
-        IOptions<WebhooksOptions> options = Options.Create(new WebhooksOptions { StorePayload = true });
+        IOptions<WebhooksOptions> options = Microsoft.Extensions.Options.Options.Create(new WebhooksOptions { StorePayload = true });
         WebhookModuleConfigProvider provider = new(options);
 
         WebhookModuleConfigResponse result = provider.GetConfig();

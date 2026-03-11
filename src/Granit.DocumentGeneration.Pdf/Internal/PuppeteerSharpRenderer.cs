@@ -1,3 +1,4 @@
+using Granit.DocumentGeneration.Pdf.Options;
 using Granit.DocumentGeneration.Pipeline;
 using Granit.Templating.Keys;
 using Microsoft.Extensions.Logging;

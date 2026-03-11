@@ -1,3 +1,4 @@
+using Granit.Notifications.Email.Smtp.Options;
 using Shouldly;
 using Xunit;
 

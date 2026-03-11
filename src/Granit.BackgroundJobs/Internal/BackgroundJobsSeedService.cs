@@ -1,3 +1,4 @@
+using Granit.BackgroundJobs.Domain;
 using Microsoft.Extensions.Hosting;
 
 namespace Granit.BackgroundJobs.Internal;

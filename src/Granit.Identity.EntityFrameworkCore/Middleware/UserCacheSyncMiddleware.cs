@@ -1,6 +1,7 @@
 using Granit.Core.MultiTenancy;
 using Granit.Identity.EntityFrameworkCore.Entities;
 using Granit.Identity.EntityFrameworkCore.Internal;
+using Granit.Identity.EntityFrameworkCore.Options;
 using Granit.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;

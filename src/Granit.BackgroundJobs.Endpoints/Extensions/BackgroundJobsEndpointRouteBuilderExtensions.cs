@@ -1,5 +1,6 @@
 using Granit.BackgroundJobs.Endpoints.Endpoints;
 using Granit.BackgroundJobs.Endpoints.Internal;
+using Granit.BackgroundJobs.Endpoints.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

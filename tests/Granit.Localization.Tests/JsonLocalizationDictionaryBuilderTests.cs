@@ -15,7 +15,7 @@ public sealed class JsonLocalizationDictionaryBuilderTests
 
         // Act
         Dictionary<string, Dictionary<string, string>> result =
-            Json.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
+            Internal.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
 
         // Assert
         result.ShouldContainKey("fr");
@@ -33,7 +33,7 @@ public sealed class JsonLocalizationDictionaryBuilderTests
 
         // Act
         Dictionary<string, Dictionary<string, string>> result =
-            Json.JsonLocalizationDictionaryBuilder.Build(assembly, "NonExistent.Prefix");
+            Internal.JsonLocalizationDictionaryBuilder.Build(assembly, "NonExistent.Prefix");
 
         // Assert
         result.ShouldBeEmpty();
@@ -48,7 +48,7 @@ public sealed class JsonLocalizationDictionaryBuilderTests
 
         // Act
         Dictionary<string, Dictionary<string, string>> result =
-            Json.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
+            Internal.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
 
         // Assert
         result["fr"]["Test:Welcome"].ShouldContain("{0}");
@@ -64,7 +64,7 @@ public sealed class JsonLocalizationDictionaryBuilderTests
 
         // Act
         Dictionary<string, Dictionary<string, string>> result =
-            Json.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
+            Internal.JsonLocalizationDictionaryBuilder.Build(assembly, prefix);
 
         // Assert
         result.ShouldContainKey("fr");

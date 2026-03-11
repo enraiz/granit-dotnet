@@ -1,4 +1,5 @@
 using Granit.DocumentGeneration.Pdf.Internal;
+using Granit.DocumentGeneration.Pdf.Options;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -105,14 +106,14 @@ public sealed class ChromiumLifetimeServiceTests
 
     private static ChromiumLifetimeService CreateService(PdfRenderOptions? options = null) =>
         new(
-            Options.Create(options ?? new PdfRenderOptions()),
+            Microsoft.Extensions.Options.Options.Create(options ?? new PdfRenderOptions()),
             NullLogger<ChromiumLifetimeService>.Instance);
 
     private static ChromiumLifetimeService CreateServiceWithBrowser(IBrowser browser)
     {
         PdfRenderOptions options = new();
         ChromiumLifetimeService service = new(
-            Options.Create(options),
+            Microsoft.Extensions.Options.Options.Create(options),
             NullLogger<ChromiumLifetimeService>.Instance);
 
         System.Reflection.FieldInfo? browserField = typeof(ChromiumLifetimeService)

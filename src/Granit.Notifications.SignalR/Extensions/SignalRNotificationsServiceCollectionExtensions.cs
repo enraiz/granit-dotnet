@@ -1,4 +1,6 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.SignalR.Internal;
+using Granit.Notifications.SignalR.Options;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 

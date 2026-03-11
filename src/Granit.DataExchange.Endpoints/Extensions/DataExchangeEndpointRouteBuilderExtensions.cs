@@ -2,6 +2,7 @@ using Granit.DataExchange.Endpoints.Endpoints.Export;
 using Granit.DataExchange.Endpoints.Endpoints.Import;
 using Granit.DataExchange.Endpoints.Internal.Export;
 using Granit.DataExchange.Endpoints.Internal.Import;
+using Granit.DataExchange.Endpoints.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

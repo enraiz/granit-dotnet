@@ -1,3 +1,5 @@
+using Granit.Querying.SavedViews.Domain;
+
 namespace Granit.Querying.SavedViews;
 
 /// <summary>

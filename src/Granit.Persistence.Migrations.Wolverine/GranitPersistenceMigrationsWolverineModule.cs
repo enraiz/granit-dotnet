@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Persistence.Migrations;
+using Granit.Persistence.Migrations.Wolverine.Internal;
 using Granit.Wolverine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

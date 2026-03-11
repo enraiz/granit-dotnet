@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Granit.Identity.Keycloak.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

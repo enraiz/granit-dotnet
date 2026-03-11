@@ -1,4 +1,5 @@
 using Granit.Webhooks.Domain;
+using Granit.Webhooks.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

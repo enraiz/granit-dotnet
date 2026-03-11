@@ -13,6 +13,7 @@ using Granit.Webhooks.Exceptions;
 using Granit.Webhooks.Handlers;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
+using Granit.Webhooks.Options;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -215,7 +216,7 @@ public sealed class SendWebhookHandlerTests
         HttpClient httpClient = new(new StaticResponseHandler(statusCode));
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        IOptions<WebhooksOptions> opts = Options.Create(new WebhooksOptions { StorePayload = storePayload });
+        IOptions<WebhooksOptions> opts = Microsoft.Extensions.Options.Options.Create(new WebhooksOptions { StorePayload = storePayload });
         return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, opts, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 
@@ -224,7 +225,7 @@ public sealed class SendWebhookHandlerTests
         HttpClient httpClient = new(new TimeoutHandler());
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
-        IOptions<WebhooksOptions> opts = Options.Create(new WebhooksOptions());
+        IOptions<WebhooksOptions> opts = Microsoft.Extensions.Options.Options.Create(new WebhooksOptions());
         return new SendWebhookHandler(factory, _deliveryWriter, _secretProtector, opts, NullLogger<SendWebhookHandler>.Instance, _clock);
     }
 

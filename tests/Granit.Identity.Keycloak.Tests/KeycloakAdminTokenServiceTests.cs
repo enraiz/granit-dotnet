@@ -1,5 +1,6 @@
 using System.Net;
 using Granit.Identity.Keycloak.Internal;
+using Granit.Identity.Keycloak.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -34,7 +35,7 @@ public sealed class KeycloakAdminTokenServiceTests : IDisposable
 
         _service = new KeycloakAdminTokenService(
             factory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             _clock,
             NullLogger<KeycloakAdminTokenService>.Instance);
     }
@@ -89,7 +90,7 @@ public sealed class KeycloakAdminTokenServiceTests : IDisposable
 
         using var service = new KeycloakAdminTokenService(
             factory,
-            Options.Create(_options),
+            Microsoft.Extensions.Options.Options.Create(_options),
             _clock,
             NullLogger<KeycloakAdminTokenService>.Instance);
 

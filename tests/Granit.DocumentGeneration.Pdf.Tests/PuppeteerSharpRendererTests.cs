@@ -1,4 +1,5 @@
 using Granit.DocumentGeneration.Pdf.Internal;
+using Granit.DocumentGeneration.Pdf.Options;
 using Granit.DocumentGeneration.Pipeline;
 using Granit.Templating.Keys;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -98,7 +99,7 @@ public sealed class PuppeteerSharpRendererTests
         ChromiumLifetimeService lifetime = CreateLifetimeWithBrowser(browser, opts);
         PuppeteerSharpRenderer renderer = new(
             lifetime,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<PuppeteerSharpRenderer>.Instance);
 
         DocumentResult result = await renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
@@ -127,7 +128,7 @@ public sealed class PuppeteerSharpRendererTests
         ChromiumLifetimeService lifetime = CreateLifetimeWithBrowser(browser, opts);
         PuppeteerSharpRenderer renderer = new(
             lifetime,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<PuppeteerSharpRenderer>.Instance);
 
         await renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
@@ -154,7 +155,7 @@ public sealed class PuppeteerSharpRendererTests
         ChromiumLifetimeService lifetime = CreateLifetimeWithBrowser(browser, opts);
         PuppeteerSharpRenderer renderer = new(
             lifetime,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<PuppeteerSharpRenderer>.Instance);
 
         await renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
@@ -185,7 +186,7 @@ public sealed class PuppeteerSharpRendererTests
         ChromiumLifetimeService lifetime = CreateLifetimeWithBrowser(browser, opts);
         PuppeteerSharpRenderer renderer = new(
             lifetime,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<PuppeteerSharpRenderer>.Instance);
 
         await renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
@@ -213,7 +214,7 @@ public sealed class PuppeteerSharpRendererTests
         ChromiumLifetimeService lifetime = CreateLifetimeWithBrowser(browser, opts);
         PuppeteerSharpRenderer renderer = new(
             lifetime,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<PuppeteerSharpRenderer>.Instance);
 
         await renderer.RenderAsync("<h1>Hello</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
@@ -245,7 +246,7 @@ public sealed class PuppeteerSharpRendererTests
         ChromiumLifetimeService lifetime = CreateLifetimeWithBrowser(browser, opts);
         PuppeteerSharpRenderer renderer = new(
             lifetime,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<PuppeteerSharpRenderer>.Instance);
 
         await renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
@@ -272,7 +273,7 @@ public sealed class PuppeteerSharpRendererTests
         ChromiumLifetimeService lifetime = CreateLifetimeWithBrowser(browser, opts);
         PuppeteerSharpRenderer renderer = new(
             lifetime,
-            Options.Create(opts),
+            Microsoft.Extensions.Options.Options.Create(opts),
             NullLogger<PuppeteerSharpRenderer>.Instance);
 
         Func<Task> act = () => renderer.RenderAsync("<h1>Test</h1>", DocumentFormat.Pdf, TestContext.Current.CancellationToken);
@@ -287,19 +288,19 @@ public sealed class PuppeteerSharpRendererTests
     {
         PdfRenderOptions options = new();
         ChromiumLifetimeService lifetime = new(
-            Options.Create(options),
+            Microsoft.Extensions.Options.Options.Create(options),
             NullLogger<ChromiumLifetimeService>.Instance);
 
         return new PuppeteerSharpRenderer(
             lifetime,
-            Options.Create(options),
+            Microsoft.Extensions.Options.Options.Create(options),
             NullLogger<PuppeteerSharpRenderer>.Instance);
     }
 
     private static ChromiumLifetimeService CreateLifetimeWithBrowser(IBrowser browser, PdfRenderOptions options)
     {
         ChromiumLifetimeService lifetime = new(
-            Options.Create(options),
+            Microsoft.Extensions.Options.Options.Create(options),
             NullLogger<ChromiumLifetimeService>.Instance);
 
         // Use reflection to set the browser field for testing

@@ -2,6 +2,8 @@ using System.Net;
 using System.Text.Json;
 using Granit.Notifications.MobilePush;
 using Granit.Notifications.MobilePush.Fcm;
+using Granit.Notifications.MobilePush.Fcm.Internal;
+using Granit.Notifications.MobilePush.Fcm.Options;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -58,7 +60,7 @@ public sealed class FcmMobilePushSenderTests
         HttpClient client = new(handler) { BaseAddress = new Uri("https://fcm.googleapis.com/") };
         factory.CreateClient("FcmPush").Returns(client);
 
-        IOptions<FcmOptions> options = Options.Create(new FcmOptions { ProjectId = "test-project", ServiceAccountJson = "{}" });
+        IOptions<FcmOptions> options = Microsoft.Extensions.Options.Options.Create(new FcmOptions { ProjectId = "test-project", ServiceAccountJson = "{}" });
         return new FcmMobilePushSender(factory, options, messageBus ?? Substitute.For<IMessageBus>(), NullLogger<FcmMobilePushSender>.Instance);
     }
 

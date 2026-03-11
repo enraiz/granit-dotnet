@@ -3,6 +3,7 @@
 // =============================================================================
 
 using Granit.MultiTenancy;
+using Granit.MultiTenancy.Options;
 using Granit.MultiTenancy.Resolvers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,7 @@ public sealed class HeaderTenantResolverTests
 {
     private static HeaderTenantResolver CreateResolver(string headerName = "X-Tenant-Id")
     {
-        IOptions<MultiTenancyOptions> options = Options.Create(new MultiTenancyOptions
+        IOptions<MultiTenancyOptions> options = Microsoft.Extensions.Options.Options.Create(new MultiTenancyOptions
         {
             TenantIdHeaderName = headerName
         });

@@ -1,4 +1,5 @@
 using Granit.Templating.Enrichment;
+using Granit.Templating.Extensions;
 using Granit.Templating.GlobalContext;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;

@@ -1,4 +1,5 @@
 using Granit.Core.MultiTenancy;
+using Granit.Identity.EntityFrameworkCore.Options;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Identity.EntityFrameworkCore.Internal;

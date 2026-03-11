@@ -1,5 +1,6 @@
 using Granit.Identity.EntityFrameworkCore.DbContext;
 using Granit.Identity.EntityFrameworkCore.Internal;
+using Granit.Identity.EntityFrameworkCore.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

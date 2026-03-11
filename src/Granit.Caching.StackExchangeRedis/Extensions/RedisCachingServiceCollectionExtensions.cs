@@ -1,5 +1,7 @@
 using Granit.Caching;
+using Granit.Caching.Options;
 using Granit.Caching.StackExchangeRedis.HealthChecks;
+using Granit.Caching.StackExchangeRedis.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;

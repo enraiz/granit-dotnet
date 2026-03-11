@@ -1,5 +1,7 @@
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.SignalR.Extensions;
+using Granit.Notifications.SignalR.Internal;
+using Granit.Notifications.SignalR.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

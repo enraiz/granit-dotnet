@@ -1,3 +1,4 @@
+using Granit.Cors.Options;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Options;
 

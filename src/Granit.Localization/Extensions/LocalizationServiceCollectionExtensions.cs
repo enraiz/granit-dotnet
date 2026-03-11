@@ -1,4 +1,5 @@
-using Granit.Localization.Json;
+using Granit.Localization.Internal;
+using Granit.Localization.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

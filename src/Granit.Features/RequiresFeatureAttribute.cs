@@ -1,5 +1,4 @@
 using Granit.Features.AspNetCore;
-using Granit.Features.Checker;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 

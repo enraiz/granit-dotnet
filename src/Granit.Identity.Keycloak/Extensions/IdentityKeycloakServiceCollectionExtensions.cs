@@ -1,5 +1,6 @@
 using Granit.Identity.Extensions;
 using Granit.Identity.Keycloak.Internal;
+using Granit.Identity.Keycloak.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;

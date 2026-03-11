@@ -1,3 +1,4 @@
+using Granit.Localization.EntityFrameworkCore.Entities;
 using Granit.Localization.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;

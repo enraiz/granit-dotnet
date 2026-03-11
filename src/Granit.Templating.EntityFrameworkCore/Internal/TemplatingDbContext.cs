@@ -12,24 +12,12 @@ namespace Granit.Templating.EntityFrameworkCore.Internal;
 /// Isolated from the host application's DbContext to avoid coupling.
 /// Compatible with PostgreSQL and SQL Server.
 /// </remarks>
-internal sealed class TemplatingDbContext : DbContext
+internal sealed class TemplatingDbContext(
+    DbContextOptions<TemplatingDbContext> options,
+    ICurrentTenant? currentTenant = null,
+    IDataFilter? dataFilter = null)
+    : DbContext(options)
 {
-    private readonly ICurrentTenant? _currentTenant;
-    private readonly IDataFilter? _dataFilter;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="TemplatingDbContext"/>.
-    /// </summary>
-    public TemplatingDbContext(
-        DbContextOptions<TemplatingDbContext> options,
-        ICurrentTenant? currentTenant = null,
-        IDataFilter? dataFilter = null)
-        : base(options)
-    {
-        _currentTenant = currentTenant;
-        _dataFilter = dataFilter;
-    }
-
     /// <summary>All template revisions (Draft, PendingReview, Published, Archived).</summary>
     public DbSet<TemplateRevisionEntity> TemplateRevisions { get; set; } = null!;
 
@@ -42,6 +30,6 @@ internal sealed class TemplatingDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new TemplateRevisionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new TemplateCategoryEntityConfiguration());
-        modelBuilder.ApplyGranitConventions(_currentTenant, _dataFilter);
+        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
     }
 }

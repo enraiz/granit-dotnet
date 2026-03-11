@@ -1,4 +1,6 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.WhatsApp.Internal;
+using Granit.Notifications.WhatsApp.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Notifications.WhatsApp.Extensions;

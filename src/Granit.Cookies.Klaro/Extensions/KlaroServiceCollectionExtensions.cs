@@ -1,3 +1,4 @@
+using Granit.Cookies.Klaro.Internal;
 using Granit.Cookies.Klaro.Options;
 using Microsoft.Extensions.DependencyInjection;
 

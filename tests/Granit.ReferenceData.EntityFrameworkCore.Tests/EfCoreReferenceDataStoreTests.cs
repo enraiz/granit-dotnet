@@ -1,6 +1,7 @@
 using Granit.Querying;
 using Granit.ReferenceData.EntityFrameworkCore.Extensions;
 using Granit.ReferenceData.EntityFrameworkCore.Internal;
+using Granit.ReferenceData.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +42,7 @@ public sealed class EfCoreReferenceDataStoreTests
 
         ServiceProvider sp = services.BuildServiceProvider();
         IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-        IOptions<ReferenceDataOptions> options = Options.Create(new ReferenceDataOptions());
+        IOptions<ReferenceDataOptions> options = Microsoft.Extensions.Options.Options.Create(new ReferenceDataOptions());
 
         return new EfCoreReferenceDataStore<TestEntity, TestDbContext>(
             sp.GetRequiredService<IServiceScopeFactory>(),
@@ -353,7 +354,7 @@ public sealed class EfCoreReferenceDataStoreTests
 
         // Use shared cache to test invalidation
         MemoryCache cache = new(new MemoryCacheOptions());
-        IOptions<ReferenceDataOptions> opts = Options.Create(new ReferenceDataOptions());
+        IOptions<ReferenceDataOptions> opts = Microsoft.Extensions.Options.Options.Create(new ReferenceDataOptions());
 
         ServiceCollection services = new();
         services.AddDbContext<TestDbContext>(o => o.UseInMemoryDatabase(db));

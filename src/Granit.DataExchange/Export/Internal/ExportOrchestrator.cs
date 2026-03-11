@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Granit.DataExchange.Export.Domain;
 using Granit.DataExchange.Export.Messages;
 using Granit.DataExchange.Import.Pipeline;
 using Granit.Guids;

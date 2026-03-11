@@ -1,4 +1,6 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.MobilePush.Internal;
+using Granit.Notifications.MobilePush.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

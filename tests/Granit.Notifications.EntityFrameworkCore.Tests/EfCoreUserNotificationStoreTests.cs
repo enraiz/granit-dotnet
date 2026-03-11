@@ -7,6 +7,7 @@
 
 using System.Text.Json;
 using Granit.Notifications.Domain;
+using Granit.Notifications.EntityFrameworkCore.Internal;
 using Granit.Querying;
 using Shouldly;
 using Xunit;

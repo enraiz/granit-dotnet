@@ -8,6 +8,7 @@
 
 using System.Text.Json;
 using Granit.Notifications.SignalR;
+using Granit.Notifications.SignalR.Internal;
 using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using Shouldly;

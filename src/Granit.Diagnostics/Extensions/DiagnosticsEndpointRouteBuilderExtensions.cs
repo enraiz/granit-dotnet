@@ -1,3 +1,4 @@
+using Granit.Diagnostics.Options;
 using Granit.Diagnostics.ResponseWriters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;

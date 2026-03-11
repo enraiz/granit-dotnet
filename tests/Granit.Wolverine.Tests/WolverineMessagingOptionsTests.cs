@@ -7,6 +7,7 @@
 
 using Granit.Wolverine;
 using Granit.Wolverine.Internal;
+using Granit.Wolverine.Options;
 using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;

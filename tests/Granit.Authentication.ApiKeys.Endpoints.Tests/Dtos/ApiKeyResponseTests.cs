@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.Domain;
 using Granit.Authentication.ApiKeys.Endpoints.Dtos;
 using Shouldly;
 using Xunit;

@@ -10,6 +10,8 @@
 
 using Granit.ExceptionHandling;
 using Granit.ExceptionHandling.Extensions;
+using Granit.ExceptionHandling.Internal;
+using Granit.ExceptionHandling.Options;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

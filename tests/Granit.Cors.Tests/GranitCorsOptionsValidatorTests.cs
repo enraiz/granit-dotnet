@@ -1,4 +1,5 @@
 using Granit.Cors.Internal;
+using Granit.Cors.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NSubstitute;

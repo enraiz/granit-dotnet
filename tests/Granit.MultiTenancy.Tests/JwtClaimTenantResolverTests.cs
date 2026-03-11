@@ -4,6 +4,7 @@
 
 using System.Security.Claims;
 using Granit.MultiTenancy;
+using Granit.MultiTenancy.Options;
 using Granit.MultiTenancy.Resolvers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -16,7 +17,7 @@ public sealed class JwtClaimTenantResolverTests
 {
     private static JwtClaimTenantResolver CreateResolver(string claimType = "tenant_id")
     {
-        IOptions<MultiTenancyOptions> options = Options.Create(new MultiTenancyOptions
+        IOptions<MultiTenancyOptions> options = Microsoft.Extensions.Options.Options.Create(new MultiTenancyOptions
         {
             TenantIdClaimType = claimType
         });

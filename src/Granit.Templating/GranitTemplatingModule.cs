@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Templating.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Templating;

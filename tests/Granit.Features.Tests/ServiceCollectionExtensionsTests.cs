@@ -1,7 +1,6 @@
-using Granit.Features.Checker;
 using Granit.Features.Definitions;
-using Granit.Features.Limits;
-using Granit.Features.Store;
+using Granit.Features.Extensions;
+using Granit.Features.Internal;
 using Granit.Features.ValueProviders;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

@@ -5,6 +5,7 @@
 // deduplication (upsert), tenant isolation, and multi-subscription support.
 // =============================================================================
 
+using Granit.Notifications.WebPush.Internal;
 using Shouldly;
 using Xunit;
 

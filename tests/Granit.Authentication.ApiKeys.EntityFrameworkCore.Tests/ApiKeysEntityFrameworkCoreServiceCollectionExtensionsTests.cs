@@ -1,4 +1,5 @@
 using Granit.Authentication.ApiKeys.EntityFrameworkCore.Extensions;
+using Granit.Authentication.ApiKeys.EntityFrameworkCore.Internal;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
 using Granit.Persistence.Interceptors;

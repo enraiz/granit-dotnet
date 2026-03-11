@@ -1,6 +1,8 @@
 using Granit.Caching;
 using Granit.Core.Modularity;
+using Granit.Features.Extensions;
 using Granit.Localization;
+using Granit.Localization.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Features;

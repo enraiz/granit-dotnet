@@ -1,3 +1,4 @@
+using Granit.Identity.Keycloak.Options;
 using Shouldly;
 using Xunit;
 

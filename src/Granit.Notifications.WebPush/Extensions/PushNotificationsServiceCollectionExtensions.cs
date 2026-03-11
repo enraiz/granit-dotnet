@@ -1,4 +1,5 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.WebPush.Internal;
 using Granit.Notifications.WebPush.Options;
 using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;

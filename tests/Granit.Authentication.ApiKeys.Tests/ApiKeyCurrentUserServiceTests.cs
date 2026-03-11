@@ -1,3 +1,5 @@
+using Granit.Authentication.ApiKeys.Domain;
+using Granit.Authentication.ApiKeys.Internal;
 using Granit.Security;
 using Shouldly;
 using Xunit;

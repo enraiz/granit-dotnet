@@ -1,4 +1,5 @@
 using Granit.Authorization.Abstractions;
+using Granit.BackgroundJobs.Endpoints.Internal;
 using Granit.Core.Localization;
 
 namespace Granit.BackgroundJobs.Endpoints.Permissions;

@@ -1,3 +1,4 @@
+using Granit.BlobStorage.S3.Options;
 using Granit.Core.MultiTenancy;
 using Granit.Timing;
 using Microsoft.Extensions.Options;

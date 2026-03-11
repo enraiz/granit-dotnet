@@ -1,4 +1,5 @@
 using Granit.ReferenceData.EntityFrameworkCore.Extensions;
+using Granit.ReferenceData.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Shouldly;

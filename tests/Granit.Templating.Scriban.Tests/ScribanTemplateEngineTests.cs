@@ -3,6 +3,7 @@ using Granit.Templating.Keys;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Scriban;
 using Granit.Templating.Scriban.Exceptions;
+using Granit.Templating.Scriban.Internal;
 using NSubstitute;
 using Shouldly;
 using Xunit;

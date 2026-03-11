@@ -1,4 +1,5 @@
 using Granit.Cookies.Endpoints.Dtos;
+using Granit.Cookies.Endpoints.Internal;
 using NSubstitute;
 using Shouldly;
 using Xunit;

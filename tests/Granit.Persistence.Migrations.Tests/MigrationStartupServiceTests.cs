@@ -8,6 +8,7 @@
 
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
+using Granit.Persistence.Migrations.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -96,7 +97,7 @@ public sealed class MigrationStartupServiceTests
             factory,
             tenantEnumerator,
             dispatcher,
-            Options.Create(new MigrationStartupOptions { DefaultBatchSize = defaultBatchSize }),
+            Microsoft.Extensions.Options.Options.Create(new MigrationStartupOptions { DefaultBatchSize = defaultBatchSize }),
             NullLogger<MigrationStartupService>.Instance);
 
     // -------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 using Granit.BlobStorage.S3;
 using Granit.BlobStorage.S3.Internal;
+using Granit.BlobStorage.S3.Options;
 using Granit.Core.MultiTenancy;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
@@ -27,7 +28,7 @@ public sealed class PrefixBlobKeyStrategyTests
         _sut = new PrefixBlobKeyStrategy(
             _currentTenant,
             _clock,
-            Options.Create(new S3BlobOptions { DefaultBucket = "granit-blobs" }));
+            Microsoft.Extensions.Options.Options.Create(new S3BlobOptions { DefaultBucket = "granit-blobs" }));
     }
 
     // ── BuildObjectKey ────────────────────────────────────────────────────────
@@ -68,7 +69,7 @@ public sealed class PrefixBlobKeyStrategyTests
 
         PrefixBlobKeyStrategy strategyB = new(
             BuildTenantSubstitute(tenantB), _clock,
-            Options.Create(new S3BlobOptions { DefaultBucket = "granit-blobs" }));
+            Microsoft.Extensions.Options.Options.Create(new S3BlobOptions { DefaultBucket = "granit-blobs" }));
 
         // Act
         string keyA = _sut.BuildObjectKey("medical-images", blobId);

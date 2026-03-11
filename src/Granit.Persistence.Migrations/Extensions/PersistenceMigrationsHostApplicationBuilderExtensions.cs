@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using Granit.Persistence.Migrations.Internal;
 using Granit.Persistence.Migrations.Messages;
+using Granit.Persistence.Migrations.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

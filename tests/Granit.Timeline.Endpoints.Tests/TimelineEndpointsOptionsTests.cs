@@ -1,3 +1,4 @@
+using Granit.Timeline.Endpoints.Options;
 using Shouldly;
 using Xunit;
 

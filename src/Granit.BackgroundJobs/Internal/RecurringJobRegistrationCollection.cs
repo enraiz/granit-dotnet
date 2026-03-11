@@ -1,3 +1,5 @@
+using Granit.BackgroundJobs.Domain;
+
 namespace Granit.BackgroundJobs.Internal;
 
 /// <summary>

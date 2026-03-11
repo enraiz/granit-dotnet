@@ -1,3 +1,4 @@
+using Granit.Authentication.ApiKeys.Endpoints.Internal;
 using Granit.Authorization.Abstractions;
 using Granit.Core.Localization;
 

@@ -1,5 +1,6 @@
 using Granit.Core.MultiTenancy;
 using Granit.Templating.Store;
+using Granit.Templating.Workflow.Internal;
 using Granit.Workflow;
 using Granit.Workflow.Domain;
 using NSubstitute;

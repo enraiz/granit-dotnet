@@ -1,4 +1,5 @@
 using Granit.BackgroundJobs.Endpoints;
+using Granit.BackgroundJobs.Endpoints.Options;
 using Shouldly;
 using Xunit;
 

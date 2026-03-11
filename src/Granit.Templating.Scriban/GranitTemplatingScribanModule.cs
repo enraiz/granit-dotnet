@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Templating.Scriban.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Templating.Scriban;

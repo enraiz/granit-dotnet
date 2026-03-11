@@ -1,5 +1,6 @@
 using Granit.Workflow.Endpoints.Endpoints;
 using Granit.Workflow.Endpoints.Internal;
+using Granit.Workflow.Endpoints.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

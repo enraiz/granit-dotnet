@@ -3,6 +3,7 @@ using Granit.Guids;
 using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Domain;
+using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 
 namespace Granit.Webhooks.Handlers;

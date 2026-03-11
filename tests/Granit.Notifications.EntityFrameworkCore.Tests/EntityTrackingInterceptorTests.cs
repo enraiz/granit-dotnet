@@ -7,6 +7,7 @@
 // =============================================================================
 
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.EntityFrameworkCore.Internal;
 using Granit.Timing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Cors.Extensions;
+using Granit.Cors.Options;
 
 namespace Granit.Cors;
 

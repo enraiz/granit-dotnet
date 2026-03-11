@@ -1,4 +1,5 @@
 using FluentValidation.Results;
+using Granit.Notifications.Endpoints.Dtos;
 using Granit.Notifications.Endpoints.Validators;
 using Shouldly;
 using Xunit;

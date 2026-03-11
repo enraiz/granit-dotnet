@@ -6,6 +6,7 @@
 // error codes for the GranitExceptionHandler localization pipeline.
 // =============================================================================
 
+using Granit.BlobStorage.Domain;
 using Granit.BlobStorage.Exceptions;
 using Granit.Core.Exceptions;
 using Shouldly;

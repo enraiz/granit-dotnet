@@ -2,6 +2,7 @@ using Granit.Notifications.Abstractions;
 using Granit.Notifications.Exceptions;
 using Granit.Notifications.Internal;
 using Granit.Notifications.Messages;
+using Granit.Notifications.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

@@ -7,6 +7,7 @@
 //   - Type sans suffixe CacheItem → nom intact
 // =============================================================================
 
+using Granit.Caching.Internal;
 using Shouldly;
 using Xunit;
 

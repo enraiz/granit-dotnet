@@ -1,3 +1,4 @@
+using Granit.Settings.EntityFrameworkCore.Entities;
 using Granit.Settings.EntityFrameworkCore.Extensions;
 using Granit.Settings.EntityFrameworkCore.Internal;
 using Granit.Settings.Values;

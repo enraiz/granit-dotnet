@@ -99,8 +99,8 @@
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.*" />
   </ItemGroup>
   <ItemGroup Label="Roslyn Analyzers">
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.*" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.*" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.*" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.*" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.*" />
     <PackageVersion Include="System.Composition.AttributedModel" Version="9.*" />
     <!-- Used by Granit.Localization.SourceGenerator (netstandard2.0 target) -->

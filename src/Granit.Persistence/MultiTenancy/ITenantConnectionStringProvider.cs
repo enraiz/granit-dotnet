@@ -1,4 +1,4 @@
-namespace Granit.Persistence;
+namespace Granit.Persistence.MultiTenancy;
 
 /// <summary>
 /// Provides the connection string for a given tenant's isolated database.

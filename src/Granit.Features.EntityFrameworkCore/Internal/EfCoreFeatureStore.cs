@@ -1,4 +1,3 @@
-using Granit.Features.Store;
 using Microsoft.EntityFrameworkCore;
 
 namespace Granit.Features.EntityFrameworkCore.Internal;
