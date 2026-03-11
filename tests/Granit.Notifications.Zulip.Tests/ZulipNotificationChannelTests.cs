@@ -112,7 +112,7 @@ public sealed class ZulipNotificationChannelTests
     [Fact]
     public async Task SendAsync_LogsWhenLoggingEnabled()
     {
-        var enabledLogger = Substitute.For<ILogger<ZulipNotificationChannel>>();
+        ILogger<ZulipNotificationChannel> enabledLogger = Substitute.For<ILogger<ZulipNotificationChannel>>();
         enabledLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         var channel = new ZulipNotificationChannel(_sender, _options, enabledLogger);
         NotificationDeliveryContext context = BuildContext();
@@ -126,12 +126,12 @@ public sealed class ZulipNotificationChannelTests
     [Fact]
     public async Task SendAsync_WithCustomOptions_LogsStreamAndTopic()
     {
-        var customOptions = Microsoft.Extensions.Options.Options.Create(new ZulipChannelOptions
+        IOptions<ZulipChannelOptions> customOptions = Microsoft.Extensions.Options.Options.Create(new ZulipChannelOptions
         {
             DefaultStream = "custom-stream",
             DefaultTopic = "custom-topic",
         });
-        var enabledLogger = Substitute.For<ILogger<ZulipNotificationChannel>>();
+        ILogger<ZulipNotificationChannel> enabledLogger = Substitute.For<ILogger<ZulipNotificationChannel>>();
         enabledLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         var channel = new ZulipNotificationChannel(_sender, customOptions, enabledLogger);
         ZulipMessage? captured = null;

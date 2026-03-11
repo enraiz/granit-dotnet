@@ -47,7 +47,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             DefaultSmsSenderId = "TestApp",
         });
 
-        var enabledLogger = Substitute.For<ILogger<BrevoNotificationProvider>>();
+        ILogger<BrevoNotificationProvider> enabledLogger = Substitute.For<ILogger<BrevoNotificationProvider>>();
         enabledLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
 
         _provider = new BrevoNotificationProvider(
@@ -437,7 +437,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             BaseAddress = new Uri("https://api.brevo.com/v3/"),
         };
 
-        var factory = Substitute.For<IHttpClientFactory>();
+        IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient("Brevo").Returns(throwingClient);
 
         IOptionsMonitor<BrevoOptions> optionsMonitor = Substitute.For<IOptionsMonitor<BrevoOptions>>();
@@ -448,7 +448,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
             DefaultSenderName = "Test App",
         });
 
-        var throwTestLogger = Substitute.For<ILogger<BrevoNotificationProvider>>();
+        ILogger<BrevoNotificationProvider> throwTestLogger = Substitute.For<ILogger<BrevoNotificationProvider>>();
         throwTestLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
 
         var provider = new BrevoNotificationProvider(

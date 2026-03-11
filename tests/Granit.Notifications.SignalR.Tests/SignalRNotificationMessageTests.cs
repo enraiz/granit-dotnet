@@ -30,8 +30,8 @@ public sealed class SignalRNotificationMessageTests
     public void Properties_CanBeSet()
     {
         var id = Guid.NewGuid();
-        var occurredAt = DateTimeOffset.UtcNow;
-        var data = JsonSerializer.SerializeToElement(new { foo = "bar" });
+        DateTimeOffset occurredAt = DateTimeOffset.UtcNow;
+        JsonElement data = JsonSerializer.SerializeToElement(new { foo = "bar" });
 
         SignalRNotificationMessage message = new()
         {
@@ -57,8 +57,8 @@ public sealed class SignalRNotificationMessageTests
     public void Record_SupportsEquality()
     {
         var id = Guid.NewGuid();
-        var occurredAt = DateTimeOffset.UtcNow;
-        var data = JsonSerializer.SerializeToElement(new { key = "value" });
+        DateTimeOffset occurredAt = DateTimeOffset.UtcNow;
+        JsonElement data = JsonSerializer.SerializeToElement(new { key = "value" });
 
         SignalRNotificationMessage message1 = new()
         {

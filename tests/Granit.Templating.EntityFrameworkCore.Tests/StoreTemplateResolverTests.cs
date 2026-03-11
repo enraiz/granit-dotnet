@@ -13,7 +13,7 @@ public sealed class StoreTemplateResolverTests
     [Fact]
     public void Priority_Is100()
     {
-        var storeReader = Substitute.For<IDocumentTemplateStoreReader>();
+        IDocumentTemplateStoreReader storeReader = Substitute.For<IDocumentTemplateStoreReader>();
         var resolver = new StoreTemplateResolver(storeReader);
 
         resolver.Priority.ShouldBe(100);
@@ -22,7 +22,7 @@ public sealed class StoreTemplateResolverTests
     [Fact]
     public async Task TryResolveAsync_DelegatesToStoreReader()
     {
-        var storeReader = Substitute.For<IDocumentTemplateStoreReader>();
+        IDocumentTemplateStoreReader storeReader = Substitute.For<IDocumentTemplateStoreReader>();
         var descriptor = new TemplateDescriptor
         {
             Content = "<p>Hello</p>",
@@ -44,7 +44,7 @@ public sealed class StoreTemplateResolverTests
     [Fact]
     public async Task TryResolveAsync_WhenStoreReturnsNull_ReturnsNull()
     {
-        var storeReader = Substitute.For<IDocumentTemplateStoreReader>();
+        IDocumentTemplateStoreReader storeReader = Substitute.For<IDocumentTemplateStoreReader>();
         var key = new TemplateKey("NonExistent");
         storeReader.TryGetPublishedAsync(key, Arg.Any<CancellationToken>())
             .Returns((TemplateDescriptor?)null);

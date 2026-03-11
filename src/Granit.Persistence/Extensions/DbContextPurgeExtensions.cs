@@ -40,7 +40,7 @@ public static class DbContextPurgeExtensions
 
         int totalDeleted = 0;
 
-        foreach (var clrType in context.Model.GetEntityTypes()
+        foreach (Type? clrType in context.Model.GetEntityTypes()
             .Where(et => typeof(ISoftDeletable).IsAssignableFrom(et.ClrType))
             .Select(et => et.ClrType))
         {

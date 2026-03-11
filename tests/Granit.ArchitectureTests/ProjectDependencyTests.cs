@@ -67,7 +67,7 @@ public sealed partial class ProjectDependencyTests
         inStack.Add(node);
         path.Add(node);
 
-        if (graph.TryGetValue(node, out var neighbors))
+        if (graph.TryGetValue(node, out HashSet<string>? neighbors))
         {
             foreach (string neighbor in neighbors)
             {
@@ -75,7 +75,7 @@ public sealed partial class ProjectDependencyTests
                 {
                     // Found a cycle — extract the cycle path
                     int cycleStart = path.IndexOf(neighbor);
-                    var cyclePath = path.Skip(cycleStart).Append(neighbor);
+                    IEnumerable<string> cyclePath = path.Skip(cycleStart).Append(neighbor);
                     cycles.Add(string.Join(" → ", cyclePath));
                 }
                 else if (!visited.Contains(neighbor))

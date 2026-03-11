@@ -76,11 +76,11 @@ public sealed class EfCoreApiKeyStoreTests : IDisposable
     public async Task UpdateLastUsedAsync_DbUpdateException_DoesNotPropagate()
     {
         // Mock factory that throws DbUpdateException when creating a context
-        var mockFactory = Substitute.For<IDbContextFactory<ApiKeysDbContext>>();
+        IDbContextFactory<ApiKeysDbContext> mockFactory = Substitute.For<IDbContextFactory<ApiKeysDbContext>>();
         mockFactory.CreateDbContextAsync(Arg.Any<CancellationToken>())
             .Returns<ApiKeysDbContext>(_ => throw new DbUpdateException("Simulated failure"));
 
-        var logger = Substitute.For<ILogger<EfCoreApiKeyStore>>();
+        ILogger<EfCoreApiKeyStore> logger = Substitute.For<ILogger<EfCoreApiKeyStore>>();
         var failingSut = new EfCoreApiKeyStore(mockFactory, logger);
 
         // Should not throw — the exception is caught and logged

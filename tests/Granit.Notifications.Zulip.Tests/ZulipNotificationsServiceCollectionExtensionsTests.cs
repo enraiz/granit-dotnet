@@ -24,7 +24,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_RegistersZulipSender()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         services.AddGranitNotificationsZulip(
             configureBot: bot =>
@@ -35,7 +35,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
             });
 
         ServiceProvider provider = services.BuildServiceProvider();
-        var sender = provider.GetService<IZulipSender>();
+        IZulipSender? sender = provider.GetService<IZulipSender>();
         sender.ShouldNotBeNull();
         sender.ShouldBeOfType<ZulipBotSender>();
     }
@@ -43,7 +43,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_RegistersNotificationChannel()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         services.AddGranitNotificationsZulip(
             configureBot: bot =>
@@ -54,8 +54,8 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
             });
 
         ServiceProvider provider = services.BuildServiceProvider();
-        using var scope = provider.CreateScope();
-        var channel = scope.ServiceProvider.GetService<INotificationChannel>();
+        using IServiceScope scope = provider.CreateScope();
+        INotificationChannel? channel = scope.ServiceProvider.GetService<INotificationChannel>();
         channel.ShouldNotBeNull();
         channel.ShouldBeOfType<ZulipNotificationChannel>();
     }
@@ -63,7 +63,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_ConfiguresChannelOptions()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         services.AddGranitNotificationsZulip(
             configureChannel: ch =>
@@ -79,7 +79,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
             });
 
         ServiceProvider provider = services.BuildServiceProvider();
-        var channelOptions = provider.GetRequiredService<IOptions<ZulipChannelOptions>>().Value;
+        ZulipChannelOptions channelOptions = provider.GetRequiredService<IOptions<ZulipChannelOptions>>().Value;
         channelOptions.DefaultStream.ShouldBe("custom-stream");
         channelOptions.DefaultTopic.ShouldBe("custom-topic");
     }
@@ -87,7 +87,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_ConfiguresBotOptions()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         services.AddGranitNotificationsZulip(
             configureBot: bot =>
@@ -99,7 +99,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
             });
 
         ServiceProvider provider = services.BuildServiceProvider();
-        var botOptions = provider.GetRequiredService<IOptions<ZulipBotOptions>>().Value;
+        ZulipBotOptions botOptions = provider.GetRequiredService<IOptions<ZulipBotOptions>>().Value;
         botOptions.BaseUrl.ShouldBe("https://zulip.custom.com");
         botOptions.BotEmail.ShouldBe("custom-bot@test.com");
         botOptions.ApiKey.ShouldBe("custom-key");
@@ -109,7 +109,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_WithNullConfigureDelegates_DoesNotThrow()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         Should.NotThrow(() => services.AddGranitNotificationsZulip());
     }
@@ -117,9 +117,9 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_ReturnsServiceCollection()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
-        var result = services.AddGranitNotificationsZulip();
+        IServiceCollection result = services.AddGranitNotificationsZulip();
 
         result.ShouldBeSameAs(services);
     }
@@ -127,7 +127,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_RegistersHttpClient()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         services.AddGranitNotificationsZulip(
             configureBot: bot =>
@@ -138,14 +138,14 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
             });
 
         ServiceProvider provider = services.BuildServiceProvider();
-        var httpClientFactory = provider.GetService<IHttpClientFactory>();
+        IHttpClientFactory? httpClientFactory = provider.GetService<IHttpClientFactory>();
         httpClientFactory.ShouldNotBeNull();
     }
 
     [Fact]
     public void AddGranitNotificationsZulip_HttpClientHasCorrectBaseAddress()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         services.AddGranitNotificationsZulip(
             configureBot: bot =>
@@ -157,7 +157,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
             });
 
         ServiceProvider provider = services.BuildServiceProvider();
-        var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+        IHttpClientFactory httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
         HttpClient client = httpClientFactory.CreateClient(ZulipBotSender.HttpClientName);
         client.BaseAddress.ShouldNotBeNull();
         client.BaseAddress!.ToString().ShouldBe("https://zulip.test.com/");
@@ -166,7 +166,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
     [Fact]
     public void AddGranitNotificationsZulip_HttpClientBaseUrlTrailingSlashNormalized()
     {
-        var services = CreateServices();
+        ServiceCollection services = CreateServices();
 
         services.AddGranitNotificationsZulip(
             configureBot: bot =>
@@ -177,7 +177,7 @@ public sealed class ZulipNotificationsServiceCollectionExtensionsTests
             });
 
         ServiceProvider provider = services.BuildServiceProvider();
-        var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+        IHttpClientFactory httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
         HttpClient client = httpClientFactory.CreateClient(ZulipBotSender.HttpClientName);
         client.BaseAddress.ShouldNotBeNull();
         client.BaseAddress!.ToString().ShouldBe("https://zulip.test.com/");

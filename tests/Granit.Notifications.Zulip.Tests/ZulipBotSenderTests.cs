@@ -35,7 +35,7 @@ public sealed class ZulipBotSenderTests
             return new HttpResponseMessage(HttpStatusCode.OK);
         });
 
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -71,7 +71,7 @@ public sealed class ZulipBotSenderTests
             return new HttpResponseMessage(HttpStatusCode.OK);
         });
 
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -104,7 +104,7 @@ public sealed class ZulipBotSenderTests
             return new HttpResponseMessage(HttpStatusCode.OK);
         });
 
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -131,7 +131,7 @@ public sealed class ZulipBotSenderTests
         var handler = new FakeHttpMessageHandler((_, _) =>
             new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent("Bad request body") });
 
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -158,7 +158,7 @@ public sealed class ZulipBotSenderTests
             return new HttpResponseMessage(HttpStatusCode.OK);
         });
 
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -187,7 +187,7 @@ public sealed class ZulipBotSenderTests
             return new HttpResponseMessage(HttpStatusCode.OK);
         });
 
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -216,7 +216,7 @@ public sealed class ZulipBotSenderTests
     public void Class_ImplementsIZulipSender()
     {
         var handler = new FakeHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK));
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         sender.ShouldBeAssignableTo<IZulipSender>();
@@ -238,7 +238,7 @@ public sealed class ZulipBotSenderTests
             return new HttpResponseMessage(HttpStatusCode.OK);
         });
 
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -264,7 +264,7 @@ public sealed class ZulipBotSenderTests
     public async Task SendAsync_StreamMessage_SuccessDoesNotThrow()
     {
         var handler = new FakeHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK));
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -284,7 +284,7 @@ public sealed class ZulipBotSenderTests
     public async Task SendAsync_DirectMessage_SuccessDoesNotThrow()
     {
         var handler = new FakeHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK));
-        var factory = CreateFactory(handler);
+        IHttpClientFactory factory = CreateFactory(handler);
         var sender = new ZulipBotSender(factory, _options, NullLogger<ZulipBotSender>.Instance);
 
         var message = new ZulipMessage
@@ -303,8 +303,8 @@ public sealed class ZulipBotSenderTests
     public async Task SendAsync_StreamMessage_LogsWhenLoggingEnabled()
     {
         var handler = new FakeHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK));
-        var factory = CreateFactory(handler);
-        var enabledLogger = CreateEnabledLogger<ZulipBotSender>();
+        IHttpClientFactory factory = CreateFactory(handler);
+        ILogger<ZulipBotSender> enabledLogger = CreateEnabledLogger<ZulipBotSender>();
         var sender = new ZulipBotSender(factory, _options, enabledLogger);
 
         var message = new ZulipMessage
@@ -325,8 +325,8 @@ public sealed class ZulipBotSenderTests
     public async Task SendAsync_DirectMessage_LogsTargetAsDirect()
     {
         var handler = new FakeHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK));
-        var factory = CreateFactory(handler);
-        var enabledLogger = CreateEnabledLogger<ZulipBotSender>();
+        IHttpClientFactory factory = CreateFactory(handler);
+        ILogger<ZulipBotSender> enabledLogger = CreateEnabledLogger<ZulipBotSender>();
         var sender = new ZulipBotSender(factory, _options, enabledLogger);
 
         var message = new ZulipMessage
@@ -347,8 +347,8 @@ public sealed class ZulipBotSenderTests
     {
         var handler = new FakeHttpMessageHandler((_, _) =>
             new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent("Server error") });
-        var factory = CreateFactory(handler);
-        var enabledLogger = CreateEnabledLogger<ZulipBotSender>();
+        IHttpClientFactory factory = CreateFactory(handler);
+        ILogger<ZulipBotSender> enabledLogger = CreateEnabledLogger<ZulipBotSender>();
         var sender = new ZulipBotSender(factory, _options, enabledLogger);
 
         var message = new ZulipMessage
@@ -370,7 +370,7 @@ public sealed class ZulipBotSenderTests
 
     private static IHttpClientFactory CreateFactory(HttpMessageHandler handler)
     {
-        var factory = Substitute.For<IHttpClientFactory>();
+        IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         var client = new HttpClient(handler) { BaseAddress = new Uri("https://zulip.example.com/") };
         factory.CreateClient(ZulipBotSender.HttpClientName).Returns(client);
         return factory;
@@ -378,7 +378,7 @@ public sealed class ZulipBotSenderTests
 
     private static ILogger<T> CreateEnabledLogger<T>()
     {
-        var logger = Substitute.For<ILogger<T>>();
+        ILogger<T> logger = Substitute.For<ILogger<T>>();
         logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         return logger;
     }

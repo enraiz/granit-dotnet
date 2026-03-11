@@ -110,7 +110,7 @@ public static class ClassDesignRules
         string typePrefix,
         params string[] excludedTypeFullNames)
     {
-        var excluded = excludedTypeFullNames.ToHashSet(StringComparer.Ordinal);
+        HashSet<string> excluded = excludedTypeFullNames.ToHashSet(StringComparer.Ordinal);
 
         IEnumerable<IType> violations = architecture.Types
             .Where(t => t.FullName.StartsWith(typePrefix, StringComparison.Ordinal)

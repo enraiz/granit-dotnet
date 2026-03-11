@@ -36,7 +36,7 @@ public static class WolverineValidationServiceCollectionExtensions
     public static IServiceCollection AddGranitValidatorsFromWolverineHandlerModules(
         this IServiceCollection services)
     {
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()
+        foreach (Assembly? assembly in AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.GetCustomAttribute<WolverineHandlerModuleAttribute>() is not null))
         {
             services.AddValidatorsFromAssembly(

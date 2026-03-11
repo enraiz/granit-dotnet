@@ -10,7 +10,7 @@ public sealed class TemplateCategoryEntityTests
     public void Properties_can_be_set_and_read()
     {
         var id = Guid.NewGuid();
-        var createdAt = DateTimeOffset.UtcNow;
+        DateTimeOffset createdAt = DateTimeOffset.UtcNow;
 
         var entity = new TemplateCategoryEntity
         {

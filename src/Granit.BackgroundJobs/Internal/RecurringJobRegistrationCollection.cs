@@ -16,7 +16,7 @@ internal sealed class RecurringJobRegistrationCollection
     {
         lock (_lock)
         {
-            foreach (var registration in registrations
+            foreach (RecurringJobRegistration? registration in registrations
                 .Where(r => !_registrations.Exists(existing => existing.JobName == r.JobName)))
             {
                 _registrations.Add(registration);
