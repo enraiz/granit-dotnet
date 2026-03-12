@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Localization;
 using Granit.Localization.Options;
 using Granit.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ namespace Granit.Validation.Europe;
 /// Granit module for European regulatory identifier validation (France, Belgium).
 /// </summary>
 [DependsOn(typeof(GranitValidationModule))]
+[DependsOn(typeof(GranitLocalizationModule))]
 public sealed class GranitValidationEuropeModule : GranitModule
 {
     /// <inheritdoc/>

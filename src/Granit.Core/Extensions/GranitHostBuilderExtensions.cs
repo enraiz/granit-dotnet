@@ -1,3 +1,4 @@
+using System.Reflection;
 using Granit.Core.Modularity;
 using Granit.Core.MultiTenancy;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,11 +26,13 @@ public static class GranitHostBuilderExtensions
     {
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TModule>();
         GranitApplication application = new(modules);
+        IReadOnlyList<Assembly> moduleAssemblies = GetDistinctModuleAssemblies(modules);
 
         ServiceConfigurationContext context = new(
             builder.Services,
             builder.Configuration,
-            builder);
+            builder,
+            moduleAssemblies);
 
         // Default: NullTenantContext (no-op). Granit.MultiTenancy replaces it if present.
         builder.Services.TryAddSingleton<ICurrentTenant>(NullTenantContext.Instance);
@@ -55,11 +58,13 @@ public static class GranitHostBuilderExtensions
     {
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TModule>();
         GranitApplication application = new(modules);
+        IReadOnlyList<Assembly> moduleAssemblies = GetDistinctModuleAssemblies(modules);
 
         ServiceConfigurationContext context = new(
             builder.Services,
             builder.Configuration,
-            builder);
+            builder,
+            moduleAssemblies);
 
         // Default: NullTenantContext (no-op). Granit.MultiTenancy replaces it if present.
         builder.Services.TryAddSingleton<ICurrentTenant>(NullTenantContext.Instance);
@@ -70,4 +75,8 @@ public static class GranitHostBuilderExtensions
 
         return builder;
     }
+
+    private static IReadOnlyList<Assembly> GetDistinctModuleAssemblies(
+        IReadOnlyList<ModuleDescriptor> modules) =>
+        [.. modules.Select(m => m.ModuleType.Assembly).Distinct()];
 }

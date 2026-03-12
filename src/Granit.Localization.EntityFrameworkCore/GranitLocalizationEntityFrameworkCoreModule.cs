@@ -12,7 +12,7 @@ namespace Granit.Localization.EntityFrameworkCore;
 /// Register via the host application's builder:
 /// <code>
 /// builder.AddGranitLocalizationEntityFrameworkCore(opt =>
-///     opt.UseNpgsql(connectionString));
+///     opt.UseYourProvider(connectionString));
 /// </code>
 /// </remarks>
 [DependsOn(

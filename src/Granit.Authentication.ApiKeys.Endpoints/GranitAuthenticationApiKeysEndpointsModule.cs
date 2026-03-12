@@ -1,9 +1,7 @@
 using Granit.Authentication.ApiKeys.Endpoints.Permissions;
-using Granit.Authentication.ApiKeys.Endpoints.Validators;
 using Granit.Authorization;
 using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
-using Granit.Validation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Authentication.ApiKeys.Endpoints;
@@ -21,6 +19,5 @@ public sealed class GranitAuthenticationApiKeysEndpointsModule : GranitModule
     {
         context.Services.AddSingleton<IPermissionDefinitionProvider,
             ApiKeyPermissionDefinitionProvider>();
-        context.Services.AddGranitValidatorsFromAssemblyContaining<ApiKeyCreateRequestValidator>();
     }
 }

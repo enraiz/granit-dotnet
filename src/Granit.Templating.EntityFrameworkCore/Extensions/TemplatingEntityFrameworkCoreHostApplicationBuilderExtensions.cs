@@ -1,4 +1,4 @@
-using Granit.Persistence.Interceptors;
+using Granit.Persistence.Extensions;
 using Granit.Templating.EntityFrameworkCore.Internal;
 using Granit.Templating.Pipeline;
 using Granit.Templating.Store;
@@ -43,20 +43,7 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
         builder.Services.AddDbContextFactory<TemplatingDbContext>((sp, options) =>
         {
             configure(options);
-
-            AuditedEntityInterceptor? auditInterceptor =
-                sp.GetService<AuditedEntityInterceptor>();
-            if (auditInterceptor is not null)
-            {
-                options.AddInterceptors(auditInterceptor);
-            }
-
-            SoftDeleteInterceptor? softDeleteInterceptor =
-                sp.GetService<SoftDeleteInterceptor>();
-            if (softDeleteInterceptor is not null)
-            {
-                options.AddInterceptors(softDeleteInterceptor);
-            }
+            options.UseGranitInterceptors(sp);
         }, ServiceLifetime.Scoped);
         builder.Services.AddScoped<EfDocumentTemplateStore>();
         builder.Services.AddScoped<IDocumentTemplateStoreReader>(sp => sp.GetRequiredService<EfDocumentTemplateStore>());

@@ -1,5 +1,5 @@
 using Granit.Authentication.ApiKeys.EntityFrameworkCore.Internal;
-using Granit.Persistence.Interceptors;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -26,20 +26,7 @@ public static class ApiKeysEntityFrameworkCoreServiceCollectionExtensions
         services.AddDbContextFactory<ApiKeysDbContext>((sp, options) =>
         {
             configureDbContext(options);
-
-            AuditedEntityInterceptor? auditInterceptor =
-                sp.GetService<AuditedEntityInterceptor>();
-            if (auditInterceptor is not null)
-            {
-                options.AddInterceptors(auditInterceptor);
-            }
-
-            SoftDeleteInterceptor? softDeleteInterceptor =
-                sp.GetService<SoftDeleteInterceptor>();
-            if (softDeleteInterceptor is not null)
-            {
-                options.AddInterceptors(softDeleteInterceptor);
-            }
+            options.UseGranitInterceptors(sp);
         }, ServiceLifetime.Scoped);
 
         services.TryAddScoped<IApiKeyStore, EfCoreApiKeyStore>();

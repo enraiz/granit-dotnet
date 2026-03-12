@@ -4,8 +4,6 @@ using Granit.Core.Modularity;
 using Granit.Settings.Definitions;
 using Granit.Settings.Endpoints.Internal;
 using Granit.Settings.Endpoints.Permissions;
-using Granit.Settings.Endpoints.Validators;
-using Granit.Validation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Settings.Endpoints;
@@ -36,6 +34,5 @@ public sealed class GranitSettingsEndpointsModule : GranitModule
     {
         context.Services.AddSingleton<ISettingDefinitionProvider, WellKnownSettingDefinitionProvider>();
         context.Services.AddSingleton<IPermissionDefinitionProvider, SettingsPermissionDefinitionProvider>();
-        context.Services.AddGranitValidatorsFromAssemblyContaining<UpdateSettingValueRequestValidator>();
     }
 }

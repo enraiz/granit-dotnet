@@ -5,7 +5,7 @@ using Granit.DataExchange.EntityFrameworkCore.Internal.Import.Stores;
 using Granit.DataExchange.Export;
 using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Pipeline;
-using Granit.Persistence.Interceptors;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,20 +32,7 @@ public static class DataExchangeEfCoreHostBuilderExtensions
         builder.Services.AddDbContextFactory<DataExchangeDbContext>((sp, options) =>
         {
             configure(options);
-
-            AuditedEntityInterceptor? auditInterceptor =
-                sp.GetService<AuditedEntityInterceptor>();
-            if (auditInterceptor is not null)
-            {
-                options.AddInterceptors(auditInterceptor);
-            }
-
-            SoftDeleteInterceptor? softDeleteInterceptor =
-                sp.GetService<SoftDeleteInterceptor>();
-            if (softDeleteInterceptor is not null)
-            {
-                options.AddInterceptors(softDeleteInterceptor);
-            }
+            options.UseGranitInterceptors(sp);
         }, ServiceLifetime.Scoped);
 
         // Import stores

@@ -1,6 +1,6 @@
 using Granit.Localization.EntityFrameworkCore.Internal;
 using Granit.Localization.Internal;
-using Granit.Persistence.Interceptors;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -40,16 +40,7 @@ public static class LocalizationEntityFrameworkCoreHostApplicationBuilderExtensi
         builder.Services.AddDbContextFactory<GranitLocalizationOverridesDbContext>((sp, options) =>
         {
             configure(options);
-
-            // Automatically wire the ISO 27001 audit interceptor when Granit.Persistence is present.
-            // The interceptor is Scoped — using ServiceLifetime.Scoped for the factory ensures
-            // it is resolved from the current request/message scope on write operations.
-            AuditedEntityInterceptor? auditInterceptor =
-                sp.GetService<AuditedEntityInterceptor>();
-            if (auditInterceptor is not null)
-            {
-                options.AddInterceptors(auditInterceptor);
-            }
+            options.UseGranitInterceptors(sp);
         }, ServiceLifetime.Scoped);
 
         builder.Services.TryAddKeyedScoped<ILocalizationOverrideStoreReader, EfCoreLocalizationOverrideStore>(

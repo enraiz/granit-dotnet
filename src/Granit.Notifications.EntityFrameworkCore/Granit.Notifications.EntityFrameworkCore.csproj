@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.Notifications.EntityFrameworkCore</PackageId>
-    <Description>EF Core persistence for Granit.Notifications. PostgreSQL stores, EntityTrackingInterceptor for Odoo-style auto-tracking, and ISO 27001-compliant INSERT-only audit trail.</Description>
+    <Description>EF Core persistence for Granit.Notifications. Stores for user notifications, preferences, subscriptions, and delivery audit trail. Includes EntityTrackingInterceptor for automatic entity follower notifications. Database-provider agnostic, ISO 27001-compliant.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>
