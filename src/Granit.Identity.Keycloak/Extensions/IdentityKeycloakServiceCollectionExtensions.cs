@@ -1,3 +1,4 @@
+using Granit.Core.Diagnostics;
 using Granit.Identity.Extensions;
 using Granit.Identity.Keycloak.Internal;
 using Granit.Identity.Keycloak.Options;
@@ -34,6 +35,8 @@ public static class IdentityKeycloakServiceCollectionExtensions
     public static IServiceCollection AddGranitIdentityKeycloak(
         this IServiceCollection services)
     {
+        GranitActivitySourceRegistry.Register(Diagnostics.IdentityKeycloakActivitySource.Name);
+
         services.AddOptions<KeycloakAdminOptions>()
             .BindConfiguration(KeycloakAdminOptions.SectionName)
             .ValidateDataAnnotations()

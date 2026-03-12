@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Granit.Identity.Keycloak.Diagnostics;
 using Granit.Identity.Keycloak.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Logging;
@@ -43,6 +45,8 @@ internal sealed partial class KeycloakAdminTokenService(
             {
                 return _cachedToken;
             }
+
+            using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.TokenAcquire);
 
             KeycloakAdminOptions opts = options.Value;
             HttpClient client = httpClientFactory.CreateClient("KeycloakAdmin");

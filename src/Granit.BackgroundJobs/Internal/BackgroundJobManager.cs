@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Cronos;
+using Granit.BackgroundJobs.Diagnostics;
 using Granit.BackgroundJobs.Domain;
 using Granit.Core.Exceptions;
 using Granit.Security;
@@ -77,6 +79,11 @@ internal sealed partial class BackgroundJobManager(
     public async Task TriggerNowAsync(string jobName, CancellationToken cancellationToken = default)
     {
         BackgroundJobDefinition job = await RequireJobAsync(jobName, cancellationToken).ConfigureAwait(false);
+
+        using Activity? activity = BackgroundJobsActivitySource.Source.StartActivity(BackgroundJobsActivitySource.Trigger);
+        activity?.SetTag("backgroundjobs.job_name", jobName);
+        activity?.SetTag("backgroundjobs.triggered_by", currentUserService.UserId ?? "system");
+
         object message = CreateMessage(job.MessageType, jobName);
 
         DeliveryOptions options = new();

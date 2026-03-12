@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
 using Granit.Webhooks.Abstractions;
+using Granit.Webhooks.Diagnostics;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 
@@ -35,6 +37,9 @@ public sealed class WebhookFanoutHandler(
         WebhookTrigger trigger,
         CancellationToken cancellationToken)
     {
+        using Activity? activity = WebhooksActivitySource.Source.StartActivity(WebhooksActivitySource.Fanout);
+        activity?.SetTag("webhooks.event_type", trigger.EventType);
+
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : trigger.TenantId;
 
         IReadOnlyList<Domain.WebhookSubscription> subscriptions =
@@ -45,6 +50,7 @@ public sealed class WebhookFanoutHandler(
 
         if (subscriptions.Count == 0)
         {
+            activity?.SetTag("webhooks.subscriber_count", 0);
             return [];
         }
 
@@ -57,6 +63,8 @@ public sealed class WebhookFanoutHandler(
             ApiVersion = WebhooksConstants.ApiVersion,
             Data = trigger.Payload,
         };
+
+        activity?.SetTag("webhooks.subscriber_count", subscriptions.Count);
 
         return subscriptions.Select(sub => new SendWebhookCommand
         {

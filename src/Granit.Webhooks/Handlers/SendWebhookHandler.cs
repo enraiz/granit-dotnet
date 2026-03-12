@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using Granit.Timing;
 using Granit.Webhooks.Abstractions;
+using Granit.Webhooks.Diagnostics;
 using Granit.Webhooks.Exceptions;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
@@ -53,6 +54,11 @@ public sealed partial class SendWebhookHandler(
     /// </summary>
     public async Task HandleAsync(SendWebhookCommand command, CancellationToken cancellationToken)
     {
+        using Activity? activity = WebhooksActivitySource.Source.StartActivity(WebhooksActivitySource.Deliver);
+        activity?.SetTag("webhooks.subscription_id", command.SubscriptionId.ToString());
+        activity?.SetTag("webhooks.delivery_id", command.DeliveryId.ToString());
+        activity?.SetTag("webhooks.event_type", command.Envelope.EventType);
+
         string bodyJson = JsonSerializer.Serialize(command.Envelope);
         string payloadHash = WebhookSignatureService.ComputePayloadHash(bodyJson);
         string? storedPayload = options.Value.StorePayload ? bodyJson : null;
@@ -88,15 +94,18 @@ public sealed partial class SendWebhookHandler(
             await deliveryWriter.RecordFailureAsync(
                 command, httpStatusCode: null, stopwatch.ElapsedMilliseconds, timeoutMessage, storedPayload, cancellationToken).ConfigureAwait(false);
 
+            activity?.SetStatus(ActivityStatusCode.Error, timeoutMessage);
             throw new WebhookDeliveryException(timeoutMessage, ex);
         }
 
         stopwatch.Stop();
         int statusCode = (int)response.StatusCode;
+        activity?.SetTag("http.response.status_code", statusCode);
 
         if (IsNonRetriable(response.StatusCode))
         {
             LogNonRetriableHttpError(statusCode, command.SubscriptionId, command.DeliveryId);
+            activity?.SetStatus(ActivityStatusCode.Error, $"Non-retriable HTTP {statusCode}");
 
             await deliveryWriter.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds,
@@ -122,6 +131,7 @@ public sealed partial class SendWebhookHandler(
             await deliveryWriter.RecordFailureAsync(
                 command, statusCode, stopwatch.ElapsedMilliseconds, retriableMessage, storedPayload, cancellationToken).ConfigureAwait(false);
 
+            activity?.SetStatus(ActivityStatusCode.Error, retriableMessage);
             throw new WebhookDeliveryException(retriableMessage);
         }
 

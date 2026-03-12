@@ -176,23 +176,75 @@ Les attributs de ressource OpenTelemetry sont configurés automatiquement :
 | `OpenTelemetry.Instrumentation.EntityFrameworkCore` | Instrumentation automatique EF Core |
 | `OpenTelemetry.Exporter.OpenTelemetryProtocol` | Export gRPC vers le collecteur |
 
-## Intégration Granit.Wolverine
+## Tracing distribué des modules Granit
 
-Lorsque `Granit.Wolverine` est installé, `AddGranitObservability()` enregistre
-automatiquement la source `Granit.Wolverine` dans le tracer OTel. Cela permet
-d'exporter les **spans bridge** créés par `TraceContextBehavior` lors du traitement
-des messages Outbox.
+### GranitActivitySourceRegistry
 
-Résultat : une requête HTTP et tous les traitements Wolverine asynchrones qu'elle
-déclenche apparaissent sous le **même `trace-id`** dans Grafana/Tempo.
+Chaque module Granit qui effectue de l'I/O significatif déclare un
+`ActivitySource` dédié et l'enregistre via `GranitActivitySourceRegistry.Register()`
+dans son `AddGranit*()`. `AddGranitObservability()` itère le registre et appelle
+`.AddSource()` pour chaque entrée.
+
+**Pattern soft dependency** : aucun module ne référence `Granit.Observability`.
+Si aucun listener n'est enregistré, `StartActivity()` retourne `null` (no-op).
+
+### ActivitySources enregistrés
+
+| Source | Module | Spans |
+| --- | --- | --- |
+| `Granit.Wolverine` | Granit.Wolverine | `wolverine.message.handle` |
+| `Granit.Webhooks` | Granit.Webhooks | `webhooks.deliver`, `webhooks.fanout` |
+| `Granit.Notifications` | Granit.Notifications | `notifications.deliver`, `notifications.fanout` |
+| `Granit.BackgroundJobs` | Granit.BackgroundJobs | `backgroundjobs.trigger` |
+| `Granit.BlobStorage.S3` | Granit.BlobStorage.S3 | `blobstorage.upload-ticket`, `blobstorage.download-url`, `blobstorage.delete`, `blobstorage.get-size`, `blobstorage.partial-stream` |
+| `Granit.Identity.Keycloak` | Granit.Identity.Keycloak | `identity.keycloak.*` (toutes les méthodes publiques IIdentityProvider + token-acquire) |
+| `Granit.Identity.EntraId` | Granit.Identity.EntraId | `identity.entraid.*` (toutes les méthodes publiques IIdentityProvider + token-acquire) |
+
+### Ajouter le tracing à un nouveau module
+
+1. Créer `Diagnostics/<Module>ActivitySource.cs` :
+
+    ```csharp
+    internal static class MyModuleActivitySource
+    {
+        internal const string Name = "Granit.MyModule";
+        internal static readonly ActivitySource Source = new(Name);
+        internal const string MyOperation = "mymodule.my-operation";
+    }
+    ```
+
+2. Enregistrer dans `AddGranitMyModule()` :
+
+    ```csharp
+    GranitActivitySourceRegistry.Register(MyModuleActivitySource.Name);
+    ```
+
+3. Instrumenter les points d'I/O :
+
+    ```csharp
+    using var activity = MyModuleActivitySource.Source.StartActivity(MyModuleActivitySource.MyOperation);
+    activity?.SetTag("mymodule.key", value);
+    ```
+
+### Contrainte d'ordre
+
+`AddGranitObservability()` doit être appelé **après** les modules (c'est le cas
+par défaut dans le pattern Granit — observabilité = dernière étape de configuration).
+
+### Intégration Wolverine
+
+Lorsque `Granit.Wolverine` est installé, la source `Granit.Wolverine` est
+enregistrée automatiquement. Les **spans bridge** créés par `TraceContextBehavior`
+lient les traitements Outbox asynchrones à la requête HTTP d'origine sous le
+**même `trace-id`** dans Grafana/Tempo.
 
 → Voir [wolverine-tracing.md](wolverine-tracing.md) pour le détail.
 
 ## Dépendances Granit
 
-| Direction | Modules |
-|-----------|---------|
-| **Dépend de** | `Granit.Core` |
+| Direction       | Modules                                        |
+|-----------------|------------------------------------------------|
+| **Dépend de**   | `Granit.Core`                                  |
 | **Utilisé par** | Module feuille (consommé par les applications) |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).

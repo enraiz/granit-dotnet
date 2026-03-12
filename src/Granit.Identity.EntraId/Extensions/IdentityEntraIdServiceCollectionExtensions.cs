@@ -1,3 +1,4 @@
+using Granit.Core.Diagnostics;
 using Granit.Identity.EntraId.Internal;
 using Granit.Identity.EntraId.Options;
 using Granit.Identity.Extensions;
@@ -36,6 +37,8 @@ public static class IdentityEntraIdServiceCollectionExtensions
     public static IServiceCollection AddGranitIdentityEntraId(
         this IServiceCollection services)
     {
+        GranitActivitySourceRegistry.Register(Diagnostics.IdentityEntraIdActivitySource.Name);
+
         services.AddOptions<EntraIdAdminOptions>()
             .BindConfiguration(EntraIdAdminOptions.SectionName)
             .ValidateDataAnnotations()

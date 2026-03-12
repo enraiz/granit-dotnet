@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Granit.Guids;
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.Diagnostics;
 using Granit.Notifications.Domain;
 using Granit.Notifications.Exceptions;
 using Granit.Notifications.Messages;
@@ -26,6 +27,12 @@ public sealed partial class NotificationDeliveryHandler(
     /// </summary>
     public async Task HandleAsync(DeliverNotificationCommand command, CancellationToken cancellationToken)
     {
+        using Activity? activity = NotificationsActivitySource.Source.StartActivity(NotificationsActivitySource.Deliver);
+        activity?.SetTag("notifications.channel", command.ChannelName);
+        activity?.SetTag("notifications.delivery_id", command.DeliveryId.ToString());
+        activity?.SetTag("notifications.notification_id", command.NotificationId.ToString());
+        activity?.SetTag("notifications.type", command.NotificationTypeName);
+
         INotificationChannel? channel = channels.FirstOrDefault(c => c.Name == command.ChannelName);
 
         if (channel is null)
@@ -53,6 +60,7 @@ public sealed partial class NotificationDeliveryHandler(
         {
             await channel.SendAsync(context, cancellationToken).ConfigureAwait(false);
             stopwatch.Stop();
+            activity?.SetTag("notifications.success", true);
 
             await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {
@@ -73,6 +81,8 @@ public sealed partial class NotificationDeliveryHandler(
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             stopwatch.Stop();
+            activity?.SetTag("notifications.success", false);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
 
             await deliveryWriter.RecordAsync(new NotificationDeliveryAttempt
             {

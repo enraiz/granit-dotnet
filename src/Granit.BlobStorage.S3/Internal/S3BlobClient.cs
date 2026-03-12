@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Granit.BlobStorage.Internal;
 using Granit.BlobStorage.Options;
+using Granit.BlobStorage.S3.Diagnostics;
 using Granit.BlobStorage.S3.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Options;
@@ -50,6 +52,11 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
         TimeSpan expiry,
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = BlobStorageS3ActivitySource.Source.StartActivity(BlobStorageS3ActivitySource.UploadTicket);
+        activity?.SetTag("blobstorage.bucket", bucket);
+        activity?.SetTag("blobstorage.object_key", objectKey);
+        activity?.SetTag("blobstorage.content_type", request.ContentType);
+
         GetPreSignedUrlRequest presignRequest = new()
         {
             BucketName = bucket,
@@ -96,6 +103,10 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
         TimeSpan expiry,
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = BlobStorageS3ActivitySource.Source.StartActivity(BlobStorageS3ActivitySource.DownloadUrl);
+        activity?.SetTag("blobstorage.bucket", bucket);
+        activity?.SetTag("blobstorage.object_key", objectKey);
+
         GetPreSignedUrlRequest presignRequest = new()
         {
             BucketName = bucket,
@@ -127,6 +138,10 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
         string objectKey,
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = BlobStorageS3ActivitySource.Source.StartActivity(BlobStorageS3ActivitySource.Delete);
+        activity?.SetTag("blobstorage.bucket", bucket);
+        activity?.SetTag("blobstorage.object_key", objectKey);
+
         DeleteObjectRequest deleteRequest = new()
         {
             BucketName = bucket,
@@ -142,6 +157,10 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
         string objectKey,
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = BlobStorageS3ActivitySource.Source.StartActivity(BlobStorageS3ActivitySource.GetSize);
+        activity?.SetTag("blobstorage.bucket", bucket);
+        activity?.SetTag("blobstorage.object_key", objectKey);
+
         GetObjectMetadataRequest metadataRequest = new()
         {
             BucketName = bucket,
@@ -159,6 +178,10 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
         int byteCount,
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = BlobStorageS3ActivitySource.Source.StartActivity(BlobStorageS3ActivitySource.PartialStream);
+        activity?.SetTag("blobstorage.bucket", bucket);
+        activity?.SetTag("blobstorage.object_key", objectKey);
+
         GetObjectRequest rangeRequest = new()
         {
             BucketName = bucket,
