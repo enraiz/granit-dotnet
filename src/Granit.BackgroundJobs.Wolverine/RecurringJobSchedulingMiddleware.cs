@@ -5,7 +5,7 @@ using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using Wolverine;
 
-namespace Granit.BackgroundJobs.Wolverine.Internal;
+namespace Granit.BackgroundJobs.Wolverine;
 
 /// <summary>
 /// Wolverine middleware that records job execution and atomically reschedules the next
