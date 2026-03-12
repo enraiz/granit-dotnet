@@ -49,6 +49,27 @@
           "EmptyFiles": "4.4.0"
         }
       },
+      "WolverineFx": {
+        "type": "Direct",
+        "requested": "[5.18.*, )",
+        "resolved": "5.18.2",
+        "contentHash": "ID3GXymFnsWbwYrKa4i2HZMmAMslHrc6KX+AgK4WfKCFHQmHvOKzVSPu5xxkjB3a2Wq/kjwfiH23SQ9UTrT30A==",
+        "dependencies": {
+          "JasperFx": "1.21.0",
+          "JasperFx.Events": "1.23.1",
+          "JasperFx.RuntimeCompiler": "4.4.0",
+          "Microsoft.Extensions.Caching.Memory": "10.0.0",
+          "Microsoft.Extensions.Configuration": "10.0.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Configuration.Binder": "10.0.0",
+          "Microsoft.Extensions.Configuration.Json": "10.0.0",
+          "Microsoft.Extensions.Hosting": "10.0.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
+          "Microsoft.Extensions.ObjectPool": "10.0.2",
+          "NewId": "4.0.1",
+          "Newtonsoft.Json": "13.0.3"
+        }
+      },
       "xunit.runner.visualstudio": {
         "type": "Direct",
         "requested": "[3.1.5, )",
@@ -658,11 +679,19 @@
           "Cronos": "[0.11.*, )",
           "Granit.Core": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
-          "Granit.Wolverine": "[0.1.0-dev, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.*, )"
+        }
+      },
+      "granit.backgroundjobs.wolverine": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.BackgroundJobs": "[0.1.0-dev, )",
+          "Granit.Wolverine": "[0.1.0-dev, )",
+          "WolverineFx": "[5.18.*, )"
         }
       },
       "granit.core": {
@@ -886,35 +915,14 @@
         "resolved": "9.0.0",
         "contentHash": "iri00l/zIX9g4lHMY+Nz0qV1n40+jFYAmgsaiNn16xvt2RDwlqByNG4wgblagnDYxm3YSQQ0jLlC/7Xlk9CzyA=="
       },
-      "WolverineFx": {
-        "type": "CentralTransitive",
-        "requested": "[5.18.*, )",
-        "resolved": "5.18.1",
-        "contentHash": "XijAcTxUZSiOsWlcF2i1X6pVvYhP20XIMZaEbI76O3QLYnoMNCdZRYUhdgEL3ahYq6bzK7D61N/0XdJxUEy2Tw==",
-        "dependencies": {
-          "JasperFx": "1.21.0",
-          "JasperFx.Events": "1.23.1",
-          "JasperFx.RuntimeCompiler": "4.4.0",
-          "Microsoft.Extensions.Caching.Memory": "10.0.0",
-          "Microsoft.Extensions.Configuration": "10.0.0",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.0",
-          "Microsoft.Extensions.Configuration.Binder": "10.0.0",
-          "Microsoft.Extensions.Configuration.Json": "10.0.0",
-          "Microsoft.Extensions.Hosting": "10.0.0",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
-          "Microsoft.Extensions.ObjectPool": "10.0.2",
-          "NewId": "4.0.1",
-          "Newtonsoft.Json": "13.0.3"
-        }
-      },
       "WolverineFx.FluentValidation": {
         "type": "CentralTransitive",
         "requested": "[5.18.*, )",
-        "resolved": "5.18.1",
-        "contentHash": "aCBWhFt36geoYlFB0bXlcrjH8E+gM998UW697OBgsy/CkgWPa4JCbokyd5O/LBylb/ff5RprGQmIl6Oi8Nt2dg==",
+        "resolved": "5.18.2",
+        "contentHash": "7NuiyXcPow50r8rXnRCQlbirl4hnJMtzBofzo3yhMzjIOIlj4m4MRD0qXSZCAY652/46n5mRNCx4QUgSkxdn6w==",
         "dependencies": {
           "FluentValidation": "12.0.0",
-          "WolverineFx": "5.18.1"
+          "WolverineFx": "5.18.2"
         }
       }
     }
