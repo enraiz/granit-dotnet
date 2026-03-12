@@ -332,6 +332,36 @@ Une variante synchrone `AddGranit<TModule>()` existe pour les cas où l'async n'
 pas souhaité. Elle appelle `ConfigureServices()` (sync) au lieu de
 `ConfigureServicesAsync()`.
 
+### Fluent builder API (alternative)
+
+Pour les développeurs qui préfèrent une configuration explicite dans `Program.cs`,
+une API fluent est disponible via `GranitBuilder` :
+
+```csharp
+await builder.AddGranitAsync(granit => granit
+    .AddModule<GranitPersistenceModule>()
+    .AddModule<GranitObservabilityModule>()
+    .AddModule<AppHostModule>()
+);
+```
+
+Les deux approches coexistent : `[DependsOn]` continue de résoudre les dépendances
+internes automatiquement. Les **meta-packages** (bundles) fournissent des raccourcis :
+
+```csharp
+using Granit.Bundle.Api;
+using Granit.Bundle.SaaS;
+
+await builder.AddGranitAsync(granit => granit
+    .AddApi()           // Essentials + API modules
+    .AddSaaS()          // MultiTenancy + Features + RateLimiting
+    .AddModule<AppHostModule>()
+);
+```
+
+Bundles disponibles : `AddEssentials()`, `AddApi()`, `AddNotifications()`,
+`AddDocuments()`, `AddSaaS()`.
+
 ### UseGranitAsync (recommandé)
 
 `UseGranitAsync()` est appelé après `Build()`, avant `Run()`. Il résout le singleton

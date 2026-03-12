@@ -1,9 +1,30 @@
+using Granit.ApiDocumentation;
+using Granit.ApiVersioning;
+using Granit.Caching;
 using Granit.Core.Modularity;
+using Granit.Cors;
 using Granit.Diagnostics;
+using Granit.DocumentGeneration;
+using Granit.DocumentGeneration.Excel;
+using Granit.DocumentGeneration.Pdf;
 using Granit.ExceptionHandling;
+using Granit.Features;
+using Granit.Features.EntityFrameworkCore;
+using Granit.Guids;
+using Granit.Idempotency;
+using Granit.Localization;
+using Granit.MultiTenancy;
+using Granit.Notifications;
+using Granit.Notifications.Email;
+using Granit.Notifications.EntityFrameworkCore;
+using Granit.Notifications.SignalR;
 using Granit.Observability;
 using Granit.Persistence;
+using Granit.RateLimiting;
 using Granit.Security;
+using Granit.Templating;
+using Granit.Templating.EntityFrameworkCore;
+using Granit.Templating.Scriban;
 using Granit.Timing;
 using Granit.Validation;
 using Shouldly;
@@ -20,11 +41,9 @@ public sealed class BundleTransitiveDependencyTests
     [Fact]
     public void Essentials_ExposesAllTransitiveDependencies()
     {
-        // These types come from 9 different packages — all transitively
-        // available through Granit.Bundle.Essentials.
         typeof(GranitModule).Assembly.ShouldNotBeNull();                 // Core
         typeof(IClock).Assembly.ShouldNotBeNull();                       // Timing
-        typeof(Guids.IGuidGenerator).Assembly.ShouldNotBeNull();         // Guids
+        typeof(IGuidGenerator).Assembly.ShouldNotBeNull();               // Guids
         typeof(ICurrentUserService).Assembly.ShouldNotBeNull();          // Security
         typeof(GranitValidationModule).Assembly.ShouldNotBeNull();       // Validation
         typeof(GranitPersistenceModule).Assembly.ShouldNotBeNull();      // Persistence
@@ -36,45 +55,43 @@ public sealed class BundleTransitiveDependencyTests
     [Fact]
     public void Api_IncludesEssentialsAndApiModules()
     {
-        // Essentials types (transitive through Bundle.Api → Bundle.Essentials)
         typeof(GranitModule).Assembly.ShouldNotBeNull();
         typeof(IClock).Assembly.ShouldNotBeNull();
 
-        // API-specific types
-        typeof(ApiVersioning.GranitApiVersioningModule).Assembly.ShouldNotBeNull();
-        typeof(ApiDocumentation.GranitApiDocumentationModule).Assembly.ShouldNotBeNull();
-        typeof(Cors.GranitCorsModule).Assembly.ShouldNotBeNull();
-        typeof(Idempotency.GranitIdempotencyModule).Assembly.ShouldNotBeNull();
-        typeof(Localization.GranitLocalizationModule).Assembly.ShouldNotBeNull();
-        typeof(Caching.GranitCachingModule).Assembly.ShouldNotBeNull();
+        typeof(GranitApiVersioningModule).Assembly.ShouldNotBeNull();
+        typeof(GranitApiDocumentationModule).Assembly.ShouldNotBeNull();
+        typeof(GranitCorsModule).Assembly.ShouldNotBeNull();
+        typeof(GranitIdempotencyModule).Assembly.ShouldNotBeNull();
+        typeof(GranitLocalizationModule).Assembly.ShouldNotBeNull();
+        typeof(GranitCachingModule).Assembly.ShouldNotBeNull();
     }
 
     [Fact]
     public void Notifications_ExposesAllNotificationModules()
     {
-        typeof(Notifications.GranitNotificationsModule).Assembly.ShouldNotBeNull();
-        typeof(Notifications.EntityFrameworkCore.GranitNotificationsEntityFrameworkCoreModule)
-            .Assembly.ShouldNotBeNull();
-        typeof(Notifications.Email.EmailMessage).Assembly.ShouldNotBeNull();
-        typeof(Notifications.SignalR.NotificationHub).Assembly.ShouldNotBeNull();
+        typeof(GranitNotificationsModule).Assembly.ShouldNotBeNull();
+        typeof(GranitNotificationsEntityFrameworkCoreModule).Assembly.ShouldNotBeNull();
+        typeof(EmailMessage).Assembly.ShouldNotBeNull();
+        typeof(NotificationHub).Assembly.ShouldNotBeNull();
     }
 
     [Fact]
     public void Documents_ExposesAllDocumentModules()
     {
-        typeof(Templating.GranitTemplatingModule).Assembly.ShouldNotBeNull();
-        typeof(Templating.Scriban.GranitTemplatingScribanModule).Assembly.ShouldNotBeNull();
-        typeof(DocumentGeneration.GranitDocumentGenerationModule).Assembly.ShouldNotBeNull();
-        typeof(DocumentGeneration.Pdf.GranitDocumentGenerationPdfModule).Assembly.ShouldNotBeNull();
-        typeof(DocumentGeneration.Excel.GranitDocumentGenerationExcelModule).Assembly.ShouldNotBeNull();
+        typeof(GranitTemplatingModule).Assembly.ShouldNotBeNull();
+        typeof(GranitTemplatingScribanModule).Assembly.ShouldNotBeNull();
+        typeof(GranitTemplatingEntityFrameworkCoreModule).Assembly.ShouldNotBeNull();
+        typeof(GranitDocumentGenerationModule).Assembly.ShouldNotBeNull();
+        typeof(GranitDocumentGenerationPdfModule).Assembly.ShouldNotBeNull();
+        typeof(GranitDocumentGenerationExcelModule).Assembly.ShouldNotBeNull();
     }
 
     [Fact]
     public void SaaS_ExposesAllSaaSModules()
     {
-        typeof(MultiTenancy.GranitMultiTenancyModule).Assembly.ShouldNotBeNull();
-        typeof(Features.GranitFeaturesModule).Assembly.ShouldNotBeNull();
-        typeof(Features.EntityFrameworkCore.GranitFeaturesEntityFrameworkCoreModule).Assembly.ShouldNotBeNull();
-        typeof(RateLimiting.GranitRateLimitingModule).Assembly.ShouldNotBeNull();
+        typeof(GranitMultiTenancyModule).Assembly.ShouldNotBeNull();
+        typeof(GranitFeaturesModule).Assembly.ShouldNotBeNull();
+        typeof(GranitFeaturesEntityFrameworkCoreModule).Assembly.ShouldNotBeNull();
+        typeof(GranitRateLimitingModule).Assembly.ShouldNotBeNull();
     }
 }

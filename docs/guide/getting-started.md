@@ -138,6 +138,21 @@ info: Granit.Core.Modularity.GranitApplication[0]
 5. `UseGranitAsync()` called `OnApplicationInitializationAsync()` on
    each module
 
+## Alternative: fluent builder API
+
+Instead of a root module with `[DependsOn]`, you can use the fluent builder:
+
+```csharp
+using Granit.Bundle.Api;
+
+await builder.AddGranitAsync(granit => granit
+    .AddApi()
+    .AddModule<AppModule>()
+);
+```
+
+Both approaches coexist and can be combined freely.
+
 ## Next steps
 
 - Add a **domain model** and **EF Core persistence**:

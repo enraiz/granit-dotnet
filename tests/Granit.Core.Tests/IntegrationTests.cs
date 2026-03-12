@@ -193,4 +193,63 @@ public sealed class IntegrationTests
         granitApp.GetModuleTypes().ShouldBe(new[] { typeof(AsyncTestLeafModule),
             typeof(AsyncTestRootModule) });
     }
+
+    // --- Tests fluent builder API ---
+
+    [Fact]
+    public void AddGranit_FluentBuilder_RegistersModules()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+
+        // Act
+        builder.AddGranit(granit => granit
+            .AddModule<TestRootModule>());
+        using WebApplication app = builder.Build();
+
+        // Assert — both TestLeafModule (via [DependsOn]) and TestRootModule should be loaded
+        GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
+        granitApp.GetModuleTypes().ShouldContain(typeof(TestLeafModule));
+        granitApp.GetModuleTypes().ShouldContain(typeof(TestRootModule));
+    }
+
+    [Fact]
+    public void AddGranit_FluentBuilder_ModuleServicesAreRegistered()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+
+        // Act
+        builder.AddGranit(granit => granit.AddModule<TestRootModule>());
+        using WebApplication app = builder.Build();
+
+        // Assert
+        ITestService? service = app.Services.GetService<ITestService>();
+        service.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task AddGranitAsync_FluentBuilder_RegistersModules()
+    {
+        // Arrange
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+
+        // Act
+        await builder.AddGranitAsync(granit => granit
+            .AddModule<AsyncTestRootModule>());
+        await using WebApplication app = builder.Build();
+
+        // Assert
+        GranitApplication granitApp = app.Services.GetRequiredService<GranitApplication>();
+        granitApp.GetModuleTypes().ShouldContain(typeof(AsyncTestLeafModule));
+        granitApp.GetModuleTypes().ShouldContain(typeof(AsyncTestRootModule));
+    }
+
+    [Fact]
+    public void AddGranit_FluentBuilder_ThrowsOnNullConfigure()
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        Should.Throw<ArgumentNullException>(() =>
+            builder.AddGranit((Action<GranitBuilder>)null!));
+    }
 }

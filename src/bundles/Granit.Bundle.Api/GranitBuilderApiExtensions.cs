@@ -1,0 +1,32 @@
+using Granit.ApiDocumentation;
+using Granit.ApiVersioning;
+using Granit.Bundle.Essentials;
+using Granit.Caching;
+using Granit.Core.Modularity;
+using Granit.Cors;
+using Granit.Idempotency;
+using Granit.Localization;
+
+namespace Granit.Bundle.Api;
+
+/// <summary>
+/// Extension methods on <see cref="GranitBuilder"/> for adding the Api bundle.
+/// </summary>
+public static class GranitBuilderApiExtensions
+{
+    /// <summary>
+    /// Adds the Api bundle: Essentials + ApiVersioning, ApiDocumentation,
+    /// Cors, Idempotency, Localization, Caching.
+    /// </summary>
+    public static GranitBuilder AddApi(this GranitBuilder builder)
+    {
+        builder.AddEssentials();
+        builder.AddModule<GranitApiVersioningModule>();
+        builder.AddModule<GranitApiDocumentationModule>();
+        builder.AddModule<GranitCorsModule>();
+        builder.AddModule<GranitIdempotencyModule>();
+        builder.AddModule<GranitLocalizationModule>();
+        builder.AddModule<GranitCachingModule>();
+        return builder;
+    }
+}
