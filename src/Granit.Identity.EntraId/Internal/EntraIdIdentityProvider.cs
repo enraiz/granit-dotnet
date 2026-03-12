@@ -68,7 +68,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.GetUser);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         try
         {
@@ -98,7 +98,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.SetUserEnabled);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = $"/v1.0/users/{Uri.EscapeDataString(userId)}";
@@ -121,7 +121,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(update);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.UpdateUser);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = $"/v1.0/users/{Uri.EscapeDataString(userId)}";
@@ -165,7 +165,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.GetUserSessions);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         try
         {
@@ -197,7 +197,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.GetUserDeviceActivity);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         try
         {
@@ -254,7 +254,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.GetPasswordChangedAt);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         try
         {
@@ -312,7 +312,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(roleName);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.GetRoleMembers);
-        activity?.SetTag("identity.role_name", roleName);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagRoleName, roleName);
 
         try
         {
@@ -368,7 +368,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.GetUserRoles);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         try
         {
@@ -415,8 +415,8 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(roleName);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.AssignRole);
-        activity?.SetTag("identity.user_id", userId);
-        activity?.SetTag("identity.role_name", roleName);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagRoleName, roleName);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
 
@@ -451,8 +451,8 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(roleName);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.RemoveRole);
-        activity?.SetTag("identity.user_id", userId);
-        activity?.SetTag("identity.role_name", roleName);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagRoleName, roleName);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
 
@@ -497,7 +497,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(sessionId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.TerminateSession);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         // Entra ID does not support individual session termination.
         // We revoke all sessions and log a warning.
@@ -514,7 +514,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.TerminateAllSessions);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = EntraIdAdminOptions.GetRevokeSessionsEndpoint(userId);
@@ -538,7 +538,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.SendPasswordResetEmail);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         // Entra ID does not support sending password reset emails via Graph API.
         // We generate a temporary password, set it, then notify via the optional hook.
@@ -560,7 +560,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(temporaryPassword);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.SetTemporaryPassword);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = $"/v1.0/users/{Uri.EscapeDataString(userId)}";
@@ -635,7 +635,7 @@ internal sealed partial class EntraIdIdentityProvider(
         string createdUserId = created?.Id
             ?? throw new InvalidOperationException("Entra ID did not return a user ID after creation.");
 
-        activity?.SetTag("identity.user_id", createdUserId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, createdUserId);
         LogUserCreated(user.Username, createdUserId);
 
         return new IdentityUser(
@@ -658,7 +658,7 @@ internal sealed partial class EntraIdIdentityProvider(
         try
         {
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
-            string endpoint = EntraIdAdminOptions.GetGroupsEndpoint();
+            string endpoint = EntraIdAdminOptions.GroupsEndpoint;
 
             GraphCollectionResponse<GraphGroupRepresentation>? response = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphGroupRepresentation>>(endpoint, cancellationToken)
@@ -682,7 +682,7 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.GetUserGroups);
-        activity?.SetTag("identity.user_id", userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
 
         try
         {
@@ -713,15 +713,15 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(groupId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.AddUserToGroup);
-        activity?.SetTag("identity.user_id", userId);
-        activity?.SetTag("identity.group_id", groupId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagGroupId, groupId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = EntraIdAdminOptions.GetGroupMembersRefEndpoint(groupId);
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
             endpoint,
-            new { odataId = $"https://graph.microsoft.com/v1.0/directoryObjects/{userId}" },
+            new { odataId = $"{options.Value.GraphBaseUrl}/v1.0/directoryObjects/{userId}" },
             cancellationToken).ConfigureAwait(false);
 
         response.EnsureSuccessStatusCode();
@@ -739,8 +739,8 @@ internal sealed partial class EntraIdIdentityProvider(
         ArgumentNullException.ThrowIfNull(groupId);
 
         using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.RemoveUserFromGroup);
-        activity?.SetTag("identity.user_id", userId);
-        activity?.SetTag("identity.group_id", groupId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagUserId, userId);
+        activity?.SetTag(IdentityEntraIdActivitySource.TagGroupId, groupId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = EntraIdAdminOptions.GetGroupMemberEndpoint(groupId, userId);

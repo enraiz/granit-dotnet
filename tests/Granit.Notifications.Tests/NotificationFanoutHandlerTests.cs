@@ -6,6 +6,7 @@
 // fallback, tenant resolution priority, and distinct delivery IDs.
 // =============================================================================
 
+using System.Diagnostics;
 using System.Text.Json;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
@@ -18,16 +19,24 @@ using Xunit;
 
 namespace Granit.Notifications.Tests;
 
-public sealed class NotificationFanoutHandlerTests
+public sealed class NotificationFanoutHandlerTests : IDisposable
 {
     private readonly INotificationSubscriptionReader _subscriptionReader = Substitute.For<INotificationSubscriptionReader>();
     private readonly INotificationPreferenceReader _preferenceReader = Substitute.For<INotificationPreferenceReader>();
     private readonly INotificationDefinitionStore _definitionStore = Substitute.For<INotificationDefinitionStore>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly NotificationFanoutHandler _handler;
+    private readonly ActivityListener _activityListener;
 
     public NotificationFanoutHandlerTests()
     {
+        _activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "Granit.Notifications",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+        };
+        ActivitySource.AddActivityListener(_activityListener);
+
         _currentTenant.IsAvailable.Returns(false);
         _handler = new NotificationFanoutHandler(
             _subscriptionReader,
@@ -36,6 +45,8 @@ public sealed class NotificationFanoutHandlerTests
             new SimpleGuidGenerator(),
             _currentTenant);
     }
+
+    public void Dispose() => _activityListener.Dispose();
 
     [Fact]
     public async Task HandleAsync_NoRecipients_NoSubscribers_ReturnsEmpty()

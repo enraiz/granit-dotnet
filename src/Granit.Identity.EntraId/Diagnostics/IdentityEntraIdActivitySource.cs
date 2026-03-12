@@ -42,6 +42,12 @@ internal static class IdentityEntraIdActivitySource
     internal const string AddUserToGroup = "identity.entraid.add-user-to-group";
     internal const string RemoveUserFromGroup = "identity.entraid.remove-user-from-group";
 
+    // ──── Tag names ────
+
+    internal const string TagUserId = "identity.user_id";
+    internal const string TagRoleName = "identity.role_name";
+    internal const string TagGroupId = "identity.group_id";
+
 #pragma warning disable GRSEC003 // Operation name constants, not secrets
     internal const string GetPasswordChangedAt = "identity.entraid.get-password-changed-at";
     internal const string SendPasswordResetEmail = "identity.entraid.send-password-reset-email";

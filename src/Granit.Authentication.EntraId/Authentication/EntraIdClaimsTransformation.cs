@@ -34,10 +34,10 @@ public sealed class EntraIdClaimsTransformation : IClaimsTransformation
         // Collect existing roles in a HashSet to avoid O(n²) HasClaim scans
         HashSet<string> existingRoles = [.. identity.FindAll(ClaimTypes.Role).Select(c => c.Value)];
 
-        foreach (Claim rolesClaim in rolesClaims)
-        {
-            string value = rolesClaim.Value;
+        IEnumerable<string> roleValues = rolesClaims.Select(c => c.Value);
 
+        foreach (string value in roleValues)
+        {
             if (value.StartsWith('['))
             {
                 // v1.0 format: single claim with JSON array value

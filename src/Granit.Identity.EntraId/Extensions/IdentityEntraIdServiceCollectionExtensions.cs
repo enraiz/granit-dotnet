@@ -47,7 +47,7 @@ public static class IdentityEntraIdServiceCollectionExtensions
         services.AddHttpClient("MicrosoftGraph", (sp, client) =>
             {
                 EntraIdAdminOptions opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<EntraIdAdminOptions>>().Value;
-                client.BaseAddress = new Uri("https://graph.microsoft.com");
+                client.BaseAddress = new Uri(opts.GraphBaseUrl);
                 client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
             })
             .AddStandardResilienceHandler();

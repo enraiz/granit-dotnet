@@ -24,4 +24,10 @@ internal static class BlobStorageS3ActivitySource
     internal const string Delete = "blobstorage.delete";
     internal const string GetSize = "blobstorage.get-size";
     internal const string PartialStream = "blobstorage.partial-stream";
+
+    // ──── Tag names ────
+
+    internal const string TagBucket = "blobstorage.bucket";
+    internal const string TagObjectKey = "blobstorage.object_key";
+    internal const string TagContentType = "blobstorage.content_type";
 }

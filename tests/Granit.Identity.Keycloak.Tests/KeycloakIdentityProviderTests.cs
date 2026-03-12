@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using Granit.Identity.Keycloak.Internal;
 using Granit.Identity.Keycloak.Options;
@@ -34,8 +35,17 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         ResponseBody = """{"access_token":"user-token","expires_in":300}""",
     };
 
+    private readonly ActivityListener _activityListener;
+
     public KeycloakIdentityProviderTests()
     {
+        _activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "Granit.Identity.Keycloak",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+        };
+        ActivitySource.AddActivityListener(_activityListener);
+
         _httpClient = new HttpClient(_handler) { BaseAddress = new Uri("https://keycloak.test/") };
         _httpClientFactory.CreateClient("KeycloakAdmin").Returns(_httpClient);
 
@@ -1246,7 +1256,11 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
                 TestContext.Current.CancellationToken));
     }
 
-    public void Dispose() => _httpClient.Dispose();
+    public void Dispose()
+    {
+        _activityListener.Dispose();
+        _httpClient.Dispose();
+    }
 }
 
 /// <summary>

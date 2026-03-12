@@ -5,6 +5,7 @@
 // and fields when subscribers exist, tenant resolution priority.
 // =============================================================================
 
+using System.Diagnostics;
 using System.Text.Json;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
@@ -19,17 +20,27 @@ using Xunit;
 
 namespace Granit.Webhooks.Tests;
 
-public sealed class WebhookFanoutHandlerTests
+public sealed class WebhookFanoutHandlerTests : IDisposable
 {
     private readonly IWebhookSubscriptionReader _reader = Substitute.For<IWebhookSubscriptionReader>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly WebhookFanoutHandler _handler;
+    private readonly ActivityListener _activityListener;
 
     public WebhookFanoutHandlerTests()
     {
+        _activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "Granit.Webhooks",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+        };
+        ActivitySource.AddActivityListener(_activityListener);
+
         _currentTenant.IsAvailable.Returns(false);
         _handler = new WebhookFanoutHandler(_reader, _currentTenant, new SimpleGuidGenerator());
     }
+
+    public void Dispose() => _activityListener.Dispose();
 
     [Fact]
     public async Task HandleAsync_NoSubscribers_ReturnsEmptyEnumerable()

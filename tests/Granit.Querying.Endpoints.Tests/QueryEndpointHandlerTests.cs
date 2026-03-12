@@ -205,7 +205,7 @@ public sealed class QueryEndpointHandlerTests
         var viewId = Guid.NewGuid();
         ISavedViewStoreReader savedViewStore = Substitute.For<ISavedViewStoreReader>();
         savedViewStore.GetListAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
-            .Returns(
+            .Returns((IReadOnlyList<SavedView>)
             [
                 new()
                 {

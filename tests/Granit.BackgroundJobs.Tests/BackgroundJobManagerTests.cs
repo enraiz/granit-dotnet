@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
 using Granit.Core.Exceptions;
@@ -15,7 +16,7 @@ using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
 
-public sealed class BackgroundJobManagerTests
+public sealed class BackgroundJobManagerTests : IDisposable
 {
     private readonly IBackgroundJobStoreReader _storeReader = Substitute.For<IBackgroundJobStoreReader>();
     private readonly IBackgroundJobStoreWriter _storeWriter = Substitute.For<IBackgroundJobStoreWriter>();
@@ -26,9 +27,17 @@ public sealed class BackgroundJobManagerTests
         Substitute.For<ILogger<BackgroundJobManager>>();
     private readonly IMessageStore _messageStore = Substitute.For<IMessageStore>();
     private readonly IDeadLetters _deadLetters = Substitute.For<IDeadLetters>();
+    private readonly ActivityListener _activityListener;
 
     public BackgroundJobManagerTests()
     {
+        _activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "Granit.BackgroundJobs",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+        };
+        ActivitySource.AddActivityListener(_activityListener);
+
         // Allow [LoggerMessage] generated code to execute both branches (IsEnabled check)
         _logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
 
@@ -38,6 +47,8 @@ public sealed class BackgroundJobManagerTests
             .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([]));
     }
+
+    public void Dispose() => _activityListener.Dispose();
 
     private BackgroundJobManager MakeSut() =>
         new(_storeReader, _storeWriter, _bus, _clock, _user, _logger, _messageStore);

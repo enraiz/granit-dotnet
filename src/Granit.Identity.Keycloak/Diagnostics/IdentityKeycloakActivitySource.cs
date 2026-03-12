@@ -42,6 +42,14 @@ internal static class IdentityKeycloakActivitySource
     internal const string AddUserToGroup = "identity.keycloak.add-user-to-group";
     internal const string RemoveUserFromGroup = "identity.keycloak.remove-user-from-group";
 
+    // ──── Tag names ────
+
+    internal const string TagUserId = "identity.keycloak.user_id";
+    internal const string TagRoleName = "identity.keycloak.role_name";
+    internal const string TagGroupId = "identity.keycloak.group_id";
+    internal const string TagEnabled = "identity.keycloak.enabled";
+    internal const string TagSearch = "identity.keycloak.search";
+
 #pragma warning disable GRSEC003 // Operation name constants, not secrets
     internal const string GetPasswordChangedAt = "identity.keycloak.get-password-changed-at";
     internal const string SendPasswordResetEmail = "identity.keycloak.send-password-reset-email";
