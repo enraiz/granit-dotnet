@@ -4,14 +4,15 @@
 
 - **Type**: Rock-solid, production-ready modular framework for .NET and React
 - **Repo**: `granit-dotnet` (company-level, not product-specific)
-- **Compliance**: RGPD + ISO 27001 + ISO 9001
-- **Publication**: GitLab Package Registry (NuGet)
+- **License**: Apache-2.0 (open-source)
+- **Compliance**: GDPR + ISO 27001 + ISO 9001
+- **Publication**: nuget.org (planned), GitLab Package Registry (internal)
 
 ## Stack & versions
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
-## Packages (86 packages)
+## Packages (93 packages)
 
 ### Core & utilities
 
@@ -20,7 +21,8 @@
 | `Granit.Core` | Module system (ABP-inspired), shared domain types |
 | `Granit.Timing` | IClock, ICurrentTimezoneProvider, TimeProvider |
 | `Granit.Guids` | IGuidGenerator, sequential GUIDs for clustered indexes |
-| `Granit.Validation` | FluentValidation integration |
+| `Granit.Validation` | FluentValidation integration (international validators) |
+| `Granit.Validation.Europe` | France/Belgium-specific validators (NISS, SIREN, VAT, RIB, etc.) |
 | `Granit.Analyzers` / `.CodeFixes` | Custom Roslyn analyzers and code fixes |
 
 ### Security & authentication
@@ -33,7 +35,7 @@
 | `Granit.Authorization` / `.EntityFrameworkCore` | Policy-based authorization, EF Core store |
 | `Granit.Vault` | VaultSharp, ITransitEncryptionService, dynamic credentials |
 | `Granit.Encryption` | Data encryption abstractions |
-| `Granit.Privacy` | RGPD privacy helpers |
+| `Granit.Privacy` | GDPR privacy helpers |
 
 ### Identity
 
@@ -41,8 +43,8 @@
 | ------- | ---- |
 | `Granit.Identity` | Identity provider abstractions (IIdentityProvider, IUserLookupService, models) |
 | `Granit.Identity.Keycloak` | Keycloak Admin API implementation of IIdentityProvider |
-| `Granit.Identity.EntityFrameworkCore` | EF Core user cache (cache-aside, login-time sync, RGPD) |
-| `Granit.Identity.Endpoints` | Minimal API endpoints for user cache (CRUD, sync, RGPD, webhook, stats) |
+| `Granit.Identity.EntityFrameworkCore` | EF Core user cache (cache-aside, login-time sync, GDPR) |
+| `Granit.Identity.Endpoints` | Minimal API endpoints for user cache (CRUD, sync, GDPR, webhook, stats) |
 
 ### Data & persistence
 
@@ -134,7 +136,7 @@ dotnet format --verify-no-changes
 
 ## Compliance constraints
 
-1. **RGPD**: Minimization, right to erasure, pseudonymization
+1. **GDPR**: Minimization, right to erasure, pseudonymization
 2. **ISO 27001**: Audit trail, encryption at rest and in transit
 3. **ISO 9001**: Quality management, traceability
 4. **Secrets**: No plaintext secrets, mandatory rotation
@@ -144,7 +146,9 @@ dotnet format --verify-no-changes
 See [`docs/guide/conventions/langues.md`](docs/guide/conventions/langues.md) for full language and localization rules.
 
 - **Code** (identifiers, XML docs, comments): **English**
-- **Docs, issues, commits**: **French** (with correct diacritics: é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
+- **Commits**: **English** (Conventional Commits)
+- **Docs** (`docs/**/*.md`): **English** (migration in progress, some legacy pages still in French)
+- **Issues GitLab**: **French** (with correct diacritics: é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
 - **`CLAUDE.md`, skills**: **English**
 - **Localization**: **17 cultures** — 14 base languages (en, fr, nl, de, es, it, pt,
   zh, ja, pl, tr, ko, sv, cs) + 3 regional variants (fr-CA, en-GB, pt-BR). Every
@@ -210,7 +214,7 @@ and is available in every module without referencing `Granit.MultiTenancy`.
 - Always check `IsAvailable` before using `Id` — the null object is the normal state when
   multi-tenancy is not installed.
 - Hard dependency on `Granit.MultiTenancy` is allowed **only** when the module must enforce
-  strict tenant isolation (example: BlobStorage — throws if no tenant context, RGPD).
+  strict tenant isolation (example: BlobStorage — throws if no tenant context, GDPR).
 - Application modules (`AppHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
   as usual when multi-tenancy is required in the application.
 
@@ -284,7 +288,7 @@ See [`docs/guide/conventions/securite.md`](docs/guide/conventions/securite.md) f
 ## Refactoring — mandatory rules
 
 Code that looks "weird" almost always exists for a reason: production fix, regulatory
-edge case, RGPD/ISO 27001 constraint, third-party limitation workaround. Never remove or
+edge case, GDPR/ISO 27001 constraint, third-party limitation workaround. Never remove or
 rewrite code without understanding the original intent.
 
 **Before any refactoring:**
@@ -315,7 +319,7 @@ rewrite code without understanding the original intent.
 
 ## Expected behavior
 
-- Understand RGPD, ISO 27001 and ISO 9001 context before responding
+- Understand GDPR, ISO 27001 and ISO 9001 context before responding
 - Challenge security bad practices
 - Propose alternatives when a request compromises security
 - Explain the "why" behind best practices
