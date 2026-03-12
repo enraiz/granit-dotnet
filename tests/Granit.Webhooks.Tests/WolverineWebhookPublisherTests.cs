@@ -1,30 +1,30 @@
 // =============================================================================
-// Tests - WolverineWebhookPublisher
+// Tests - ChannelWebhookPublisher
 // =============================================================================
-// Verifies that PublishAsync serializes the payload and publishes a WebhookTrigger
-// with correct fields, including tenant context handling.
+// Verifies that PublishAsync serializes the payload and writes a WebhookTrigger
+// to the in-process channel with correct fields, including tenant context handling.
 // =============================================================================
 
 using System.Text.Json;
+using System.Threading.Channels;
 using Granit.Core.MultiTenancy;
 using Granit.Timing;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
 using NSubstitute;
 using Shouldly;
-using Wolverine;
 using Xunit;
 
 namespace Granit.Webhooks.Tests;
 
-public sealed class WolverineWebhookPublisherTests
+public sealed class ChannelWebhookPublisherTests
 {
-    private readonly IMessageBus _messageBus = Substitute.For<IMessageBus>();
+    private readonly Channel<WebhookTrigger> _channel = Channel.CreateUnbounded<WebhookTrigger>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IClock _clock = Substitute.For<IClock>();
     private readonly DateTimeOffset _fixedNow = new(2025, 6, 15, 10, 0, 0, TimeSpan.Zero);
 
-    public WolverineWebhookPublisherTests()
+    public ChannelWebhookPublisherTests()
     {
         _clock.Now.Returns(_ => _fixedNow);
     }
@@ -36,15 +36,15 @@ public sealed class WolverineWebhookPublisherTests
         _currentTenant.IsAvailable.Returns(true);
         _currentTenant.Id.Returns(tenantId);
 
-        var publisher = new WolverineWebhookPublisher(_messageBus, _currentTenant, _clock);
+        var publisher = new ChannelWebhookPublisher(_channel, _currentTenant, _clock);
         var payload = new { DocumentId = Guid.NewGuid(), Name = "test.pdf" };
 
         await publisher.PublishAsync("document.uploaded", payload, TestContext.Current.CancellationToken);
 
-        await _messageBus.Received(1).PublishAsync(Arg.Is<WebhookTrigger>(t =>
-            t.EventType == "document.uploaded"
-            && t.TenantId == tenantId
-            && t.OccurredAt == _fixedNow));
+        _channel.Reader.TryRead(out WebhookTrigger? trigger).ShouldBeTrue();
+        trigger!.EventType.ShouldBe("document.uploaded");
+        trigger.TenantId.ShouldBe(tenantId);
+        trigger.OccurredAt.ShouldBe(_fixedNow);
     }
 
     [Fact]
@@ -52,12 +52,12 @@ public sealed class WolverineWebhookPublisherTests
     {
         _currentTenant.IsAvailable.Returns(false);
 
-        var publisher = new WolverineWebhookPublisher(_messageBus, _currentTenant, _clock);
+        var publisher = new ChannelWebhookPublisher(_channel, _currentTenant, _clock);
 
         await publisher.PublishAsync("test.event", new { Key = "value" }, TestContext.Current.CancellationToken);
 
-        await _messageBus.Received(1).PublishAsync(Arg.Is<WebhookTrigger>(t =>
-            t.TenantId == null));
+        _channel.Reader.TryRead(out WebhookTrigger? trigger).ShouldBeTrue();
+        trigger!.TenantId.ShouldBeNull();
     }
 
     [Fact]
@@ -65,14 +65,14 @@ public sealed class WolverineWebhookPublisherTests
     {
         _currentTenant.IsAvailable.Returns(false);
 
-        var publisher = new WolverineWebhookPublisher(_messageBus, _currentTenant, _clock);
+        var publisher = new ChannelWebhookPublisher(_channel, _currentTenant, _clock);
         var payload = new { Id = 42, Label = "test" };
 
         await publisher.PublishAsync("item.created", payload, TestContext.Current.CancellationToken);
 
-        await _messageBus.Received(1).PublishAsync(Arg.Is<WebhookTrigger>(t =>
-            t.Payload.GetProperty("Id").GetInt32() == 42
-            && t.Payload.GetProperty("Label").GetString() == "test"));
+        _channel.Reader.TryRead(out WebhookTrigger? trigger).ShouldBeTrue();
+        trigger!.Payload.GetProperty("Id").GetInt32().ShouldBe(42);
+        trigger.Payload.GetProperty("Label").GetString().ShouldBe("test");
     }
 
     [Fact]
@@ -80,11 +80,11 @@ public sealed class WolverineWebhookPublisherTests
     {
         _currentTenant.IsAvailable.Returns(false);
 
-        var publisher = new WolverineWebhookPublisher(_messageBus, _currentTenant, _clock);
+        var publisher = new ChannelWebhookPublisher(_channel, _currentTenant, _clock);
 
         await publisher.PublishAsync("test.event", new { }, TestContext.Current.CancellationToken);
 
-        await _messageBus.Received(1).PublishAsync(Arg.Is<WebhookTrigger>(t =>
-            t.OccurredAt == _fixedNow));
+        _channel.Reader.TryRead(out WebhookTrigger? trigger).ShouldBeTrue();
+        trigger!.OccurredAt.ShouldBe(_fixedNow);
     }
 }

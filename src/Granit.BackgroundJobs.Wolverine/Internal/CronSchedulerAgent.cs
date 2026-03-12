@@ -1,12 +1,13 @@
 using Cronos;
+using Granit.BackgroundJobs.Abstractions;
 using Granit.BackgroundJobs.Domain;
+using Granit.BackgroundJobs.Internal;
 using Granit.Timing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Wolverine;
 using Wolverine.Runtime.Agents;
 
-namespace Granit.BackgroundJobs.Internal;
+namespace Granit.BackgroundJobs.Wolverine.Internal;
 
 /// <summary>
 /// Wolverine singleton agent that initializes recurring job scheduling on cluster startup.
@@ -21,10 +22,6 @@ namespace Granit.BackgroundJobs.Internal;
 /// <b>Anti-doublon guarantee:</b> before scheduling a job, <see cref="startAsync"/> checks
 /// whether <see cref="BackgroundJobDefinition.NextExecutionAt"/> is already in the future.
 /// If it is, the job is already scheduled via the Outbox — no message is published.
-/// </para>
-/// <para>
-/// Registered via <c>services.AddSingularAgent&lt;CronSchedulerAgent&gt;()</c> in
-/// <c>AddGranitBackgroundJobs()</c>.
 /// </para>
 /// </remarks>
 internal sealed partial class CronSchedulerAgent(
@@ -54,11 +51,11 @@ internal sealed partial class CronSchedulerAgent(
                 continue;
             }
 
-            object message = CreateMessage(job.MessageType, job.JobName);
+            object message = CronSchedulerHelper.CreateMessage(job.MessageType, job.JobName);
 
             await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-            IMessageBus bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-            await bus.ScheduleAsync(message, next.Value).ConfigureAwait(false);
+            IBackgroundJobDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IBackgroundJobDispatcher>();
+            await dispatcher.ScheduleAsync(message, next.Value, cancellationToken).ConfigureAwait(false);
             await storeWriter.RecordNextExecutionAsync(job.JobName, next.Value, cancellationToken).ConfigureAwait(false);
             LogJobScheduled(logger, job.JobName, next.Value);
         }
@@ -87,21 +84,6 @@ internal sealed partial class CronSchedulerAgent(
         {
             return null;
         }
-    }
-
-    internal static object CreateMessage(string messageType, string jobName)
-    {
-        var type = Type.GetType(messageType);
-        if (type is null)
-        {
-            throw new InvalidOperationException(
-                $"Cannot resolve message type '{messageType}' for job '{jobName}'. " +
-                "Ensure the assembly containing the message is loaded.");
-        }
-
-        return Activator.CreateInstance(type)
-            ?? throw new InvalidOperationException(
-                $"Cannot instantiate message type '{type.Name}' for job '{jobName}'.");
     }
 
     [LoggerMessage(Level = LogLevel.Debug,

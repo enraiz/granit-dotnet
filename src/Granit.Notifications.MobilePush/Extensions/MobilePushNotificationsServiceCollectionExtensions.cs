@@ -25,6 +25,7 @@ public static class MobilePushNotificationsServiceCollectionExtensions
 
         services.TryAddSingleton<IMobilePushTokenReader, InMemoryMobilePushTokenStore>();
         services.TryAddSingleton<IMobilePushTokenWriter, InMemoryMobilePushTokenStore>();
+        services.TryAddScoped<IMobilePushEventPublisher, NullMobilePushEventPublisher>();
         services.AddScoped<INotificationChannel, MobilePushNotificationChannel>();
         return services;
     }

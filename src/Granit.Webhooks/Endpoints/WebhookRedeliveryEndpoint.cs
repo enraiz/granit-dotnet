@@ -1,8 +1,8 @@
+using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Handlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Wolverine;
 
 namespace Granit.Webhooks.Endpoints;
 
@@ -34,7 +34,7 @@ public static class WebhookRedeliveryEndpoint
     private static async Task<IResult> HandleRetryAsync(
         Guid deliveryId,
         RetryWebhookHandler retryHandler,
-        IMessageBus messageBus,
+        IWebhookCommandDispatcher dispatcher,
         CancellationToken cancellationToken)
     {
         RetryWebhookResult result = await retryHandler
@@ -52,7 +52,7 @@ public static class WebhookRedeliveryEndpoint
             return TypedResults.Problem(detail: result.Error, statusCode: statusCode);
         }
 
-        await messageBus.SendAsync(result.Command!).ConfigureAwait(false);
+        await dispatcher.DispatchAsync(result.Command!, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Accepted(string.Empty);
     }

@@ -5,17 +5,15 @@ using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Messages;
 using Wolverine;
 
-namespace Granit.Webhooks.Internal;
+namespace Granit.Webhooks.Wolverine.Internal;
 
 /// <summary>
-/// Default implementation of <see cref="IWebhookPublisher"/> backed by Wolverine.
+/// <see cref="IWebhookPublisher"/> implementation backed by Wolverine's durable Outbox.
 /// </summary>
-/// <remarks>
-/// Serializes the payload to a <see cref="JsonElement"/> and publishes a
-/// <see cref="WebhookTrigger"/> into the Wolverine Outbox. The ambient
-/// <see cref="ICurrentTenant"/> is captured when available (<c>IsAvailable = true</c>).
-/// </remarks>
-internal sealed class WolverineWebhookPublisher(IMessageBus bus, ICurrentTenant currentTenant, IClock clock) : IWebhookPublisher
+internal sealed class WolverineWebhookPublisher(
+    IMessageBus bus,
+    ICurrentTenant currentTenant,
+    IClock clock) : IWebhookPublisher
 {
     public async ValueTask PublishAsync<TPayload>(
         string eventType,

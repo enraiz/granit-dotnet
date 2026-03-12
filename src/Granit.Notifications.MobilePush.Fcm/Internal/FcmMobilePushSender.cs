@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using Granit.Notifications.MobilePush.Fcm.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Wolverine;
 
 namespace Granit.Notifications.MobilePush.Fcm.Internal;
 
@@ -19,7 +18,7 @@ namespace Granit.Notifications.MobilePush.Fcm.Internal;
 internal sealed partial class FcmMobilePushSender(
     IHttpClientFactory httpClientFactory,
     IOptions<FcmOptions> options,
-    IMessageBus messageBus,
+    IMobilePushEventPublisher eventPublisher,
     ILogger<FcmMobilePushSender> logger) : IMobilePushSender
 {
     private const string FcmHttpClientName = "FcmPush";
@@ -40,10 +39,10 @@ internal sealed partial class FcmMobilePushSender(
             catch (FcmTokenUnregisteredException)
             {
                 LogTokenUnregistered(token);
-                await messageBus.PublishAsync(new MobilePushTokenInvalidated
+                await eventPublisher.PublishTokenInvalidatedAsync(new MobilePushTokenInvalidated
                 {
                     DeviceToken = token,
-                }).ConfigureAwait(false);
+                }, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

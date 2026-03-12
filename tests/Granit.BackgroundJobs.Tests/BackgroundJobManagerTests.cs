@@ -1,17 +1,13 @@
 using System.Diagnostics;
+using Granit.BackgroundJobs.Abstractions;
 using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
 using Granit.Core.Exceptions;
 using Granit.Security;
 using Granit.Timing;
-using JasperFx.Core;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Shouldly;
-using Wolverine;
-using Wolverine.Persistence.Durability;
-using Wolverine.Persistence.Durability.DeadLetterManagement;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests;
@@ -20,13 +16,12 @@ public sealed class BackgroundJobManagerTests : IDisposable
 {
     private readonly IBackgroundJobStoreReader _storeReader = Substitute.For<IBackgroundJobStoreReader>();
     private readonly IBackgroundJobStoreWriter _storeWriter = Substitute.For<IBackgroundJobStoreWriter>();
-    private readonly IMessageBus _bus = Substitute.For<IMessageBus>();
+    private readonly IBackgroundJobDispatcher _dispatcher = Substitute.For<IBackgroundJobDispatcher>();
+    private readonly IDeadLetterQueueInspector _dlqInspector = Substitute.For<IDeadLetterQueueInspector>();
     private readonly IClock _clock = Substitute.For<IClock>();
     private readonly ICurrentUserService _user = Substitute.For<ICurrentUserService>();
     private readonly ILogger<BackgroundJobManager> _logger =
         Substitute.For<ILogger<BackgroundJobManager>>();
-    private readonly IMessageStore _messageStore = Substitute.For<IMessageStore>();
-    private readonly IDeadLetters _deadLetters = Substitute.For<IDeadLetters>();
     private readonly ActivityListener _activityListener;
 
     public BackgroundJobManagerTests()
@@ -42,16 +37,15 @@ public sealed class BackgroundJobManagerTests : IDisposable
         _logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
 
         // Default: no dead letters (graceful baseline)
-        _messageStore.DeadLetters.Returns(_deadLetters);
-        _deadLetters
-            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([]));
+        _dlqInspector.GetCountsAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyDictionary<string, long>>(
+                new Dictionary<string, long>()));
     }
 
     public void Dispose() => _activityListener.Dispose();
 
     private BackgroundJobManager MakeSut() =>
-        new(_storeReader, _storeWriter, _bus, _clock, _user, _logger, _messageStore);
+        new(_storeReader, _storeWriter, _dispatcher, _dlqInspector, _clock, _user, _logger);
 
     private static BackgroundJobDefinition MakeJob(
         string name = "test-job",
@@ -104,17 +98,9 @@ public sealed class BackgroundJobManagerTests : IDisposable
         _storeReader.GetAllJobsAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
 
-        DeadLetterQueueCount dlqEntry = new(
-            ServiceName: "my-app",
-            ReceivedAt: new Uri("queue://test"),
-            MessageType: messageTypeShortName,
-            ExceptionType: "TimeoutException",
-            Database: new Uri("db://test"),
-            Count: 5);
-
-        _deadLetters
-            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([dlqEntry]));
+        _dlqInspector.GetCountsAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyDictionary<string, long>>(
+                new Dictionary<string, long> { [messageTypeShortName] = 5 }));
 
         BackgroundJobManager sut = MakeSut();
 
@@ -127,29 +113,6 @@ public sealed class BackgroundJobManagerTests : IDisposable
         result[0].ConsecutiveFailures.ShouldBe(3);
         result[0].LastError.ShouldBe("timeout");
         result[0].DeadLetterCount.ShouldBe(5);
-    }
-
-    [Fact]
-    public async Task GetAllAsync_WhenDlqQueryThrows_ReturnsZeroDeadLetterCount()
-    {
-        // Arrange
-        BackgroundJobDefinition job = MakeJob("daily-report");
-        _storeReader.GetAllJobsAsync(Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<BackgroundJobDefinition>>([job]));
-
-        _deadLetters
-            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException("DLQ unavailable"));
-
-        BackgroundJobManager sut = MakeSut();
-
-        // Act — must not throw
-        IReadOnlyList<BackgroundJobStatus> result =
-            await sut.GetAllAsync(TestContext.Current.CancellationToken);
-
-        // Assert — graceful degradation
-        result.Count.ShouldBe(1);
-        result[0].DeadLetterCount.ShouldBe(0);
     }
 
     // =========================================================================
@@ -314,11 +277,12 @@ public sealed class BackgroundJobManagerTests : IDisposable
         await sut.TriggerNowAsync("daily-report", cancellationToken);
 
         // Assert
-        await _bus.Received(1).PublishAsync(
+        await _dispatcher.Received(1).PublishAsync(
             Arg.Is<FakeDailyReportMessage>(m => m != null),
-            Arg.Is<DeliveryOptions>(o =>
-                o.Headers.ContainsKey(RecurringJobSchedulingMiddleware.TriggeredByHeader)
-                && o.Headers[RecurringJobSchedulingMiddleware.TriggeredByHeader] == "user-abc"));
+            Arg.Is<IDictionary<string, string>>(h =>
+                h.ContainsKey(BackgroundJobHeaders.TriggeredBy)
+                && h[BackgroundJobHeaders.TriggeredBy] == "user-abc"),
+            cancellationToken);
     }
 
     [Fact]
@@ -335,11 +299,11 @@ public sealed class BackgroundJobManagerTests : IDisposable
         // Act
         await sut.TriggerNowAsync("daily-report", TestContext.Current.CancellationToken);
 
-        // Assert
-        await _bus.Received(1).PublishAsync(
+        // Assert — headers should be null for anonymous user
+        await _dispatcher.Received(1).PublishAsync(
             Arg.Any<FakeDailyReportMessage>(),
-            Arg.Is<DeliveryOptions>(o =>
-                !o.Headers.ContainsKey(RecurringJobSchedulingMiddleware.TriggeredByHeader)));
+            null,
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

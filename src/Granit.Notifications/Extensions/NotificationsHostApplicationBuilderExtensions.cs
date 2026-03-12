@@ -1,14 +1,13 @@
+using System.Threading.Channels;
 using Granit.Core.Diagnostics;
 using Granit.Notifications.Abstractions;
-using Granit.Notifications.Exceptions;
+using Granit.Notifications.Handlers;
 using Granit.Notifications.Internal;
 using Granit.Notifications.Messages;
 using Granit.Notifications.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Wolverine;
-using Wolverine.ErrorHandling;
 
 namespace Granit.Notifications.Extensions;
 
@@ -20,6 +19,11 @@ public static class NotificationsHostApplicationBuilderExtensions
     /// <summary>
     /// Adds the Granit notification dispatch engine.
     /// </summary>
+    /// <remarks>
+    /// By default, notifications are dispatched via an in-process <see cref="Channel{T}"/>
+    /// consumed by a <see cref="BackgroundService"/>. For durable outbox-backed dispatch,
+    /// add the <c>Granit.Notifications.Wolverine</c> package.
+    /// </remarks>
     public static IHostApplicationBuilder AddGranitNotifications(
         this IHostApplicationBuilder builder,
         Action<NotificationsOptions>? configure = null)
@@ -55,30 +59,17 @@ public static class NotificationsHostApplicationBuilderExtensions
         builder.Services.AddSingleton<NotificationDefinitionStore>();
         builder.Services.AddSingleton<INotificationDefinitionStore>(sp => sp.GetRequiredService<NotificationDefinitionStore>());
 
-        // Application facade
-        builder.Services.AddScoped<INotificationPublisher, WolverineNotificationPublisher>();
+        // Handlers (scoped — required by the Channel-based worker)
+        builder.Services.AddScoped<NotificationFanoutHandler>();
+        builder.Services.AddScoped<NotificationDeliveryHandler>();
+
+        // In-process channel dispatch (default — replaced by Granit.Notifications.Wolverine)
+        builder.Services.AddSingleton(Channel.CreateUnbounded<NotificationTrigger>());
+        builder.Services.AddScoped<INotificationPublisher, ChannelNotificationPublisher>();
+        builder.Services.AddHostedService<NotificationDispatchWorker>();
 
         // InApp channel (built-in)
         builder.Services.AddSingleton<INotificationChannel, InAppNotificationChannel>();
-
-        // Wolverine configuration
-        builder.Services.ConfigureWolverine(opts =>
-        {
-            opts.LocalQueueFor<NotificationTrigger>()
-                .Named("notification-fanout");
-
-            opts.LocalQueueFor<DeliverNotificationCommand>()
-                .Named("notification-delivery")
-                .MaximumParallelMessages(options.MaxParallelDeliveries);
-
-            opts.OnException<NotificationDeliveryException>()
-                .RetryWithCooldown(
-                    TimeSpan.FromSeconds(10),
-                    TimeSpan.FromMinutes(1),
-                    TimeSpan.FromMinutes(5),
-                    TimeSpan.FromMinutes(30),
-                    TimeSpan.FromHours(2));
-        });
 
         return builder;
     }

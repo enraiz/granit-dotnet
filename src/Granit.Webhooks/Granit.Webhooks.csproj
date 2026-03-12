@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <PackageId>Granit.Webhooks</PackageId>
-    <Description>Outbound webhook delivery engine for Granit. Async dispatch via Wolverine outbox, HMAC-SHA256 anti-replay signatures, durable exponential backoff, payload-type agnostic (thin ISO 27001 or fat standard).</Description>
+    <Description>Outbound webhook delivery engine for Granit. HMAC-SHA256 anti-replay signatures, durable exponential backoff, payload-type agnostic (thin ISO 27001 or fat standard). Uses in-process channels by default; add Granit.Webhooks.Wolverine for durable outbox dispatch.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.Webhooks.Tests" />
+    <InternalsVisibleTo Include="Granit.Webhooks.Wolverine" />
     <InternalsVisibleTo Include="Granit.Webhooks.EntityFrameworkCore" />
     <InternalsVisibleTo Include="Granit.Webhooks.EntityFrameworkCore.Tests" />
     <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal interfaces in tests -->
@@ -22,7 +23,6 @@
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
     <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
-    <ProjectReference Include="..\Granit.Wolverine\Granit.Wolverine.csproj" />
   </ItemGroup>
 
 </Project>

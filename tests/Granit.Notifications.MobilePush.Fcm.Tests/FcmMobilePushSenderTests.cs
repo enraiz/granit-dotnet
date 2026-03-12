@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Shouldly;
-using Wolverine;
 using Xunit;
 
 namespace Granit.Notifications.MobilePush.Fcm.Tests;
@@ -27,18 +26,20 @@ public sealed class FcmMobilePushSenderTests
     [Fact]
     public async Task SendAsync_UnregisteredToken_PublishesInvalidationEvent()
     {
-        IMessageBus messageBus = Substitute.For<IMessageBus>();
+        IMobilePushEventPublisher eventPublisher = Substitute.For<IMobilePushEventPublisher>();
         FcmMobilePushSender sender = CreateSender(
             new DelegatingHandlerStub(_ => new HttpResponseMessage(HttpStatusCode.NotFound)
             {
                 Content = new StringContent("{\"error\":{\"code\":404,\"message\":\"UNREGISTERED\"}}"),
             }),
-            messageBus);
+            eventPublisher);
 
         MobilePushMessage message = BuildMessage("expired-token");
         await sender.SendAsync(message, TestContext.Current.CancellationToken);
 
-        await messageBus.Received(1).PublishAsync(Arg.Is<MobilePushTokenInvalidated>(e => e.DeviceToken == "expired-token"));
+        await eventPublisher.Received(1).PublishTokenInvalidatedAsync(
+            Arg.Is<MobilePushTokenInvalidated>(e => e.DeviceToken == "expired-token"),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -54,14 +55,14 @@ public sealed class FcmMobilePushSenderTests
         await Should.ThrowAsync<AggregateException>(() => sender.SendAsync(message, TestContext.Current.CancellationToken));
     }
 
-    private static FcmMobilePushSender CreateSender(DelegatingHandler handler, IMessageBus? messageBus = null)
+    private static FcmMobilePushSender CreateSender(DelegatingHandler handler, IMobilePushEventPublisher? eventPublisher = null)
     {
         IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
         HttpClient client = new(handler) { BaseAddress = new Uri("https://fcm.googleapis.com/") };
         factory.CreateClient("FcmPush").Returns(client);
 
         IOptions<FcmOptions> options = Microsoft.Extensions.Options.Options.Create(new FcmOptions { ProjectId = "test-project", ServiceAccountJson = "{}" });
-        return new FcmMobilePushSender(factory, options, messageBus ?? Substitute.For<IMessageBus>(), NullLogger<FcmMobilePushSender>.Instance);
+        return new FcmMobilePushSender(factory, options, eventPublisher ?? Substitute.For<IMobilePushEventPublisher>(), NullLogger<FcmMobilePushSender>.Instance);
     }
 
     private static MobilePushMessage BuildMessage(params string[] tokens) => new()

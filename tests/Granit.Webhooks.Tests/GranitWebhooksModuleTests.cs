@@ -6,10 +6,10 @@
 // =============================================================================
 
 using Granit.Core.Modularity;
+using Granit.Timing;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Extensions;
 using Granit.Webhooks.Options;
-using Granit.Wolverine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -29,12 +29,12 @@ public sealed class GranitWebhooksModuleTests
         typeof(GranitWebhooksModule).IsSealed.ShouldBeTrue();
 
     [Fact]
-    public void GranitWebhooksModule_DependsOn_WolverineModule()
+    public void GranitWebhooksModule_DependsOn_TimingModule()
     {
         var attributes = (DependsOnAttribute[])
             typeof(GranitWebhooksModule).GetCustomAttributes(typeof(DependsOnAttribute), inherit: false);
 
-        attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));
+        attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitTimingModule)));
     }
 
     [Fact]

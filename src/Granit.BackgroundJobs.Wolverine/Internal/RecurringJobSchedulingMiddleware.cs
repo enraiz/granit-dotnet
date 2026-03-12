@@ -5,7 +5,7 @@ using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using Wolverine;
 
-namespace Granit.BackgroundJobs.Internal;
+namespace Granit.BackgroundJobs.Wolverine.Internal;
 
 /// <summary>
 /// Wolverine middleware that records job execution and atomically reschedules the next
@@ -34,9 +34,6 @@ internal sealed partial class RecurringJobSchedulingMiddleware(
     IClock clock,
     ILogger<RecurringJobSchedulingMiddleware> logger)
 {
-    /// <summary>Header name carrying the admin identity for manual triggers (ISO 27001 audit).</summary>
-    internal const string TriggeredByHeader = "X-Triggered-By";
-
     /// <summary>
     /// Records the execution start and captures the <c>X-Triggered-By</c> header for ISO 27001 audit.
     /// </summary>
@@ -52,7 +49,7 @@ internal sealed partial class RecurringJobSchedulingMiddleware(
 
         await storeWriter.RecordExecutionStartAsync(attr.Name, clock.Now, cancellationToken).ConfigureAwait(false);
 
-        if (envelope.Headers.TryGetValue(TriggeredByHeader, out string? triggeredBy)
+        if (envelope.Headers.TryGetValue(BackgroundJobHeaders.TriggeredBy, out string? triggeredBy)
             && !string.IsNullOrEmpty(triggeredBy))
         {
             await storeWriter.SetTriggeredByAsync(attr.Name, triggeredBy, cancellationToken).ConfigureAwait(false);

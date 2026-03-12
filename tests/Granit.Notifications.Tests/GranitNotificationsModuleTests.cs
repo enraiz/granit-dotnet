@@ -2,12 +2,11 @@
 // Tests - GranitNotificationsModule
 // =============================================================================
 // Verifies the module metadata: DependsOn attributes ensure the correct
-// module dependency graph for Timing and Wolverine prerequisites.
+// module dependency graph for Timing prerequisites.
 // =============================================================================
 
 using Granit.Core.Modularity;
 using Granit.Timing;
-using Granit.Wolverine;
 using Shouldly;
 using Xunit;
 
@@ -24,17 +23,6 @@ public sealed class GranitNotificationsModuleTests
             .ToArray();
 
         attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitTimingModule)));
-    }
-
-    [Fact]
-    public void Module_DependsOnGranitWolverineModule()
-    {
-        DependsOnAttribute[] attributes = typeof(GranitNotificationsModule)
-            .GetCustomAttributes(typeof(DependsOnAttribute), inherit: false)
-            .Cast<DependsOnAttribute>()
-            .ToArray();
-
-        attributes.ShouldContain(a => a.DependedTypes.Contains(typeof(GranitWolverineModule)));
     }
 
     [Fact]

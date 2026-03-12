@@ -1,18 +1,23 @@
 using System.Text.Json;
+using System.Threading.Channels;
 using Granit.Core.MultiTenancy;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Messages;
 using Granit.Timing;
-using Wolverine;
 
 namespace Granit.Notifications.Internal;
 
 /// <summary>
-/// <see cref="INotificationPublisher"/> implementation that publishes
-/// <see cref="NotificationTrigger"/> messages into the Wolverine Outbox.
+/// Default <see cref="INotificationPublisher"/> implementation that writes
+/// <see cref="NotificationTrigger"/> messages to an in-process channel consumed
+/// by <see cref="NotificationDispatchWorker"/>.
 /// </summary>
-internal sealed class WolverineNotificationPublisher(
-    IMessageBus messageBus,
+/// <remarks>
+/// Replaced by the Wolverine-backed publisher when <c>Granit.Notifications.Wolverine</c>
+/// is loaded (durable outbox dispatch).
+/// </remarks>
+internal sealed class ChannelNotificationPublisher(
+    Channel<NotificationTrigger> channel,
     ICurrentTenant currentTenant,
     IClock clock) : INotificationPublisher
 {
@@ -32,7 +37,7 @@ internal sealed class WolverineNotificationPublisher(
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity);
         trigger = trigger with { RecipientUserIds = recipientUserIds };
-        await messageBus.PublishAsync(trigger).ConfigureAwait(false);
+        await channel.Writer.WriteAsync(trigger, cancellationToken).ConfigureAwait(false);
     }
 
     public async ValueTask PublishToSubscribersAsync<TData>(
@@ -41,7 +46,7 @@ internal sealed class WolverineNotificationPublisher(
         CancellationToken cancellationToken = default) where TData : notnull
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity: null);
-        await messageBus.PublishAsync(trigger).ConfigureAwait(false);
+        await channel.Writer.WriteAsync(trigger, cancellationToken).ConfigureAwait(false);
     }
 
     public async ValueTask PublishToEntityFollowersAsync<TData>(
@@ -51,7 +56,7 @@ internal sealed class WolverineNotificationPublisher(
         CancellationToken cancellationToken = default) where TData : notnull
     {
         NotificationTrigger trigger = BuildTrigger(notificationType, data, relatedEntity);
-        await messageBus.PublishAsync(trigger).ConfigureAwait(false);
+        await channel.Writer.WriteAsync(trigger, cancellationToken).ConfigureAwait(false);
     }
 
     private NotificationTrigger BuildTrigger<TData>(

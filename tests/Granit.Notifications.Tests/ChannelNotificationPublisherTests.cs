@@ -1,34 +1,34 @@
 // =============================================================================
-// Tests - WolverineNotificationPublisher
+// Tests - ChannelNotificationPublisher
 // =============================================================================
-// Verifies Wolverine-backed publisher: trigger construction with explicit
+// Verifies Channel-backed publisher: trigger construction with explicit
 // recipients, entity references, subscriber/follower variants, tenant capture.
 // =============================================================================
 
+using System.Threading.Channels;
 using Granit.Core.MultiTenancy;
 using Granit.Notifications.Internal;
 using Granit.Notifications.Messages;
 using Granit.Timing;
 using NSubstitute;
 using Shouldly;
-using Wolverine;
 using Xunit;
 
 namespace Granit.Notifications.Tests;
 
-public sealed class WolverineNotificationPublisherTests
+public sealed class ChannelNotificationPublisherTests
 {
-    private readonly IMessageBus _bus = Substitute.For<IMessageBus>();
+    private readonly Channel<NotificationTrigger> _channel = Channel.CreateUnbounded<NotificationTrigger>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IClock _clock;
-    private readonly WolverineNotificationPublisher _publisher;
+    private readonly ChannelNotificationPublisher _publisher;
 
-    public WolverineNotificationPublisherTests()
+    public ChannelNotificationPublisherTests()
     {
         _clock = Substitute.For<IClock>();
         _clock.Now.Returns(_ => DateTimeOffset.UtcNow);
         _currentTenant.IsAvailable.Returns(false);
-        _publisher = new WolverineNotificationPublisher(_bus, _currentTenant, _clock);
+        _publisher = new ChannelNotificationPublisher(_channel, _currentTenant, _clock);
     }
 
     [Fact]
@@ -42,10 +42,9 @@ public sealed class WolverineNotificationPublisherTests
             recipients,
             TestContext.Current.CancellationToken);
 
-        await _bus.Received(1).PublishAsync(
-            Arg.Is<NotificationTrigger>(t =>
-                t.NotificationTypeName == "test.notification" &&
-                t.RecipientUserIds.Count == 2));
+        _channel.Reader.TryRead(out NotificationTrigger? trigger).ShouldBeTrue();
+        trigger!.NotificationTypeName.ShouldBe("test.notification");
+        trigger.RecipientUserIds.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -60,11 +59,10 @@ public sealed class WolverineNotificationPublisherTests
             entity,
             TestContext.Current.CancellationToken);
 
-        await _bus.Received(1).PublishAsync(
-            Arg.Is<NotificationTrigger>(t =>
-                t.RelatedEntity != null &&
-                t.RelatedEntity.EntityType == "Invoice" &&
-                t.RelatedEntity.EntityId == "inv-42"));
+        _channel.Reader.TryRead(out NotificationTrigger? trigger).ShouldBeTrue();
+        trigger!.RelatedEntity.ShouldNotBeNull();
+        trigger.RelatedEntity.EntityType.ShouldBe("Invoice");
+        trigger.RelatedEntity.EntityId.ShouldBe("inv-42");
     }
 
     [Fact]
@@ -75,11 +73,10 @@ public sealed class WolverineNotificationPublisherTests
             new TestPayload("value"),
             TestContext.Current.CancellationToken);
 
-        await _bus.Received(1).PublishAsync(
-            Arg.Is<NotificationTrigger>(t =>
-                t.NotificationTypeName == "test.notification" &&
-                t.RecipientUserIds.Count == 0 &&
-                t.RelatedEntity == null));
+        _channel.Reader.TryRead(out NotificationTrigger? trigger).ShouldBeTrue();
+        trigger!.NotificationTypeName.ShouldBe("test.notification");
+        trigger.RecipientUserIds.Count.ShouldBe(0);
+        trigger.RelatedEntity.ShouldBeNull();
     }
 
     [Fact]
@@ -93,12 +90,11 @@ public sealed class WolverineNotificationPublisherTests
             entity,
             TestContext.Current.CancellationToken);
 
-        await _bus.Received(1).PublishAsync(
-            Arg.Is<NotificationTrigger>(t =>
-                t.RecipientUserIds.Count == 0 &&
-                t.RelatedEntity != null &&
-                t.RelatedEntity.EntityType == "Document" &&
-                t.RelatedEntity.EntityId == "doc-99"));
+        _channel.Reader.TryRead(out NotificationTrigger? trigger).ShouldBeTrue();
+        trigger!.RecipientUserIds.Count.ShouldBe(0);
+        trigger.RelatedEntity.ShouldNotBeNull();
+        trigger.RelatedEntity.EntityType.ShouldBe("Document");
+        trigger.RelatedEntity.EntityId.ShouldBe("doc-99");
     }
 
     [Fact]
@@ -114,8 +110,8 @@ public sealed class WolverineNotificationPublisherTests
             ["user-1"],
             TestContext.Current.CancellationToken);
 
-        await _bus.Received(1).PublishAsync(
-            Arg.Is<NotificationTrigger>(t => t.TenantId == tenantId));
+        _channel.Reader.TryRead(out NotificationTrigger? trigger).ShouldBeTrue();
+        trigger!.TenantId.ShouldBe(tenantId);
     }
 
     [Fact]
@@ -129,8 +125,8 @@ public sealed class WolverineNotificationPublisherTests
             ["user-1"],
             TestContext.Current.CancellationToken);
 
-        await _bus.Received(1).PublishAsync(
-            Arg.Is<NotificationTrigger>(t => t.TenantId == null));
+        _channel.Reader.TryRead(out NotificationTrigger? trigger).ShouldBeTrue();
+        trigger!.TenantId.ShouldBeNull();
     }
 
     // -------------------------------------------------------------------------
