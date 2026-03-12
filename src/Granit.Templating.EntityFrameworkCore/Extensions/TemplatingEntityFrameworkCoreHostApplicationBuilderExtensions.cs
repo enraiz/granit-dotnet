@@ -40,11 +40,7 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
         Action<DbContextOptionsBuilder> configure)
     {
         builder.Services.AddHybridCache();
-        builder.Services.AddDbContextFactory<TemplatingDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<TemplatingDbContext>(configure);
         builder.Services.AddScoped<EfDocumentTemplateStore>();
         builder.Services.AddScoped<IDocumentTemplateStoreReader>(sp => sp.GetRequiredService<EfDocumentTemplateStore>());
         builder.Services.AddScoped<IDocumentTemplateStoreWriter>(sp => sp.GetRequiredService<EfDocumentTemplateStore>());

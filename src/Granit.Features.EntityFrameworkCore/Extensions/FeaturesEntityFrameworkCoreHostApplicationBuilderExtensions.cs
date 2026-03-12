@@ -35,11 +35,7 @@ public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<GranitFeaturesDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<GranitFeaturesDbContext>(configure);
 
         builder.Services.Replace(
             ServiceDescriptor.Scoped<IFeatureStoreReader, EfCoreFeatureStore>());

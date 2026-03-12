@@ -32,11 +32,7 @@ public static class BackgroundJobsEntityFrameworkCoreHostApplicationBuilderExten
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<BackgroundJobsDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<BackgroundJobsDbContext>(configure);
 
         builder.Services.AddSingleton<EfBackgroundJobStore>();
         builder.Services.Replace(

@@ -39,11 +39,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<NotificationDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<NotificationDbContext>(configure);
 
         // UserNotification store — CQRS forwarding pattern
         builder.Services.RemoveAll<InMemoryUserNotificationStore>();

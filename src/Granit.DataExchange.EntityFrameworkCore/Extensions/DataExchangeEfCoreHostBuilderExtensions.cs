@@ -29,11 +29,7 @@ public static class DataExchangeEfCoreHostBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<DataExchangeDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<DataExchangeDbContext>(configure);
 
         // Import stores
         builder.Services.AddScoped<IMappingReader, EfMappingStore>();

@@ -33,11 +33,7 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<BlobStorageDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<BlobStorageDbContext>(configure);
 
         builder.Services.AddScoped<EfBlobDescriptorStore>();
         builder.Services.AddScoped<IBlobDescriptorStore>(sp => sp.GetRequiredService<EfBlobDescriptorStore>());

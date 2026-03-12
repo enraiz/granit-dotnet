@@ -33,11 +33,7 @@ public static class WebhooksEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<WebhooksDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<WebhooksDbContext>(configure);
 
         builder.Services.AddSingleton<EfWebhookSubscriptionStore>();
         builder.Services.Replace(

@@ -24,11 +24,7 @@ public static class QueryingEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<QueryingDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<QueryingDbContext>(configure);
 
         // Replace the null-object default from Granit.Querying — CQRS forwarding pattern
         builder.Services.AddScoped<EfCoreSavedViewStore>();

@@ -33,11 +33,7 @@ public static class TimelineEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<TimelineDbContext>((sp, options) =>
-        {
-            configure(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<TimelineDbContext>(configure);
 
         builder.Services.Replace(
             ServiceDescriptor.Scoped<ITimelineWriter, EfCoreTimelineStore>());

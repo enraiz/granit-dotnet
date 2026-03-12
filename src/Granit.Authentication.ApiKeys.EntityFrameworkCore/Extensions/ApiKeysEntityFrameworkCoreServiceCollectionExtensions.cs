@@ -23,11 +23,7 @@ public static class ApiKeysEntityFrameworkCoreServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configureDbContext);
 
-        services.AddDbContextFactory<ApiKeysDbContext>((sp, options) =>
-        {
-            configureDbContext(options);
-            options.UseGranitInterceptors(sp);
-        }, ServiceLifetime.Scoped);
+        services.AddGranitDbContext<ApiKeysDbContext>(configureDbContext);
 
         services.TryAddScoped<IApiKeyStore, EfCoreApiKeyStore>();
         services.TryAddScoped<IApiKeyAdminStore, EfCoreApiKeyAdminStore>();

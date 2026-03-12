@@ -3,6 +3,7 @@ using Granit.Persistence.Extensions;
 using Granit.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
@@ -90,6 +91,65 @@ public sealed class DbContextOptionsBuilderExtensionsTests
         result.ShouldBeSameAs(builder);
     }
 
+    [Fact]
+    public void AddGranitDbContext_RegistersDbContextFactory()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        AddRequiredDependencies(services);
+        services.AddGranitPersistence();
+
+        // Act
+        services.AddGranitDbContext<TestDbContext>(options =>
+            options.UseInMemoryDatabase("test-db"));
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Assert — factory should be resolvable
+        IDbContextFactory<TestDbContext> factory = sp.GetRequiredService<IDbContextFactory<TestDbContext>>();
+        factory.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void AddGranitDbContext_WiresGranitInterceptors()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        AddRequiredDependencies(services);
+        services.AddGranitPersistence();
+        services.AddGranitDbContext<TestDbContext>(options =>
+            options.UseInMemoryDatabase("test-interceptors"));
+
+        using ServiceProvider sp = services.BuildServiceProvider();
+
+        // Act
+        using TestDbContext context = sp.GetRequiredService<IDbContextFactory<TestDbContext>>()
+            .CreateDbContext();
+
+        // Assert — interceptors should be wired (verify via options extensions)
+        IEnumerable<IInterceptor> interceptors = context.GetService<DbContextOptions>()!.Extensions
+            .OfType<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>()
+            .SelectMany(e => e.Interceptors ?? []);
+
+        interceptors.ShouldContain(i => i is AuditedEntityInterceptor);
+    }
+
+    [Fact]
+    public void AddGranitDbContext_ThrowsOnNullServices()
+    {
+        Should.Throw<ArgumentNullException>(() =>
+            PersistenceDbContextServiceCollectionExtensions.AddGranitDbContext<TestDbContext>(
+                null!, _ => { }));
+    }
+
+    [Fact]
+    public void AddGranitDbContext_ThrowsOnNullConfigure()
+    {
+        ServiceCollection services = new();
+        Should.Throw<ArgumentNullException>(() =>
+            services.AddGranitDbContext<TestDbContext>(null!));
+    }
+
     private static void AddRequiredDependencies(ServiceCollection services)
     {
         services.AddSingleton(NSubstitute.Substitute.For<Granit.Timing.IClock>());
@@ -97,4 +157,8 @@ public sealed class DbContextOptionsBuilderExtensionsTests
         services.AddSingleton(NSubstitute.Substitute.For<Granit.Security.ICurrentUserService>());
         services.AddSingleton(NSubstitute.Substitute.For<ICurrentTenant>());
     }
+
+    /// <summary>Minimal test DbContext for AddGranitDbContext tests.</summary>
+    private sealed class TestDbContext(DbContextOptions<TestDbContext> options)
+        : DbContext(options);
 }
