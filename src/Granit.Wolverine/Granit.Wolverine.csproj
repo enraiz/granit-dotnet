@@ -2,9 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Wolverine</PackageId>
-    <Description>Intégration Wolverine pour Granit : module, behaviors de contexte et
-    routing IDomainEvent/IIntegrationEvent. Provider-agnostique — ne dépend pas de
-    PostgreSQL, SQL Server ou tout autre fournisseur de transport.</Description>
+    <Description>Wolverine integration for Granit: module, context behaviors and IDomainEvent/IIntegrationEvent routing. Provider-agnostic — no dependency on PostgreSQL, SQL Server or any transport provider.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

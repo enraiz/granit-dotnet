@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Localization</PackageId>
-    <Description>Localisation JSON modulaire inspirée ABP. IStringLocalizer avec ressources embarquées, héritage inter-modules et culture fallback.</Description>
+    <Description>Modular JSON localization inspired by ABP. IStringLocalizer with embedded resources, cross-module inheritance and culture fallback.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

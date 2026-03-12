@@ -9,7 +9,7 @@ namespace Granit.DocumentGeneration.Pdf.PdfA;
 /// <para>
 /// PDF/A-3b is required for:
 /// <list type="bullet">
-///   <item>Factur-X electronic invoicing (NF Z 55-140) — mandatory in France from September 2026</item>
+///   <item>Factur-X / ZUGFeRD electronic invoicing (EN 16931)</item>
 ///   <item>Long-term archival of medical documents (ISO 27001 compliance)</item>
 /// </list>
 /// </para>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.DataExchange.Wolverine</PackageId>
-    <Description>Intégration Wolverine pour Granit.DataExchange : dispatch import/export via IMessageBus (Outbox durable) et handlers Wolverine.</Description>
+    <Description>Wolverine integration for Granit.DataExchange: import/export dispatch via IMessageBus (durable outbox) and Wolverine handlers.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

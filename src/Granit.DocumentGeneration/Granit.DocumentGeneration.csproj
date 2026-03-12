@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.DocumentGeneration</PackageId>
-    <Description>Couche de génération de documents (PDF, Excel) au-dessus de Granit.Templating. Fournit IDocumentGenerator, IDocumentRenderer et DocumentTemplateType. Les renderers concrets (PuppeteerSharp, ClosedXML) vivent dans des packages séparés.</Description>
+    <Description>Document generation layer (PDF, Excel) on top of Granit.Templating. Provides IDocumentGenerator, IDocumentRenderer and DocumentTemplateType. Concrete renderers (PuppeteerSharp, ClosedXML) live in separate packages.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
-- **Issue** : [#10](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/10)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Observability)
 
@@ -116,6 +115,6 @@ Ce choix devrait être réévalué si :
 ## Références
 
 - Commit initial : `52f1444` (2026-02-21)
-- Issues : [#10 — Granit.Observability](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/10), [#222](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/222)
+- Issues : #10 — Granit.Observability, #222
 - Serilog : <https://serilog.net/>
 - OpenTelemetry .NET : <https://opentelemetry.io/docs/languages/dotnet/>

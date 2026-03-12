@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Persistence.Migrations.Wolverine</PackageId>
-    <Description>Intégration Wolverine pour Granit.Persistence.Migrations : dispatch des batches via IMessageBus (Outbox durable) et handler cascade.</Description>
+    <Description>Wolverine integration for Granit.Persistence.Migrations: batch dispatch via IMessageBus (durable outbox) and cascade handler.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

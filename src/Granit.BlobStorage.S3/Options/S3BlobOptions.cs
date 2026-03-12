@@ -9,8 +9,8 @@ namespace Granit.BlobStorage.S3.Options;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>S3-compatible provider</b>: set <see cref="ServiceUrl"/> to
-/// <c>https://s3.rbx.io.cloud.ovh.net</c> and <see cref="Region"/> to <c>rbx</c>.
+/// <b>S3-compatible provider</b>: set <see cref="ServiceUrl"/> to your provider's endpoint
+/// (e.g. <c>https://s3.eu-west-1.amazonaws.com</c>) and <see cref="Region"/> accordingly.
 /// </para>
 /// <para>
 /// <b>MinIO (development)</b>: set <see cref="ServiceUrl"/> to
@@ -26,7 +26,7 @@ public sealed class S3BlobOptions : BlobStorageOptions
 {
     /// <summary>
     /// S3-compatible endpoint URL.
-    /// Examples: <c>https://s3.rbx.io.cloud.ovh.net</c>, <c>http://localhost:9000</c>.
+    /// Examples: <c>https://s3.eu-west-1.amazonaws.com</c>, <c>http://localhost:9000</c>.
     /// </summary>
     public string ServiceUrl { get; set; } = string.Empty;
 
@@ -38,7 +38,7 @@ public sealed class S3BlobOptions : BlobStorageOptions
 
     /// <summary>
     /// S3 region identifier used by the SDK for request signing.
-    /// For sovereign European hosting: <c>rbx</c>. For MinIO: any non-empty value (e.g. <c>us-east-1</c>).
+    /// Examples: <c>eu-west-1</c>, <c>us-east-1</c>. For MinIO: any non-empty value.
     /// </summary>
     public string Region { get; set; } = "us-east-1";
 
@@ -72,7 +72,7 @@ internal sealed class S3BlobOptionsValidator : IValidateOptions<S3BlobOptions>
         {
             return ValidateOptionsResult.Fail(
                 $"{nameof(options.ServiceUrl)} must be non-empty. " +
-                "Set it to your S3-compatible endpoint (e.g. https://s3.rbx.io.cloud.ovh.net or http://localhost:9000).");
+                "Set it to your S3-compatible endpoint (e.g. https://s3.eu-west-1.amazonaws.com or http://localhost:9000).");
         }
 
         if (string.IsNullOrWhiteSpace(options.AccessKey))

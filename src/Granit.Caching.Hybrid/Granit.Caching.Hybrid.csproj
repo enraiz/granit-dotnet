@@ -2,10 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Caching.Hybrid</PackageId>
-    <Description>Fournisseur HybridCache (L1 mémoire locale + L2 Redis) pour Granit.Caching.
-    Optimisé pour Kubernetes multi-pods : lecture &lt; 1 ms sur L1, ~2 ms sur L2 Redis.
-    Protection stampede native via HybridCache .NET 9. LocalCacheExpiration court (≤ 60 s)
-    pour borner la fenêtre de données obsolètes entre pods.</Description>
+    <Description>HybridCache provider (L1 local memory + L2 Redis) for Granit.Caching. Optimized for multi-pod Kubernetes: native stampede protection via HybridCache .NET 9, short LocalCacheExpiration to bound stale data window across pods.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

@@ -1,0 +1,24 @@
+{
+  "culture": "zh",
+  "texts": {
+    "Granit:Validation:InvalidBelgianNiss": "比利时国家身份识别号码（NISS）无效。",
+    "Granit:Validation:InvalidFrenchRpps": "法国 RPPS 专业人员标识符无效。",
+    "Granit:Validation:InvalidFrenchAdeli": "法国 ADELI 专业人员编号无效。",
+    "Granit:Validation:InvalidFrenchFiness": "法国 Finess 机构编号无效。",
+    "Granit:Validation:InvalidBelgianInami": "比利时 INAMI/RIZIV 医疗服务提供者编号无效。",
+    "Granit:Validation:InvalidBelgianEid": "比利时电子身份证号码（eID）无效。",
+    "Granit:Validation:InvalidFrenchNir": "法国国家身份识别号码（NIR / Social Security Number）无效。",
+    "Granit:Validation:InvalidFrenchSiren": "法国企业标识符（SIREN）无效。",
+    "Granit:Validation:InvalidFrenchSiret": "法国机构标识符（SIRET）无效。",
+    "Granit:Validation:InvalidBelgianBce": "比利时企业编号（BCE / KBO）无效。",
+    "Granit:Validation:InvalidBelgianVat": "比利时增值税号（TVA / BTW）无效。",
+    "Granit:Validation:InvalidFrenchVat": "法国增值税号（intra-Community VAT）无效。",
+    "Granit:Validation:InvalidEuropeanVat": "欧洲增值税号无效。",
+    "Granit:Validation:InvalidFrenchPostalCode": "法国邮政编码无效（应为 5 位数字，范围 01000–99999）。",
+    "Granit:Validation:InvalidBelgianPostalCode": "比利时邮政编码无效（应为 4 位数字，范围 1000–9999）。",
+    "Granit:Validation:InvalidFrenchInseeCode": "法国 INSEE 市镇代码无效。",
+    "Granit:Validation:InvalidFrenchNafCode": "法国 NAF/APE 行业代码无效（应为 4 位数字后跟一个字母，例如 6201Z）。",
+    "Granit:Validation:InvalidFrenchRib": "法国 RIB 银行账号无效。",
+    "Granit:Validation:InvalidBelgianAccountNumber": "比利时银行账号无效。"
+  }
+}

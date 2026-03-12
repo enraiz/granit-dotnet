@@ -1,128 +1,144 @@
-# Guide de contribution
+# Contributing to Granit
 
-> Comment contribuer aux packages Granit
+Thank you for your interest in contributing to Granit! This guide will help you get
+started.
 
----
+## Code of Conduct
 
-## Code de conduite
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing. We are
+committed to providing a welcoming and inclusive experience for everyone.
 
-- **Respect** : Traitez les autres avec courtoisie et professionnalisme
-- **Qualité** : Privilégiez la qualité sur la rapidité
-- **Sécurité** : La sécurité des données de santé est notre priorité absolue
+## Getting Started
 
----
+### Prerequisites
 
-## Workflow Git
+- **.NET 10 SDK** — `dotnet --version` should return `10.0.x`
+- **Git** with SSH access
+- **Node.js** (for markdownlint only)
 
-### Prérequis
-
-- **glab** : CLI GitLab (`glab auth login --hostname gitlab.digitaldynamics.be`)
-- **.NET 10 SDK** : `dotnet --version` doit retourner `10.0.x`
-- **Git** avec accès SSH au GitLab
-
-### 1. Créer une branche
-
-```text
-<type>/<description-courte>
-
-Types : feature/ | fix/ | hotfix/ | docs/ | refactor/ | chore/
-```
-
-### 2. Commits
-
-**Conventional Commits** obligatoires :
+### Build and test
 
 ```bash
-git commit -m "feat(security): add Keycloak claims transformation"
-git commit -m "fix(persistence): handle concurrent soft delete"
-git commit -m "docs: update Vault integration guide"
+# Build the entire solution
+dotnet build
+
+# Run all tests
+dotnet test
+
+# Run tests for a specific package
+dotnet test tests/Granit.Security.Tests
+
+# Verify code formatting
+dotnet format --verify-no-changes
 ```
 
-### 3. Merge Request
+## How to Contribute
 
-1. Pousser votre branche
-2. Créer une MR vers `main` (utiliser le template)
-3. **1 approbation minimum** requise
+### Reporting Bugs
 
----
+Open an issue using the **Bug** template. Include:
 
-## Standards de code
+- A clear, concise description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- .NET version and OS
+
+### Suggesting Features
+
+Open an issue using the **Feature** template. Describe:
+
+- The use case and motivation
+- How it fits into Granit's modular architecture
+- Any alternatives you considered
+
+### Submitting Changes
+
+1. **Fork** the repository
+2. **Create a branch** from `develop`:
+
+   ```text
+   <type>/<short-description>
+
+   Types: feature/ | fix/ | docs/ | refactor/ | chore/ | test/ | perf/
+   ```
+
+3. **Write your code** following the conventions below
+4. **Write or update tests** — every package has a matching `*.Tests` project
+5. **Run the Definition of Done checks** (see below)
+6. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/):
+
+   ```bash
+   git commit -m "feat(security): add API key rotation support"
+   git commit -m "fix(persistence): handle concurrent soft delete"
+   git commit -m "docs: update Vault integration guide"
+   ```
+
+7. **Open a pull request** against `develop`
+
+### Definition of Done
+
+All checks are **blocking** — a PR will not be merged until they pass:
+
+1. `dotnet test` — zero failures
+2. `dotnet format --verify-no-changes` — zero formatting issues
+3. `npx markdownlint-cli2 "<file>"` — every modified `.md` file passes
+4. Documentation updated if the change affects public API or behavior
+
+## Code Conventions
 
 ### C# / .NET
 
-- **Target** : `net10.0`
-- **Nullable** : activé (`<Nullable>enable</Nullable>`)
-- **Warnings as errors** : activé
-- **Central Package Management** : toutes les versions dans `Directory.Packages.props`
-- **Namespaces** : `Granit.{Package}.{Sous-dossier}`
+- **Target**: `net10.0`, **C# 14**
+- **Nullable**: enabled (`<Nullable>enable</Nullable>`)
+- **Warnings as errors**: enabled
+- **Central Package Management**: all versions in `Directory.Packages.props`
+- **Namespaces**: match the project name (`Granit.{Package}`)
+- **`var`**: use when the type is apparent; explicit type otherwise (IDE0008)
+- **Expression body** (`=>`): for single-statement methods (IDE0022)
+- **Regex**: always `[GeneratedRegex]`, never `new Regex(..., Compiled)`
+- **Logging**: always `[LoggerMessage]` source-generated
+- **Time**: never `DateTime.Now`/`UtcNow` — inject `TimeProvider` or `IClock`
+- **Async**: `ConfigureAwait(false)` in library code, `CancellationToken` as last parameter
 
-### Architecture des packages
+### Architecture
 
-- `Abstractions` ne dépend d'**aucun** autre package (ni Granit, ni tiers)
-- Tous les autres packages référencent `Abstractions`
-- Zéro référence circulaire entre packages
-- Un projet = un package NuGet
+- One project = one NuGet package
+- Zero circular references between packages
+- `*.Abstractions` packages have no dependencies on other Granit packages
 
 ### Tests
 
-```bash
-# Lancer tous les tests
-dotnet test
+- **Framework**: xUnit
+- **Assertions**: Shouldly
+- **Mocking**: NSubstitute
+- **Test data**: Bogus
 
-# Tests d'un package spécifique
-dotnet test tests/Granit.Security.Tests
+### Security
 
-# Avec couverture
-dotnet test --collect:"XPlat Code Coverage"
-```
+**Never**:
 
-- **Framework** : xUnit
-- **Mocking** : NSubstitute
-- **Assertions** : FluentAssertions
-- **Données** : Bogus
+- Commit secrets or credentials
+- Log PII in plain text
+- Disable security scans
 
-### Sécurité
+**Always**:
 
-**JAMAIS** :
+- Encrypt sensitive data at rest and in transit
+- Maintain audit trail for sensitive operations
 
-- Commiter des secrets ou credentials
-- Logger des données de santé (PII) en clair
-- Désactiver les scans de sécurité
+## Review Process
 
-**TOUJOURS** :
+A maintainer will review your PR against this checklist:
 
-- Secrets via Vault / ExternalSecret
-- Données de santé chiffrées en transit et au repos
-- Audit trail pour toute opération sensible
+- [ ] No hardcoded secrets
+- [ ] Tests pass (`dotnet test`)
+- [ ] Build succeeds (`dotnet build`)
+- [ ] Format verified (`dotnet format --verify-no-changes`)
+- [ ] No PII in logs
+- [ ] CHANGELOG.md updated
+- [ ] Documentation updated if applicable
 
----
+## License
 
-## Processus de review
-
-### Checklist du reviewer
-
-- [ ] Aucun secret hardcodé
-- [ ] Tests passent (`dotnet test`)
-- [ ] Build réussi (`dotnet build`)
-- [ ] Format vérifié (`dotnet format --verify-no-changes`)
-- [ ] Pas de PII dans les logs
-- [ ] CHANGELOG.md mis à jour
-- [ ] Changements respectent RGPD/ISO 27001
-
----
-
-## Publication NuGet
-
-Les packages sont publiés automatiquement sur GitLab Package Registry via CI/CD lors d'un tag `vX.Y.Z` sur `main`.
-
-Pour publier manuellement (développement) :
-
-```bash
-dotnet pack -c Release -o ./nupkgs
-dotnet nuget push ./nupkgs/*.nupkg --source gitlab
-```
-
----
-
-**Version** : 1.0
-**Dernière mise à jour** : 2026-02-20
+By contributing, you agree that your contributions will be licensed under the
+[Apache License 2.0](LICENSE).

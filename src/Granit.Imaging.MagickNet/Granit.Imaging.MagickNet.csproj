@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Imaging.MagickNet</PackageId>
-    <Description>Implémentation Magick.NET du module Granit.Imaging. Fournit IImageProcessor et IImagePipeline avec support natif de JPEG, PNG, WebP, AVIF, GIF, BMP, TIFF. API fluide pour resize, crop, compress, watermark et strip EXIF.</Description>
+    <Description>Magick.NET implementation for Granit.Imaging. Provides IImageProcessor and IImagePipeline with native support for JPEG, PNG, WebP, AVIF, GIF, BMP, TIFF. Fluent API for resize, crop, compress, watermark and EXIF stripping.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

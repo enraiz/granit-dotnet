@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Guids</PackageId>
-    <Description>Abstraction IGuidGenerator avec support des GUID sequentiels optimises pour les index clustered. Defaut : SequentialAsString (PostgreSQL).</Description>
+    <Description>IGuidGenerator abstraction with sequential GUID support optimized for clustered indexes. Default: SequentialAsString (PostgreSQL).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

@@ -24,8 +24,10 @@
   <PropertyGroup>
     <Authors>Jean-François Meyers</Authors>
     <Company>Granit</Company>
-    <Copyright>Copyright (c) 2026 Jean-François Meyers. All rights reserved.</Copyright>
+    <Copyright>Copyright 2026 Jean-Francois Meyers</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>dotnet;framework;modular;modular-monolith;vertical-slicing;efcore;wolverine;clean-architecture</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</RepositoryUrl>
     <PackageProjectUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</PackageProjectUrl>

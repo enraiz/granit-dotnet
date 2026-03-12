@@ -1,0 +1,24 @@
+{
+  "culture": "en",
+  "texts": {
+    "Granit:Validation:InvalidBelgianNiss": "The Belgian national identification number (NISS) is invalid.",
+    "Granit:Validation:InvalidFrenchRpps": "The French RPPS professional identifier is invalid.",
+    "Granit:Validation:InvalidFrenchAdeli": "The French ADELI professional number is invalid.",
+    "Granit:Validation:InvalidFrenchFiness": "The French Finess establishment number is invalid.",
+    "Granit:Validation:InvalidBelgianInami": "The Belgian INAMI/RIZIV healthcare provider number is invalid.",
+    "Granit:Validation:InvalidBelgianEid": "The Belgian electronic identity card number (eID) is invalid.",
+    "Granit:Validation:InvalidFrenchNir": "The French national identification number (NIR / Numéro de Sécurité Sociale) is invalid.",
+    "Granit:Validation:InvalidFrenchSiren": "The French company identifier (SIREN) is invalid.",
+    "Granit:Validation:InvalidFrenchSiret": "The French establishment identifier (SIRET) is invalid.",
+    "Granit:Validation:InvalidBelgianBce": "The Belgian enterprise number (BCE / KBO) is invalid.",
+    "Granit:Validation:InvalidBelgianVat": "The Belgian VAT number (TVA / BTW) is invalid.",
+    "Granit:Validation:InvalidFrenchVat": "The French VAT number (TVA intracommunautaire) is invalid.",
+    "Granit:Validation:InvalidEuropeanVat": "The European VAT number is invalid.",
+    "Granit:Validation:InvalidFrenchPostalCode": "The French postal code is invalid (expected 5 digits, range 01000–99999).",
+    "Granit:Validation:InvalidBelgianPostalCode": "The Belgian postal code is invalid (expected 4 digits, range 1000–9999).",
+    "Granit:Validation:InvalidFrenchInseeCode": "The French INSEE commune code is invalid.",
+    "Granit:Validation:InvalidFrenchNafCode": "The French NAF/APE activity code is invalid (expected 4 digits followed by a letter, e.g. 6201Z).",
+    "Granit:Validation:InvalidFrenchRib": "The French RIB bank account number is invalid.",
+    "Granit:Validation:InvalidBelgianAccountNumber": "The Belgian bank account number is invalid."
+  }
+}

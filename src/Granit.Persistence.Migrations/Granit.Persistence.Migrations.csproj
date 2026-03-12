@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Persistence.Migrations</PackageId>
-    <Description>Framework Zero-Downtime Migrations Expand &amp; Contract pour EF Core. Suivi de progression, isolation multi-tenant agnostique et orchestration des batches.</Description>
+    <Description>Zero-downtime Expand &amp; Contract migrations framework for EF Core. Progress tracking, provider-agnostic multi-tenant isolation and batch orchestration.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

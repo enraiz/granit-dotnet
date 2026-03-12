@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Templating.Scriban</PackageId>
-    <Description>Implémentation Scriban du moteur de templating Granit. Fournit ScribanTemplateEngine (sandboxé, multi-tenant safe), NowGlobalContext ({{ now.date }}, …) et ExecutionContextGlobalContext ({{ context.culture }}, …).</Description>
+    <Description>Scriban implementation of the Granit templating engine. Provides ScribanTemplateEngine (sandboxed, multi-tenant safe), NowGlobalContext ({{ now.date }}) and ExecutionContextGlobalContext ({{ context.culture }}).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

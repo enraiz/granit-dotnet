@@ -2,9 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Caching.StackExchangeRedis</PackageId>
-    <Description>Fournisseur Redis pour Granit.Caching.
-    Remplace IDistributedCache (MemoryDistributedCache) par RedisCache (StackExchange.Redis).
-    Active le chiffrement AES-256 automatiquement si CachingOptions.EncryptValues = true.</Description>
+    <Description>Redis provider for Granit.Caching. Replaces IDistributedCache (MemoryDistributedCache) with RedisCache (StackExchange.Redis). Enables AES-256 encryption automatically when CachingOptions.EncryptValues = true.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

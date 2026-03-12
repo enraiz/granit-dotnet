@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-26
-- **Issue** : [#23](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/23)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Localization)
 

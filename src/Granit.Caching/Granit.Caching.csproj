@@ -2,10 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Caching</PackageId>
-    <Description>Abstraction de cache typée (ICacheService) avec fournisseur Memory par défaut.
-    Protection stampede via SemaphoreSlim dans IMemoryCache (sans fuite mémoire).
-    Chiffrement AES-256-CBC opt-in par type via [CacheEncrypted] pour la conformité GDPR/ISO 27001.
-    Conçu pour être remplacé par GranitCachingRedisModule ou GranitCachingHybridModule en production.</Description>
+    <Description>Typed cache abstraction (ICacheService) with in-memory provider by default. Stampede protection via SemaphoreSlim in IMemoryCache. Opt-in AES-256-CBC encryption per type via [CacheEncrypted] for GDPR/ISO 27001 compliance. Designed to be replaced by GranitCachingRedisModule or GranitCachingHybridModule in production.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
