@@ -12,14 +12,12 @@ out/
 nupkgs/
 TestResults/
 
-# --- Coverage (généré par dotnet test + ReportGenerator) ---
-coverage.opencover.xml
-coverage.cobertura.xml
+# --- Coverage (dotnet test + ReportGenerator) ---
 **/coverage.opencover.xml
 **/coverage.cobertura.xml
 coverage-report/
 
-# --- Environnement ---
+# --- Environment ---
 .env
 .env.*
 !.env.example
@@ -33,7 +31,9 @@ coverage-report/
 *.swo
 *~
 
-# --- AI tools ---
+# --- AI tools (Claude Code) ---
+# Commit skills (shared with all contributors), ignore local settings
+.claude/settings.json
 .claude/settings.local.json
 
 # --- OS ---
@@ -41,8 +41,8 @@ coverage-report/
 Thumbs.db
 Desktop.ini
 
-# --- Sécurité (CRITIQUE) ---
-# Ne JAMAIS commiter ces fichiers
+# --- Security (CRITICAL) ---
+# NEVER commit these files
 *.pem
 *.key
 *.cert
@@ -56,12 +56,7 @@ token.json
 *.log
 logs/
 
-# --- Coverage (généré par dotnet test + ReportGenerator) ---
-**/coverage.opencover.xml
-**/coverage.cobertura.xml
-coverage-report/
-
-# --- Temporaire ---
+# --- Temporary ---
 tmp/
 temp/
 *.tmp
