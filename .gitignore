@@ -55,6 +55,11 @@ token.json
 *.log
 logs/
 
+# --- Documentation site (Astro Starlight) ---
+docs-site/node_modules/
+docs-site/dist/
+docs-site/.astro/
+
 # --- Temporary ---
 tmp/
 temp/
