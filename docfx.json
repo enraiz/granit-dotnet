@@ -26,13 +26,13 @@
         "files": ["api/**.yml", "api/index.md"]
       },
       {
-        "files": ["docs/**/*.md"],
+        "files": ["docs_old/**/*.md"],
         "exclude": ["**/obj/**", "**/bin/**"]
       }
     ],
     "resource": [
       {
-        "files": ["docs/images/**"]
+        "files": ["docs_old/images/**"]
       }
     ],
     "dest": "_site",
@@ -41,7 +41,7 @@
       "_appTitle": "Granit",
       "_appFooter": "Granit — Documentation",
       "_enableSearch": true,
-      "_appLogoPath": "docs/images/granit-icon.svg"
+      "_appLogoPath": "docs_old/images/granit-icon.svg"
     }
   }
 }
