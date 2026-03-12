@@ -180,6 +180,7 @@ public sealed class GranitLocalizationOptions
     public LocalizationResourceStore Resources { get; }
     public Type? DefaultResourceType { get; set; }
     public List<LanguageInfo> Languages { get; }
+    public List<CultureInfo> FormattingCultures { get; }
 }
 ```
 
@@ -187,7 +188,38 @@ public sealed class GranitLocalizationOptions
 | --- | --- | --- |
 | `Resources` | `LocalizationResourceStore` | Registre des ressources déclarées |
 | `DefaultResourceType` | `Type?` | Ressource fallback quand le type exact n'est pas enregistré |
-| `Languages` | `List<LanguageInfo>` | Langues disponibles (pour un sélecteur de langue en UI) |
+| `Languages` | `List<LanguageInfo>` | Langues disponibles (UI + `SupportedUICultures`) |
+| `FormattingCultures` | `List<CultureInfo>` | Cultures de formatage (`SupportedCultures`). Vide par défaut = même liste que `Languages` |
+
+### Séparation cultures de formatage et d'interface
+
+ASP.NET Core distingue deux axes de culture :
+
+- **`SupportedCultures`** — formatage des dates, nombres, monnaie
+  (`CultureInfo.CurrentCulture`)
+- **`SupportedUICultures`** — résolution des traductions
+  (`CultureInfo.CurrentUICulture`)
+
+Par défaut, `Languages` alimente les deux listes. Pour les cas où le formatage
+doit différer des traductions (applications financières, contextes multi-pays),
+utiliser `FormattingCultures` :
+
+```csharp
+// Application financière : formatage fixe en-US, interface multilingue
+options.Languages.Add(new LanguageInfo("fr", "Français", "fr", isDefault: true));
+options.Languages.Add(new LanguageInfo("de", "Deutsch", "de"));
+options.FormattingCultures.Add(new CultureInfo("en-US"));
+```
+
+```csharp
+// Application suisse : UI en de/fr/it, formatage en de-CH/fr-CH/it-CH
+options.Languages.Add(new LanguageInfo("de", "Deutsch", "de", isDefault: true));
+options.Languages.Add(new LanguageInfo("fr", "Français", "fr"));
+options.Languages.Add(new LanguageInfo("it", "Italiano", "it"));
+options.FormattingCultures.Add(new CultureInfo("de-CH"));
+options.FormattingCultures.Add(new CultureInfo("fr-CH"));
+options.FormattingCultures.Add(new CultureInfo("it-CH"));
+```
 
 ## LocalizationResourceStore
 
@@ -229,6 +261,37 @@ Utilisé pour peupler un sélecteur de langue en interface utilisateur.
   France), `fr-CA` (Français — Canada), `en` (English — United States, défaut),
   `en-GB` (English — United Kingdom). Les modules applicatifs peuvent les remplacer
   ou les compléter via `Configure<GranitLocalizationOptions>`.
+
+## Middleware de localisation
+
+`Granit.Localization.Endpoints` fournit `UseGranitRequestLocalization()` qui configure
+automatiquement le middleware ASP.NET Core `RequestLocalizationMiddleware` à partir
+de `GranitLocalizationOptions` :
+
+```csharp
+app.UseGranitRequestLocalization();
+```
+
+**Comportement :**
+
+| `FormattingCultures` | `SupportedCultures` | `SupportedUICultures` | `DefaultRequestCulture` |
+| --- | --- | --- | --- |
+| Vide (défaut) | = `Languages` | = `Languages` | Langue avec `IsDefault = true` |
+| Non vide | = `FormattingCultures` | = `Languages` | Langue avec `IsDefault = true` |
+
+Un delegate optionnel permet de personnaliser davantage les options ASP.NET Core :
+
+```csharp
+app.UseGranitRequestLocalization(options =>
+{
+    // Ajouter un provider de culture personnalisé
+    options.RequestCultureProviders.Insert(0, new CustomRequestCultureProvider(/* ... */));
+});
+```
+
+> **Note** : cette méthode nécessite le package `Granit.Localization.Endpoints`.
+> Pour les projets qui n'utilisent pas les endpoints, configurer
+> `RequestLocalizationOptions` manuellement reste possible.
 
 ## Ressource Granit intégrée
 
