@@ -1,6 +1,6 @@
 # Catalogue des Design Patterns — Granit
 
-Ce répertoire documente les **46 patterns de conception** identifiés dans le framework
+Ce répertoire documente les **51 patterns de conception** identifiés dans le framework
 Granit. Chaque fichier décrit le pattern, son implémentation concrète dans le code source,
 un diagramme Mermaid et un exemple d'usage.
 
@@ -29,6 +29,11 @@ un diagramme Mermaid et un exemple d'usage.
 | Sidecar / Behavior | [sidecar-behavior.md](cloud-saas/sidecar-behavior.md) | Propagation de contexte via Wolverine Behaviors |
 | Circuit Breaker & Retry | [circuit-breaker-retry.md](cloud-saas/circuit-breaker-retry.md) | AddStandardResilienceHandler + Wolverine RetryWithCooldown |
 | Cache-Aside | [cache-aside.md](cloud-saas/cache-aside.md) | Double-check locking + HybridCache L1/L2 |
+| Rate Limiting / Throttling | [rate-limiting.md](cloud-saas/rate-limiting.md) | Per-tenant rate limiting Redis + quotas dynamiques Granit.Features |
+| Saga / Process Manager | [saga-process-manager.md](cloud-saas/saga-process-manager.md) | GdprExportSaga, Import/Export orchestrators, WorkflowManager FSM |
+| Fan-Out | [fan-out.md](cloud-saas/fan-out.md) | Wolverine cascade IEnumerable pour notifications et webhooks |
+| Claim Check | [claim-check.md](cloud-saas/claim-check.md) | Soft dependency IClaimCheckStore pour payloads volumineux |
+| Bulkhead Isolation | [bulkhead-isolation.md](cloud-saas/bulkhead-isolation.md) | Isolation par queues, parallélisme, circuit breaker et quotas tenant |
 
 ## Patterns GoF — Création
 
