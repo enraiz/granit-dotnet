@@ -3,21 +3,24 @@
 Trois packages constituent la couche d'authentification de Granit,
 suivant le pattern ABP Framework : abstractions / implémentation générique / extension IDP.
 
-```text
-Granit.Core
-      ↑
-Granit.Security                   ← ICurrentUserService, ActorKind
-      ↑
-Granit.Authentication.JwtBearer   ← JWT Bearer générique, CurrentUserService,
-      ↑                                  policy "Authenticated"
-Granit.Authentication.Keycloak    ← Claims Keycloak, PostConfigure JWT Bearer,
-                                         policy "Admin"
+```mermaid
+graph BT
+    Core["Granit.Core"]
+    Sec["Granit.Security<br/><i>ICurrentUserService, ActorKind</i>"]
+    JWT["Granit.Authentication.JwtBearer<br/><i>JWT Bearer générique, CurrentUserService, policy Authenticated</i>"]
+    KC["Granit.Authentication.Keycloak<br/><i>Claims Keycloak, PostConfigure JWT Bearer, policy Admin</i>"]
+    EA["Granit.Authentication.EntraId<br/><i>Claims Entra ID, PostConfigure JWT Bearer, policy Admin</i>"]
+    AK["Granit.Authentication.ApiKeys<br/><i>Clés API M2M</i>"]
+    AKEF["Granit.Authentication.ApiKeys.EntityFrameworkCore"]
+    AKE["Granit.Authentication.ApiKeys.Endpoints"]
 
-Granit.Authentication.ApiKeys     ← Clés API M2M (voir api-keys.md)
-      ↑
-Granit.Authentication.ApiKeys.EntityFrameworkCore
-      ↑
-Granit.Authentication.ApiKeys.Endpoints
+    Sec --> Core
+    JWT --> Sec
+    KC --> JWT
+    EA --> JWT
+    AK --> Sec
+    AKEF --> AK
+    AKE --> AKEF
 ```
 
 ## Packages
@@ -27,6 +30,7 @@ Granit.Authentication.ApiKeys.Endpoints
 | `Granit.Security` | `ICurrentUserService` (abstraction) | `GranitSecurityModule` |
 | `Granit.Authentication.JwtBearer` | JWT Bearer générique, `CurrentUserService` | `GranitJwtBearerModule` |
 | `Granit.Authentication.Keycloak` | Claims Keycloak, policy `Admin` | `GranitAuthenticationKeycloakModule` |
+| `Granit.Authentication.EntraId` | Claims Entra ID, policy `Admin` | `GranitAuthenticationEntraIdModule` |
 | `Granit.Authentication.ApiKeys` | Clés API M2M ([détails](api-keys.md)) | `GranitAuthenticationApiKeysModule` |
 
 ---
@@ -286,6 +290,159 @@ standard .NET, permettant `[Authorize(Roles = "admin")]` et `User.IsInRole("admi
 
 ---
 
+## Granit.Authentication.EntraId
+
+Extension Microsoft Entra ID (anciennement Azure AD) pour `Granit.Authentication.JwtBearer`.
+Dépend transitivement de `Granit.Security` et `Granit.Authentication.JwtBearer`.
+
+### Installation
+
+```bash
+dotnet add package Granit.Authentication.EntraId
+```
+
+Un seul package suffit — `Granit.Security` et `Granit.Authentication.JwtBearer`
+sont amenés transitivement.
+
+### Configuration
+
+Seule la section `"EntraId"` est nécessaire. La section `"Authentication"` n'est
+**pas** requise quand ce module est utilisé : `PostConfigureAll<JwtBearerOptions>`
+applique les valeurs Entra ID après l'initialisation du JWT Bearer.
+
+```json
+{
+  "EntraId": {
+    "Instance": "https://login.microsoftonline.com/",
+    "TenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "ClientId": "my-client-id",
+    "RequireHttpsMetadata": true,
+    "AdminRole": "admin"
+  }
+}
+```
+
+### Program.cs
+
+Via le système de modules (recommandé) :
+
+```csharp
+[DependsOn(typeof(GranitAuthenticationEntraIdModule))]
+public sealed class MyAppModule : GranitModule { ... }
+// GranitAuthenticationEntraIdModule amène automatiquement :
+// → GranitJwtBearerModule → GranitSecurityModule
+```
+
+Enregistrement direct :
+
+```csharp
+builder.Services.AddGranitJwtBearer();
+builder.Services.AddGranitEntraId();
+```
+
+### EntraIdOptions
+
+```csharp
+public sealed class EntraIdOptions
+{
+    public const string SectionName = "EntraId";
+
+    public string Instance { get; set; } = "https://login.microsoftonline.com/";
+    public string TenantId { get; set; } = string.Empty;
+    public string ClientId { get; set; } = string.Empty;
+    public bool RequireHttpsMetadata { get; set; } = true;
+    public string AdminRole { get; set; } = "admin";
+
+    // Computed: Authority = "{Instance}/{TenantId}/v2.0"
+    public string Authority => $"{Instance.TrimEnd('/')}/{TenantId}/v2.0";
+}
+```
+
+### Transformation des claims
+
+Entra ID v2.0 émet les App Roles comme des claims individuels de type `"roles"` :
+
+```json
+{
+  "roles": ["admin", "practitioner"]
+}
+```
+
+`EntraIdClaimsTransformation` convertit ces claims en `ClaimTypes.Role` standard .NET,
+permettant `[Authorize(Roles = "admin")]` et `User.IsInRole("admin")`.
+
+> **Compatibilité v1.0 :** les tokens v1.0 peuvent encoder les rôles dans un tableau
+> JSON (valeur qui commence par `[`). La transformation gère les deux formats.
+
+### Services supplémentaires enregistrés
+
+| Service | Implémentation | Lifetime |
+| --- | --- | --- |
+| `IClaimsTransformation` | `EntraIdClaimsTransformation` | Transient |
+
+### Policies supplémentaires enregistrées
+
+| Policy | Exigence |
+| --- | --- |
+| `Admin` | Rôle configuré dans `EntraIdOptions.AdminRole` (défaut : `admin`) |
+
+> Les policies métier (`DataAccess`, `ManagerOnly`…) sont à définir dans
+> l'application, pas dans Granit.
+
+---
+
+## Comparatif des providers d'authentification
+
+Le code applicatif ne change pas entre les providers : seule la section de
+configuration (`"Keycloak"` ou `"EntraId"`) et le module DI diffèrent.
+`Granit.Authentication.JwtBearer` reste le socle commun — les extensions
+provider-spécifiques ne font que `PostConfigure` les `JwtBearerOptions`.
+
+### Matrice fonctionnelle
+
+| Fonctionnalité | JwtBearer (générique) | Keycloak | Entra ID |
+| -------------- | --------------------- | -------- | -------- |
+| Validation JWT (issuer, audience, signature, lifetime) | ✅ | ✅ (hérité) | ✅ (hérité) |
+| `ICurrentUserService` (UserId, UserName, Email, Roles) | ✅ | ✅ (hérité) | ✅ (hérité) |
+| Policy `Authenticated` | ✅ | ✅ (hérité) | ✅ (hérité) |
+| Policy `Admin` | — | ✅ | ✅ |
+| Claims transformation → `ClaimTypes.Role` | — | ✅ | ✅ |
+| Back-channel logout (OIDC standard) | ✅ | ✅ (hérité) | ✅ (hérité) |
+| `NameClaimType` par défaut | `"sub"` | `"preferred_username"` | `"preferred_username"` |
+
+### Transformation des claims — comparaison
+
+| Aspect | Keycloak | Entra ID |
+| ------ | -------- | -------- |
+| **Source des rôles** | Claim JSON imbriqué (`realm_access.roles[]` ou `resource_access.{clientId}.roles[]`) | Claims individuels de type `"roles"` (v2.0) ou tableau JSON (v1.0) |
+| **Configurable** | Oui (`RoleClaimsSource` : `realm_access` ou `resource_access`) | Non (format fixe Entra ID) |
+| **Parsing** | JsonDocument pour extraire le tableau depuis l'objet JSON | Itération sur les claims `"roles"` existants + parsing JSON si valeur commence par `[` |
+| **Dédoublonnage** | HashSet (évite les doublons si le claim est déjà un `ClaimTypes.Role`) | HashSet (même pattern) |
+
+### Configuration — comparaison
+
+| Propriété | Keycloak | Entra ID |
+| --------- | -------- | -------- |
+| Section | `"Keycloak"` | `"EntraId"` |
+| Authority | Explicite (`Authority`) | Calculée (`{Instance}/{TenantId}/v2.0`) |
+| Audience | `Audience` (fallback : `ClientId`) | `ClientId` |
+| HTTPS metadata | `RequireHttpsMetadata` | `RequireHttpsMetadata` |
+| Admin role | `AdminRole` (défaut : `"admin"`) | `AdminRole` (défaut : `"admin"`) |
+| Rôles source | `RoleClaimsSource` (`realm_access` / `resource_access`) | Fixe (claims `"roles"`) |
+| Instance | N/A | `Instance` (défaut : `https://login.microsoftonline.com/`) |
+| Tenant | N/A (implicite dans `Authority`) | `TenantId` (requis) |
+
+### Choisir son provider
+
+| Critère | Keycloak | Entra ID |
+| ------- | -------- | -------- |
+| Environnement | Self-hosted, on-premise, cloud privé | Azure, Microsoft 365, environnement Microsoft |
+| SSO corporate | Via federation | Natif (Azure AD = IDP corporate) |
+| Multi-tenant | Un realm par tenant | Un tenant Azure AD par organisation |
+| Licence | Open source (CNCF) | Inclus dans Azure AD / Microsoft Entra |
+
+---
+
 ## Back-channel logout (OIDC générique)
 
 Le back-channel logout (spécification OIDC Back-Channel Logout 1.0) permet à
@@ -298,23 +455,20 @@ déclenché sur un autre client, l'IDP envoie un `logout_token` (JWT signé) au 
 
 ### Architecture du back-channel logout
 
-```text
-Keycloak ──POST logout_token──► BackChannelLogoutEndpoint
-                                   │
-                                   ▼
-                         BackChannelLogoutTokenValidator
-                           (signature JWKS, iss, aud, events claim)
-                                   │
-                                   ▼
-                         IRevokedSessionStore.RevokeSessionAsync(sid, ttl)
-                           (IDistributedCache, clé = "granit:revoked-session:{sid}")
+```mermaid
+flowchart TD
+    subgraph Révocation
+        IDP["IDP (Keycloak, Entra ID...)"] -->|POST logout_token| BCL["BackChannelLogoutEndpoint"]
+        BCL --> BCV["BackChannelLogoutTokenValidator<br/>(signature JWKS, iss, aud, events)"]
+        BCV --> RS["IRevokedSessionStore.RevokeSessionAsync(sid, ttl)<br/>(IDistributedCache, clé granit:revoked-session:{sid})"]
+    end
 
-Requête ──JWT──► JwtBearerEvents.OnTokenValidated
-                    │
-                    ▼
-                 IRevokedSessionStore.IsSessionRevokedAsync(sid)
-                    ├── révoqué → 401 Unauthorized
-                    └── ok → continue
+    subgraph Détection
+        REQ["Requête HTTP + JWT"] --> TV["JwtBearerEvents.OnTokenValidated"]
+        TV --> CHK["IRevokedSessionStore.IsSessionRevokedAsync(sid)"]
+        CHK -->|révoqué| R401["401 Unauthorized"]
+        CHK -->|ok| CONT["Continue pipeline"]
+    end
 ```
 
 ### Configuration du back-channel logout
@@ -408,29 +562,39 @@ Ce hook ne s'exécute qu'une fois par validation de token (pas sur chaque requê
 
 ## Architecture des fichiers
 
-```text
-Granit.Security
-└── ICurrentUserService.cs
+```mermaid
+graph LR
+    subgraph "Granit.Security"
+        S1["ICurrentUserService.cs"]
+    end
 
-Granit.Authentication.JwtBearer
-├── Options/JwtBearerAuthOptions.cs
-├── Options/BackChannelLogoutOptions.cs
-├── Authentication/CurrentUserService.cs
-├── BackChannelLogout/
-│   ├── IRevokedSessionStore.cs
-│   ├── DistributedCacheRevokedSessionStore.cs
-│   ├── BackChannelLogoutTokenValidator.cs
-│   ├── BackChannelLogoutResult.cs
-│   └── BackChannelLogoutEndpoint.cs
-├── Extensions/JwtBearerServiceCollectionExtensions.cs       (AddGranitJwtBearer)
-├── Extensions/JwtBearerEndpointRouteBuilderExtensions.cs    (MapBackChannelLogout)
-└── GranitJwtBearerModule.cs                             [DependsOn(Security)]
+    subgraph "Granit.Authentication.JwtBearer"
+        J1["Options/JwtBearerAuthOptions.cs"]
+        J2["Options/BackChannelLogoutOptions.cs"]
+        J3["Authentication/CurrentUserService.cs"]
+        J4["BackChannelLogout/IRevokedSessionStore.cs"]
+        J5["BackChannelLogout/DistributedCacheRevokedSessionStore.cs"]
+        J6["BackChannelLogout/BackChannelLogoutTokenValidator.cs"]
+        J7["BackChannelLogout/BackChannelLogoutResult.cs"]
+        J8["BackChannelLogout/BackChannelLogoutEndpoint.cs"]
+        J9["Extensions/JwtBearerServiceCollectionExtensions.cs<br/>(AddGranitJwtBearer)"]
+        J10["Extensions/JwtBearerEndpointRouteBuilderExtensions.cs<br/>(MapBackChannelLogout)"]
+        J11["GranitJwtBearerModule.cs<br/>[DependsOn(Security)]"]
+    end
 
-Granit.Authentication.Keycloak
-├── Options/KeycloakOptions.cs
-├── Authentication/KeycloakClaimsTransformation.cs
-├── Extensions/KeycloakServiceCollectionExtensions.cs        (AddGranitKeycloak)
-└── GranitAuthenticationKeycloakModule.cs                [DependsOn(JwtBearer)]
+    subgraph "Granit.Authentication.Keycloak"
+        K1["Options/KeycloakOptions.cs"]
+        K2["Authentication/KeycloakClaimsTransformation.cs"]
+        K3["Extensions/KeycloakServiceCollectionExtensions.cs<br/>(AddGranitKeycloak)"]
+        K4["GranitAuthenticationKeycloakModule.cs<br/>[DependsOn(JwtBearer)]"]
+    end
+
+    subgraph "Granit.Authentication.EntraId"
+        E1["Options/EntraIdOptions.cs"]
+        E2["Authentication/EntraIdClaimsTransformation.cs"]
+        E3["Extensions/EntraIdServiceCollectionExtensions.cs<br/>(AddGranitEntraId)"]
+        E4["GranitAuthenticationEntraIdModule.cs<br/>[DependsOn(JwtBearer)]"]
+    end
 ```
 
 ## Validation du token
@@ -467,8 +631,9 @@ public sealed class GranitAuthenticationAuth0Module : GranitModule
 | Package | Dépend de | Utilisé par |
 | ------- | --------- | ----------- |
 | `Granit.Security` | `Granit.Core` | `Persistence`, `Authorization`, `Wolverine`, `BackgroundJobs`, `Settings`, `Idempotency`, `ApiDocumentation`, `Authentication.JwtBearer` |
-| `Granit.Authentication.JwtBearer` | `Granit.Security` | `Granit.Authentication.Keycloak` |
+| `Granit.Authentication.JwtBearer` | `Granit.Security` | `Granit.Authentication.Keycloak`, `Granit.Authentication.EntraId` |
 | `Granit.Authentication.Keycloak` | `Granit.Authentication.JwtBearer` | Module feuille |
+| `Granit.Authentication.EntraId` | `Granit.Authentication.JwtBearer` | Module feuille |
 | `Granit.Authentication.ApiKeys` | `Granit.Security`, `Granit.Timing`, `Granit.Guids` | `Granit.Authentication.ApiKeys.EntityFrameworkCore`, `.Endpoints` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).
