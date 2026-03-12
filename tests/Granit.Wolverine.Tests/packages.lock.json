@@ -515,8 +515,8 @@
       "WolverineFx": {
         "type": "CentralTransitive",
         "requested": "[5.18.*, )",
-        "resolved": "5.18.1",
-        "contentHash": "XijAcTxUZSiOsWlcF2i1X6pVvYhP20XIMZaEbI76O3QLYnoMNCdZRYUhdgEL3ahYq6bzK7D61N/0XdJxUEy2Tw==",
+        "resolved": "5.18.2",
+        "contentHash": "ID3GXymFnsWbwYrKa4i2HZMmAMslHrc6KX+AgK4WfKCFHQmHvOKzVSPu5xxkjB3a2Wq/kjwfiH23SQ9UTrT30A==",
         "dependencies": {
           "JasperFx": "1.21.0",
           "JasperFx.Events": "1.23.1",
@@ -528,11 +528,11 @@
       "WolverineFx.FluentValidation": {
         "type": "CentralTransitive",
         "requested": "[5.18.*, )",
-        "resolved": "5.18.1",
-        "contentHash": "aCBWhFt36geoYlFB0bXlcrjH8E+gM998UW697OBgsy/CkgWPa4JCbokyd5O/LBylb/ff5RprGQmIl6Oi8Nt2dg==",
+        "resolved": "5.18.2",
+        "contentHash": "7NuiyXcPow50r8rXnRCQlbirl4hnJMtzBofzo3yhMzjIOIlj4m4MRD0qXSZCAY652/46n5mRNCx4QUgSkxdn6w==",
         "dependencies": {
           "FluentValidation": "12.0.0",
-          "WolverineFx": "5.18.1"
+          "WolverineFx": "5.18.2"
         }
       }
     }
