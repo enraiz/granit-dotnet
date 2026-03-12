@@ -2,6 +2,7 @@ using Granit.Core.Modularity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Granit.Core.Endpoints;
@@ -40,7 +41,7 @@ public static class ModuleConfigEndpointExtensions
         where TResponse : class
     {
         RouteHandlerBuilder builder = endpoints
-            .MapGet($"{routePrefix}/config", (TProvider provider) => HandleGetConfig(provider))
+            .MapGet($"{routePrefix}/config", ([FromServices] TProvider provider) => HandleGetConfig(provider))
             .WithName(endpointName)
             .WithTags(tag)
             .WithSummary($"Returns the current {tag} module configuration.")
