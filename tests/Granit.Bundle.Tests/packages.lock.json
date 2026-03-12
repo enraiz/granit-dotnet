@@ -432,6 +432,15 @@
           "Granit.Core": "[0.1.0-dev, )"
         }
       },
+      "granit.bulkhead": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )"
+        }
+      },
       "granit.bundle.api": {
         "type": "Project",
         "dependencies": {
@@ -484,6 +493,7 @@
       "granit.bundle.saas": {
         "type": "Project",
         "dependencies": {
+          "Granit.Bulkhead": "[0.1.0-dev, )",
           "Granit.Features": "[0.1.0-dev, )",
           "Granit.Features.EntityFrameworkCore": "[0.1.0-dev, )",
           "Granit.MultiTenancy": "[0.1.0-dev, )",
