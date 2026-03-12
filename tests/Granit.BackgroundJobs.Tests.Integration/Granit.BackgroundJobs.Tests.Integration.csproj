@@ -14,10 +14,12 @@
     <PackageReference Include="Shouldly" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="WolverineFx" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Granit.BackgroundJobs\Granit.BackgroundJobs.csproj" />
+    <ProjectReference Include="..\..\src\Granit.BackgroundJobs.Wolverine\Granit.BackgroundJobs.Wolverine.csproj" />
     <ProjectReference Include="..\..\src\Granit.Security\Granit.Security.csproj" />
   </ItemGroup>
 

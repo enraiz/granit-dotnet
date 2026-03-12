@@ -1,7 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Timing;
 using Granit.Webhooks.Extensions;
-using Granit.Wolverine;
 
 namespace Granit.Webhooks;
 
@@ -9,16 +8,12 @@ namespace Granit.Webhooks;
 /// Granit module for outbound webhook dispatch.
 /// </summary>
 /// <remarks>
-/// Registers the webhook engine on top of <see cref="GranitWolverineModule"/>.
-/// <para>
-/// Default registrations use in-memory and no-op stores suitable for development and tests.
-/// For production, call <c>AddGranitWebhooksEntityFrameworkCore()</c>
-/// from <c>Granit.Webhooks.EntityFrameworkCore</c> to enable durable persistence and
-/// the ISO 27001-compliant audit trail.
-/// </para>
+/// Default registrations use in-memory stores and in-process channel dispatch,
+/// suitable for development and tests. For production, add
+/// <c>Granit.Webhooks.Wolverine</c> for durable outbox dispatch and call
+/// <c>AddGranitWebhooksEntityFrameworkCore()</c> for persistent stores.
 /// </remarks>
 [DependsOn(typeof(GranitTimingModule))]
-[DependsOn(typeof(GranitWolverineModule))]
 public sealed class GranitWebhooksModule : GranitModule
 {
     /// <inheritdoc/>

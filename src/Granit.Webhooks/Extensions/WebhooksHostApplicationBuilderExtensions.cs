@@ -1,7 +1,7 @@
+using System.Threading.Channels;
 using Granit.Core.Diagnostics;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Endpoints;
-using Granit.Webhooks.Exceptions;
 using Granit.Webhooks.Handlers;
 using Granit.Webhooks.Internal;
 using Granit.Webhooks.Messages;
@@ -10,8 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Wolverine;
-using Wolverine.ErrorHandling;
 
 namespace Granit.Webhooks.Extensions;
 
@@ -24,20 +22,10 @@ public static class WebhooksHostApplicationBuilderExtensions
     /// Adds the Granit webhook dispatch engine.
     /// </summary>
     /// <remarks>
-    /// Registers:
-    /// <list type="bullet">
-    ///   <item><see cref="IWebhookPublisher"/> — application façade (scoped).</item>
-    ///   <item><see cref="IWebhookSubscriptionReader"/> and <see cref="IWebhookSubscriptionWriter"/> — InMemory by default (replaceable via <c>AddGranitWebhooksEntityFrameworkCore()</c>).</item>
-    ///   <item><see cref="IWebhookDeliveryWriter"/> — no-op by default (replaceable via <c>AddGranitWebhooksEntityFrameworkCore()</c>).</item>
-    ///   <item><see cref="IWebhookSecretProtector"/> — pass-through by default (replaceable for production Vault integration).</item>
-    ///   <item>Named <see cref="System.Net.Http.HttpClient"/> for webhook delivery with configurable timeout.</item>
-    ///   <item>Wolverine local queue <c>webhook-delivery</c> with configurable parallelism.</item>
-    ///   <item>Wolverine retry policy for <see cref="WebhookDeliveryException"/> (6 levels of exponential backoff).</item>
-    /// </list>
+    /// By default, webhooks are dispatched via in-process <see cref="Channel{T}"/>
+    /// consumed by a <see cref="BackgroundService"/>. For durable outbox-backed dispatch,
+    /// add the <c>Granit.Webhooks.Wolverine</c> package.
     /// </remarks>
-    /// <param name="builder">The host application builder.</param>
-    /// <param name="configure">Optional delegate to override <see cref="WebhooksOptions"/> values.</param>
-    /// <returns>The builder for chaining.</returns>
     public static IHostApplicationBuilder AddGranitWebhooks(
         this IHostApplicationBuilder builder,
         Action<WebhooksOptions>? configure = null)
@@ -58,7 +46,7 @@ public static class WebhooksHostApplicationBuilderExtensions
             .Bind(options);
         configure?.Invoke(options);
 
-        // Named HttpClient for webhook delivery — strict timeout to avoid blocking Wolverine workers.
+        // Named HttpClient for webhook delivery — strict timeout to avoid blocking workers.
         builder.Services.AddHttpClient(WebhooksConstants.HttpClientName, client =>
         {
             client.Timeout = TimeSpan.FromSeconds(options.HttpTimeoutSeconds);
@@ -74,34 +62,22 @@ public static class WebhooksHostApplicationBuilderExtensions
         builder.Services.AddScoped<IWebhookDeliveryReader, NullWebhookDeliveryReader>();
         builder.Services.AddSingleton<IWebhookSecretProtector, NoOpWebhookSecretProtector>();
 
-        // Application façade.
-        builder.Services.AddScoped<IWebhookPublisher, WolverineWebhookPublisher>();
+        // Handlers (scoped — required by the Channel-based worker)
+        builder.Services.AddScoped<WebhookFanoutHandler>();
+        builder.Services.AddScoped<SendWebhookHandler>();
+
+        // In-process channel dispatch (default — replaced by Granit.Webhooks.Wolverine)
+        builder.Services.AddSingleton(Channel.CreateUnbounded<WebhookTrigger>());
+        builder.Services.AddSingleton(Channel.CreateUnbounded<SendWebhookCommand>());
+        builder.Services.AddScoped<IWebhookPublisher, ChannelWebhookPublisher>();
+        builder.Services.AddScoped<IWebhookCommandDispatcher, ChannelWebhookCommandDispatcher>();
+        builder.Services.AddHostedService<WebhookDispatchWorker>();
 
         // Module config provider — used by GET /webhooks/config endpoint.
         builder.Services.AddScoped<WebhookModuleConfigProvider>();
 
         // Redelivery service — used by admin endpoints.
         builder.Services.AddScoped<RetryWebhookHandler>();
-
-        builder.Services.ConfigureWolverine(opts =>
-        {
-            // Dedicated local queue for HTTP delivery — isolated from the main bus.
-            opts.LocalQueueFor<SendWebhookCommand>()
-                .Named(WebhooksConstants.DeliveryQueueName)
-                .MaximumParallelMessages(options.MaxParallelDeliveries);
-
-            // Exponential backoff for retriable HTTP errors.
-            // Declared before OnAnyException() to take priority.
-            // After 6 retries (~14h30 total), Wolverine moves the message to the Dead-Letter Queue.
-            opts.OnException<WebhookDeliveryException>()
-                .RetryWithCooldown(
-                    TimeSpan.FromSeconds(30),
-                    TimeSpan.FromMinutes(2),
-                    TimeSpan.FromMinutes(10),
-                    TimeSpan.FromMinutes(30),
-                    TimeSpan.FromHours(2),
-                    TimeSpan.FromHours(12));
-        });
 
         return builder;
     }

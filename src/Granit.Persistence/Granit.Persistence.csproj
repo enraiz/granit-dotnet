@@ -9,6 +9,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.Persistence.Tests" />
     <InternalsVisibleTo Include="Granit.Wolverine.Postgresql.Tests.Integration" />
+    <InternalsVisibleTo Include="Granit.Wolverine.SqlServer.Tests.Integration" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 

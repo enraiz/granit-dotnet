@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Ce document illustre les dépendances entre les 92 packages source Granit.
+Ce document illustre les dépendances entre les 111 packages source Granit.
 Les flèches indiquent le sens de la dépendance : `A → B` signifie « A
 dépend de B ». Le package racine `Granit.Core` n'a aucune dépendance.
 
@@ -23,32 +23,32 @@ flowchart TD
     CORE["Core (1)"]
 
     subgraph Fondation
-        UTILS["Utilitaires (9)"]
-        SEC["Sécurité (7)"]
+        UTILS["Utilitaires (12)"]
+        SEC["Sécurité (12)"]
         CACHE["Caching (3)"]
-        IDENT["Identity (4)"]
+        IDENT["Identity (5)"]
     end
 
     subgraph Infrastructure
         PERS["Persistence (3)"]
-        WOL["Wolverine (2)"]
+        WOL["Wolverine (3)"]
     end
 
     subgraph Fonctionnel
         LOC["Localization (4)"]
-        WEB["Web & API (5)"]
-        CONFIG["Configuration (7)"]
+        WEB["Web & API (6)"]
+        CONFIG["Configuration (8)"]
         STORAGE["Stockage (5)"]
     end
 
     subgraph Métier
-        TMPL["Templating (7)"]
+        TMPL["Templating (8)"]
         QRY["Querying (3)"]
         DX["DataExchange (6)"]
         WF["Workflow (4)"]
-        NOTIF["Notifications (10)"]
+        NOTIF["Notifications (15)"]
         TL["Timeline (4)"]
-        JOBS["Jobs & Events (5)"]
+        JOBS["Jobs & Events (7)"]
     end
 
     ANLZ["Analyzers (2)"]
@@ -113,13 +113,13 @@ flowchart TD
 
 | Domaine | Packages |
 | ------- | -------- |
-| Utilitaires | Timing, Guids, Diagnostics, Validation, ExceptionHandling, Observability, MultiTenancy, Privacy, Cors |
-| Identity | Identity, Identity.Keycloak, Identity.EntityFrameworkCore, Identity.Endpoints |
-| Sécurité | Security, Encryption, Vault, Auth.JwtBearer, Auth.Keycloak, Authorization, Authorization.EF |
-| Configuration | Settings (2), Features (2), ReferenceData (3) |
-| Web & API | ApiVersioning, ApiDocumentation, Cookies, Cookies.Klaro, Idempotency |
+| Utilitaires | Timing, Guids, Diagnostics, Validation, Validation.Europe, ExceptionHandling, Observability, MultiTenancy, Privacy, Cors, Bulkhead, RateLimiting |
+| Identity | Identity, Identity.Keycloak, Identity.EntraId, Identity.EntityFrameworkCore, Identity.Endpoints |
+| Sécurité | Security, Encryption, Vault, Auth.JwtBearer, Auth.Keycloak, Auth.EntraId, Auth.ApiKeys (3), Authorization, Authorization.EF, Authorization.Endpoints |
+| Configuration | Settings (3), Features (2), ReferenceData (3) |
+| Web & API | ApiVersioning, ApiDocumentation, Cookies, Cookies.Klaro, Cookies.Endpoints, Idempotency |
 | Stockage | BlobStorage (3), Imaging (2) |
-| Jobs & Events | BackgroundJobs (3), Webhooks (2) |
+| Jobs & Events | BackgroundJobs (4), Webhooks (3) |
 
 ---
 
@@ -138,6 +138,15 @@ flowchart LR
 
     JWT["Auth.JwtBearer"] --> SEC
     KC["Auth.Keycloak"] --> JWT
+    ENTRA["Auth.EntraId"] --> JWT
+
+    APIKEYS["Auth.ApiKeys"] --> SEC
+    APIKEYS --> GUIDS["Guids"]
+    APIKEYS --> QRY["Querying"]
+    APIKEYS_EP["Auth.ApiKeys<br/>.Endpoints"] --> APIKEYS
+    APIKEYS_EP --> AUTHZ
+    APIKEYS_EF["Auth.ApiKeys<br/>.EF"] --> APIKEYS
+    APIKEYS_EF --> PERS
 
     CACHE["Caching"] --> CORE
     CACHE_REDIS["Caching.Redis"] --> CACHE
@@ -148,8 +157,9 @@ flowchart LR
     AUTHZ --> CACHE
     AUTHZ_EF["Authorization.EF"] --> AUTHZ
     AUTHZ_EF --> PERS
+    AUTHZ_EP["Authorization<br/>.Endpoints"] --> AUTHZ
 
-    PERS["Persistence"] --> GUIDS["Guids"]
+    PERS["Persistence"] --> GUIDS
     PERS --> SEC
     PERS --> EXC["ExceptionHandling"]
 
@@ -161,6 +171,8 @@ flowchart LR
     WOL --> SEC
     WOL_PG["Wolverine.Postgresql"] --> WOL
     WOL_PG --> PERS
+    WOL_SQL["Wolverine.SqlServer"] --> WOL
+    WOL_SQL --> PERS
 
     style CORE fill:#2d5a27,color:#fff
     style PERS fill:#ff6b6b,color:#fff
@@ -169,10 +181,16 @@ flowchart LR
     style SEC fill:#e84393,color:#fff
     style AUTHZ fill:#e84393,color:#fff
     style AUTHZ_EF fill:#e84393,color:#fff
+    style AUTHZ_EP fill:#e84393,color:#fff
     style JWT fill:#e84393,color:#fff
     style KC fill:#e84393,color:#fff
+    style ENTRA fill:#e84393,color:#fff
+    style APIKEYS fill:#e84393,color:#fff
+    style APIKEYS_EP fill:#e84393,color:#fff
+    style APIKEYS_EF fill:#e84393,color:#fff
     style WOL fill:#9b59b6,color:#fff
     style WOL_PG fill:#9b59b6,color:#fff
+    style WOL_SQL fill:#9b59b6,color:#fff
 ```
 
 ### Notifications
@@ -187,6 +205,9 @@ flowchart LR
     NOTIF_EP["Notifications.Endpoints"] --> NOTIF
     NOTIF_EF["Notifications.EF"] --> NOTIF
 
+    NOTIF_WOL["Notifications.Wolverine"] --> NOTIF
+    NOTIF_WOL --> WOL
+
     NOTIF_EMAIL["Notifications.Email"] --> NOTIF
     NOTIF_SMTP["Notifications.Email.Smtp"] --> NOTIF_EMAIL
 
@@ -194,6 +215,11 @@ flowchart LR
     NOTIF_WA["Notifications.WhatsApp"] --> NOTIF
     NOTIF_PUSH["Notifications.WebPush"] --> NOTIF
     NOTIF_SR["Notifications.SignalR"] --> NOTIF
+    NOTIF_SSE["Notifications.Sse"] --> NOTIF
+    NOTIF_ZULIP["Notifications.Zulip"] --> NOTIF
+
+    NOTIF_MP["Notifications.MobilePush"] --> NOTIF
+    NOTIF_FCM["Notifications.MobilePush<br/>.Fcm"] --> NOTIF_MP
 
     NOTIF_BREVO["Notifications.Brevo"] --> NOTIF_EMAIL
     NOTIF_BREVO --> NOTIF_SMS
@@ -202,12 +228,17 @@ flowchart LR
     style NOTIF fill:#c0392b,color:#fff
     style NOTIF_EP fill:#c0392b,color:#fff
     style NOTIF_EF fill:#c0392b,color:#fff
+    style NOTIF_WOL fill:#c0392b,color:#fff
     style NOTIF_EMAIL fill:#c0392b,color:#fff
     style NOTIF_SMTP fill:#c0392b,color:#fff
     style NOTIF_SMS fill:#c0392b,color:#fff
     style NOTIF_WA fill:#c0392b,color:#fff
     style NOTIF_PUSH fill:#c0392b,color:#fff
     style NOTIF_SR fill:#c0392b,color:#fff
+    style NOTIF_SSE fill:#c0392b,color:#fff
+    style NOTIF_ZULIP fill:#c0392b,color:#fff
+    style NOTIF_MP fill:#c0392b,color:#fff
+    style NOTIF_FCM fill:#c0392b,color:#fff
     style NOTIF_BREVO fill:#c0392b,color:#fff
 ```
 
@@ -226,6 +257,9 @@ flowchart LR
     TMPL_WF["Templating.Workflow"] --> TMPL
     TMPL_WF --> WF["Workflow"]
 
+    TMPL_EP["Templating.Endpoints"] --> TMPL
+    TMPL_EP --> AUTHZ["Authorization"]
+
     DOCGEN["DocumentGeneration"] --> TMPL
     DOCGEN_PDF["DocumentGeneration.Pdf"] --> DOCGEN
     DOCGEN_XLS["DocumentGeneration.Excel"] --> TMPL
@@ -234,6 +268,7 @@ flowchart LR
     style TMPL_SCR fill:#16a085,color:#fff
     style TMPL_EF fill:#16a085,color:#fff
     style TMPL_WF fill:#16a085,color:#fff
+    style TMPL_EP fill:#16a085,color:#fff
     style DOCGEN fill:#16a085,color:#fff
     style DOCGEN_PDF fill:#16a085,color:#fff
     style DOCGEN_XLS fill:#16a085,color:#fff
@@ -332,7 +367,8 @@ Cache local des utilisateurs identity provider. Le package de base
 (`Granit.Identity`) expose les abstractions provider-agnostic
 (`IIdentityProvider`, `IUserLookupService`, `IUserCacheStats`).
 `Granit.Identity.Keycloak` implémente `IIdentityProvider` via l'Admin
-API Keycloak. Le package EF Core fournit le cache-aside local
+API Keycloak. `Granit.Identity.EntraId` implémente `IIdentityProvider`
+via Microsoft Graph API. Le package EF Core fournit le cache-aside local
 (`UserCacheEntry`, staleness threshold, login-time sync, événements
 Wolverine) et les endpoints exposent CRUD, sync, RGPD
 (erasure/pseudonymisation), webhook HMAC et health check.
@@ -343,6 +379,9 @@ flowchart LR
 
     IDENT_KC["Identity.Keycloak"] --> IDENT
 
+    IDENT_ENTRA["Identity.EntraId"] --> IDENT
+    IDENT_ENTRA --> TIMING["Timing"]
+
     IDENT_EF["Identity.EF"] --> IDENT
     IDENT_EF --> PERS["Persistence"]
     IDENT_EF --> SEC["Security"]
@@ -352,6 +391,7 @@ flowchart LR
 
     style IDENT fill:#1abc9c,color:#fff
     style IDENT_KC fill:#1abc9c,color:#fff
+    style IDENT_ENTRA fill:#1abc9c,color:#fff
     style IDENT_EF fill:#1abc9c,color:#fff
     style IDENT_EP fill:#1abc9c,color:#fff
 ```
@@ -376,6 +416,9 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 | `Granit.Guids` | `Timing` |
 | `Granit.Diagnostics` | `Timing` |
 | `Granit.Validation` | `ExceptionHandling`, `Localization` |
+| `Granit.Validation.Europe` | `Validation` |
+| `Granit.Bulkhead` | `Core`, `ExceptionHandling`, `Features`, `Security` |
+| `Granit.RateLimiting` | `Core`, `ExceptionHandling`, `Features`, `Security` |
 
 ### Localization
 
@@ -392,6 +435,7 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 | ------- | --------- |
 | `Granit.Settings` | `Caching`, `Encryption`, `Security` |
 | `Granit.Settings.EntityFrameworkCore` | `Settings`, `Persistence` |
+| `Granit.Settings.Endpoints` | `Settings`, `Authorization`, `Timing`, `Validation` |
 | `Granit.Features` | `Caching`, `Localization` |
 | `Granit.Features.EntityFrameworkCore` | `Features`, `Persistence` |
 | `Granit.ReferenceData` | `Core` |
@@ -416,6 +460,7 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 | `Granit.ApiDocumentation` | `ApiVersioning`, `Security` |
 | `Granit.Cookies` | `Timing` |
 | `Granit.Cookies.Klaro` | `Cookies` |
+| `Granit.Cookies.Endpoints` | `Cookies`, `Core` |
 | `Granit.Idempotency` | `Caching`, `Security` |
 
 ### Jobs & Events
@@ -425,8 +470,10 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 | `Granit.BackgroundJobs` | `Timing`, `Wolverine` |
 | `Granit.BackgroundJobs.EntityFrameworkCore` | `BackgroundJobs` |
 | `Granit.BackgroundJobs.Endpoints` | `BackgroundJobs`, `Authorization` |
+| `Granit.BackgroundJobs.Wolverine` | `BackgroundJobs`, `Wolverine` |
 | `Granit.Webhooks` | `Timing`, `Wolverine` |
 | `Granit.Webhooks.EntityFrameworkCore` | `Webhooks` |
+| `Granit.Webhooks.Wolverine` | `Webhooks`, `Wolverine` |
 
 ### Analyzers
 
@@ -459,10 +506,10 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
 
 ## Propriétés du graphe
 
-- **187 projets** (92 sources + 95 tests), **zéro dépendance circulaire**
+- **229 projets** (111 sources + 118 tests), **zéro dépendance circulaire**
 - **Profondeur maximale** : 5 niveaux (ex. Core → Security → Wolverine →
-  Notifications → Email → Smtp, ou Core → Timing → Persistence →
-  Workflow.EF → Workflow.Endpoints)
+  Notifications → Email → Smtp, ou Core → Timing → Notifications →
+  MobilePush → MobilePush.Fcm)
 - **Modules feuilles** : les packages `*.EntityFrameworkCore` et `*.S3` sont
   presque toujours des feuilles — exception : `Workflow.EntityFrameworkCore`
   qui est référencé par `Workflow.Endpoints` et `Templating.Workflow`
@@ -489,6 +536,8 @@ Packages dont la structure interne ne nécessite pas de diagramme dédié.
    en option via `Granit.Persistence.Migrations.Wolverine`)
 7. **Brevo est un agrégateur multi-canal** — il dépend de Email, Sms et
    WhatsApp pour fournir un fournisseur unifié
+8. **SQL Server est un transport alternatif** — `Wolverine.SqlServer`
+   fournit le transport et l'outbox SQL Server en complément de PostgreSQL
 
 ## Choix architecturaux intentionnels
 
@@ -542,6 +591,13 @@ per-user self-service : inbox, préférences, subscriptions, follow/unfollow.
 Chaque endpoint filtre par `GetUserId(user)` et ne peut accéder qu'aux données
 de l'utilisateur connecté. `.RequireAuthorization()` (authentifié, sans policy
 RBAC) est suffisant — aucune donnée admin n'est exposée.
+
+### 6. `Auth.ApiKeys` → `Querying`
+
+Le module API Keys référence `Querying` pour exposer des listes paginées,
+filtrées et triées de clés API via les `QueryDefinition`. Ce couplage est
+identique au pattern `DataExchange → Querying` (réutilisation des métadonnées
+de colonnes).
 
 ## Voir aussi
 

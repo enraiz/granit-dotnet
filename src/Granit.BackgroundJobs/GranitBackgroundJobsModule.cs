@@ -2,7 +2,6 @@ using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Extensions;
 using Granit.BackgroundJobs.Options;
 using Granit.Core.Modularity;
-using Granit.Wolverine;
 
 namespace Granit.BackgroundJobs;
 
@@ -10,7 +9,8 @@ namespace Granit.BackgroundJobs;
 /// Granit module for recurring background jobs (provider-agnostic core).
 /// </summary>
 /// <remarks>
-/// Registers the background jobs infrastructure on top of <see cref="GranitWolverineModule"/>.
+/// Default registrations use in-process channel dispatch and in-memory stores.
+/// For durable, cluster-safe scheduling, add <c>Granit.BackgroundJobs.Wolverine</c>.
 /// <para>
 /// Mode selection is driven by <see cref="BackgroundJobsOptions.Mode"/>
 /// (bound from the <c>"BackgroundJobs"</c> configuration section):
@@ -20,7 +20,6 @@ namespace Granit.BackgroundJobs;
 /// </list>
 /// </para>
 /// </remarks>
-[DependsOn(typeof(GranitWolverineModule))]
 public sealed class GranitBackgroundJobsModule : GranitModule
 {
     /// <inheritdoc/>

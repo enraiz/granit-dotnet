@@ -1,16 +1,14 @@
+using Granit.BackgroundJobs.Abstractions;
 using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
+using Granit.BackgroundJobs.Wolverine.Internal;
 using Granit.Guids;
 using Granit.Security;
 using Granit.Timing;
-using JasperFx.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using NSubstitute.Core;
 using Shouldly;
 using Wolverine;
-using Wolverine.Persistence.Durability;
-using Wolverine.Persistence.Durability.DeadLetterManagement;
 using Xunit;
 
 namespace Granit.BackgroundJobs.Tests.Integration;
@@ -114,36 +112,30 @@ public sealed class BackgroundJobsIntegrationTests
         user.IsAuthenticated.Returns(true);
         user.UserId.Returns("user-admin");
 
-        IMessageBus bus = Substitute.For<IMessageBus>();
-        IMessageStore messageStore = Substitute.For<IMessageStore>();
-        IDeadLetters deadLetters = Substitute.For<IDeadLetters>();
-        messageStore.DeadLetters.Returns(deadLetters);
-        deadLetters
-            .SummarizeAllAsync(Arg.Any<string>(), Arg.Any<TimeRange>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<DeadLetterQueueCount>>([]));
+        IBackgroundJobDispatcher dispatcher = Substitute.For<IBackgroundJobDispatcher>();
+        IDeadLetterQueueInspector dlqInspector = Substitute.For<IDeadLetterQueueInspector>();
+        dlqInspector.GetCountsAsync(Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<string, long>());
 
         BackgroundJobManager manager = new(
-            store, store, bus, clock, user, NullLogger<BackgroundJobManager>.Instance, messageStore);
+            store, store, dispatcher, dlqInspector, clock, user, NullLogger<BackgroundJobManager>.Instance);
         RecurringJobSchedulingMiddleware middleware = new(
             store, store, clock, NullLogger<RecurringJobSchedulingMiddleware>.Instance);
 
-        // Act — TriggerNow injects X-Triggered-By into DeliveryOptions
+        // Act — TriggerNow injects X-Triggered-By into headers dict
         await manager.TriggerNowAsync("fake-daily-report", TestContext.Current.CancellationToken);
 
         // Recover published call args via NSubstitute ReceivedCalls()
-        ICall publishCall = bus.ReceivedCalls()
-            .First(c => c.GetMethodInfo().Name == nameof(IMessageBus.PublishAsync));
+        NSubstitute.Core.ICall publishCall = dispatcher.ReceivedCalls()
+            .First(c => c.GetMethodInfo().Name == nameof(IBackgroundJobDispatcher.PublishAsync));
         object capturedMessage = publishCall.GetArguments()[0]!;
-        var capturedOptions = (DeliveryOptions)publishCall.GetArguments()[1]!;
+        var capturedHeaders = (IDictionary<string, string>)publishCall.GetArguments()[1]!;
 
-        // Simulate Wolverine copying DeliveryOptions.Headers into Envelope.Headers
+        // Simulate Wolverine copying headers into Envelope.Headers
         Envelope envelope = new(capturedMessage);
-        foreach (KeyValuePair<string, string?> kv in capturedOptions.Headers)
+        foreach (KeyValuePair<string, string> kv in capturedHeaders)
         {
-            if (kv.Value is not null)
-            {
-                envelope.Headers[kv.Key] = kv.Value;
-            }
+            envelope.Headers[kv.Key] = kv.Value;
         }
 
         await middleware.BeforeAsync(envelope, TestContext.Current.CancellationToken);

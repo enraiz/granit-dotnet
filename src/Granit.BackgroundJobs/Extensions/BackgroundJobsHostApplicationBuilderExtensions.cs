@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Threading.Channels;
+using Granit.BackgroundJobs.Abstractions;
 using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
 using Granit.BackgroundJobs.Options;
@@ -7,8 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Wolverine;
-using Wolverine.Runtime.Handlers;
 
 namespace Granit.BackgroundJobs.Extensions;
 
@@ -21,13 +21,12 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
     /// Adds the Granit background jobs infrastructure (provider-agnostic).
     /// </summary>
     /// <remarks>
-    /// Reads <see cref="BackgroundJobsOptions"/> from the <c>"BackgroundJobs"</c>
-    /// configuration section and registers:
-    /// <list type="bullet">
-    ///   <item><see cref="IBackgroundJobReader"/> and <see cref="IBackgroundJobWriter"/> — admin API (scoped).</item>
-    ///   <item><see cref="IBackgroundJobStoreReader"/> and <see cref="IBackgroundJobStoreWriter"/> — InMemory or EF Core, depending on <see cref="JobStoreMode"/>.</item>
-    ///   <item><see cref="RecurringJobSchedulingMiddleware"/> — Wolverine middleware for atomic rescheduling, injected via <c>opts.Policies.AddMiddleware</c>.</item>
-    /// </list>
+    /// <para>
+    /// By default, job dispatch uses an in-process <see cref="Channel{T}"/> with a
+    /// <see cref="BackgroundService"/>-based scheduler. For durable, cluster-safe scheduling
+    /// via Wolverine's Outbox and <c>SingularAgent</c>, add the
+    /// <c>Granit.BackgroundJobs.Wolverine</c> package.
+    /// </para>
     /// <para>
     /// Jobs declared in the calling assembly (and any additional assemblies passed via
     /// <paramref name="additionalAssemblies"/>) are seeded into the store on startup.
@@ -38,12 +37,10 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
     /// Additional assemblies to scan for <see cref="RecurringJobAttribute"/>.
     /// The entry assembly is always scanned automatically.
     /// </param>
-    /// <param name="configure">Optional additional Wolverine configuration.</param>
     /// <returns>The builder for chaining.</returns>
     public static IHostApplicationBuilder AddGranitBackgroundJobs(
         this IHostApplicationBuilder builder,
-        IEnumerable<Assembly>? additionalAssemblies = null,
-        Action<WolverineOptions>? configure = null)
+        IEnumerable<Assembly>? additionalAssemblies = null)
     {
         GranitActivitySourceRegistry.Register(Diagnostics.BackgroundJobsActivitySource.Name);
 
@@ -71,7 +68,13 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
         builder.Services.AddScoped<BackgroundJobManager>();
         builder.Services.AddScoped<IBackgroundJobReader>(sp => sp.GetRequiredService<BackgroundJobManager>());
         builder.Services.AddScoped<IBackgroundJobWriter>(sp => sp.GetRequiredService<BackgroundJobManager>());
-        builder.Services.AddSingularAgent<CronSchedulerAgent>();
+
+        // In-process channel dispatch (default — replaced by Granit.BackgroundJobs.Wolverine)
+        builder.Services.AddSingleton(Channel.CreateUnbounded<BackgroundJobEnvelope>());
+        builder.Services.AddSingleton<IBackgroundJobDispatcher, ChannelBackgroundJobDispatcher>();
+        builder.Services.AddSingleton<IDeadLetterQueueInspector, NullDeadLetterQueueInspector>();
+        builder.Services.AddHostedService<BackgroundJobWorker>();
+        builder.Services.AddHostedService<ChannelCronSchedulerService>();
 
         // Discover and seed recurring jobs from all relevant assemblies.
         IEnumerable<Assembly> scanAssemblies = new[] { Assembly.GetEntryAssembly()! }
@@ -80,18 +83,6 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
 
         IReadOnlyList<RecurringJobRegistration> registrations =
             RecurringJobDiscovery.Discover(scanAssemblies);
-
-        // Register Wolverine middleware on all handler chains whose message type carries
-        // [RecurringJobAttribute]. Uses the idiomatic IPolicies.AddMiddleware<T>(filter) API
-        // so Wolverine resolves constructor parameters from DI and injects Before/AfterAsync
-        // methods at code-generation time (zero overhead at runtime).
-        builder.Services.ConfigureWolverine(opts =>
-        {
-            opts.Policies.AddMiddleware<RecurringJobSchedulingMiddleware>(
-                (HandlerChain chain) => chain.MessageType
-                    .GetCustomAttribute<RecurringJobAttribute>() is not null);
-            configure?.Invoke(opts);
-        });
 
         // Seed jobs after the host is built — store must be resolved from DI.
         builder.Services.AddHostedService(sp =>

@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.Notifications</PackageId>
-    <Description>Multi-channel notification engine for Granit. Wolverine-based fan-out, InApp channel, notification definitions, entity tracking abstractions (Odoo-style), and pluggable channel architecture with graceful degradation.</Description>
+    <Description>Multi-channel notification engine for Granit. InApp channel, notification definitions, entity tracking abstractions (Odoo-style), and pluggable channel architecture with graceful degradation. Uses in-process channels by default; add Granit.Notifications.Wolverine for durable outbox dispatch.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.Notifications.Tests" />
+    <InternalsVisibleTo Include="Granit.Notifications.Wolverine" />
     <InternalsVisibleTo Include="Granit.Notifications.EntityFrameworkCore" />
     <InternalsVisibleTo Include="Granit.Notifications.EntityFrameworkCore.Tests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
@@ -20,6 +21,5 @@
     <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
     <ProjectReference Include="..\Granit.Querying\Granit.Querying.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
-    <ProjectReference Include="..\Granit.Wolverine\Granit.Wolverine.csproj" />
   </ItemGroup>
 </Project>

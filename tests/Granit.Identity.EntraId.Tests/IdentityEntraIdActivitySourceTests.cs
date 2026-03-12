@@ -154,9 +154,11 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
 
         await _provider.TerminateAllSessionsAsync("u1", TestContext.Current.CancellationToken);
 
-        Activity? activity = _activities.Find(a => a.OperationName == IdentityEntraIdActivitySource.TerminateAllSessions);
+        // Filter by both operation name AND tag to avoid cross-contamination from parallel test classes.
+        Activity? activity = _activities.Find(a =>
+            a.OperationName == IdentityEntraIdActivitySource.TerminateAllSessions
+            && a.GetTagItem("identity.user_id") is "u1");
         activity.ShouldNotBeNull();
-        activity.GetTagItem("identity.user_id").ShouldBe("u1");
     }
 
     [Fact]

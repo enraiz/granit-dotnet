@@ -16,11 +16,13 @@ public sealed class TestProjectConventionTests
         string srcDir = Path.Combine(RepoRoot, "src");
         string testsDir = Path.Combine(RepoRoot, "tests");
 
-        // Packages excluded: Analyzers and SourceGenerator target netstandard2.0
+        // Packages excluded: Analyzers/SourceGenerator target netstandard2.0,
+        // ArchitectureTests.Abstractions is test infrastructure (not a deliverable package).
         HashSet<string> excluded =
         [
             "Granit.Analyzers",
             "Granit.Analyzers.CodeFixes",
+            "Granit.ArchitectureTests.Abstractions",
             "Granit.Localization.SourceGenerator",
         ];
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Bundle.SaaS</PackageId>
-    <Description>Meta-package grouping Granit modules for multi-tenant SaaS applications: MultiTenancy, Features (toggle/numeric/selection), Features.EntityFrameworkCore, RateLimiting.</Description>
+    <Description>Meta-package grouping Granit modules for multi-tenant SaaS applications: MultiTenancy, Features (toggle/numeric/selection), Features.EntityFrameworkCore, RateLimiting, Bulkhead (per-tenant concurrency isolation).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
@@ -11,6 +11,7 @@
     <ProjectReference Include="..\..\Granit.Features\Granit.Features.csproj" />
     <ProjectReference Include="..\..\Granit.Features.EntityFrameworkCore\Granit.Features.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\Granit.RateLimiting\Granit.RateLimiting.csproj" />
+    <ProjectReference Include="..\..\Granit.Bulkhead\Granit.Bulkhead.csproj" />
   </ItemGroup>
 
 </Project>

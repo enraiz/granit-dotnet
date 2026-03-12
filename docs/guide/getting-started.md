@@ -9,6 +9,20 @@ Build a working Granit API in under 5 minutes.
 
 ## 1. Create the project
 
+### Option A: using the Granit template (recommended)
+
+```bash
+dotnet new install Granit.Templates
+dotnet new granit-api -n MyApi
+cd MyApi
+```
+
+This scaffolds a ready-to-run project with the module system, bundles,
+and standard configuration. For a full setup with Keycloak, Identity,
+and Notifications, use `dotnet new granit-api-full`.
+
+### Option B: manual setup
+
 ```bash
 dotnet new web -n MyApi
 cd MyApi

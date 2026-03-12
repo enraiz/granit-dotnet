@@ -1,7 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Notifications.Extensions;
 using Granit.Timing;
-using Granit.Wolverine;
 
 namespace Granit.Notifications;
 
@@ -9,12 +8,12 @@ namespace Granit.Notifications;
 /// Granit module for the multi-channel notification engine.
 /// </summary>
 /// <remarks>
-/// Default registrations use in-memory stores suitable for development and tests.
-/// For production, call <c>AddGranitNotificationsEntityFrameworkCore()</c>
-/// to enable durable persistence and the ISO 27001-compliant audit trail.
+/// Default registrations use in-memory stores and in-process channel dispatch,
+/// suitable for development and tests. For production, add
+/// <c>Granit.Notifications.Wolverine</c> for durable outbox dispatch and call
+/// <c>AddGranitNotificationsEntityFrameworkCore()</c> for persistent stores.
 /// </remarks>
 [DependsOn(typeof(GranitTimingModule))]
-[DependsOn(typeof(GranitWolverineModule))]
 public sealed class GranitNotificationsModule : GranitModule
 {
     /// <inheritdoc/>

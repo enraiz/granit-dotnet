@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <PackageId>Granit.BackgroundJobs</PackageId>
-    <Description>Durable and manageable background jobs module for Granit. [RecurringJob] declaration, atomic Wolverine scheduling via outbox, provider-agnostic EF Core store (SQL Server / PostgreSQL), IBackgroundJobReader/IBackgroundJobWriter for administration (CQRS).</Description>
+    <Description>Manageable background jobs module for Granit. [RecurringJob] declaration, provider-agnostic EF Core store (SQL Server / PostgreSQL), IBackgroundJobReader/IBackgroundJobWriter for administration (CQRS). Uses in-process channels by default; add Granit.BackgroundJobs.Wolverine for durable outbox scheduling.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Granit.BackgroundJobs.Tests" />
+    <InternalsVisibleTo Include="Granit.BackgroundJobs.Wolverine" />
     <InternalsVisibleTo Include="Granit.BackgroundJobs.Tests.Integration" />
     <InternalsVisibleTo Include="Granit.BackgroundJobs.EntityFrameworkCore" />
     <InternalsVisibleTo Include="Granit.BackgroundJobs.EntityFrameworkCore.Tests" />
@@ -25,8 +26,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
     <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
+    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
-    <ProjectReference Include="..\Granit.Wolverine\Granit.Wolverine.csproj" />
   </ItemGroup>
 
 </Project>

@@ -57,6 +57,7 @@
     <ProjectReference Include="..\..\src\Granit.DataExchange.Endpoints\Granit.DataExchange.Endpoints.csproj" />
     <ProjectReference Include="..\..\src\Granit.DataExchange.EntityFrameworkCore\Granit.DataExchange.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\src\Granit.DataExchange.Excel\Granit.DataExchange.Excel.csproj" />
+    <ProjectReference Include="..\..\src\Granit.BackgroundJobs.Wolverine\Granit.BackgroundJobs.Wolverine.csproj" />
     <ProjectReference Include="..\..\src\Granit.DataExchange.Wolverine\Granit.DataExchange.Wolverine.csproj" />
     <ProjectReference Include="..\..\src\Granit.Diagnostics\Granit.Diagnostics.csproj" />
     <ProjectReference Include="..\..\src\Granit.DocumentGeneration\Granit.DocumentGeneration.csproj" />
@@ -91,6 +92,7 @@
     <ProjectReference Include="..\..\src\Granit.Notifications.Sms\Granit.Notifications.Sms.csproj" />
     <ProjectReference Include="..\..\src\Granit.Notifications.WhatsApp\Granit.Notifications.WhatsApp.csproj" />
     <ProjectReference Include="..\..\src\Granit.Notifications.Zulip\Granit.Notifications.Zulip.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Notifications.Wolverine\Granit.Notifications.Wolverine.csproj" />
     <ProjectReference Include="..\..\src\Granit.Observability\Granit.Observability.csproj" />
     <ProjectReference Include="..\..\src\Granit.Persistence\Granit.Persistence.csproj" />
     <ProjectReference Include="..\..\src\Granit.Persistence.Migrations\Granit.Persistence.Migrations.csproj" />
@@ -119,8 +121,10 @@
     <ProjectReference Include="..\..\src\Granit.Vault\Granit.Vault.csproj" />
     <ProjectReference Include="..\..\src\Granit.Webhooks\Granit.Webhooks.csproj" />
     <ProjectReference Include="..\..\src\Granit.Webhooks.EntityFrameworkCore\Granit.Webhooks.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Webhooks.Wolverine\Granit.Webhooks.Wolverine.csproj" />
     <ProjectReference Include="..\..\src\Granit.Wolverine\Granit.Wolverine.csproj" />
     <ProjectReference Include="..\..\src\Granit.Wolverine.Postgresql\Granit.Wolverine.Postgresql.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Wolverine.SqlServer\Granit.Wolverine.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Granit.Workflow\Granit.Workflow.csproj" />
     <ProjectReference Include="..\..\src\Granit.Workflow.Endpoints\Granit.Workflow.Endpoints.csproj" />
     <ProjectReference Include="..\..\src\Granit.Workflow.EntityFrameworkCore\Granit.Workflow.EntityFrameworkCore.csproj" />

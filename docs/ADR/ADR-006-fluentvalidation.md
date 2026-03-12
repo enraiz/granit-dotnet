@@ -1,79 +1,79 @@
-# ADR-006 : FluentValidation — Framework de validation métier
+# ADR-006: FluentValidation — Business Validation Framework
 
-- **Statut** : Accepté
-- **Date** : 2026-02-24
-- **Auteurs** : Jean-François Meyers
-- **Portée** : granit-dotnet (Granit.Validation, Granit.Wolverine)
+- **Status**: Accepted
+- **Date**: 2026-02-24
+- **Authors**: Jean-François Meyers
+- **Scope**: granit-dotnet (Granit.Validation, Granit.Wolverine)
 
-## Contexte
+## Context
 
-La plateforme nécessite un framework de validation pour :
+The platform requires a validation framework for:
 
-- **Validation métier** : règles complexes et composables (adresse, SIRET, IBAN,
-  email, locale) avec codes d'erreur standardisés
-- **Intégration Wolverine** : validation automatique des commandes avant exécution
-  via le middleware pipeline (`WolverineFx.FluentValidation`)
-- **Codes d'erreur** : mapping vers RFC 7807 ProblemDetails pour les réponses HTTP
-- **Extensibilité** : validateurs custom réutilisables entre modules
+- **Business validation**: complex and composable rules (address, SIRET, IBAN,
+  email, locale) with standardized error codes
+- **Wolverine integration**: automatic command validation before execution
+  via the middleware pipeline (`WolverineFx.FluentValidation`)
+- **Error codes**: mapping to RFC 7807 ProblemDetails for HTTP responses
+- **Extensibility**: custom reusable validators across modules
 
-## Décision
+## Decision
 
-**FluentValidation** comme framework de validation métier.
+**FluentValidation** as the business validation framework.
 
-## Alternatives évaluées
+## Alternatives considered
 
-### Option 1 : FluentValidation (retenue)
+### Option 1: FluentValidation (selected)
 
-- **Licence** : Apache-2.0
-- **Avantage** : API fluent composable (`RuleFor(x => x.Email).EmailAddress()`),
-  intégration Wolverine native, large communauté, validateurs custom faciles
-- **Maturité** : 15+ ans, standard de facto pour la validation .NET
+- **License**: Apache-2.0
+- **Advantage**: composable fluent API (`RuleFor(x => x.Email).EmailAddress()`),
+  native Wolverine integration, large community, easy custom validators
+- **Maturity**: 15+ years, de facto standard for .NET validation
 
-### Option 2 : DataAnnotations seules
+### Option 2: DataAnnotations only
 
-- **Avantage** : natif .NET, zéro dépendance, intégré au model binding
-- **Inconvénient** : limité aux validations simples (attributs), pas de
-  composition, pas de validation conditionnelle complexe, pas d'intégration
-  middleware Wolverine, codes d'erreur non standardisés
+- **Advantage**: native .NET, zero dependency, integrated with model binding
+- **Disadvantage**: limited to simple validations (attributes), no
+  composition, no complex conditional validation, no Wolverine
+  middleware integration, non-standardized error codes
 
-### Option 3 : MiniValidation
+### Option 3: MiniValidation
 
-- **Licence** : MIT
-- **Avantage** : léger, basé sur DataAnnotations avec extensions
-- **Inconvénient** : pas de règles composables, pas d'intégration Wolverine,
-  communauté limitée, ne couvre pas les cas métier complexes
+- **License**: MIT
+- **Advantage**: lightweight, based on DataAnnotations with extensions
+- **Disadvantage**: no composable rules, no Wolverine integration,
+  limited community, does not cover complex business cases
 
-### Option 4 : Validation custom (sans framework)
+### Option 4: Custom validation (no framework)
 
-- **Avantage** : contrôle total, pas de dépendance
-- **Inconvénient** : effort de développement et maintenance considérable,
-  réinvention de la roue, pas de standards, pas de middleware pipeline
+- **Advantage**: full control, no dependency
+- **Disadvantage**: considerable development and maintenance effort,
+  reinventing the wheel, no standards, no middleware pipeline
 
 ## Justification
 
-| Critère | FluentValidation | DataAnnotations | MiniValidation | Custom |
-| ------- | ---------------- | --------------- | -------------- | ------ |
-| Licence | Apache-2.0 | Natif .NET | MIT | N/A |
-| Règles composables | Oui | Non | Non | Manuel |
-| Wolverine middleware | Natif | Non | Non | Manuel |
-| Validation conditionnelle | Oui (When/Unless) | Non | Non | Manuel |
-| Codes d'erreur | Oui (WithErrorCode) | Limité | Limité | Manuel |
-| Communauté | Très large | Standard | Faible | N/A |
-| RFC 7807 mapping | Via Granit.AspNetCore | Manuel | Manuel | Manuel |
+| Criterion | FluentValidation | DataAnnotations | MiniValidation | Custom |
+| --------- | ---------------- | --------------- | -------------- | ------ |
+| License | Apache-2.0 | Native .NET | MIT | N/A |
+| Composable rules | Yes | No | No | Manual |
+| Wolverine middleware | Native | No | No | Manual |
+| Conditional validation | Yes (When/Unless) | No | No | Manual |
+| Error codes | Yes (WithErrorCode) | Limited | Limited | Manual |
+| Community | Very large | Standard | Low | N/A |
+| RFC 7807 mapping | Via Granit.AspNetCore | Manual | Manual | Manual |
 
-## Conséquences
+## Consequences
 
-### Positives
+### Positive
 
-- Validation déclarative et lisible dans chaque module
-- Intégration Wolverine : les commandes sont validées avant exécution (DLQ si échec)
-- Codes d'erreur standardisés Granit (ex. `VALIDATION.EMAIL.INVALID`)
-- Validateurs réutilisables entre packages (`AddressValidator`, `SiretValidator`)
-- Mapping automatique vers ProblemDetails RFC 7807 via `GranitExceptionHandler`
+- Declarative and readable validation in each module
+- Wolverine integration: commands are validated before execution (DLQ on failure)
+- Standardized Granit error codes (e.g. `VALIDATION.EMAIL.INVALID`)
+- Reusable validators across packages (`AddressValidator`, `SiretValidator`)
+- Automatic mapping to ProblemDetails RFC 7807 via `GranitExceptionHandler`
 
-### Négatives
+### Negative
 
-- Dépendance tierce pour la validation (risque de breaking changes majeures)
-- Duplication partielle avec DataAnnotations pour les cas simples
-  (conventions Granit : utiliser FluentValidation même pour les cas simples,
-  pour la cohérence)
+- Third-party dependency for validation (risk of major breaking changes)
+- Partial duplication with DataAnnotations for simple cases
+  (Granit convention: use FluentValidation even for simple cases,
+  for consistency)
