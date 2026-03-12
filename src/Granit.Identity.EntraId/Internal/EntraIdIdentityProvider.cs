@@ -39,7 +39,7 @@ internal sealed partial class EntraIdIdentityProvider(
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
             string endpoint = EntraIdAdminOptions.GetUsersEndpoint(search, first, max);
 
-            var response = await client
+            GraphCollectionResponse<GraphUserRepresentation>? response = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphUserRepresentation>>(endpoint, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -151,7 +151,7 @@ internal sealed partial class EntraIdIdentityProvider(
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
             string endpoint = EntraIdAdminOptions.GetAuditSignInsEndpoint(userId);
 
-            var response = await client
+            GraphCollectionResponse<GraphAuditSignInRepresentation>? response = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphAuditSignInRepresentation>>(endpoint, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -179,7 +179,7 @@ internal sealed partial class EntraIdIdentityProvider(
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
             string endpoint = EntraIdAdminOptions.GetAuditSignInsEndpoint(userId, top: 50);
 
-            var response = await client
+            GraphCollectionResponse<GraphAuditSignInRepresentation>? response = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphAuditSignInRepresentation>>(endpoint, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -285,7 +285,7 @@ internal sealed partial class EntraIdIdentityProvider(
             // Get all App Role assignments on the Service Principal
             string endpoint = options.Value.GetServicePrincipalAppRoleAssignedToEndpoint();
 
-            var assignments = await client
+            GraphCollectionResponse<GraphAppRoleAssignmentRepresentation>? assignments = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphAppRoleAssignmentRepresentation>>(endpoint, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -335,7 +335,7 @@ internal sealed partial class EntraIdIdentityProvider(
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
             string endpoint = EntraIdAdminOptions.GetUserAppRoleAssignmentsEndpoint(userId);
 
-            var assignments = await client
+            GraphCollectionResponse<GraphAppRoleAssignmentRepresentation>? assignments = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphAppRoleAssignmentRepresentation>>(endpoint, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -346,7 +346,7 @@ internal sealed partial class EntraIdIdentityProvider(
 
             // Cross-reference with App Role definitions to get names
             List<GraphAppRoleRepresentation> appRoles = await GetAppRolesAsync(client, cancellationToken).ConfigureAwait(false);
-            Dictionary<string, GraphAppRoleRepresentation> roleMap = appRoles.ToDictionary(r => r.Id, StringComparer.OrdinalIgnoreCase);
+            var roleMap = appRoles.ToDictionary(r => r.Id, StringComparer.OrdinalIgnoreCase);
 
             return assignments.Value
                 .Where(a => roleMap.ContainsKey(a.AppRoleId))
@@ -410,7 +410,7 @@ internal sealed partial class EntraIdIdentityProvider(
         // Find the assignment to delete
         string assignmentsEndpoint = EntraIdAdminOptions.GetUserAppRoleAssignmentsEndpoint(userId);
 
-        var assignments = await client
+        GraphCollectionResponse<GraphAppRoleAssignmentRepresentation>? assignments = await client
             .GetFromJsonAsync<GraphCollectionResponse<GraphAppRoleAssignmentRepresentation>>(assignmentsEndpoint, cancellationToken)
             .ConfigureAwait(false);
 
@@ -594,7 +594,7 @@ internal sealed partial class EntraIdIdentityProvider(
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
             string endpoint = EntraIdAdminOptions.GetGroupsEndpoint();
 
-            var response = await client
+            GraphCollectionResponse<GraphGroupRepresentation>? response = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphGroupRepresentation>>(endpoint, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -619,7 +619,7 @@ internal sealed partial class EntraIdIdentityProvider(
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
             string endpoint = EntraIdAdminOptions.GetUserGroupsEndpoint(userId);
 
-            var response = await client
+            GraphCollectionResponse<GraphGroupRepresentation>? response = await client
                 .GetFromJsonAsync<GraphCollectionResponse<GraphGroupRepresentation>>(endpoint, cancellationToken)
                 .ConfigureAwait(false);
 

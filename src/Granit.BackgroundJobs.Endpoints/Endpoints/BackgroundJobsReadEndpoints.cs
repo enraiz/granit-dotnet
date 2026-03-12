@@ -41,7 +41,7 @@ internal static class BackgroundJobsReadEndpoints
 
         int totalCount = all.Count;
         int skip = (clampedPage - 1) * clampedPageSize;
-        List<BackgroundJobStatus> items = all.Skip(skip).Take(clampedPageSize).ToList();
+        var items = all.Skip(skip).Take(clampedPageSize).ToList();
 
         return TypedResults.Ok(new PagedResult<BackgroundJobStatus>(items, totalCount, HasMore: skip + items.Count < totalCount));
     }

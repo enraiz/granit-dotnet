@@ -178,7 +178,7 @@ public sealed class MobilePushTokenEndpointsTests : IAsyncDisposable
         HttpResponseMessage response = await _authClient.GetAsync(Prefix, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<List<MobilePushTokenResponse>>(
+        List<MobilePushTokenResponse>? result = await response.Content.ReadFromJsonAsync<List<MobilePushTokenResponse>>(
             TestContext.Current.CancellationToken);
         result.ShouldNotBeNull();
         result!.Count.ShouldBe(2);
