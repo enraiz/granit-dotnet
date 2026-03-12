@@ -102,7 +102,7 @@ public static class SseNotificationEndpoints
         int heartbeatSeconds,
         CancellationToken cancellationToken)
     {
-        using CancellationTokenSource heartbeatCts =
+        using var heartbeatCts =
             CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         heartbeatCts.CancelAfter(TimeSpan.FromSeconds(heartbeatSeconds));
 

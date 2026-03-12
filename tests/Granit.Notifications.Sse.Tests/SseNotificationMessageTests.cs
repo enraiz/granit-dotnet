@@ -23,7 +23,7 @@ public sealed class SseNotificationMessageTests
     {
         JsonElement data = JsonSerializer.SerializeToElement(new { key = "value" });
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        Guid id = Guid.NewGuid();
+        var id = Guid.NewGuid();
 
         SseNotificationMessage msg1 = new()
         {

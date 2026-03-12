@@ -30,7 +30,7 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
 
         int totalCount = filtered.Count;
         int skip = (clampedPage - 1) * clampedPageSize;
-        List<UserNotification> items = filtered
+        var items = filtered
             .Skip(skip)
             .Take(clampedPageSize)
             .ToList();
@@ -78,7 +78,7 @@ internal sealed class InMemoryUserNotificationStore : IUserNotificationReader, I
 
         int totalCount = filtered.Count;
         int skip = (clampedPage - 1) * clampedPageSize;
-        List<UserNotification> items = filtered
+        var items = filtered
             .Skip(skip)
             .Take(clampedPageSize)
             .ToList();

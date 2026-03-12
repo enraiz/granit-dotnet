@@ -242,7 +242,7 @@ public sealed class EfCoreApiKeyAdminStoreTests : IDisposable
     [Fact]
     public async Task ListAsync_Pagination_RespectsPageAndPageSize()
     {
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             await SeedAsync(CreateEntry($"hash{i}", $"Key {i}"));
         }
