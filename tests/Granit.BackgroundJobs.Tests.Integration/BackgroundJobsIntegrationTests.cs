@@ -1,7 +1,7 @@
 using Granit.BackgroundJobs.Abstractions;
 using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
-using Granit.BackgroundJobs.Wolverine.Internal;
+using Granit.BackgroundJobs.Wolverine;
 using Granit.Guids;
 using Granit.Security;
 using Granit.Timing;

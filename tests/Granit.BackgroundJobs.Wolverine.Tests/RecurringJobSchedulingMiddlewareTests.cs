@@ -1,5 +1,4 @@
 using Granit.BackgroundJobs.Domain;
-using Granit.BackgroundJobs.Wolverine.Internal;
 using Granit.Timing;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
