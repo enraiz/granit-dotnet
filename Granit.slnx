@@ -109,6 +109,7 @@
     <Project Path="src/Granit.Webhooks.Wolverine/Granit.Webhooks.Wolverine.csproj" />
     <Project Path="src/Granit.Webhooks/Granit.Webhooks.csproj" />
     <Project Path="src/Granit.Wolverine.Postgresql/Granit.Wolverine.Postgresql.csproj" />
+    <Project Path="src/Granit.Wolverine.SqlServer/Granit.Wolverine.SqlServer.csproj" />
     <Project Path="src/Granit.Wolverine/Granit.Wolverine.csproj" />
     <Project Path="src/Granit.Workflow.Endpoints/Granit.Workflow.Endpoints.csproj" />
     <Project Path="src/Granit.Workflow.EntityFrameworkCore/Granit.Workflow.EntityFrameworkCore.csproj" />
@@ -232,6 +233,8 @@
     <Project Path="tests/Granit.Webhooks.Tests/Granit.Webhooks.Tests.csproj" />
     <Project Path="tests/Granit.Webhooks.Wolverine.Tests/Granit.Webhooks.Wolverine.Tests.csproj" />
     <Project Path="tests/Granit.Wolverine.Postgresql.Tests.Integration/Granit.Wolverine.Postgresql.Tests.Integration.csproj" />
+    <Project Path="tests/Granit.Wolverine.SqlServer.Tests/Granit.Wolverine.SqlServer.Tests.csproj" />
+    <Project Path="tests/Granit.Wolverine.SqlServer.Tests.Integration/Granit.Wolverine.SqlServer.Tests.Integration.csproj" />
     <Project Path="tests/Granit.Wolverine.Postgresql.Tests/Granit.Wolverine.Postgresql.Tests.csproj" />
     <Project Path="tests/Granit.Wolverine.Tests/Granit.Wolverine.Tests.csproj" />
     <Project Path="tests/Granit.Workflow.Endpoints.Tests/Granit.Workflow.Endpoints.Tests.csproj" />
