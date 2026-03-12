@@ -1,6 +1,7 @@
 using Granit.Identity.EntityFrameworkCore.Entities;
 using Granit.Identity.EntityFrameworkCore.Events;
 using Granit.Identity.EntityFrameworkCore.Internal;
+using Granit.Identity.Events;
 using Granit.Identity.Models;
 using Microsoft.Extensions.Logging;
 
@@ -16,17 +17,64 @@ internal sealed partial class IdentityUserEventHandler(
     ILogger<IdentityUserEventHandler> logger)
 {
     /// <summary>
-    /// Handles a user created/updated event by fetching the user from the identity provider
-    /// and upserting the cache entry.
+    /// Handles a user created/updated event (from webhook) by fetching the user from
+    /// the identity provider and upserting the cache entry.
     /// </summary>
     public async Task HandleAsync(IdentityUserUpdatedEvent @event, CancellationToken cancellationToken)
     {
-        IdentityUser? user = await identityProvider.GetUserAsync(@event.UserId, cancellationToken)
+        await SyncUserCacheAsync(@event.UserId, cancellationToken).ConfigureAwait(false);
+        LogUserCacheUpdated(@event.UserId, "webhook");
+    }
+
+    /// <summary>
+    /// Handles a user deleted event by hard-deleting the cache entry (RGPD Art. 17).
+    /// </summary>
+    public async Task HandleAsync(IdentityUserDeletedEvent @event, CancellationToken cancellationToken)
+    {
+        await store.DeleteByExternalIdAsync(@event.UserId, @event.TenantId, cancellationToken)
+            .ConfigureAwait(false);
+        LogUserCacheDeleted(@event.UserId);
+    }
+
+    // ──── Domain event handlers (provider-triggered) ────
+
+    /// <summary>
+    /// Handles a user created event by syncing the new user into the local cache.
+    /// </summary>
+    public async Task HandleAsync(IdentityUserCreatedEvent @event, CancellationToken cancellationToken)
+    {
+        await SyncUserCacheAsync(@event.UserId, cancellationToken).ConfigureAwait(false);
+        LogUserCacheUpdated(@event.UserId, "create");
+    }
+
+    /// <summary>
+    /// Handles a user profile updated event by refreshing the cache entry.
+    /// </summary>
+    public async Task HandleAsync(IdentityUserProfileUpdatedEvent @event, CancellationToken cancellationToken)
+    {
+        await SyncUserCacheAsync(@event.UserId, cancellationToken).ConfigureAwait(false);
+        LogUserCacheUpdated(@event.UserId, "profile-update");
+    }
+
+    /// <summary>
+    /// Handles a user enabled/disabled event by refreshing the cache entry.
+    /// </summary>
+    public async Task HandleAsync(IdentityUserEnabledChangedEvent @event, CancellationToken cancellationToken)
+    {
+        await SyncUserCacheAsync(@event.UserId, cancellationToken).ConfigureAwait(false);
+        LogUserCacheUpdated(@event.UserId, "enabled-change");
+    }
+
+    // ──── Shared helpers ────
+
+    private async Task SyncUserCacheAsync(string userId, CancellationToken cancellationToken)
+    {
+        IdentityUser? user = await identityProvider.GetUserAsync(userId, cancellationToken)
             .ConfigureAwait(false);
 
         if (user is null)
         {
-            LogUserNotFoundInProvider(@event.UserId);
+            LogUserNotFoundInProvider(userId);
             return;
         }
 
@@ -42,24 +90,13 @@ internal sealed partial class IdentityUserEventHandler(
         };
 
         await store.UpsertAsync(entry, cancellationToken).ConfigureAwait(false);
-        LogUserCacheUpdated(@event.UserId);
-    }
-
-    /// <summary>
-    /// Handles a user deleted event by hard-deleting the cache entry (RGPD Art. 17).
-    /// </summary>
-    public async Task HandleAsync(IdentityUserDeletedEvent @event, CancellationToken cancellationToken)
-    {
-        await store.DeleteByExternalIdAsync(@event.UserId, @event.TenantId, cancellationToken)
-            .ConfigureAwait(false);
-        LogUserCacheDeleted(@event.UserId);
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "User {UserId} not found in identity provider during cache sync")]
     private partial void LogUserNotFoundInProvider(string userId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "[AUDIT] User cache entry updated via webhook for user {UserId}")]
-    private partial void LogUserCacheUpdated(string userId);
+    [LoggerMessage(Level = LogLevel.Information, Message = "[AUDIT] User cache entry updated via {Source} for user {UserId}")]
+    private partial void LogUserCacheUpdated(string userId, string source);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "[AUDIT] RGPD: user cache entry deleted via webhook for user {UserId}")]
     private partial void LogUserCacheDeleted(string userId);

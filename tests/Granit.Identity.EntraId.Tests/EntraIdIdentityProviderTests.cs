@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Net;
+using Granit.Identity;
 using Granit.Identity.EntraId.Internal;
 using Granit.Identity.EntraId.Options;
+using Granit.Identity.Events;
 using Granit.Identity.Models;
 using Granit.Timing;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -27,6 +29,7 @@ public sealed class EntraIdIdentityProviderTests : IDisposable
 
     private readonly EntraIdAdminTokenService _tokenService;
     private readonly IPasswordResetNotifier _passwordResetNotifier = Substitute.For<IPasswordResetNotifier>();
+    private readonly IIdentityEventPublisher _eventPublisher = Substitute.For<IIdentityEventPublisher>();
     private readonly EntraIdIdentityProvider _provider;
     private readonly ActivityListener _activityListener;
 
@@ -65,6 +68,7 @@ public sealed class EntraIdIdentityProviderTests : IDisposable
             _httpClientFactory,
             Microsoft.Extensions.Options.Options.Create(_options),
             _passwordResetNotifier,
+            _eventPublisher,
             NullLogger<EntraIdIdentityProvider>.Instance);
     }
 
@@ -222,6 +226,7 @@ public sealed class EntraIdIdentityProviderTests : IDisposable
             factory,
             Microsoft.Extensions.Options.Options.Create(optionsWithRopc),
             _passwordResetNotifier,
+            _eventPublisher,
             NullLogger<EntraIdIdentityProvider>.Instance);
 
         bool result = await provider.VerifyUserCredentialsAsync("admin", "password123",
@@ -262,6 +267,7 @@ public sealed class EntraIdIdentityProviderTests : IDisposable
             factory,
             Microsoft.Extensions.Options.Options.Create(optionsWithRopc),
             _passwordResetNotifier,
+            _eventPublisher,
             NullLogger<EntraIdIdentityProvider>.Instance);
 
         bool result = await provider.VerifyUserCredentialsAsync("admin", "wrong-password",
@@ -276,6 +282,64 @@ public sealed class EntraIdIdentityProviderTests : IDisposable
         await Should.ThrowAsync<InvalidOperationException>(
             () => _provider.VerifyUserCredentialsAsync("admin", "pass",
                 TestContext.Current.CancellationToken));
+    }
+
+    // --- Domain event publishing tests ---
+
+    [Fact]
+    public async Task SetUserEnabledAsync_PublishesEnabledChangedEvent()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.SetUserEnabledAsync("u1", true, TestContext.Current.CancellationToken);
+
+        await _eventPublisher.Received(1).PublishAsync(
+            Arg.Is<IdentityUserEnabledChangedEvent>(e => e.UserId == "u1" && e.Enabled),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task CreateUserAsync_PublishesUserCreatedEvent()
+    {
+        var optionsWithDomain = new EntraIdAdminOptions
+        {
+            TenantId = "test-tenant-id",
+            ClientId = "admin-service",
+            ClientSecret = "secret",
+            ServicePrincipalObjectId = "sp-object-id",
+            DefaultDomain = "contoso.com",
+        };
+
+        MockHttpMessageHandler handler = new()
+        {
+            ResponseBody = """{"id":"new-user-id","userPrincipalName":"alice@contoso.com","mail":"alice@test.com","givenName":"Alice","surname":"Doe","accountEnabled":true}""",
+        };
+
+        HttpClient client = new(handler) { BaseAddress = new Uri("https://graph.microsoft.com/") };
+        IHttpClientFactory factory = Substitute.For<IHttpClientFactory>();
+        factory.CreateClient("MicrosoftGraph").Returns(client);
+
+        IIdentityEventPublisher eventPublisher = Substitute.For<IIdentityEventPublisher>();
+
+        EntraIdIdentityProvider provider = new(
+            _tokenService,
+            factory,
+            Microsoft.Extensions.Options.Options.Create(optionsWithDomain),
+            _passwordResetNotifier,
+            eventPublisher,
+            NullLogger<EntraIdIdentityProvider>.Instance);
+
+        IdentityUserCreate newUser = new("alice", "alice@test.com", "Alice", "Doe");
+
+        await provider.CreateUserAsync(newUser, TestContext.Current.CancellationToken);
+
+        await eventPublisher.Received(1).PublishAsync(
+            Arg.Is<IdentityUserCreatedEvent>(e =>
+                e.UserId == "new-user-id" &&
+                e.Username == "alice" &&
+                e.Email == "alice@test.com"),
+            Arg.Any<CancellationToken>());
     }
 
     public void Dispose()

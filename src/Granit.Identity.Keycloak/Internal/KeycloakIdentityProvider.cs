@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Granit.Identity.Events;
 using Granit.Identity.Keycloak.Diagnostics;
 using Granit.Identity.Keycloak.Options;
 using Granit.Identity.Models;
@@ -27,6 +28,7 @@ internal sealed partial class KeycloakIdentityProvider(
     KeycloakUserTokenExchangeService tokenExchangeService,
     IHttpClientFactory httpClientFactory,
     IOptions<KeycloakAdminOptions> options,
+    IIdentityEventPublisher eventPublisher,
     ILogger<KeycloakIdentityProvider> logger) : IIdentityProvider
 {
     /// <inheritdoc/>
@@ -108,6 +110,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogUserEnabledChanged(userId, enabled ? "enabled" : "disabled");
+
+        await eventPublisher.PublishAsync(new IdentityUserEnabledChangedEvent(userId, enabled), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -173,6 +177,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogUserProfileUpdated(userId);
+
+        await eventPublisher.PublishAsync(new IdentityUserProfileUpdatedEvent(userId, update), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -372,6 +378,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogRoleAssigned(roleName, userId);
+
+        await eventPublisher.PublishAsync(new IdentityRoleAssignedEvent(userId, roleName), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -405,6 +413,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogRoleRemoved(roleName, userId);
+
+        await eventPublisher.PublishAsync(new IdentityRoleRemovedEvent(userId, roleName), cancellationToken).ConfigureAwait(false);
     }
 
     // ──── Feature 2: Session termination ────
@@ -431,6 +441,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogSessionTerminated(sessionId, userId);
+
+        await eventPublisher.PublishAsync(new IdentitySessionsRevokedEvent(userId), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -453,6 +465,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogAllSessionsTerminated(userId);
+
+        await eventPublisher.PublishAsync(new IdentitySessionsRevokedEvent(userId), cancellationToken).ConfigureAwait(false);
     }
 
     // ──── Feature 3: Password reset ────
@@ -477,6 +491,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogPasswordResetEmailSent(userId);
+
+        await eventPublisher.PublishAsync(new IdentityPasswordResetEvent(userId), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -502,6 +518,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogTemporaryPasswordSet(userId);
+
+        await eventPublisher.PublishAsync(new IdentityPasswordResetEvent(userId), cancellationToken).ConfigureAwait(false);
     }
 
     // ──── Feature 4: User creation ────
@@ -547,6 +565,8 @@ internal sealed partial class KeycloakIdentityProvider(
         }
 
         LogUserCreated(user.Username, createdUserId);
+
+        await eventPublisher.PublishAsync(new IdentityUserCreatedEvent(createdUserId, user.Username, user.Email), cancellationToken).ConfigureAwait(false);
 
         return new IdentityUser(
             createdUserId,
@@ -636,6 +656,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogUserAddedToGroup(userId, groupId);
+
+        await eventPublisher.PublishAsync(new IdentityGroupMembershipChangedEvent(userId, groupId, Added: true), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -661,6 +683,8 @@ internal sealed partial class KeycloakIdentityProvider(
         response.EnsureSuccessStatusCode();
 
         LogUserRemovedFromGroup(userId, groupId);
+
+        await eventPublisher.PublishAsync(new IdentityGroupMembershipChangedEvent(userId, groupId, Added: false), cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<IReadOnlyList<IdentityDeviceActivity>> GetDeviceActivityViaAccountApiAsync(
