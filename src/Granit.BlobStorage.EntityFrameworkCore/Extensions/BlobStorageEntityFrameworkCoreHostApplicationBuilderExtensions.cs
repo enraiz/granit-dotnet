@@ -16,7 +16,7 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
     /// </summary>
     /// <remarks>
     /// Registers <see cref="BlobStorageDbContext"/> via
-    /// <see cref="EntityFrameworkServiceCollectionExtensions.AddDbContextFactory{TContext}(IServiceCollection, Action{DbContextOptionsBuilder}?, ServiceLifetime)"/>
+    /// <c>AddGranitDbContext</c> (<c>IDbContextFactory</c> with interceptor DI)
     /// and binds <see cref="IBlobDescriptorStore"/> to <c>EfBlobDescriptorStore</c>.
     /// <para>
     /// <see cref="AuditedEntityInterceptor"/> is added automatically when

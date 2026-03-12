@@ -20,7 +20,7 @@ public static class BackgroundJobsEntityFrameworkCoreHostApplicationBuilderExten
     /// Replaces the default <c>InMemoryBackgroundJobStore</c> registered by
     /// <c>AddGranitBackgroundJobs()</c> with <see cref="EfBackgroundJobStore"/>,
     /// and registers <see cref="BackgroundJobsDbContext"/> via
-    /// <see cref="EntityFrameworkServiceCollectionExtensions.AddDbContextFactory{TContext}(IServiceCollection, Action{DbContextOptionsBuilder}?, ServiceLifetime)"/>.
+    /// <c>AddGranitDbContext</c> (<c>IDbContextFactory</c> with interceptor DI).
     /// <para>
     /// Must be called after <c>AddGranitBackgroundJobs()</c>.
     /// </para>
