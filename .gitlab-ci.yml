@@ -113,18 +113,14 @@ test:
     - job: build
       artifacts: false
   variables:
-    VSTEST_CONNECTION_TIMEOUT: "300"
-    XUNIT_LAUNCH_TIMEOUT: "300"
+    VSTEST_CONNECTION_TIMEOUT: "600"
   script:
-    - echo "=== CPU diagnostics ==="
-    - nproc
-    - cat /sys/fs/cgroup/cpu.max 2>/dev/null || cat /sys/fs/cgroup/cpu/cpu.cfs_quota_us /sys/fs/cgroup/cpu/cpu.cfs_period_us 2>/dev/null || echo "cgroup info unavailable"
     - !reference [.ensure-build, script]
     - >
       dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage"
-      -- RunConfiguration.MaxCpuCount=4
+      -- RunConfiguration.MaxCpuCount=1
       DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover,cobertura
   artifacts:
     when: always
