@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Bundle.SaaS</PackageId>
+    <Description>Meta-package grouping Granit modules for multi-tenant SaaS applications: MultiTenancy, Features (toggle/numeric/selection), Features.EntityFrameworkCore, RateLimiting.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Granit.MultiTenancy\Granit.MultiTenancy.csproj" />
+    <ProjectReference Include="..\..\Granit.Features\Granit.Features.csproj" />
+    <ProjectReference Include="..\..\Granit.Features.EntityFrameworkCore\Granit.Features.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\Granit.RateLimiting\Granit.RateLimiting.csproj" />
+  </ItemGroup>
+
+</Project>

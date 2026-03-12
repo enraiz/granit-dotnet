@@ -673,6 +673,15 @@
           "Granit.Notifications.SignalR": "[0.1.0-dev, )"
         }
       },
+      "granit.bundle.saas": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Features.EntityFrameworkCore": "[0.1.0-dev, )",
+          "Granit.MultiTenancy": "[0.1.0-dev, )",
+          "Granit.RateLimiting": "[0.1.0-dev, )"
+        }
+      },
       "granit.caching": {
         "type": "Project",
         "dependencies": {
@@ -721,6 +730,21 @@
           "Granit.Core": "[0.1.0-dev, )"
         }
       },
+      "granit.features": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Caching": "[0.1.0-dev, )",
+          "Granit.Localization": "[0.1.0-dev, )"
+        }
+      },
+      "granit.features.entityframeworkcore": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Persistence": "[0.1.0-dev, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
+        }
+      },
       "granit.guids": {
         "type": "Project",
         "dependencies": {
@@ -749,6 +773,12 @@
           "Granit.Localization": "[0.1.0-dev, )",
           "Granit.Persistence": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
+        }
+      },
+      "granit.multitenancy": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.notifications": {
@@ -836,6 +866,16 @@
         "type": "Project",
         "dependencies": {
           "Granit.Core": "[0.1.0-dev, )"
+        }
+      },
+      "granit.ratelimiting": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
+          "StackExchange.Redis": "[2.*, )"
         }
       },
       "granit.security": {

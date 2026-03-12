@@ -68,4 +68,13 @@ public sealed class BundleTransitiveDependencyTests
         typeof(DocumentGeneration.Pdf.GranitDocumentGenerationPdfModule).Assembly.ShouldNotBeNull();
         typeof(DocumentGeneration.Excel.GranitDocumentGenerationExcelModule).Assembly.ShouldNotBeNull();
     }
+
+    [Fact]
+    public void SaaS_ExposesAllSaaSModules()
+    {
+        typeof(MultiTenancy.GranitMultiTenancyModule).Assembly.ShouldNotBeNull();
+        typeof(Features.GranitFeaturesModule).Assembly.ShouldNotBeNull();
+        typeof(Features.EntityFrameworkCore.GranitFeaturesEntityFrameworkCoreModule).Assembly.ShouldNotBeNull();
+        typeof(RateLimiting.GranitRateLimitingModule).Assembly.ShouldNotBeNull();
+    }
 }
