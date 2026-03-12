@@ -16,7 +16,7 @@ namespace Granit.Wolverine.ClaimCheck.Internal;
 /// the process is recycled.
 /// </para>
 /// </remarks>
-public sealed class InMemoryClaimCheckStore : IClaimCheckStore
+internal sealed class InMemoryClaimCheckStore : IClaimCheckStore
 {
     private readonly ConcurrentDictionary<Guid, byte[]> _store = new();
 

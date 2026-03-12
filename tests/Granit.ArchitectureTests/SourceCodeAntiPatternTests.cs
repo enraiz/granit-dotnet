@@ -114,6 +114,13 @@ public sealed partial class SourceCodeAntiPatternTests
         string relativePath = Path.GetRelativePath(srcRoot, filePath);
         string[] parts = relativePath.Split(Path.DirectorySeparatorChar);
 
+        // Strip organizational grouping folders (e.g. "bundles/") that are not part of the namespace.
+        // Bundle projects live in src/bundles/Granit.Bundle.X/ but their namespace is Granit.Bundle.X.
+        if (parts.Length > 1 && !parts[0].Contains('.'))
+        {
+            parts = parts[1..];
+        }
+
         // parts[0] = project name, parts[1..^1] = subfolders, parts[^1] = filename
         string projectName = parts[0];
 

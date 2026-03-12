@@ -18,7 +18,7 @@ namespace Granit.Vault.Tests;
 public sealed class GranitVaultModuleTests
 {
     [Fact]
-    public void ConfigureServices_InDevelopment_SkipsRegistration()
+    public void IsEnabled_InDevelopment_ReturnsFalse()
     {
         // Arrange
         GranitVaultModule module = new();
@@ -28,14 +28,8 @@ public sealed class GranitVaultModuleTests
             builder.Configuration,
             builder);
 
-        // Act
-        module.ConfigureServices(context);
-
-        using ServiceProvider sp = builder.Services.BuildServiceProvider();
-
-        // Assert — aucun service Vault ne doit être enregistré
-        ITransitEncryptionService? transitService = sp.GetService<ITransitEncryptionService>();
-        transitService.ShouldBeNull();
+        // Act & Assert — module disabled in Development (no Vault required locally)
+        module.IsEnabled(context).ShouldBeFalse();
     }
 
     [Fact]
