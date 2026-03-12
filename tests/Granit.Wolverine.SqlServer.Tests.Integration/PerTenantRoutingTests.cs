@@ -55,7 +55,7 @@ public sealed class TwoSqlServerContainersFixture : IAsyncLifetime
     public string ConnectionStringA { get; private set; } = string.Empty;
     public string ConnectionStringB { get; private set; } = string.Empty;
 
-    [Obsolete]
+    [Obsolete("Required by xUnit IAsyncLifetime")]
     public async ValueTask InitializeAsync()
     {
         string? ciHost = Environment.GetEnvironmentVariable("MSSQL_HOST");
