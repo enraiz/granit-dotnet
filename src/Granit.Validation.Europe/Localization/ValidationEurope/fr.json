@@ -1,0 +1,24 @@
+{
+  "culture": "fr",
+  "texts": {
+    "Granit:Validation:InvalidBelgianNiss": "Le numéro national d'identification belge (NISS) est invalide.",
+    "Granit:Validation:InvalidFrenchRpps": "Le numéro RPPS (identifiant du professionnel de santé) est invalide.",
+    "Granit:Validation:InvalidFrenchAdeli": "Le numéro ADELI (professionnel de santé) est invalide.",
+    "Granit:Validation:InvalidFrenchFiness": "Le numéro FINESS (établissement de santé) est invalide.",
+    "Granit:Validation:InvalidBelgianInami": "Le numéro INAMI/RIZIV du prestataire de soins est invalide.",
+    "Granit:Validation:InvalidBelgianEid": "Le numéro de carte d'identité électronique belge (eID) est invalide.",
+    "Granit:Validation:InvalidFrenchNir": "Le numéro d'identification au répertoire (NIR / numéro de Sécurité Sociale) est invalide.",
+    "Granit:Validation:InvalidFrenchSiren": "Le numéro SIREN de l'entreprise est invalide.",
+    "Granit:Validation:InvalidFrenchSiret": "Le numéro SIRET de l'établissement est invalide.",
+    "Granit:Validation:InvalidBelgianBce": "Le numéro d'entreprise belge (BCE / KBO) est invalide.",
+    "Granit:Validation:InvalidBelgianVat": "Le numéro de TVA belge (TVA / BTW) est invalide.",
+    "Granit:Validation:InvalidFrenchVat": "Le numéro de TVA intracommunautaire français est invalide.",
+    "Granit:Validation:InvalidEuropeanVat": "Le numéro de TVA européen est invalide.",
+    "Granit:Validation:InvalidFrenchPostalCode": "Le code postal français est invalide (5 chiffres attendus, plage 01000–99999).",
+    "Granit:Validation:InvalidBelgianPostalCode": "Le code postal belge est invalide (4 chiffres attendus, plage 1000–9999).",
+    "Granit:Validation:InvalidFrenchInseeCode": "Le code commune INSEE est invalide.",
+    "Granit:Validation:InvalidFrenchNafCode": "Le code NAF/APE est invalide (4 chiffres suivis d'une lettre attendus, ex : 6201Z).",
+    "Granit:Validation:InvalidFrenchRib": "Le RIB (relevé d'identité bancaire) est invalide.",
+    "Granit:Validation:InvalidBelgianAccountNumber": "Le numéro de compte bancaire belge est invalide."
+  }
+}

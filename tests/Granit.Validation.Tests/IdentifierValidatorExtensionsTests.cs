@@ -1,7 +1,7 @@
 // =============================================================================
-// Tests - HealthValidatorExtensions
+// Tests - International identifier validators
 // =============================================================================
-// Verifies each health validator with real valid/invalid values.
+// Verifies each identifier validator with real valid/invalid values.
 // Error codes follow the convention Granit:Validation:* (WithMessage = WithErrorCode).
 // =============================================================================
 
@@ -15,79 +15,6 @@ namespace Granit.Validation.Tests;
 
 public sealed class IdentifierValidatorExtensionsTests
 {
-    // =========================================================================
-    // BelgianNiss
-    // =========================================================================
-
-    [Theory]
-    [InlineData("85073003328")]         // born 1985, male
-    [InlineData("85.07.30-033.28")]     // formatted
-    [InlineData("00010100105")]         // born 2000 (prefix-2 case)
-    [InlineData("01012500182")]         // born 2001
-    public void BelgianNiss_ValidValues_PassValidation(string niss)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).BelgianNiss();
-
-        ValidationResult result = validator.Validate(new TestModel(niss));
-
-        result.IsValid.ShouldBeTrue();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("1234567890")]          // 10 digits
-    [InlineData("123456789012")]        // 12 digits
-    [InlineData("85073003300")]         // wrong check digit
-    [InlineData("abcdefghijk")]         // not digits
-    public void BelgianNiss_InvalidValues_FailValidation(string? niss)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).BelgianNiss();
-
-        ValidationResult result = validator.Validate(new TestModel(niss));
-
-        result.IsValid.ShouldBeFalse();
-        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidBelgianNiss");
-        result.Errors[0].ErrorCode.ShouldBe("Granit:Validation:InvalidBelgianNiss");
-    }
-
-    // =========================================================================
-    // FrenchRpps
-    // =========================================================================
-
-    [Theory]
-    [InlineData("10003456786")]         // valid Luhn 11-digit RPPS
-    [InlineData("10000000009")]         // minimal valid
-    public void FrenchRpps_ValidValues_PassValidation(string rpps)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).FrenchRpps();
-
-        ValidationResult result = validator.Validate(new TestModel(rpps));
-
-        result.IsValid.ShouldBeTrue();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("1000345678")]          // 10 digits
-    [InlineData("100034567890")]        // 12 digits
-    [InlineData("10003456788")]         // wrong Luhn check
-    [InlineData("1000345678A")]         // non-digit character
-    public void FrenchRpps_InvalidValues_FailValidation(string? rpps)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).FrenchRpps();
-
-        ValidationResult result = validator.Validate(new TestModel(rpps));
-
-        result.IsValid.ShouldBeFalse();
-        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchRpps");
-    }
-
     // =========================================================================
     // E164Phone
     // =========================================================================
@@ -127,40 +54,6 @@ public sealed class IdentifierValidatorExtensionsTests
     }
 
     // =========================================================================
-    // FrenchAdeli
-    // =========================================================================
-
-    [Theory]
-    [InlineData("123456789")]
-    [InlineData("000000001")]
-    public void FrenchAdeli_ValidValues_PassValidation(string adeli)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).FrenchAdeli();
-
-        ValidationResult result = validator.Validate(new TestModel(adeli));
-
-        result.IsValid.ShouldBeTrue();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("12345678")]            // 8 digits
-    [InlineData("1234567890")]          // 10 digits
-    [InlineData("12345678A")]           // non-digit
-    public void FrenchAdeli_InvalidValues_FailValidation(string? adeli)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).FrenchAdeli();
-
-        ValidationResult result = validator.Validate(new TestModel(adeli));
-
-        result.IsValid.ShouldBeFalse();
-        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchAdeli");
-    }
-
-    // =========================================================================
     // Iban
     // =========================================================================
 
@@ -196,40 +89,6 @@ public sealed class IdentifierValidatorExtensionsTests
 
         result.IsValid.ShouldBeFalse();
         result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidIban");
-    }
-
-    // =========================================================================
-    // FrenchFiness
-    // =========================================================================
-
-    [Theory]
-    [InlineData("750100018")]           // valid Luhn 9-digit Finess
-    public void FrenchFiness_ValidValues_PassValidation(string finess)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).FrenchFiness();
-
-        ValidationResult result = validator.Validate(new TestModel(finess));
-
-        result.IsValid.ShouldBeTrue();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("75010001")]            // 8 digits
-    [InlineData("7501000180")]          // 10 digits
-    [InlineData("750100019")]           // wrong Luhn check
-    [InlineData("75010001A")]           // non-digit
-    public void FrenchFiness_InvalidValues_FailValidation(string? finess)
-    {
-        InlineValidator<TestModel> validator = [];
-        validator.RuleFor(x => x.Value).FrenchFiness();
-
-        ValidationResult result = validator.Validate(new TestModel(finess));
-
-        result.IsValid.ShouldBeFalse();
-        result.Errors[0].ErrorMessage.ShouldBe("Granit:Validation:InvalidFrenchFiness");
     }
 
     // -------------------------------------------------------------------------

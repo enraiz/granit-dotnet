@@ -1,0 +1,24 @@
+{
+  "culture": "pt",
+  "texts": {
+    "Granit:Validation:InvalidBelgianNiss": "O número de identificação nacional belga (NISS) é inválido.",
+    "Granit:Validation:InvalidFrenchRpps": "O identificador profissional francês RPPS é inválido.",
+    "Granit:Validation:InvalidFrenchAdeli": "O número ADELI francês (profissional de saúde) é inválido.",
+    "Granit:Validation:InvalidFrenchFiness": "O número FINESS francês (estabelecimento de saúde) é inválido.",
+    "Granit:Validation:InvalidBelgianInami": "O número INAMI/RIZIV do prestador de cuidados de saúde belga é inválido.",
+    "Granit:Validation:InvalidBelgianEid": "O número do cartão de identidade eletrónico belga (eID) é inválido.",
+    "Granit:Validation:InvalidFrenchNir": "O número de identificação francês (NIR / Numéro de Sécurité Sociale) é inválido.",
+    "Granit:Validation:InvalidFrenchSiren": "O identificador de empresa francês (SIREN) é inválido.",
+    "Granit:Validation:InvalidFrenchSiret": "O identificador de estabelecimento francês (SIRET) é inválido.",
+    "Granit:Validation:InvalidBelgianBce": "O número de empresa belga (BCE / KBO) é inválido.",
+    "Granit:Validation:InvalidBelgianVat": "O número de IVA belga (TVA / BTW) é inválido.",
+    "Granit:Validation:InvalidFrenchVat": "O número de IVA intracomunitário francês é inválido.",
+    "Granit:Validation:InvalidEuropeanVat": "O número de IVA europeu é inválido.",
+    "Granit:Validation:InvalidFrenchPostalCode": "O código postal francês é inválido (esperados 5 dígitos, intervalo 01000–99999).",
+    "Granit:Validation:InvalidBelgianPostalCode": "O código postal belga é inválido (esperados 4 dígitos, intervalo 1000–9999).",
+    "Granit:Validation:InvalidFrenchInseeCode": "O código de município INSEE francês é inválido.",
+    "Granit:Validation:InvalidFrenchNafCode": "O código de atividade NAF/APE francês é inválido (esperados 4 dígitos seguidos de uma letra, ex.: 6201Z).",
+    "Granit:Validation:InvalidFrenchRib": "O número de conta bancária francês (RIB) é inválido.",
+    "Granit:Validation:InvalidBelgianAccountNumber": "O número de conta bancária belga é inválido."
+  }
+}

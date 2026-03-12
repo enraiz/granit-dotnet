@@ -19,7 +19,7 @@ namespace Granit.Templating.Scriban.GlobalContexts;
 ///   <item><term><c>{{ context.culture }}</c></term><description><c>fr-BE</c></description></item>
 ///   <item><term><c>{{ context.culture_name }}</c></term><description><c>français (Belgique)</c></description></item>
 ///   <item><term><c>{{ context.tenant_id }}</c></term><description><c>3fa85f64-…</c> or empty string</description></item>
-///   <item><term><c>{{ context.tenant_name }}</c></term><description><c>Hôpital Saint-Luc</c> or empty string</description></item>
+///   <item><term><c>{{ context.tenant_name }}</c></term><description><c>Acme Corp</c> or empty string</description></item>
 /// </list>
 /// </para>
 /// <para>

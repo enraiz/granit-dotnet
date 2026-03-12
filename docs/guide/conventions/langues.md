@@ -8,9 +8,9 @@
 | --- | --- |
 | Code C# (identifiants, XML docs, commentaires `//`) | Anglais |
 | Code TypeScript/React (identifiants, JSDoc, commentaires) | Anglais |
-| `docs/**/*.md` | Français |
+| `docs/**/*.md` | Anglais (migration en cours, pages legacy en français) |
 | Issues GitLab (titre, description, commentaires) | Français |
-| Commits (Conventional Commits) | Français |
+| Commits (Conventional Commits) | Anglais |
 | `CLAUDE.md`, skills | Anglais |
 | Fichiers de localisation (`Localization/**/*.json`) | 17 cultures |
 

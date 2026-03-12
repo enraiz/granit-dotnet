@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
-- **Issue** : [#25](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/25)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Caching, Granit.Caching.StackExchangeRedis, Granit.Caching.Hybrid)
 
@@ -90,5 +89,5 @@ Ce choix devrait être réévalué si :
 ## Références
 
 - Commit initial : `76378865` (2026-02-21)
-- Issues : [#25](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/25), [#27](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/27), [#28](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/28)
+- Issues : #25, #27, #28
 - StackExchange.Redis : <https://github.com/StackExchange/StackExchange.Redis>

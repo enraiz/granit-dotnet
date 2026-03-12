@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Authentication.Keycloak</PackageId>
-    <Description>Extension Keycloak pour Granit.Authentication.JwtBearer : transformation des claims realm_access/resource_access, policy Admin, configuration JWT Bearer depuis la section "Keycloak".</Description>
+    <Description>Keycloak extension for Granit.Authentication.JwtBearer: realm_access/resource_access claims transformation, Admin policy, JWT Bearer configuration from the "Keycloak" config section.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

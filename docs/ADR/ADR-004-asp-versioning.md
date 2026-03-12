@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-22
-- **Issue** : [#78](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/78)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.ApiVersioning)
 

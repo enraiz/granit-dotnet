@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.DataExchange</PackageId>
-    <Description>Socle d'import de données pour Granit. Pipeline streaming Extract → Map → Validate → Execute avec Fluent API (ImportDefinition), smart mapping 4-tier (Saved → Exact → Fuzzy → Semantic IA optionnelle RGPD-safe), résolution INSERT/UPDATE (roundtrip), rapport partiel, et fichier de correction.</Description>
+    <Description>Data import foundation for Granit. Streaming pipeline Extract, Map, Validate, Execute with Fluent API (ImportDefinition), 4-tier smart mapping (Saved, Exact, Fuzzy, optional GDPR-safe semantic AI), INSERT/UPDATE resolution (roundtrip), partial report and correction file.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

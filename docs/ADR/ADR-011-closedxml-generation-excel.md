@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-27
-- **Issue** : [#326](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/326)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.DocumentGeneration.Excel)
 

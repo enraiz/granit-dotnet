@@ -1,0 +1,24 @@
+{
+  "culture": "cs",
+  "texts": {
+    "Granit:Validation:InvalidBelgianNiss": "Belgické národní identifikační číslo (NISS) je neplatné.",
+    "Granit:Validation:InvalidFrenchRpps": "Francouzský profesní identifikátor RPPS je neplatný.",
+    "Granit:Validation:InvalidFrenchAdeli": "Francouzské profesní číslo ADELI je neplatné.",
+    "Granit:Validation:InvalidFrenchFiness": "Francouzské číslo zařízení Finess je neplatné.",
+    "Granit:Validation:InvalidBelgianInami": "Belgické číslo poskytovatele zdravotní péče INAMI/RIZIV je neplatné.",
+    "Granit:Validation:InvalidBelgianEid": "Číslo belgického elektronického občanského průkazu (eID) je neplatné.",
+    "Granit:Validation:InvalidFrenchNir": "Francouzské národní identifikační číslo (NIR / Social Security Number) je neplatné.",
+    "Granit:Validation:InvalidFrenchSiren": "Francouzský identifikátor podniku (SIREN) je neplatný.",
+    "Granit:Validation:InvalidFrenchSiret": "Francouzský identifikátor provozovny (SIRET) je neplatný.",
+    "Granit:Validation:InvalidBelgianBce": "Belgické číslo podniku (BCE / KBO) je neplatné.",
+    "Granit:Validation:InvalidBelgianVat": "Belgické číslo DPH (TVA / BTW) je neplatné.",
+    "Granit:Validation:InvalidFrenchVat": "Francouzské číslo DPH (intra-Community VAT) je neplatné.",
+    "Granit:Validation:InvalidEuropeanVat": "Evropské číslo DPH je neplatné.",
+    "Granit:Validation:InvalidFrenchPostalCode": "Francouzské poštovní směrovací číslo je neplatné (očekáváno 5 číslic, rozsah 01000–99999).",
+    "Granit:Validation:InvalidBelgianPostalCode": "Belgické poštovní směrovací číslo je neplatné (očekávány 4 číslice, rozsah 1000–9999).",
+    "Granit:Validation:InvalidFrenchInseeCode": "Francouzský kód obce INSEE je neplatný.",
+    "Granit:Validation:InvalidFrenchNafCode": "Francouzský kód činnosti NAF/APE je neplatný (očekávány 4 číslice následované písmenem, např. 6201Z).",
+    "Granit:Validation:InvalidFrenchRib": "Francouzské číslo bankovního účtu RIB je neplatné.",
+    "Granit:Validation:InvalidBelgianAccountNumber": "Belgické číslo bankovního účtu je neplatné."
+  }
+}

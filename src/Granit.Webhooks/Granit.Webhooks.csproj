@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Webhooks</PackageId>
-    <Description>Moteur d'envoi de webhooks sortants pour Granit. Dispatch asynchrone via l'Outbox Wolverine, signature HMAC-SHA256 anti-replay, backoff exponentiel durable, agnostique au type de payload (thin ISO 27001 ou fat standard).</Description>
+    <Description>Outbound webhook delivery engine for Granit. Async dispatch via Wolverine outbox, HMAC-SHA256 anti-replay signatures, durable exponential backoff, payload-type agnostic (thin ISO 27001 or fat standard).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

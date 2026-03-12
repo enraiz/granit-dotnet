@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-27
-- **Issue** : [#322](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/322)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Templating.Scriban)
 

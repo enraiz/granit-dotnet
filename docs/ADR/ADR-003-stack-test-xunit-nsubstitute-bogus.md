@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-21
-- **Issue** : [#4](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/4)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet, applications consommatrices
 

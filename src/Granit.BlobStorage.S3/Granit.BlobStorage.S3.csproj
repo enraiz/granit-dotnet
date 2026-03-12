@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.BlobStorage.S3</PackageId>
-    <Description>Implémentation S3-compatible pour Granit.BlobStorage. Génération de Pre-signed URLs via AWSSDK.S3, isolation multi-tenant par préfixe (PrefixBlobKeyStrategy), suppression physique d'objets. Compatible OVHcloud Object Storage (production) et MinIO (développement local).</Description>
+    <Description>S3-compatible implementation for Granit.BlobStorage. Pre-signed URL generation via AWSSDK.S3, multi-tenant isolation by prefix (PrefixBlobKeyStrategy), physical object deletion. Compatible with any S3-compatible provider (AWS, MinIO, etc.).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

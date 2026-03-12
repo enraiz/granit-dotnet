@@ -1,9 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:abp.io)",
       "Bash(git merge:*)",
-      "mcp__sonarqube__sonar_quality_gate",
       "Bash(glab *)",
       "Bash(glab -R:*)",
       "Bash(dotnet *)",
@@ -12,9 +10,6 @@
       "Bash(git stash:*)",
       "Bash(python3:*)",
       "Bash(find:*)"
-    ],
-    "additionalDirectories": [
-      "/home/jf/dev/digital-dynamics/"
     ]
   }
 }

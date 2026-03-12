@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.BlobStorage</PackageId>
-    <Description>Module de stockage de fichiers mutables pour Granit. Architecture Direct-to-Cloud : génération de Pre-signed URLs (upload/download) S3-compatibles, isolation multi-tenant par préfixe TenantId, pipeline de validation post-upload (IBlobValidator), cycle de vie BlobDescriptor avec Crypto-Shredding RGPD.</Description>
+    <Description>Mutable file storage module for Granit. Direct-to-Cloud architecture: S3-compatible pre-signed URL generation (upload/download), multi-tenant isolation by TenantId prefix, post-upload validation pipeline (IBlobValidator), BlobDescriptor lifecycle with GDPR crypto-shredding.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

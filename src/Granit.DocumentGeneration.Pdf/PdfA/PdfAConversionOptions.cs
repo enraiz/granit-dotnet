@@ -13,7 +13,7 @@ public sealed class PdfAConversionOptions
     /// <summary>
     /// Optional Factur-X / ZUGFeRD XML content to embed as an attachment.
     /// When set, the resulting PDF/A-3b will contain the XML as an associated file
-    /// per the Factur-X specification (NF Z 55-140).
+    /// per the Factur-X / ZUGFeRD specification (EN 16931).
     /// </summary>
     public string? FacturXXmlContent { get; init; }
 

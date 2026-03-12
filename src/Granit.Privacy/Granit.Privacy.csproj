@@ -2,10 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Privacy</PackageId>
-    <Description>Abstractions PIMS reutilisables pour les droits des utilisateurs (GDPR, ISO 27001).
-    Data Subject Export via Wolverine Saga (scatter-gather), Data Subject Deletion via events,
-    Legal Agreements versioning, IDataProviderRegistry.
-    Conforme GDPR/ISO 27001.</Description>
+    <Description>Reusable PIMS abstractions for data subject rights (GDPR, ISO 27001). Data Subject Export via Wolverine Saga (scatter-gather), Data Subject Deletion via events, Legal Agreements versioning, IDataProviderRegistry.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

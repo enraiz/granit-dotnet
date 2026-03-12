@@ -25,13 +25,13 @@
 Ne **jamais** cibler `main` pour une branche `feature/*` ou `fix/*` sauf demande
 explicite. En cas de doute, demander avant de créer la MR.
 
-## Commits (Conventional Commits, en français)
+## Commits (Conventional Commits, en anglais)
 
 ```text
-feat(vault): ajouter le chiffrement Transit AES-256
-fix(persistence): corriger l'intercepteur d'audit sur les entités détachées
-docs(guide): créer le guide des conventions de codage
-chore(ci): mettre à jour la pipeline GitLab CI
+feat(vault): add Transit AES-256 encryption
+fix(persistence): handle audit interceptor on detached entities
+docs(guide): create coding conventions guide
+chore(ci): update GitLab CI pipeline
 ```
 
 Types disponibles : `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`.

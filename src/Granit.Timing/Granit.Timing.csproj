@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Timing</PackageId>
-    <Description>Abstraction IClock pour l'acces au temps systeme et les conversions de fuseau horaire. Utilise System.TimeProvider en interne.</Description>
+    <Description>IClock abstraction for system time access and timezone conversions. Uses System.TimeProvider internally.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

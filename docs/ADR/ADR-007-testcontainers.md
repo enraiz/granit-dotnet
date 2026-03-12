@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-24
-- **Issue** : [#117](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/117)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Wolverine.Postgresql.IntegrationTests)
 

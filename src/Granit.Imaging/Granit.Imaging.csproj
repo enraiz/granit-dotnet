@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Imaging</PackageId>
-    <Description>Couche d'abstraction pour la manipulation d'images : interfaces IImageProcessor et IImagePipeline (API fluide), enums (ImageFormat, ResizeMode), value types et ImageResult. Les implémentations concrètes (Magick.NET, etc.) vivent dans des packages séparés.</Description>
+    <Description>Image processing abstraction layer: IImageProcessor and IImagePipeline interfaces (fluent API), enums (ImageFormat, ResizeMode), value types and ImageResult. Concrete implementations (Magick.NET, etc.) live in separate packages.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

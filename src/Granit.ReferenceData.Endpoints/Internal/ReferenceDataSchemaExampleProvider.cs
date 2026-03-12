@@ -9,35 +9,32 @@ namespace Granit.ReferenceData.Endpoints.Internal;
 /// </summary>
 internal sealed class ReferenceDataSchemaExampleProvider : ISchemaExampleProvider
 {
-    private const string ExampleBelgique = "Belgique";
-    private const string ExampleBelgica = "Bélgica";
-
     /// <inheritdoc/>
     public IReadOnlyDictionary<Type, JsonNode> GetExamples() =>
         new Dictionary<Type, JsonNode>
         {
             [typeof(ReferenceDataCreateRequest)] = new JsonObject
             {
-                ["code"] = "BE",
-                ["labelEn"] = "Belgium",
-                ["labelFr"] = ExampleBelgique,
-                ["labelNl"] = "België",
-                ["labelDe"] = "Belgien",
-                ["labelEs"] = ExampleBelgica,
-                ["labelIt"] = "Belgio",
-                ["labelPt"] = ExampleBelgica,
-                ["sortOrder"] = 56,
+                ["code"] = "EUR",
+                ["labelEn"] = "Europe",
+                ["labelFr"] = "Europe",
+                ["labelNl"] = "Europa",
+                ["labelDe"] = "Europa",
+                ["labelEs"] = "Europa",
+                ["labelIt"] = "Europa",
+                ["labelPt"] = "Europa",
+                ["sortOrder"] = 1,
             },
             [typeof(ReferenceDataUpdateRequest)] = new JsonObject
             {
-                ["labelEn"] = "Belgium",
-                ["labelFr"] = ExampleBelgique,
-                ["labelNl"] = "België",
-                ["labelDe"] = "Belgien",
-                ["labelEs"] = ExampleBelgica,
-                ["labelIt"] = "Belgio",
-                ["labelPt"] = ExampleBelgica,
-                ["sortOrder"] = 56,
+                ["labelEn"] = "Europe",
+                ["labelFr"] = "Europe",
+                ["labelNl"] = "Europa",
+                ["labelDe"] = "Europa",
+                ["labelEs"] = "Europa",
+                ["labelIt"] = "Europa",
+                ["labelPt"] = "Europa",
+                ["sortOrder"] = 1,
                 ["isActive"] = true,
             },
         };

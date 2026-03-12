@@ -2,7 +2,6 @@
 
 - **Statut** : Accepté
 - **Date** : 2026-02-24
-- **Issue** : [#183](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/issues/183)
 - **Auteurs** : Jean-François Meyers
 - **Portée** : granit-dotnet (Granit.Validation, Granit.Wolverine)
 

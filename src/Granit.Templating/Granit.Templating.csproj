@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Templating</PackageId>
-    <Description>Socle de templating générique pour Granit. Pipeline résolution → rendu Scriban → texte/HTML. Sans dépendance tierce : moteur et renderer concrets fournis séparément (Granit.Templating.Scriban, Granit.DocumentGeneration.*).</Description>
+    <Description>Generic templating foundation for Granit. Pipeline: resolution, rendering, text/HTML output. No third-party dependencies: concrete engines and renderers provided separately (Granit.Templating.Scriban, Granit.DocumentGeneration.*).</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

@@ -94,4 +94,4 @@ Changes are documented in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-Proprietary. All rights reserved. See [LICENSE](LICENSE).
+Licensed under the [Apache License 2.0](LICENSE).

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Features</PackageId>
-    <Description>Module de Feature Management SaaS pour Granit. Résolution multi-niveaux (Default → Plan → Tenant), cache hybride IHybridCache, [RequiresFeature] ASP.NET Core et Wolverine, IFeatureLimitGuard pour les limites numériques.</Description>
+    <Description>SaaS feature management module for Granit. Multi-level resolution (Default, Plan, Tenant), IHybridCache, [RequiresFeature] for ASP.NET Core and Wolverine, IFeatureLimitGuard for numeric limits.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
