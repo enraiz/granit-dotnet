@@ -32,8 +32,7 @@ coverage-report/
 *~
 
 # --- AI tools (Claude Code) ---
-# Commit skills (shared with all contributors), ignore local settings
-.claude/settings.json
+# Commit settings.json and skills (shared with all contributors), ignore local overrides
 .claude/settings.local.json
 
 # --- OS ---
