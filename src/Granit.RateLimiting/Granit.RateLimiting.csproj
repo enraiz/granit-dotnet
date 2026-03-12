@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.RateLimiting</PackageId>
+    <Description>Per-tenant rate limiting for Granit. Sliding window, fixed window, token bucket algorithms via Redis. Plan-based quotas via Granit.Features integration. ASP.NET Core middleware (429 + Retry-After) and Wolverine behavior.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.RateLimiting.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.ExceptionHandling\Granit.ExceptionHandling.csproj" />
+    <ProjectReference Include="..\Granit.Features\Granit.Features.csproj" />
+    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
+  </ItemGroup>
+
+</Project>
