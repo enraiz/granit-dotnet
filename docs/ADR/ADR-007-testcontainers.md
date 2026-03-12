@@ -1,78 +1,77 @@
-# ADR-007 : Testcontainers — Tests d'intégration conteneurisés
+# ADR-007: Testcontainers — Containerized Integration Tests
 
-- **Statut** : Accepté
-- **Date** : 2026-02-24
-- **Auteurs** : Jean-François Meyers
-- **Portée** : granit-dotnet (Granit.Wolverine.Postgresql.IntegrationTests)
+- **Status**: Accepted
+- **Date**: 2026-02-24
+- **Authors**: Jean-François Meyers
+- **Scope**: granit-dotnet (Granit.Wolverine.Postgresql.IntegrationTests)
 
-## Contexte
+## Context
 
-Les tests d'intégration de Granit nécessitent une base de données PostgreSQL
-réelle pour valider les comportements spécifiques au SGBD : migrations EF Core,
-outbox Wolverine, filtres globaux multi-tenant, requêtes JSONB, etc.
+Granit integration tests require a real PostgreSQL database to validate
+DBMS-specific behaviors: EF Core migrations, Wolverine outbox, multi-tenant
+global filters, JSONB queries, etc.
 
-Les alternatives in-memory (EF Core InMemory, SQLite) ne reproduisent pas
-fidèlement le comportement PostgreSQL et masquent des bugs qui n'apparaissent
-qu'en production.
+In-memory alternatives (EF Core InMemory, SQLite) do not faithfully reproduce
+PostgreSQL behavior and mask bugs that only appear in production.
 
-## Décision
+## Decision
 
-**Testcontainers** (`Testcontainers.PostgreSql`) pour orchestrer des conteneurs
-PostgreSQL éphémères dans les tests d'intégration.
+**Testcontainers** (`Testcontainers.PostgreSql`) to orchestrate ephemeral
+PostgreSQL containers in integration tests.
 
-## Alternatives évaluées
+## Alternatives considered
 
-### Option 1 : Testcontainers (retenue)
+### Option 1: Testcontainers (selected)
 
-- **Licence** : MIT
-- **Avantage** : conteneur PostgreSQL réel démarré à la demande, isolation
-  complète par test, nettoyage automatique, API fluent .NET, support xUnit
+- **License**: MIT
+- **Advantage**: real PostgreSQL container started on demand, complete
+  isolation per test, automatic cleanup, .NET fluent API, xUnit support
   via `IAsyncLifetime`
-- **CI** : compatible GitLab CI (Docker-in-Docker ou service container)
+- **CI**: compatible with GitLab CI (Docker-in-Docker or service container)
 
-### Option 2 : EF Core InMemory
+### Option 2: EF Core InMemory
 
-- **Avantage** : rapide, zéro dépendance infrastructure
-- **Inconvénient** : pas de SQL réel (pas de migrations, pas de contraintes FK,
-  pas de JSONB, pas de transactions), faux sentiment de confiance,
-  bugs masqués en production
+- **Advantage**: fast, zero infrastructure dependency
+- **Disadvantage**: no real SQL (no migrations, no FK constraints,
+  no JSONB, no transactions), false sense of confidence,
+  bugs masked in production
 
-### Option 3 : SQLite (EF Core)
+### Option 3: SQLite (EF Core)
 
-- **Avantage** : SQL réel sans serveur, rapide
-- **Inconvénient** : dialecte SQL différent de PostgreSQL (pas de JSONB,
-  pas de schémas, types différents), migrations non portables,
-  comportement transactionnel différent
+- **Advantage**: real SQL without a server, fast
+- **Disadvantage**: SQL dialect different from PostgreSQL (no JSONB,
+  no schemas, different types), non-portable migrations,
+  different transactional behavior
 
-### Option 4 : Base de test PostgreSQL partagée
+### Option 4: Shared PostgreSQL test database
 
-- **Avantage** : pas de Docker, rapidité (pas de démarrage conteneur)
-- **Inconvénient** : state partagé entre tests (isolation difficile),
-  nettoyage manuel, CI non reproductible (dépend d'un serveur externe),
-  conflits entre développeurs
+- **Advantage**: no Docker, speed (no container startup)
+- **Disadvantage**: shared state between tests (difficult isolation),
+  manual cleanup, non-reproducible CI (depends on external server),
+  conflicts between developers
 
 ## Justification
 
-| Critère | Testcontainers | InMemory | SQLite | Base partagée |
-| ------- | -------------- | -------- | ------ | ------------- |
-| Fidélité PostgreSQL | Totale | Nulle | Partielle | Totale |
-| Isolation | Par test | Par test | Par test | Difficile |
-| Reproductibilité CI | Oui | Oui | Oui | Non |
-| Vitesse | Moyen (~3-5s init) | Très rapide | Rapide | Rapide |
-| Zéro infra externe | Oui (Docker) | Oui | Oui | Non |
-| Migrations EF Core | Oui | Non | Partiel | Oui |
+| Criterion | Testcontainers | InMemory | SQLite | Shared DB |
+| --------- | -------------- | -------- | ------ | --------- |
+| PostgreSQL fidelity | Full | None | Partial | Full |
+| Isolation | Per test | Per test | Per test | Difficult |
+| CI reproducibility | Yes | Yes | Yes | No |
+| Speed | Medium (~3-5s init) | Very fast | Fast | Fast |
+| Zero external infra | Yes (Docker) | Yes | Yes | No |
+| EF Core migrations | Yes | No | Partial | Yes |
 
-## Conséquences
+## Consequences
 
-### Positives
+### Positive
 
-- Tests fidèles au comportement production (vrai PostgreSQL)
-- Isolation complète : chaque suite de tests a sa propre base
-- CI reproductible sans dépendance externe
-- Détection précoce des bugs liés au SGBD (types, contraintes, transactions)
+- Tests faithful to production behavior (real PostgreSQL)
+- Complete isolation: each test suite has its own database
+- Reproducible CI without external dependency
+- Early detection of DBMS-related bugs (types, constraints, transactions)
 
-### Négatives
+### Negative
 
-- Nécessite Docker sur les postes de développement et en CI
-- Temps de démarrage du conteneur (~3-5 secondes par suite de tests)
-- Consommation mémoire plus élevée que les alternatives in-memory
+- Requires Docker on development machines and in CI
+- Container startup time (~3-5 seconds per test suite)
+- Higher memory consumption than in-memory alternatives

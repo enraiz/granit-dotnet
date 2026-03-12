@@ -1,96 +1,96 @@
-# ADR-NNN : Titre court et descriptif
+# ADR-NNN: Short descriptive title
 
-- **Statut** : Accepté | Proposé | Déprécié | Remplacé par [ADR-NNN](ADR-NNN-xxx.md)
-- **Date** : YYYY-MM-DD
-- **Issue** : [#NNN](URL) (si applicable)
-- **Auteurs** : Jean-François Meyers
-- **Portée** : repo-name (packages ou modules concernés)
+- **Status**: Accepted | Proposed | Deprecated | Superseded by [ADR-NNN](ADR-NNN-xxx.md)
+- **Date**: YYYY-MM-DD
+- **Issue**: [#NNN](URL) (if applicable)
+- **Authors**: Jean-François Meyers
+- **Scope**: repo-name (affected packages or modules)
 
-> Voir aussi : [Titre ADR lié](URL) (si référence croisée inter-repo nécessaire)
+> See also: [Related ADR title](URL) (if cross-repo reference needed)
 
-## Contexte
+## Context
 
-Décrire le problème, le besoin fonctionnel ou technique, et les contraintes
-(réglementaires, techniques, budgétaires) qui motivent la décision.
+Describe the problem, the functional or technical need, and the constraints
+(regulatory, technical, budgetary) that motivate the decision.
 
-## Décision
+## Decision
 
-**Résumé en gras de la décision prise.** Une à deux phrases.
+**Bold summary of the decision made.** One to two sentences.
 
-## Alternatives évaluées
+## Alternatives considered
 
-### Option 1 : Nom (retenue)
+### Option 1: Name (selected)
 
-- **Licence** : MIT | Apache-2.0 | …
-- **Avantage** : …
-- (pas d'inconvénient listé pour l'option retenue — les limites sont dans Conséquences)
+- **License**: MIT | Apache-2.0 | ...
+- **Advantage**: ...
+- (no disadvantage listed for the selected option — limitations are in Consequences)
 
-### Option 2 : Nom
+### Option 2: Name
 
-- **Licence** : …
-- **Avantage** : …
-- **Inconvénient** : raison du rejet
+- **License**: ...
+- **Advantage**: ...
+- **Disadvantage**: reason for rejection
 
-### Option 3 : Nom
+### Option 3: Name
 
-- …
+- ...
 
 ## Justification
 
-Tableau comparatif synthétique des alternatives sur les critères discriminants :
+Synthetic comparison table of alternatives on discriminating criteria:
 
-| Critère | Option 1 | Option 2 | Option 3 |
-| ------- | -------- | -------- | -------- |
-| Licence | MIT | Commercial | Apache-2.0 |
-| Critère A | Oui | Non | Partiel |
-| Critère B | … | … | … |
+| Criterion | Option 1 | Option 2 | Option 3 |
+| --------- | -------- | -------- | -------- |
+| License | MIT | Commercial | Apache-2.0 |
+| Criterion A | Yes | No | Partial |
+| Criterion B | ... | ... | ... |
 
-## Configuration déployée
+## Deployed configuration
 
-> Section **optionnelle** — pertinente pour les décisions d'infrastructure ou
-> les bibliothèques avec une configuration significative par environnement.
+> **Optional** section — relevant for infrastructure decisions or
+> libraries with significant per-environment configuration.
 
-| Paramètre | Staging | Production |
+| Parameter | Staging | Production |
 | --------- | ------- | ---------- |
 | Version | x.y.z | x.y.z |
-| … | … | … |
+| ... | ... | ... |
 
-## Conséquences
+## Consequences
 
-### Positives
+### Positive
 
-- Point positif 1
-- Point positif 2
+- Positive point 1
+- Positive point 2
 
-### Négatives
+### Negative
 
-- Compromis accepté 1
-- Compromis accepté 2
+- Accepted trade-off 1
+- Accepted trade-off 2
 
-## Actions de suivi
+## Follow-up actions
 
-> Section **optionnelle** — liste les actions concrètes à réaliser après
-> l'acceptation de l'ADR.
+> **Optional** section — lists concrete actions to perform after
+> the ADR is accepted.
 
-1. **Action 1** : description
-2. **Action 2** : description
+1. **Action 1**: description
+2. **Action 2**: description
 
-## Conditions de réévaluation
+## Re-evaluation conditions
 
-> Section **optionnelle** — décrit les signaux qui devraient déclencher une
-> révision de cette décision.
+> **Optional** section — describes signals that should trigger a
+> review of this decision.
 
-Ce choix devrait être réévalué si :
+This decision should be re-evaluated if:
 
 - Condition 1
 - Condition 2
 
-## Références
+## References
 
-> Section **optionnelle** — liens vers les commits, issues, modules,
-> documentation externe et ADR liés.
+> **Optional** section — links to commits, issues, modules,
+> external documentation and related ADRs.
 
-- Commit initial : `abc1234` (YYYY-MM-DD, description)
-- Issue : [#NNN — Titre](URL)
-- Documentation : [lien](URL)
-- ADR-NNN : [Titre](ADR-NNN-xxx.md)
+- Initial commit: `abc1234` (YYYY-MM-DD, description)
+- Issue: [#NNN — Title](URL)
+- Documentation: [Title](URL)
+- ADR-NNN: [Title](ADR-NNN-xxx.md)

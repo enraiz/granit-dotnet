@@ -1,142 +1,142 @@
-# ADR-005 : Wolverine + Cronos — Messaging, CQRS et scheduling
+# ADR-005: Wolverine + Cronos — Messaging, CQRS and Scheduling
 
-- **Statut** : Accepté
-- **Date** : 2026-02-22
-- **Auteurs** : Jean-François Meyers
-- **Portée** : granit-dotnet (Granit.Wolverine, Granit.Wolverine.Postgresql, Granit.BackgroundJobs)
+- **Status**: Accepted
+- **Date**: 2026-02-22
+- **Authors**: Jean-François Meyers
+- **Scope**: granit-dotnet (Granit.Wolverine, Granit.Wolverine.Postgresql, Granit.BackgroundJobs)
 
-## Contexte
+## Context
 
-La plateforme nécessite :
+The platform requires:
 
-- **Messaging asynchrone** : envoi de commandes et d'événements entre modules
-  (domain events, integration events) avec garantie de livraison
-- **Outbox transactionnel** : les messages doivent être persistés dans la même
-  transaction que les changements métier (consistance éventuelle sans perte)
-- **CQRS** : séparation commande/query avec un médiateur intégré
-- **Background jobs** : exécution de tâches récurrentes (synchronisation, nettoyage,
-  rapports) avec scheduling cron et résilience multi-instance
-- **Pas de broker externe** : pour le MVP, éviter la complexité opérationnelle
-  d'un RabbitMQ ou Kafka — PostgreSQL doit suffire comme transport
+- **Asynchronous messaging**: sending commands and events between modules
+  (domain events, integration events) with delivery guarantees
+- **Transactional outbox**: messages must be persisted in the same
+  transaction as business changes (eventual consistency without loss)
+- **CQRS**: command/query separation with an integrated mediator
+- **Background jobs**: execution of recurring tasks (synchronization, cleanup,
+  reports) with cron scheduling and multi-instance resilience
+- **No external broker**: for the MVP, avoid the operational complexity
+  of a RabbitMQ or Kafka — PostgreSQL must suffice as transport
 
-Cronos est utilisé comme parser d'expressions cron dans le module
-`Granit.BackgroundJobs` pour la planification des jobs récurrents.
+Cronos is used as the cron expression parser in the `Granit.BackgroundJobs`
+module for recurring job scheduling.
 
-## Décision
+## Decision
 
-- **Wolverine** (WolverineFx) comme bus de messages, médiateur et framework
-  de handlers avec outbox PostgreSQL
-- **Cronos** comme parser d'expressions cron pour le scheduling des background jobs
+- **Wolverine** (WolverineFx) as message bus, mediator and handler framework
+  with PostgreSQL outbox
+- **Cronos** as cron expression parser for background job scheduling
 
-## Alternatives évaluées
+## Alternatives considered
 
-### Messaging / Médiateur
+### Messaging / Mediator
 
-#### Wolverine (retenu)
+#### Wolverine (selected)
 
-- **Licence** : MIT (JasperFx)
-- **Outbox** : transactionnel EF Core natif (`WolverineFx.EntityFrameworkCore`)
-- **Transport** : PostgreSQL natif (`WolverineFx.Postgresql`) — pas de broker requis
-- **Pipeline** : middleware composable (validation, retry, DLQ, logging)
-- **Handlers** : convention-based (pas d'interface à implémenter), découverte auto
-- **Intégration** : FluentValidation middleware natif, support multi-tenancy
+- **License**: MIT (JasperFx)
+- **Outbox**: native EF Core transactional (`WolverineFx.EntityFrameworkCore`)
+- **Transport**: native PostgreSQL (`WolverineFx.Postgresql`) — no broker required
+- **Pipeline**: composable middleware (validation, retry, DLQ, logging)
+- **Handlers**: convention-based (no interface to implement), auto-discovery
+- **Integration**: native FluentValidation middleware, multi-tenancy support
 
 #### MassTransit
 
-- **Licence** : Apache-2.0
-- **Avantage** : très mature, large communauté, support multi-transport
+- **License**: Apache-2.0
+- **Advantage**: very mature, large community, multi-transport support
   (RabbitMQ, Azure SB, Amazon SQS, in-memory)
-- **Inconvénient** : nécessite un broker externe pour la production (RabbitMQ
-  minimum), configuration plus verbeuse, outbox EF Core disponible mais
-  moins intégré que Wolverine, pas de support PostgreSQL-as-transport natif
+- **Disadvantage**: requires an external broker for production (RabbitMQ
+  minimum), more verbose configuration, EF Core outbox available but
+  less integrated than Wolverine, no native PostgreSQL-as-transport
 
 #### MediatR
 
-- **Licence** : Apache-2.0
-- **Avantage** : simple, léger, pattern médiateur pur
-- **Inconvénient** : pas d'outbox, pas de transport, pas de retry/DLQ,
-  pas de scheduling — uniquement un médiateur in-process. Nécessite de
-  combiner avec un autre outil pour le messaging asynchrone
+- **License**: Apache-2.0
+- **Advantage**: simple, lightweight, pure mediator pattern
+- **Disadvantage**: no outbox, no transport, no retry/DLQ,
+  no scheduling — only an in-process mediator. Requires combining
+  with another tool for asynchronous messaging
 
 #### Brighter
 
-- **Licence** : MIT
-- **Avantage** : support outbox, pipeline de middlewares
-- **Inconvénient** : communauté plus restreinte, documentation moins fournie,
-  configuration plus complexe que Wolverine
+- **License**: MIT
+- **Advantage**: outbox support, middleware pipeline
+- **Disadvantage**: smaller community, less comprehensive documentation,
+  more complex configuration than Wolverine
 
 #### NServiceBus
 
-- **Licence** : commerciale (Particular Software)
-- **Avantage** : solution entreprise complète, saga support, monitoring
-- **Inconvénient** : licence payante, incompatible avec la stratégie OSS du projet
+- **License**: commercial (Particular Software)
+- **Advantage**: complete enterprise solution, saga support, monitoring
+- **Disadvantage**: paid license, incompatible with the project's OSS strategy
 
 ### Scheduling / Cron
 
-#### Cronos (retenu)
+#### Cronos (selected)
 
-- **Licence** : MIT
-- **Avantage** : parser cron léger et rapide, support des secondes optionnel,
-  calcul du prochain déclenchement sans état
-- **Utilisation** : intégré dans `RecurringJobAttribute` et `CronSchedulerAgent`
+- **License**: MIT
+- **Advantage**: lightweight and fast cron parser, optional seconds support,
+  next occurrence calculation without state
+- **Usage**: integrated in `RecurringJobAttribute` and `CronSchedulerAgent`
 
 #### Quartz.NET
 
-- **Avantage** : scheduler complet avec persistance, clustering, triggers avancés
-- **Inconvénient** : surdimensionné (scheduler complet alors que Wolverine gère
-  déjà l'exécution), duplication de responsabilité, configuration lourde
+- **Advantage**: complete scheduler with persistence, clustering, advanced triggers
+- **Disadvantage**: oversized (complete scheduler when Wolverine already handles
+  execution), responsibility duplication, heavy configuration
 
 #### Hangfire
 
-- **Licence** : LGPL-3.0 (core), commercial (Pro)
-- **Avantage** : dashboard intégré, jobs récurrents, retry automatique
-- **Inconvénient** : doublon avec Wolverine (transport, retry, DLQ), licence
-  restrictive pour les fonctionnalités avancées
+- **License**: LGPL-3.0 (core), commercial (Pro)
+- **Advantage**: built-in dashboard, recurring jobs, automatic retry
+- **Disadvantage**: overlap with Wolverine (transport, retry, DLQ), restrictive
+  license for advanced features
 
 #### NCrontab
 
-- **Avantage** : parser cron simple et léger
-- **Inconvénient** : pas de support des secondes, API moins moderne que Cronos,
-  maintenance réduite
+- **Advantage**: simple and lightweight cron parser
+- **Disadvantage**: no seconds support, less modern API than Cronos,
+  reduced maintenance
 
 ## Justification
 
 ### Messaging
 
-| Critère | Wolverine | MassTransit | MediatR | Brighter | NServiceBus |
-| ------- | --------- | ----------- | ------- | -------- | ----------- |
-| Licence | MIT | Apache-2.0 | Apache-2.0 | MIT | Commercial |
-| Outbox EF Core | Natif | Oui | Non | Oui | Oui |
-| PostgreSQL transport | Natif | Non | N/A | Non | Non |
-| Broker requis | Non | Oui (prod) | N/A | Oui | Oui |
-| Pipeline middleware | Oui | Oui | Oui | Oui | Oui |
-| FluentValidation | Natif | Tiers | Tiers | Non | Non |
-| Convention-based | Oui | Partiel | Non | Non | Non |
-| Multi-tenancy | Oui | Oui | Non | Non | Oui |
+| Criterion | Wolverine | MassTransit | MediatR | Brighter | NServiceBus |
+| --------- | --------- | ----------- | ------- | -------- | ----------- |
+| License | MIT | Apache-2.0 | Apache-2.0 | MIT | Commercial |
+| EF Core outbox | Native | Yes | No | Yes | Yes |
+| PostgreSQL transport | Native | No | N/A | No | No |
+| Broker required | No | Yes (prod) | N/A | Yes | Yes |
+| Middleware pipeline | Yes | Yes | Yes | Yes | Yes |
+| FluentValidation | Native | Third-party | Third-party | No | No |
+| Convention-based | Yes | Partial | No | No | No |
+| Multi-tenancy | Yes | Yes | No | No | Yes |
 
 ### Scheduling
 
-| Critère | Cronos | Quartz.NET | Hangfire | NCrontab |
-| ------- | ------ | ---------- | -------- | -------- |
-| Licence | MIT | Apache-2.0 | LGPL/Commercial | Apache-2.0 |
-| Scope | Parser seul | Scheduler complet | Scheduler complet | Parser seul |
-| Secondes | Optionnel | Oui | Non | Non |
-| Poids | Très léger | Lourd | Moyen | Léger |
+| Criterion | Cronos | Quartz.NET | Hangfire | NCrontab |
+| --------- | ------ | ---------- | -------- | -------- |
+| License | MIT | Apache-2.0 | LGPL/Commercial | Apache-2.0 |
+| Scope | Parser only | Complete scheduler | Complete scheduler | Parser only |
+| Seconds | Optional | Yes | No | No |
+| Weight | Very light | Heavy | Medium | Light |
 
-## Conséquences
+## Consequences
 
-### Positives
+### Positive
 
-- Pas de broker externe : PostgreSQL suffit comme transport (simplicité opérationnelle)
-- Outbox transactionnel : zéro perte de message, consistance éventuelle garantie
-- Pipeline Wolverine unifié : validation, retry, DLQ, logging, tracing
-- Cronos léger : juste un parser, l'orchestration est gérée par Wolverine
-- Licence MIT pour l'ensemble de la stack
+- No external broker: PostgreSQL suffices as transport (operational simplicity)
+- Transactional outbox: zero message loss, guaranteed eventual consistency
+- Unified Wolverine pipeline: validation, retry, DLQ, logging, tracing
+- Lightweight Cronos: just a parser, orchestration is handled by Wolverine
+- MIT license for the entire stack
 
-### Négatives
+### Negative
 
-- Wolverine est moins connu que MassTransit (communauté plus restreinte)
-- Dépendance sur JasperFx (mainteneur principal : Jeremy D. Miller)
-- Si le besoin d'un broker apparaît (RabbitMQ, Kafka), migration nécessaire
-  (Wolverine supporte RabbitMQ et Azure SB, mais pas Kafka nativement)
-- PostgreSQL-as-transport a des limites de débit vs un broker dédié
+- Wolverine is less known than MassTransit (smaller community)
+- Dependency on JasperFx (primary maintainer: Jeremy D. Miller)
+- If a broker need arises (RabbitMQ, Kafka), migration required
+  (Wolverine supports RabbitMQ and Azure SB, but not Kafka natively)
+- PostgreSQL-as-transport has throughput limits vs a dedicated broker

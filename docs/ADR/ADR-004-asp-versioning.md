@@ -1,69 +1,69 @@
-# ADR-004 : Asp.Versioning — Versionnement d'API REST
+# ADR-004: Asp.Versioning — REST API Versioning
 
-- **Statut** : Accepté
-- **Date** : 2026-02-22
-- **Auteurs** : Jean-François Meyers
-- **Portée** : granit-dotnet (Granit.ApiVersioning)
+- **Status**: Accepted
+- **Date**: 2026-02-22
+- **Authors**: Jean-François Meyers
+- **Scope**: granit-dotnet (Granit.ApiVersioning)
 
-## Contexte
+## Context
 
-Les API REST de la plateforme doivent supporter le versionnement pour
-permettre l'évolution des contrats sans casser les clients existants. Ce besoin
-est particulièrement critique dans un contexte santé (ISO 27001) où les intégrateurs
-tiers (laboratoires, DPI) ont des cycles de mise à jour longs.
+The platform REST APIs must support versioning to allow contract evolution
+without breaking existing clients. This need is particularly critical in a
+healthcare context (ISO 27001) where third-party integrators (laboratories,
+EHR systems) have long update cycles.
 
-Le versionnement doit être :
+Versioning must be:
 
-- **Explicite** : chaque endpoint déclare sa version
-- **Négociable** : le client choisit la version via URL, header ou query string
-- **Documenté** : les versions apparaissent dans l'OpenAPI spec (Scalar UI)
+- **Explicit**: each endpoint declares its version
+- **Negotiable**: the client chooses the version via URL, header or query string
+- **Documented**: versions appear in the OpenAPI spec (Scalar UI)
 
-## Décision
+## Decision
 
-**Asp.Versioning.Mvc** (+ ApiExplorer) pour le versionnement sémantique des API.
+**Asp.Versioning.Mvc** (+ ApiExplorer) for semantic API versioning.
 
-## Alternatives évaluées
+## Alternatives considered
 
-### Option 1 : Asp.Versioning (retenue)
+### Option 1: Asp.Versioning (selected)
 
-- **Licence** : MIT (.NET Foundation)
-- **Avantage** : package officiel .NET Foundation (ex-Microsoft.AspNetCore.Mvc.Versioning),
-  support URL segment (`/api/v1/…`), header (`api-version`), query string (`?api-version=1`),
-  media type. Intégration ApiExplorer pour OpenAPI
-- **Maturité** : 8+ ans, migration depuis le package Microsoft historique
+- **License**: MIT (.NET Foundation)
+- **Advantage**: official .NET Foundation package (formerly Microsoft.AspNetCore.Mvc.Versioning),
+  support for URL segment (`/api/v1/...`), header (`api-version`), query string (`?api-version=1`),
+  media type. ApiExplorer integration for OpenAPI
+- **Maturity**: 8+ years, migrated from the historical Microsoft package
 
-### Option 2 : Versionnement URL manuel (convention de routage)
+### Option 2: Manual URL versioning (routing convention)
 
-- **Avantage** : zéro dépendance, simple pour des cas basiques
-- **Inconvénient** : pas de négociation de version, pas de sunset policies,
-  duplication de code entre versions, pas d'intégration OpenAPI automatique
+- **Advantage**: zero dependency, simple for basic cases
+- **Disadvantage**: no version negotiation, no sunset policies,
+  code duplication between versions, no automatic OpenAPI integration
 
-### Option 3 : Convention de nommage custom (namespace-based)
+### Option 3: Custom naming convention (namespace-based)
 
-- **Avantage** : organisation claire du code par namespace/version
-- **Inconvénient** : nécessite un framework maison, pas de standard,
-  maintenance et documentation à charge de l'équipe
+- **Advantage**: clear code organization by namespace/version
+- **Disadvantage**: requires a homegrown framework, no standard,
+  maintenance and documentation burden on the team
 
 ## Justification
 
-| Critère | Asp.Versioning | URL manuel | Custom |
-| ------- | -------------- | ---------- | ------ |
-| Standard .NET | Oui (.NET Foundation) | Non | Non |
-| Modes de version | URL, header, QS, media type | URL seul | Variable |
-| OpenAPI intégré | Oui (ApiExplorer) | Non | Non |
-| Sunset policies | Oui | Non | Non |
-| Effort maintenance | Nul (communauté) | Élevé | Très élevé |
+| Criterion | Asp.Versioning | Manual URL | Custom |
+| --------- | -------------- | ---------- | ------ |
+| .NET standard | Yes (.NET Foundation) | No | No |
+| Version modes | URL, header, QS, media type | URL only | Variable |
+| Integrated OpenAPI | Yes (ApiExplorer) | No | No |
+| Sunset policies | Yes | No | No |
+| Maintenance effort | None (community) | High | Very high |
 
-## Conséquences
+## Consequences
 
-### Positives
+### Positive
 
-- Standard de l'écosystème .NET, documentation abondante
-- Versionnement multi-modal (URL segment par défaut dans Granit)
-- Intégration automatique avec Scalar UI via ApiExplorer
-- Sunset headers pour la dépréciation progressive des anciennes versions
+- .NET ecosystem standard, abundant documentation
+- Multi-modal versioning (URL segment by default in Granit)
+- Automatic integration with Scalar UI via ApiExplorer
+- Sunset headers for progressive deprecation of old versions
 
-### Négatives
+### Negative
 
-- Version preview (10.0.0-preview.1) pour .NET 10 — à surveiller
-- Configuration initiale nécessaire (convention par défaut dans `GranitApiVersioningModule`)
+- Preview version (10.0.0-preview.1) for .NET 10 — to monitor
+- Initial configuration required (default convention in `GranitApiVersioningModule`)

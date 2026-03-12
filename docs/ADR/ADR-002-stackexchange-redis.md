@@ -1,93 +1,93 @@
-# ADR-002 : Redis via StackExchange.Redis — Cache distribué
+# ADR-002: Redis via StackExchange.Redis — Distributed Cache
 
-- **Statut** : Accepté
-- **Date** : 2026-02-21
-- **Auteurs** : Jean-François Meyers
-- **Portée** : granit-dotnet (Granit.Caching, Granit.Caching.StackExchangeRedis, Granit.Caching.Hybrid)
+- **Status**: Accepted
+- **Date**: 2026-02-21
+- **Authors**: Jean-François Meyers
+- **Scope**: granit-dotnet (Granit.Caching, Granit.Caching.StackExchangeRedis, Granit.Caching.Hybrid)
 
-## Contexte
+## Context
 
-Le framework Granit fournit les abstractions de cache (`Granit.Caching`) et
-nécessite un backend de cache distribué pour :
+The Granit framework provides cache abstractions (`Granit.Caching`) and
+requires a distributed cache backend for:
 
-- **Performance** : réduire la latence des lectures fréquentes (settings, traductions,
+- **Performance**: reducing latency for frequent reads (settings, translations,
   templates, permissions)
-- **Scalabilité** : cache partagé entre les instances Kubernetes (sticky sessions
-  impossibles en contexte ISO 27001 — haute disponibilité requise)
-- **Idempotence** : stockage des clés d'idempotence HTTP
-- **SignalR** : backplane Redis pour les notifications temps réel
+- **Scalability**: shared cache across Kubernetes instances (sticky sessions
+  impossible in an ISO 27001 context — high availability required)
+- **Idempotency**: HTTP idempotency key storage
+- **SignalR**: Redis backplane for real-time notifications
 
-Le choix du backend de cache conditionne l'implémentation de
-`Granit.Caching.StackExchangeRedis` et le pattern L1+L2 de `Granit.Caching.Hybrid`.
+The choice of cache backend determines the implementation of
+`Granit.Caching.StackExchangeRedis` and the L1+L2 pattern of `Granit.Caching.Hybrid`.
 
-## Décision
+## Decision
 
-**Redis** via **StackExchange.Redis** comme backend de cache distribué (L2),
-combiné avec `Microsoft.Extensions.Caching.Hybrid` pour le pattern L1+L2.
+**Redis** via **StackExchange.Redis** as the distributed cache backend (L2),
+combined with `Microsoft.Extensions.Caching.Hybrid` for the L1+L2 pattern.
 
-## Alternatives évaluées
+## Alternatives considered
 
-### Option 1 : Redis via StackExchange.Redis (retenue)
+### Option 1: Redis via StackExchange.Redis (selected)
 
-- **Licence** : MIT (StackExchange.Redis)
-- **Avantage** : standard de facto, intégration native `IDistributedCache`,
-  support HybridCache, Pub/Sub pour invalidation, backplane SignalR
+- **License**: MIT (StackExchange.Redis)
+- **Advantage**: de facto standard, native `IDistributedCache` integration,
+  HybridCache support, Pub/Sub for invalidation, SignalR backplane
 
-### Option 2 : Memcached
+### Option 2: Memcached
 
-- **Avantage** : simple, léger, performant pour du key-value pur
-- **Inconvénient** : pas de Pub/Sub, pas de structures de données avancées,
-  pas de persistance, pas de backplane SignalR
+- **Advantage**: simple, lightweight, performant for pure key-value
+- **Disadvantage**: no Pub/Sub, no advanced data structures,
+  no persistence, no SignalR backplane
 
-### Option 3 : NCache
+### Option 3: NCache
 
-- **Avantage** : solution .NET native, topologies avancées
-- **Inconvénient** : licence commerciale, communauté restreinte,
-  pas d'intégration HybridCache standard
+- **Advantage**: .NET native solution, advanced topologies
+- **Disadvantage**: commercial license, limited community,
+  no standard HybridCache integration
 
-### Option 4 : Microsoft Garnet
+### Option 4: Microsoft Garnet
 
-- **Avantage** : compatible Redis protocol, performances supérieures
-- **Inconvénient** : projet récent (2024), pas de managed service, risque
-  de stabilité pour un usage production ISO 27001
+- **Advantage**: Redis protocol compatible, superior performance
+- **Disadvantage**: recent project (2024), no managed service, stability risk
+  for ISO 27001 production use
 
 ## Justification
 
-| Critère | SE.Redis | Memcached | NCache | Garnet |
-| ------- | -------- | --------- | ------ | ------ |
-| Licence client | MIT | Apache-2.0 | Freemium | MIT |
-| IDistributedCache | Natif MS | Tiers | Tiers | Compatible |
-| HybridCache .NET 10 | Oui | Non | Non | Compatible |
-| Pub/Sub | Oui | Non | Oui | Oui |
-| SignalR backplane | Oui (MS officiel) | Non | Non | Non testé |
-| Maturité | 10+ ans | Mature | Mature | Récent |
+| Criterion | SE.Redis | Memcached | NCache | Garnet |
+| --------- | -------- | --------- | ------ | ------ |
+| Client license | MIT | Apache-2.0 | Freemium | MIT |
+| IDistributedCache | Native MS | Third-party | Third-party | Compatible |
+| HybridCache .NET 10 | Yes | No | No | Compatible |
+| Pub/Sub | Yes | No | Yes | Yes |
+| SignalR backplane | Yes (MS official) | No | No | Untested |
+| Maturity | 10+ years | Mature | Mature | Recent |
 
-## Conséquences
+## Consequences
 
-### Positives
+### Positive
 
-- Intégration native avec le DI Microsoft (`IDistributedCache`, `HybridCache`)
-- Client MIT, stable et très largement adopté
-- Pub/Sub pour l'invalidation de cache et backplane SignalR
-- Pipeline HybridCache L1+L2 transparent via `Granit.Caching`
+- Native integration with Microsoft DI (`IDistributedCache`, `HybridCache`)
+- MIT client, stable and very widely adopted
+- Pub/Sub for cache invalidation and SignalR backplane
+- Transparent L1+L2 HybridCache pipeline via `Granit.Caching`
 
-### Négatives
+### Negative
 
-- Redis est une dépendance infrastructure supplémentaire à opérer
-- Licence Redis 7.4+ (SSPL) : à surveiller si self-hosted
-- Sérialisation des objets complexes nécessite une stratégie cohérente
+- Redis is an additional infrastructure dependency to operate
+- Redis 7.4+ license (SSPL): to monitor if self-hosted
+- Complex object serialization requires a consistent strategy
 
-## Conditions de réévaluation
+## Re-evaluation conditions
 
-Ce choix devrait être réévalué si :
+This decision should be re-evaluated if:
 
-- Microsoft Garnet atteint la maturité production et offre un managed service
-- La licence Redis (SSPL) devient problématique pour le déploiement self-hosted
-- Les besoins de cache évoluent vers un pattern incompatible avec Redis
-  (ex. cache distribué géographiquement)
+- Microsoft Garnet reaches production maturity and offers a managed service
+- The Redis license (SSPL) becomes problematic for self-hosted deployment
+- Cache needs evolve toward a pattern incompatible with Redis
+  (e.g. geographically distributed cache)
 
-## Références
+## References
 
-- Commit initial : `76378865` (2026-02-21)
-- Issues : #25, #27, #28
-- StackExchange.Redis : <https://github.com/StackExchange/StackExchange.Redis>
+- Initial commit: `76378865` (2026-02-21)
+- Issues: #25, #27, #28
+- StackExchange.Redis: <https://github.com/StackExchange/StackExchange.Redis>

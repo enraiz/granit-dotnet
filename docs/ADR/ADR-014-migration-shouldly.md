@@ -1,99 +1,99 @@
-# ADR-014 : Migrer FluentAssertions vers Shouldly
+# ADR-014: Migrate FluentAssertions to Shouldly
 
-- **Statut** : Accepté
-- **Date** : 2026-02-28
-- **Auteurs** : Jean-François Meyers
-- **Portée** : granit-dotnet, applications consommatrices
+- **Status**: Accepted
+- **Date**: 2026-02-28
+- **Authors**: Jean-François Meyers
+- **Scope**: granit-dotnet, consuming applications
 
-## Contexte
+## Context
 
-FluentAssertions est la bibliothèque d'assertions utilisée dans tous les projets de
-test (`*.Tests`) de granit-dotnet et des applications consommatrices.
+FluentAssertions is the assertion library used in all test projects (`*.Tests`)
+of granit-dotnet and consuming applications.
 
-À partir de la **version 7.x**, FluentAssertions a été acquis par **Xceed Software**
-et a changé de licence : passage de **MIT** à la **Xceed Community License Agreement**.
-Cette nouvelle licence **interdit l'usage commercial** sans achat d'une licence payante.
+Starting with **version 7.x**, FluentAssertions was acquired by **Xceed Software**
+and changed its license: from **MIT** to the **Xceed Community License Agreement**.
+This new license **prohibits commercial use** without purchasing a paid license.
 
-La plateforme est un produit commercial (santé, certification ISO 27001). L'utilisation
-de FluentAssertions 8.x dans ce contexte constitue une **non-conformité de licence**.
+The platform is a commercial product (healthcare, ISO 27001 certification). Using
+FluentAssertions 8.x in this context constitutes a **license non-compliance**.
 
-## Décision
+## Decision
 
-**Migrer vers Shouldly** comme bibliothèque d'assertions pour tous les projets de test.
+**Migrate to Shouldly** as the assertion library for all test projects.
 
-## Alternatives évaluées
+## Alternatives considered
 
-### Option 1 : Shouldly (retenue)
+### Option 1: Shouldly (selected)
 
-- **Licence** : Apache-2.0 (permissive, compatible usage commercial)
-- **Maturité** : projet stable, maintenu activement, large communauté
-- **Impact** : remplacement des assertions uniquement, le framework de test xUnit
-  reste inchangé
-- **API** : syntaxe concise et lisible (`actual.ShouldBe(expected)`)
+- **License**: Apache-2.0 (permissive, compatible with commercial use)
+- **Maturity**: stable project, actively maintained, large community
+- **Impact**: assertion replacement only, the xUnit test framework
+  remains unchanged
+- **API**: concise and readable syntax (`actual.ShouldBe(expected)`)
 
-### Option 2 : Rétrograder vers FluentAssertions 6.x (MIT)
+### Option 2: Downgrade to FluentAssertions 6.x (MIT)
 
-- **Licence** : MIT (dernière version sous licence permissive)
-- **Avantage** : aucune migration de code nécessaire
-- **Inconvénient** : version en fin de vie, plus aucune mise à jour de sécurité
-  ni correctif. Incompatible avec une stratégie de maintenance à long terme
+- **License**: MIT (last version under permissive license)
+- **Advantage**: no code migration required
+- **Disadvantage**: end-of-life version, no more security updates or
+  patches. Incompatible with a long-term maintenance strategy
 
-### Option 3 : TUnit (remplacement complet xUnit + FluentAssertions)
+### Option 3: TUnit (complete xUnit + FluentAssertions replacement)
 
-- **Licence** : Apache-2.0
-- **Avantage** : framework de test moderne avec assertions intégrées
-  (`Assert.That(x).IsEqualTo(42)`), parallélisme natif via source generators
-  (pas de réflexion au runtime), DI native dans les tests, lifecycle par attributs
-  (`[Before]`, `[After]`) sans `IAsyncLifetime`
-- **Performance** : significativement plus rapide que xUnit sur les grandes suites
-  de tests grâce aux source generators et au parallélisme par défaut
-- **Inconvénient** : implique le remplacement complet du framework de test
-  (xUnit → TUnit), pas uniquement des assertions. Migration : attributs (`[Fact]` →
-  `[Test]`, `[Theory]` → `[Test]` + `[Arguments]`), lifecycle, DI, runner CI
+- **License**: Apache-2.0
+- **Advantage**: modern test framework with built-in assertions
+  (`Assert.That(x).IsEqualTo(42)`), native parallelism via source generators
+  (no runtime reflection), native DI in tests, attribute-based lifecycle
+  (`[Before]`, `[After]`) without `IAsyncLifetime`
+- **Performance**: significantly faster than xUnit on large test suites
+  thanks to source generators and default parallelism
+- **Disadvantage**: implies complete test framework replacement
+  (xUnit -> TUnit), not just assertions. Migration: attributes (`[Fact]` ->
+  `[Test]`, `[Theory]` -> `[Test]` + `[Arguments]`), lifecycle, DI, CI runner
 
-**Discussion (2026-02-28)** : le framework Granit n'étant pas encore en production
-et le volume de tests étant faible, le coût de migration vers TUnit serait
-actuellement minime. Cependant :
+**Discussion (2026-02-28)**: since the Granit framework is not yet in production
+and the test volume is low, the migration cost to TUnit would currently be
+minimal. However:
 
-1. **xUnit v3 vient de sortir** avec des améliorations substantielles (parallélisme,
-   `CancellationToken` natif, meilleure DI) qui réduisent l'écart de performance
-2. **Risque asymétrique** : si TUnit stagne (projet jeune, mainteneur unique),
-   le framework se retrouve sur un framework niche sans écosystème ni support
-   communautaire large. L'écosystème .NET (Testcontainers, Verify, etc.) cible
-   principalement xUnit/NUnit
-3. **Séparation des préoccupations** : découpler le choix d'assertion (problème
-   immédiat de licence) du choix de framework (décision architecturale distincte)
-   permet de traiter l'urgence sans prendre de pari spéculatif
+1. **xUnit v3 just released** with substantial improvements (parallelism,
+   native `CancellationToken`, better DI) that reduce the performance gap
+2. **Asymmetric risk**: if TUnit stagnates (young project, single maintainer),
+   the framework ends up on a niche framework without ecosystem or broad
+   community support. The .NET ecosystem (Testcontainers, Verify, etc.)
+   primarily targets xUnit/NUnit
+3. **Separation of concerns**: decoupling the assertion choice (immediate
+   license problem) from the framework choice (distinct architectural decision)
+   allows addressing the urgency without speculative bets
 
-**Verdict** : TUnit reste une option à réévaluer quand le projet aura atteint une
-maturité suffisante (v2+, adoption significative, documentation Testcontainers
-officielle). Un ADR dédié pourra être ouvert à ce moment-là pour évaluer une
-migration xUnit → TUnit sur base de données concrètes
+**Verdict**: TUnit remains an option to re-evaluate when the project reaches
+sufficient maturity (v2+, significant adoption, official Testcontainers
+documentation). A dedicated ADR can be opened at that point to evaluate a
+xUnit -> TUnit migration based on concrete data
 
-### Option 4 : Acquérir une licence commerciale Xceed
+### Option 4: Purchase an Xceed commercial license
 
-- **Avantage** : aucune migration
-- **Inconvénient** : coût récurrent, dépendance à un éditeur tiers pour une
-  bibliothèque de test, risque de ré-augmentation tarifaire
+- **Advantage**: no migration
+- **Disadvantage**: recurring cost, dependency on a third-party vendor for a
+  test library, risk of further price increases
 
 ## Justification
 
-| Critère | Shouldly | FA 6.x | TUnit | Licence Xceed |
-| ------- | -------- | ------ | ----- | ------------- |
-| Licence permissive | Apache-2.0 | MIT (EOL) | Apache-2.0 | Payante |
-| Effort de migration | Moyen | Nul | Très élevé | Nul |
-| Pérennité | Maintenance active | Fin de vie | Récent | Dépendance vendor |
-| Compatibilité xUnit | Totale | Totale | Incompatible | Totale |
-| Conformité RGPD/ISO 27001 | Oui | Risque (EOL) | Oui | Oui |
+| Criterion | Shouldly | FA 6.x | TUnit | Xceed License |
+| --------- | -------- | ------ | ----- | ------------- |
+| Permissive license | Apache-2.0 | MIT (EOL) | Apache-2.0 | Paid |
+| Migration effort | Medium | None | Very high | None |
+| Longevity | Active maintenance | End of life | Recent | Vendor dependency |
+| xUnit compatibility | Full | Full | Incompatible | Full |
+| GDPR/ISO 27001 compliance | Yes | Risk (EOL) | Yes | Yes |
 
-Shouldly offre le meilleur rapport conformité / effort de migration / pérennité.
+Shouldly offers the best compliance / migration effort / longevity ratio.
 
-> **Note** : TUnit présente des avantages réels en performance et modernité, mais
-> le risque lié à sa jeunesse (v1.x, écosystème restreint) ne justifie pas de
-> coupler le problème de licence (urgent) à un changement de framework (stratégique).
-> La migration vers TUnit pourra être réévaluée indépendamment via un ADR futur.
+> **Note**: TUnit presents real advantages in performance and modernity, but
+> the risk associated with its youth (v1.x, limited ecosystem) does not justify
+> coupling the license problem (urgent) to a framework change (strategic).
+> Migration to TUnit can be re-evaluated independently via a future ADR.
 
-## Correspondance des assertions
+## Assertion mapping
 
 | FluentAssertions | Shouldly |
 | ---------------- | -------- |
@@ -110,28 +110,28 @@ Shouldly offre le meilleur rapport conformité / effort de migration / pérennit
 | `x.Should().BeGreaterThan(0)` | `x.ShouldBeGreaterThan(0)` |
 | `act.Should().Throw<T>()` | `Should.Throw<T>(() => act())` |
 | `await act.Should().ThrowAsync<T>()` | `await Should.ThrowAsync<T>(() => act())` |
-| `.Because("raison")` | `customMessage: "raison"` |
+| `.Because("reason")` | `customMessage: "reason"` |
 
-## Conséquences
+## Consequences
 
-### Positives
+### Positive
 
-- Conformité de licence restaurée (Apache-2.0)
-- Élimination d'un risque d'audit ISO 27001
-- Bibliothèque activement maintenue
+- License compliance restored (Apache-2.0)
+- ISO 27001 audit risk eliminated
+- Actively maintained library
 
-### Négatives
+### Negative
 
-- Effort de migration ponctuel sur tous les projets `*.Tests`
-- Formation de l'équipe à la syntaxe Shouldly (courbe d'apprentissage faible)
-- Mise à jour de la documentation (`docs/testing/assertions.md`, `CLAUDE.md`)
+- One-time migration effort on all `*.Tests` projects
+- Team training on Shouldly syntax (low learning curve)
+- Documentation update (`docs/testing/assertions.md`, `CLAUDE.md`)
 
-## Plan d'exécution
+## Execution plan
 
-1. Ajouter `Shouldly` dans `Directory.Packages.props` (granit-dotnet + applications consommatrices)
-2. Remplacer les assertions dans chaque projet `*.Tests`
-3. Supprimer `FluentAssertions` de `Directory.Packages.props`
-4. Mettre à jour `THIRD-PARTY-NOTICES.md`
-5. Mettre à jour `docs/testing/assertions.md`
-6. Mettre à jour `CLAUDE.md` (section Tests)
-7. Valider : `dotnet test` passe sans échec
+1. Add `Shouldly` to `Directory.Packages.props` (granit-dotnet + consuming applications)
+2. Replace assertions in each `*.Tests` project
+3. Remove `FluentAssertions` from `Directory.Packages.props`
+4. Update `THIRD-PARTY-NOTICES.md`
+5. Update `docs/testing/assertions.md`
+6. Update `CLAUDE.md` (Tests section)
+7. Validate: `dotnet test` passes without failures
