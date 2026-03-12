@@ -1,3 +1,4 @@
+using Granit.Bulkhead;
 using Granit.Core.Modularity;
 using Granit.Features;
 using Granit.Features.EntityFrameworkCore;
@@ -13,7 +14,7 @@ public static class GranitBuilderSaaSExtensions
 {
     /// <summary>
     /// Adds the SaaS bundle: MultiTenancy, Features, Features.EntityFrameworkCore,
-    /// RateLimiting.
+    /// RateLimiting, Bulkhead.
     /// </summary>
     public static GranitBuilder AddSaaS(this GranitBuilder builder)
     {
@@ -21,6 +22,7 @@ public static class GranitBuilderSaaSExtensions
         builder.AddModule<GranitFeaturesModule>();
         builder.AddModule<GranitFeaturesEntityFrameworkCoreModule>();
         builder.AddModule<GranitRateLimitingModule>();
+        builder.AddModule<GranitBulkheadModule>();
         return builder;
     }
 }
