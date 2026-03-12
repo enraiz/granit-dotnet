@@ -67,3 +67,7 @@ IVaultClient client = vaultClientFactory.Create();
 SecretData secret = await client.V1.Secrets.KeyValue.V2
     .ReadSecretAsync("app/database", cancellationToken: ct);
 ```
+
+## Pour en savoir plus
+
+- [Factory Method — refactoring.guru](https://refactoring.guru/design-patterns/factory-method)

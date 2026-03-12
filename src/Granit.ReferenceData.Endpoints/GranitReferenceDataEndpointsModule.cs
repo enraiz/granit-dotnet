@@ -1,7 +1,4 @@
 using Granit.Core.Modularity;
-using Granit.ReferenceData.Endpoints.Validators;
-using Granit.Validation.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.ReferenceData.Endpoints;
 
@@ -13,11 +10,8 @@ namespace Granit.ReferenceData.Endpoints;
 /// This module does not auto-map routes. The host application must call
 /// <c>app.MapReferenceDataEndpoints&lt;TEntity&gt;()</c> for each entity type.
 /// </para>
+/// <para>Validators are auto-discovered by <c>GranitValidationModule</c>.</para>
 /// </remarks>
 [DependsOn(typeof(GranitReferenceDataModule))]
-public sealed class GranitReferenceDataEndpointsModule : GranitModule
-{
-    /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitValidatorsFromAssemblyContaining<ReferenceDataCreateRequestValidator>();
-}
+public sealed class GranitReferenceDataEndpointsModule : GranitModule;
+

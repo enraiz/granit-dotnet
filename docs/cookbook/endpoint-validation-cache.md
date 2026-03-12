@@ -124,4 +124,4 @@ public static class PatientCacheInvalidationHandler
 - [Caching](../framework/data/caching.md)
 - [Persistance](../framework/data/persistence.md)
 - [Validation](../framework/utilities/validation/index.md)
-- [Pattern Cache-Aside](../patterns/concurrency/cache-aside.md)
+- [Pattern Cache-Aside](../patterns/cloud-saas/cache-aside.md)

@@ -1,10 +1,5 @@
 using Granit.Authorization;
-using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
-using Granit.Templating.Endpoints.Permissions;
-using Granit.Templating.Endpoints.Validators;
-using Granit.Validation.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Templating.Endpoints;
 
@@ -19,17 +14,9 @@ namespace Granit.Templating.Endpoints;
 /// <see cref="Extensions.TemplatingEndpointRouteBuilderExtensions.MapGranitTemplatingAdmin"/>
 /// to register the routes.
 /// </para>
+/// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </remarks>
 [DependsOn(
     typeof(GranitTemplatingModule),
     typeof(GranitAuthorizationModule))]
-public sealed class GranitTemplatingEndpointsModule : GranitModule
-{
-    /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.AddSingleton<IPermissionDefinitionProvider,
-            TemplatingPermissionDefinitionProvider>();
-        context.Services.AddGranitValidatorsFromAssemblyContaining<SaveTemplateRequestValidator>();
-    }
-}
+public sealed class GranitTemplatingEndpointsModule : GranitModule;

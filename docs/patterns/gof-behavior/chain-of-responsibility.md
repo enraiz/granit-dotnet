@@ -78,3 +78,7 @@ public sealed class SubdomainTenantResolver : ITenantResolver
 // Enregistrement
 services.AddSingleton<ITenantResolver, SubdomainTenantResolver>();
 ```
+
+## Pour en savoir plus
+
+- [Chain of Responsibility — refactoring.guru](https://refactoring.guru/design-patterns/chain-of-responsibility)

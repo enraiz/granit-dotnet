@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Bundle.Api</PackageId>
+    <Description>Meta-package grouping Granit modules for a complete REST API: Bundle.Essentials + ApiVersioning, ApiDocumentation, Cors, Idempotency, Localization, Localization.EntityFrameworkCore, Caching.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Bundle.Essentials\Granit.Bundle.Essentials.csproj" />
+    <ProjectReference Include="..\..\Granit.ApiVersioning\Granit.ApiVersioning.csproj" />
+    <ProjectReference Include="..\..\Granit.ApiDocumentation\Granit.ApiDocumentation.csproj" />
+    <ProjectReference Include="..\..\Granit.Cors\Granit.Cors.csproj" />
+    <ProjectReference Include="..\..\Granit.Idempotency\Granit.Idempotency.csproj" />
+    <ProjectReference Include="..\..\Granit.Localization\Granit.Localization.csproj" />
+    <ProjectReference Include="..\..\Granit.Localization.EntityFrameworkCore\Granit.Localization.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\Granit.Caching\Granit.Caching.csproj" />
+  </ItemGroup>
+
+</Project>

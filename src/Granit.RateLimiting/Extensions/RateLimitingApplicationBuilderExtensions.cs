@@ -1,0 +1,19 @@
+using Microsoft.AspNetCore.Builder;
+
+namespace Granit.RateLimiting.Extensions;
+
+/// <summary>
+/// Extension methods for adding Granit rate limiting to the ASP.NET Core pipeline.
+/// </summary>
+/// <remarks>
+/// Rate limiting is applied per-endpoint via <see cref="AspNetCore.RateLimitEndpointExtensions.RequireGranitRateLimiting{TBuilder}"/>,
+/// not as a global middleware. This extension is provided for future global policy support.
+/// </remarks>
+public static class RateLimitingApplicationBuilderExtensions
+{
+    /// <summary>
+    /// Placeholder for future global rate limiting middleware.
+    /// Currently, rate limiting is applied per-endpoint via <c>.RequireGranitRateLimiting("policy")</c>.
+    /// </summary>
+    public static IApplicationBuilder UseGranitRateLimiting(this IApplicationBuilder app) => app;
+}

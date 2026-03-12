@@ -1,4 +1,4 @@
-using Granit.Persistence.Interceptors;
+using Granit.Persistence.Extensions;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
@@ -33,24 +33,7 @@ public static class TimelineEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<TimelineDbContext>((sp, options) =>
-        {
-            configure(options);
-
-            AuditedEntityInterceptor? auditInterceptor =
-                sp.GetService<AuditedEntityInterceptor>();
-            if (auditInterceptor is not null)
-            {
-                options.AddInterceptors(auditInterceptor);
-            }
-
-            SoftDeleteInterceptor? softDeleteInterceptor =
-                sp.GetService<SoftDeleteInterceptor>();
-            if (softDeleteInterceptor is not null)
-            {
-                options.AddInterceptors(softDeleteInterceptor);
-            }
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<TimelineDbContext>(configure);
 
         builder.Services.Replace(
             ServiceDescriptor.Scoped<ITimelineWriter, EfCoreTimelineStore>());

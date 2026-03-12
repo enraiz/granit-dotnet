@@ -126,3 +126,7 @@ public sealed class Patient : FullAuditedEntity, IMultiTenant
 // - IsDeleted, DeletedAt, DeletedBy (soft delete RGPD)
 // - TenantId (isolation multi-tenant via IMultiTenant)
 ```
+
+## Pour en savoir plus
+
+- [Presentation Domain Data Layering — Martin Fowler](https://martinfowler.com/bliki/PresentationDomainDataLayering.html)

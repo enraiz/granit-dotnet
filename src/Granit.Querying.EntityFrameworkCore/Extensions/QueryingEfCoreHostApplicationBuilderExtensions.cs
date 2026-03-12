@@ -1,4 +1,4 @@
-using Granit.Persistence.Interceptors;
+using Granit.Persistence.Extensions;
 using Granit.Querying.EntityFrameworkCore.Internal;
 using Granit.Querying.SavedViews;
 using Microsoft.EntityFrameworkCore;
@@ -24,24 +24,7 @@ public static class QueryingEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<QueryingDbContext>((sp, options) =>
-        {
-            configure(options);
-
-            AuditedEntityInterceptor? auditInterceptor =
-                sp.GetService<AuditedEntityInterceptor>();
-            if (auditInterceptor is not null)
-            {
-                options.AddInterceptors(auditInterceptor);
-            }
-
-            SoftDeleteInterceptor? softDeleteInterceptor =
-                sp.GetService<SoftDeleteInterceptor>();
-            if (softDeleteInterceptor is not null)
-            {
-                options.AddInterceptors(softDeleteInterceptor);
-            }
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<QueryingDbContext>(configure);
 
         // Replace the null-object default from Granit.Querying — CQRS forwarding pattern
         builder.Services.AddScoped<EfCoreSavedViewStore>();

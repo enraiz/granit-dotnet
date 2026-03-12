@@ -75,3 +75,7 @@ descriptor.MarkAsDeleted(clock.Now, "RGPD Art. 17"); // Valid → Deleted ✓
 // Transition invalide → exception
 descriptor.MarkAsValid(); // Deleted → Valid ✗ InvalidOperationException
 ```
+
+## Pour en savoir plus
+
+- [State — refactoring.guru](https://refactoring.guru/design-patterns/state)

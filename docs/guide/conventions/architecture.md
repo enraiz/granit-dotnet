@@ -130,6 +130,123 @@ public static class TaskEndpointRouteBuilderExtensions
 }
 ```
 
+### Pattern REPR (Request-Endpoint-Response)
+
+Granit adopte les **principes** du
+[REPR design pattern](https://deviq.com/design-patterns/repr-design-pattern) en les
+adaptant aux Minimal API natives de .NET. REPR formalise la séparation entre la requête
+entrante, le handler qui la traite, et la réponse retournée — chacun étant un type
+dédié. Cette séparation garantit des contrats OpenAPI propres, une testabilité unitaire
+aisée et un couplage minimal entre couches.
+
+#### Les trois piliers
+
+| Pilier | Règle Granit | Conséquence |
+| --- | --- | --- |
+| **Request** | Un `sealed record` dédié par opération | Pas de réutilisation de l'entité EF, pas de `dynamic` |
+| **Endpoint** | Une méthode `private static` nommée par route | Pas de contrôleur MVC, pas de lambda inline |
+| **Response** | Un `sealed record` distinct de l'entité domaine | Contrat OpenAPI stable, découplé du schéma DB |
+
+#### Ce que Granit fait — et ne fait pas
+
+| Caractéristique | REPR strict (FastEndpoints / Ardalis) | Granit |
+| --- | --- | --- |
+| Request/Response dédiés par opération | Oui | **Oui** |
+| Pas de retour d'entité EF | Oui | **Oui** |
+| Un fichier/classe par endpoint | Oui | **Non** — handlers groupés par feature |
+| Dépendance externe (FastEndpoints, MediatR) | Oui | **Non** — Minimal API natif |
+
+Granit **groupe les handlers par feature** dans une classe d'extensions sur
+`RouteGroupBuilder` au lieu de créer une classe par endpoint. Ce choix pragmatique
+réduit le nombre de fichiers tout en préservant la séparation Request / Endpoint /
+Response.
+
+#### Structure type d'un package Endpoints
+
+```text
+src/Granit.{Module}.Endpoints/
+├── Dtos/
+│   ├── {Module}{Action}Request.cs      ← Request (input body / query)
+│   └── {Module}{Action}Response.cs     ← Response (output)
+├── Endpoints/
+│   ├── {Module}ReadEndpoints.cs        ← Endpoint (handlers lecture)
+│   └── {Module}AdminEndpoints.cs       ← Endpoint (handlers admin)
+└── Extensions/
+    └── {Module}EndpointRouteBuilderExtensions.cs  ← Point d'entrée public
+```
+
+#### Exemple concret (CRUD complet)
+
+```csharp
+// --- Dtos/TaskCreateRequest.cs ---
+/// <summary>Request to create a new task.</summary>
+public sealed record TaskCreateRequest(string Title, string? Description = null);
+
+// --- Dtos/TaskResponse.cs ---
+/// <summary>Represents a task returned by the API.</summary>
+public sealed record TaskResponse(Guid Id, string Title, string? Description);
+
+// --- Endpoints/TaskEndpoints.cs ---
+internal static class TaskEndpoints
+{
+    internal static void MapTaskRoutes(this RouteGroupBuilder group)
+    {
+        group.MapGet("/{id:guid}", GetByIdAsync)
+            .WithName("GetTask")
+            .WithSummary("Returns a task by its unique identifier.");
+
+        group.MapPost("/", CreateAsync)
+            .WithName("CreateTask")
+            .WithSummary("Creates a new task.");
+    }
+
+    private static async Task<Results<Ok<TaskResponse>, NotFound>> GetByIdAsync(
+        Guid id,
+        ITaskReader reader,
+        CancellationToken cancellationToken)
+    {
+        TaskResponse? task = await reader.FindAsync(id, cancellationToken)
+            .ConfigureAwait(false);
+        return task is not null
+            ? TypedResults.Ok(task)
+            : TypedResults.NotFound();
+    }
+
+    private static async Task<Created<TaskResponse>> CreateAsync(
+        TaskCreateRequest request,
+        ITaskWriter writer,
+        CancellationToken cancellationToken)
+    {
+        TaskResponse created = await writer.CreateAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        return TypedResults.Created($"/{created.Id}", created);
+    }
+}
+```
+
+#### Règles de nommage des DTOs
+
+Ces règles sont détaillées dans [style-et-nommage.md](style-et-nommage.md) ; rappel
+rapide dans le contexte REPR :
+
+- **Suffixe `Request`** pour les corps de requête (POST/PUT)
+- **Suffixe `Response`** pour les retours
+- **Jamais `Dto`** comme suffixe
+- **Préfixe métier obligatoire** : `WorkflowTransitionRequest`, pas `TransitionRequest`
+  (OpenAPI aplatit les namespaces)
+- **Types cross-cutting exemptés** : `PagedResult<T>`, `ProblemDetails`
+
+#### Pourquoi pas FastEndpoints / MediatR ?
+
+Granit est un framework open-source minimal : chaque dépendance ajoutée est une
+dépendance que les consommateurs héritent. Les Minimal API natives offrent la même
+séparation Request/Endpoint/Response sans imposer de couche d'abstraction
+supplémentaire. Le regroupement par feature réduit le boilerplate (pas de classe +
+héritage + configuration par endpoint) tout en restant facile à tester via des
+méthodes statiques pures.
+
+> Voir aussi : [Pattern REPR — catalogue complet](../../patterns/architecture/repr.md)
+
 ### Qualité du document OpenAPI
 
 Le document OpenAPI est le **contrat** entre le backend et ses consommateurs (frontend,

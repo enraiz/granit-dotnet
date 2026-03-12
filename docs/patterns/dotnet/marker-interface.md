@@ -57,7 +57,7 @@ classDiagram
 ### Marqueurs d'entités
 
 | Interface | Fichier | Détectée par |
-|-----------|---------|-------------|
+| --------- | ------- | ------------ |
 | `ISoftDeletable` | `src/Granit.Core/Domain/ISoftDeletable.cs` | `SoftDeleteInterceptor`, `ApplyGranitConventions()` |
 | `IMultiTenant` | `src/Granit.Core/Domain/IMultiTenant.cs` | `AuditedEntityInterceptor`, `ApplyGranitConventions()` |
 | `IActive` | `src/Granit.Core/Domain/IActive.cs` | `ApplyGranitConventions()` |
@@ -65,14 +65,14 @@ classDiagram
 ### Marqueurs d'événements
 
 | Interface | Fichier | Détectée par |
-|-----------|---------|-------------|
+| --------- | ------- | ------------ |
 | `IDomainEvent` | `src/Granit.Core/Events/IDomainEvent.cs` | Wolverine routing → local queue |
 | `IIntegrationEvent` | `src/Granit.Core/Events/IIntegrationEvent.cs` | Wolverine routing → transport/Outbox |
 
 ### Marqueurs d'exceptions
 
 | Interface | Fichier | Détectée par |
-|-----------|---------|-------------|
+| --------- | ------- | ------------ |
 | `IUserFriendlyException` | `src/Granit.Core/Exceptions/IUserFriendlyException.cs` | `GranitExceptionHandler` — message exposé au client |
 | `IHasErrorCode` | `src/Granit.Core/Exceptions/IHasErrorCode.cs` | `GranitExceptionHandler` — error code dans ProblemDetails |
 | `IHasValidationErrors` | `src/Granit.Core/Exceptions/IHasValidationErrors.cs` | `GranitExceptionHandler` — field errors dans extensions |
@@ -80,7 +80,7 @@ classDiagram
 ### Marqueurs d'idempotence
 
 | Interface | Fichier | Détectée par |
-|-----------|---------|-------------|
+| --------- | ------- | ------------ |
 | `IIdempotencyMetadata` | `src/Granit.Idempotency/Abstractions/IIdempotencyMetadata.cs` | `IdempotencyMiddleware` — active l'idempotence sur l'endpoint |
 
 ## Justification

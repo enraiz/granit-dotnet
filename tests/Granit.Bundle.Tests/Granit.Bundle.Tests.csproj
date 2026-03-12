@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\bundles\Granit.Bundle.Essentials\Granit.Bundle.Essentials.csproj" />
+    <ProjectReference Include="..\..\src\bundles\Granit.Bundle.Api\Granit.Bundle.Api.csproj" />
+    <ProjectReference Include="..\..\src\bundles\Granit.Bundle.Notifications\Granit.Bundle.Notifications.csproj" />
+    <ProjectReference Include="..\..\src\bundles\Granit.Bundle.Documents\Granit.Bundle.Documents.csproj" />
+    <ProjectReference Include="..\..\src\bundles\Granit.Bundle.SaaS\Granit.Bundle.SaaS.csproj" />
+  </ItemGroup>
+
+</Project>

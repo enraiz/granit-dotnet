@@ -80,6 +80,7 @@ public sealed class MyAppModule : GranitModule
 
 | Section | Content |
 | --- | --- |
+| [Getting Started](docs/guide/getting-started.md) | Build a working Granit API in under 5 minutes |
 | [Framework](docs/framework/index.md) | Architecture, modules, security, data, API, messaging, storage |
 | [Tests](docs/testing/index.md) | xUnit conventions, mocking, assertions, EF Core integration |
 | [Package catalogue](docs/index.md) | Complete list of 100 packages with their roles |

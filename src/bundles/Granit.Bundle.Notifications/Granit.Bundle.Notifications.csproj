@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Bundle.Notifications</PackageId>
+    <Description>Meta-package grouping Granit notification modules: Notifications, EntityFrameworkCore store, Endpoints, Email (SMTP), SignalR real-time channel.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Granit.Notifications\Granit.Notifications.csproj" />
+    <ProjectReference Include="..\..\Granit.Notifications.EntityFrameworkCore\Granit.Notifications.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\Granit.Notifications.Endpoints\Granit.Notifications.Endpoints.csproj" />
+    <ProjectReference Include="..\..\Granit.Notifications.Email\Granit.Notifications.Email.csproj" />
+    <ProjectReference Include="..\..\Granit.Notifications.Email.Smtp\Granit.Notifications.Email.Smtp.csproj" />
+    <ProjectReference Include="..\..\Granit.Notifications.SignalR\Granit.Notifications.SignalR.csproj" />
+  </ItemGroup>
+
+</Project>

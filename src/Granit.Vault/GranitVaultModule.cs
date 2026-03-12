@@ -9,8 +9,8 @@ namespace Granit.Vault;
 
 /// <summary>
 /// Module Granit pour Vault (credentials dynamiques + Transit encryption).
-/// Skip l'enregistrement en Development (pas de Vault en local).
-/// Enregistre <see cref="VaultStringEncryptionProvider"/> si Vault est actif.
+/// Disabled in Development (no Vault required locally).
+/// Registers <see cref="VaultStringEncryptionProvider"/> when enabled.
 /// </summary>
 /// <remarks>
 /// Localization resources (<c>Localization/Vault/{culture}.json</c>) are embedded in this
@@ -20,15 +20,13 @@ namespace Granit.Vault;
 [DependsOn(typeof(GranitEncryptionModule))]
 public sealed class GranitVaultModule : GranitModule
 {
+    /// <inheritdoc />
+    public override bool IsEnabled(ServiceConfigurationContext context) =>
+        !context.Builder.Environment.IsDevelopment();
+
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        if (context.Builder.Environment.IsDevelopment())
-        {
-            return;
-        }
-
         context.Services.AddGranitVault();
-
         context.Services.AddSingleton<IStringEncryptionProvider, VaultStringEncryptionProvider>();
     }
 }

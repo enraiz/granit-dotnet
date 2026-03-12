@@ -74,3 +74,7 @@ public static class CreatePatientHandler
 // PatientCreatedOccurred → local queue → domain handler (même tx)
 // SendWelcomeEmailCommand → Outbox → background handler (après commit)
 ```
+
+## Pour en savoir plus
+
+- [Mediator — refactoring.guru](https://refactoring.guru/design-patterns/mediator)

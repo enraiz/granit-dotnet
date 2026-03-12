@@ -82,3 +82,7 @@ public static class DownloadDocumentHandler
     }
 }
 ```
+
+## Pour en savoir plus
+
+- [Guard Clause — deviq.com](https://deviq.com/design-patterns/guard-clause)

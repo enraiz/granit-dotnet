@@ -61,3 +61,7 @@ builder.AddGranit<MyAppHostModule>();
 // AddGranitPersistence(), AddGranitFeatures(), etc.
 // dans l'ordre topologique des dépendances
 ```
+
+## Pour en savoir plus
+
+- [Builder — refactoring.guru](https://refactoring.guru/design-patterns/builder)

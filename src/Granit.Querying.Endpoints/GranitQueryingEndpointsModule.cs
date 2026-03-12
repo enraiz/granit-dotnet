@@ -1,8 +1,5 @@
 using Granit.Authorization;
 using Granit.Core.Modularity;
-using Granit.Querying.Endpoints.Validators;
-using Granit.Validation.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Querying.Endpoints;
 
@@ -15,13 +12,10 @@ namespace Granit.Querying.Endpoints;
 /// the <c>GET /meta</c> metadata endpoint, and CRUD saved view endpoints.
 /// Requires both <see cref="GranitQueryingModule"/> (core infrastructure)
 /// and <see cref="GranitAuthorizationModule"/> (permission policy enforcement).
+/// Validators are auto-discovered by <c>GranitValidationModule</c>.
 /// </remarks>
 [DependsOn(
     typeof(GranitQueryingModule),
     typeof(GranitAuthorizationModule))]
-public sealed class GranitQueryingEndpointsModule : GranitModule
-{
-    /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddGranitValidatorsFromAssemblyContaining<CreateSavedViewRequestValidator>();
-}
+public sealed class GranitQueryingEndpointsModule : GranitModule;
+

@@ -192,10 +192,11 @@ Chaque package Granit `*.EntityFrameworkCore` qui possède un `DbContext` isolé
 3. **Appel `modelBuilder.ApplyGranitConventions(currentTenant, dataFilter)`** à
    la fin de `OnModelCreating` — applique les query filters pour `ISoftDeletable`,
    `IMultiTenant`, `IActive`, `IProcessingRestrictable` et `IPublishable`.
-4. **Câblage des intercepteurs** dans la méthode d'extension : utiliser la
-   surcharge `(sp, options)` de `AddDbContextFactory` avec
-   `ServiceLifetime.Scoped` et résoudre `AuditedEntityInterceptor` /
-   `SoftDeleteInterceptor` depuis le service provider.
+4. **Câblage des intercepteurs** dans la méthode d'extension : utiliser
+   `AddGranitDbContext<TContext>(configure)` qui encapsule `AddDbContextFactory`
+   avec `ServiceLifetime.Scoped` et résout automatiquement tous les intercepteurs
+   Granit (`AuditedEntityInterceptor`, `VersioningInterceptor`,
+   `DomainEventDispatcherInterceptor`, `SoftDeleteInterceptor`).
 5. **`[DependsOn(typeof(GranitPersistenceModule))]`** sur la classe module.
 6. **Pas de `HasQueryFilter` manuel** dans les configurations d'entité —
    `ApplyGranitConventions` gère tous les filtres standard centralement. Les
@@ -228,20 +229,7 @@ public static IHostApplicationBuilder AddMyEntityFrameworkCore(
     this IHostApplicationBuilder builder,
     Action<DbContextOptionsBuilder> configure)
 {
-    builder.Services.AddDbContextFactory<MyDbContext>((sp, options) =>
-    {
-        configure(options);
-
-        AuditedEntityInterceptor? auditInterceptor =
-            sp.GetService<AuditedEntityInterceptor>();
-        if (auditInterceptor is not null)
-            options.AddInterceptors(auditInterceptor);
-
-        SoftDeleteInterceptor? softDeleteInterceptor =
-            sp.GetService<SoftDeleteInterceptor>();
-        if (softDeleteInterceptor is not null)
-            options.AddInterceptors(softDeleteInterceptor);
-    }, ServiceLifetime.Scoped);
+    builder.Services.AddGranitDbContext<MyDbContext>(configure);
 
     // ... service registrations
     return builder;

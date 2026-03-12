@@ -28,7 +28,7 @@ flowchart TD
 ## Implémentation dans Granit
 
 | Composant | Fichier | Rôle |
-|-----------|---------|------|
+| --------- | ------- | ---- |
 | `DistributedCacheService` | `src/Granit.Caching/DistributedCacheService.cs` | Cache-aside avec double-check locking et chiffrement optionnel |
 | `FeatureChecker` | `src/Granit.Features/Checker/FeatureChecker.cs` | HybridCache pour la résolution de features |
 | `CachedLocalizationOverrideStore` | `src/Granit.Localization/CachedLocalizationOverrideStore.cs` | Cache mémoire pour les overrides de localisation |
@@ -49,7 +49,7 @@ concerné.
 ## Justification
 
 | Problème | Solution |
-|----------|----------|
+| -------- | -------- |
 | Résolution de features trop lente (DB à chaque requête) | Cache L1 (nanosecondes) + L2 Redis (microsecondes) |
 | Stampede sur cache miss (100 requêtes → 100 queries DB) | SemaphoreSlim + double-check locking |
 | Données sensibles en cache Redis | Chiffrement AES-256 conditionnel via `[CacheEncrypted]` |
@@ -68,3 +68,7 @@ PatientDto patient = await cache.GetOrAddAsync(
 // 1er appel → DB + stocke en cache
 // 2e appel → retourné depuis le cache (L1 ou L2)
 ```
+
+## Pour en savoir plus
+
+- [Cache-Aside pattern — Microsoft Cloud Design Patterns](https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside)

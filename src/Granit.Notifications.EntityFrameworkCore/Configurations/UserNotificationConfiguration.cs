@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Granit.Notifications.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Granit.Notifications.EntityFrameworkCore.Configurations;
 
@@ -13,7 +15,14 @@ internal sealed class UserNotificationConfiguration : IEntityTypeConfiguration<U
 
         builder.Property(x => x.NotificationTypeName).HasMaxLength(256).IsRequired();
         builder.Property(x => x.RecipientUserId).HasMaxLength(256).IsRequired();
-        builder.Property(x => x.Data).HasColumnType("jsonb");
+
+        // Provider-agnostic JSON storage. Npgsql auto-maps JsonElement to jsonb;
+        // other providers fall back to the string conversion below.
+        builder.Property(x => x.Data)
+            .HasConversion(new ValueConverter<JsonElement, string>(
+                v => v.GetRawText(),
+                v => JsonDocument.Parse(v, default).RootElement));
+
         builder.Property(x => x.RelatedEntityType).HasMaxLength(256);
         builder.Property(x => x.RelatedEntityId).HasMaxLength(256);
 
@@ -22,7 +31,7 @@ internal sealed class UserNotificationConfiguration : IEntityTypeConfiguration<U
             .IsDescending(false, false, false, true)
             .HasDatabaseName("ix_notification_user_notifications_inbox");
 
-        // Activity feed Odoo-style
+        // Activity feed: per-entity notification history
         builder.HasIndex(x => new { x.RelatedEntityType, x.RelatedEntityId, x.TenantId, x.CreatedAt })
             .IsDescending(false, false, false, true)
             .HasDatabaseName("ix_notification_user_notifications_entity_feed");

@@ -1,8 +1,5 @@
 using Granit.Authorization;
-using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
-using Granit.Timeline.Endpoints.Permissions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Timeline.Endpoints;
 
@@ -15,14 +12,9 @@ namespace Granit.Timeline.Endpoints;
 /// <code>
 /// app.MapTimelineEndpoints();
 /// </code>
+/// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </remarks>
 [DependsOn(
     typeof(GranitTimelineModule),
     typeof(GranitAuthorizationModule))]
-public sealed class GranitTimelineEndpointsModule : GranitModule
-{
-    /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context) =>
-        context.Services.AddSingleton<IPermissionDefinitionProvider,
-            TimelinePermissionDefinitionProvider>();
-}
+public sealed class GranitTimelineEndpointsModule : GranitModule;

@@ -122,3 +122,7 @@ public async Task MigrateTenantDataAsync(
     // Le tenant précédent est automatiquement restauré ici
 }
 ```
+
+## Pour en savoir plus
+
+- [Architect Multitenant Solutions on Azure — Microsoft Azure Architecture Center](https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview)

@@ -3,7 +3,7 @@ using Granit.Notifications.EntityFrameworkCore.Internal;
 using Granit.Notifications.Internal;
 using Granit.Notifications.MobilePush;
 using Granit.Notifications.MobilePush.Internal;
-using Granit.Persistence.Interceptors;
+using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -39,24 +39,7 @@ public static class NotificationsEfCoreHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<DbContextOptionsBuilder> configure)
     {
-        builder.Services.AddDbContextFactory<NotificationDbContext>((sp, options) =>
-        {
-            configure(options);
-
-            AuditedEntityInterceptor? auditInterceptor =
-                sp.GetService<AuditedEntityInterceptor>();
-            if (auditInterceptor is not null)
-            {
-                options.AddInterceptors(auditInterceptor);
-            }
-
-            SoftDeleteInterceptor? softDeleteInterceptor =
-                sp.GetService<SoftDeleteInterceptor>();
-            if (softDeleteInterceptor is not null)
-            {
-                options.AddInterceptors(softDeleteInterceptor);
-            }
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddGranitDbContext<NotificationDbContext>(configure);
 
         // UserNotification store — CQRS forwarding pattern
         builder.Services.RemoveAll<InMemoryUserNotificationStore>();

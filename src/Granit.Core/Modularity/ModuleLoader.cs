@@ -26,6 +26,21 @@ internal static class ModuleLoader
         return TopologicalSort(descriptors);
     }
 
+    /// <summary>
+    /// Loads all modules reachable from multiple root module types
+    /// and returns them in topological order (dependencies first, deduplicated).
+    /// </summary>
+    public static IReadOnlyList<ModuleDescriptor> LoadModules(IEnumerable<Type> moduleTypes)
+    {
+        Dictionary<Type, ModuleDescriptor> descriptors = [];
+        foreach (Type moduleType in moduleTypes)
+        {
+            DiscoverModules(moduleType, descriptors);
+        }
+
+        return TopologicalSort(descriptors);
+    }
+
     private static void DiscoverModules(Type moduleType, Dictionary<Type, ModuleDescriptor> descriptors)
     {
         if (descriptors.ContainsKey(moduleType))

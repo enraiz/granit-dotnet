@@ -3,6 +3,7 @@ using Granit.Core.Modularity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 using Xunit;
 
@@ -38,7 +39,7 @@ public sealed class GranitApplicationExtensionsTests
     {
         HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder([]);
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModule>();
-        GranitApplication granitApp = new(modules);
+        GranitApplication granitApp = new(modules, NullLogger<GranitApplication>.Instance);
         hostBuilder.Services.AddSingleton(granitApp);
 
         using IHost host = hostBuilder.Build();
@@ -57,7 +58,7 @@ public sealed class GranitApplicationExtensionsTests
     {
         HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder([]);
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TrackingModule>();
-        GranitApplication granitApp = new(modules);
+        GranitApplication granitApp = new(modules, NullLogger<GranitApplication>.Instance);
         hostBuilder.Services.AddSingleton(granitApp);
 
         using IHost host = hostBuilder.Build();

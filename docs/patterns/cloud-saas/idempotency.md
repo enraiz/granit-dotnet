@@ -95,3 +95,7 @@ app.MapPost("/api/invoices", async (
 // Deuxième appel (même clé, même body) → 201 Created (replay)
 // Deuxième appel (même clé, body modifié) → 422 Unprocessable Entity
 ```
+
+## Pour en savoir plus
+
+- [Idempotent Requests — Stripe API Documentation](https://docs.stripe.com/api/idempotent_requests)

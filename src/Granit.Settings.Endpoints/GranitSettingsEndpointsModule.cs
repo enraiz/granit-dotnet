@@ -1,12 +1,5 @@
 using Granit.Authorization;
-using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
-using Granit.Settings.Definitions;
-using Granit.Settings.Endpoints.Internal;
-using Granit.Settings.Endpoints.Permissions;
-using Granit.Settings.Endpoints.Validators;
-using Granit.Validation.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Settings.Endpoints;
 
@@ -25,17 +18,9 @@ namespace Granit.Settings.Endpoints;
 /// </list>
 /// Also registers the <see cref="Middleware.SettingsCultureMiddleware"/> setting definitions
 /// for locale and timezone.
+/// Permission and setting definition providers are auto-discovered by their respective modules.
 /// </remarks>
 [DependsOn(
     typeof(GranitSettingsModule),
     typeof(GranitAuthorizationModule))]
-public sealed class GranitSettingsEndpointsModule : GranitModule
-{
-    /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.AddSingleton<ISettingDefinitionProvider, WellKnownSettingDefinitionProvider>();
-        context.Services.AddSingleton<IPermissionDefinitionProvider, SettingsPermissionDefinitionProvider>();
-        context.Services.AddGranitValidatorsFromAssemblyContaining<UpdateSettingValueRequestValidator>();
-    }
-}
+public sealed class GranitSettingsEndpointsModule : GranitModule;
