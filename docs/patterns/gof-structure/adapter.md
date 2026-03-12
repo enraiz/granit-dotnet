@@ -75,3 +75,7 @@ PatientDto patient = await cache.GetOrAddAsync(
     async ct => await db.Patients.FindAsync([patientId], ct),
     cancellationToken);
 ```
+
+## Pour en savoir plus
+
+- [Adapter — refactoring.guru](https://refactoring.guru/design-patterns/adapter)

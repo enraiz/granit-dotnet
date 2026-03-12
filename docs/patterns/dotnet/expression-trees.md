@@ -32,7 +32,7 @@ flowchart TD
 ## Implémentation dans Granit
 
 | Composant | Fichier | Lignes |
-|-----------|---------|--------|
+| --------- | ------- | ------ |
 | `ApplyGranitConventions()` | `src/Granit.Persistence/Extensions/ModelBuilderExtensions.cs` | 54-126 |
 | `FilterProxy` | `src/Granit.Persistence/Extensions/ModelBuilderExtensions.cs` | 133-140 |
 
@@ -83,3 +83,7 @@ List<Patient> patients = await db.Patients.ToListAsync(ct);
 // WHERE (@SoftDeleteEnabled = 0 OR IsDeleted = 0)
 //   AND (@MultiTenantEnabled = 0 OR TenantId = @CurrentTenantId)
 ```
+
+## Pour en savoir plus
+
+- [Expression Trees — Microsoft .NET Documentation](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/)

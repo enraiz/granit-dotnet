@@ -97,3 +97,7 @@ public sealed class MedicalRecord : FullAuditedEntity, IMultiTenant
 }
 // Les interceptors remplissent automatiquement tous les champs d'audit
 ```
+
+## Pour en savoir plus
+
+- [Composite — refactoring.guru](https://refactoring.guru/design-patterns/composite)

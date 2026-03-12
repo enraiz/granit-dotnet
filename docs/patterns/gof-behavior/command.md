@@ -81,3 +81,7 @@ public static class CreateInvoiceHandler
     }
 }
 ```
+
+## Pour en savoir plus
+
+- [Command — refactoring.guru](https://refactoring.guru/design-patterns/command)

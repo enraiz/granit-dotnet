@@ -77,3 +77,7 @@ using (currentTenant.Change(newTenantId))
 }
 // Ici, le tenant précédent est restauré
 ```
+
+## Pour en savoir plus
+
+- [Singleton — refactoring.guru](https://refactoring.guru/design-patterns/singleton)

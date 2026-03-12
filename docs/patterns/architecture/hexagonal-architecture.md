@@ -134,3 +134,7 @@ PresignedUploadTicket ticket = await blobStorage.InitiateUploadAsync(
     new BlobUploadRequest("rapport-irm.pdf", "application/pdf", MaxAllowedBytes: 50_000_000),
     cancellationToken);
 ```
+
+## Pour en savoir plus
+
+- [Hexagonal Architecture — Alistair Cockburn (article original, 2005)](https://alistair.cockburn.us/hexagonal-architecture/)

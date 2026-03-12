@@ -219,6 +219,31 @@ public sealed class OrderCreatedHandler
 - La chaîne de connexion doit pointer sur une base de données **en Europe**,
   jamais sur un service US (Cloud Act)
 
+## Optionalité — quels packages nécessitent Wolverine ?
+
+Wolverine est **optionnel** dans Granit. La grande majorité des packages (85+)
+fonctionnent sans aucune dépendance vers Wolverine. Seuls 8 packages en
+dépendent directement :
+
+| Package | Dépendance Wolverine | Raison |
+| --- | --- | --- |
+| `Granit.Wolverine` | **requise** | Core Wolverine provider-agnostique |
+| `Granit.Wolverine.Postgresql` | **requise** | Outbox PostgreSQL + transactions EF Core |
+| `Granit.BackgroundJobs` | **requise** | Scheduling via Wolverine message bus |
+| `Granit.Notifications` | **requise** | Fan-out multi-canal via message bus |
+| `Granit.Webhooks` | **requise** | Delivery fiable via Wolverine pipeline |
+| `Granit.Privacy` | **requise** | Orchestration RGPD right-to-erasure via handlers |
+| `Granit.DataExchange.Wolverine` | **requise** | Import pipeline long-running via handlers |
+| `Granit.Persistence.Migrations.Wolverine` | **requise** | Auto-migrate Wolverine storage tables |
+
+Tous les autres packages (Core, Security, Authorization, Persistence, Caching,
+Localization, Settings, Features, Identity, Templating, DocumentGeneration,
+BlobStorage, Timeline, Workflow, Querying, etc.) fonctionnent **sans Wolverine**.
+
+> **Règle d'architecture** : si votre application n'a pas besoin de messaging
+> asynchrone (background jobs, notifications, webhooks), vous pouvez utiliser
+> Granit sans aucune référence à Wolverine.
+
 ## Dépendances Granit
 
 | Direction | Modules |

@@ -144,3 +144,7 @@ public static class CreatePatientHandler
 app.MapPost("/api/patients", CreatePatientEndpoint.Handle)
     .RequiresFeature("Acme.MaxUsers");
 ```
+
+## Pour en savoir plus
+
+- [Feature Management — Microsoft Azure App Configuration](https://learn.microsoft.com/en-us/azure/azure-app-configuration/concept-feature-management)

@@ -100,3 +100,7 @@ using (dataFilter.Disable<ISoftDeletable>())
 }
 // Le filtre est automatiquement réactivé ici
 ```
+
+## Pour en savoir plus
+
+- [Query Object — Martin Fowler (PoEAA)](https://martinfowler.com/eaaCatalog/queryObject.html)

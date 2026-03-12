@@ -113,3 +113,7 @@ public static class DischargePatientHandler
     }
 }
 ```
+
+## Pour en savoir plus
+
+- [Federated Identity pattern — Microsoft Cloud Design Patterns](https://learn.microsoft.com/en-us/azure/architecture/patterns/federated-identity)

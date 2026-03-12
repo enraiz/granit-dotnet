@@ -122,3 +122,7 @@ public static class ProcessMedicalReportHandler
     }
 }
 ```
+
+## Pour en savoir plus
+
+- [Sidecar pattern — Microsoft Cloud Design Patterns](https://learn.microsoft.com/en-us/azure/architecture/patterns/sidecar)

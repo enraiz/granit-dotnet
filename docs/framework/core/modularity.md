@@ -110,6 +110,55 @@ La classe de base fournit des implémentations vides (no-op) pour toutes les mé
 Les variantes async appellent par défaut la version sync. Un module qui n'a besoin que de
 déclarer des dépendances sans logique propre peut hériter sans surcharger quoi que ce soit.
 
+### Chargement conditionnel — IsEnabled
+
+Un module peut surcharger `IsEnabled(ServiceConfigurationContext)` pour se désactiver
+dynamiquement selon la configuration ou l'environnement. Un module désactivé :
+
+- **Reste** dans le graphe de dépendances (ses dépendants continuent à fonctionner)
+- **Ne voit pas** ses méthodes `ConfigureServices` et `OnApplicationInitialization` appelées
+- **Apparaît** comme `[DISABLED]` dans les logs de démarrage
+
+```csharp
+// Vault n'est pas nécessaire en développement local
+[DependsOn(typeof(GranitEncryptionModule))]
+public sealed class GranitVaultModule : GranitModule
+{
+    public override bool IsEnabled(ServiceConfigurationContext context) =>
+        !context.Builder.Environment.IsDevelopment();
+
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.AddGranitVault();
+    }
+}
+
+// Redis désactivé si la configuration n'est pas présente
+[DependsOn(typeof(GranitCachingModule))]
+public sealed class GranitCachingRedisModule : GranitModule
+{
+    public override bool IsEnabled(ServiceConfigurationContext context)
+    {
+        var opts = context.Configuration
+            .GetSection("Cache:Redis").Get<RedisCachingOptions>();
+        return opts?.IsEnabled ?? false;
+    }
+}
+```
+
+### Logs de démarrage
+
+Au démarrage, `GranitApplication` logue tous les modules chargés avec leur statut :
+
+```text
+info: Granit.Core.Modularity.GranitApplication
+      Granit module GranitTimingModule [OK]
+      Granit module GranitGuidsModule [OK]
+      Granit module GranitVaultModule [DISABLED]
+      Granit module GranitPersistenceModule [OK]
+      Granit: 4 modules loaded, 3 enabled
+```
+
 ### ServiceConfigurationContext
 
 Le contexte passé à `ConfigureServices` expose :
@@ -119,6 +168,7 @@ Le contexte passé à `ConfigureServices` expose :
 | `Services` | `IServiceCollection` | Collection de services pour l'enregistrement DI |
 | `Configuration` | `IConfiguration` | Configuration de l'application (appsettings, variables d'environnement) |
 | `Builder` | `IHostApplicationBuilder` | Builder complet, nécessaire pour certains modules (ex: Observability utilise `builder.Host.UseSerilog()`) |
+| `ModuleAssemblies` | `IReadOnlyList<Assembly>` | Assemblies de tous les modules chargés (dédupliquées, ordre topologique). Utilisé pour le scanning par convention (validateurs, permission/setting providers) |
 | `Items` | `IDictionary<string, object?>` | Dictionnaire d'état partagé pour la communication inter-modules pendant ConfigureServices |
 
 Exemple avec accès à la configuration et au builder :

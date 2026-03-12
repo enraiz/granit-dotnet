@@ -117,3 +117,7 @@ public static class InvoiceCreatedHandler
     }
 }
 ```
+
+## Pour en savoir plus
+
+- [Transactional Outbox — microservices.io (Chris Richardson)](https://microservices.io/patterns/data/transactional-outbox.html)

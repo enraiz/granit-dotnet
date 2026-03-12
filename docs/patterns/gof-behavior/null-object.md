@@ -40,7 +40,7 @@ classDiagram
 ## Implémentation dans Granit
 
 | Null Object | Fichier | Interface | Comportement |
-|-------------|---------|-----------|-------------|
+| --- | --- | --- | --- |
 | `NullTenantContext` | `src/Granit.Core/MultiTenancy/NullTenantContext.cs` | `ICurrentTenant` | `IsAvailable = false`, `Id = null`, `Change()` → no-op |
 | `NullCacheValueEncryptor` | `src/Granit.Caching/NullCacheValueEncryptor.cs` | `ICacheValueEncryptor` | Passe les bytes sans chiffrement (dev) |
 | `NullWebhookDeliveryStore` | `src/Granit.Webhooks/Internal/NullWebhookDeliveryStore.cs` | `IWebhookDeliveryStore` | Opérations no-op |
@@ -77,3 +77,7 @@ public sealed class FeatureChecker(IServiceProvider sp)
     }
 }
 ```
+
+## Pour en savoir plus
+
+- [Null Object Design Pattern — sourcemaking.com](https://sourcemaking.com/design_patterns/null_object)

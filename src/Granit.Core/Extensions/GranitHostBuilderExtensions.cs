@@ -4,6 +4,7 @@ using Granit.Core.MultiTenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Granit.Core.Extensions;
 
@@ -25,7 +26,8 @@ public static class GranitHostBuilderExtensions
         where TModule : GranitModule
     {
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TModule>();
-        GranitApplication application = new(modules);
+        ILogger<GranitApplication> logger = CreateBootstrapLogger(builder);
+        GranitApplication application = new(modules, logger);
         IReadOnlyList<Assembly> moduleAssemblies = GetDistinctModuleAssemblies(modules);
 
         ServiceConfigurationContext context = new(
@@ -57,7 +59,8 @@ public static class GranitHostBuilderExtensions
         where TModule : GranitModule
     {
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules<TModule>();
-        GranitApplication application = new(modules);
+        ILogger<GranitApplication> logger = CreateBootstrapLogger(builder);
+        GranitApplication application = new(modules, logger);
         IReadOnlyList<Assembly> moduleAssemblies = GetDistinctModuleAssemblies(modules);
 
         ServiceConfigurationContext context = new(
@@ -79,4 +82,16 @@ public static class GranitHostBuilderExtensions
     private static IReadOnlyList<Assembly> GetDistinctModuleAssemblies(
         IReadOnlyList<ModuleDescriptor> modules) =>
         [.. modules.Select(m => m.ModuleType.Assembly).Distinct()];
+
+    /// <summary>
+    /// Creates a bootstrap logger from the host builder's logging configuration.
+    /// This logger is available before the full DI container is built.
+    /// </summary>
+    private static ILogger<GranitApplication> CreateBootstrapLogger(
+        IHostApplicationBuilder builder)
+    {
+        using ILoggerFactory factory = LoggerFactory.Create(lb =>
+            lb.AddConfiguration(builder.Configuration.GetSection("Logging")));
+        return factory.CreateLogger<GranitApplication>();
+    }
 }

@@ -1,8 +1,5 @@
 using Granit.Authorization;
-using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
-using Granit.Localization.Endpoints.Permissions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Localization.Endpoints;
 
@@ -18,16 +15,9 @@ namespace Granit.Localization.Endpoints;
 ///   (requires <c>Localization.Overrides.Manage</c> permission), via
 ///   <see cref="Extensions.LocalizationEndpointRouteBuilderExtensions.MapGranitLocalizationOverrides"/>.</item>
 /// </list>
+/// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </remarks>
 [DependsOn(
     typeof(GranitLocalizationModule),
     typeof(GranitAuthorizationModule))]
-public sealed class GranitLocalizationEndpointsModule : GranitModule
-{
-    /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.AddSingleton<IPermissionDefinitionProvider,
-            LocalizationOverridesPermissionDefinitionProvider>();
-    }
-}
+public sealed class GranitLocalizationEndpointsModule : GranitModule;

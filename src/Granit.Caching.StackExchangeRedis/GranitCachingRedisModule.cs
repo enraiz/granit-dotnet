@@ -30,17 +30,16 @@ namespace Granit.Caching.StackExchangeRedis;
 public sealed class GranitCachingRedisModule : GranitModule
 {
     /// <inheritdoc/>
-    public override void ConfigureServices(ServiceConfigurationContext context)
+    public override bool IsEnabled(ServiceConfigurationContext context)
     {
         RedisCachingOptions redisOpts = context.Configuration
             .GetSection(RedisCachingOptions.SectionName)
             .Get<RedisCachingOptions>() ?? new RedisCachingOptions();
 
-        if (!redisOpts.IsEnabled)
-        {
-            return;
-        }
-
-        context.Services.AddGranitCachingRedis();
+        return redisOpts.IsEnabled;
     }
+
+    /// <inheritdoc/>
+    public override void ConfigureServices(ServiceConfigurationContext context) =>
+        context.Services.AddGranitCachingRedis();
 }

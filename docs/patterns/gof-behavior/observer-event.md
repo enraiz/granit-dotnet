@@ -95,3 +95,8 @@ public static class FeatureAuditLogHandler
     }
 }
 ```
+
+## Pour en savoir plus
+
+- [Observer — refactoring.guru](https://refactoring.guru/design-patterns/observer)
+- [Publisher-Subscriber — Microsoft Cloud Design Patterns](https://learn.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber)

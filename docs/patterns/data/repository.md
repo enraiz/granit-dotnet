@@ -92,3 +92,7 @@ string? value = await reader.GetOrNullAsync(tenantId, "MaxPatients", ct);
 IFeatureStoreWriter writer = serviceProvider.GetRequiredService<IFeatureStoreWriter>();
 await writer.SetAsync(tenantId, "MaxPatients", "500", ct);
 ```
+
+## Pour en savoir plus
+
+- [Repository — Martin Fowler (PoEAA)](https://martinfowler.com/eaaCatalog/repository.html)

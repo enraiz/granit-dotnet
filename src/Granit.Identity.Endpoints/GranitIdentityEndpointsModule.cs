@@ -1,8 +1,5 @@
 using Granit.Authorization;
-using Granit.Authorization.Abstractions;
 using Granit.Core.Modularity;
-using Granit.Identity.Endpoints.Permissions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Identity.Endpoints;
 
@@ -19,17 +16,10 @@ namespace Granit.Identity.Endpoints;
 /// <para>
 /// Exposes user cache management routes via
 /// <see cref="Extensions.IdentityEndpointRouteBuilderExtensions.MapIdentityUserCacheEndpoints"/>.
+/// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </para>
 /// </remarks>
 [DependsOn(
     typeof(GranitIdentityModule),
     typeof(GranitAuthorizationModule))]
-public sealed class GranitIdentityEndpointsModule : GranitModule
-{
-    /// <inheritdoc />
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.AddSingleton<IPermissionDefinitionProvider,
-            IdentityPermissionDefinitionProvider>();
-    }
-}
+public sealed class GranitIdentityEndpointsModule : GranitModule;

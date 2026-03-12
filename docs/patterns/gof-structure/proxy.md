@@ -82,3 +82,7 @@ await db.SaveChangesAsync(ct);
 // → UPDATE Patients SET IsDeleted=1, DeletedAt=..., DeletedBy=... WHERE Id=...
 // → Pas de DELETE physique
 ```
+
+## Pour en savoir plus
+
+- [Proxy — refactoring.guru](https://refactoring.guru/design-patterns/proxy)

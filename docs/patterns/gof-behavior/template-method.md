@@ -83,3 +83,7 @@ public sealed class MyAppHostModule : GranitModule
     // ne sont pas surchargés — ils délèguent aux versions sync ci-dessus
 }
 ```
+
+## Pour en savoir plus
+
+- [Template Method — refactoring.guru](https://refactoring.guru/design-patterns/template-method)

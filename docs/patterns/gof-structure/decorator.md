@@ -81,3 +81,7 @@ PatientDto patient = await cache.GetOrAddAsync(
 // 4. Exécute la factory
 // 5. Sérialise en JSON → chiffre (si [CacheEncrypted]) → stocke dans Redis
 ```
+
+## Pour en savoir plus
+
+- [Decorator — refactoring.guru](https://refactoring.guru/design-patterns/decorator)

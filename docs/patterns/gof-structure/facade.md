@@ -72,3 +72,7 @@ PresignedUploadTicket ticket = await blobStorage.InitiateUploadAsync(
     new BlobUploadRequest("photo.jpg", "image/jpeg", MaxAllowedBytes: 5_000_000),
     cancellationToken);
 ```
+
+## Pour en savoir plus
+
+- [Facade — refactoring.guru](https://refactoring.guru/design-patterns/facade)

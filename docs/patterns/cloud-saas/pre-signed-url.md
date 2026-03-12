@@ -127,3 +127,7 @@ await blobStorage.DeleteAsync(
 // → Objet S3 physiquement supprimé
 // → BlobDescriptor conservé en DB (IsDeleted=true, DeletedBy, DeletedAt, DeletionReason)
 ```
+
+## Pour en savoir plus
+
+- [Valet Key pattern — Microsoft Cloud Design Patterns](https://learn.microsoft.com/en-us/azure/architecture/patterns/valet-key)

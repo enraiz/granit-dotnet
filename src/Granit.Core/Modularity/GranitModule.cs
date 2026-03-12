@@ -8,6 +8,16 @@ namespace Granit.Core.Modularity;
 public abstract class GranitModule
 {
     /// <summary>
+    /// Determines whether this module is enabled and should execute its lifecycle methods.
+    /// Disabled modules remain in the dependency graph but their
+    /// <see cref="ConfigureServices"/> and <see cref="OnApplicationInitialization"/>
+    /// methods are skipped.
+    /// </summary>
+    /// <param name="context">Service configuration context (provides <c>Configuration</c>).</param>
+    /// <returns><c>true</c> if the module should be loaded; <c>false</c> to skip.</returns>
+    public virtual bool IsEnabled(ServiceConfigurationContext context) => true;
+
+    /// <summary>
     /// Registers the module's services in the DI container (synchronous version).
     /// Called in topological order (dependencies first).
     /// </summary>

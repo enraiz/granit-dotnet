@@ -89,3 +89,7 @@ public sealed class PatientService(AppDbContext db)
     // DatabasePerTenant → Connection vers tenant_xxx_db; SELECT ... WHERE Id = @id
 }
 ```
+
+## Pour en savoir plus
+
+- [Strategy — refactoring.guru](https://refactoring.guru/design-patterns/strategy)
