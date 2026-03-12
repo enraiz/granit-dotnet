@@ -1,12 +1,13 @@
 # Messagerie — Granit.Wolverine
 
 Intégration de [WolverineFx](https://wolverinefx.net/) pour les applications Granit.
-Deux packages composables :
+Trois packages composables :
 
 | Package | Rôle |
 | --- | --- |
 | `Granit.Wolverine` | Core provider-agnostique : module, routing IDomainEvent, propagation de contexte |
 | `Granit.Wolverine.Postgresql` | Outbox PostgreSQL + intégration transactionnelle EF Core |
+| `Granit.Wolverine.SqlServer` | Outbox SQL Server + intégration transactionnelle EF Core |
 
 ## Installation rapide
 
@@ -70,6 +71,24 @@ Ajoute :
 > **Prérequis :** les `DbContext` participant aux transactions Wolverine doivent être enregistrés
 > via `services.AddDbContextWithWolverineIntegration<TContext>()` et non `AddDbContext<TContext>()`.
 
+### GranitWolverineSqlServerModule
+
+```csharp
+[DependsOn(typeof(GranitWolverineModule), typeof(GranitPersistenceModule))]
+public sealed class GranitWolverineSqlServerModule : GranitModule { ... }
+```
+
+Miroir SQL Server de `GranitWolverinePostgresqlModule`. Ajoute :
+
+- Outbox SQL Server durable (at-least-once delivery, conforme ISO 27001)
+- Intégration transactionnelle EF Core (`UseEntityFrameworkCoreTransactions`)
+- Application automatique des transactions sur tous les handlers (`AutoApplyTransactions`)
+- Support multi-tenant avec `AddGranitWolverineWithSqlServerPerTenant<TContext>()`
+  pour le routage dynamique par tenant via `opts.UseSqlServer(connectionString)`
+
+> **Prérequis :** les `DbContext` participant aux transactions Wolverine doivent être enregistrés
+> via `services.AddDbContextWithWolverineIntegration<TContext>()` et non `AddDbContext<TContext>()`.
+
 ## Options de configuration
 
 ### WolverineMessagingOptions (`"Wolverine"`)
@@ -88,6 +107,36 @@ Ajoute :
 
 `TransactionMiddlewareMode.Eager` est le mode ISO 27001-conforme : la transaction est ouverte
 explicitement avant tout write. Ne pas utiliser `Lightweight` en production.
+
+### WolverineSqlServerOptions (`"WolverineSqlServer"`)
+
+| Propriété | Type | Défaut | Description |
+| --- | --- | --- | --- |
+| `TransportConnectionString` | `string` | — | Chaîne de connexion SQL Server (obligatoire) |
+| `TransactionMode` | `TransactionMiddlewareMode` | `Eager` | Mode de transaction EF Core |
+
+Configuration identique à PostgreSQL, avec un outbox SQL Server :
+
+```json
+// appsettings.json
+{
+  "WolverineSqlServer": {
+    "TransportConnectionString": "Server=db;Database=myapp;User Id=app;Password=...;TrustServerCertificate=True"
+  }
+}
+```
+
+#### Multi-tenant SQL Server
+
+Pour les applications multi-tenant avec une base de données par tenant :
+
+```csharp
+// Enregistre le routage dynamique via EF Core
+builder.AddGranitWolverineWithSqlServerPerTenant<AppDbContext>();
+```
+
+Le transport partagé utilise `TransportConnectionString` ; chaque tenant
+utilise la connexion de son `DbContext` pour les transactions EF Core.
 
 ## Propagation du contexte
 
@@ -229,6 +278,7 @@ dépendent directement :
 | --- | --- | --- |
 | `Granit.Wolverine` | **requise** | Core Wolverine provider-agnostique |
 | `Granit.Wolverine.Postgresql` | **requise** | Outbox PostgreSQL + transactions EF Core |
+| `Granit.Wolverine.SqlServer` | **requise** | Outbox SQL Server + transactions EF Core |
 | `Granit.BackgroundJobs` | **requise** | Scheduling via Wolverine message bus |
 | `Granit.Notifications` | **requise** | Fan-out multi-canal via message bus |
 | `Granit.Webhooks` | **requise** | Delivery fiable via Wolverine pipeline |
@@ -249,7 +299,8 @@ BlobStorage, Timeline, Workflow, Querying, etc.) fonctionnent **sans Wolverine**
 | Direction | Modules |
 | --- | --- |
 | **Dépend de** | `Granit.Core`, `Granit.Security`, `Granit.Validation` |
-| **Utilisé par** | `Granit.BackgroundJobs`, `Granit.Webhooks`, `Granit.Wolverine.Postgresql`, `Granit.Persistence.Migrations` |
+| **Utilisé par** | `Granit.BackgroundJobs`, `Granit.Webhooks`, `Granit.Wolverine.Postgresql`, `Granit.Wolverine.SqlServer`, `Granit.Persistence.Migrations` |
 | **Package PostgreSQL** | `Granit.Wolverine.Postgresql` → ajoute `Granit.Persistence` |
+| **Package SQL Server** | `Granit.Wolverine.SqlServer` → ajoute `Granit.Persistence` |
 
 > Voir le [graphe de dépendances complet](../dependencies.md).
