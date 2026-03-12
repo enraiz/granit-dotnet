@@ -16,7 +16,7 @@ internal sealed class SseConnectionManager : ISseConnectionManager, IDisposable
     {
         ArgumentNullException.ThrowIfNull(userId);
 
-        Channel<SseNotificationMessage> channel = Channel.CreateUnbounded<SseNotificationMessage>(
+        var channel = Channel.CreateUnbounded<SseNotificationMessage>(
             new UnboundedChannelOptions { SingleWriter = false, SingleReader = true });
 
         SseConnection connection = new(Guid.CreateVersion7(), userId, channel);

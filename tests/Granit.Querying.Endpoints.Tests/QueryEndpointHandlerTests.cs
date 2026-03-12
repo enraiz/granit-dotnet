@@ -28,52 +28,52 @@ public sealed class QueryEndpointHandlerTests
     [Fact]
     public async Task QueryAsync_WithoutGroupBy_ReturnsPagedResult()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
         var pagedResult = new PagedResult<TestEntity>(
             [new TestEntity { Name = "A" }], 1, HasMore: false);
         engine.ExecuteAsync(Arg.Any<IQueryable<TestEntity>>(), Arg.Any<QueryRequest>(), Arg.Any<CancellationToken>())
             .Returns(pagedResult);
 
-        var request = CreateBindableRequest(new QueryRequest());
-        var source = Array.Empty<TestEntity>().AsQueryable();
+        BindableQueryRequest request = CreateBindableRequest(new QueryRequest());
+        IQueryable<TestEntity> source = Array.Empty<TestEntity>().AsQueryable();
 
         IResult result = await QueryEndpointHandler.QueryAsync(
             engine, request, source, TestContext.Current.CancellationToken);
 
-        var okResult = result.ShouldBeOfType<Ok<PagedResult<TestEntity>>>();
+        Ok<PagedResult<TestEntity>> okResult = result.ShouldBeOfType<Ok<PagedResult<TestEntity>>>();
         okResult.Value.ShouldBe(pagedResult);
     }
 
     [Fact]
     public async Task QueryAsync_WithGroupBy_ReturnsGroupedResult()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
         var groupedResult = new GroupedResult<TestEntity>([], 0);
         engine.ExecuteGroupedAsync(Arg.Any<IQueryable<TestEntity>>(), Arg.Any<QueryRequest>(), Arg.Any<CancellationToken>())
             .Returns(groupedResult);
 
         var queryRequest = new QueryRequest { GroupBy = "Name" };
-        var request = CreateBindableRequest(queryRequest);
-        var source = Array.Empty<TestEntity>().AsQueryable();
+        BindableQueryRequest request = CreateBindableRequest(queryRequest);
+        IQueryable<TestEntity> source = Array.Empty<TestEntity>().AsQueryable();
 
         IResult result = await QueryEndpointHandler.QueryAsync(
             engine, request, source, TestContext.Current.CancellationToken);
 
-        var okResult = result.ShouldBeOfType<Ok<GroupedResult<TestEntity>>>();
+        Ok<GroupedResult<TestEntity>> okResult = result.ShouldBeOfType<Ok<GroupedResult<TestEntity>>>();
         okResult.Value.ShouldBe(groupedResult);
     }
 
     [Fact]
     public async Task QueryAsync_EmptyGroupBy_ReturnsPagedResult()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
         var pagedResult = new PagedResult<TestEntity>([], 0, HasMore: false);
         engine.ExecuteAsync(Arg.Any<IQueryable<TestEntity>>(), Arg.Any<QueryRequest>(), Arg.Any<CancellationToken>())
             .Returns(pagedResult);
 
         var queryRequest = new QueryRequest { GroupBy = "  " };
-        var request = CreateBindableRequest(queryRequest);
-        var source = Array.Empty<TestEntity>().AsQueryable();
+        BindableQueryRequest request = CreateBindableRequest(queryRequest);
+        IQueryable<TestEntity> source = Array.Empty<TestEntity>().AsQueryable();
 
         IResult result = await QueryEndpointHandler.QueryAsync(
             engine, request, source, TestContext.Current.CancellationToken);
@@ -88,16 +88,16 @@ public sealed class QueryEndpointHandlerTests
     [Fact]
     public async Task GetMetadataAsync_WithSubClaim_UsesSubAsUserId()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
-        var definition = CreateDefinition();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
+        QueryDefinition<TestEntity> definition = CreateDefinition();
         QueryMetadata metadata = CreateMetadata();
         engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>()).Returns(metadata);
 
-        var savedViewStore = Substitute.For<ISavedViewStoreReader>();
+        ISavedViewStoreReader savedViewStore = Substitute.For<ISavedViewStoreReader>();
         savedViewStore.GetListAsync(Arg.Any<string>(), "user-42", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<SavedView>());
+            .Returns([]);
 
-        var tenant = Substitute.For<ICurrentTenant>();
+        ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(false);
 
         var user = new ClaimsPrincipal(new ClaimsIdentity(
@@ -116,16 +116,16 @@ public sealed class QueryEndpointHandlerTests
     [Fact]
     public async Task GetMetadataAsync_WithNameIdentifierClaim_UsesNameIdentifier()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
-        var definition = CreateDefinition();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
+        QueryDefinition<TestEntity> definition = CreateDefinition();
         QueryMetadata metadata = CreateMetadata();
         engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>()).Returns(metadata);
 
-        var savedViewStore = Substitute.For<ISavedViewStoreReader>();
+        ISavedViewStoreReader savedViewStore = Substitute.For<ISavedViewStoreReader>();
         savedViewStore.GetListAsync(Arg.Any<string>(), "name-id-user", Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<SavedView>());
+            .Returns([]);
 
-        var tenant = Substitute.For<ICurrentTenant>();
+        ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(false);
 
         var user = new ClaimsPrincipal(new ClaimsIdentity(
@@ -144,16 +144,16 @@ public sealed class QueryEndpointHandlerTests
     [Fact]
     public async Task GetMetadataAsync_WithNoUserClaims_UsesEmptyString()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
-        var definition = CreateDefinition();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
+        QueryDefinition<TestEntity> definition = CreateDefinition();
         QueryMetadata metadata = CreateMetadata();
         engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>()).Returns(metadata);
 
-        var savedViewStore = Substitute.For<ISavedViewStoreReader>();
+        ISavedViewStoreReader savedViewStore = Substitute.For<ISavedViewStoreReader>();
         savedViewStore.GetListAsync(Arg.Any<string>(), string.Empty, Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<SavedView>());
+            .Returns([]);
 
-        var tenant = Substitute.For<ICurrentTenant>();
+        ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(false);
 
         var user = new ClaimsPrincipal(new ClaimsIdentity());
@@ -168,17 +168,17 @@ public sealed class QueryEndpointHandlerTests
     [Fact]
     public async Task GetMetadataAsync_WithTenant_PassesTenantId()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
-        var definition = CreateDefinition();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
+        QueryDefinition<TestEntity> definition = CreateDefinition();
         QueryMetadata metadata = CreateMetadata();
         engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>()).Returns(metadata);
 
         var tenantId = Guid.NewGuid();
-        var savedViewStore = Substitute.For<ISavedViewStoreReader>();
+        ISavedViewStoreReader savedViewStore = Substitute.For<ISavedViewStoreReader>();
         savedViewStore.GetListAsync(Arg.Any<string>(), Arg.Any<string>(), tenantId, Arg.Any<CancellationToken>())
-            .Returns(new List<SavedView>());
+            .Returns([]);
 
-        var tenant = Substitute.For<ICurrentTenant>();
+        ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(true);
         tenant.Id.Returns(tenantId);
 
@@ -197,16 +197,16 @@ public sealed class QueryEndpointHandlerTests
     [Fact]
     public async Task GetMetadataAsync_MapsSavedViewsToSummaries()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
-        var definition = CreateDefinition();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
+        QueryDefinition<TestEntity> definition = CreateDefinition();
         QueryMetadata metadata = CreateMetadata();
         engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>()).Returns(metadata);
 
         var viewId = Guid.NewGuid();
-        var savedViewStore = Substitute.For<ISavedViewStoreReader>();
+        ISavedViewStoreReader savedViewStore = Substitute.For<ISavedViewStoreReader>();
         savedViewStore.GetListAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<SavedView>
-            {
+            .Returns(
+            [
                 new()
                 {
                     Id = viewId,
@@ -216,9 +216,9 @@ public sealed class QueryEndpointHandlerTests
                     IsShared = true,
                     IsDefault = false,
                 },
-            });
+            ]);
 
-        var tenant = Substitute.For<ICurrentTenant>();
+        ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(false);
 
         var user = new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", "user-1")]));
@@ -238,16 +238,16 @@ public sealed class QueryEndpointHandlerTests
     [Fact]
     public async Task GetMetadataAsync_NullSavedViewStore_ReturnsEmptySavedViews()
     {
-        var engine = Substitute.For<IQueryEngine<TestEntity>>();
-        var definition = CreateDefinition();
+        IQueryEngine<TestEntity> engine = Substitute.For<IQueryEngine<TestEntity>>();
+        QueryDefinition<TestEntity> definition = CreateDefinition();
         QueryMetadata metadata = CreateMetadata();
         engine.GetMetadata(Arg.Any<IReadOnlyList<SavedViewSummary>?>()).Returns(metadata);
 
-        var savedViewStore = Substitute.For<ISavedViewStoreReader>();
+        ISavedViewStoreReader savedViewStore = Substitute.For<ISavedViewStoreReader>();
         savedViewStore.GetListAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
             .Throws(new NotImplementedException());
 
-        var tenant = Substitute.For<ICurrentTenant>();
+        ICurrentTenant tenant = Substitute.For<ICurrentTenant>();
         tenant.IsAvailable.Returns(false);
 
         var user = new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", "user-1")]));
@@ -280,7 +280,7 @@ public sealed class QueryEndpointHandlerTests
     private static BindableQueryRequest CreateBindableRequest(QueryRequest queryRequest)
     {
         // Use reflection to create BindableQueryRequest since the constructor is private.
-        var ctor = typeof(BindableQueryRequest).GetConstructor(
+        System.Reflection.ConstructorInfo? ctor = typeof(BindableQueryRequest).GetConstructor(
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
             [typeof(QueryRequest)]);
         return (BindableQueryRequest)ctor!.Invoke([queryRequest]);
