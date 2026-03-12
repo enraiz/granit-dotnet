@@ -2,6 +2,7 @@ using System.Reflection;
 using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Internal;
 using Granit.BackgroundJobs.Options;
+using Granit.Core.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,6 +45,8 @@ public static class BackgroundJobsHostApplicationBuilderExtensions
         IEnumerable<Assembly>? additionalAssemblies = null,
         Action<WolverineOptions>? configure = null)
     {
+        GranitActivitySourceRegistry.Register(Diagnostics.BackgroundJobsActivitySource.Name);
+
         // Bind and validate options at startup.
         builder.Services
             .AddOptions<BackgroundJobsOptions>()

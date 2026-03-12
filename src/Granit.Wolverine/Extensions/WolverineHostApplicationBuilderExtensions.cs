@@ -1,4 +1,5 @@
 using FluentValidation;
+using Granit.Core.Diagnostics;
 using Granit.Security;
 using Granit.Wolverine.Behaviors;
 using Granit.Wolverine.Diagnostics;
@@ -45,6 +46,8 @@ public static class WolverineHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<WolverineOptions>? configure = null)
     {
+        GranitActivitySourceRegistry.Register(Diagnostics.WolverineActivitySource.Name);
+
         // Bind and validate options at startup via DI.
         builder.Services
             .AddOptions<WolverineMessagingOptions>()

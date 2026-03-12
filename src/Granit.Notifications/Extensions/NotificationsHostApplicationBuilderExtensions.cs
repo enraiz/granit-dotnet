@@ -1,3 +1,4 @@
+using Granit.Core.Diagnostics;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Exceptions;
 using Granit.Notifications.Internal;
@@ -23,6 +24,8 @@ public static class NotificationsHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<NotificationsOptions>? configure = null)
     {
+        GranitActivitySourceRegistry.Register(Diagnostics.NotificationsActivitySource.Name);
+
         // Options
         builder.Services
             .AddOptions<NotificationsOptions>()

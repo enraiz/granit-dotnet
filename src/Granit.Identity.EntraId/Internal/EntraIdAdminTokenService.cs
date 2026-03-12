@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Granit.Identity.EntraId.Diagnostics;
 using Granit.Identity.EntraId.Options;
 using Granit.Timing;
 using Microsoft.Extensions.Logging;
@@ -43,6 +45,8 @@ internal sealed partial class EntraIdAdminTokenService(
             {
                 return _cachedToken;
             }
+
+            using Activity? activity = IdentityEntraIdActivitySource.Source.StartActivity(IdentityEntraIdActivitySource.TokenAcquire);
 
             EntraIdAdminOptions opts = options.Value;
             HttpClient client = httpClientFactory.CreateClient("MicrosoftGraph");

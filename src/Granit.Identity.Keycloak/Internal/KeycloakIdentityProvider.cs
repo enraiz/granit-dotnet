@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Granit.Identity.Keycloak.Diagnostics;
 using Granit.Identity.Keycloak.Options;
 using Granit.Identity.Models;
 using Microsoft.Extensions.Logging;
@@ -34,6 +36,9 @@ internal sealed partial class KeycloakIdentityProvider(
         int? max = null,
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetUsers);
+        activity?.SetTag("identity.keycloak.search", search);
+
         try
         {
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
@@ -47,6 +52,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetUsersFailed(ex);
             return [];
         }
@@ -58,6 +64,9 @@ internal sealed partial class KeycloakIdentityProvider(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(userId);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetUser);
+        activity?.SetTag("identity.keycloak.user_id", userId);
 
         try
         {
@@ -72,6 +81,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetUserFailed(ex, userId);
             return null;
         }
@@ -84,6 +94,10 @@ internal sealed partial class KeycloakIdentityProvider(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(userId);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.SetUserEnabled);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+        activity?.SetTag("identity.keycloak.enabled", enabled);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetUserEndpoint(userId);
@@ -104,6 +118,9 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(update);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.UpdateUser);
+        activity?.SetTag("identity.keycloak.user_id", userId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetUserEndpoint(userId);
@@ -165,6 +182,9 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
 
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetUserSessions);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+
         try
         {
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
@@ -178,6 +198,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetSessionsFailed(ex, userId);
             return [];
         }
@@ -190,6 +211,9 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
 
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetUserDeviceActivity);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+
         try
         {
             return options.Value.UseTokenExchangeForDeviceActivity
@@ -198,6 +222,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetDeviceActivityFailed(ex, userId);
             return [];
         }
@@ -209,6 +234,9 @@ internal sealed partial class KeycloakIdentityProvider(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(userId);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetPasswordChangedAt);
+        activity?.SetTag("identity.keycloak.user_id", userId);
 
         try
         {
@@ -228,6 +256,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetCredentialsFailed(ex, userId);
             return null;
         }
@@ -237,6 +266,8 @@ internal sealed partial class KeycloakIdentityProvider(
     public async Task<IReadOnlyList<IdentityRole>> GetRolesAsync(
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetRoles);
+
         try
         {
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
@@ -250,6 +281,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetRolesFailed(ex);
             return [];
         }
@@ -261,6 +293,9 @@ internal sealed partial class KeycloakIdentityProvider(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(roleName);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetRoleMembers);
+        activity?.SetTag("identity.keycloak.role_name", roleName);
 
         try
         {
@@ -275,6 +310,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetRoleMembersFailed(ex, roleName);
             return [];
         }
@@ -289,6 +325,9 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
 
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetUserRoles);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+
         try
         {
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
@@ -302,6 +341,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetUserRolesFailed(ex, userId);
             return [];
         }
@@ -315,6 +355,10 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(roleName);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.AssignRole);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+        activity?.SetTag("identity.keycloak.role_name", roleName);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
 
@@ -338,6 +382,10 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(roleName);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.RemoveRole);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+        activity?.SetTag("identity.keycloak.role_name", roleName);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
 
@@ -370,6 +418,9 @@ internal sealed partial class KeycloakIdentityProvider(
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(sessionId);
 
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.TerminateSession);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetSessionEndpoint(sessionId);
 
@@ -388,6 +439,9 @@ internal sealed partial class KeycloakIdentityProvider(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(userId);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.TerminateAllSessions);
+        activity?.SetTag("identity.keycloak.user_id", userId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetUserLogoutEndpoint(userId);
@@ -410,6 +464,9 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
 
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.SendPasswordResetEmail);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetExecuteActionsEmailEndpoint(userId);
 
@@ -430,6 +487,9 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(temporaryPassword);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.SetTemporaryPassword);
+        activity?.SetTag("identity.keycloak.user_id", userId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetResetPasswordEndpoint(userId);
@@ -452,6 +512,8 @@ internal sealed partial class KeycloakIdentityProvider(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(user);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.CreateUser);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetUsersEndpoint();
@@ -501,6 +563,8 @@ internal sealed partial class KeycloakIdentityProvider(
     public async Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(
         CancellationToken cancellationToken = default)
     {
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetGroups);
+
         try
         {
             HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
@@ -514,6 +578,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetGroupsFailed(ex);
             return [];
         }
@@ -525,6 +590,9 @@ internal sealed partial class KeycloakIdentityProvider(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(userId);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.GetUserGroups);
+        activity?.SetTag("identity.keycloak.user_id", userId);
 
         try
         {
@@ -539,6 +607,7 @@ internal sealed partial class KeycloakIdentityProvider(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             LogKeycloakGetUserGroupsFailed(ex, userId);
             return [];
         }
@@ -552,6 +621,10 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(groupId);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.AddUserToGroup);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+        activity?.SetTag("identity.keycloak.group_id", groupId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetUserGroupMembershipEndpoint(userId, groupId);
@@ -573,6 +646,10 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(groupId);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.RemoveUserFromGroup);
+        activity?.SetTag("identity.keycloak.user_id", userId);
+        activity?.SetTag("identity.keycloak.group_id", groupId);
 
         HttpClient client = await CreateAuthenticatedClientAsync(cancellationToken).ConfigureAwait(false);
         string endpoint = options.Value.GetUserGroupMembershipEndpoint(userId, groupId);
@@ -702,6 +779,8 @@ internal sealed partial class KeycloakIdentityProvider(
     {
         ArgumentNullException.ThrowIfNull(username);
         ArgumentNullException.ThrowIfNull(password);
+
+        using Activity? activity = IdentityKeycloakActivitySource.Source.StartActivity(IdentityKeycloakActivitySource.VerifyUserCredentials);
 
         KeycloakAdminOptions opts = options.Value;
 

@@ -1,3 +1,4 @@
+using Granit.Core.Diagnostics;
 using Granit.Observability.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,10 +81,14 @@ public static class ObservabilityServiceCollectionExtensions
                     return;
                 }
 
+                // Register all Granit module ActivitySources declared via
+                // GranitActivitySourceRegistry.Register() during host configuration.
+                foreach (string source in GranitActivitySourceRegistry.GetRegisteredSources())
+                {
+                    tracing.AddSource(source);
+                }
+
                 tracing
-                    // Granit.Wolverine bridge spans (trace context restored from Outbox envelopes).
-                    // No-op if Granit.Wolverine is not installed — the source emits no spans.
-                    .AddSource("Granit.Wolverine")
                     .AddAspNetCoreInstrumentation(aspnet =>
                     {
                         aspnet.RecordException = true;

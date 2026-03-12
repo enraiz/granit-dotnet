@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Granit.Core.MultiTenancy;
 using Granit.Guids;
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.Diagnostics;
 using Granit.Notifications.Messages;
 
 namespace Granit.Notifications.Handlers;
@@ -23,6 +25,9 @@ public sealed class NotificationFanoutHandler(
         NotificationTrigger trigger,
         CancellationToken cancellationToken)
     {
+        using Activity? activity = NotificationsActivitySource.Source.StartActivity(NotificationsActivitySource.Fanout);
+        activity?.SetTag("notifications.type", trigger.NotificationTypeName);
+
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : trigger.TenantId;
         NotificationDefinition? definition = definitionStore.Get(trigger.NotificationTypeName);
         IReadOnlyList<string> defaultChannels = definition?.DefaultChannels ?? [NotificationChannels.InApp];
@@ -50,6 +55,8 @@ public sealed class NotificationFanoutHandler(
 
         if (recipientUserIds.Count == 0)
         {
+            activity?.SetTag("notifications.recipient_count", 0);
+            activity?.SetTag("notifications.delivery_count", 0);
             return [];
         }
 
@@ -85,6 +92,9 @@ public sealed class NotificationFanoutHandler(
                 });
             }
         }
+
+        activity?.SetTag("notifications.recipient_count", recipientUserIds.Count);
+        activity?.SetTag("notifications.delivery_count", commands.Count);
 
         return commands;
     }

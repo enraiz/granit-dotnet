@@ -3,6 +3,7 @@ using Granit.BlobStorage.Internal;
 using Granit.BlobStorage.Options;
 using Granit.BlobStorage.S3.Internal;
 using Granit.BlobStorage.S3.Options;
+using Granit.Core.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -30,6 +31,8 @@ public static class BlobStorageS3HostApplicationBuilderExtensions
     public static IHostApplicationBuilder AddGranitBlobStorageS3(
         this IHostApplicationBuilder builder)
     {
+        GranitActivitySourceRegistry.Register(S3.Diagnostics.BlobStorageS3ActivitySource.Name);
+
         builder.Services
             .AddOptions<S3BlobOptions>()
             .BindConfiguration(BlobStorageOptions.SectionName)

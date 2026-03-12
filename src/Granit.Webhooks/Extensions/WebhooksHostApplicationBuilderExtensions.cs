@@ -1,3 +1,4 @@
+using Granit.Core.Diagnostics;
 using Granit.Webhooks.Abstractions;
 using Granit.Webhooks.Endpoints;
 using Granit.Webhooks.Exceptions;
@@ -41,6 +42,8 @@ public static class WebhooksHostApplicationBuilderExtensions
         this IHostApplicationBuilder builder,
         Action<WebhooksOptions>? configure = null)
     {
+        GranitActivitySourceRegistry.Register(Diagnostics.WebhooksActivitySource.Name);
+
         // Bind and validate options at startup.
         builder.Services
             .AddOptions<WebhooksOptions>()
