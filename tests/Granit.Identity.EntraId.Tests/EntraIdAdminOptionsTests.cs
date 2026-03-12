@@ -81,7 +81,7 @@ public sealed class EntraIdAdminOptionsTests
     [Fact]
     public void GetGroupsEndpoint_ReturnsStaticUrl()
     {
-        string endpoint = EntraIdAdminOptions.GetGroupsEndpoint();
+        string endpoint = EntraIdAdminOptions.GroupsEndpoint;
 
         endpoint.ShouldBe("/v1.0/groups?$select=id,displayName,description");
     }
@@ -155,8 +155,6 @@ public sealed class EntraIdAdminOptionsTests
     }
 
     [Fact]
-    public void SectionName_IsEntraIdAdmin()
-    {
+    public void SectionName_IsEntraIdAdmin() =>
         EntraIdAdminOptions.SectionName.ShouldBe("EntraIdAdmin");
-    }
 }

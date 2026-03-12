@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using Granit.Identity.EntraId.Internal;
 using Granit.Identity.EntraId.Options;
@@ -27,9 +28,17 @@ public sealed class EntraIdIdentityProviderTests : IDisposable
     private readonly EntraIdAdminTokenService _tokenService;
     private readonly IPasswordResetNotifier _passwordResetNotifier = Substitute.For<IPasswordResetNotifier>();
     private readonly EntraIdIdentityProvider _provider;
+    private readonly ActivityListener _activityListener;
 
     public EntraIdIdentityProviderTests()
     {
+        _activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "Granit.Identity.EntraId",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+        };
+        ActivitySource.AddActivityListener(_activityListener);
+
         _httpClient = new HttpClient(_handler) { BaseAddress = new Uri("https://graph.microsoft.com/") };
         _httpClientFactory.CreateClient("MicrosoftGraph").Returns(_httpClient);
 
@@ -269,5 +278,9 @@ public sealed class EntraIdIdentityProviderTests : IDisposable
                 TestContext.Current.CancellationToken));
     }
 
-    public void Dispose() => _httpClient.Dispose();
+    public void Dispose()
+    {
+        _activityListener.Dispose();
+        _httpClient.Dispose();
+    }
 }

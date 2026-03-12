@@ -5,6 +5,7 @@
 // retriable errors (exception thrown), network timeout handling, StorePayload.
 // =============================================================================
 
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using Granit.Timing;
@@ -22,7 +23,7 @@ using Xunit;
 
 namespace Granit.Webhooks.Tests;
 
-public sealed class SendWebhookHandlerTests
+public sealed class SendWebhookHandlerTests : IDisposable
 {
     private readonly IWebhookDeliveryWriter _deliveryWriter = Substitute.For<IWebhookDeliveryWriter>();
 
@@ -30,12 +31,22 @@ public sealed class SendWebhookHandlerTests
     private readonly IWebhookSecretProtector _secretProtector = new NoOpWebhookSecretProtector();
 
     private readonly IClock _clock;
+    private readonly ActivityListener _activityListener;
 
     public SendWebhookHandlerTests()
     {
+        _activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "Granit.Webhooks",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+        };
+        ActivitySource.AddActivityListener(_activityListener);
+
         _clock = Substitute.For<IClock>();
         _clock.Now.Returns(_ => DateTimeOffset.UtcNow);
     }
+
+    public void Dispose() => _activityListener.Dispose();
 
     // -------------------------------------------------------------------------
     // Success

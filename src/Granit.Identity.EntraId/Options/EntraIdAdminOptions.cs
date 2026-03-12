@@ -63,6 +63,11 @@ public sealed class EntraIdAdminOptions
     public int TimeoutSeconds { get; set; } = 30;
 
     /// <summary>
+    /// Base URL for the Microsoft Graph API. Default: <c>https://graph.microsoft.com</c>.
+    /// </summary>
+    public string GraphBaseUrl { get; set; } = "https://graph.microsoft.com";
+
+    /// <summary>
     /// Public client ID with <c>Allow public client flows</c> enabled,
     /// used to verify user credentials via the Resource Owner Password Credentials (ROPC) flow.
     /// Required for <see cref="IIdentityProvider.VerifyUserCredentialsAsync"/>.
@@ -158,10 +163,9 @@ public sealed class EntraIdAdminOptions
     // ──── Groups ────
 
     /// <summary>
-    /// Builds the Graph API URL for listing all groups.
+    /// Graph API URL for listing all groups.
     /// </summary>
-    internal static string GetGroupsEndpoint() =>
-        "/v1.0/groups?$select=id,displayName,description";
+    internal const string GroupsEndpoint = "/v1.0/groups?$select=id,displayName,description";
 
     /// <summary>
     /// Builds the Graph API URL for listing groups a user is member of.

@@ -5,6 +5,7 @@
 // delivery audit, failure audit with rethrow, and context field correctness.
 // =============================================================================
 
+using System.Diagnostics;
 using System.Text.Json;
 using Granit.Guids;
 using Granit.Notifications.Abstractions;
@@ -22,18 +23,28 @@ using Xunit;
 
 namespace Granit.Notifications.Tests;
 
-public sealed class NotificationDeliveryHandlerTests
+public sealed class NotificationDeliveryHandlerTests : IDisposable
 {
     private readonly INotificationChannel _channel = Substitute.For<INotificationChannel>();
     private readonly INotificationDeliveryWriter _deliveryWriter = Substitute.For<INotificationDeliveryWriter>();
     private readonly IClock _clock;
     private readonly ILogger<NotificationDeliveryHandler> _logger = NullLogger<NotificationDeliveryHandler>.Instance;
+    private readonly ActivityListener _activityListener;
 
     public NotificationDeliveryHandlerTests()
     {
+        _activityListener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "Granit.Notifications",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+        };
+        ActivitySource.AddActivityListener(_activityListener);
+
         _clock = Substitute.For<IClock>();
         _clock.Now.Returns(_ => DateTimeOffset.UtcNow);
     }
+
+    public void Dispose() => _activityListener.Dispose();
 
     [Fact]
     public async Task HandleAsync_ChannelNotRegistered_LogsWarningAndReturns()
