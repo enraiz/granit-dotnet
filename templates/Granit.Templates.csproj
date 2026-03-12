@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageId>Granit.Templates</PackageId>
+    <Description>Project templates for Granit framework: granit-api (minimal), granit-api-full (complete), granit-module (library).</Description>
+    <PackageTags>dotnet-new;templates;granit;modular;framework</PackageTags>
+    <TargetFramework>net10.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <NoWarn>$(NoWarn);NU5128;CA1016</NoWarn>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <IsPackable>true</IsPackable>
+    <!-- Exclude from build — this is a content-only package -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+
+  <!-- Remove inherited analyzers — this is a content-only template package -->
+  <ItemGroup>
+    <ProjectReference Remove="@(ProjectReference)" />
+    <PackageReference Remove="Microsoft.CodeAnalysis.BannedApiAnalyzers" />
+    <AdditionalFiles Remove="@(AdditionalFiles)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="granit-api\**\*" Exclude="granit-api\**\bin\**;granit-api\**\obj\**" />
+    <Content Include="granit-api-full\**\*" Exclude="granit-api-full\**\bin\**;granit-api-full\**\obj\**" />
+    <Content Include="granit-module\**\*" Exclude="granit-module\**\bin\**;granit-module\**\obj\**" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+</Project>
