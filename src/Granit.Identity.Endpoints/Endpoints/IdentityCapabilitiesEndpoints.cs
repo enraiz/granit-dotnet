@@ -1,0 +1,34 @@
+using Granit.Identity.Endpoints.Dtos;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
+
+namespace Granit.Identity.Endpoints.Endpoints;
+
+/// <summary>
+/// Endpoint exposing the active identity provider's capabilities.
+/// </summary>
+internal static class IdentityCapabilitiesEndpoints
+{
+    internal static RouteGroupBuilder MapCapabilitiesEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/capabilities", GetCapabilities)
+            .WithName("GetIdentityProviderCapabilities")
+            .WithSummary("Returns the capabilities of the active identity provider.");
+
+        return group;
+    }
+
+    private static Ok<IdentityProviderCapabilitiesResponse> GetCapabilities(
+        IIdentityProviderCapabilities capabilities) =>
+        TypedResults.Ok(new IdentityProviderCapabilitiesResponse(
+            capabilities.ProviderName,
+            capabilities.SupportsIndividualSessionTermination,
+            capabilities.SupportsNativePasswordResetEmail,
+            capabilities.SupportsGroupHierarchy,
+            capabilities.SupportsCustomAttributes,
+            capabilities.MaxCustomAttributes,
+            capabilities.SupportsCredentialVerification,
+            capabilities.SupportsUserCreation));
+}

@@ -1,5 +1,6 @@
 using Granit.Identity.Endpoints.Internal;
 using Granit.Identity.Endpoints.Options;
+using Granit.Identity.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Identity.Endpoints.Extensions;
@@ -14,6 +15,8 @@ public static class IdentityEndpointsServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddGranitIdentityEndpoints(this IServiceCollection services)
     {
+        services.AddGranitIdentity();
+
         services.AddSingleton<WebhookSignatureValidator>();
         services.AddOptions<IdentityWebhookOptions>()
             .BindConfiguration(IdentityWebhookOptions.SectionName);

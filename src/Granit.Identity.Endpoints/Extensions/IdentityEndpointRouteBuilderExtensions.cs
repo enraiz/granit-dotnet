@@ -57,6 +57,11 @@ public static class IdentityEndpointRouteBuilderExtensions
             .MapGroup(options.RoutePrefix)
             .WithTags(options.TagName);
 
+        // Capabilities endpoint
+        group
+            .RequireAuthorization(IdentityUserCachePermissions.UserCache.Read)
+            .MapCapabilitiesEndpoints();
+
         // Read endpoints (list, get, batch)
         group
             .RequireAuthorization(IdentityUserCachePermissions.UserCache.Read)

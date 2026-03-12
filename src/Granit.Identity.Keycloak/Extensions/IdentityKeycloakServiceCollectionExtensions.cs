@@ -52,6 +52,7 @@ public static class IdentityKeycloakServiceCollectionExtensions
         services.TryAddSingleton<KeycloakAdminTokenService>();
         services.TryAddTransient<KeycloakUserTokenExchangeService>();
         services.AddIdentityProvider<KeycloakIdentityProvider>();
+        services.Replace(ServiceDescriptor.Scoped<IIdentityProviderCapabilities, KeycloakIdentityProviderCapabilities>());
 
         return services;
     }

@@ -37,53 +37,211 @@ dotnet add package Granit.Identity
 
 ### IIdentityProvider
 
-Interface centrale. Un `NullIdentityProvider` est enregistré par défaut (retourne
-des listes vides et des no-ops). Installer un package d'implémentation remplace le
-null object.
+Interface centrale composite. Un `NullIdentityProvider` est enregistré par défaut
+(retourne des listes vides et des no-ops). Installer un package d'implémentation
+remplace le null object.
+
+`IIdentityProvider` hérite des 7 interfaces fines (voir [section ISP](#ségrégation-dinterfaces-isp))
+et sert de point d'accès rétrocompatible :
 
 ```csharp
-public interface IIdentityProvider
+public interface IIdentityProvider :
+    IIdentityUserReader,
+    IIdentityUserWriter,
+    IIdentityRoleManager,
+    IIdentityGroupManager,
+    IIdentitySessionManager,
+    IIdentityPasswordManager,
+    IIdentityCredentialVerifier
 {
-    // --- Lecture utilisateurs ---
-    Task<IReadOnlyList<IdentityUser>> GetUsersAsync(
-        string? search = null, int? first = null, int? max = null,
-        CancellationToken cancellationToken = default);
-    Task<IdentityUser?> GetUserAsync(string userId, CancellationToken cancellationToken = default);
-
-    // --- Gestion du compte ---
-    Task SetUserEnabledAsync(string userId, bool enabled, CancellationToken cancellationToken = default);
-    Task<IdentityUser> CreateUserAsync(IdentityUserCreate user, CancellationToken cancellationToken = default);
-
-    // --- Sessions ---
-    Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(string userId, CancellationToken cancellationToken = default);
-    Task TerminateSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default);
-    Task TerminateAllSessionsAsync(string userId, CancellationToken cancellationToken = default);
-
-    // --- Credentials ---
-    Task<DateTimeOffset?> GetPasswordChangedAtAsync(string userId, CancellationToken cancellationToken = default);
-    Task SendPasswordResetEmailAsync(string userId, CancellationToken cancellationToken = default);
-    Task SetTemporaryPasswordAsync(string userId, string temporaryPassword, CancellationToken cancellationToken = default);
-    Task<bool> VerifyUserCredentialsAsync(string username, string password, CancellationToken cancellationToken = default);
-
-    // --- Rôles ---
-    Task<IReadOnlyList<IdentityRole>> GetRolesAsync(CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(string roleName, CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(string userId, CancellationToken cancellationToken = default);
-    Task AssignRoleAsync(string userId, string roleName, CancellationToken cancellationToken = default);
-    Task RemoveRoleAsync(string userId, string roleName, CancellationToken cancellationToken = default);
-
-    // --- Groupes ---
-    Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(string userId, CancellationToken cancellationToken = default);
-    Task AddUserToGroupAsync(string userId, string groupId, CancellationToken cancellationToken = default);
-    Task RemoveUserFromGroupAsync(string userId, string groupId, CancellationToken cancellationToken = default);
 }
 ```
 
 > **Conventions d'erreur :** les opérations de lecture appliquent la *graceful degradation*
 > (log warning + retour vide/null si le provider est indisponible). `SetUserEnabledAsync`
 > propage les exceptions HTTP pour que l'appelant soit informé d'un échec.
+
+### Ségrégation d'interfaces (ISP)
+
+`IIdentityProvider` est découpé en **7 interfaces fines** conformément au
+*Interface Segregation Principle*. Chaque consommateur peut injecter uniquement
+l'interface dont il a besoin, réduisant le couplage et facilitant les tests.
+
+| Interface | Responsabilité | Méthodes |
+| --------- | -------------- | -------- |
+| `IIdentityUserReader` | Lecture des utilisateurs | `GetUsersAsync`, `GetUserAsync` |
+| `IIdentityUserWriter` | Écriture des utilisateurs | `SetUserEnabledAsync`, `UpdateUserAsync`, `CreateUserAsync` |
+| `IIdentityRoleManager` | Gestion des rôles | `GetRolesAsync`, `GetRoleMembersAsync`, `GetUserRolesAsync`, `AssignRoleAsync`, `RemoveRoleAsync` |
+| `IIdentityGroupManager` | Gestion des groupes | `GetGroupsAsync`, `GetUserGroupsAsync`, `AddUserToGroupAsync`, `RemoveUserFromGroupAsync` |
+| `IIdentitySessionManager` | Gestion des sessions | `GetUserSessionsAsync`, `GetUserDeviceActivityAsync`, `TerminateSessionAsync`, `TerminateAllSessionsAsync` |
+| `IIdentityPasswordManager` | Gestion des mots de passe | `GetPasswordChangedAtAsync`, `SendPasswordResetEmailAsync`, `SetTemporaryPasswordAsync` |
+| `IIdentityCredentialVerifier` | Vérification de credentials | `VerifyUserCredentialsAsync` |
+
+**Recommandation :** injecter l'interface spécifique plutôt que `IIdentityProvider`.
+Par exemple, un service qui ne fait que lire des utilisateurs :
+
+```csharp
+// Préférer ceci :
+public sealed class UserLookupService(IIdentityUserReader userReader)
+{
+    public Task<IdentityUser?> FindAsync(string userId, CancellationToken ct)
+        => userReader.GetUserAsync(userId, ct);
+}
+
+// Plutôt que ceci :
+public sealed class UserLookupService(IIdentityProvider identityProvider) { ... }
+```
+
+#### Enregistrement DI automatique
+
+Les 7 interfaces fines sont enregistrées automatiquement comme *forwarding* vers
+`IIdentityProvider`. Aucune configuration supplémentaire n'est requise :
+
+```csharp
+// Dans AddGranitIdentity() / AddIdentityProvider<T>() :
+services.Replace(ServiceDescriptor.Scoped<IIdentityUserReader>(
+    sp => sp.GetRequiredService<IIdentityProvider>()));
+services.Replace(ServiceDescriptor.Scoped<IIdentityUserWriter>(
+    sp => sp.GetRequiredService<IIdentityProvider>()));
+// ... idem pour les 5 autres interfaces
+```
+
+Que l'on injecte `IIdentityUserReader` ou `IIdentityProvider`, la même instance
+est résolue dans le scope DI courant.
+
+### Capacités du provider (IIdentityProviderCapabilities)
+
+L'interface `IIdentityProviderCapabilities` permet d'interroger **à l'exécution**
+les fonctionnalités supportées par le provider actif. Cela évite les patterns
+*try/catch* et permet à l'UI de s'adapter dynamiquement.
+
+```csharp
+public interface IIdentityProviderCapabilities
+{
+    string ProviderName { get; }
+    bool SupportsIndividualSessionTermination { get; }
+    bool SupportsNativePasswordResetEmail { get; }
+    bool SupportsGroupHierarchy { get; }
+    bool SupportsCustomAttributes { get; }
+    int MaxCustomAttributes { get; }
+    bool SupportsCredentialVerification { get; }
+    bool SupportsUserCreation { get; }
+}
+```
+
+#### Comparaison par provider
+
+| Propriété | Keycloak | Entra ID | None (défaut) |
+| --------- | -------- | -------- | ------------- |
+| `ProviderName` | `"Keycloak"` | `"Entra ID"` | `"None"` |
+| `SupportsIndividualSessionTermination` | `true` | `false` | `false` |
+| `SupportsNativePasswordResetEmail` | `true` | `false` | `false` |
+| `SupportsGroupHierarchy` | `true` | `false` | `false` |
+| `SupportsCustomAttributes` | `true` | `true` | `false` |
+| `MaxCustomAttributes` | `int.MaxValue` | `15` | `0` |
+| `SupportsCredentialVerification` | `true` | `true` | `false` |
+| `SupportsUserCreation` | `true` | `true` | `false` |
+
+#### Endpoint REST
+
+Le package `Granit.Identity.Endpoints` expose un endpoint de consultation :
+
+```text
+GET /api/identity/capabilities
+```
+
+Retourne un `IdentityProviderCapabilitiesResponse` avec toutes les propriétés
+ci-dessus. Le frontend peut appeler cet endpoint au démarrage pour adapter son
+interface (masquer le bouton « Déconnecter cette session » si
+`SupportsIndividualSessionTermination` est `false`, par exemple).
+
+#### Exemple d'utilisation côté serveur
+
+```csharp
+public sealed class SessionEndpoints(
+    IIdentitySessionManager sessionManager,
+    IIdentityProviderCapabilities capabilities)
+{
+    public async Task<IResult> TerminateSession(
+        string userId, string sessionId, CancellationToken ct)
+    {
+        if (!capabilities.SupportsIndividualSessionTermination)
+            return TypedResults.Problem(
+                detail: "Le provider actif ne supporte pas la révocation de session individuelle.",
+                statusCode: 422);
+
+        await sessionManager.TerminateSessionAsync(userId, sessionId, ct);
+        return TypedResults.NoContent();
+    }
+}
+```
+
+### Événements de domaine (IIdentityEventPublisher)
+
+Les providers publient des événements de domaine après chaque opération d'écriture
+réussie via l'interface `IIdentityEventPublisher`. Ces événements permettent la
+synchronisation du cache local et l'audit trail.
+
+```csharp
+public interface IIdentityEventPublisher
+{
+    Task PublishAsync<TEvent>(TEvent domainEvent, CancellationToken cancellationToken = default)
+        where TEvent : notnull;
+}
+```
+
+#### Événements disponibles
+
+Tous les événements sont des `sealed record` dans le namespace `Granit.Identity.Events` :
+
+| Événement | Paramètres | Déclenché par |
+| --------- | ---------- | ------------- |
+| `IdentityUserCreatedEvent` | `UserId`, `Username?`, `Email?` | `CreateUserAsync` |
+| `IdentityUserProfileUpdatedEvent` | `UserId`, `Update` | `UpdateUserAsync` |
+| `IdentityUserEnabledChangedEvent` | `UserId`, `Enabled` | `SetUserEnabledAsync` |
+| `IdentityRoleAssignedEvent` | `UserId`, `RoleName` | `AssignRoleAsync` |
+| `IdentityRoleRemovedEvent` | `UserId`, `RoleName` | `RemoveRoleAsync` |
+| `IdentityGroupMembershipChangedEvent` | `UserId`, `GroupId`, `Added` | `AddUserToGroupAsync`, `RemoveUserFromGroupAsync` |
+| `IdentityPasswordResetEvent` | `UserId` | `SendPasswordResetEmailAsync`, `SetTemporaryPasswordAsync` |
+| `IdentitySessionsRevokedEvent` | `UserId` | `TerminateSessionAsync`, `TerminateAllSessionsAsync` |
+
+#### Implémentation par défaut
+
+Par défaut, `AddGranitIdentity()` enregistre un `NullIdentityEventPublisher` (no-op)
+via `TryAddScoped`. Les événements sont simplement ignorés tant qu'aucune
+implémentation n'est branchée.
+
+#### Brancher Wolverine
+
+Pour publier les événements via Wolverine (`IMessageBus`) :
+
+```csharp
+internal sealed class WolverineIdentityEventPublisher(IMessageBus bus) : IIdentityEventPublisher
+{
+    public Task PublishAsync<TEvent>(TEvent domainEvent, CancellationToken cancellationToken)
+        where TEvent : notnull =>
+        bus.PublishAsync(domainEvent, new DeliveryOptions { DeliverWithin = TimeSpan.FromSeconds(30) });
+}
+
+// Enregistrement — AVANT AddGranitIdentityKeycloak() / AddGranitIdentityEntraId()
+builder.Services.AddScoped<IIdentityEventPublisher, WolverineIdentityEventPublisher>();
+```
+
+#### Synchronisation du cache local (Identity.EntityFrameworkCore)
+
+Le package `Granit.Identity.EntityFrameworkCore` fournit un handler Wolverine
+(`IdentityUserEventHandler`) qui réagit aux événements de domaine pour
+maintenir le cache utilisateur local à jour :
+
+| Événement | Action sur le cache |
+| --------- | ------------------- |
+| `IdentityUserCreatedEvent` | Récupère l'utilisateur depuis le provider et crée/met à jour l'entrée |
+| `IdentityUserProfileUpdatedEvent` | Récupère l'utilisateur depuis le provider et met à jour l'entrée |
+| `IdentityUserEnabledChangedEvent` | Récupère l'utilisateur depuis le provider et met à jour l'entrée |
+| `IdentityUserDeletedEvent` (webhook) | Suppression physique de l'entrée (RGPD Art. 17) |
+
+Ces handlers sont automatiquement découverts par Wolverine grâce au module
+`GranitIdentityEntityFrameworkCoreModule`.
 
 ### Modèles
 
@@ -284,7 +442,10 @@ le bearer token. Pour l'appeler depuis un service account admin, Granit utilise 
 
 | Service | Implémentation | Lifetime |
 | ------- | -------------- | -------- |
-| `IIdentityProvider` | `KeycloakIdentityProvider` | Singleton |
+| `IIdentityProvider` | `KeycloakIdentityProvider` | Scoped |
+| `IIdentityUserReader`, `IIdentityUserWriter`, `IIdentityRoleManager`, `IIdentityGroupManager`, `IIdentitySessionManager`, `IIdentityPasswordManager`, `IIdentityCredentialVerifier` | Forwarding → `IIdentityProvider` | Scoped |
+| `IIdentityProviderCapabilities` | `KeycloakIdentityProviderCapabilities` | Scoped |
+| `IIdentityEventPublisher` | `NullIdentityEventPublisher` (défaut, via `TryAddScoped`) | Scoped |
 | `KeycloakAdminTokenService` | — | Singleton (token admin mis en cache) |
 | `KeycloakUserTokenExchangeService` | — | Transient (pas de cache, token user-specific) |
 
@@ -480,7 +641,10 @@ builder.Services.AddGranitIdentityEntraId();
 
 | Service | Implémentation | Lifetime |
 | ------- | -------------- | -------- |
-| `IIdentityProvider` | `EntraIdIdentityProvider` | Singleton |
+| `IIdentityProvider` | `EntraIdIdentityProvider` | Scoped |
+| `IIdentityUserReader`, `IIdentityUserWriter`, `IIdentityRoleManager`, `IIdentityGroupManager`, `IIdentitySessionManager`, `IIdentityPasswordManager`, `IIdentityCredentialVerifier` | Forwarding → `IIdentityProvider` | Scoped |
+| `IIdentityProviderCapabilities` | `EntraIdIdentityProviderCapabilities` | Scoped |
+| `IIdentityEventPublisher` | `NullIdentityEventPublisher` (défaut, via `TryAddScoped`) | Scoped |
 | `EntraIdAdminTokenService` | — | Singleton (token admin mis en cache) |
 | `IPasswordResetNotifier` | `NullPasswordResetNotifier` (défaut) | Scoped |
 

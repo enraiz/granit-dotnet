@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Net;
+using Granit.Identity;
+using Granit.Identity.Events;
 using Granit.Identity.Keycloak.Internal;
 using Granit.Identity.Keycloak.Options;
 using Granit.Identity.Models;
@@ -27,6 +29,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
 
     private readonly KeycloakAdminTokenService _tokenService;
     private readonly KeycloakUserTokenExchangeService _tokenExchangeService;
+    private readonly IIdentityEventPublisher _eventPublisher = Substitute.For<IIdentityEventPublisher>();
     private readonly KeycloakIdentityProvider _provider;
 
     // Separate handler for token exchange responses (Account API user tokens).
@@ -82,6 +85,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenExchangeService,
             _httpClientFactory,
             Microsoft.Extensions.Options.Options.Create(_options),
+            _eventPublisher,
             NullLogger<KeycloakIdentityProvider>.Instance);
     }
 
@@ -548,6 +552,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             exchangeSvc,
             seqFactory,
             Microsoft.Extensions.Options.Options.Create(opts),
+            Substitute.For<IIdentityEventPublisher>(),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         IReadOnlyList<IdentityDeviceActivity> result = await provider.GetUserDeviceActivityAsync(
@@ -945,6 +950,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenExchangeService,
             locationFactory,
             Microsoft.Extensions.Options.Options.Create(_options),
+            Substitute.For<IIdentityEventPublisher>(),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         IdentityUserCreate newUser = new("alice", "alice@test.com", "Alice", "Doe");
@@ -1118,6 +1124,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenExchangeService,
             seqFactory,
             Microsoft.Extensions.Options.Options.Create(_options),
+            Substitute.For<IIdentityEventPublisher>(),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         IdentityUserUpdate update = new(Email: "newalice@test.com", FirstName: "Alicia");
@@ -1184,6 +1191,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenExchangeService,
             factory,
             Microsoft.Extensions.Options.Options.Create(optionsWithDirect),
+            Substitute.For<IIdentityEventPublisher>(),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         bool result = await provider.VerifyUserCredentialsAsync("admin", "password123",
@@ -1224,6 +1232,7 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
             _tokenExchangeService,
             factory,
             Microsoft.Extensions.Options.Options.Create(optionsWithDirect),
+            Substitute.For<IIdentityEventPublisher>(),
             NullLogger<KeycloakIdentityProvider>.Instance);
 
         bool result = await provider.VerifyUserCredentialsAsync("admin", "wrong-password",
@@ -1254,6 +1263,33 @@ public sealed class KeycloakIdentityProviderTests : IDisposable
         await Should.ThrowAsync<ArgumentNullException>(
             () => _provider.VerifyUserCredentialsAsync("admin", null!,
                 TestContext.Current.CancellationToken));
+    }
+
+    // --- Domain event publishing tests ---
+
+    [Fact]
+    public async Task SetUserEnabledAsync_PublishesEnabledChangedEvent()
+    {
+        _handler.ResponseStatusCode = HttpStatusCode.NoContent;
+        _handler.ResponseBody = string.Empty;
+
+        await _provider.SetUserEnabledAsync("u1", true, TestContext.Current.CancellationToken);
+
+        await _eventPublisher.Received(1).PublishAsync(
+            Arg.Is<IdentityUserEnabledChangedEvent>(e => e.UserId == "u1" && e.Enabled),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AssignRoleAsync_PublishesRoleAssignedEvent()
+    {
+        _handler.ResponseBody = """{"id":"role-1","name":"editor","description":"Content editor"}""";
+
+        await _provider.AssignRoleAsync("u1", "editor", TestContext.Current.CancellationToken);
+
+        await _eventPublisher.Received(1).PublishAsync(
+            Arg.Is<IdentityRoleAssignedEvent>(e => e.UserId == "u1" && e.RoleName == "editor"),
+            Arg.Any<CancellationToken>());
     }
 
     public void Dispose()

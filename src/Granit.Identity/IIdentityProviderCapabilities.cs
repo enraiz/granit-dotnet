@@ -1,0 +1,36 @@
+namespace Granit.Identity;
+
+/// <summary>
+/// Describes the capabilities supported by the active identity provider at runtime.
+/// </summary>
+/// <remarks>
+/// Consumers (endpoints, frontend) can query these capabilities to adapt their behavior
+/// instead of relying on try/catch patterns. For example, hiding the "terminate single session"
+/// button when <see cref="SupportsIndividualSessionTermination"/> is <c>false</c>.
+/// </remarks>
+public interface IIdentityProviderCapabilities
+{
+    /// <summary>The display name of the identity provider (e.g. "Keycloak", "Entra ID").</summary>
+    string ProviderName { get; }
+
+    /// <summary>Whether the provider can terminate a specific session without revoking all sessions.</summary>
+    bool SupportsIndividualSessionTermination { get; }
+
+    /// <summary>Whether the provider can send a password reset email natively (without an external notifier).</summary>
+    bool SupportsNativePasswordResetEmail { get; }
+
+    /// <summary>Whether the provider supports hierarchical group structures (sub-groups).</summary>
+    bool SupportsGroupHierarchy { get; }
+
+    /// <summary>Whether the provider supports custom user attributes.</summary>
+    bool SupportsCustomAttributes { get; }
+
+    /// <summary>Maximum number of custom attributes supported (0 if not supported).</summary>
+    int MaxCustomAttributes { get; }
+
+    /// <summary>Whether the provider supports credential verification (ROPC or equivalent).</summary>
+    bool SupportsCredentialVerification { get; }
+
+    /// <summary>Whether the provider supports creating new user accounts.</summary>
+    bool SupportsUserCreation { get; }
+}

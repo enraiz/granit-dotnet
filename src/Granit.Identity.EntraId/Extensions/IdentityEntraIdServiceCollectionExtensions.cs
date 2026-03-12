@@ -55,6 +55,7 @@ public static class IdentityEntraIdServiceCollectionExtensions
         services.TryAddSingleton<EntraIdAdminTokenService>();
         services.TryAddScoped<IPasswordResetNotifier, NullPasswordResetNotifier>();
         services.AddIdentityProvider<EntraIdIdentityProvider>();
+        services.Replace(ServiceDescriptor.Scoped<IIdentityProviderCapabilities, EntraIdIdentityProviderCapabilities>());
 
         return services;
     }

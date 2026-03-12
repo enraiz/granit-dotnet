@@ -19,6 +19,10 @@ public static class IdentityServiceCollectionExtensions
         this IServiceCollection services)
     {
         services.TryAddScoped<IIdentityProvider, NullIdentityProvider>();
+        RegisterFineGrainedInterfaces(services);
+
+        services.TryAddScoped<IIdentityProviderCapabilities, NullIdentityProviderCapabilities>();
+        services.TryAddScoped<IIdentityEventPublisher, NullIdentityEventPublisher>();
         services.TryAddScoped<IUserLookupService, NullUserLookupService>();
         services.TryAddScoped<IUserCacheStats, NullUserCacheStats>();
         return services;
@@ -36,6 +40,25 @@ public static class IdentityServiceCollectionExtensions
         where TProvider : class, IIdentityProvider
     {
         services.Replace(ServiceDescriptor.Scoped<IIdentityProvider, TProvider>());
+        RegisterFineGrainedInterfaces(services);
         return services;
+    }
+
+    private static void RegisterFineGrainedInterfaces(IServiceCollection services)
+    {
+        services.Replace(ServiceDescriptor.Scoped<IIdentityUserReader>(
+            sp => sp.GetRequiredService<IIdentityProvider>()));
+        services.Replace(ServiceDescriptor.Scoped<IIdentityUserWriter>(
+            sp => sp.GetRequiredService<IIdentityProvider>()));
+        services.Replace(ServiceDescriptor.Scoped<IIdentityRoleManager>(
+            sp => sp.GetRequiredService<IIdentityProvider>()));
+        services.Replace(ServiceDescriptor.Scoped<IIdentityGroupManager>(
+            sp => sp.GetRequiredService<IIdentityProvider>()));
+        services.Replace(ServiceDescriptor.Scoped<IIdentitySessionManager>(
+            sp => sp.GetRequiredService<IIdentityProvider>()));
+        services.Replace(ServiceDescriptor.Scoped<IIdentityPasswordManager>(
+            sp => sp.GetRequiredService<IIdentityProvider>()));
+        services.Replace(ServiceDescriptor.Scoped<IIdentityCredentialVerifier>(
+            sp => sp.GetRequiredService<IIdentityProvider>()));
     }
 }
