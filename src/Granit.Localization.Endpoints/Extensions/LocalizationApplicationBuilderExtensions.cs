@@ -44,7 +44,7 @@ public static class LocalizationApplicationBuilderExtensions
         this IApplicationBuilder app,
         Action<RequestLocalizationOptions>? configure = null)
     {
-        var granitOptions = app.ApplicationServices
+        GranitLocalizationOptions granitOptions = app.ApplicationServices
             .GetRequiredService<IOptions<GranitLocalizationOptions>>().Value;
 
         app.UseRequestLocalization(options =>
@@ -64,14 +64,14 @@ public static class LocalizationApplicationBuilderExtensions
             .Select(l => new CultureInfo(l.CultureName))
             .ToList();
 
-        var formattingCultures = granitOptions.FormattingCultures.Count > 0
+        List<CultureInfo> formattingCultures = granitOptions.FormattingCultures.Count > 0
             ? granitOptions.FormattingCultures
             : uiCultures;
 
         options.SupportedCultures = formattingCultures;
         options.SupportedUICultures = uiCultures;
 
-        var defaultLanguage = granitOptions.Languages.FirstOrDefault(l => l.IsDefault)
+        LanguageInfo? defaultLanguage = granitOptions.Languages.FirstOrDefault(l => l.IsDefault)
             ?? granitOptions.Languages.FirstOrDefault();
 
         if (defaultLanguage is not null)
