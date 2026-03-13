@@ -218,6 +218,22 @@ and is available in every module without referencing `Granit.MultiTenancy`.
 - Application modules (`AppHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
   as usual when multi-tenancy is required in the application.
 
+**`[DependsOn]` convention — direct non-transitive dependencies only**:
+
+Every `<ProjectReference>` to a package that exposes a `*Module` class must have a corresponding
+`[DependsOn(typeof(...))]` on the module class — **unless** the dependency is already satisfied
+transitively through another declared `DependsOn`.
+
+- **Direct = declare it.** If your module references `Granit.Timing` and no other declared
+  dependency already pulls in `GranitTimingModule`, add `[DependsOn(typeof(GranitTimingModule))]`.
+- **Transitive = omit it.** If your module declares `[DependsOn(typeof(GranitPersistenceModule))]`
+  and `GranitPersistenceModule` already depends on `GranitTimingModule`, do NOT also declare
+  `GranitTimingModule`.
+- **`Granit.Core`** is the implicit base — never needs a `DependsOn`.
+- **Alphabetical order** — sort `DependsOn` entries alphabetically by module name.
+- **Zero-dependency modules** (`GranitAuthorizationModule`, `GranitQueryingModule`,
+  `GranitLocalizationModule`, etc.) have no `[DependsOn]` attribute at all — this is correct.
+
 ## Personas (user stories)
 
 Two persona registries:
