@@ -3,7 +3,7 @@
 Roslyn analyzers enforcing Granit conventions: zero-downtime migrations,
 security best practices, and Entity Framework Core usage rules.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Rules
 
@@ -38,4 +38,4 @@ dotnet add package Granit.Analyzers
 
 ## Documentation
 
-See the [Granit documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/index.md).
+See the [Granit documentation](https://granit-fx.dev).

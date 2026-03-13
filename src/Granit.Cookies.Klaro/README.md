@@ -3,7 +3,7 @@
 Klaro CMP integration for Granit.Cookies. Implements `IConsentResolver` by parsing
 the Klaro consent cookie and mapping per-service consent to RGPD `CookieCategory`.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -11,6 +11,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Cookies.Klaro
 ```
 
+## Dependencies
+
+- `Granit.Cookies`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/security/cookies.md).
+See the [full documentation](https://granit-fx.dev).

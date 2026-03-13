@@ -2,7 +2,7 @@
 
 Microsoft Entra ID (Azure AD) extension for Granit.Authentication.JwtBearer: App Roles claims transformation to `ClaimTypes.Role`, Admin policy, and JWT Bearer configuration from the `EntraId` section.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Authentication.EntraId
 ```
 
+## Dependencies
+
+- `Granit.Authentication.JwtBearer`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/security/authentication.md).
+See the [full documentation](https://granit-fx.dev).

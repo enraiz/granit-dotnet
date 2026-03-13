@@ -3,7 +3,7 @@
 Minimal API endpoints for Granit.Timeline. Exposes paginated activity stream,
 comment/note posting, soft-delete (RGPD), and follower management REST endpoints.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -11,6 +11,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Timeline.Endpoints
 ```
 
+## Dependencies
+
+- `Granit.Authorization`
+- `Granit.Timeline`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/timeline/index.md).
+See the [full documentation](https://granit-fx.dev).

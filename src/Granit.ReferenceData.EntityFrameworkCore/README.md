@@ -6,7 +6,7 @@ EF Core persistence for `Granit.ReferenceData`. Provides
 and a `ReferenceDataSeedContributor` bridge for the `IDataSeedContributor`
 infrastructure.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -14,6 +14,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.ReferenceData.EntityFrameworkCore
 ```
 
+## Dependencies
+
+- `Granit.Persistence`
+- `Granit.ReferenceData`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/reference-data/efcore.md).
+See the [full documentation](https://granit-fx.dev).

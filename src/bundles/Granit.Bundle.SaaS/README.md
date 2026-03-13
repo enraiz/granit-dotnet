@@ -3,7 +3,7 @@
 Meta-package grouping Granit modules for multi-tenant SaaS applications:
 tenant isolation, feature flags per commercial plan, and rate limiting.
 
-Part of the [Granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [Granit](https://granit-fx.dev) framework.
 
 ## Included packages
 
@@ -22,4 +22,4 @@ dotnet add package Granit.Bundle.SaaS
 
 ## Documentation
 
-See the [multi-tenancy documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/multi-tenancy.md).
+See the [multi-tenancy documentation](https://granit-fx.dev).

@@ -3,7 +3,7 @@
 Meta-package grouping Granit templating and document generation modules
 for HTML-to-PDF rendering, Excel generation, and Scriban template management.
 
-Part of the [Granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [Granit](https://granit-fx.dev) framework.
 
 ## Included packages
 
@@ -24,4 +24,4 @@ dotnet add package Granit.Bundle.Documents
 
 ## Documentation
 
-See the [templating documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/documents/templating.md).
+See the [templating documentation](https://granit-fx.dev).

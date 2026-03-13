@@ -3,7 +3,7 @@
 Meta-package grouping Granit notification modules for multi-channel delivery
 (InApp, Email, SignalR real-time).
 
-Part of the [Granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [Granit](https://granit-fx.dev) framework.
 
 ## Included packages
 
@@ -24,4 +24,4 @@ dotnet add package Granit.Bundle.Notifications
 
 ## Documentation
 
-See the [notifications documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/messaging/notifications.md).
+See the [notifications documentation](https://granit-fx.dev).

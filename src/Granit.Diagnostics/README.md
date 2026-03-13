@@ -2,7 +2,7 @@
 
 Kubernetes health checks infrastructure for Granit applications. Exposes liveness, readiness and startup probes with anti-stampede cache and structured JSON format.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Diagnostics
 ```
 
+## Dependencies
+
+- `Granit.Timing`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/diagnostics/diagnostics.md).
+See the [full documentation](https://granit-fx.dev).

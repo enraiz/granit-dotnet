@@ -2,7 +2,7 @@
 
 Zero-Downtime Migrations framework (Expand & Contract) for EF Core. Progress tracking, database-agnostic multi-tenant isolation, and Wolverine batch orchestration.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Persistence.Migrations
 ```
 
+## Dependencies
+
+- `Granit.Persistence`
+- `Granit.Timing`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/migrations.md).
+See the [full documentation](https://granit-fx.dev).
