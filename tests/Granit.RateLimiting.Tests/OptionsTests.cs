@@ -50,8 +50,6 @@ public sealed class OptionsTests
     }
 
     [Fact]
-    public void SectionName_IsRateLimiting()
-    {
+    public void SectionName_IsRateLimiting() =>
         GranitRateLimitingOptions.SectionName.ShouldBe("RateLimiting");
-    }
 }

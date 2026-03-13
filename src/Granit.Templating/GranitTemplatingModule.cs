@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Templating.Extensions;
+using Granit.Timing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Granit.Templating;
@@ -19,6 +20,7 @@ namespace Granit.Templating;
 /// </list>
 /// </para>
 /// </remarks>
+[DependsOn(typeof(GranitTimingModule))]
 public sealed class GranitTemplatingModule : GranitModule
 {
     /// <inheritdoc/>

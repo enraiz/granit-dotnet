@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Security;
+using Granit.Validation;
 using Granit.Wolverine.Extensions;
 
 namespace Granit.Wolverine;
@@ -17,7 +18,9 @@ namespace Granit.Wolverine;
 /// </list>
 /// </para>
 /// </remarks>
-[DependsOn(typeof(GranitSecurityModule))]
+[DependsOn(
+    typeof(GranitSecurityModule),
+    typeof(GranitValidationModule))]
 public sealed class GranitWolverineModule : GranitModule
 {
     /// <inheritdoc/>

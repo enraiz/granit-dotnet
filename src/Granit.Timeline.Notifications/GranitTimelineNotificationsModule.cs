@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Notifications;
 using Granit.Timeline.Notifications.Extensions;
 
 namespace Granit.Timeline.Notifications;
@@ -8,7 +9,9 @@ namespace Granit.Timeline.Notifications;
 /// Replaces the default in-memory follower service and null notifier with
 /// notification-backed implementations.
 /// </summary>
-[DependsOn(typeof(GranitTimelineModule))]
+[DependsOn(
+    typeof(GranitNotificationsModule),
+    typeof(GranitTimelineModule))]
 public sealed class GranitTimelineNotificationsModule : GranitModule
 {
     /// <inheritdoc/>

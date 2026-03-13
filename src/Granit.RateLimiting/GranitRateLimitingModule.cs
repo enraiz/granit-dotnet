@@ -1,5 +1,8 @@
 using Granit.Core.Modularity;
+using Granit.ExceptionHandling;
+using Granit.Features;
 using Granit.RateLimiting.Extensions;
+using Granit.Security;
 
 namespace Granit.RateLimiting;
 
@@ -8,6 +11,10 @@ namespace Granit.RateLimiting;
 /// Registers <see cref="Abstractions.IRateLimitCounterStore"/>, <see cref="Abstractions.IRateLimitQuotaProvider"/>,
 /// and all required dependencies from configuration section <c>"RateLimiting"</c>.
 /// </summary>
+[DependsOn(
+    typeof(GranitExceptionHandlingModule),
+    typeof(GranitFeaturesModule),
+    typeof(GranitSecurityModule))]
 public sealed class GranitRateLimitingModule : GranitModule
 {
     /// <inheritdoc/>

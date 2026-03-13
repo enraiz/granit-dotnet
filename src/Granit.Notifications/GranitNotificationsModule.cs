@@ -1,5 +1,7 @@
 using Granit.Core.Modularity;
+using Granit.Guids;
 using Granit.Notifications.Extensions;
+using Granit.Querying;
 using Granit.Timing;
 
 namespace Granit.Notifications;
@@ -13,7 +15,10 @@ namespace Granit.Notifications;
 /// <c>Granit.Notifications.Wolverine</c> for durable outbox dispatch and call
 /// <c>AddGranitNotificationsEntityFrameworkCore()</c> for persistent stores.
 /// </remarks>
-[DependsOn(typeof(GranitTimingModule))]
+[DependsOn(
+    typeof(GranitGuidsModule),
+    typeof(GranitQueryingModule),
+    typeof(GranitTimingModule))]
 public sealed class GranitNotificationsModule : GranitModule
 {
     /// <inheritdoc/>

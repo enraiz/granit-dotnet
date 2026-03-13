@@ -1,5 +1,8 @@
+using Granit.ApiDocumentation;
 using Granit.Authorization;
 using Granit.Core.Modularity;
+using Granit.Security;
+using Granit.Validation;
 
 namespace Granit.Templating.Endpoints;
 
@@ -17,6 +20,9 @@ namespace Granit.Templating.Endpoints;
 /// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </remarks>
 [DependsOn(
+    typeof(GranitApiDocumentationModule),
+    typeof(GranitAuthorizationModule),
+    typeof(GranitSecurityModule),
     typeof(GranitTemplatingModule),
-    typeof(GranitAuthorizationModule))]
+    typeof(GranitValidationModule))]
 public sealed class GranitTemplatingEndpointsModule : GranitModule;

@@ -117,13 +117,11 @@ public sealed class TenantPartitionedBulkhead(
             return false;
         }
 
-        foreach (string role in _options.BypassRoles)
+        string? matchedRole = _options.BypassRoles.FirstOrDefault(currentUser.IsInRole);
+        if (matchedRole is not null)
         {
-            if (currentUser.IsInRole(role))
-            {
-                BulkheadLog.LogBypassApplied(logger, policyName, $"Role:{role}", currentUser.UserId);
-                return true;
-            }
+            BulkheadLog.LogBypassApplied(logger, policyName, $"Role:{matchedRole}", currentUser.UserId);
+            return true;
         }
 
         return false;

@@ -37,10 +37,8 @@ public sealed class OptionsTests
     }
 
     [Fact]
-    public void SectionName_IsBulkhead()
-    {
+    public void SectionName_IsBulkhead() =>
         GranitBulkheadOptions.SectionName.ShouldBe("Bulkhead");
-    }
 
     [Fact]
     public void Policies_CaseInsensitive()

@@ -56,7 +56,7 @@ EOF
 
 - `## Objectif`
 - `## Features` (placeholder for links)
-- `## Contraintes` (RGPD/ISO 27001/ISO 9001)
+- `## Contraintes` (RGPD/ISO 27001)
 - `## Critères de succès`
 
 ### Bug — required sections

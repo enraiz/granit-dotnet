@@ -5,7 +5,7 @@
 - **Type**: Rock-solid, production-ready modular framework for .NET and React
 - **Repo**: `granit-dotnet` (company-level, not product-specific)
 - **License**: Apache-2.0 (open-source)
-- **Compliance**: GDPR + ISO 27001 + ISO 9001
+- **Compliance**: GDPR + ISO 27001
 - **Publication**: nuget.org (planned), GitLab Package Registry (internal)
 
 ## Stack & versions
@@ -134,12 +134,72 @@ dotnet pack -c Release -o ./nupkgs   # local NuGet pack
 dotnet format --verify-no-changes
 ```
 
+## Documentation site (Starlight)
+
+The project documentation lives in `docs-site/` — an Astro + Starlight site.
+
+### Structure
+
+| Path | Content |
+| ---- | ------- |
+| `docs-site/src/content/docs/getting-started/` | Getting started guides (.NET) |
+| `docs-site/src/content/docs/guides/` | How-to guides (backend + frontend) |
+| `docs-site/src/content/docs/concepts/` | Conceptual pages (security, compliance, multi-tenancy) |
+| `docs-site/src/content/docs/operations/` | Ops pages (CI/CD, deployment, observability, production checklist) |
+| `docs-site/src/content/docs/reference/modules/` | .NET module reference (one `.mdx` per module) |
+| `docs-site/src/content/docs/reference/frontend/` | Frontend SDK reference (one `.mdx` per package group) |
+| `docs-site/src/content/docs/architecture/patterns/` | Backend design patterns |
+| `docs-site/src/content/docs/architecture/patterns-frontend/` | Frontend design patterns |
+| `docs-site/src/content/docs/architecture/adr/` | Backend ADRs |
+| `docs-site/src/content/docs/architecture/adr-frontend/` | Frontend ADRs |
+| `docs-site/src/pages/index.astro` | Landing page (custom, not Starlight) |
+| `docs-site/src/data/constants.ts` | Counters used across the site |
+| `docs-site/astro.config.mjs` | Sidebar configuration (starlight-sidebar-topics) |
+
+### Constants — `docs-site/src/data/constants.ts`
+
+When adding/removing packages, patterns, ADRs, or cultures, **update the counters**:
+
+```typescript
+export const PACKAGE_COUNT = 93;          // .NET NuGet packages
+export const FRONTEND_PACKAGE_COUNT = 49; // @granit/* npm packages
+export const CULTURE_COUNT = 17;          // Supported cultures
+export const PATTERN_COUNT = 51;          // Design pattern pages (backend + frontend)
+export const ADR_COUNT = 16;              // ADR pages (backend only, frontend separate)
+```
+
+These constants are referenced on the landing page and across the docs.
+
+### When creating a new .NET module
+
+1. Create `docs-site/src/content/docs/reference/modules/<module-name>.mdx`
+2. Update `PACKAGE_COUNT` in `docs-site/src/data/constants.ts`
+3. The sidebar auto-discovers files in `reference/modules/` — no config change needed
+4. Add a "See also" link from related existing module pages
+
+### When creating a new frontend package
+
+1. Create `docs-site/src/content/docs/reference/frontend/<package-name>.mdx`
+2. Update `FRONTEND_PACKAGE_COUNT` in `docs-site/src/data/constants.ts`
+3. The sidebar auto-discovers files in `reference/frontend/` — no config change needed
+
+### When adding a new ADR or pattern
+
+1. Create the `.md` file in the appropriate directory (`architecture/adr/`, `architecture/patterns/`, etc.)
+2. Update `ADR_COUNT` or `PATTERN_COUNT` in `docs-site/src/data/constants.ts`
+3. Update the index page table (`architecture/adr/index.mdx` or `architecture/patterns/index.md`)
+
+### Build and verify
+
+```bash
+cd docs-site && npx astro build   # must produce 0 errors, all links valid
+```
+
 ## Compliance constraints
 
 1. **GDPR**: Minimization, right to erasure, pseudonymization
 2. **ISO 27001**: Audit trail, encryption at rest and in transit
-3. **ISO 9001**: Quality management, traceability
-4. **Secrets**: No plaintext secrets, mandatory rotation
+3. **Secrets**: No plaintext secrets, mandatory rotation
 
 ## Language
 
@@ -217,6 +277,22 @@ and is available in every module without referencing `Granit.MultiTenancy`.
   strict tenant isolation (example: BlobStorage — throws if no tenant context, GDPR).
 - Application modules (`AppHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
   as usual when multi-tenancy is required in the application.
+
+**`[DependsOn]` convention — direct non-transitive dependencies only**:
+
+Every `<ProjectReference>` to a package that exposes a `*Module` class must have a corresponding
+`[DependsOn(typeof(...))]` on the module class — **unless** the dependency is already satisfied
+transitively through another declared `DependsOn`.
+
+- **Direct = declare it.** If your module references `Granit.Timing` and no other declared
+  dependency already pulls in `GranitTimingModule`, add `[DependsOn(typeof(GranitTimingModule))]`.
+- **Transitive = omit it.** If your module declares `[DependsOn(typeof(GranitPersistenceModule))]`
+  and `GranitPersistenceModule` already depends on `GranitTimingModule`, do NOT also declare
+  `GranitTimingModule`.
+- **`Granit.Core`** is the implicit base — never needs a `DependsOn`.
+- **Alphabetical order** — sort `DependsOn` entries alphabetically by module name.
+- **Zero-dependency modules** (`GranitAuthorizationModule`, `GranitQueryingModule`,
+  `GranitLocalizationModule`, etc.) have no `[DependsOn]` attribute at all — this is correct.
 
 ## Personas (user stories)
 
@@ -319,7 +395,7 @@ rewrite code without understanding the original intent.
 
 ## Expected behavior
 
-- Understand GDPR, ISO 27001 and ISO 9001 context before responding
+- Understand GDPR and ISO 27001 context before responding
 - Challenge security bad practices
 - Propose alternatives when a request compromises security
 - Explain the "why" behind best practices

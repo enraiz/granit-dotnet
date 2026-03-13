@@ -7,7 +7,7 @@ namespace Granit.Identity.Internal;
 internal sealed class NullIdentityEventPublisher : IIdentityEventPublisher
 {
     /// <inheritdoc/>
-    public Task PublishAsync<TEvent>(TEvent domainEvent, CancellationToken cancellationToken)
+    public Task PublishAsync<TEvent>(TEvent domainEvent, CancellationToken cancellationToken = default)
         where TEvent : notnull =>
         Task.CompletedTask;
 }

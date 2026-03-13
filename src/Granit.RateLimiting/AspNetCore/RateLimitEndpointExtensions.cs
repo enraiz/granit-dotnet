@@ -4,6 +4,7 @@ using Granit.RateLimiting.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 
 namespace Granit.RateLimiting.AspNetCore;
 
@@ -32,7 +33,7 @@ public static class RateLimitEndpointExtensions
 
             if (result is { IsAllowed: false })
             {
-                context.HttpContext.Response.Headers["Retry-After"] = ((int)Math.Ceiling(result.RetryAfter.TotalSeconds)).ToString();
+                context.HttpContext.Response.Headers[HeaderNames.RetryAfter] = ((int)Math.Ceiling(result.RetryAfter.TotalSeconds)).ToString();
 
                 return TypedResults.Problem(
                     detail: $"Rate limit exceeded for policy '{policyName}'. Retry after {result.RetryAfter.TotalSeconds:F0}s.",

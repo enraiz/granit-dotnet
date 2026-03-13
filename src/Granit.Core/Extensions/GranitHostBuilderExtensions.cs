@@ -25,16 +25,6 @@ public static class GranitHostBuilderExtensions
         AddGranitCore(builder, ModuleLoader.LoadModules<TModule>());
 
     /// <summary>
-    /// Discovers and configures all Granit modules from the root module
-    /// <typeparamref name="TModule"/> (asynchronous version).
-    /// </summary>
-    /// <typeparam name="TModule">Root module of the application.</typeparam>
-    public static Task<IHostApplicationBuilder> AddGranitAsync<TModule>(
-        this IHostApplicationBuilder builder)
-        where TModule : GranitModule =>
-        AddGranitCoreAsync(builder, ModuleLoader.LoadModules<TModule>());
-
-    /// <summary>
     /// Configures Granit modules using a fluent builder API (synchronous version).
     /// Coexists with <see cref="DependsOnAttribute"/> — modules added via the builder
     /// still have their <c>[DependsOn]</c> dependencies resolved automatically.
@@ -63,6 +53,16 @@ public static class GranitHostBuilderExtensions
         IReadOnlyList<ModuleDescriptor> modules = ModuleLoader.LoadModules(granitBuilder.ModuleTypes);
         return AddGranitCore(builder, modules);
     }
+
+    /// <summary>
+    /// Discovers and configures all Granit modules from the root module
+    /// <typeparamref name="TModule"/> (asynchronous version).
+    /// </summary>
+    /// <typeparam name="TModule">Root module of the application.</typeparam>
+    public static Task<IHostApplicationBuilder> AddGranitAsync<TModule>(
+        this IHostApplicationBuilder builder)
+        where TModule : GranitModule =>
+        AddGranitCoreAsync(builder, ModuleLoader.LoadModules<TModule>());
 
     /// <summary>
     /// Configures Granit modules using a fluent builder API (asynchronous version).

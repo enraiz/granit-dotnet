@@ -39,10 +39,8 @@ public sealed class TenantPartitionedRateLimiterTests : IDisposable
         _meterFactory = sp.GetRequiredService<IMeterFactory>();
     }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         (_meterFactory as IDisposable)?.Dispose();
-    }
 
     private TenantPartitionedRateLimiter CreateLimiter() =>
         new(

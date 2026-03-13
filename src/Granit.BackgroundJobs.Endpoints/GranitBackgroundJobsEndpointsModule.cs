@@ -1,5 +1,6 @@
 using Granit.Authorization;
 using Granit.Core.Modularity;
+using Granit.Querying;
 
 namespace Granit.BackgroundJobs.Endpoints;
 
@@ -14,6 +15,7 @@ namespace Granit.BackgroundJobs.Endpoints;
 /// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </remarks>
 [DependsOn(
+    typeof(GranitAuthorizationModule),
     typeof(GranitBackgroundJobsModule),
-    typeof(GranitAuthorizationModule))]
+    typeof(GranitQueryingModule))]
 public sealed class GranitBackgroundJobsEndpointsModule : GranitModule;

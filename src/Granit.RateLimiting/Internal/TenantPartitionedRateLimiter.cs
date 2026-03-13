@@ -77,13 +77,11 @@ public sealed class TenantPartitionedRateLimiter(
             return false;
         }
 
-        foreach (string role in _options.BypassRoles)
+        string? matchedRole = _options.BypassRoles.FirstOrDefault(currentUser.IsInRole);
+        if (matchedRole is not null)
         {
-            if (currentUser.IsInRole(role))
-            {
-                RateLimitingLog.LogBypassApplied(logger, policyName, role, currentUser.UserId);
-                return true;
-            }
+            RateLimitingLog.LogBypassApplied(logger, policyName, matchedRole, currentUser.UserId);
+            return true;
         }
 
         return false;

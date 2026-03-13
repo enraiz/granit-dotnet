@@ -211,10 +211,8 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
     }
 
     [Fact]
-    public void ActivitySource_HasCorrectName()
-    {
+    public void ActivitySource_HasCorrectName() =>
         IdentityEntraIdActivitySource.Name.ShouldBe("Granit.Identity.EntraId");
-    }
 
     [Fact]
     public async Task SpansDoNotContainPii()

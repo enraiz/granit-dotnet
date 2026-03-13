@@ -2,6 +2,9 @@ using Granit.BackgroundJobs.Domain;
 using Granit.BackgroundJobs.Extensions;
 using Granit.BackgroundJobs.Options;
 using Granit.Core.Modularity;
+using Granit.Guids;
+using Granit.Security;
+using Granit.Timing;
 
 namespace Granit.BackgroundJobs;
 
@@ -20,6 +23,10 @@ namespace Granit.BackgroundJobs;
 /// </list>
 /// </para>
 /// </remarks>
+[DependsOn(
+    typeof(GranitGuidsModule),
+    typeof(GranitSecurityModule),
+    typeof(GranitTimingModule))]
 public sealed class GranitBackgroundJobsModule : GranitModule
 {
     /// <inheritdoc/>

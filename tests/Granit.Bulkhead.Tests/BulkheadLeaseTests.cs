@@ -23,18 +23,16 @@ public sealed class BulkheadLeaseTests : IDisposable
     // =========================================================================
 
     [Fact]
-    public void NoOp_IsAcquired_ReturnsTrue()
-    {
+    public void NoOp_IsAcquired_ReturnsTrue() =>
         BulkheadLease.NoOp.IsAcquired.ShouldBeTrue();
-    }
 
     [Fact]
-    public void NoOp_Dispose_DoesNotThrow()
-    {
-        // Disposing NoOp multiple times should be safe
-        BulkheadLease.NoOp.Dispose();
-        BulkheadLease.NoOp.Dispose();
-    }
+    public void NoOp_Dispose_DoesNotThrow() =>
+        Should.NotThrow(() =>
+        {
+            BulkheadLease.NoOp.Dispose();
+            BulkheadLease.NoOp.Dispose();
+        });
 
     // =========================================================================
     // Dispose releases permit

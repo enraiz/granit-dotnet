@@ -1,5 +1,7 @@
 using Granit.Core.Modularity;
 using Granit.DataExchange.Extensions;
+using Granit.Guids;
+using Granit.Querying;
 using Granit.Timing;
 using Granit.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +28,8 @@ namespace Granit.DataExchange;
 /// </para>
 /// </remarks>
 [DependsOn(
+    typeof(GranitGuidsModule),
+    typeof(GranitQueryingModule),
     typeof(GranitTimingModule),
     typeof(GranitValidationModule))]
 public sealed class GranitDataExchangeModule : GranitModule
