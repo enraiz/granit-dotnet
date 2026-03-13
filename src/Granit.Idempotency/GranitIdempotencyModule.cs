@@ -1,5 +1,7 @@
+using Granit.Caching;
 using Granit.Core.Modularity;
 using Granit.Idempotency.Extensions;
+using Granit.Security;
 
 namespace Granit.Idempotency;
 
@@ -8,6 +10,9 @@ namespace Granit.Idempotency;
 /// Registers <see cref="Abstractions.IIdempotencyStore"/>, <see cref="Internal.IdempotencyMiddleware"/>,
 /// and all required dependencies from configuration section <c>"Idempotency"</c>.
 /// </summary>
+[DependsOn(
+    typeof(GranitCachingModule),
+    typeof(GranitSecurityModule))]
 public sealed class GranitIdempotencyModule : GranitModule
 {
     /// <inheritdoc/>

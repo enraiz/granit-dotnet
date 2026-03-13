@@ -1,5 +1,7 @@
 using Granit.Authorization;
 using Granit.Core.Modularity;
+using Granit.Timing;
+using Granit.Validation;
 
 namespace Granit.Settings.Endpoints;
 
@@ -21,6 +23,8 @@ namespace Granit.Settings.Endpoints;
 /// Permission and setting definition providers are auto-discovered by their respective modules.
 /// </remarks>
 [DependsOn(
+    typeof(GranitAuthorizationModule),
     typeof(GranitSettingsModule),
-    typeof(GranitAuthorizationModule))]
+    typeof(GranitTimingModule),
+    typeof(GranitValidationModule))]
 public sealed class GranitSettingsEndpointsModule : GranitModule;

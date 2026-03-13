@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.ExceptionHandling;
 using Granit.Guids;
 using Granit.Persistence.Extensions;
 using Granit.Security;
@@ -13,9 +14,10 @@ namespace Granit.Persistence;
 /// n'est pas une dépendance directe de ce module.
 /// </summary>
 [DependsOn(
-    typeof(GranitTimingModule),
+    typeof(GranitExceptionHandlingModule),
     typeof(GranitGuidsModule),
-    typeof(GranitSecurityModule))]
+    typeof(GranitSecurityModule),
+    typeof(GranitTimingModule))]
 public sealed class GranitPersistenceModule : GranitModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context) =>

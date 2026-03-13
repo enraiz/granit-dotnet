@@ -1,3 +1,4 @@
+using Granit.ApiDocumentation;
 using Granit.Authorization;
 using Granit.Core.Modularity;
 
@@ -14,6 +15,7 @@ namespace Granit.DataExchange.Endpoints;
 /// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </remarks>
 [DependsOn(
-    typeof(GranitDataExchangeModule),
-    typeof(GranitAuthorizationModule))]
+    typeof(GranitApiDocumentationModule),
+    typeof(GranitAuthorizationModule),
+    typeof(GranitDataExchangeModule))]
 public sealed class GranitDataExchangeEndpointsModule : GranitModule;

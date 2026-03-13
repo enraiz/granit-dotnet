@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Querying;
 using Granit.ReferenceData.Extensions;
 
 namespace Granit.ReferenceData;
@@ -13,6 +14,7 @@ namespace Granit.ReferenceData;
 /// services.AddGranitReferenceData();
 /// </code>
 /// </remarks>
+[DependsOn(typeof(GranitQueryingModule))]
 public sealed class GranitReferenceDataModule : GranitModule
 {
     /// <inheritdoc/>

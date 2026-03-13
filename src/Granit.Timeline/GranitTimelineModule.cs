@@ -1,4 +1,7 @@
 using Granit.Core.Modularity;
+using Granit.Guids;
+using Granit.Querying;
+using Granit.Security;
 using Granit.Timeline.Extensions;
 using Granit.Timing;
 
@@ -12,7 +15,11 @@ namespace Granit.Timeline;
 /// For production, call <c>AddGranitTimelineEntityFrameworkCore()</c>
 /// to enable durable persistence.
 /// </remarks>
-[DependsOn(typeof(GranitTimingModule))]
+[DependsOn(
+    typeof(GranitGuidsModule),
+    typeof(GranitQueryingModule),
+    typeof(GranitSecurityModule),
+    typeof(GranitTimingModule))]
 public sealed class GranitTimelineModule : GranitModule
 {
     /// <inheritdoc/>

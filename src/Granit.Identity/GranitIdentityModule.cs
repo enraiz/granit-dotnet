@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Identity.Extensions;
+using Granit.Querying;
 
 namespace Granit.Identity;
 
@@ -9,6 +10,7 @@ namespace Granit.Identity;
 /// Install a provider package (e.g. <c>Granit.Identity.Keycloak</c>) to connect
 /// to a real identity system.
 /// </summary>
+[DependsOn(typeof(GranitQueryingModule))]
 public sealed class GranitIdentityModule : GranitModule
 {
     /// <inheritdoc/>

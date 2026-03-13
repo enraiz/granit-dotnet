@@ -1,5 +1,6 @@
 using Granit.Core.Modularity;
 using Granit.Identity.EntraId.Extensions;
+using Granit.Timing;
 
 namespace Granit.Identity.EntraId;
 
@@ -7,7 +8,9 @@ namespace Granit.Identity.EntraId;
 /// Granit module that registers the Microsoft Graph API as the
 /// <see cref="IIdentityProvider"/> implementation.
 /// </summary>
-[DependsOn(typeof(GranitIdentityModule))]
+[DependsOn(
+    typeof(GranitIdentityModule),
+    typeof(GranitTimingModule))]
 public sealed class GranitIdentityEntraIdModule : GranitModule
 {
     /// <inheritdoc/>

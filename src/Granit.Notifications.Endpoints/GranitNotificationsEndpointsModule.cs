@@ -1,4 +1,6 @@
+using Granit.ApiDocumentation;
 using Granit.Core.Modularity;
+using Granit.Validation;
 
 namespace Granit.Notifications.Endpoints;
 
@@ -10,6 +12,9 @@ namespace Granit.Notifications.Endpoints;
 /// management routes via Minimal API endpoints.
 /// Validators are auto-discovered by <c>GranitValidationModule</c>.
 /// </remarks>
-[DependsOn(typeof(GranitNotificationsModule))]
+[DependsOn(
+    typeof(GranitApiDocumentationModule),
+    typeof(GranitNotificationsModule),
+    typeof(GranitValidationModule))]
 public sealed class GranitNotificationsEndpointsModule : GranitModule;
 

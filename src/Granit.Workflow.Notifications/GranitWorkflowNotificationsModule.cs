@@ -1,4 +1,7 @@
+using Granit.Authorization;
 using Granit.Core.Modularity;
+using Granit.Identity;
+using Granit.Notifications;
 using Granit.Workflow.Notifications.Extensions;
 
 namespace Granit.Workflow.Notifications;
@@ -20,7 +23,11 @@ namespace Granit.Workflow.Notifications;
 /// via <c>services.AddWorkflowApproverResolver&lt;MyResolver&gt;()</c>.
 /// </para>
 /// </remarks>
-[DependsOn(typeof(GranitWorkflowModule))]
+[DependsOn(
+    typeof(GranitAuthorizationModule),
+    typeof(GranitIdentityModule),
+    typeof(GranitNotificationsModule),
+    typeof(GranitWorkflowModule))]
 public sealed class GranitWorkflowNotificationsModule : GranitModule
 {
     /// <inheritdoc/>

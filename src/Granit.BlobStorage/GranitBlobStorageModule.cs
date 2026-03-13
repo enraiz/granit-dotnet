@@ -1,4 +1,5 @@
 using Granit.Core.Modularity;
+using Granit.Guids;
 
 namespace Granit.BlobStorage;
 
@@ -16,4 +17,5 @@ namespace Granit.BlobStorage;
 /// <see cref="BlobStorageLocalizationResource"/>.
 /// </para>
 /// </remarks>
+[DependsOn(typeof(GranitGuidsModule))]
 public sealed class GranitBlobStorageModule : GranitModule;

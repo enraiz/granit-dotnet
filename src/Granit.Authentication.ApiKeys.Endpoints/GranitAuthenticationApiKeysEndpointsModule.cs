@@ -1,5 +1,7 @@
+using Granit.ApiDocumentation;
 using Granit.Authorization;
 using Granit.Core.Modularity;
+using Granit.Validation;
 
 namespace Granit.Authentication.ApiKeys.Endpoints;
 
@@ -8,6 +10,8 @@ namespace Granit.Authentication.ApiKeys.Endpoints;
 /// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </summary>
 [DependsOn(
+    typeof(GranitApiDocumentationModule),
     typeof(GranitAuthenticationApiKeysModule),
-    typeof(GranitAuthorizationModule))]
+    typeof(GranitAuthorizationModule),
+    typeof(GranitValidationModule))]
 public sealed class GranitAuthenticationApiKeysEndpointsModule : GranitModule;
