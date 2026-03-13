@@ -24,6 +24,8 @@ internal static class BlobStorageS3ActivitySource
     internal const string Delete = "blobstorage.delete";
     internal const string GetSize = "blobstorage.get-size";
     internal const string PartialStream = "blobstorage.partial-stream";
+    internal const string Save = "blobstorage.save";
+    internal const string Read = "blobstorage.read";
 
     // ──── Tag names ────
 

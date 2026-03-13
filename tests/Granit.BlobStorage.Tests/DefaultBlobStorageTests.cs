@@ -20,7 +20,8 @@ public sealed class DefaultBlobStorageTests
     private readonly IBlobDescriptorReader _reader = Substitute.For<IBlobDescriptorReader>();
     private readonly IBlobDescriptorWriter _writer = Substitute.For<IBlobDescriptorWriter>();
     private readonly IBlobKeyStrategy _keyStrategy = Substitute.For<IBlobKeyStrategy>();
-    private readonly IBlobStorageClient _storageClient = Substitute.For<IBlobStorageClient>();
+    private readonly IBlobStoreProvider _storeProvider = Substitute.For<IBlobStoreProvider>();
+    private readonly IPresignedUrlProvider _presignedUrlProvider = Substitute.For<IPresignedUrlProvider>();
     private readonly IGuidGenerator _guidGenerator = Substitute.For<IGuidGenerator>();
     private readonly IClock _clock = Substitute.For<IClock>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
@@ -36,7 +37,8 @@ public sealed class DefaultBlobStorageTests
             _reader,
             _writer,
             _keyStrategy,
-            _storageClient,
+            _storeProvider,
+            _presignedUrlProvider,
             _guidGenerator,
             _clock,
             _currentTenant,
@@ -62,7 +64,7 @@ public sealed class DefaultBlobStorageTests
             Now.AddMinutes(15),
             new Dictionary<string, string> { ["Content-Type"] = "image/jpeg" });
 
-        _storageClient.GenerateUploadTicketAsync(
+        _presignedUrlProvider.GenerateUploadTicketAsync(
             "granit-blobs",
             Arg.Any<string>(),
             blobId,
@@ -90,7 +92,7 @@ public sealed class DefaultBlobStorageTests
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
 
         PresignedUploadTicket ticket = new(blobId, new Uri("https://s3.example.com/up"), "PUT", Now.AddMinutes(15), new Dictionary<string, string>());
-        _storageClient.GenerateUploadTicketAsync(
+        _presignedUrlProvider.GenerateUploadTicketAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid>(),
             Arg.Any<BlobUploadRequest>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
             .Returns(ticket);
@@ -122,14 +124,14 @@ public sealed class DefaultBlobStorageTests
         _guidGenerator.Create().Returns(blobId);
         _keyStrategy.BuildObjectKey(Arg.Any<string>(), Arg.Any<Guid>()).Returns("key");
         _keyStrategy.ResolveBucketName(Arg.Any<string>()).Returns("bucket");
-        _storageClient.GenerateUploadTicketAsync(
+        _presignedUrlProvider.GenerateUploadTicketAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid>(),
             Arg.Any<BlobUploadRequest>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
             .Returns(new PresignedUploadTicket(blobId, new Uri("https://s3.example.com/up"), "PUT", Now.AddMinutes(15), new Dictionary<string, string>()));
 
         BlobStorageOptions customOptions = new() { UploadUrlExpiry = TimeSpan.FromMinutes(30) };
         DefaultBlobStorage sutWithCustomOptions = new(
-            _reader, _writer, _keyStrategy, _storageClient,
+            _reader, _writer, _keyStrategy, _storeProvider, _presignedUrlProvider,
             _guidGenerator, _clock, _currentTenant,
             Microsoft.Extensions.Options.Options.Create(customOptions));
 
@@ -137,7 +139,7 @@ public sealed class DefaultBlobStorageTests
         await sutWithCustomOptions.InitiateUploadAsync("docs", new BlobUploadRequest("file.pdf", "application/pdf", 1_000_000), TestContext.Current.CancellationToken);
 
         // Assert
-        await _storageClient.Received(1).GenerateUploadTicketAsync(
+        await _presignedUrlProvider.Received(1).GenerateUploadTicketAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<BlobUploadRequest>(),
             TimeSpan.FromMinutes(30),
             Arg.Any<CancellationToken>());
@@ -173,7 +175,7 @@ public sealed class DefaultBlobStorageTests
         _keyStrategy.ResolveBucketName("medical-images").Returns("granit-blobs");
 
         PresignedDownloadUrl expectedUrl = new(new Uri("https://s3.example.com/download"), Now.AddMinutes(5));
-        _storageClient.GenerateDownloadUrlAsync(
+        _presignedUrlProvider.GenerateDownloadUrlAsync(
             "granit-blobs", Arg.Any<string>(), Arg.Any<DownloadUrlOptions?>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
             .Returns(expectedUrl);
 
@@ -228,7 +230,7 @@ public sealed class DefaultBlobStorageTests
         await _sut.DeleteAsync("medical-images", blobId, "RGPD Art. 17", TestContext.Current.CancellationToken);
 
         // Assert — S3 physically deleted
-        await _storageClient.Received(1).DeleteObjectAsync("granit-blobs", descriptor.ObjectKey, Arg.Any<CancellationToken>());
+        await _storeProvider.Received(1).DeleteAsync("granit-blobs", descriptor.ObjectKey, Arg.Any<CancellationToken>());
         // Assert — descriptor updated in store with Deleted status
         await _writer.Received(1).UpdateAsync(
             Arg.Is<BlobDescriptor>(d =>
@@ -250,7 +252,7 @@ public sealed class DefaultBlobStorageTests
         await _sut.DeleteAsync("medical-images", blobId, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert — no S3 call, no store update
-        await _storageClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _storeProvider.DidNotReceive().DeleteAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _writer.DidNotReceive().UpdateAsync(Arg.Any<BlobDescriptor>(), Arg.Any<CancellationToken>());
     }
 
@@ -266,7 +268,7 @@ public sealed class DefaultBlobStorageTests
 
         // Assert
         await Should.ThrowAsync<BlobNotFoundException>(act);
-        await _storageClient.DidNotReceive().DeleteObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _storeProvider.DidNotReceive().DeleteAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
