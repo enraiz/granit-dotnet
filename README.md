@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/granit-logo.svg" alt="granit" width="200" />
+  <img src="docs-site/src/assets/granit-icon.svg" alt="granit" width="200" />
 </p>
 
 <p align="center">

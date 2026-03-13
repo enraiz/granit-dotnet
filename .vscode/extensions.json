@@ -1,6 +1,10 @@
 {
-    "recommendations": [
-        "unifiedjs.vscode-mdx",
-        "astro-build.astro-vscode"
-    ]
+  "recommendations": [
+    "ms-dotnettools.csdevkit",
+    "editorconfig.editorconfig",
+    "sonarsource.sonarlint-vscode",
+    "davidanson.vscode-markdownlint",
+    "unifiedjs.vscode-mdx",
+    "astro-build.astro-vscode"
+  ]
 }
