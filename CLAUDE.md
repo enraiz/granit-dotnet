@@ -134,6 +134,67 @@ dotnet pack -c Release -o ./nupkgs   # local NuGet pack
 dotnet format --verify-no-changes
 ```
 
+## Documentation site (Starlight)
+
+The project documentation lives in `docs-site/` — an Astro + Starlight site.
+
+### Structure
+
+| Path | Content |
+| ---- | ------- |
+| `docs-site/src/content/docs/getting-started/` | Getting started guides (.NET) |
+| `docs-site/src/content/docs/guides/` | How-to guides (backend + frontend) |
+| `docs-site/src/content/docs/concepts/` | Conceptual pages (security, compliance, multi-tenancy) |
+| `docs-site/src/content/docs/operations/` | Ops pages (CI/CD, deployment, observability, production checklist) |
+| `docs-site/src/content/docs/reference/modules/` | .NET module reference (one `.mdx` per module) |
+| `docs-site/src/content/docs/reference/frontend/` | Frontend SDK reference (one `.mdx` per package group) |
+| `docs-site/src/content/docs/architecture/patterns/` | Backend design patterns |
+| `docs-site/src/content/docs/architecture/patterns-frontend/` | Frontend design patterns |
+| `docs-site/src/content/docs/architecture/adr/` | Backend ADRs |
+| `docs-site/src/content/docs/architecture/adr-frontend/` | Frontend ADRs |
+| `docs-site/src/pages/index.astro` | Landing page (custom, not Starlight) |
+| `docs-site/src/data/constants.ts` | Counters used across the site |
+| `docs-site/astro.config.mjs` | Sidebar configuration (starlight-sidebar-topics) |
+
+### Constants — `docs-site/src/data/constants.ts`
+
+When adding/removing packages, patterns, ADRs, or cultures, **update the counters**:
+
+```typescript
+export const PACKAGE_COUNT = 93;          // .NET NuGet packages
+export const FRONTEND_PACKAGE_COUNT = 49; // @granit/* npm packages
+export const CULTURE_COUNT = 17;          // Supported cultures
+export const PATTERN_COUNT = 51;          // Design pattern pages (backend + frontend)
+export const ADR_COUNT = 16;              // ADR pages (backend only, frontend separate)
+```
+
+These constants are referenced on the landing page and across the docs.
+
+### When creating a new .NET module
+
+1. Create `docs-site/src/content/docs/reference/modules/<module-name>.mdx`
+2. Update `PACKAGE_COUNT` in `docs-site/src/data/constants.ts`
+3. The sidebar auto-discovers files in `reference/modules/` — no config change needed
+4. Add a "See also" link from related existing module pages
+
+### When creating a new frontend package
+
+1. Create `docs-site/src/content/docs/reference/frontend/<package-name>.mdx`
+2. Update `FRONTEND_PACKAGE_COUNT` in `docs-site/src/data/constants.ts`
+3. The sidebar auto-discovers files in `reference/frontend/` — no config change needed
+
+### When adding a new ADR or pattern
+
+1. Create the `.md` file in the appropriate directory (`architecture/adr/`, `architecture/patterns/`, etc.)
+2. Update `ADR_COUNT` or `PATTERN_COUNT` in `docs-site/src/data/constants.ts`
+3. Update the index page table (`architecture/adr/index.mdx` or `architecture/patterns/index.md`)
+
+### Build and verify
+
+```bash
+cd docs-site && npx astro build   # must produce 0 errors, all links valid
+```
+
 ## Compliance constraints
 
 1. **GDPR**: Minimization, right to erasure, pseudonymization
