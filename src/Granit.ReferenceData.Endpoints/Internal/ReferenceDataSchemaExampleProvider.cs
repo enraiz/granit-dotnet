@@ -9,6 +9,9 @@ namespace Granit.ReferenceData.Endpoints.Internal;
 /// </summary>
 internal sealed class ReferenceDataSchemaExampleProvider : ISchemaExampleProvider
 {
+    private const string Europe = "Europe";
+    private const string Europa = "Europa";
+
     /// <inheritdoc/>
     public IReadOnlyDictionary<Type, JsonNode> GetExamples() =>
         new Dictionary<Type, JsonNode>
@@ -16,24 +19,24 @@ internal sealed class ReferenceDataSchemaExampleProvider : ISchemaExampleProvide
             [typeof(ReferenceDataCreateRequest)] = new JsonObject
             {
                 ["code"] = "EUR",
-                ["labelEn"] = "Europe",
-                ["labelFr"] = "Europe",
-                ["labelNl"] = "Europa",
-                ["labelDe"] = "Europa",
-                ["labelEs"] = "Europa",
-                ["labelIt"] = "Europa",
-                ["labelPt"] = "Europa",
+                ["labelEn"] = Europe,
+                ["labelFr"] = Europe,
+                ["labelNl"] = Europa,
+                ["labelDe"] = Europa,
+                ["labelEs"] = Europa,
+                ["labelIt"] = Europa,
+                ["labelPt"] = Europa,
                 ["sortOrder"] = 1,
             },
             [typeof(ReferenceDataUpdateRequest)] = new JsonObject
             {
-                ["labelEn"] = "Europe",
-                ["labelFr"] = "Europe",
-                ["labelNl"] = "Europa",
-                ["labelDe"] = "Europa",
-                ["labelEs"] = "Europa",
-                ["labelIt"] = "Europa",
-                ["labelPt"] = "Europa",
+                ["labelEn"] = Europe,
+                ["labelFr"] = Europe,
+                ["labelNl"] = Europa,
+                ["labelDe"] = Europa,
+                ["labelEs"] = Europa,
+                ["labelIt"] = Europa,
+                ["labelPt"] = Europa,
                 ["sortOrder"] = 1,
                 ["isActive"] = true,
             },

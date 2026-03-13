@@ -35,10 +35,8 @@ public sealed class RateLimitMiddlewareTests : IDisposable
         _meterFactory = sp.GetRequiredService<IMeterFactory>();
     }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         (_meterFactory as IDisposable)?.Dispose();
-    }
 
     private TenantPartitionedRateLimiter CreateLimiter(GranitRateLimitingOptions? options = null)
     {

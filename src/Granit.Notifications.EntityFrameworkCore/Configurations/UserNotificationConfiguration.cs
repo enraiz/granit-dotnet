@@ -16,8 +16,6 @@ internal sealed class UserNotificationConfiguration : IEntityTypeConfiguration<U
         builder.Property(x => x.NotificationTypeName).HasMaxLength(256).IsRequired();
         builder.Property(x => x.RecipientUserId).HasMaxLength(256).IsRequired();
 
-        // Provider-agnostic JSON storage. Npgsql auto-maps JsonElement to jsonb;
-        // other providers fall back to the string conversion below.
         builder.Property(x => x.Data)
             .HasConversion(new ValueConverter<JsonElement, string>(
                 v => v.GetRawText(),
