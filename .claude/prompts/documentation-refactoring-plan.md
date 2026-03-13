@@ -24,7 +24,7 @@ production-ready ASP.NET Core APIs. Key characteristics:
   auto-discovery of validators/providers, fluent `GranitBuilder` API
 - **5 bundles**: Essentials, Api, Documents, Notifications, SaaS — meta-packages for
   quick onboarding
-- **Compliance**: RGPD + ISO 27001 + ISO 9001 (audit trail, encryption, right to erasure)
+- **Compliance**: RGPD + ISO 27001 (audit trail, encryption, right to erasure)
 - **Wolverine optional**: 4 packages decoupled with Channel-based fallback
   (BackgroundJobs, Notifications, Webhooks, DataExchange)
 - **Multi-tenant**: shared DB, per-schema, per-database strategies
@@ -141,7 +141,7 @@ docs/
 │   ├── persistence.md              # DbContext pattern, interceptors, conventions
 │   ├── messaging.md                # Wolverine optional, Channel fallback, outbox
 │   ├── security-model.md           # Authentication, authorization, encryption
-│   ├── compliance.md               # GDPR, ISO 27001, ISO 9001 — what Granit enforces
+│   ├── compliance.md               # GDPR, ISO 27001 — what Granit enforces
 │   ├── bundles.md                  # Meta-packages and the fluent builder
 │   ├── wolverine-optionality.md    # What works without Wolverine
 │   └── modular-monolith-vs-microservices.md  # Architecture comparison + Granit in both

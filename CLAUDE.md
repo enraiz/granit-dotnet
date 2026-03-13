@@ -5,7 +5,7 @@
 - **Type**: Rock-solid, production-ready modular framework for .NET and React
 - **Repo**: `granit-dotnet` (company-level, not product-specific)
 - **License**: Apache-2.0 (open-source)
-- **Compliance**: GDPR + ISO 27001 + ISO 9001
+- **Compliance**: GDPR + ISO 27001
 - **Publication**: nuget.org (planned), GitLab Package Registry (internal)
 
 ## Stack & versions
@@ -138,8 +138,7 @@ dotnet format --verify-no-changes
 
 1. **GDPR**: Minimization, right to erasure, pseudonymization
 2. **ISO 27001**: Audit trail, encryption at rest and in transit
-3. **ISO 9001**: Quality management, traceability
-4. **Secrets**: No plaintext secrets, mandatory rotation
+3. **Secrets**: No plaintext secrets, mandatory rotation
 
 ## Language
 
@@ -335,7 +334,7 @@ rewrite code without understanding the original intent.
 
 ## Expected behavior
 
-- Understand GDPR, ISO 27001 and ISO 9001 context before responding
+- Understand GDPR and ISO 27001 context before responding
 - Challenge security bad practices
 - Propose alternatives when a request compromises security
 - Explain the "why" behind best practices

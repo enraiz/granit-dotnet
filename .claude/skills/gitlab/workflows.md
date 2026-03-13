@@ -168,7 +168,7 @@ glab -R "$PROJECT" issue create \
 
 ## Contraintes
 
-- [ ] RGPD / ISO 27001 / ISO 9001 : [contraintes spécifiques]
+- [ ] RGPD / ISO 27001 : [contraintes spécifiques]
 
 ## Critères de succès
 
