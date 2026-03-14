@@ -37,6 +37,9 @@ public sealed class UserCacheHealthCheckTests
             .CheckHealthAsync(null!, TestContext.Current.CancellationToken);
 
         result.Status.ShouldBe(HealthStatus.Healthy);
+        result.Data.ShouldContainKey("total");
+        result.Data.ShouldContainKey("stale");
+        result.Data.ShouldContainKey("stale_ratio");
     }
 
     [Fact]
@@ -73,6 +76,8 @@ public sealed class UserCacheHealthCheckTests
             .CheckHealthAsync(null!, TestContext.Current.CancellationToken);
 
         result.Status.ShouldBe(HealthStatus.Unhealthy);
-        result.Exception.ShouldNotBeNull();
+        result.Description!.ShouldContain("inaccessible");
+        result.Description!.ShouldContain(nameof(InvalidOperationException));
+        result.Exception.ShouldBeNull();
     }
 }

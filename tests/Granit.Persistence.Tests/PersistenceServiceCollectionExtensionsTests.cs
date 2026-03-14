@@ -175,13 +175,14 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         // Act — no explicit name → defaults to typeof(TContext).Name
         builder.AddGranitDbContextCheck<TestDbContext>();
 
-        // Assert — registration uses type name and is tagged "readiness"
+        // Assert — registration uses type name and is tagged "readiness" and "startup"
         using ServiceProvider sp = services.BuildServiceProvider();
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(
             r => r.Name == nameof(TestDbContext));
         registration.ShouldNotBeNull();
         registration.Tags.ShouldContain("readiness");
+        registration.Tags.ShouldContain("startup");
     }
 
     [Fact]

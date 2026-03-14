@@ -61,7 +61,7 @@ public static class RedisCachingServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds a Redis connectivity health check tagged <c>"readiness"</c>.
+    /// Adds a Redis connectivity health check tagged <c>"readiness"</c> and <c>"startup"</c>.
     /// Issues a PING command and measures round-trip latency. Returns <c>Degraded</c>
     /// when latency exceeds <paramref name="degradedThreshold"/> and <c>Unhealthy</c>
     /// when Redis is unreachable.
@@ -101,7 +101,7 @@ public static class RedisCachingServiceCollectionExtensions
             name,
             sp => sp.GetRequiredService<RedisHealthCheck>(),
             failureStatus,
-            ["readiness"],
+            ["readiness", "startup"],
             timeout ?? TimeSpan.FromSeconds(5)));
     }
 }
