@@ -1,6 +1,8 @@
+using Granit.Notifications.Email.Smtp.HealthChecks;
 using Granit.Notifications.Email.Smtp.Internal;
 using Granit.Notifications.Email.Smtp.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Granit.Notifications.Email.Smtp.Extensions;
 
@@ -23,5 +25,29 @@ public static class SmtpEmailServiceCollectionExtensions
 
         services.AddKeyedSingleton<IEmailSender, MailKitEmailSender>("Smtp");
         return services;
+    }
+
+    /// <summary>
+    /// Adds an SMTP connectivity health check tagged <c>"readiness"</c>.
+    /// Performs an EHLO handshake with optional authentication.
+    /// </summary>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Check name. Defaults to <c>"smtp"</c>.</param>
+    /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
+    /// <param name="timeout">Check timeout. Defaults to 10 seconds.</param>
+    public static IHealthChecksBuilder AddGranitSmtpCheck(
+        this IHealthChecksBuilder builder,
+        string name = "smtp",
+        HealthStatus? failureStatus = null,
+        TimeSpan? timeout = null)
+    {
+        builder.Services.AddSingleton<SmtpHealthCheck>();
+
+        return builder.Add(new HealthCheckRegistration(
+            name,
+            sp => sp.GetRequiredService<SmtpHealthCheck>(),
+            failureStatus,
+            ["readiness"],
+            timeout ?? TimeSpan.FromSeconds(10)));
     }
 }
