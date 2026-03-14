@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.Validation.UnitedKingdom</PackageId>
+    <Description>United Kingdom identifier, tax, and address validators for Granit. NI number, NHS number, UTR, UK VAT, Companies House number, postcode, and sort code.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Validation.UnitedKingdom.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Localization\Granit.Localization.csproj" />
+    <ProjectReference Include="..\Granit.Validation\Granit.Validation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\**\*.json" />
+  </ItemGroup>
+
+</Project>
