@@ -76,7 +76,7 @@ public static class RedisCachingServiceCollectionExtensions
     /// <param name="degradedThreshold">Latency above which the check returns Degraded. Defaults to 100 ms.</param>
     /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
     /// <param name="timeout">Check timeout. Defaults to 5 seconds.</param>
-    public static IHealthChecksBuilder AddGranitRedisCheck(
+    public static IHealthChecksBuilder AddGranitRedisHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "redis",
         TimeSpan? degradedThreshold = null,

@@ -52,7 +52,7 @@ public static class VaultServiceCollectionExtensions
     /// <param name="name">Check name. Defaults to <c>"vault"</c>.</param>
     /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
     /// <param name="timeout">Check timeout. Defaults to 10 seconds.</param>
-    public static IHealthChecksBuilder AddGranitVaultCheck(
+    public static IHealthChecksBuilder AddGranitVaultHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "vault",
         HealthStatus? failureStatus = null,

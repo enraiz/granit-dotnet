@@ -90,7 +90,7 @@ public static class PersistenceServiceCollectionExtensions
     /// <param name="builder">The health checks builder.</param>
     /// <param name="name">Check name. Defaults to the DbContext type name.</param>
     /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
-    public static IHealthChecksBuilder AddGranitDbContextCheck<TContext>(
+    public static IHealthChecksBuilder AddGranitDbContextHealthCheck<TContext>(
         this IHealthChecksBuilder builder,
         string? name = null,
         HealthStatus? failureStatus = null)

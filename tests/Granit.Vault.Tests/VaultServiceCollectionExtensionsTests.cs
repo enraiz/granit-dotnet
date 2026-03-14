@@ -127,7 +127,7 @@ public sealed class VaultServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitVaultCheck_RegistersVaultHealthCheck_AsReadinessCheck()
+    public void AddGranitVaultHealthCheck_RegistersVaultHealthCheck_AsReadinessCheck()
     {
         // Arrange
         ServiceCollection services = new();
@@ -136,7 +136,7 @@ public sealed class VaultServiceCollectionExtensionsTests
         IHealthChecksBuilder builder = services.AddHealthChecks();
 
         // Act
-        builder.AddGranitVaultCheck();
+        builder.AddGranitVaultHealthCheck();
 
         // Assert — VaultHealthCheck singleton registered
         ServiceDescriptor? healthCheckDescriptor = services.FirstOrDefault(
@@ -154,7 +154,7 @@ public sealed class VaultServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitVaultCheck_WithCustomName_RegistersCheckWithThatName()
+    public void AddGranitVaultHealthCheck_WithCustomName_RegistersCheckWithThatName()
     {
         // Arrange
         ServiceCollection services = new();
@@ -162,7 +162,7 @@ public sealed class VaultServiceCollectionExtensionsTests
         IHealthChecksBuilder builder = services.AddHealthChecks();
 
         // Act
-        builder.AddGranitVaultCheck(name: "vault-primary");
+        builder.AddGranitVaultHealthCheck(name: "vault-primary");
 
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();

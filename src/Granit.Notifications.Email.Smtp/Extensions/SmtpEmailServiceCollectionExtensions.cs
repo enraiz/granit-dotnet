@@ -35,7 +35,7 @@ public static class SmtpEmailServiceCollectionExtensions
     /// <param name="name">Check name. Defaults to <c>"smtp"</c>.</param>
     /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
     /// <param name="timeout">Check timeout. Defaults to 10 seconds.</param>
-    public static IHealthChecksBuilder AddGranitSmtpCheck(
+    public static IHealthChecksBuilder AddGranitSmtpHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "smtp",
         HealthStatus? failureStatus = null,

@@ -111,11 +111,11 @@ public sealed class AwsVaultServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitKmsCheck_RegistersHealthCheck()
+    public void AddGranitKmsHealthCheck_RegistersHealthCheck()
     {
         ServiceCollection services = new();
         services.AddGranitVaultAws();
-        services.AddHealthChecks().AddGranitKmsCheck();
+        services.AddHealthChecks().AddGranitKmsHealthCheck();
 
         services.ShouldContain(d =>
             d.ServiceType == typeof(KmsHealthCheck));

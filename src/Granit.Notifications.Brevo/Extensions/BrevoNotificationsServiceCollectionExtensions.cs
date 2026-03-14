@@ -61,7 +61,7 @@ public static class BrevoNotificationsServiceCollectionExtensions
     /// <param name="failureStatus">Optional failure status override.</param>
     /// <param name="timeout">Optional timeout override.</param>
     /// <returns>The builder for chaining.</returns>
-    public static IHealthChecksBuilder AddGranitBrevoCheck(
+    public static IHealthChecksBuilder AddGranitBrevoHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "brevo",
         HealthStatus? failureStatus = null,

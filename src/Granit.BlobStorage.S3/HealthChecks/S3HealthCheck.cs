@@ -21,6 +21,7 @@ namespace Granit.BlobStorage.S3.HealthChecks;
 internal sealed class S3HealthCheck(
     IOptions<S3BlobOptions> options) : IHealthCheck
 {
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
     private readonly AmazonS3Client _s3 = CreateClient(options.Value);
 
     public async Task<HealthCheckResult> CheckHealthAsync(
@@ -35,7 +36,8 @@ internal sealed class S3HealthCheck(
                 MaxKeys = 1,
             };
 
-            await _s3.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
+            await _s3.ListObjectsV2Async(request, cancellationToken)
+                .WaitAsync(s_healthCheckTimeout, cancellationToken).ConfigureAwait(false);
 
             return HealthCheckResult.Healthy();
         }

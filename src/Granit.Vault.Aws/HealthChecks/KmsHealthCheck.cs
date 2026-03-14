@@ -13,6 +13,8 @@ internal sealed class KmsHealthCheck(
     IAmazonKeyManagementService kmsClient,
     IOptions<AwsVaultOptions> options) : IHealthCheck
 {
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
+
     /// <inheritdoc />
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
@@ -24,6 +26,7 @@ internal sealed class KmsHealthCheck(
 
             DescribeKeyResponse response = await kmsClient
                 .DescribeKeyAsync(request, cancellationToken)
+                .WaitAsync(s_healthCheckTimeout, cancellationToken)
                 .ConfigureAwait(false);
 
             return response.KeyMetadata.Enabled == true

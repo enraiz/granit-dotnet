@@ -3,7 +3,7 @@
 // =============================================================================
 // Verifies that AddGranitPersistence registers the EF Core interceptors
 // and the IDataFilter service.
-// Verifies that AddGranitDbContextCheck<T> registers a readiness health check.
+// Verifies that AddGranitDbContextHealthCheck<T> registers a readiness health check.
 // =============================================================================
 
 using Granit.Core.DataFiltering;
@@ -165,7 +165,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitDbContextCheck_WithDefaultName_RegistersCheckNamedAfterDbContextType()
+    public void AddGranitDbContextHealthCheck_WithDefaultName_RegistersCheckNamedAfterDbContextType()
     {
         // Arrange
         ServiceCollection services = new();
@@ -173,7 +173,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         IHealthChecksBuilder builder = services.AddHealthChecks();
 
         // Act — no explicit name → defaults to typeof(TContext).Name
-        builder.AddGranitDbContextCheck<TestDbContext>();
+        builder.AddGranitDbContextHealthCheck<TestDbContext>();
 
         // Assert — registration uses type name and is tagged "readiness" and "startup"
         using ServiceProvider sp = services.BuildServiceProvider();
@@ -186,7 +186,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitDbContextCheck_WithCustomName_RegistersCheckWithThatName()
+    public void AddGranitDbContextHealthCheck_WithCustomName_RegistersCheckWithThatName()
     {
         // Arrange
         ServiceCollection services = new();
@@ -194,7 +194,7 @@ public sealed class PersistenceServiceCollectionExtensionsTests
         IHealthChecksBuilder builder = services.AddHealthChecks();
 
         // Act — explicit name
-        builder.AddGranitDbContextCheck<TestDbContext>(name: "database");
+        builder.AddGranitDbContextHealthCheck<TestDbContext>(name: "database");
 
         // Assert
         using ServiceProvider sp = services.BuildServiceProvider();

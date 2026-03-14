@@ -71,7 +71,7 @@ public static class IdentityEntraIdServiceCollectionExtensions
     /// <param name="failureStatus">Optional failure status override.</param>
     /// <param name="timeout">Optional timeout override.</param>
     /// <returns>The builder for chaining.</returns>
-    public static IHealthChecksBuilder AddGranitEntraIdCheck(
+    public static IHealthChecksBuilder AddGranitEntraIdHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "entraid",
         HealthStatus? failureStatus = null,

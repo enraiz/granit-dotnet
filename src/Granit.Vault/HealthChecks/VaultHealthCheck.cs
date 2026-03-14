@@ -19,6 +19,8 @@ namespace Granit.Vault.HealthChecks;
 /// </remarks>
 internal sealed class VaultHealthCheck(IVaultClient vaultClient) : IHealthCheck
 {
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
@@ -27,7 +29,7 @@ internal sealed class VaultHealthCheck(IVaultClient vaultClient) : IHealthCheck
         {
             // VaultSharp API does not expose cancellation — WaitAsync provides a defensive timeout.
             VaultSystemHealth status = await vaultClient.V1.System.GetHealthStatusAsync()
-                .WaitAsync(cancellationToken).ConfigureAwait(false);
+                .WaitAsync(s_healthCheckTimeout, cancellationToken).ConfigureAwait(false);
 
             if (status.Sealed)
             {

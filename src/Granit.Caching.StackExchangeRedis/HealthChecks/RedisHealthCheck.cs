@@ -21,14 +21,18 @@ internal sealed class RedisHealthCheck(
     IConnectionMultiplexer connection,
     TimeSpan degradedThreshold) : IHealthCheck
 {
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            // StackExchange.Redis PingAsync() does not accept CancellationToken (library limitation).
-            TimeSpan latency = await connection.GetDatabase().PingAsync().ConfigureAwait(false);
+            // StackExchange.Redis PingAsync() does not accept CancellationToken (library limitation) —
+            // WaitAsync provides a defensive timeout.
+            TimeSpan latency = await connection.GetDatabase().PingAsync()
+                .WaitAsync(s_healthCheckTimeout, cancellationToken).ConfigureAwait(false);
 
             Dictionary<string, object> data = new()
             {

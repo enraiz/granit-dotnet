@@ -20,28 +20,18 @@ namespace Granit.Notifications.Email.Smtp.HealthChecks;
 /// </remarks>
 internal sealed class SmtpHealthCheck(IOptions<SmtpOptions> options) : IHealthCheck
 {
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            SmtpOptions smtp = options.Value;
-            SecureSocketOptions socketOptions = smtp.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
-
-            using SmtpClient client = new();
-            client.Timeout = smtp.TimeoutSeconds * 1000;
-
-            await client.ConnectAsync(smtp.Host, smtp.Port, socketOptions, cancellationToken)
+            // Wrap the entire SMTP handshake (connect + auth + disconnect) with a defensive timeout.
+            await VerifySmtpAsync(cancellationToken)
+                .WaitAsync(s_healthCheckTimeout, cancellationToken)
                 .ConfigureAwait(false);
-
-            if (!string.IsNullOrEmpty(smtp.Username))
-            {
-                await client.AuthenticateAsync(smtp.Username, smtp.Password ?? string.Empty, cancellationToken)
-                    .ConfigureAwait(false);
-            }
-
-            await client.DisconnectAsync(quit: true, cancellationToken).ConfigureAwait(false);
 
             return HealthCheckResult.Healthy();
         }
@@ -50,5 +40,25 @@ internal sealed class SmtpHealthCheck(IOptions<SmtpOptions> options) : IHealthCh
             // Sanitize: never expose host, port, or credentials in the message
             return HealthCheckResult.Unhealthy($"SMTP unreachable: {ex.GetType().Name}");
         }
+    }
+
+    private async Task VerifySmtpAsync(CancellationToken cancellationToken)
+    {
+        SmtpOptions smtp = options.Value;
+        SecureSocketOptions socketOptions = smtp.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+
+        using SmtpClient client = new();
+        client.Timeout = Math.Min(smtp.TimeoutSeconds, 10) * 1000;
+
+        await client.ConnectAsync(smtp.Host, smtp.Port, socketOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!string.IsNullOrEmpty(smtp.Username))
+        {
+            await client.AuthenticateAsync(smtp.Username, smtp.Password ?? string.Empty, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        await client.DisconnectAsync(quit: true, cancellationToken).ConfigureAwait(false);
     }
 }
