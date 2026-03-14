@@ -117,10 +117,11 @@ test:
   script:
     - !reference [.ensure-build, script]
     - >
-      dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
+      dotnet test -c $CONFIGURATION --no-build
+      -p:SkipIntegrationTests=true -p:SkipArchitectureTests=true
       --logger "junit;LogFilePath=TestResults/results.xml"
       --collect:"XPlat Code Coverage"
-      -- RunConfiguration.MaxCpuCount=1
+      -- RunConfiguration.MaxCpuCount=4
       DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover,cobertura
   artifacts:
     when: always
@@ -136,6 +137,28 @@ test:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+
+architecture-test:
+  extends: .dotnet
+  stage: quality
+  timeout: 10m
+  needs:
+    - job: build
+      artifacts: false
+  script:
+    - !reference [.ensure-build, script]
+    - >
+      dotnet test tests/Granit.ArchitectureTests/Granit.ArchitectureTests.csproj
+      -c $CONFIGURATION --no-build
+      --logger "junit;LogFilePath=TestResults/results.xml"
+  artifacts:
+    when: always
+    reports:
+      junit: "**/TestResults/results.xml"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
 
 integration-test:
   extends: .dotnet

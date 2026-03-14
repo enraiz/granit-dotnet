@@ -122,7 +122,8 @@ jobs:
 
       - name: Run tests
         run: >
-          dotnet test -c $CONFIGURATION --no-build -p:SkipIntegrationTests=true
+          dotnet test -c $CONFIGURATION --no-build
+          -p:SkipIntegrationTests=true -p:SkipArchitectureTests=true
           --logger "trx;LogFilePath=TestResults/results.trx"
           --collect:"XPlat Code Coverage"
           -- RunConfiguration.MaxCpuCount=4
@@ -142,6 +143,44 @@ jobs:
         with:
           name: coverage
           path: "**/coverage.opencover.xml"
+          retention-days: 7
+
+  architecture-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: NuGet cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+
+      - name: Run architecture tests
+        run: >
+          dotnet test tests/Granit.ArchitectureTests/Granit.ArchitectureTests.csproj
+          -c $CONFIGURATION --no-build
+          --logger "trx;LogFilePath=TestResults/results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-test-results
+          path: "**/TestResults/"
           retention-days: 7
 
   integration-test:
