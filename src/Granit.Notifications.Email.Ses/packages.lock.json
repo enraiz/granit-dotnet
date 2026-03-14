@@ -4,11 +4,11 @@
     "net10.0": {
       "AWSSDK.SimpleEmailV2": {
         "type": "Direct",
-        "requested": "[3.*, )",
-        "resolved": "3.7.509.3",
-        "contentHash": "3R7MHoOz5m6aWr2G/9OmyrPapohFygIvBPCpMdkTKPmBIfNw19k/A8pHk5UrP5NZf1o8sNt7dyb6YzcRfXnR2A==",
+        "requested": "[4.*, )",
+        "resolved": "4.0.12.2",
+        "contentHash": "1NqLYAT5RkwnUjJMfXqmOD2utuBSXL5THzT/YhaLYLlmhKARL5W0QpzuY93ujUkhGapoZO7mjm5E9gv3C+enLQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.500.91, 4.0.0)"
+          "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
         }
       },
       "Microsoft.CodeAnalysis.BannedApiAnalyzers": {
@@ -57,8 +57,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.500.91",
-        "contentHash": "lN2zGNxSoZHk4mSx6qBCB9keTKBs6R3zVkxopFE6Is8ypT4XMNkDGuAH4Q9H/Vm2X40+SsC9HbUcxoyLz/BXlg=="
+        "resolved": "4.0.3.17",
+        "contentHash": "Ab24kVquQ8kvuQKNe5MK/SvaXR4uoxPkAlTPALDEImaHcwsBg+UWfRVcNzLEx4dRR2y1mDFFh+zZ9TVMXGY6Jg=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",

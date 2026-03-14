@@ -4,7 +4,7 @@ Ce fichier répertorie les bibliothèques tierces utilisées par le projet
 **granit-dotnet** ainsi que leurs licences respectives. Il est mis à jour
 à chaque ajout ou modification de dépendance externe.
 
-Dernière mise à jour : 2026-03-03
+Dernière mise à jour : 2026-03-14
 
 ---
 
@@ -12,8 +12,8 @@ Dernière mise à jour : 2026-03-03
 
 | Licence      | Nombre de packages |
 | ------------ | ------------------ |
-| MIT          | 49                 |
-| Apache-2.0   | 15                 |
+| MIT          | 51                 |
+| Apache-2.0   | 18                 |
 | BSD-3-Clause | 2                  |
 | BSD-2-Clause | 1                  |
 | PostgreSQL   | 1                  |
@@ -41,8 +41,10 @@ Dernière mise à jour : 2026-03-03
 | Microsoft.Extensions.Caching.StackExchangeRedis | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Configuration.Binder | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.3 | (c) Microsoft Corporation |
+| Microsoft.Extensions.Diagnostics.HealthChecks | 10.0.5 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Hosting.Abstractions | 10.0.3 | (c) Microsoft Corporation |
+| Microsoft.Extensions.Logging.Abstractions | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Localization | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Options | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Options.ConfigurationExtensions | 10.0.3 | (c) Microsoft Corporation |
@@ -68,7 +70,10 @@ Dernière mise à jour : 2026-03-03
 
 | Package | Version | Copyright |
 | ------- | ------- | --------- |
-| AWSSDK.S3 | 3.7.510.11 | Amazon Web Services, Inc. |
+| AWSSDK.KeyManagementService | 4.0.9.3 | Amazon Web Services, Inc. |
+| AWSSDK.S3 | 4.0.19 | Amazon Web Services, Inc. |
+| AWSSDK.SecretsManager | 4.0.4.9 | Amazon Web Services, Inc. |
+| AWSSDK.SimpleEmailV2 | 4.0.12.2 | Amazon Web Services, Inc. |
 | FluentValidation | 12.1.1 | Copyright (c) Jeremy Skinner, .NET Foundation 2008-2025 |
 | Magick.NET-Q8-AnyCPU | 14.10.3 | Copyright 2013-2026 Dirk Lemstra |
 | OpenTelemetry | 1.15.0 | Copyright The OpenTelemetry Authors |
@@ -138,3 +143,14 @@ Dernière mise à jour : 2026-03-03
 Ce SDK est utilisé uniquement pour la compatibilité S3 avec un stockage objet
 hébergé en Europe (S3-compatible object storage, API S3-compatible). Aucune donnée
 de santé ne transite par l'infrastructure AWS.
+
+### AWSSDK.SimpleEmailV2
+
+Ce SDK fournit un canal d'envoi d'emails via Amazon SES. Il est utilisé par le
+package `Granit.Notifications.Email.Ses` comme alternative au canal SMTP.
+
+### AWSSDK.KeyManagementService / AWSSDK.SecretsManager
+
+Ces SDK sont utilisés par le package `Granit.Vault.Aws` pour le chiffrement
+transit (KMS) et la gestion de credentials de base de données (Secrets Manager)
+comme alternative au provider HashiCorp Vault.
