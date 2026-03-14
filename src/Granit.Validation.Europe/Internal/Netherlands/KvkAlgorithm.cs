@@ -28,14 +28,6 @@ internal static class KvkAlgorithm
             return false;
         }
 
-        foreach (char c in normalized)
-        {
-            if (!char.IsDigit(c))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return normalized.All(char.IsDigit);
     }
 }

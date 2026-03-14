@@ -107,13 +107,11 @@ internal static partial class EuropeanVatAlgorithm
         return BceAlgorithm.IsValid(digits);
     }
 
-    private static bool ValidateDutchVat(string normalized)
-    {
-        // Dutch VAT: NL + 9 digits + B + 2 digits. The 9 digits are not a BSN
-        // (different structure), so we validate format only beyond the regex.
-        // The "B" at position 12 distinguishes sub-entities.
-        return true; // Regex already validated the format NL\d{9}B\d{2}.
-    }
+    // Dutch VAT: NL + 9 digits + B + 2 digits. The 9 digits are not a BSN
+    // (different structure), so we validate format only beyond the regex.
+    // The "B" at position 12 distinguishes sub-entities.
+    private static bool ValidateDutchVat(string _) =>
+        true; // Regex already validated the format NL\d{9}B\d{2}.
 
     private static bool ValidateSpanishVat(string normalized)
     {

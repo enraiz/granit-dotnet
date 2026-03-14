@@ -165,11 +165,9 @@ internal sealed partial class GoogleCloudIdentityProvider(
     public Task<IReadOnlyList<IdentityRole>> GetRolesAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<IdentityRole>>([]);
 
-    public Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(string roleName, CancellationToken cancellationToken = default)
-    {
+    public Task<IReadOnlyList<IdentityUser>> GetRoleMembersAsync(string roleName, CancellationToken cancellationToken = default) =>
         // Not efficiently queryable in Firebase Auth. Return empty.
-        return Task.FromResult<IReadOnlyList<IdentityUser>>([]);
-    }
+        Task.FromResult<IReadOnlyList<IdentityUser>>([]);
 
     public async Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(string userId, CancellationToken cancellationToken = default)
     {
