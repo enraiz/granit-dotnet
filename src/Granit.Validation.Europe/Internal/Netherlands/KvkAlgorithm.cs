@@ -1,4 +1,4 @@
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Netherlands;
 
 /// <summary>
 /// Validates Dutch Chamber of Commerce numbers (Kamer van Koophandel / KVK).
@@ -28,14 +28,6 @@ internal static class KvkAlgorithm
             return false;
         }
 
-        foreach (char c in normalized)
-        {
-            if (!char.IsDigit(c))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return normalized.All(char.IsDigit);
     }
 }

@@ -1,5 +1,5 @@
 using FluentValidation;
-using Granit.Validation.Europe.Internal;
+using Granit.Validation.Europe.Internal.Spain;
 using Granit.Validation.Extensions;
 
 namespace Granit.Validation.Europe.Extensions;

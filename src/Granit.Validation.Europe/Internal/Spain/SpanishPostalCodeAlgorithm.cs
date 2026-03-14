@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Spain;
 
 /// <summary>
 /// Validates Spanish postal codes (código postal).

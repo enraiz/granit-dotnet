@@ -14,6 +14,7 @@
     <Project Path="src/Granit.Authentication.ApiKeys/Granit.Authentication.ApiKeys.csproj" />
     <Project Path="src/Granit.Authentication.Cognito/Granit.Authentication.Cognito.csproj" />
     <Project Path="src/Granit.Authentication.EntraId/Granit.Authentication.EntraId.csproj" />
+    <Project Path="src/Granit.Authentication.GoogleCloud/Granit.Authentication.GoogleCloud.csproj" />
     <Project Path="src/Granit.Authentication.JwtBearer/Granit.Authentication.JwtBearer.csproj" />
     <Project Path="src/Granit.Authentication.Keycloak/Granit.Authentication.Keycloak.csproj" />
     <Project Path="src/Granit.Authorization.Endpoints/Granit.Authorization.Endpoints.csproj" />
@@ -27,6 +28,7 @@
     <Project Path="src/Granit.BlobStorage.Database/Granit.BlobStorage.Database.csproj" />
     <Project Path="src/Granit.BlobStorage.EntityFrameworkCore/Granit.BlobStorage.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.BlobStorage.FileSystem/Granit.BlobStorage.FileSystem.csproj" />
+    <Project Path="src/Granit.BlobStorage.GoogleCloud/Granit.BlobStorage.GoogleCloud.csproj" />
     <Project Path="src/Granit.BlobStorage.Proxy/Granit.BlobStorage.Proxy.csproj" />
     <Project Path="src/Granit.BlobStorage.S3/Granit.BlobStorage.S3.csproj" />
     <Project Path="src/Granit.BlobStorage/Granit.BlobStorage.csproj" />
@@ -57,6 +59,7 @@
     <Project Path="src/Granit.Idempotency/Granit.Idempotency.csproj" />
     <Project Path="src/Granit.Identity.Endpoints/Granit.Identity.Endpoints.csproj" />
     <Project Path="src/Granit.Identity.Cognito/Granit.Identity.Cognito.csproj" />
+    <Project Path="src/Granit.Identity.GoogleCloud/Granit.Identity.GoogleCloud.csproj" />
     <Project Path="src/Granit.Identity.EntityFrameworkCore/Granit.Identity.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.Identity.EntraId/Granit.Identity.EntraId.csproj" />
     <Project Path="src/Granit.Identity.Keycloak/Granit.Identity.Keycloak.csproj" />
@@ -77,9 +80,11 @@
     <Project Path="src/Granit.Notifications.EntityFrameworkCore/Granit.Notifications.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.Notifications.MobilePush.AzureNotificationHubs/Granit.Notifications.MobilePush.AzureNotificationHubs.csproj" />
     <Project Path="src/Granit.Notifications.MobilePush.Fcm/Granit.Notifications.MobilePush.Fcm.csproj" />
+    <Project Path="src/Granit.Notifications.MobilePush.Sns/Granit.Notifications.MobilePush.Sns.csproj" />
     <Project Path="src/Granit.Notifications.MobilePush/Granit.Notifications.MobilePush.csproj" />
     <Project Path="src/Granit.Notifications.SignalR/Granit.Notifications.SignalR.csproj" />
     <Project Path="src/Granit.Notifications.Sms.AzureCommunicationServices/Granit.Notifications.Sms.AzureCommunicationServices.csproj" />
+    <Project Path="src/Granit.Notifications.Sms.Sns/Granit.Notifications.Sms.Sns.csproj" />
     <Project Path="src/Granit.Notifications.Sms/Granit.Notifications.Sms.csproj" />
     <Project Path="src/Granit.Notifications.Sse/Granit.Notifications.Sse.csproj" />
     <Project Path="src/Granit.Notifications.WebPush/Granit.Notifications.WebPush.csproj" />
@@ -119,6 +124,7 @@
     <Project Path="src/Granit.Validation/Granit.Validation.csproj" />
     <Project Path="src/Granit.Vault.Aws/Granit.Vault.Aws.csproj" />
     <Project Path="src/Granit.Vault.Azure/Granit.Vault.Azure.csproj" />
+    <Project Path="src/Granit.Vault.GoogleCloud/Granit.Vault.GoogleCloud.csproj" />
     <Project Path="src/Granit.Vault.HashiCorp/Granit.Vault.HashiCorp.csproj" />
     <Project Path="src/Granit.Vault/Granit.Vault.csproj" />
     <Project Path="src/Granit.Webhooks.EntityFrameworkCore/Granit.Webhooks.EntityFrameworkCore.csproj" />
@@ -151,6 +157,7 @@
     <Project Path="tests/Granit.Authentication.ApiKeys.Tests/Granit.Authentication.ApiKeys.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.Cognito.Tests/Granit.Authentication.Cognito.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.EntraId.Tests/Granit.Authentication.EntraId.Tests.csproj" />
+    <Project Path="tests/Granit.Authentication.GoogleCloud.Tests/Granit.Authentication.GoogleCloud.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.JwtBearer.Tests/Granit.Authentication.JwtBearer.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.Keycloak.Tests/Granit.Authentication.Keycloak.Tests.csproj" />
     <Project Path="tests/Granit.Authorization.Endpoints.Tests/Granit.Authorization.Endpoints.Tests.csproj" />
@@ -165,6 +172,7 @@
     <Project Path="tests/Granit.BlobStorage.Database.Tests/Granit.BlobStorage.Database.Tests.csproj" />
     <Project Path="tests/Granit.BlobStorage.EntityFrameworkCore.Tests/Granit.BlobStorage.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.BlobStorage.FileSystem.Tests/Granit.BlobStorage.FileSystem.Tests.csproj" />
+    <Project Path="tests/Granit.BlobStorage.GoogleCloud.Tests/Granit.BlobStorage.GoogleCloud.Tests.csproj" />
     <Project Path="tests/Granit.BlobStorage.S3.Tests/Granit.BlobStorage.S3.Tests.csproj" />
     <Project Path="tests/Granit.BlobStorage.Proxy.Tests/Granit.BlobStorage.Proxy.Tests.csproj" />
     <Project Path="tests/Granit.BlobStorage.Tests/Granit.BlobStorage.Tests.csproj" />
@@ -196,6 +204,7 @@
     <Project Path="tests/Granit.Idempotency.Tests/Granit.Idempotency.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Endpoints.Tests/Granit.Identity.Endpoints.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Cognito.Tests/Granit.Identity.Cognito.Tests.csproj" />
+    <Project Path="tests/Granit.Identity.GoogleCloud.Tests/Granit.Identity.GoogleCloud.Tests.csproj" />
     <Project Path="tests/Granit.Identity.EntityFrameworkCore.Tests/Granit.Identity.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.Identity.EntraId.Tests/Granit.Identity.EntraId.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Keycloak.Tests/Granit.Identity.Keycloak.Tests.csproj" />
@@ -216,9 +225,11 @@
     <Project Path="tests/Granit.Notifications.EntityFrameworkCore.Tests/Granit.Notifications.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.MobilePush.AzureNotificationHubs.Tests/Granit.Notifications.MobilePush.AzureNotificationHubs.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.MobilePush.Fcm.Tests/Granit.Notifications.MobilePush.Fcm.Tests.csproj" />
+    <Project Path="tests/Granit.Notifications.MobilePush.Sns.Tests/Granit.Notifications.MobilePush.Sns.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.MobilePush.Tests/Granit.Notifications.MobilePush.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.SignalR.Tests/Granit.Notifications.SignalR.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Sms.AzureCommunicationServices.Tests/Granit.Notifications.Sms.AzureCommunicationServices.Tests.csproj" />
+    <Project Path="tests/Granit.Notifications.Sms.Sns.Tests/Granit.Notifications.Sms.Sns.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Sms.Tests/Granit.Notifications.Sms.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Sse.Tests/Granit.Notifications.Sse.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Tests/Granit.Notifications.Tests.csproj" />
@@ -259,6 +270,7 @@
     <Project Path="tests/Granit.Validation.Tests/Granit.Validation.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Aws.Tests/Granit.Vault.Aws.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Azure.Tests/Granit.Vault.Azure.Tests.csproj" />
+    <Project Path="tests/Granit.Vault.GoogleCloud.Tests/Granit.Vault.GoogleCloud.Tests.csproj" />
     <Project Path="tests/Granit.Vault.HashiCorp.Tests/Granit.Vault.HashiCorp.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Tests/Granit.Vault.Tests.csproj" />
     <Project Path="tests/Granit.Webhooks.EntityFrameworkCore.Tests/Granit.Webhooks.EntityFrameworkCore.Tests.csproj" />

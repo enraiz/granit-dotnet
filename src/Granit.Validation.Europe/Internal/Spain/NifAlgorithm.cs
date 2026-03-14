@@ -1,4 +1,4 @@
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Spain;
 
 /// <summary>
 /// Validates Spanish NIF/DNI numbers (Número de Identificación Fiscal / Documento Nacional de Identidad).

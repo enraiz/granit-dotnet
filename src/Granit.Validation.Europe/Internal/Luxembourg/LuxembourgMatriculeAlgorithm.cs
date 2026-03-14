@@ -1,6 +1,6 @@
 using Granit.Validation.Internal;
 
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Luxembourg;
 
 /// <summary>
 /// Validates Luxembourg national identification numbers (matricule national).

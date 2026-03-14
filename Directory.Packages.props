@@ -60,6 +60,7 @@
     <PackageVersion Include="AWSSDK.S3" Version="4.*" />
     <PackageVersion Include="Azure.Identity" Version="1.*" />
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.*" />
+    <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.*" />
   </ItemGroup>
   <ItemGroup Label="DataExchange">
     <PackageVersion Include="Sep" Version="0.*" />
@@ -71,12 +72,17 @@
   <ItemGroup Label="Identity (AWS Cognito)">
     <PackageVersion Include="AWSSDK.CognitoIdentityProvider" Version="4.*" />
   </ItemGroup>
+  <ItemGroup Label="Identity (Google Cloud)">
+    <PackageVersion Include="FirebaseAdmin" Version="3.*" />
+  </ItemGroup>
   <ItemGroup Label="Vault">
     <PackageVersion Include="AWSSDK.KeyManagementService" Version="4.*" />
     <PackageVersion Include="AWSSDK.SecretsManager" Version="4.*" />
     <PackageVersion Include="Azure.Security.KeyVault.Keys" Version="4.*" />
     <PackageVersion Include="Azure.Security.KeyVault.Secrets" Version="4.*" />
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
+    <PackageVersion Include="Google.Cloud.Kms.V1" Version="3.*" />
+    <PackageVersion Include="Google.Cloud.SecretManager.V1" Version="2.*" />
   </ItemGroup>
   <!-- Security patches: transitive dependency version overrides -->
   <!-- MimeKit 4.15.0 is vulnerable to GHSA-g7hc-96xr-gvvx (Moderate) -->
@@ -86,6 +92,7 @@
 
   <ItemGroup Label="Notifications">
     <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.*" />
+    <PackageVersion Include="AWSSDK.SimpleNotificationService" Version="4.*" />
     <PackageVersion Include="Azure.Communication.Email" Version="1.*" />
     <PackageVersion Include="Azure.Communication.Sms" Version="1.*" />
     <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.*" />

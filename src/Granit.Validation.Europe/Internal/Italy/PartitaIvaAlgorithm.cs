@@ -1,4 +1,4 @@
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Italy;
 
 /// <summary>
 /// Validates Italian Partita IVA (VAT identification number).

@@ -2,7 +2,7 @@
 
 ## Project
 
-- **Type**: Rock-solid, production-ready modular framework for .NET and React
+- **Type**: Modular .NET framework — 128 packages, 134 test projects
 - **Repo**: `granit-dotnet` (company-level, not product-specific)
 - **License**: Apache-2.0 (open-source)
 - **Compliance**: GDPR + ISO 27001
@@ -12,391 +12,218 @@
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
-## Packages (120 packages)
+## Architecture
 
-### Core & utilities
+```
+src/
+  Granit.Core/                             # Module system (ABP-inspired), shared domain types
+  Granit.{Module}/                         # Abstractions + DI registration (e.g. Granit.BlobStorage)
+  Granit.{Module}.Endpoints/               # Minimal API endpoints
+  Granit.{Module}.EntityFrameworkCore/      # Isolated DbContext, EF configurations, migrations
+  Granit.{Module}.{Provider}/              # Provider implementations (e.g. .S3, .AzureBlob, .Keycloak)
+  Granit.{Module}.Wolverine/               # Wolverine message handlers
+  Granit.{Module}.Notifications/           # Notification channel integration
+  bundles/
+    Granit.Bundle.{Name}/                  # Meta-packages grouping related modules
 
-| Package | Role |
-| ------- | ---- |
-| `Granit.Core` | Module system (ABP-inspired), shared domain types |
-| `Granit.Timing` | IClock, ICurrentTimezoneProvider, TimeProvider |
-| `Granit.Guids` | IGuidGenerator, sequential GUIDs for clustered indexes |
-| `Granit.Validation` | FluentValidation integration (international validators) |
-| `Granit.Validation.Europe` | France/Belgium-specific validators (NISS, SIREN, VAT, RIB, etc.) |
-| `Granit.Analyzers` / `.CodeFixes` | Custom Roslyn analyzers and code fixes |
+tests/
+  Granit.{Module}.Tests/                   # Unit tests (xUnit + Shouldly + NSubstitute + Bogus)
+  Granit.{Module}.Tests.Integration/       # Integration tests (Testcontainers)
+  Granit.ArchitectureTests/                # Cross-cutting architecture rules (NetArchTest)
 
-### Security & authentication
+templates/
+  granit-api/                              # dotnet new template: minimal API project
+  granit-api-full/                         # dotnet new template: full API project
+  granit-module/                           # dotnet new template: new Granit module
 
-| Package | Role |
-| ------- | ---- |
-| `Granit.Security` | ICurrentUserService, shared security abstractions |
-| `Granit.Authentication.JwtBearer` | JWT Bearer authentication middleware |
-| `Granit.Authentication.Keycloak` | Keycloak claims transformation |
-| `Granit.Authorization` / `.EntityFrameworkCore` | Policy-based authorization, EF Core store |
-| `Granit.Vault` | VaultSharp, ITransitEncryptionService, dynamic credentials |
-| `Granit.Encryption` | Data encryption abstractions |
-| `Granit.Privacy` | GDPR privacy helpers |
+docs-site/                                 # Astro + Starlight documentation site
+```
 
-### Identity
+### Package naming convention
 
-| Package | Role |
-| ------- | ---- |
-| `Granit.Identity` | Identity provider abstractions (IIdentityProvider, IUserLookupService, models) |
-| `Granit.Identity.Keycloak` | Keycloak Admin API implementation of IIdentityProvider |
-| `Granit.Identity.EntityFrameworkCore` | EF Core user cache (cache-aside, login-time sync, GDPR) |
-| `Granit.Identity.Endpoints` | Minimal API endpoints for user cache (CRUD, sync, GDPR, webhook, stats) |
+One project = one NuGet package. Namespace = project name. Zero circular refs.
 
-### Data & persistence
+Discover packages: `ls src/` — do NOT rely on a hardcoded list.
 
-| Package | Role |
-| ------- | ---- |
-| `Granit.Persistence` / `.Migrations` / `.Migrations.Wolverine` | EF Core interceptors (audit, soft delete), migrations |
-| `Granit.Caching` / `.Hybrid` / `.StackExchangeRedis` | Distributed caching (IDistributedCache, HybridCache, Redis) |
-| `Granit.MultiTenancy` | Tenant isolation, ICurrentTenant |
-| `Granit.Settings` / `.EntityFrameworkCore` | Application settings management |
-| `Granit.Features` / `.EntityFrameworkCore` | Feature management (Toggle/Numeric/Selection) |
-| `Granit.ReferenceData` / `.Endpoints` / `.EntityFrameworkCore` | Reference data (i18n labels, CRUD) |
+### Module anatomy
 
-### API & web
+Each module follows a consistent layered split:
 
-| Package | Role |
-| ------- | ---- |
-| `Granit.ApiVersioning` | Asp.Versioning integration |
-| `Granit.ApiDocumentation` | Scalar OpenAPI documentation |
-| `Granit.ExceptionHandling` | RFC 7807 Problem Details |
-| `Granit.Idempotency` | Idempotency-Key middleware |
-| `Granit.Cors` | CORS policy configuration |
-| `Granit.Cookies` / `.Klaro` | Cookie consent management |
-
-### Messaging & events
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.Wolverine` / `.Postgresql` | Wolverine messaging, transactional outbox |
-| `Granit.Webhooks` / `.EntityFrameworkCore` | Webhook subscriptions and delivery |
-| `Granit.Notifications` / `.Endpoints` / `.EntityFrameworkCore` | Notification engine (fan-out, delivery tracking) |
-| `Granit.Notifications.Email` / `.Email.Smtp` / `.Brevo` | Email channels (SMTP, Brevo) |
-| `Granit.Notifications.Sms` / `.WhatsApp` / `.Push` | SMS, WhatsApp, Web Push channels |
-| `Granit.Notifications.SignalR` | Real-time SignalR channel |
-
-### Documents & templates
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.Templating` / `.Scriban` / `.EntityFrameworkCore` / `.Workflow` | Template engine (Scriban), EF store, workflow integration |
-| `Granit.DocumentGeneration` / `.Pdf` / `.Excel` | Document rendering (HTML→PDF, Excel) |
-
-### Data exchange (import/export)
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.DataExchange` / `.Csv` / `.Excel` / `.EntityFrameworkCore` / `.Endpoints` | Import: Extract→Map→Validate→Execute (Sep, Sylvan). Export: tabular Excel/CSV with presets and background jobs |
-
-### Workflow
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.Workflow` / `.Endpoints` / `.EntityFrameworkCore` / `.Notifications` | FSM engine, publication lifecycle |
-
-### Diagnostics & observability
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.Observability` | Serilog + OpenTelemetry → OTLP → Loki/Tempo/Mimir |
-| `Granit.Diagnostics` | Health checks, readiness probes |
-| `Granit.Timeline` / `.Endpoints` / `.EntityFrameworkCore` / `.Notifications` | Audit timeline |
-
-### Storage & imaging
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.BlobStorage` / `.S3` / `.AzureBlob` / `.FileSystem` / `.Database` / `.Proxy` / `.EntityFrameworkCore` | Multi-provider blob storage (S3, Azure, FileSystem, Database), proxy endpoints, metadata EF store |
-| `Granit.Imaging` / `.MagickNet` | Image processing (WebP/AVIF, EXIF stripping) |
-
-### Scheduling & jobs
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.BackgroundJobs` / `.Endpoints` / `.EntityFrameworkCore` | Background job scheduling (Wolverine + Cronos) |
-
-### Localization
-
-| Package | Role |
-| ------- | ---- |
-| `Granit.Localization` / `.Endpoints` / `.EntityFrameworkCore` / `.SourceGenerator` | i18n (17 cultures: 14 base + 3 regional variants), override store, source-generated keys |
+| Layer | Project suffix | Contains |
+| ----- | -------------- | -------- |
+| Abstractions | `Granit.{Module}` | Interfaces, options, DI extension, `*Module` class |
+| Endpoints | `.Endpoints` | Minimal API route groups, request/response DTOs |
+| Persistence | `.EntityFrameworkCore` | Isolated `DbContext`, entity configs, migrations |
+| Provider | `.{Provider}` | External service implementation (S3, Keycloak, SMTP...) |
+| Messaging | `.Wolverine` | Wolverine handlers, saga state machines |
 
 ## Commands
 
 ```bash
+# Full solution
 dotnet build
 dotnet test
-dotnet pack -c Release -o ./nupkgs   # local NuGet pack
 dotnet format --verify-no-changes
+
+# Single package
+dotnet build src/Granit.BlobStorage
+dotnet test tests/Granit.BlobStorage.Tests
+
+# Architecture tests
+dotnet test tests/Granit.ArchitectureTests
+
+# Pack for local feed
+dotnet pack -c Release -o ./nupkgs
+
+# Docs site
+cd docs-site && npx astro build   # must produce 0 errors
 ```
 
-## Documentation site (Starlight)
+## Code quality
 
-The project documentation lives in `docs-site/` — an Astro + Starlight site.
+Modern C# 14 with idiomatic .NET 10. Prefer the latest language features: primary constructors,
+collection expressions, `field` keyword, pattern matching, file-scoped namespaces. Write code
+that a senior .NET developer would recognize as current and clean.
 
-### Structure
+## Code conventions
 
-| Path | Content |
-| ---- | ------- |
-| `docs-site/src/content/docs/getting-started/` | Getting started guides (.NET) |
-| `docs-site/src/content/docs/guides/` | How-to guides (backend + frontend) |
-| `docs-site/src/content/docs/concepts/` | Conceptual pages (security, compliance, multi-tenancy) |
-| `docs-site/src/content/docs/operations/` | Ops pages (CI/CD, deployment, observability, production checklist) |
-| `docs-site/src/content/docs/reference/modules/` | .NET module reference (one `.mdx` per module) |
-| `docs-site/src/content/docs/reference/frontend/` | Frontend SDK reference (one `.mdx` per package group) |
-| `docs-site/src/content/docs/architecture/patterns/` | Backend design patterns |
-| `docs-site/src/content/docs/architecture/patterns-frontend/` | Frontend design patterns |
-| `docs-site/src/content/docs/architecture/adr/` | Backend ADRs |
-| `docs-site/src/content/docs/architecture/adr-frontend/` | Frontend ADRs |
-| `docs-site/src/pages/index.astro` | Landing page (custom, not Starlight) |
-| `docs-site/src/data/constants.ts` | Counters used across the site |
-| `docs-site/astro.config.mjs` | Sidebar configuration (starlight-sidebar-topics) |
+Full standards: [`docs/guide/conventions/`](docs/guide/conventions/index.md)
 
-### Constants — `docs-site/src/data/constants.ts`
+### Must-use patterns
 
-When adding/removing packages, patterns, ADRs, or cultures, **update the counters**:
+- **`var`**: when type is apparent; explicit type otherwise (IDE0008)
+- **Expression body** (`=>`): for single-statement methods (IDE0022)
+- **`[GeneratedRegex]`**: ALWAYS — never `new Regex(..., Compiled)`. Timeout on user input.
+- **`[LoggerMessage]`**: ALWAYS — never string interpolation in log calls
+- **`TimeProvider` / `IClock`**: NEVER `DateTime.Now`/`UtcNow`
+- **`ConfigureAwait(false)`**: in library code. `CancellationToken` as last param.
+- **`ArgumentNullException.ThrowIfNull()`**: over manual null checks
+- **`AddAuthorizationBuilder()`**: not `AddAuthorization(Action<>)` (ASP0025)
 
-```typescript
-export const PACKAGE_COUNT = 97;          // .NET NuGet packages
-export const FRONTEND_PACKAGE_COUNT = 49; // @granit/* npm packages
-export const CULTURE_COUNT = 17;          // Supported cultures
-export const PATTERN_COUNT = 51;          // Design pattern pages (backend + frontend)
-export const ADR_COUNT = 16;              // ADR pages (backend only, frontend separate)
-```
+### DTOs & API responses
 
-These constants are referenced on the landing page and across the docs.
+- **Prefixed names**: `WorkflowTransitionRequest`, not `TransitionRequest` — OpenAPI flattens namespaces
+- **Suffixes**: `*Request` for input, `*Response` for output. NEVER `*Dto`.
+- **Errors**: Always `TypedResults.Problem(detail, statusCode)` (RFC 7807). Return type: `ProblemHttpResult`.
+- **No entity exposure**: EF entities must NOT be returned — create `*Response` records.
 
-### When creating a new .NET module
+### Validator registration
 
-1. Create `docs-site/src/content/docs/reference/modules/<module-name>.mdx`
-2. Update `PACKAGE_COUNT` in `docs-site/src/data/constants.ts`
-3. The sidebar auto-discovers files in `reference/modules/` — no config change needed
-4. Add a "See also" link from related existing module pages
+- Modules with `[assembly: WolverineHandlerModule]` → automatic via `AddGranitWolverine()`
+- Modules **without** Wolverine → MUST call `AddGranitValidatorsFromAssemblyContaining<T>()` manually
+- Without registration, `FluentValidationEndpointFilter<T>` silently skips validation
 
-### When creating a new frontend package
+### Isolated DbContext — MANDATORY for `*.EntityFrameworkCore` packages
 
-1. Create `docs-site/src/content/docs/reference/frontend/<package-name>.mdx`
-2. Update `FRONTEND_PACKAGE_COUNT` in `docs-site/src/data/constants.ts`
-3. The sidebar auto-discovers files in `reference/frontend/` — no config change needed
+Every isolated `DbContext` MUST:
 
-### When adding a new ADR or pattern
+1. `<ProjectReference>` to `Granit.Persistence`
+2. Constructor-inject `ICurrentTenant?` and `IDataFilter?` (both optional, default `null`)
+3. Call `modelBuilder.ApplyGranitConventions(currentTenant, dataFilter)` at end of `OnModelCreating`
+4. Wire interceptors via `(sp, options)` overload of `AddDbContextFactory` (Scoped), resolving `AuditedEntityInterceptor` / `SoftDeleteInterceptor`
+5. `[DependsOn(typeof(GranitPersistenceModule))]` on module class
+6. **No manual `HasQueryFilter`** — `ApplyGranitConventions` handles all standard filters
+7. `IMultiTenant` entities use `Guid? TenantId` (never `string`)
 
-1. Create the `.md` file in the appropriate directory (`architecture/adr/`, `architecture/patterns/`, etc.)
-2. Update `ADR_COUNT` or `PATTERN_COUNT` in `docs-site/src/data/constants.ts`
-3. Update the index page table (`architecture/adr/index.mdx` or `architecture/patterns/index.md`)
+Reference: [`docs/framework/data/persistence.md`](docs/framework/data/persistence.md)
 
-### Build and verify
+### Multi-tenancy — soft dependency
 
-```bash
-cd docs-site && npx astro build   # must produce 0 errors, all links valid
-```
+`ICurrentTenant` lives in `Granit.Core.MultiTenancy` — available everywhere without referencing `Granit.MultiTenancy`.
 
-## Compliance constraints
+- Use `using Granit.Core.MultiTenancy;` — do NOT add `[DependsOn(GranitMultiTenancyModule)]`
+- Always check `IsAvailable` before using `Id` — `NullTenantContext` is the default
+- Hard dependency on `Granit.MultiTenancy` only when enforcing strict tenant isolation (GDPR)
+
+### `[DependsOn]` convention
+
+- **Direct = declare it.** Every `<ProjectReference>` with a `*Module` needs a `[DependsOn]`
+- **Transitive = omit it.** Already pulled in by another declared dependency → skip
+- **`Granit.Core`** = implicit base, never needs `DependsOn`
+- **Alphabetical order** for `DependsOn` entries
+- **Zero-dependency modules** have no `[DependsOn]` attribute — this is correct
+
+### Tests
+
+Each package has `*.Tests` project (xUnit + Shouldly + NSubstitute + Bogus). Part of DoD.
+
+### Markdown
+
+All `.md` must pass `npx markdownlint-cli2 "file.md"` before committing.
+
+## Anti-patterns — NEVER do this
+
+### Code
+
+- `DateTime.Now`/`UtcNow` → inject `TimeProvider`
+- `new Regex(..., Compiled)` → `[GeneratedRegex]`
+- String interpolation in logs → `[LoggerMessage]`
+- `new HttpClient()` → `IHttpClientFactory`
+- `async void` → always return `Task`
+- `.Result` / `.Wait()` → `await`
+- `Results.Ok()` → `TypedResults.Ok()` for OpenAPI
+- Return EF entities from endpoints → map to `*Response` DTOs
+- Bare `catch (Exception)` → catch specific types
+- `*Dto` suffix → use `*Request` / `*Response`
+- `TypedResults.BadRequest<string>()` → `TypedResults.Problem()` (RFC 7807)
+
+### Architecture
+
+- Merge `I*Reader`/`I*Writer` into combined `I*Store` → CQRS, keep them separate
+- Share DbContext across modules → each module owns its isolated DbContext
+- Manual `HasQueryFilter` in entity configs → `ApplyGranitConventions` handles all filters
+- Cross-module direct method calls → use integration events (Wolverine)
+- Repository pattern over EF Core → use DbContext directly
+- Circular project references → restructure dependencies
+
+### Refactoring
+
+Code that looks "weird" almost always exists for a reason: production fix, regulatory
+edge case, GDPR/ISO 27001 constraint, third-party workaround.
+
+**Before any refactoring:**
+
+1. Read the entire file, not just the targeted function
+2. Check `git log -p -- <file>` to understand evolution
+3. If unclear, search for the linked GitLab issue before modifying
+4. When in doubt, **ask**
+
+**NEVER:**
+
+- Delete "dead" code without verifying dynamic references (reflection, DI, runtime config)
+- Simplify complex conditions without testing the edge cases they cover
+- Replace custom implementations with stdlib without understanding why stdlib wasn't used
+- Remove/change interface implementations on `ValueObject`/`Entity`/`AggregateRoot` for SonarQube — mark as won't fix
+- Reduce constructor params via wrapper types that aren't real domain concepts — mark `brain-overload` as won't fix
+
+## Compliance
 
 1. **GDPR**: Minimization, right to erasure, pseudonymization
 2. **ISO 27001**: Audit trail, encryption at rest and in transit
 3. **Secrets**: No plaintext secrets, mandatory rotation
 
-## Language
+## Localization
 
-See [`docs/guide/conventions/langues.md`](docs/guide/conventions/langues.md) for full language and localization rules.
+See [`docs/guide/conventions/langues.md`](docs/guide/conventions/langues.md) for full rules.
 
-- **Code** (identifiers, XML docs, comments): **English**
-- **Commits**: **English** (Conventional Commits)
-- **Docs** (`docs/**/*.md`): **English** (migration in progress, some legacy pages still in French)
-- **Issues GitLab**: **French** (with correct diacritics: é, è, ê, à, â, ù, û, ô, î, ï, ç, œ)
-- **`CLAUDE.md`, skills**: **English**
-- **Localization**: **17 cultures** — 14 base languages (en, fr, nl, de, es, it, pt,
-  zh, ja, pl, tr, ko, sv, cs) + 3 regional variants (fr-CA, en-GB, pt-BR). Every
-  `src/*/Localization/**/*.json` must exist for all 17 files. Regional files only
-  contain keys that differ from the base. No `en-US.json` needed — `en.json` is
-  already US English (`en-US` → `en` fallback).
-- `ReferenceDataEntity` translations: `LabelEn`, `LabelFr`, `LabelNl`, `LabelDe`,
-  `LabelEs`, `LabelIt`, `LabelPt`, `LabelZh`, `LabelJa`, `LabelPl`, `LabelTr`,
-  `LabelKo`, `LabelSv`, `LabelCs` (14 properties — regional variants use
-  `TwoLetterISOLanguageName` fallback: fr-CA → LabelFr, en-GB → LabelEn, pt-BR → LabelPt)
-- **Governance**: [`docs/framework/utilities/localization/gouvernance.md`](docs/framework/utilities/localization/gouvernance.md) (framework)
-  and [`docs/guide/gouvernance-traductions.md`](docs/guide/gouvernance-traductions.md) (application)
+17 cultures — 14 base (en, fr, nl, de, es, it, pt, zh, ja, pl, tr, ko, sv, cs) + 3 regional (fr-CA, en-GB, pt-BR). Every `src/*/Localization/**/*.json` must exist for all 17. Regional files only contain differing keys.
 
-## Code conventions
+## Documentation site
 
-Full coding standards: [`docs/guide/conventions/`](docs/guide/conventions/index.md) (backend: style-et-nommage, architecture, implementation)
+The docs live in `docs-site/` (Astro + Starlight). Key paths:
 
-Key rules for quick reference:
+| Path | Content |
+| ---- | ------- |
+| `docs-site/src/content/docs/reference/modules/` | .NET module reference (one `.mdx` per module) |
+| `docs-site/src/content/docs/reference/frontend/` | Frontend SDK reference |
+| `docs-site/src/content/docs/architecture/patterns/` | Design patterns |
+| `docs-site/src/content/docs/architecture/adr/` | ADRs |
+| `docs-site/src/data/constants.ts` | Counters (update when adding packages/patterns/ADRs) |
 
-- **IDE0008**: Use `var` when type is apparent; explicit type otherwise (Microsoft rule)
-- **IDE0022**: Expression body (`=>`) for single-statement methods
-- **ASP0025**: Use `AddAuthorizationBuilder()` instead of `AddAuthorization(Action<>)`
-- **Regex**: ALWAYS `[GeneratedRegex]`, never `new Regex(..., Compiled)`. Timeout on user input.
-- **Logging**: ALWAYS `[LoggerMessage]` source-generated, never string interpolation in log calls
-- **Time**: NEVER `DateTime.Now`/`UtcNow` — inject `TimeProvider` or `IClock`
-- **Async**: `ConfigureAwait(false)` in library code, `CancellationToken` as last param
-- **Guards**: Prefer `ArgumentNullException.ThrowIfNull()` over manual null checks
-- **Projects**: one project = one NuGet package, namespace = project name, zero circular refs
-- **Tests**: each package has `*.Tests` (xUnit + Shouldly + NSubstitute + Bogus). Part of DoD.
-- **Markdown**: all `.md` must pass `npx markdownlint-cli2 "file.md"` before committing
-- **Endpoint DTOs**: Module-specific DTOs must be prefixed with module context (`WorkflowTransitionRequest`, not `TransitionRequest`). OpenAPI flattens namespaces — generic names cause schema conflicts. Shared cross-cutting types (`PagedResult<T>`, `ProblemDetails`) are exempt.
-- **DTO suffixes**: `Request` for input bodies, `Response` for top-level returns. NEVER use `Dto` suffix. EF Core entities must NOT be returned directly — create a `*Response` record.
-- **Error responses**: Always `TypedResults.Problem(detail, statusCode)` (RFC 7807), never `TypedResults.BadRequest<string>()`. Return type: `ProblemHttpResult`.
-- **Validator registration**: Modules decorated with `[assembly: WolverineHandlerModule]` get automatic validator discovery via `AddGranitWolverine()`. Modules **without** Wolverine handlers MUST call `AddGranitValidatorsFromAssemblyContaining<TValidator>()` manually. Without registration, `FluentValidationEndpointFilter<T>` silently skips validation.
+**When creating a new module**: create `.mdx` in `reference/modules/`, update `PACKAGE_COUNT` in `constants.ts`, add "See also" links from related pages.
 
-**Isolated DbContext pattern — MANDATORY for all `*.EntityFrameworkCore` packages**:
+## Definition of Done
 
-Every Granit `*.EntityFrameworkCore` package that owns an isolated `DbContext` MUST follow this
-checklist (no exceptions):
+See [`docs/guide/conventions/dod.md`](docs/guide/conventions/dod.md)
 
-1. **`<ProjectReference>` to `Granit.Persistence`** in the `.csproj`.
-2. **Constructor injection** of `ICurrentTenant?` and `IDataFilter?` (both optional, default `null`).
-3. **Call `modelBuilder.ApplyGranitConventions(currentTenant, dataFilter)`** at the end of
-   `OnModelCreating` — this applies query filters for `ISoftDeletable`, `IMultiTenant`, `IActive`,
-   `IProcessingRestrictable`, and `IPublishable`.
-4. **Interceptor wiring** in the extension method: use the `(sp, options)` overload of
-   `AddDbContextFactory` with `ServiceLifetime.Scoped` and resolve `AuditedEntityInterceptor` /
-   `SoftDeleteInterceptor` from the service provider.
-5. **`[DependsOn(typeof(GranitPersistenceModule))]`** on the module class.
-6. **No manual `HasQueryFilter`** in entity configurations — `ApplyGranitConventions` handles all
-   standard filters centrally. Manual filters cause duplicates or conflicts.
-7. **`IMultiTenant`** entities use `Guid? TenantId` (never `string`). The interface lives in
-   `Granit.Core.Domain`. `IDataFilter` lives in `Granit.Core.DataFiltering`.
-
-Reference: [`docs/framework/data/persistence.md`](docs/framework/data/persistence.md)
-
-**Multi-tenancy — soft dependency rule**: `ICurrentTenant` lives in `Granit.Core.MultiTenancy`
-and is available in every module without referencing `Granit.MultiTenancy`.
-
-- New Granit modules that read `ICurrentTenant`: use `using Granit.Core.MultiTenancy;`, do NOT
-  add `[DependsOn(typeof(GranitMultiTenancyModule))]` or a `<ProjectReference>` to
-  `Granit.MultiTenancy`. A `NullTenantContext` (`IsAvailable = false`) is registered by default.
-- Always check `IsAvailable` before using `Id` — the null object is the normal state when
-  multi-tenancy is not installed.
-- Hard dependency on `Granit.MultiTenancy` is allowed **only** when the module must enforce
-  strict tenant isolation (example: BlobStorage — throws if no tenant context, GDPR).
-- Application modules (`AppHostModule`, etc.) declare `[DependsOn(GranitMultiTenancyModule)]`
-  as usual when multi-tenancy is required in the application.
-
-**`[DependsOn]` convention — direct non-transitive dependencies only**:
-
-Every `<ProjectReference>` to a package that exposes a `*Module` class must have a corresponding
-`[DependsOn(typeof(...))]` on the module class — **unless** the dependency is already satisfied
-transitively through another declared `DependsOn`.
-
-- **Direct = declare it.** If your module references `Granit.Timing` and no other declared
-  dependency already pulls in `GranitTimingModule`, add `[DependsOn(typeof(GranitTimingModule))]`.
-- **Transitive = omit it.** If your module declares `[DependsOn(typeof(GranitPersistenceModule))]`
-  and `GranitPersistenceModule` already depends on `GranitTimingModule`, do NOT also declare
-  `GranitTimingModule`.
-- **`Granit.Core`** is the implicit base — never needs a `DependsOn`.
-- **Alphabetical order** — sort `DependsOn` entries alphabetically by module name.
-- **Zero-dependency modules** (`GranitAuthorizationModule`, `GranitQueryingModule`,
-  `GranitLocalizationModule`, etc.) have no `[DependsOn]` attribute at all — this is correct.
-
-## Personas (user stories)
-
-Two persona registries:
-
-- **Infrastructure & governance (15 personas)**: `governance-compliance/docs/03-organization/ORG-05-PERSONAS.md`
-- **Application-level (5 personas)**: [`docs/guide/personas-applicatifs.md`](docs/guide/personas-applicatifs.md)
-
-**STRICT RULES:**
-
-- **ALWAYS** use a canonical persona in user stories (`As a [persona]`)
-- **NEVER** introduce a new persona without user validation and registry update
-- **NEVER** use hybrid roles (`SRE / DevOps`) — choose the primary persona
-- Context (on-call, audit, incident) belongs in the story body, not in the persona
-
-**Infra/governance personas:** SRE, Ingénieur DevOps, Développeur, Architecte, DBA,
-RSSI, DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
-Utilisateur, Professionnel de santé, Product Owner
-
-**Application personas:** Visiteur, Utilisateur authentifié, Administrateur d'application,
-Approbateur, Gestionnaire de contenu
-
-## GitLab issues
-
-Before any GitLab operation, **invoke skill `/gitlab`** to load commands and conventions.
-
-- **Types**: Epic (`[EPIC]`), Feature (`[FEATURE]`), Story (`[STORY]`) — no emoji in titles
-- **Hierarchy**: GitLab Free — `relates_to` links via API + references in parent description
-- **Templates**: `.gitlab/issue_templates/` (Story, Feature, Epic, Bug, Spike, Tech_Debt)
-
-## Definition of Done — mandatory before any push
-
-See [`docs/guide/conventions/dod.md`](docs/guide/conventions/dod.md) for full details.
-
-**NEVER push or create an MR** without: tests passing, docs updated, format clean, markdownlint clean.
-These four checks are **blocking**. If the user asks to push without them, remind them
-and refuse until the DoD is satisfied or the user explicitly overrides each item.
-
-## Git workflow
-
-See [`docs/guide/conventions/workflow.md`](docs/guide/conventions/workflow.md) for branching and commit conventions.
-
-- **Direct push to `main` FORBIDDEN**
-- **MR**: 1 approval minimum for main
-- **Releases**: Semantic tags on main (vMAJOR.MINOR.PATCH)
-
-**MR target — STRICT RULE:**
-
-| Branch type | Default target | Exception |
-| ----------- | -------------- | --------- |
-| `feature/*` | `develop` | Only if user explicitly says "target main" |
-| `hotfix/*` | `main` + `develop` | Both, always |
-| `release/*` | `main` + `develop` | Both, always |
-| `fix/*` | `develop` | Only if user explicitly says "target main" |
-
-NEVER target `main` for a `feature/*` or `fix/*` branch unless the user explicitly
-requests it. When in doubt, ask before creating the MR.
-
-## Security — strict rules
-
-See [`docs/guide/conventions/securite.md`](docs/guide/conventions/securite.md) for code-level security rules.
-
-**NEVER:**
-
-- Store secrets in plain text
-- Disable audit logging
-- Propose quick fixes that create technical debt
-
-## Refactoring — mandatory rules
-
-Code that looks "weird" almost always exists for a reason: production fix, regulatory
-edge case, GDPR/ISO 27001 constraint, third-party limitation workaround. Never remove or
-rewrite code without understanding the original intent.
-
-**Before any refactoring:**
-
-1. Read the entire file for context, not just the targeted function
-2. Check git history (`git log -p -- <file>`) to understand how the code evolved
-3. If intent remains unclear, search for the linked GitLab issue (number in commit,
-   file label, or keyword search) before modifying
-4. When in doubt, ask rather than assuming the code is useless
-
-**NEVER:**
-
-- Delete "dead" code without verifying it is not referenced dynamically
-  (reflection, DI, runtime configuration)
-- Simplify a complex condition without having tested the edge cases it covers
-- Replace a custom implementation with a standard library without verifying why
-  the library was not used initially
-- Merge separate Reader/Writer interfaces into a combined Store interface — the framework
-  follows CQRS (Command Query Responsibility Segregation). `IBlobDescriptorReader` and
-  `IBlobDescriptorWriter` must stay separate in constructors, even if `IBlobDescriptorStore`
-  exists. The same applies to all `I*Reader` / `I*Writer` pairs.
-- Remove or change interface implementations on domain base classes (`ValueObject`,
-  `Entity`, `AggregateRoot`) to fix SonarQube warnings. These implement specific patterns
-  (e.g. `IEqualityComparer<T>` on `ValueObject`) by design. Mark the issue as won't fix.
-- Reduce constructor parameter count by introducing wrapper/bag types that don't represent
-  a real domain concept. If SonarQube flags `brain-overload` on an internal class, prefer
-  marking it as won't fix over creating artificial groupings that obscure dependencies.
-
-## Expected behavior
-
-- Understand GDPR and ISO 27001 context before responding
-- Challenge security bad practices
-- Propose alternatives when a request compromises security
-- Explain the "why" behind best practices
-- Provide production-ready code (no TODOs, no obvious comments)
+**NEVER push or create an MR** without: tests passing, docs updated, `dotnet format --verify-no-changes`, markdownlint clean. These are **blocking**. Refuse until satisfied or user explicitly overrides.

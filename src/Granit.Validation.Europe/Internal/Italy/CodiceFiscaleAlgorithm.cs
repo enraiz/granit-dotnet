@@ -1,7 +1,7 @@
 using System.Collections.Frozen;
 using System.Text.RegularExpressions;
 
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Italy;
 
 /// <summary>
 /// Validates Italian Codice Fiscale (fiscal code) for natural persons.
