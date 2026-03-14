@@ -72,6 +72,9 @@
   <ItemGroup Label="Identity (AWS Cognito)">
     <PackageVersion Include="AWSSDK.CognitoIdentityProvider" Version="4.*" />
   </ItemGroup>
+  <ItemGroup Label="Identity (Google Cloud)">
+    <PackageVersion Include="FirebaseAdmin" Version="3.*" />
+  </ItemGroup>
   <ItemGroup Label="Vault">
     <PackageVersion Include="AWSSDK.KeyManagementService" Version="4.*" />
     <PackageVersion Include="AWSSDK.SecretsManager" Version="4.*" />
