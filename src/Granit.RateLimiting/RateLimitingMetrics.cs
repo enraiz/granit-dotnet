@@ -1,6 +1,6 @@
 using System.Diagnostics.Metrics;
 
-namespace Granit.RateLimiting.Internal;
+namespace Granit.RateLimiting;
 
 /// <summary>
 /// Metrics for the rate limiting module.

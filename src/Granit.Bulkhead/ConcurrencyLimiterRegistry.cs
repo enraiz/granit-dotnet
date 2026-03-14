@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Threading.RateLimiting;
 
-namespace Granit.Bulkhead.Internal;
+namespace Granit.Bulkhead;
 
 /// <summary>
 /// Singleton registry that manages <see cref="ConcurrencyLimiter"/> instances keyed by

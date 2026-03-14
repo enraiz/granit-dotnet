@@ -1,6 +1,5 @@
 using Granit.RateLimiting.Abstractions;
 using Granit.RateLimiting.Exceptions;
-using Granit.RateLimiting.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

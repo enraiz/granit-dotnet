@@ -1,6 +1,6 @@
 using System.Diagnostics.Metrics;
 
-namespace Granit.Bulkhead.Internal;
+namespace Granit.Bulkhead;
 
 /// <summary>
 /// OpenTelemetry metrics for the bulkhead module.

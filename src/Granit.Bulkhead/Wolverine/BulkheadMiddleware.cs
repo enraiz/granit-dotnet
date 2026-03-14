@@ -1,6 +1,5 @@
 using Granit.Bulkhead.Abstractions;
 using Granit.Bulkhead.Attributes;
-using Granit.Bulkhead.Internal;
 
 namespace Granit.Bulkhead.Wolverine;
 

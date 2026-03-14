@@ -29,7 +29,9 @@ public sealed class ClassDesignTests
 
     [Fact]
     public void EntityTypeConfigurations_should_be_in_EfCore_layer() =>
-        ClassDesignRules.EntityTypeConfigurationsShouldBeInEfCoreLayer(Architecture, "Granit.");
+        ClassDesignRules.EntityTypeConfigurationsShouldBeInEfCoreLayer(Architecture, "Granit.",
+            // Granit.BlobStorage.Database is a persistence layer that stores blobs in the database.
+            "Database");
 
     [Fact]
     public void Entity_configurations_should_not_be_public() =>
