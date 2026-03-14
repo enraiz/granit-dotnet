@@ -13,7 +13,7 @@ Dernière mise à jour : 2026-03-14
 | Licence      | Nombre de packages |
 | ------------ | ------------------ |
 | MIT          | 51                 |
-| Apache-2.0   | 18                 |
+| Apache-2.0   | 19                 |
 | BSD-3-Clause | 2                  |
 | BSD-2-Clause | 1                  |
 | PostgreSQL   | 1                  |
@@ -70,6 +70,7 @@ Dernière mise à jour : 2026-03-14
 
 | Package | Version | Copyright |
 | ------- | ------- | --------- |
+| AWSSDK.CognitoIdentityProvider | 4.0.6.2 | Amazon Web Services, Inc. |
 | AWSSDK.KeyManagementService | 4.0.9.3 | Amazon Web Services, Inc. |
 | AWSSDK.S3 | 4.0.19 | Amazon Web Services, Inc. |
 | AWSSDK.SecretsManager | 4.0.4.9 | Amazon Web Services, Inc. |
@@ -148,6 +149,12 @@ de santé ne transite par l'infrastructure AWS.
 
 Ce SDK fournit un canal d'envoi d'emails via Amazon SES. Il est utilisé par le
 package `Granit.Notifications.Email.Ses` comme alternative au canal SMTP.
+
+### AWSSDK.CognitoIdentityProvider
+
+Ce SDK est utilisé par le package `Granit.Identity.Cognito` pour l'administration
+des utilisateurs AWS Cognito User Pools (CRUD, groupes, sessions, mots de passe)
+comme alternative au provider Keycloak.
 
 ### AWSSDK.KeyManagementService / AWSSDK.SecretsManager
 

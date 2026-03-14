@@ -12,6 +12,7 @@
     <Project Path="src/Granit.Authentication.ApiKeys.Endpoints/Granit.Authentication.ApiKeys.Endpoints.csproj" />
     <Project Path="src/Granit.Authentication.ApiKeys.EntityFrameworkCore/Granit.Authentication.ApiKeys.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.Authentication.ApiKeys/Granit.Authentication.ApiKeys.csproj" />
+    <Project Path="src/Granit.Authentication.Cognito/Granit.Authentication.Cognito.csproj" />
     <Project Path="src/Granit.Authentication.EntraId/Granit.Authentication.EntraId.csproj" />
     <Project Path="src/Granit.Authentication.JwtBearer/Granit.Authentication.JwtBearer.csproj" />
     <Project Path="src/Granit.Authentication.Keycloak/Granit.Authentication.Keycloak.csproj" />
@@ -51,6 +52,7 @@
     <Project Path="src/Granit.Guids/Granit.Guids.csproj" />
     <Project Path="src/Granit.Idempotency/Granit.Idempotency.csproj" />
     <Project Path="src/Granit.Identity.Endpoints/Granit.Identity.Endpoints.csproj" />
+    <Project Path="src/Granit.Identity.Cognito/Granit.Identity.Cognito.csproj" />
     <Project Path="src/Granit.Identity.EntityFrameworkCore/Granit.Identity.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.Identity.EntraId/Granit.Identity.EntraId.csproj" />
     <Project Path="src/Granit.Identity.Keycloak/Granit.Identity.Keycloak.csproj" />
@@ -136,6 +138,7 @@
     <Project Path="tests/Granit.Authentication.ApiKeys.Endpoints.Tests/Granit.Authentication.ApiKeys.Endpoints.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.ApiKeys.EntityFrameworkCore.Tests/Granit.Authentication.ApiKeys.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.ApiKeys.Tests/Granit.Authentication.ApiKeys.Tests.csproj" />
+    <Project Path="tests/Granit.Authentication.Cognito.Tests/Granit.Authentication.Cognito.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.EntraId.Tests/Granit.Authentication.EntraId.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.JwtBearer.Tests/Granit.Authentication.JwtBearer.Tests.csproj" />
     <Project Path="tests/Granit.Authentication.Keycloak.Tests/Granit.Authentication.Keycloak.Tests.csproj" />
@@ -177,6 +180,7 @@
     <Project Path="tests/Granit.Guids.Tests/Granit.Guids.Tests.csproj" />
     <Project Path="tests/Granit.Idempotency.Tests/Granit.Idempotency.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Endpoints.Tests/Granit.Identity.Endpoints.Tests.csproj" />
+    <Project Path="tests/Granit.Identity.Cognito.Tests/Granit.Identity.Cognito.Tests.csproj" />
     <Project Path="tests/Granit.Identity.EntityFrameworkCore.Tests/Granit.Identity.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.Identity.EntraId.Tests/Granit.Identity.EntraId.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Keycloak.Tests/Granit.Identity.Keycloak.Tests.csproj" />
