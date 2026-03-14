@@ -3,7 +3,7 @@
 EF Core persistence for `Granit.Authentication.ApiKeys`. Provides `EfCoreApiKeyStore`,
 `ApiKeysDbContext`, and entity configuration with SHA-256 indexed lookups and soft delete.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -11,6 +11,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Authentication.ApiKeys.EntityFrameworkCore
 ```
 
+## Dependencies
+
+- `Granit.Authentication.ApiKeys`
+- `Granit.Persistence`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/security/api-keys.md).
+See the [full documentation](https://granit-fx.dev).

@@ -1,13 +1,17 @@
 using Granit.BlobStorage.Options;
+
 namespace Granit.BlobStorage.Internal;
 
 /// <summary>
-/// Generates Pre-signed S3 URLs. Implemented by <c>Granit.BlobStorage.S3</c>.
+/// Generates pre-signed URLs for direct client-to-storage transfers.
+/// Implemented by cloud providers (S3, Azure Blob Storage).
+/// For server-side providers (FileSystem, Database), <c>Granit.BlobStorage.Proxy</c>
+/// provides a proxy-based implementation.
 /// </summary>
-internal interface IBlobPresignedUrlGenerator
+internal interface IPresignedUrlProvider
 {
     /// <summary>
-    /// Generates a Pre-signed PUT URL and returns the full <see cref="PresignedUploadTicket"/>.
+    /// Generates a pre-signed PUT URL and returns the full <see cref="PresignedUploadTicket"/>.
     /// </summary>
     Task<PresignedUploadTicket> GenerateUploadTicketAsync(
         string bucket,
@@ -18,7 +22,7 @@ internal interface IBlobPresignedUrlGenerator
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Generates a Pre-signed GET URL for client download.
+    /// Generates a pre-signed GET URL for client download.
     /// </summary>
     Task<PresignedDownloadUrl> GenerateDownloadUrlAsync(
         string bucket,

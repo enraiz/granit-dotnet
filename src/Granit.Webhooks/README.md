@@ -2,7 +2,7 @@
 
 Outgoing webhook engine for Granit. Asynchronous dispatch via Wolverine Outbox, HMAC-SHA256 anti-replay signature, durable exponential backoff.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,12 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Webhooks
 ```
 
+## Dependencies
+
+- `Granit.Core`
+- `Granit.Guids`
+- `Granit.Timing`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/messaging/webhooks.md).
+See the [full documentation](https://granit-fx.dev).

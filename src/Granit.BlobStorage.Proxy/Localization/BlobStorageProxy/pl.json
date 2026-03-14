@@ -1,0 +1,8 @@
+{
+  "culture": "pl",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "Token przesyłania/pobierania jest nieprawidłowy lub wygasł.",
+    "BlobStorageProxy:PayloadTooLarge": "Przesłany plik przekracza maksymalny dozwolony rozmiar.",
+    "BlobStorageProxy:ContentTypeMismatch": "Nagłówek Content-Type nie odpowiada oczekiwanemu typowi."
+  }
+}

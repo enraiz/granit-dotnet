@@ -6,7 +6,7 @@ from external identity systems (Keycloak, Auth0, Entra ID, etc.). Includes model
 (`IdentityUser`, `IdentityRole`, `IdentityGroup`, `IdentityUserCreate`) and a
 `NullIdentityProvider` null-object registered by default.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -14,6 +14,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Identity
 ```
 
+## Dependencies
+
+- `Granit.Core`
+- `Granit.Querying`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/security/identity.md).
+See the [full documentation](https://granit-fx.dev).

@@ -1,0 +1,8 @@
+{
+  "culture": "nl",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "Het upload-/downloadtoken is ongeldig of verlopen.",
+    "BlobStorageProxy:PayloadTooLarge": "Het geüploade bestand overschrijdt de maximaal toegestane grootte.",
+    "BlobStorageProxy:ContentTypeMismatch": "De Content-Type header komt niet overeen met het verwachte type."
+  }
+}

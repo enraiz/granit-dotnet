@@ -3,7 +3,7 @@
 Magick.NET implementation of `Granit.Imaging`. Provides `IImageProcessor` with native
 support for JPEG, PNG, WebP, AVIF, GIF, BMP and TIFF formats. Licensed under Apache 2.0.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -11,6 +11,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Imaging.MagickNet
 ```
 
+## Dependencies
+
+- `Granit.Imaging`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/imaging/index.md).
+See the [full documentation](https://granit-fx.dev).

@@ -2,7 +2,7 @@
 
 EF Core interceptors for ISO 27001 audit trail and GDPR soft delete for Granit applications.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,13 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Persistence
 ```
 
+## Dependencies
+
+- `Granit.ExceptionHandling`
+- `Granit.Guids`
+- `Granit.Security`
+- `Granit.Timing`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/persistence.md).
+See the [full documentation](https://granit-fx.dev).

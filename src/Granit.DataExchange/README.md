@@ -8,7 +8,7 @@ smart mapping suggestion engine (Saved → Exact → Fuzzy → Semantic AI).
 **Export**: tabular export (Excel/CSV) with fluent `ExportDefinition<T>`, presets,
 background jobs, and roundtrip support (export → modify → reimport).
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -16,6 +16,13 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.DataExchange
 ```
 
+## Dependencies
+
+- `Granit.Guids`
+- `Granit.Querying`
+- `Granit.Timing`
+- `Granit.Validation`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/data-exchange.md).
+See the [full documentation](https://granit-fx.dev).

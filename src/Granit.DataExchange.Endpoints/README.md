@@ -8,7 +8,7 @@ async execution, dry-run, status, report, correction file download.
 **Export** (`DataExchange.Export` permission): list definitions, list fields,
 create export job, check status, download file, preset CRUD.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -16,6 +16,14 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.DataExchange.Endpoints
 ```
 
+## Dependencies
+
+- `Granit.ApiDocumentation`
+- `Granit.Authorization`
+- `Granit.DataExchange`
+- `Granit.Guids`
+- `Granit.Validation`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/data-exchange.md).
+See the [full documentation](https://granit-fx.dev).

@@ -4,7 +4,7 @@ European regulatory identifier validators for the Granit framework.
 Provides FluentValidation extensions for France and Belgium-specific identifiers
 (SIREN, SIRET, NISS, NIR, BCE, eID, RPPS, ADELI, FINESS, INAMI, VAT, RIB, postal codes).
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,6 +12,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Validation.Europe
 ```
 
+## Dependencies
+
+- `Granit.Localization`
+- `Granit.Validation`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/tree/develop/docs/framework/validation).
+See the [full documentation](https://granit-fx.dev/-/tree/develop/docs/framework/validation).

@@ -2,7 +2,7 @@
 
 Foundation module for all Granit packages. Provides the module system (GranitModule, [DependsOn], topological loading), shared domain types (Entity, AuditedEntity, ISoftDeletable), and IDataFilter.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,4 +12,4 @@ dotnet add package Granit.Core
 
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/core/core.md).
+See the [full documentation](https://granit-fx.dev).

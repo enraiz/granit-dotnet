@@ -3,7 +3,7 @@
 Minimal API endpoints for API key management. Provides CRUD, revocation, rotation,
 scope updates, and permission-based authorization for `ApiKeyEntry` entities.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -11,6 +11,15 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Authentication.ApiKeys.Endpoints
 ```
 
+## Dependencies
+
+- `Granit.ApiDocumentation`
+- `Granit.Authentication.ApiKeys`
+- `Granit.Authorization`
+- `Granit.Querying`
+- `Granit.Timing`
+- `Granit.Validation`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/tree/develop/docs/framework/security/api-keys.md).
+See the [full documentation](https://granit-fx.dev/-/tree/develop/docs/framework/security/api-keys.md).

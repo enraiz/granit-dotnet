@@ -1,0 +1,8 @@
+{
+  "culture": "tr",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "Yükleme/indirme jetonu geçersiz veya süresi dolmuş.",
+    "BlobStorageProxy:PayloadTooLarge": "Yüklenen dosya izin verilen maksimum boyutu aşıyor.",
+    "BlobStorageProxy:ContentTypeMismatch": "Content-Type başlığı beklenen türle eşleşmiyor."
+  }
+}

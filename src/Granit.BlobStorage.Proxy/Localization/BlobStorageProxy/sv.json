@@ -1,0 +1,8 @@
+{
+  "culture": "sv",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "Uppladdnings-/nedladdningstoken är ogiltigt eller har upphört.",
+    "BlobStorageProxy:PayloadTooLarge": "Den uppladdade filen överskrider den maximalt tillåtna storleken.",
+    "BlobStorageProxy:ContentTypeMismatch": "Content-Type-huvudet matchar inte den förväntade typen."
+  }
+}

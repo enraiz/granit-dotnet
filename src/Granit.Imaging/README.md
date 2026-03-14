@@ -4,7 +4,7 @@ Image processing abstraction layer for Granit applications. Provides `IImageProc
 and `IImagePipeline` — a fluent API for resize, crop, compress, convert, watermark
 and metadata stripping operations.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -15,6 +15,10 @@ dotnet add package Granit.Imaging
 This package contains interfaces only. Install an implementation package such as
 `Granit.Imaging.MagickNet` for concrete image processing.
 
+## Dependencies
+
+- `Granit.Core`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/imaging/index.md).
+See the [full documentation](https://granit-fx.dev).

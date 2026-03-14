@@ -3,7 +3,7 @@
 Wolverine integration for Granit.DataExchange. Dispatches import and export commands
 via `IMessageBus` (durable Outbox) instead of the default in-process Channel.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -11,6 +11,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.DataExchange.Wolverine
 ```
 
+## Dependencies
+
+- `Granit.DataExchange`
+- `Granit.Wolverine`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/data-exchange.md).
+See the [full documentation](https://granit-fx.dev).

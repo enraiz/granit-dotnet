@@ -1,0 +1,8 @@
+{
+  "culture": "it",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "Il token di caricamento/scaricamento non è valido o è scaduto.",
+    "BlobStorageProxy:PayloadTooLarge": "Il file caricato supera la dimensione massima consentita.",
+    "BlobStorageProxy:ContentTypeMismatch": "L'intestazione Content-Type non corrisponde al tipo previsto."
+  }
+}

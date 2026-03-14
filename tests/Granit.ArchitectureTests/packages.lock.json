@@ -95,8 +95,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.500.90",
-        "contentHash": "N+fIHBV7jpNcubRJ+ZVjAlX+D25d6gQLTaijtpYVyAlLdlQReI+b54l6D+rIq3YfnLLFWtNuZU8QsD550CYXhw=="
+        "resolved": "3.7.500.91",
+        "contentHash": "lN2zGNxSoZHk4mSx6qBCB9keTKBs6R3zVkxopFE6Is8ypT4XMNkDGuAH4Q9H/Vm2X40+SsC9HbUcxoyLz/BXlg=="
       },
       "Azure.Core": {
         "type": "Transitive",
@@ -106,16 +106,6 @@
           "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
           "System.ClientModel": "1.5.1",
           "System.Memory.Data": "8.0.1"
-        }
-      },
-      "Azure.Identity": {
-        "type": "Transitive",
-        "resolved": "1.14.2",
-        "contentHash": "YhNMwOTwT+I2wIcJKSdP0ADyB2aK+JaYWZxO8LSRDm5w77LFr0ykR9xmt2ZV5T1gaI7xU6iNFIh/yW1dAlpddQ==",
-        "dependencies": {
-          "Azure.Core": "1.46.1",
-          "Microsoft.Identity.Client": "4.73.1",
-          "Microsoft.Identity.Client.Extensions.Msal": "4.73.1"
         }
       },
       "BouncyCastle.Cryptography": {
@@ -1945,10 +1935,21 @@
       "AWSSDK.S3": {
         "type": "CentralTransitive",
         "requested": "[3.*, )",
-        "resolved": "3.7.511",
-        "contentHash": "2MTsmWi+mcan+n2DUNUzPNjpxGRTLXmTBC6XmO/r9xht4S5pZkn+mciqB10FPYxmPuHWUC0w7GKy/aeqPpNzfA==",
+        "resolved": "3.7.511.1",
+        "contentHash": "9fBsR8E4DCFfuGznup8qeHlHVAYpMco3HQ3cluCkgukDn9aWOvbAwhoCLAq1HH3C0YfbRwnK4sxFTZgtWY5z/w==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.500.90, 4.0.0)"
+          "AWSSDK.Core": "[3.7.500.91, 4.0.0)"
+        }
+      },
+      "Azure.Identity": {
+        "type": "CentralTransitive",
+        "requested": "[1.*, )",
+        "resolved": "1.14.2",
+        "contentHash": "YhNMwOTwT+I2wIcJKSdP0ADyB2aK+JaYWZxO8LSRDm5w77LFr0ykR9xmt2ZV5T1gaI7xU6iNFIh/yW1dAlpddQ==",
+        "dependencies": {
+          "Azure.Core": "1.46.1",
+          "Microsoft.Identity.Client": "4.73.1",
+          "Microsoft.Identity.Client.Extensions.Msal": "4.73.1"
         }
       },
       "ClosedXML": {
@@ -2298,8 +2299,8 @@
       "Sylvan.Data.Excel": {
         "type": "CentralTransitive",
         "requested": "[0.5.*, )",
-        "resolved": "0.5.2",
-        "contentHash": "uu8QtxfiA2E6LbjJE7C6EjYEZClcOLUbTgtqJV/c+dNU7QfvOVtY/5f4LTShmd/10B65v/Nqip4ySCJOh5EkrA=="
+        "resolved": "0.5.3",
+        "contentHash": "G+zkfopqrZwRWWpK7RPb8pGHqhVGrXaj6dQTyybeR7xI9uW6Fy7CrP1SjDyyun0gyO0DyRdBtCMJxePhSSwd5g=="
       },
       "System.Composition.AttributedModel": {
         "type": "CentralTransitive",

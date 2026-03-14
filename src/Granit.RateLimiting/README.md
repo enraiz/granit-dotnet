@@ -2,7 +2,7 @@
 
 Per-tenant rate limiting for Granit APIs. Sliding window, fixed window, and token bucket algorithms via Redis Lua scripts. Plan-based quotas via Granit.Features integration. ASP.NET Core endpoint filter (429 + Retry-After) and Wolverine middleware.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,13 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.RateLimiting
 ```
 
+## Dependencies
+
+- `Granit.Core`
+- `Granit.ExceptionHandling`
+- `Granit.Features`
+- `Granit.Security`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/api/rate-limiting.md).
+See the [full documentation](https://granit-fx.dev).

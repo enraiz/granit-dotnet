@@ -3,7 +3,7 @@
 SQL Server transport for Granit.Wolverine using Wolverine.SqlServer.
 Provides durable outbox, EF Core transaction integration, and per-tenant database routing.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -11,6 +11,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Wolverine.SqlServer
 ```
 
+## Dependencies
+
+- `Granit.Persistence`
+- `Granit.Wolverine`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/messaging/wolverine.md).
+See the [full documentation](https://granit-fx.dev).

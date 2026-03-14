@@ -4,7 +4,7 @@ Declarative query building for list views. Provides `QueryDefinition<T>` fluent 
 typed filters with operator inference, Odoo-inspired FilterGroups/presets/DatePeriod,
 SavedViews, and `QueryMetadata` for frontend auto-configuration.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,6 +12,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Querying
 ```
 
+## Dependencies
+
+- `Granit.Core`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/querying/querying.md).
+See the [full documentation](https://granit-fx.dev).

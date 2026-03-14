@@ -5,7 +5,7 @@ using `System.Threading.RateLimiting.ConcurrencyLimiter` (built-in .NET). Preven
 single tenant from monopolizing server resources (CPU, memory, threads). ASP.NET Core
 endpoint filter (503 Service Unavailable) and Wolverine middleware.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Key characteristics
 
@@ -70,6 +70,13 @@ opts.Policies.AddMiddleware<BulkheadMiddleware>(
         .GetCustomAttributes(typeof(BulkheadAttribute), true).Length > 0);
 ```
 
+## Dependencies
+
+- `Granit.Core`
+- `Granit.ExceptionHandling`
+- `Granit.Features`
+- `Granit.Security`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/api/bulkhead.md).
+See the [full documentation](https://granit-fx.dev).
