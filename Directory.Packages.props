@@ -34,6 +34,7 @@
   <ItemGroup Label="Entity Framework Core">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.*" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.*" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.*" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.*" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.*" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />
@@ -56,7 +57,7 @@
     <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="5.18.*" />
   </ItemGroup>
   <ItemGroup Label="Blob Storage">
-    <PackageVersion Include="AWSSDK.S3" Version="3.*" />
+    <PackageVersion Include="AWSSDK.S3" Version="4.*" />
     <PackageVersion Include="Azure.Identity" Version="1.*" />
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.*" />
   </ItemGroup>
@@ -67,7 +68,12 @@
   <ItemGroup Label="Imaging">
     <PackageVersion Include="Magick.NET-Q8-AnyCPU" Version="14.*" />
   </ItemGroup>
+  <ItemGroup Label="Identity (AWS Cognito)">
+    <PackageVersion Include="AWSSDK.CognitoIdentityProvider" Version="4.*" />
+  </ItemGroup>
   <ItemGroup Label="Vault">
+    <PackageVersion Include="AWSSDK.KeyManagementService" Version="4.*" />
+    <PackageVersion Include="AWSSDK.SecretsManager" Version="4.*" />
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
   </ItemGroup>
   <!-- Security patches: transitive dependency version overrides -->
@@ -77,6 +83,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Notifications">
+    <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.*" />
     <PackageVersion Include="MailKit" Version="4.*" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.*" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.*" />

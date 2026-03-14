@@ -1,9 +1,11 @@
+using Granit.Notifications.Brevo.HealthChecks;
 using Granit.Notifications.Brevo.Internal;
 using Granit.Notifications.Brevo.Options;
 using Granit.Notifications.Email;
 using Granit.Notifications.Sms;
 using Granit.Notifications.WhatsApp;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Http.Resilience;
 
 namespace Granit.Notifications.Brevo.Extensions;
@@ -50,4 +52,24 @@ public static class BrevoNotificationsServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Adds the Brevo API health check (tags: <c>readiness</c>).
+    /// </summary>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Optional check name (default: <c>"brevo"</c>).</param>
+    /// <param name="failureStatus">Optional failure status override.</param>
+    /// <param name="timeout">Optional timeout override.</param>
+    /// <returns>The builder for chaining.</returns>
+    public static IHealthChecksBuilder AddGranitBrevoCheck(
+        this IHealthChecksBuilder builder,
+        string name = "brevo",
+        HealthStatus? failureStatus = null,
+        TimeSpan? timeout = null) =>
+        builder.Add(new HealthCheckRegistration(
+            name,
+            sp => new BrevoHealthCheck(sp.GetRequiredService<IHttpClientFactory>()),
+            failureStatus,
+            ["readiness"],
+            timeout));
 }

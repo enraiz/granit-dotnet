@@ -1,9 +1,11 @@
 using Granit.Core.Diagnostics;
 using Granit.Identity.Extensions;
+using Granit.Identity.Keycloak.HealthChecks;
 using Granit.Identity.Keycloak.Internal;
 using Granit.Identity.Keycloak.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Http.Resilience;
 
 namespace Granit.Identity.Keycloak.Extensions;
@@ -55,5 +57,30 @@ public static class IdentityKeycloakServiceCollectionExtensions
         services.Replace(ServiceDescriptor.Scoped<IIdentityProviderCapabilities, KeycloakIdentityProviderCapabilities>());
 
         return services;
+    }
+
+    /// <summary>
+    /// Adds a Keycloak connectivity health check tagged <c>"readiness"</c> and <c>"startup"</c>.
+    /// Verifies that the token endpoint is reachable and that <c>client_credentials</c>
+    /// authentication succeeds.
+    /// </summary>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Check name. Defaults to <c>"keycloak"</c>.</param>
+    /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
+    /// <param name="timeout">Check timeout. Defaults to 10 seconds.</param>
+    public static IHealthChecksBuilder AddGranitKeycloakCheck(
+        this IHealthChecksBuilder builder,
+        string name = "keycloak",
+        HealthStatus? failureStatus = null,
+        TimeSpan? timeout = null)
+    {
+        builder.Services.AddSingleton<KeycloakHealthCheck>();
+
+        return builder.Add(new HealthCheckRegistration(
+            name,
+            sp => sp.GetRequiredService<KeycloakHealthCheck>(),
+            failureStatus,
+            ["readiness", "startup"],
+            timeout ?? TimeSpan.FromSeconds(10)));
     }
 }

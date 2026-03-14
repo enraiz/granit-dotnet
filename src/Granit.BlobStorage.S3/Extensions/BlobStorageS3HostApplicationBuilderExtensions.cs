@@ -1,10 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using Granit.BlobStorage.Internal;
 using Granit.BlobStorage.Options;
+using Granit.BlobStorage.S3.HealthChecks;
 using Granit.BlobStorage.S3.Internal;
 using Granit.BlobStorage.S3.Options;
 using Granit.Core.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
@@ -50,5 +52,29 @@ public static class BlobStorageS3HostApplicationBuilderExtensions
         builder.Services.AddScoped<IBlobStorage, DefaultBlobStorage>();
 
         return builder;
+    }
+
+    /// <summary>
+    /// Adds an S3 connectivity health check tagged <c>"readiness"</c> and <c>"startup"</c>.
+    /// Verifies that the default bucket is accessible by issuing a <c>ListObjectsV2</c> request.
+    /// </summary>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Check name. Defaults to <c>"s3"</c>.</param>
+    /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
+    /// <param name="timeout">Check timeout. Defaults to 10 seconds.</param>
+    public static IHealthChecksBuilder AddGranitS3Check(
+        this IHealthChecksBuilder builder,
+        string name = "s3",
+        HealthStatus? failureStatus = null,
+        TimeSpan? timeout = null)
+    {
+        builder.Services.AddSingleton<S3HealthCheck>();
+
+        return builder.Add(new HealthCheckRegistration(
+            name,
+            sp => sp.GetRequiredService<S3HealthCheck>(),
+            failureStatus,
+            ["readiness", "startup"],
+            timeout ?? TimeSpan.FromSeconds(10)));
     }
 }

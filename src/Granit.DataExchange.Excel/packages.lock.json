@@ -24,8 +24,8 @@
       "Sylvan.Data.Excel": {
         "type": "Direct",
         "requested": "[0.5.*, )",
-        "resolved": "0.5.2",
-        "contentHash": "uu8QtxfiA2E6LbjJE7C6EjYEZClcOLUbTgtqJV/c+dNU7QfvOVtY/5f4LTShmd/10B65v/Nqip4ySCJOh5EkrA=="
+        "resolved": "0.5.3",
+        "contentHash": "G+zkfopqrZwRWWpK7RPb8pGHqhVGrXaj6dQTyybeR7xI9uW6Fy7CrP1SjDyyun0gyO0DyRdBtCMJxePhSSwd5g=="
       },
       "ClosedXML.Parser": {
         "type": "Transitive",

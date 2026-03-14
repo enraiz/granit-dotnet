@@ -95,8 +95,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.500.91",
-        "contentHash": "lN2zGNxSoZHk4mSx6qBCB9keTKBs6R3zVkxopFE6Is8ypT4XMNkDGuAH4Q9H/Vm2X40+SsC9HbUcxoyLz/BXlg=="
+        "resolved": "4.0.3.17",
+        "contentHash": "Ab24kVquQ8kvuQKNe5MK/SvaXR4uoxPkAlTPALDEImaHcwsBg+UWfRVcNzLEx4dRR2y1mDFFh+zZ9TVMXGY6Jg=="
       },
       "Azure.Core": {
         "type": "Transitive",
@@ -1259,7 +1259,7 @@
       "granit.blobstorage.s3": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "[3.*, )",
+          "AWSSDK.S3": "[4.*, )",
           "Granit.BlobStorage": "[0.1.0-dev, )"
         }
       },
@@ -1934,11 +1934,11 @@
       },
       "AWSSDK.S3": {
         "type": "CentralTransitive",
-        "requested": "[3.*, )",
-        "resolved": "3.7.511.1",
-        "contentHash": "9fBsR8E4DCFfuGznup8qeHlHVAYpMco3HQ3cluCkgukDn9aWOvbAwhoCLAq1HH3C0YfbRwnK4sxFTZgtWY5z/w==",
+        "requested": "[4.*, )",
+        "resolved": "4.0.19",
+        "contentHash": "4MuPk4oADJImViC6jeNNWCrwY5/BNtuoHG2vzb5nBRPAdS8GTFIkDpIUbg+w82pZL8TEG+pN8ARTBxoD26FOzg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.500.91, 4.0.0)"
+          "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
         }
       },
       "Azure.Identity": {
