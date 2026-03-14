@@ -18,6 +18,8 @@
     <InternalsVisibleTo Include="Granit.BlobStorage.EntityFrameworkCore.Tests" />
     <InternalsVisibleTo Include="Granit.BlobStorage.FileSystem" />
     <InternalsVisibleTo Include="Granit.BlobStorage.FileSystem.Tests" />
+    <InternalsVisibleTo Include="Granit.BlobStorage.GoogleCloud" />
+    <InternalsVisibleTo Include="Granit.BlobStorage.GoogleCloud.Tests" />
     <InternalsVisibleTo Include="Granit.BlobStorage.Proxy" />
     <InternalsVisibleTo Include="Granit.BlobStorage.Proxy.Tests" />
     <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal interfaces in tests -->

@@ -60,6 +60,7 @@
     <PackageVersion Include="AWSSDK.S3" Version="4.*" />
     <PackageVersion Include="Azure.Identity" Version="1.*" />
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.*" />
+    <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.*" />
   </ItemGroup>
   <ItemGroup Label="DataExchange">
     <PackageVersion Include="Sep" Version="0.*" />
