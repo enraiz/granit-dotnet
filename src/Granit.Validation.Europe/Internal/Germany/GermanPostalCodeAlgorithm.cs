@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Germany;
 
 /// <summary>
 /// Validates German postal codes (Postleitzahl / PLZ).

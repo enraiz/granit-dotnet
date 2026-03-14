@@ -1,4 +1,4 @@
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Germany;
 
 /// <summary>
 /// Validates German Tax Identification Numbers (Steuerliche Identifikationsnummer).

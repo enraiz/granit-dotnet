@@ -1,5 +1,7 @@
 using System.Collections.Frozen;
 using System.Text.RegularExpressions;
+using Granit.Validation.Europe.Internal.Italy;
+using Granit.Validation.Europe.Internal.Spain;
 
 namespace Granit.Validation.Europe.Internal;
 

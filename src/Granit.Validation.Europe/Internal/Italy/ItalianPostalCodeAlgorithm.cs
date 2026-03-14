@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Italy;
 
 /// <summary>
 /// Validates Italian postal codes (CAP — Codice di Avviamento Postale).

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Netherlands;
 
 /// <summary>
 /// Validates Dutch postcodes (postcode).

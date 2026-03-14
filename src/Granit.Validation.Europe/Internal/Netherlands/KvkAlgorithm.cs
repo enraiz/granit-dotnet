@@ -1,4 +1,4 @@
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Netherlands;
 
 /// <summary>
 /// Validates Dutch Chamber of Commerce numbers (Kamer van Koophandel / KVK).

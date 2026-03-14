@@ -1,4 +1,4 @@
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Spain;
 
 /// <summary>
 /// Validates Spanish CIF numbers (Código de Identificación Fiscal) for legal entities.

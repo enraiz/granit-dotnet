@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Luxembourg;
 
 /// <summary>
 /// Validates Luxembourg RCS numbers (Registre de Commerce et des Sociétés).

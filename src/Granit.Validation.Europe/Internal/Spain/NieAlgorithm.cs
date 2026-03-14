@@ -1,4 +1,4 @@
-namespace Granit.Validation.Europe.Internal;
+namespace Granit.Validation.Europe.Internal.Spain;
 
 /// <summary>
 /// Validates Spanish NIE numbers (Número de Identidad de Extranjero).
