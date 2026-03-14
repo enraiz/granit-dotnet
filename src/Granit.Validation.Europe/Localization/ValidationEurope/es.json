@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "El código de municipio INSEE francés no es válido.",
     "Granit:Validation:InvalidFrenchNafCode": "El código de actividad NAF/APE francés no es válido (se esperan 4 dígitos seguidos de una letra, p. ej. 6201Z).",
     "Granit:Validation:InvalidFrenchRib": "El número de cuenta bancaria francés (RIB) no es válido.",
-    "Granit:Validation:InvalidBelgianAccountNumber": "El número de cuenta bancaria belga no es válido."
+    "Granit:Validation:InvalidBelgianAccountNumber": "El número de cuenta bancaria belga no es válido.",
+    "Granit:Validation:InvalidGermanSteuerId": "El número de identificación fiscal alemán (Steuerliche Identifikationsnummer) no es válido.",
+    "Granit:Validation:InvalidGermanPostalCode": "El código postal alemán (PLZ) no es válido (se esperan 5 dígitos).",
+    "Granit:Validation:InvalidDutchBsn": "El número de servicio ciudadano neerlandés (BSN) no es válido.",
+    "Granit:Validation:InvalidDutchKvk": "El número de la Cámara de Comercio neerlandesa (KvK) no es válido (se esperan 8 dígitos).",
+    "Granit:Validation:InvalidDutchPostcode": "El código postal neerlandés no es válido (formato esperado: 1234 AB).",
+    "Granit:Validation:InvalidSpanishNif": "El número de identificación fiscal (NIF/DNI) no es válido.",
+    "Granit:Validation:InvalidSpanishNie": "El número de identificación de extranjero (NIE) no es válido.",
+    "Granit:Validation:InvalidSpanishCif": "El número de identificación fiscal de empresa (CIF) no es válido.",
+    "Granit:Validation:InvalidSpanishPostalCode": "El código postal no es válido (se esperan 5 dígitos, provincias 01–52).",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "El código fiscal italiano (Codice Fiscale) no es válido.",
+    "Granit:Validation:InvalidItalianPartitaIva": "El número de IVA italiano (Partita IVA) no es válido.",
+    "Granit:Validation:InvalidItalianPostalCode": "El código postal italiano (CAP) no es válido (se esperan 5 dígitos).",
+    "Granit:Validation:InvalidLuxembourgMatricule": "El número de identificación nacional luxemburgués (Matricule) no es válido.",
+    "Granit:Validation:InvalidLuxembourgRcs": "El número del registro mercantil luxemburgués (RCS) no es válido.",
+    "Granit:Validation:InvalidEori": "El número EORI (Economic Operators Registration and Identification) no es válido."
   }
 }

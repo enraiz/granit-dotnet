@@ -1,19 +1,17 @@
 using Granit.Core.MultiTenancy;
 using Granit.RateLimiting.Abstractions;
+using Granit.RateLimiting.Internal;
 using Granit.RateLimiting.Options;
 using Granit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Granit.RateLimiting.Internal;
+namespace Granit.RateLimiting;
 
 /// <summary>
 /// Core rate limiting logic shared between the ASP.NET Core endpoint filter and Wolverine behavior.
 /// Partitions by tenant, resolves quotas dynamically, checks bypass roles, and records metrics.
 /// </summary>
-/// <remarks>
-/// Public so that Wolverine can resolve it from the DI container via parameter injection.
-/// </remarks>
 public sealed class TenantPartitionedRateLimiter(
     IRateLimitCounterStore counterStore,
     IRateLimitQuotaProvider quotaProvider,

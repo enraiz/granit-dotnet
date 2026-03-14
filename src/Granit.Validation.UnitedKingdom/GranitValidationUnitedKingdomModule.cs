@@ -1,0 +1,28 @@
+using Granit.Core.Modularity;
+using Granit.Localization;
+using Granit.Localization.Options;
+using Granit.Validation;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Granit.Validation.UnitedKingdom;
+
+/// <summary>
+/// Granit module for United Kingdom identifier, tax, and address validation.
+/// </summary>
+[DependsOn(typeof(GranitValidationModule))]
+[DependsOn(typeof(GranitLocalizationModule))]
+public sealed class GranitValidationUnitedKingdomModule : GranitModule
+{
+    /// <inheritdoc/>
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.Configure<GranitLocalizationOptions>(options =>
+        {
+            options.Resources
+                .Add<ValidationUnitedKingdomLocalizationResource>("en")
+                .AddJson(
+                    typeof(ValidationUnitedKingdomLocalizationResource).Assembly,
+                    "Granit.Validation.UnitedKingdom.Localization.ValidationUnitedKingdom");
+        });
+    }
+}

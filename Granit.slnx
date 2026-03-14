@@ -114,6 +114,8 @@
     <Project Path="src/Granit.Timeline/Granit.Timeline.csproj" />
     <Project Path="src/Granit.Timing/Granit.Timing.csproj" />
     <Project Path="src/Granit.Validation.Europe/Granit.Validation.Europe.csproj" />
+    <Project Path="src/Granit.Validation.NorthAmerica/Granit.Validation.NorthAmerica.csproj" />
+    <Project Path="src/Granit.Validation.UnitedKingdom/Granit.Validation.UnitedKingdom.csproj" />
     <Project Path="src/Granit.Validation/Granit.Validation.csproj" />
     <Project Path="src/Granit.Vault.Aws/Granit.Vault.Aws.csproj" />
     <Project Path="src/Granit.Vault.Azure/Granit.Vault.Azure.csproj" />
@@ -252,6 +254,8 @@
     <Project Path="tests/Granit.Timeline.Tests/Granit.Timeline.Tests.csproj" />
     <Project Path="tests/Granit.Timing.Tests/Granit.Timing.Tests.csproj" />
     <Project Path="tests/Granit.Validation.Europe.Tests/Granit.Validation.Europe.Tests.csproj" />
+    <Project Path="tests/Granit.Validation.NorthAmerica.Tests/Granit.Validation.NorthAmerica.Tests.csproj" />
+    <Project Path="tests/Granit.Validation.UnitedKingdom.Tests/Granit.Validation.UnitedKingdom.Tests.csproj" />
     <Project Path="tests/Granit.Validation.Tests/Granit.Validation.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Aws.Tests/Granit.Vault.Aws.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Azure.Tests/Granit.Vault.Azure.Tests.csproj" />

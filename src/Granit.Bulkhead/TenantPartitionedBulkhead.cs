@@ -1,22 +1,20 @@
 using System.Threading.RateLimiting;
 using Granit.Bulkhead.Abstractions;
 using Granit.Bulkhead.Exceptions;
+using Granit.Bulkhead.Internal;
 using Granit.Bulkhead.Options;
 using Granit.Core.MultiTenancy;
 using Granit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Granit.Bulkhead.Internal;
+namespace Granit.Bulkhead;
 
 /// <summary>
 /// Core bulkhead logic shared between the ASP.NET Core endpoint filter and Wolverine middleware.
 /// Partitions by tenant, resolves quotas dynamically, checks bypass (machine actors + roles),
 /// and records metrics.
 /// </summary>
-/// <remarks>
-/// Public so that Wolverine can resolve it from the DI container via parameter injection.
-/// </remarks>
 public sealed class TenantPartitionedBulkhead(
     ConcurrencyLimiterRegistry registry,
     IBulkheadQuotaProvider quotaProvider,

@@ -1,5 +1,4 @@
 using Granit.Bulkhead.Abstractions;
-using Granit.Bulkhead.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

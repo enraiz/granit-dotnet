@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "Francuski kod gminy INSEE jest nieprawidłowy.",
     "Granit:Validation:InvalidFrenchNafCode": "Francuski kod działalności NAF/APE jest nieprawidłowy (wymagane 4 cyfry i litera, np. 6201Z).",
     "Granit:Validation:InvalidFrenchRib": "Francuski numer konta bankowego RIB jest nieprawidłowy.",
-    "Granit:Validation:InvalidBelgianAccountNumber": "Belgijski numer konta bankowego jest nieprawidłowy."
+    "Granit:Validation:InvalidBelgianAccountNumber": "Belgijski numer konta bankowego jest nieprawidłowy.",
+    "Granit:Validation:InvalidGermanSteuerId": "Niemiecki numer identyfikacji podatkowej (Steuerliche Identifikationsnummer) jest nieprawidłowy.",
+    "Granit:Validation:InvalidGermanPostalCode": "Niemiecki kod pocztowy (PLZ) jest nieprawidłowy (wymagane 5 cyfr).",
+    "Granit:Validation:InvalidDutchBsn": "Holenderski numer usługi obywatelskiej (BSN) jest nieprawidłowy.",
+    "Granit:Validation:InvalidDutchKvk": "Holenderski numer Izby Handlowej (KvK) jest nieprawidłowy (wymagane 8 cyfr).",
+    "Granit:Validation:InvalidDutchPostcode": "Holenderski kod pocztowy jest nieprawidłowy (oczekiwany format: 1234 AB).",
+    "Granit:Validation:InvalidSpanishNif": "Hiszpański numer identyfikacji podatkowej (NIF/DNI) jest nieprawidłowy.",
+    "Granit:Validation:InvalidSpanishNie": "Hiszpański numer identyfikacyjny cudzoziemca (NIE) jest nieprawidłowy.",
+    "Granit:Validation:InvalidSpanishCif": "Hiszpański numer identyfikacji podatkowej firmy (CIF) jest nieprawidłowy.",
+    "Granit:Validation:InvalidSpanishPostalCode": "Hiszpański kod pocztowy jest nieprawidłowy (wymagane 5 cyfr, prowincje 01–52).",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "Włoski kod podatkowy (Codice Fiscale) jest nieprawidłowy.",
+    "Granit:Validation:InvalidItalianPartitaIva": "Włoski numer VAT (Partita IVA) jest nieprawidłowy.",
+    "Granit:Validation:InvalidItalianPostalCode": "Włoski kod pocztowy (CAP) jest nieprawidłowy (wymagane 5 cyfr).",
+    "Granit:Validation:InvalidLuxembourgMatricule": "Luksemburski numer identyfikacyjny (Matricule) jest nieprawidłowy.",
+    "Granit:Validation:InvalidLuxembourgRcs": "Luksemburski numer rejestru handlowego (RCS) jest nieprawidłowy.",
+    "Granit:Validation:InvalidEori": "Numer EORI (Economic Operators Registration and Identification) jest nieprawidłowy."
   }
 }
