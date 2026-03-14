@@ -2,7 +2,7 @@
 
 EF Core persistence for Granit.Features. Provides TenantFeatureOverride entity, GranitFeaturesDbContext, and EfCoreFeatureStore with ISO 27001 audit trail.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Features.EntityFrameworkCore
 ```
 
+## Dependencies
+
+- `Granit.Features`
+- `Granit.Persistence`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/saas/features.md).
+See the [full documentation](https://granit-fx.dev).

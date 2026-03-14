@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.BlobStorage.FileSystem</PackageId>
+    <Description>Local file system implementation for Granit.BlobStorage. Stores blobs as files on disk with tenant-prefix isolation. Ideal for development and on-premise deployments. Pre-signed URLs provided via Granit.BlobStorage.Proxy.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.BlobStorage.FileSystem.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.BlobStorage\Granit.BlobStorage.csproj" />
+  </ItemGroup>
+
+</Project>

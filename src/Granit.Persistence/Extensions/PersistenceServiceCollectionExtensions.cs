@@ -84,7 +84,7 @@ public static class PersistenceServiceCollectionExtensions
 
     /// <summary>
     /// Adds an EF Core connectivity health check for <typeparamref name="TContext"/>,
-    /// tagged <c>"readiness"</c>. Uses <c>CanConnectAsync()</c> to verify the database connection.
+    /// tagged <c>"readiness"</c> and <c>"startup"</c>. Uses <c>CanConnectAsync()</c> to verify the database connection.
     /// </summary>
     /// <typeparam name="TContext">The <see cref="DbContext"/> to probe.</typeparam>
     /// <param name="builder">The health checks builder.</param>
@@ -98,5 +98,5 @@ public static class PersistenceServiceCollectionExtensions
         => builder.AddDbContextCheck<TContext>(
             name: name ?? typeof(TContext).Name,
             failureStatus: failureStatus,
-            tags: ["readiness"]);
+            tags: ["readiness", "startup"]);
 }

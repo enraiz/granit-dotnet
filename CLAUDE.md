@@ -12,7 +12,7 @@
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
-## Packages (93 packages)
+## Packages (97 packages)
 
 ### Core & utilities
 
@@ -110,7 +110,7 @@
 
 | Package | Role |
 | ------- | ---- |
-| `Granit.BlobStorage` / `.S3` / `.EntityFrameworkCore` | Blob storage (S3-compatible), metadata EF store |
+| `Granit.BlobStorage` / `.S3` / `.AzureBlob` / `.FileSystem` / `.Database` / `.Proxy` / `.EntityFrameworkCore` | Multi-provider blob storage (S3, Azure, FileSystem, Database), proxy endpoints, metadata EF store |
 | `Granit.Imaging` / `.MagickNet` | Image processing (WebP/AVIF, EXIF stripping) |
 
 ### Scheduling & jobs
@@ -161,7 +161,7 @@ The project documentation lives in `docs-site/` — an Astro + Starlight site.
 When adding/removing packages, patterns, ADRs, or cultures, **update the counters**:
 
 ```typescript
-export const PACKAGE_COUNT = 93;          // .NET NuGet packages
+export const PACKAGE_COUNT = 97;          // .NET NuGet packages
 export const FRONTEND_PACKAGE_COUNT = 49; // @granit/* npm packages
 export const CULTURE_COUNT = 17;          // Supported cultures
 export const PATTERN_COUNT = 51;          // Design pattern pages (backend + frontend)

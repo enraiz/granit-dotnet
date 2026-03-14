@@ -1,0 +1,8 @@
+{
+  "culture": "cs",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "Token pro nahrání/stažení je neplatný nebo vypršel.",
+    "BlobStorageProxy:PayloadTooLarge": "Nahraný soubor překračuje maximální povolenou velikost.",
+    "BlobStorageProxy:ContentTypeMismatch": "Hlavička Content-Type neodpovídá očekávanému typu."
+  }
+}

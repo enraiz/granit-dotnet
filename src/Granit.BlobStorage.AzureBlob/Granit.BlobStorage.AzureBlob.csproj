@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.BlobStorage.AzureBlob</PackageId>
+    <Description>Azure Blob Storage implementation for Granit.BlobStorage. SAS token generation for Direct-to-Cloud uploads/downloads, multi-tenant isolation by prefix, Managed Identity support.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.BlobStorage.AzureBlob.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.BlobStorage\Granit.BlobStorage.csproj" />
+  </ItemGroup>
+
+</Project>

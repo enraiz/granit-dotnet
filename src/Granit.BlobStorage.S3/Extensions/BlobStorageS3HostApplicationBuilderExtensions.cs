@@ -42,10 +42,11 @@ public static class BlobStorageS3HostApplicationBuilderExtensions
 
         builder.Services.AddSingleton<IValidateOptions<S3BlobOptions>, S3BlobOptionsValidator>();
 
-        // S3BlobClient implements IBlobStorageClient (pre-signed URLs + object operations).
+        // S3BlobClient implements IBlobStoreProvider + IPresignedUrlProvider.
         // Registered as Singleton: AmazonS3Client is thread-safe and intended for reuse.
         builder.Services.AddSingleton<S3BlobClient>();
-        builder.Services.AddSingleton<IBlobStorageClient>(sp => sp.GetRequiredService<S3BlobClient>());
+        builder.Services.AddSingleton<IBlobStoreProvider>(sp => sp.GetRequiredService<S3BlobClient>());
+        builder.Services.AddSingleton<IPresignedUrlProvider>(sp => sp.GetRequiredService<S3BlobClient>());
 
         builder.Services.AddScoped<IBlobKeyStrategy, PrefixBlobKeyStrategy>();
         builder.Services.AddScoped<IBlobStorage, DefaultBlobStorage>();

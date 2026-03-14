@@ -60,6 +60,24 @@ public sealed class NullNotificationDeliveryWriterTests
         _store.ShouldNotBeNull();
     }
 
+    [Fact]
+    public async Task DeleteBeforeAsync_ReturnsZero()
+    {
+        int result = await _store.DeleteBeforeAsync(
+            DateTimeOffset.UtcNow, batchSize: 100, TestContext.Current.CancellationToken);
+
+        result.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task DeleteBeforeAsync_WithAnyCutoff_ReturnsZero()
+    {
+        int result = await _store.DeleteBeforeAsync(
+            DateTimeOffset.MinValue, batchSize: 1, TestContext.Current.CancellationToken);
+
+        result.ShouldBe(0);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------

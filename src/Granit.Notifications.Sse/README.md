@@ -4,7 +4,7 @@ Server-Sent Events (SSE) real-time notification channel for Granit.Notifications
 .NET 10 `TypedResults.ServerSentEvents()` with `Channel<T>`-based connection management. Drop-in
 replacement for `Granit.Notifications.SignalR` for unidirectional server-to-client push.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,6 +12,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Notifications.Sse
 ```
 
+## Dependencies
+
+- `Granit.Notifications`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/messaging/notifications.md).
+See the [full documentation](https://granit-fx.dev).

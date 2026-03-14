@@ -5,7 +5,7 @@ EF Core persistence for Granit.Notifications. Provides PostgreSQL-backed stores 
 and `INotificationDeliveryStore` (ISO 27001 audit trail). Includes `EntityTrackingInterceptor`
 for Odoo-style auto-tracking.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -13,6 +13,12 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Notifications.EntityFrameworkCore
 ```
 
+## Dependencies
+
+- `Granit.Notifications`
+- `Granit.Notifications.MobilePush`
+- `Granit.Persistence`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/messaging/notifications.md).
+See the [full documentation](https://granit-fx.dev).

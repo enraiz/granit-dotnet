@@ -4,7 +4,7 @@ Generic finite state machine (FSM) engine for entity lifecycle management. Fluen
 API for workflow definitions, approval routing (Odoo-style), domain events, and
 versioned entities with draft/published/archived lifecycle.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,6 +12,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Workflow
 ```
 
+## Dependencies
+
+- `Granit.Querying`
+- `Granit.Timing`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/workflow/index.md).
+See the [full documentation](https://granit-fx.dev).

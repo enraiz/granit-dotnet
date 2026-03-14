@@ -10,13 +10,14 @@ namespace Granit.BlobStorage.Internal;
 
 /// <summary>
 /// Default orchestrator for blob storage operations.
-/// Coordinates tenant resolution, key strategy, pre-signed URL generation, and descriptor persistence.
+/// Coordinates tenant resolution, key strategy, storage provider, pre-signed URL generation, and descriptor persistence.
 /// </summary>
 internal sealed class DefaultBlobStorage(
     IBlobDescriptorReader reader,
     IBlobDescriptorWriter writer,
     IBlobKeyStrategy keyStrategy,
-    IBlobStorageClient storageClient,
+    IBlobStoreProvider storeProvider,
+    IPresignedUrlProvider presignedUrlProvider,
     IGuidGenerator guidGenerator,
     IClock clock,
     ICurrentTenant currentTenant,
@@ -45,7 +46,7 @@ internal sealed class DefaultBlobStorage(
 
         await writer.SaveAsync(descriptor, cancellationToken).ConfigureAwait(false);
 
-        PresignedUploadTicket ticket = await storageClient.GenerateUploadTicketAsync(
+        PresignedUploadTicket ticket = await presignedUrlProvider.GenerateUploadTicketAsync(
             bucket,
             objectKey,
             blobId,
@@ -73,7 +74,7 @@ internal sealed class DefaultBlobStorage(
         TimeSpan expiry = options?.Expiry ?? Options.DownloadUrlExpiry;
         string bucket = keyStrategy.ResolveBucketName(containerName);
 
-        return await storageClient.GenerateDownloadUrlAsync(
+        return await presignedUrlProvider.GenerateDownloadUrlAsync(
             bucket,
             descriptor.ObjectKey,
             options,
@@ -110,7 +111,7 @@ internal sealed class DefaultBlobStorage(
 
         string bucket = keyStrategy.ResolveBucketName(containerName);
 
-        await storageClient.DeleteObjectAsync(bucket, descriptor.ObjectKey, cancellationToken).ConfigureAwait(false);
+        await storeProvider.DeleteAsync(bucket, descriptor.ObjectKey, cancellationToken).ConfigureAwait(false);
 
         descriptor.MarkAsDeleted(clock.Now, deletionReason);
         await writer.UpdateAsync(descriptor, cancellationToken).ConfigureAwait(false);

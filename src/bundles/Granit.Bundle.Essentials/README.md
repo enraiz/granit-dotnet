@@ -3,7 +3,7 @@
 Meta-package grouping the essential Granit modules for a minimal API.
 Install this single package instead of adding 9 individual references.
 
-Part of the [Granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [Granit](https://granit-fx.dev) framework.
 
 ## Included packages
 
@@ -27,4 +27,4 @@ dotnet add package Granit.Bundle.Essentials
 
 ## Documentation
 
-See the [Getting Started guide](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/guide/getting-started.md).
+See the [Getting Started guide](https://granit-fx.dev).

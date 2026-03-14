@@ -2,7 +2,7 @@
 
 Minimal API endpoints for Granit settings management: user-scoped preferences (locale, timezone, custom), global and tenant administration. Includes `SettingsCultureMiddleware` for automatic `CultureInfo`/timezone hydration from user settings.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,13 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Settings.Endpoints
 ```
 
+## Dependencies
+
+- `Granit.Authorization`
+- `Granit.Settings`
+- `Granit.Timing`
+- `Granit.Validation`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/data/settings.md).
+See the [full documentation](https://granit-fx.dev).

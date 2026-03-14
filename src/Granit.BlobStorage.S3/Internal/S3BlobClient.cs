@@ -12,12 +12,12 @@ using Microsoft.Extensions.Options;
 namespace Granit.BlobStorage.S3.Internal;
 
 /// <summary>
-/// S3 implementation of <see cref="IBlobStorageClient"/>.
+/// S3 implementation of <see cref="IBlobStoreProvider"/> and <see cref="IPresignedUrlProvider"/>.
 /// Uses AWSSDK.S3 with a configurable <see cref="S3BlobOptions.ServiceUrl"/> for S3-compatible providers.
 /// </summary>
 // Infrastructure adapter over AmazonS3Client. Unit testing requires a live S3-compatible endpoint.
 [ExcludeFromCodeCoverage]
-internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
+internal sealed class S3BlobClient : IBlobStoreProvider, IPresignedUrlProvider, IDisposable
 {
     private readonly AmazonS3Client _s3;
     private readonly IClock _clock;
@@ -41,7 +41,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
         _clock = clock;
     }
 
-    // ── IBlobPresignedUrlGenerator ────────────────────────────────────────────
+    // ── IPresignedUrlProvider ─────────────────────────────────────────────────
 
     /// <inheritdoc/>
     public Task<PresignedUploadTicket> GenerateUploadTicketAsync(
@@ -130,10 +130,54 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
         return Task.FromResult(result);
     }
 
-    // ── IBlobObjectClient ─────────────────────────────────────────────────────
+    // ── IBlobStoreProvider ────────────────────────────────────────────────────
 
     /// <inheritdoc/>
-    public async Task DeleteObjectAsync(
+    public async Task SaveAsync(
+        string bucket,
+        string objectKey,
+        Stream content,
+        string contentType,
+        CancellationToken cancellationToken = default)
+    {
+        using Activity? activity = BlobStorageS3ActivitySource.Source.StartActivity(BlobStorageS3ActivitySource.Save);
+        activity?.SetTag(BlobStorageS3ActivitySource.TagBucket, bucket);
+        activity?.SetTag(BlobStorageS3ActivitySource.TagObjectKey, objectKey);
+        activity?.SetTag(BlobStorageS3ActivitySource.TagContentType, contentType);
+
+        PutObjectRequest putRequest = new()
+        {
+            BucketName = bucket,
+            Key = objectKey,
+            ContentType = contentType,
+            InputStream = content,
+        };
+
+        await _s3.PutObjectAsync(putRequest, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<Stream> OpenReadAsync(
+        string bucket,
+        string objectKey,
+        CancellationToken cancellationToken = default)
+    {
+        using Activity? activity = BlobStorageS3ActivitySource.Source.StartActivity(BlobStorageS3ActivitySource.Read);
+        activity?.SetTag(BlobStorageS3ActivitySource.TagBucket, bucket);
+        activity?.SetTag(BlobStorageS3ActivitySource.TagObjectKey, objectKey);
+
+        GetObjectRequest getRequest = new()
+        {
+            BucketName = bucket,
+            Key = objectKey,
+        };
+
+        GetObjectResponse response = await _s3.GetObjectAsync(getRequest, cancellationToken).ConfigureAwait(false);
+        return response.ResponseStream;
+    }
+
+    /// <inheritdoc/>
+    public async Task DeleteAsync(
         string bucket,
         string objectKey,
         CancellationToken cancellationToken = default)
@@ -152,7 +196,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
     }
 
     /// <inheritdoc/>
-    public async Task<long> GetObjectSizeBytesAsync(
+    public async Task<long> GetSizeAsync(
         string bucket,
         string objectKey,
         CancellationToken cancellationToken = default)
@@ -172,7 +216,7 @@ internal sealed class S3BlobClient : IBlobStorageClient, IDisposable
     }
 
     /// <inheritdoc/>
-    public async Task<Stream> OpenPartialStreamAsync(
+    public async Task<Stream> OpenPartialReadAsync(
         string bucket,
         string objectKey,
         int byteCount,

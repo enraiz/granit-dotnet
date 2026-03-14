@@ -2,7 +2,7 @@
 
 Minimal API endpoints for administering Granit recurring background jobs. Exposes GET/POST routes for listing, pausing, resuming, and triggering jobs.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,12 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.BackgroundJobs.Endpoints
 ```
 
+## Dependencies
+
+- `Granit.Authorization`
+- `Granit.BackgroundJobs`
+- `Granit.Querying`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/scheduling/background-jobs.md).
+See the [full documentation](https://granit-fx.dev).

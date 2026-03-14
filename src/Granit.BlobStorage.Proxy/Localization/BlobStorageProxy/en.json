@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "The upload/download token is invalid or has expired.",
+    "BlobStorageProxy:PayloadTooLarge": "The uploaded file exceeds the maximum allowed size.",
+    "BlobStorageProxy:ContentTypeMismatch": "The Content-Type header does not match the expected type."
+  }
+}

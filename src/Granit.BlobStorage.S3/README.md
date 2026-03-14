@@ -2,7 +2,7 @@
 
 S3-compatible implementation for Granit.BlobStorage. Pre-signed URL generation via AWSSDK.S3, multi-tenant prefix isolation. Compatible with S3-compatible object storage and MinIO.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.BlobStorage.S3
 ```
 
+## Dependencies
+
+- `Granit.BlobStorage`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/storage/blob-storage.md).
+See the [full documentation](https://granit-fx.dev).

@@ -3,7 +3,7 @@
 Meta-package for building a complete REST API with Granit.
 Includes everything from `Granit.Bundle.Essentials` plus API-specific modules.
 
-Part of the [Granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [Granit](https://granit-fx.dev) framework.
 
 ## Included packages
 
@@ -27,4 +27,4 @@ dotnet add package Granit.Bundle.Api
 
 ## Documentation
 
-See the [Getting Started guide](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/guide/getting-started.md).
+See the [Getting Started guide](https://granit-fx.dev).

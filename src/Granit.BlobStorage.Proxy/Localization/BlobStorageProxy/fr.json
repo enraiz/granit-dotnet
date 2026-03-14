@@ -1,0 +1,8 @@
+{
+  "culture": "fr",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "Le jeton d'upload/téléchargement est invalide ou a expiré.",
+    "BlobStorageProxy:PayloadTooLarge": "Le fichier envoyé dépasse la taille maximale autorisée.",
+    "BlobStorageProxy:ContentTypeMismatch": "L'en-tête Content-Type ne correspond pas au type attendu."
+  }
+}

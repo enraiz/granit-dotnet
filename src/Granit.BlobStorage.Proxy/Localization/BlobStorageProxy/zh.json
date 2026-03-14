@@ -1,0 +1,8 @@
+{
+  "culture": "zh",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "上传/下载令牌无效或已过期。",
+    "BlobStorageProxy:PayloadTooLarge": "上传的文件超过了允许的最大大小。",
+    "BlobStorageProxy:ContentTypeMismatch": "Content-Type 标头与预期类型不匹配。"
+  }
+}

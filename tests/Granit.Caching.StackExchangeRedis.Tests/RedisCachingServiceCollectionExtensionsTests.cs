@@ -212,11 +212,12 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         // Act
         builder.AddGranitRedisCheck(name: "redis");
 
-        // Assert — HealthCheckRegistration tagged "readiness"
+        // Assert — HealthCheckRegistration tagged "readiness" and "startup"
         using ServiceProvider sp = services.BuildServiceProvider();
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "redis");
         registration.ShouldNotBeNull();
         registration!.Tags.ShouldContain("readiness");
+        registration.Tags.ShouldContain("startup");
     }
 }

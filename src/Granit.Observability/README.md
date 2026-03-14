@@ -2,7 +2,7 @@
 
 Serilog and OpenTelemetry (OTLP to Loki/Tempo/Mimir) for Granit applications.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Observability
 ```
 
+## Dependencies
+
+- `Granit.Core`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/diagnostics/observability.md).
+See the [full documentation](https://granit-fx.dev).

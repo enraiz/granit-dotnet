@@ -3,7 +3,7 @@
 Roslyn code fix providers for Granit.Analyzers rules. Bundled into the `Granit.Analyzers`
 package — this project is not distributed as a standalone NuGet package.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -13,6 +13,10 @@ Install `Granit.Analyzers` — the code fixes are included automatically.
 dotnet add package Granit.Analyzers
 ```
 
+## Dependencies
+
+- `Granit.Analyzers`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/diagnostics/analyzers.md).
+See the [full documentation](https://granit-fx.dev).

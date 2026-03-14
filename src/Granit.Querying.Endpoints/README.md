@@ -4,7 +4,7 @@ Minimal API endpoints for Granit.Querying. Provides `MapQueryEndpoints<T, TDto>(
 fluent API, `filter[field.op]=value` query string binding, `GET /meta` metadata
 endpoint, CRUD SavedViews endpoints, and OpenAPI documentation conventions.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,6 +12,15 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Querying.Endpoints
 ```
 
+## Dependencies
+
+- `Granit.ApiDocumentation`
+- `Granit.Authorization`
+- `Granit.Guids`
+- `Granit.Querying`
+- `Granit.Timing`
+- `Granit.Validation`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/querying/querying.md).
+See the [full documentation](https://granit-fx.dev).

@@ -1,11 +1,11 @@
 # Granit.Templating.Workflow
 
-Bridge optionnel entre `Granit.Templating` et `Granit.Workflow`. Remplace le
-`NullTemplateTransitionHook` par défaut par une implémentation Workflow qui fournit
-la validation FSM, le routage d'approbation, l'audit ISO 27001 unifié (`WorkflowTransitionRecord`)
-et les domain events.
+Optional bridge between `Granit.Templating` and `Granit.Workflow`. Replaces the
+default `NullTemplateTransitionHook` with a Workflow-backed implementation that provides
+FSM validation, approval routing, unified ISO 27001 audit trail (`WorkflowTransitionRecord`)
+and domain events.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -13,6 +13,11 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Templating.Workflow
 ```
 
+## Dependencies
+
+- `Granit.Templating`
+- `Granit.Workflow`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/templating/workflow-integration.md).
+See the [full documentation](https://granit-fx.dev).

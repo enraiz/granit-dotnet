@@ -2,7 +2,7 @@
 
 Minimal API endpoints for Granit localization: anonymous GET for SPA bootstrapping and admin CRUD for translation overrides.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -10,6 +10,13 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Localization.Endpoints
 ```
 
+## Dependencies
+
+- `Granit.ApiDocumentation`
+- `Granit.Authorization`
+- `Granit.Localization`
+- `Granit.Validation`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/utilities/localization/endpoints.md).
+See the [full documentation](https://granit-fx.dev).

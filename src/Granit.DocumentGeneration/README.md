@@ -4,7 +4,7 @@ Document generation layer (PDF, Excel) built on top of Granit.Templating. Provid
 `IDocumentGenerator`, `IDocumentRenderer`, and `DocumentTemplateType`. Concrete renderers
 (PuppeteerSharp, ClosedXML) live in separate packages.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,6 +12,10 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.DocumentGeneration
 ```
 
+## Dependencies
+
+- `Granit.Templating`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/templating/index.md).
+See the [full documentation](https://granit-fx.dev).

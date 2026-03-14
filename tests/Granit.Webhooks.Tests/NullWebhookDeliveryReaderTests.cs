@@ -44,4 +44,22 @@ public sealed class NullWebhookDeliveryReaderTests
         first.ShouldBeNull();
         second.ShouldBeNull();
     }
+
+    [Fact]
+    public async Task CountBeforeAsync_ReturnsZero()
+    {
+        int result = await _reader.CountBeforeAsync(
+            DateTimeOffset.UtcNow, TestContext.Current.CancellationToken);
+
+        result.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task CountBeforeAsync_WithAnyCutoff_ReturnsZero()
+    {
+        int result = await _reader.CountBeforeAsync(
+            DateTimeOffset.MinValue, TestContext.Current.CancellationToken);
+
+        result.ShouldBe(0);
+    }
 }

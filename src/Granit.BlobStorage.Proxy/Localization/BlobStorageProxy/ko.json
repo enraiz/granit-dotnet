@@ -1,0 +1,8 @@
+{
+  "culture": "ko",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "업로드/다운로드 토큰이 유효하지 않거나 만료되었습니다.",
+    "BlobStorageProxy:PayloadTooLarge": "업로드된 파일이 허용된 최대 크기를 초과합니다.",
+    "BlobStorageProxy:ContentTypeMismatch": "Content-Type 헤더가 예상 유형과 일치하지 않습니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "culture": "ja",
+  "texts": {
+    "BlobStorageProxy:TokenInvalidOrExpired": "アップロード/ダウンロードトークンが無効または期限切れです。",
+    "BlobStorageProxy:PayloadTooLarge": "アップロードされたファイルは許可された最大サイズを超えています。",
+    "BlobStorageProxy:ContentTypeMismatch": "Content-Type ヘッダーが期待されるタイプと一致しません。"
+  }
+}

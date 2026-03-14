@@ -4,7 +4,7 @@ Multi-channel notification engine for Granit. Provides `INotificationPublisher` 
 notifications, Wolverine-based transactional fan-out, `INotificationChannel` for pluggable
 delivery channels, and Odoo-style entity tracking via `ITrackedEntity`.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,6 +12,12 @@ Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-d
 dotnet add package Granit.Notifications
 ```
 
+## Dependencies
+
+- `Granit.Guids`
+- `Granit.Querying`
+- `Granit.Timing`
+
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet/-/blob/develop/docs/framework/messaging/notifications.md).
+See the [full documentation](https://granit-fx.dev).

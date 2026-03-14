@@ -39,7 +39,7 @@ public static class VaultServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds a Vault connectivity health check tagged <c>"readiness"</c>.
+    /// Adds a Vault connectivity health check tagged <c>"readiness"</c> and <c>"startup"</c>.
     /// Verifies the Vault <c>sys/health</c> endpoint. Returns <c>Degraded</c> for standby
     /// replicas (read-only but functional) and <c>Unhealthy</c> for sealed or unreachable Vault.
     /// </summary>
@@ -64,7 +64,7 @@ public static class VaultServiceCollectionExtensions
             name,
             sp => sp.GetRequiredService<VaultHealthCheck>(),
             failureStatus,
-            ["readiness"],
+            ["readiness", "startup"],
             timeout ?? TimeSpan.FromSeconds(10)));
     }
 }
