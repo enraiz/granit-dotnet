@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "Der französische INSEE-Gemeindecode ist ungültig.",
     "Granit:Validation:InvalidFrenchNafCode": "Der französische NAF/APE-Tätigkeitscode ist ungültig (4 Ziffern gefolgt von einem Buchstaben erwartet, z. B. 6201Z).",
     "Granit:Validation:InvalidFrenchRib": "Die französische RIB-Bankkontonummer ist ungültig.",
-    "Granit:Validation:InvalidBelgianAccountNumber": "Die belgische Bankkontonummer ist ungültig."
+    "Granit:Validation:InvalidBelgianAccountNumber": "Die belgische Bankkontonummer ist ungültig.",
+    "Granit:Validation:InvalidGermanSteuerId": "Die steuerliche Identifikationsnummer ist ungültig.",
+    "Granit:Validation:InvalidGermanPostalCode": "Die Postleitzahl (PLZ) ist ungültig (5 Ziffern erwartet).",
+    "Granit:Validation:InvalidDutchBsn": "Die niederländische Bürgerservicenummer (BSN) ist ungültig.",
+    "Granit:Validation:InvalidDutchKvk": "Die niederländische Handelskammernummer (KvK) ist ungültig (8 Ziffern erwartet).",
+    "Granit:Validation:InvalidDutchPostcode": "Die niederländische Postleitzahl ist ungültig (erwartetes Format: 1234 AB).",
+    "Granit:Validation:InvalidSpanishNif": "Die spanische Steueridentifikationsnummer (NIF/DNI) ist ungültig.",
+    "Granit:Validation:InvalidSpanishNie": "Die spanische Ausländeridentifikationsnummer (NIE) ist ungültig.",
+    "Granit:Validation:InvalidSpanishCif": "Die spanische Unternehmenssteueridentifikationsnummer (CIF) ist ungültig.",
+    "Granit:Validation:InvalidSpanishPostalCode": "Die spanische Postleitzahl ist ungültig (5 Ziffern erwartet, Provinzen 01–52).",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "Der italienische Steuerkode (Codice Fiscale) ist ungültig.",
+    "Granit:Validation:InvalidItalianPartitaIva": "Die italienische Umsatzsteuer-Identifikationsnummer (Partita IVA) ist ungültig.",
+    "Granit:Validation:InvalidItalianPostalCode": "Die italienische Postleitzahl (CAP) ist ungültig (5 Ziffern erwartet).",
+    "Granit:Validation:InvalidLuxembourgMatricule": "Die luxemburgische Matrikelnummer ist ungültig.",
+    "Granit:Validation:InvalidLuxembourgRcs": "Die luxemburgische Handelsregisternummer (RCS) ist ungültig.",
+    "Granit:Validation:InvalidEori": "Die EORI-Nummer (Economic Operators Registration and Identification) ist ungültig."
   }
 }

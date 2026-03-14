@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "フランスの INSEE 市区町村コードが無効です。",
     "Granit:Validation:InvalidFrenchNafCode": "フランスの NAF/APE 業種コードが無効です（数字 4 桁の後に英字 1 文字、例: 6201Z）。",
     "Granit:Validation:InvalidFrenchRib": "フランスの RIB 銀行口座番号が無効です。",
-    "Granit:Validation:InvalidBelgianAccountNumber": "ベルギーの銀行口座番号が無効です。"
+    "Granit:Validation:InvalidBelgianAccountNumber": "ベルギーの銀行口座番号が無効です。",
+    "Granit:Validation:InvalidGermanSteuerId": "ドイツの納税者番号（Steuerliche Identifikationsnummer）が無効です。",
+    "Granit:Validation:InvalidGermanPostalCode": "ドイツの郵便番号（PLZ）が無効です（5 桁の数字が必要です）。",
+    "Granit:Validation:InvalidDutchBsn": "オランダの市民サービス番号（BSN）が無効です。",
+    "Granit:Validation:InvalidDutchKvk": "オランダの商工会議所番号（KvK）が無効です（8 桁の数字が必要です）。",
+    "Granit:Validation:InvalidDutchPostcode": "オランダの郵便番号が無効です（期待される形式: 1234 AB）。",
+    "Granit:Validation:InvalidSpanishNif": "スペインの納税者番号（NIF/DNI）が無効です。",
+    "Granit:Validation:InvalidSpanishNie": "スペインの外国人識別番号（NIE）が無効です。",
+    "Granit:Validation:InvalidSpanishCif": "スペインの法人納税者番号（CIF）が無効です。",
+    "Granit:Validation:InvalidSpanishPostalCode": "スペインの郵便番号が無効です（5 桁の数字、県 01–52 が必要です）。",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "イタリアの税務コード（Codice Fiscale）が無効です。",
+    "Granit:Validation:InvalidItalianPartitaIva": "イタリアの付加価値税番号（Partita IVA）が無効です。",
+    "Granit:Validation:InvalidItalianPostalCode": "イタリアの郵便番号（CAP）が無効です（5 桁の数字が必要です）。",
+    "Granit:Validation:InvalidLuxembourgMatricule": "ルクセンブルクの国民識別番号（Matricule）が無効です。",
+    "Granit:Validation:InvalidLuxembourgRcs": "ルクセンブルクの商業登記番号（RCS）が無効です。",
+    "Granit:Validation:InvalidEori": "EORI 番号（Economic Operators Registration and Identification）が無効です。"
   }
 }

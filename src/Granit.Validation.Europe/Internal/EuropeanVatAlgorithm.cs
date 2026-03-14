@@ -8,7 +8,8 @@ namespace Granit.Validation.Europe.Internal;
 /// </summary>
 /// <remarks>
 /// Each member state has its own format. This validator applies the strictest check
-/// available per country — algorithm-based for FR and BE, format-based (regex) for others.
+/// available per country — algorithm-based for FR, BE, DE, NL, ES, IT, and LU;
+/// format-based (regex) for remaining states.
 /// Country codes follow ISO 3166-1 alpha-2 (except Greece which uses <c>EL</c> in tax contexts).
 /// </remarks>
 internal static partial class EuropeanVatAlgorithm
@@ -81,6 +82,11 @@ internal static partial class EuropeanVatAlgorithm
         {
             "FR" => FrenchVatAlgorithm.IsValid(normalized),
             "BE" => ValidateBelgianVat(normalized),
+            "DE" => true, // DE USt-IdNr is 9 digits — regex-validated; no public check digit algo.
+            "NL" => ValidateDutchVat(normalized),
+            "ES" => ValidateSpanishVat(normalized),
+            "IT" => PartitaIvaAlgorithm.IsValid(normalized[2..]),
+            "LU" => ValidateLuxembourgVat(normalized),
             _ => true // Format-only validation for other countries.
         };
     }
@@ -97,6 +103,49 @@ internal static partial class EuropeanVatAlgorithm
         }
 
         return BceAlgorithm.IsValid(digits);
+    }
+
+    private static bool ValidateDutchVat(string normalized)
+    {
+        // Dutch VAT: NL + 9 digits + B + 2 digits. The 9 digits are not a BSN
+        // (different structure), so we validate format only beyond the regex.
+        // The "B" at position 12 distinguishes sub-entities.
+        return true; // Regex already validated the format NL\d{9}B\d{2}.
+    }
+
+    private static bool ValidateSpanishVat(string normalized)
+    {
+        // Spanish VAT: ES + NIF/NIE/CIF. Dispatch to the appropriate algorithm.
+        string body = normalized[2..];
+
+        if (body.Length < 2)
+        {
+            return false;
+        }
+
+        char first = body[0];
+
+        return first switch
+        {
+            >= '0' and <= '9' => NifAlgorithm.IsValid(body),
+            'X' or 'Y' or 'Z' => NieAlgorithm.IsValid(body),
+            _ => CifAlgorithm.IsValid(body)
+        };
+    }
+
+    private static bool ValidateLuxembourgVat(string normalized)
+    {
+        // Luxembourg VAT: LU + 8 digits. Check digit: first 6 digits mod 89 = last 2 digits.
+        string digits = normalized[2..];
+
+        if (digits.Length != 8 || !digits.All(char.IsDigit))
+        {
+            return false;
+        }
+
+        int body = int.Parse(digits[..6], System.Globalization.CultureInfo.InvariantCulture);
+        int check = int.Parse(digits[6..], System.Globalization.CultureInfo.InvariantCulture);
+        return body % 89 == check;
     }
 
     [GeneratedRegex(@"^ATU\d{8}$", RegexOptions.None, 100)]

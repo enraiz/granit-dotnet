@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "De Franse INSEE-gemeentecode is ongeldig.",
     "Granit:Validation:InvalidFrenchNafCode": "De Franse NAF/APE-activiteitencode is ongeldig (4 cijfers gevolgd door een letter verwacht, bijv. 6201Z).",
     "Granit:Validation:InvalidFrenchRib": "Het Franse RIB-bankrekeningnummer is ongeldig.",
-    "Granit:Validation:InvalidBelgianAccountNumber": "Het Belgische bankrekeningnummer is ongeldig."
+    "Granit:Validation:InvalidBelgianAccountNumber": "Het Belgische bankrekeningnummer is ongeldig.",
+    "Granit:Validation:InvalidGermanSteuerId": "Het Duitse belastingidentificatienummer (Steuerliche Identifikationsnummer) is ongeldig.",
+    "Granit:Validation:InvalidGermanPostalCode": "De Duitse postcode (PLZ) is ongeldig (5 cijfers verwacht).",
+    "Granit:Validation:InvalidDutchBsn": "Het burgerservicenummer (BSN) is ongeldig.",
+    "Granit:Validation:InvalidDutchKvk": "Het KvK-nummer is ongeldig (8 cijfers verwacht).",
+    "Granit:Validation:InvalidDutchPostcode": "De postcode is ongeldig (verwacht formaat: 1234 AB).",
+    "Granit:Validation:InvalidSpanishNif": "Het Spaanse belastingidentificatienummer (NIF/DNI) is ongeldig.",
+    "Granit:Validation:InvalidSpanishNie": "Het Spaanse vreemdelingenidentificatienummer (NIE) is ongeldig.",
+    "Granit:Validation:InvalidSpanishCif": "Het Spaanse bedrijfsbelastingnummer (CIF) is ongeldig.",
+    "Granit:Validation:InvalidSpanishPostalCode": "De Spaanse postcode is ongeldig (5 cijfers verwacht, provincies 01–52).",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "De Italiaanse fiscale code (Codice Fiscale) is ongeldig.",
+    "Granit:Validation:InvalidItalianPartitaIva": "Het Italiaanse BTW-nummer (Partita IVA) is ongeldig.",
+    "Granit:Validation:InvalidItalianPostalCode": "De Italiaanse postcode (CAP) is ongeldig (5 cijfers verwacht).",
+    "Granit:Validation:InvalidLuxembourgMatricule": "Het Luxemburgse nationale identificatienummer (Matricule) is ongeldig.",
+    "Granit:Validation:InvalidLuxembourgRcs": "Het Luxemburgse handelsregisternummer (RCS) is ongeldig.",
+    "Granit:Validation:InvalidEori": "Het EORI-nummer (Economic Operators Registration and Identification) is ongeldig."
   }
 }

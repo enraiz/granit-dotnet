@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "Den franska INSEE-kommunkoden är ogiltig.",
     "Granit:Validation:InvalidFrenchNafCode": "Den franska NAF/APE-verksamhetskoden är ogiltig (4 siffror följt av en bokstav förväntas, t.ex. 6201Z).",
     "Granit:Validation:InvalidFrenchRib": "Det franska RIB-bankkontonumret är ogiltigt.",
-    "Granit:Validation:InvalidBelgianAccountNumber": "Det belgiska bankkontonumret är ogiltigt."
+    "Granit:Validation:InvalidBelgianAccountNumber": "Det belgiska bankkontonumret är ogiltigt.",
+    "Granit:Validation:InvalidGermanSteuerId": "Det tyska skatteidentifikationsnumret (Steuerliche Identifikationsnummer) är ogiltigt.",
+    "Granit:Validation:InvalidGermanPostalCode": "Det tyska postnumret (PLZ) är ogiltigt (5 siffror förväntas).",
+    "Granit:Validation:InvalidDutchBsn": "Det nederländska medborgarservicenumret (BSN) är ogiltigt.",
+    "Granit:Validation:InvalidDutchKvk": "Det nederländska handelskammarnumret (KvK) är ogiltigt (8 siffror förväntas).",
+    "Granit:Validation:InvalidDutchPostcode": "Det nederländska postnumret är ogiltigt (förväntat format: 1234 AB).",
+    "Granit:Validation:InvalidSpanishNif": "Det spanska skatteidentifikationsnumret (NIF/DNI) är ogiltigt.",
+    "Granit:Validation:InvalidSpanishNie": "Det spanska utlänningsidentifikationsnumret (NIE) är ogiltigt.",
+    "Granit:Validation:InvalidSpanishCif": "Det spanska företagsskattenumret (CIF) är ogiltigt.",
+    "Granit:Validation:InvalidSpanishPostalCode": "Det spanska postnumret är ogiltigt (5 siffror förväntas, provinser 01–52).",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "Den italienska skattekoden (Codice Fiscale) är ogiltig.",
+    "Granit:Validation:InvalidItalianPartitaIva": "Det italienska momsnumret (Partita IVA) är ogiltigt.",
+    "Granit:Validation:InvalidItalianPostalCode": "Det italienska postnumret (CAP) är ogiltigt (5 siffror förväntas).",
+    "Granit:Validation:InvalidLuxembourgMatricule": "Det luxemburgska nationella identifikationsnumret (Matricule) är ogiltigt.",
+    "Granit:Validation:InvalidLuxembourgRcs": "Det luxemburgska handelsregisternumret (RCS) är ogiltigt.",
+    "Granit:Validation:InvalidEori": "EORI-numret (Economic Operators Registration and Identification) är ogiltigt."
   }
 }

@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "Fransız INSEE belediye kodu geçersiz.",
     "Granit:Validation:InvalidFrenchNafCode": "Fransız NAF/APE faaliyet kodu geçersiz (4 rakam ve ardından bir harf bekleniyor, örn. 6201Z).",
     "Granit:Validation:InvalidFrenchRib": "Fransız RIB banka hesap numarası geçersiz.",
-    "Granit:Validation:InvalidBelgianAccountNumber": "Belçika banka hesap numarası geçersiz."
+    "Granit:Validation:InvalidBelgianAccountNumber": "Belçika banka hesap numarası geçersiz.",
+    "Granit:Validation:InvalidGermanSteuerId": "Alman vergi kimlik numarası (Steuerliche Identifikationsnummer) geçersiz.",
+    "Granit:Validation:InvalidGermanPostalCode": "Alman posta kodu (PLZ) geçersiz (5 rakam bekleniyor).",
+    "Granit:Validation:InvalidDutchBsn": "Hollanda vatandaş hizmet numarası (BSN) geçersiz.",
+    "Granit:Validation:InvalidDutchKvk": "Hollanda Ticaret Odası numarası (KvK) geçersiz (8 rakam bekleniyor).",
+    "Granit:Validation:InvalidDutchPostcode": "Hollanda posta kodu geçersiz (beklenen biçim: 1234 AB).",
+    "Granit:Validation:InvalidSpanishNif": "İspanyol vergi kimlik numarası (NIF/DNI) geçersiz.",
+    "Granit:Validation:InvalidSpanishNie": "İspanyol yabancı kimlik numarası (NIE) geçersiz.",
+    "Granit:Validation:InvalidSpanishCif": "İspanyol şirket vergi kimlik numarası (CIF) geçersiz.",
+    "Granit:Validation:InvalidSpanishPostalCode": "İspanyol posta kodu geçersiz (5 rakam bekleniyor, iller 01–52).",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "İtalyan vergi kodu (Codice Fiscale) geçersiz.",
+    "Granit:Validation:InvalidItalianPartitaIva": "İtalyan KDV numarası (Partita IVA) geçersiz.",
+    "Granit:Validation:InvalidItalianPostalCode": "İtalyan posta kodu (CAP) geçersiz (5 rakam bekleniyor).",
+    "Granit:Validation:InvalidLuxembourgMatricule": "Lüksemburg ulusal kimlik numarası (Matricule) geçersiz.",
+    "Granit:Validation:InvalidLuxembourgRcs": "Lüksemburg ticaret sicil numarası (RCS) geçersiz.",
+    "Granit:Validation:InvalidEori": "EORI numarası (Economic Operators Registration and Identification) geçersiz."
   }
 }

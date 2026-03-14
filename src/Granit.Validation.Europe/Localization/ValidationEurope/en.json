@@ -19,6 +19,21 @@
     "Granit:Validation:InvalidFrenchInseeCode": "The French INSEE commune code is invalid.",
     "Granit:Validation:InvalidFrenchNafCode": "The French NAF/APE activity code is invalid (expected 4 digits followed by a letter, e.g. 6201Z).",
     "Granit:Validation:InvalidFrenchRib": "The French RIB bank account number is invalid.",
-    "Granit:Validation:InvalidBelgianAccountNumber": "The Belgian bank account number is invalid."
+    "Granit:Validation:InvalidBelgianAccountNumber": "The Belgian bank account number is invalid.",
+    "Granit:Validation:InvalidGermanSteuerId": "The German tax identification number (Steuerliche Identifikationsnummer) is invalid.",
+    "Granit:Validation:InvalidGermanPostalCode": "The German postal code (PLZ) is invalid (expected 5 digits).",
+    "Granit:Validation:InvalidDutchBsn": "The Dutch citizen service number (BSN) is invalid.",
+    "Granit:Validation:InvalidDutchKvk": "The Dutch Chamber of Commerce number (KvK) is invalid (expected 8 digits).",
+    "Granit:Validation:InvalidDutchPostcode": "The Dutch postcode is invalid (expected format: 1234 AB).",
+    "Granit:Validation:InvalidSpanishNif": "The Spanish tax identification number (NIF/DNI) is invalid.",
+    "Granit:Validation:InvalidSpanishNie": "The Spanish foreigner identification number (NIE) is invalid.",
+    "Granit:Validation:InvalidSpanishCif": "The Spanish company tax identification number (CIF) is invalid.",
+    "Granit:Validation:InvalidSpanishPostalCode": "The Spanish postal code is invalid (expected 5 digits, provinces 01–52).",
+    "Granit:Validation:InvalidItalianCodiceFiscale": "The Italian fiscal code (Codice Fiscale) is invalid.",
+    "Granit:Validation:InvalidItalianPartitaIva": "The Italian VAT number (Partita IVA) is invalid.",
+    "Granit:Validation:InvalidItalianPostalCode": "The Italian postal code (CAP) is invalid (expected 5 digits).",
+    "Granit:Validation:InvalidLuxembourgMatricule": "The Luxembourg national identification number (Matricule) is invalid.",
+    "Granit:Validation:InvalidLuxembourgRcs": "The Luxembourg trade register number (RCS) is invalid.",
+    "Granit:Validation:InvalidEori": "The EORI (Economic Operators Registration and Identification) number is invalid."
   }
 }
