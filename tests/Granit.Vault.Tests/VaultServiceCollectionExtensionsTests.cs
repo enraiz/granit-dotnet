@@ -144,12 +144,13 @@ public sealed class VaultServiceCollectionExtensionsTests
         healthCheckDescriptor.ShouldNotBeNull();
         healthCheckDescriptor!.Lifetime.ShouldBe(ServiceLifetime.Singleton);
 
-        // Assert — HealthCheckRegistration tagged "readiness"
+        // Assert — HealthCheckRegistration tagged "readiness" and "startup"
         using ServiceProvider sp = services.BuildServiceProvider();
         HealthCheckServiceOptions opts = sp.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
         HealthCheckRegistration? registration = opts.Registrations.FirstOrDefault(r => r.Name == "vault");
         registration.ShouldNotBeNull();
         registration!.Tags.ShouldContain("readiness");
+        registration.Tags.ShouldContain("startup");
     }
 
     [Fact]

@@ -39,6 +39,8 @@ public sealed class RedisHealthCheckTests
         // Assert
         result.Status.ShouldBe(HealthStatus.Healthy);
         result.Description!.ShouldContain("10");
+        result.Data.ShouldContainKey("latency_ms");
+        result.Data.ShouldContainKey("threshold_ms");
     }
 
     [Fact]
