@@ -89,6 +89,7 @@
 
   <ItemGroup Label="Notifications">
     <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.*" />
+    <PackageVersion Include="AWSSDK.SimpleNotificationService" Version="4.*" />
     <PackageVersion Include="Azure.Communication.Email" Version="1.*" />
     <PackageVersion Include="Azure.Communication.Sms" Version="1.*" />
     <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.*" />

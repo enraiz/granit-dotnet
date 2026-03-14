@@ -78,9 +78,11 @@
     <Project Path="src/Granit.Notifications.EntityFrameworkCore/Granit.Notifications.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.Notifications.MobilePush.AzureNotificationHubs/Granit.Notifications.MobilePush.AzureNotificationHubs.csproj" />
     <Project Path="src/Granit.Notifications.MobilePush.Fcm/Granit.Notifications.MobilePush.Fcm.csproj" />
+    <Project Path="src/Granit.Notifications.MobilePush.Sns/Granit.Notifications.MobilePush.Sns.csproj" />
     <Project Path="src/Granit.Notifications.MobilePush/Granit.Notifications.MobilePush.csproj" />
     <Project Path="src/Granit.Notifications.SignalR/Granit.Notifications.SignalR.csproj" />
     <Project Path="src/Granit.Notifications.Sms.AzureCommunicationServices/Granit.Notifications.Sms.AzureCommunicationServices.csproj" />
+    <Project Path="src/Granit.Notifications.Sms.Sns/Granit.Notifications.Sms.Sns.csproj" />
     <Project Path="src/Granit.Notifications.Sms/Granit.Notifications.Sms.csproj" />
     <Project Path="src/Granit.Notifications.Sse/Granit.Notifications.Sse.csproj" />
     <Project Path="src/Granit.Notifications.WebPush/Granit.Notifications.WebPush.csproj" />
@@ -219,9 +221,11 @@
     <Project Path="tests/Granit.Notifications.EntityFrameworkCore.Tests/Granit.Notifications.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.MobilePush.AzureNotificationHubs.Tests/Granit.Notifications.MobilePush.AzureNotificationHubs.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.MobilePush.Fcm.Tests/Granit.Notifications.MobilePush.Fcm.Tests.csproj" />
+    <Project Path="tests/Granit.Notifications.MobilePush.Sns.Tests/Granit.Notifications.MobilePush.Sns.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.MobilePush.Tests/Granit.Notifications.MobilePush.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.SignalR.Tests/Granit.Notifications.SignalR.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Sms.AzureCommunicationServices.Tests/Granit.Notifications.Sms.AzureCommunicationServices.Tests.csproj" />
+    <Project Path="tests/Granit.Notifications.Sms.Sns.Tests/Granit.Notifications.Sms.Sns.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Sms.Tests/Granit.Notifications.Sms.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Sse.Tests/Granit.Notifications.Sse.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Tests/Granit.Notifications.Tests.csproj" />
