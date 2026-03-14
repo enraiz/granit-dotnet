@@ -120,11 +120,11 @@ internal sealed class FileSystemBlobClient(IOptions<FileSystemBlobOptions> optio
     }
 
     /// <summary>
-    /// Resolves the full file path for a blob. The <paramref name="bucket"/> parameter
+    /// Resolves the full file path for a blob. The bucket parameter
     /// is ignored — <see cref="BasePath"/> is used as the root directory.
     /// The <paramref name="objectKey"/> maps to the relative path within <see cref="BasePath"/>.
     /// </summary>
-    private string ResolvePath(string bucket, string objectKey)
+    private string ResolvePath(string _bucket, string objectKey)
     {
         // Prevent path traversal attacks — reject keys containing ".." segments.
         if (objectKey.Contains("..", StringComparison.Ordinal))

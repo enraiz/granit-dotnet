@@ -8,10 +8,8 @@ namespace Granit.BlobStorage.Database.Tests.Diagnostics;
 public sealed class BlobStorageDatabaseActivitySourceTests
 {
     [Fact]
-    public void Name_ShouldBe_GranitBlobStorageDatabase()
-    {
+    public void Name_ShouldBe_GranitBlobStorageDatabase() =>
         BlobStorageDatabaseActivitySource.Name.ShouldBe("Granit.BlobStorage.Database");
-    }
 
     [Fact]
     public void Source_ShouldCreateActivity_WhenListenerIsRegistered()

@@ -8,10 +8,8 @@ namespace Granit.BlobStorage.FileSystem.Tests.Diagnostics;
 public sealed class BlobStorageFileSystemActivitySourceTests
 {
     [Fact]
-    public void Name_ShouldBe_GranitBlobStorageFileSystem()
-    {
+    public void Name_ShouldBe_GranitBlobStorageFileSystem() =>
         BlobStorageFileSystemActivitySource.Name.ShouldBe("Granit.BlobStorage.FileSystem");
-    }
 
     [Fact]
     public void Source_ShouldCreateActivity_WhenListenerIsRegistered()

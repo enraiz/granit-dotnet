@@ -221,7 +221,7 @@ internal sealed class AzureBlobClient : IBlobStoreProvider, IPresignedUrlProvide
         MemoryStream buffer = new();
         byte[] tempBuffer = new byte[byteCount];
         int bytesRead = await stream.ReadAsync(tempBuffer.AsMemory(0, byteCount), cancellationToken).ConfigureAwait(false);
-        buffer.Write(tempBuffer, 0, bytesRead);
+        await buffer.WriteAsync(tempBuffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
         buffer.Position = 0;
         await stream.DisposeAsync().ConfigureAwait(false);
 

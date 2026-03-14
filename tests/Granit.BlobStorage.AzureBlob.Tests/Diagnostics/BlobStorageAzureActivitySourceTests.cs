@@ -8,10 +8,8 @@ namespace Granit.BlobStorage.AzureBlob.Tests.Diagnostics;
 public sealed class BlobStorageAzureActivitySourceTests
 {
     [Fact]
-    public void Name_ShouldBe_GranitBlobStorageAzureBlob()
-    {
+    public void Name_ShouldBe_GranitBlobStorageAzureBlob() =>
         BlobStorageAzureActivitySource.Name.ShouldBe("Granit.BlobStorage.AzureBlob");
-    }
 
     [Fact]
     public void Source_ShouldCreateActivity_WhenListenerIsRegistered()
