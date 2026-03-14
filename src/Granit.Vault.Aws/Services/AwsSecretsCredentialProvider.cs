@@ -11,12 +11,12 @@ namespace Granit.Vault.Aws.Services;
 
 /// <summary>
 /// Background service that reads database credentials from AWS Secrets Manager
-/// and polls for rotation changes. Mirrors <c>VaultCredentialLeaseManager</c>.
+/// and polls for rotation changes.
 /// </summary>
 internal sealed partial class AwsSecretsCredentialProvider(
     IAmazonSecretsManager secretsManager,
     IOptions<AwsVaultOptions> options,
-    ILogger<AwsSecretsCredentialProvider> logger) : BackgroundService, IAwsDatabaseCredentialProvider
+    ILogger<AwsSecretsCredentialProvider> logger) : BackgroundService, IDatabaseCredentialProvider
 {
     private readonly AwsVaultOptions _options = options.Value;
 

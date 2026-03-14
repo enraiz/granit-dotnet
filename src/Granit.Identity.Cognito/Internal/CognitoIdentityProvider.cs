@@ -20,6 +20,10 @@ internal sealed partial class CognitoIdentityProvider(
     IIdentityEventPublisher eventPublisher,
     ILogger<CognitoIdentityProvider> logger) : IIdentityProvider
 {
+    private const string EmailAttribute = "email";
+    private const string GivenNameAttribute = "given_name";
+    private const string FamilyNameAttribute = "family_name";
+
     private readonly CognitoAdminOptions _options = options.Value;
 
     // ── IIdentityUserReader ────────────────────────────────────────────────
@@ -144,17 +148,17 @@ internal sealed partial class CognitoIdentityProvider(
 
         if (update.Email is not null)
         {
-            attributes.Add(new AttributeType { Name = "email", Value = update.Email });
+            attributes.Add(new AttributeType { Name = EmailAttribute, Value = update.Email });
         }
 
         if (update.FirstName is not null)
         {
-            attributes.Add(new AttributeType { Name = "given_name", Value = update.FirstName });
+            attributes.Add(new AttributeType { Name = GivenNameAttribute, Value = update.FirstName });
         }
 
         if (update.LastName is not null)
         {
-            attributes.Add(new AttributeType { Name = "family_name", Value = update.LastName });
+            attributes.Add(new AttributeType { Name = FamilyNameAttribute, Value = update.LastName });
         }
 
         if (update.Attributes is not null)
@@ -202,19 +206,19 @@ internal sealed partial class CognitoIdentityProvider(
             Username = user.Username,
             UserAttributes =
             [
-                new AttributeType { Name = "email", Value = user.Email },
+                new AttributeType { Name = EmailAttribute, Value = user.Email },
                 new AttributeType { Name = "email_verified", Value = "true" },
             ],
         };
 
         if (user.FirstName is not null)
         {
-            request.UserAttributes.Add(new AttributeType { Name = "given_name", Value = user.FirstName });
+            request.UserAttributes.Add(new AttributeType { Name = GivenNameAttribute, Value = user.FirstName });
         }
 
         if (user.LastName is not null)
         {
-            request.UserAttributes.Add(new AttributeType { Name = "family_name", Value = user.LastName });
+            request.UserAttributes.Add(new AttributeType { Name = FamilyNameAttribute, Value = user.LastName });
         }
 
         if (user.TemporaryPassword is not null)
@@ -438,11 +442,9 @@ internal sealed partial class CognitoIdentityProvider(
     public Task TerminateSessionAsync(
         string userId,
         string sessionId,
-        CancellationToken cancellationToken = default)
-    {
+        CancellationToken cancellationToken = default) =>
         // Cognito does not support individual session termination
         throw new NotSupportedException("AWS Cognito does not support individual session termination. Use TerminateAllSessionsAsync instead.");
-    }
 
     /// <inheritdoc/>
     public async Task TerminateAllSessionsAsync(
@@ -473,11 +475,9 @@ internal sealed partial class CognitoIdentityProvider(
     /// <inheritdoc/>
     public Task<DateTimeOffset?> GetPasswordChangedAtAsync(
         string userId,
-        CancellationToken cancellationToken = default)
-    {
+        CancellationToken cancellationToken = default) =>
         // Cognito does not expose password change timestamp
-        return Task.FromResult<DateTimeOffset?>(null);
-    }
+        Task.FromResult<DateTimeOffset?>(null);
 
     /// <inheritdoc/>
     public async Task SendPasswordResetEmailAsync(
@@ -588,9 +588,9 @@ internal sealed partial class CognitoIdentityProvider(
         return new IdentityUser(
             Id: user.Username,
             Username: user.Username,
-            Email: attributes.GetValueOrDefault("email"),
-            FirstName: attributes.GetValueOrDefault("given_name"),
-            LastName: attributes.GetValueOrDefault("family_name"),
+            Email: attributes.GetValueOrDefault(EmailAttribute),
+            FirstName: attributes.GetValueOrDefault(GivenNameAttribute),
+            LastName: attributes.GetValueOrDefault(FamilyNameAttribute),
             Enabled: user.Enabled == true,
             Attributes: attributes.Where(a => a.Key.StartsWith("custom:", StringComparison.Ordinal))
                 .ToDictionary(a => a.Key, a => a.Value));
@@ -604,9 +604,9 @@ internal sealed partial class CognitoIdentityProvider(
         return new IdentityUser(
             Id: response.Username,
             Username: response.Username,
-            Email: attributes.GetValueOrDefault("email"),
-            FirstName: attributes.GetValueOrDefault("given_name"),
-            LastName: attributes.GetValueOrDefault("family_name"),
+            Email: attributes.GetValueOrDefault(EmailAttribute),
+            FirstName: attributes.GetValueOrDefault(GivenNameAttribute),
+            LastName: attributes.GetValueOrDefault(FamilyNameAttribute),
             Enabled: response.Enabled == true,
             Attributes: attributes.Where(a => a.Key.StartsWith("custom:", StringComparison.Ordinal))
                 .ToDictionary(a => a.Key, a => a.Value));

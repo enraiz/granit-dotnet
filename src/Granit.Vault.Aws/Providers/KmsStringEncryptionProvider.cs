@@ -1,16 +1,15 @@
 using Granit.Encryption;
 using Granit.Encryption.Options;
-using Granit.Vault.Aws.Services;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Vault.Aws.Providers;
 
 /// <summary>
-/// Bridges the async <see cref="IKmsTransitEncryptionService"/> to the
+/// Bridges the async <see cref="ITransitEncryptionService"/> to the
 /// synchronous <see cref="IStringEncryptionProvider"/> contract.
 /// </summary>
 internal sealed class KmsStringEncryptionProvider(
-    IKmsTransitEncryptionService transitEncryption,
+    ITransitEncryptionService transitEncryption,
     IOptions<StringEncryptionOptions> options) : IStringEncryptionProvider
 {
     /// <summary>Provider name constant.</summary>

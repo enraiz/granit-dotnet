@@ -2,20 +2,12 @@
 
   <PropertyGroup>
     <PackageId>Granit.Vault</PackageId>
-    <Description>VaultSharp client, dynamic credentials manager and Transit encryption for Granit applications.</Description>
+    <Description>Vault abstractions (transit encryption, dynamic credentials) for Granit applications. Install a provider package (Granit.Vault.HashiCorp, Granit.Vault.Azure, or Granit.Vault.Aws) for the implementation.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Granit.Vault.Tests" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="VaultSharp" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Options" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
   </ItemGroup>
 
   <ItemGroup>
