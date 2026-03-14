@@ -100,12 +100,21 @@
       },
       "Azure.Core": {
         "type": "Transitive",
-        "resolved": "1.47.1",
-        "contentHash": "oPcncSsDHuxB8SC522z47xbp2+ttkcKv2YZ90KXhRKN0YQd2+7l1UURT9EBzUNEXtkLZUOAB5xbByMTrYRh3yA==",
+        "resolved": "1.51.1",
+        "contentHash": "JRANrRvN5O5FFRh+pMUb8qqWU7jBQ39qXEbVr7Rkb1/s7rqc6RSzVHKGBz5Ro1gDy2WSGjG5YEOJKpPIBiCMcA==",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
-          "System.ClientModel": "1.5.1",
-          "System.Memory.Data": "8.0.1"
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.2",
+          "System.ClientModel": "1.9.0",
+          "System.Memory.Data": "10.0.1"
+        }
+      },
+      "Azure.Storage.Common": {
+        "type": "Transitive",
+        "resolved": "12.26.0",
+        "contentHash": "XaT6CDcSshZb7KaCTwc6m4EouZbLBg7ciOEpsJSdJCvkNsZJQCvPKw7V5TtXno19AA1NpwtsZriYque8mzbQVg==",
+        "dependencies": {
+          "Azure.Core": "1.50.0",
+          "System.IO.Hashing": "10.0.1"
         }
       },
       "BouncyCastle.Cryptography": {
@@ -280,8 +289,8 @@
       },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "Transitive",
-        "resolved": "9.0.0",
-        "contentHash": "owmu2Cr3IQ8yQiBleBHlGk8dSQ12oaF2e7TpzwJKEl4m84kkZJjEY1n33L67Y3zM5jPOjmmbdHjbfiL0RqcMRQ=="
+        "resolved": "10.0.2",
+        "contentHash": "qE5JhRoeJbAipLqpUCZyNfNwnpAvUttXgIQDnTiJ15d8ji+/bPgoPkB3xLzK5cQTobN2D2ditUesUlDHb7p3Pg=="
       },
       "Microsoft.Bcl.Cryptography": {
         "type": "Transitive",
@@ -561,25 +570,25 @@
       },
       "Microsoft.Identity.Client": {
         "type": "Transitive",
-        "resolved": "4.73.1",
-        "contentHash": "NnDLS8QwYqO5ZZecL2oioi1LUqjh5Ewk4bMLzbgiXJbQmZhDLtKwLxL3DpGMlQAJ2G4KgEnvGPKa+OOgffeJbw==",
+        "resolved": "4.83.1",
+        "contentHash": "jOLIrZ3cynoqHLLO1cXplFFabrhrMEYs/EuKHvmCyrOm1axqiVFT6nCSnHxk7w5+d2BeQfCdM12Yf/0X7OeS1g==",
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.35.0"
+          "Microsoft.IdentityModel.Abstractions": "8.14.0"
         }
       },
       "Microsoft.Identity.Client.Extensions.Msal": {
         "type": "Transitive",
-        "resolved": "4.73.1",
-        "contentHash": "xDztAiV2F0wI0W8FLKv5cbaBefyLD6JVaAsvgSN7bjWNCzGYzHbcOEIP5s4TJXUpQzMfUyBsFl1mC6Zmgpz0PQ==",
+        "resolved": "4.83.1",
+        "contentHash": "I3k4J4Hj4KbLEFanjeUzzDOVecukETaTgEkJ7h2pP/Yazs6SLp6TVUTo/Eo+ptPXMwvc+iX7rBFtMSUrA7R+Mg==",
         "dependencies": {
-          "Microsoft.Identity.Client": "4.73.1",
+          "Microsoft.Identity.Client": "4.83.1",
           "System.Security.Cryptography.ProtectedData": "4.5.0"
         }
       },
       "Microsoft.IdentityModel.Abstractions": {
         "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "OtlIWcyX01olfdevPKZdIPfBEvbcioDyBiE/Z2lHsopsMD7twcKtlN9kMevHmI5IIPhFpfwCIiR6qHQz1WHUIw=="
+        "resolved": "8.14.0",
+        "contentHash": "iwbCpSjD3ehfTwBhtSNEtKPK0ICun6ov7Ibx6ISNA9bfwIyzI2Siwyi9eJFCJBwxowK9xcA1mj+jBWiigeqgcQ=="
       },
       "Microsoft.IdentityModel.JsonWebTokens": {
         "type": "Transitive",
@@ -855,10 +864,10 @@
       },
       "System.ClientModel": {
         "type": "Transitive",
-        "resolved": "1.5.1",
-        "contentHash": "k2jKSO0X45IqhVOT9iQB4xralNN9foRQsRvXBTyRpAVxyzCJlG895T9qYrQWbcJ6OQXxOouJQ37x5nZH5XKK+A==",
+        "resolved": "1.9.0",
+        "contentHash": "1wdwKtMMMEFEYsxJmtrOd3G+7zVOVO3MlVZAsbKv9H0PnIx6J27fYAarMn0eQS0vKJPQL018DOb7YRK1O97p0A==",
         "dependencies": {
-          "System.Memory.Data": "8.0.1"
+          "System.Memory.Data": "10.0.1"
         }
       },
       "System.CodeDom": {
@@ -951,8 +960,8 @@
       },
       "System.Memory.Data": {
         "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "BVYuec3jV23EMRDeR7Dr1/qhx7369dZzJ9IWy2xylvb4YfXsrUxspWc4UWYid/tj4zZK58uGZqn2WQiaDMhmAg=="
+        "resolved": "10.0.1",
+        "contentHash": "BZC4mhdL569AXV56ep9YO6ShjhxFXGP7SwVX0Bc/e0dJPWnS6aBEXZJXqh64RVx8HquqWHkJUINBydLRQ1yq0g=="
       },
       "System.Reflection.MetadataLoadContext": {
         "type": "Transitive",
@@ -1171,6 +1180,20 @@
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
         }
       },
+      "granit.authentication.cognito": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Authentication.JwtBearer": "[0.1.0-dev, )",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.*, )"
+        }
+      },
+      "granit.authentication.entraid": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Authentication.JwtBearer": "[0.1.0-dev, )",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.*, )"
+        }
+      },
       "granit.authentication.jwtbearer": {
         "type": "Project",
         "dependencies": {
@@ -1248,6 +1271,22 @@
           "Granit.Guids": "[0.1.0-dev, )"
         }
       },
+      "granit.blobstorage.azureblob": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Identity": "[1.*, )",
+          "Azure.Storage.Blobs": "[12.*, )",
+          "Granit.BlobStorage": "[0.1.0-dev, )"
+        }
+      },
+      "granit.blobstorage.database": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.BlobStorage": "[0.1.0-dev, )",
+          "Granit.Persistence": "[0.1.0-dev, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
+        }
+      },
       "granit.blobstorage.entityframeworkcore": {
         "type": "Project",
         "dependencies": {
@@ -1256,11 +1295,32 @@
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
         }
       },
+      "granit.blobstorage.filesystem": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.BlobStorage": "[0.1.0-dev, )"
+        }
+      },
+      "granit.blobstorage.proxy": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.BlobStorage": "[0.1.0-dev, )"
+        }
+      },
       "granit.blobstorage.s3": {
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "[4.*, )",
           "Granit.BlobStorage": "[0.1.0-dev, )"
+        }
+      },
+      "granit.bulkhead": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )"
         }
       },
       "granit.caching": {
@@ -1439,6 +1499,13 @@
           "Granit.Querying": "[0.1.0-dev, )"
         }
       },
+      "granit.identity.cognito": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.CognitoIdentityProvider": "[4.*, )",
+          "Granit.Identity": "[0.1.0-dev, )"
+        }
+      },
       "granit.identity.endpoints": {
         "type": "Project",
         "dependencies": {
@@ -1456,6 +1523,14 @@
           "Granit.Persistence": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore": "[10.*, )"
+        }
+      },
+      "granit.identity.entraid": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Identity": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Microsoft.Extensions.Http.Resilience": "[10.*, )"
         }
       },
       "granit.identity.keycloak": {
@@ -1532,6 +1607,21 @@
           "Granit.Notifications": "[0.1.0-dev, )"
         }
       },
+      "granit.notifications.email.azurecommunicationservices": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Communication.Email": "[1.*, )",
+          "Azure.Identity": "[1.*, )",
+          "Granit.Notifications.Email": "[0.1.0-dev, )"
+        }
+      },
+      "granit.notifications.email.ses": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.SimpleEmailV2": "[4.*, )",
+          "Granit.Notifications.Email": "[0.1.0-dev, )"
+        }
+      },
       "granit.notifications.email.smtp": {
         "type": "Project",
         "dependencies": {
@@ -1565,6 +1655,13 @@
           "Granit.Notifications": "[0.1.0-dev, )"
         }
       },
+      "granit.notifications.mobilepush.azurenotificationhubs": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Notifications.MobilePush": "[0.1.0-dev, )",
+          "Microsoft.Azure.NotificationHubs": "[4.*, )"
+        }
+      },
       "granit.notifications.mobilepush.fcm": {
         "type": "Project",
         "dependencies": {
@@ -1580,6 +1677,20 @@
         }
       },
       "granit.notifications.sms": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Notifications": "[0.1.0-dev, )"
+        }
+      },
+      "granit.notifications.sms.azurecommunicationservices": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Communication.Sms": "[1.*, )",
+          "Azure.Identity": "[1.*, )",
+          "Granit.Notifications.Sms": "[0.1.0-dev, )"
+        }
+      },
+      "granit.notifications.sse": {
         "type": "Project",
         "dependencies": {
           "Granit.Notifications": "[0.1.0-dev, )"
@@ -1688,6 +1799,16 @@
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
         }
       },
+      "granit.ratelimiting": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.ExceptionHandling": "[0.1.0-dev, )",
+          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Security": "[0.1.0-dev, )",
+          "StackExchange.Redis": "[2.*, )"
+        }
+      },
       "granit.referencedata": {
         "type": "Project",
         "dependencies": {
@@ -1724,6 +1845,15 @@
           "Granit.Caching": "[0.1.0-dev, )",
           "Granit.Encryption": "[0.1.0-dev, )",
           "Granit.Security": "[0.1.0-dev, )"
+        }
+      },
+      "granit.settings.endpoints": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Authorization": "[0.1.0-dev, )",
+          "Granit.Settings": "[0.1.0-dev, )",
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Granit.Validation": "[0.1.0-dev, )"
         }
       },
       "granit.settings.entityframeworkcore": {
@@ -1822,10 +1952,41 @@
           "Granit.Localization": "[0.1.0-dev, )"
         }
       },
+      "granit.validation.europe": {
+        "type": "Project",
+        "dependencies": {
+          "FluentValidation": "[12.*, )",
+          "Granit.Localization": "[0.1.0-dev, )",
+          "Granit.Validation": "[0.1.0-dev, )"
+        }
+      },
       "granit.vault": {
         "type": "Project",
         "dependencies": {
-          "Granit.Encryption": "[0.1.0-dev, )",
+          "Granit.Encryption": "[0.1.0-dev, )"
+        }
+      },
+      "granit.vault.aws": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.KeyManagementService": "[4.*, )",
+          "AWSSDK.SecretsManager": "[4.*, )",
+          "Granit.Vault": "[0.1.0-dev, )"
+        }
+      },
+      "granit.vault.azure": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Identity": "[1.*, )",
+          "Azure.Security.KeyVault.Keys": "[4.*, )",
+          "Azure.Security.KeyVault.Secrets": "[4.*, )",
+          "Granit.Vault": "[0.1.0-dev, )"
+        }
+      },
+      "granit.vault.hashicorp": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Vault": "[0.1.0-dev, )",
           "VaultSharp": "[1.17.*, )"
         }
       },
@@ -1932,6 +2093,24 @@
           "Asp.Versioning.Mvc": "10.0.0-preview.2"
         }
       },
+      "AWSSDK.CognitoIdentityProvider": {
+        "type": "CentralTransitive",
+        "requested": "[4.*, )",
+        "resolved": "4.0.6.2",
+        "contentHash": "MOhL6nl78bYJh1AmoMNq9nJIM4dFjDO/FsLYMYj8IrWCqmfujGeHe8EnNEOM+Bxc8t5CLkil91awpS0TguzT+g==",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
+        }
+      },
+      "AWSSDK.KeyManagementService": {
+        "type": "CentralTransitive",
+        "requested": "[4.*, )",
+        "resolved": "4.0.9.3",
+        "contentHash": "pjFEtLCARMDpU6vGeGfCWAWPqfyr5hx2rir8bWc00h2lg/a8f9DMNDsmxefqKKl2oSlHwkvDSOK/7cox8ewTRg==",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
+        }
+      },
       "AWSSDK.S3": {
         "type": "CentralTransitive",
         "requested": "[4.*, )",
@@ -1941,15 +2120,79 @@
           "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
         }
       },
+      "AWSSDK.SecretsManager": {
+        "type": "CentralTransitive",
+        "requested": "[4.*, )",
+        "resolved": "4.0.4.9",
+        "contentHash": "7ymzCUjCuKKk7eQJVr33WMi2AcF5wThlta8NKnINZra6qIHmn/VclOLabvNSysiWDS8m+4Sx9ZHWYRYGJRDFZQ==",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
+        }
+      },
+      "AWSSDK.SimpleEmailV2": {
+        "type": "CentralTransitive",
+        "requested": "[4.*, )",
+        "resolved": "4.0.12.2",
+        "contentHash": "1NqLYAT5RkwnUjJMfXqmOD2utuBSXL5THzT/YhaLYLlmhKARL5W0QpzuY93ujUkhGapoZO7mjm5E9gv3C+enLQ==",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
+        }
+      },
+      "Azure.Communication.Email": {
+        "type": "CentralTransitive",
+        "requested": "[1.*, )",
+        "resolved": "1.1.0",
+        "contentHash": "yR0QWbrvM/RvOxrkFWaPqzltAiF/MGoVhjm++UkEpXvN00Brc/LevJXeg2BUVbIucoxx+kKW7HTAzGKspFh8Vg==",
+        "dependencies": {
+          "Azure.Core": "1.49.0"
+        }
+      },
+      "Azure.Communication.Sms": {
+        "type": "CentralTransitive",
+        "requested": "[1.*, )",
+        "resolved": "1.0.2",
+        "contentHash": "EOgM6NjodrOTB8ej7aLP8PmW5m1ZzAOXIv3gu+7QhYL5p/FvmsGHPozrMKVeZPsIEB50gZQg7gbDKvtpAOvDbg==",
+        "dependencies": {
+          "Azure.Core": "1.47.3"
+        }
+      },
       "Azure.Identity": {
         "type": "CentralTransitive",
         "requested": "[1.*, )",
-        "resolved": "1.14.2",
-        "contentHash": "YhNMwOTwT+I2wIcJKSdP0ADyB2aK+JaYWZxO8LSRDm5w77LFr0ykR9xmt2ZV5T1gaI7xU6iNFIh/yW1dAlpddQ==",
+        "resolved": "1.19.0",
+        "contentHash": "01KY5RC7XHwh3azcZ46GMhVR7ajRsRPFh5ivVuvs7N9nVAYK+9/g2eqXTjBneorm9PTYAUfmHvd1dIdmzBym3w==",
         "dependencies": {
-          "Azure.Core": "1.46.1",
-          "Microsoft.Identity.Client": "4.73.1",
-          "Microsoft.Identity.Client.Extensions.Msal": "4.73.1"
+          "Azure.Core": "1.51.1",
+          "Microsoft.Identity.Client": "4.83.1",
+          "Microsoft.Identity.Client.Extensions.Msal": "4.83.1"
+        }
+      },
+      "Azure.Security.KeyVault.Keys": {
+        "type": "CentralTransitive",
+        "requested": "[4.*, )",
+        "resolved": "4.9.0",
+        "contentHash": "CBuyErsNqLTbICquZa0b6Qy4ZPuxXnNjL7ucJRIbnchq9KgqYWwj9t73rio5upmg3SHjgnrrJKI3bh8xYtXXSw==",
+        "dependencies": {
+          "Azure.Core": "1.51.1"
+        }
+      },
+      "Azure.Security.KeyVault.Secrets": {
+        "type": "CentralTransitive",
+        "requested": "[4.*, )",
+        "resolved": "4.9.0",
+        "contentHash": "3cQKaNCfP6QQwEoqmxShIkzCQFJ9SlCbLzIb/UH/lMhpiqjVRkF62qOUP6T7NB4fnf7RV+TxsvjWpkNddu22EA==",
+        "dependencies": {
+          "Azure.Core": "1.51.1"
+        }
+      },
+      "Azure.Storage.Blobs": {
+        "type": "CentralTransitive",
+        "requested": "[12.*, )",
+        "resolved": "12.27.0",
+        "contentHash": "zI5rg1tTtnA8T2g2/21l+1iIUdDjpEQQ0FI1BabJVEQJ1JUyTQKrc41eNabAHs0SBHprl6pu/6OqIMK9Ve+4tQ==",
+        "dependencies": {
+          "Azure.Core": "1.50.0",
+          "Azure.Storage.Common": "12.26.0"
         }
       },
       "ClosedXML": {
@@ -2039,6 +2282,15 @@
         "dependencies": {
           "MessagePack": "2.5.187",
           "StackExchange.Redis": "2.7.27"
+        }
+      },
+      "Microsoft.Azure.NotificationHubs": {
+        "type": "CentralTransitive",
+        "requested": "[4.*, )",
+        "resolved": "4.2.0",
+        "contentHash": "LOCxFB/sB1frfuXjecdDRDKEHkH+I1qKRatS5NyWIgYhpKhIcAlPNIJajcwLgQBShckdc3hMG9E+75CnL3qDhQ==",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
         }
       },
       "Microsoft.CodeAnalysis.Analyzers": {

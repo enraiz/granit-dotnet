@@ -34,7 +34,7 @@ internal sealed class FileSystemBlobClient(IOptions<FileSystemBlobOptions> optio
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagObjectKey, objectKey);
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagContentType, contentType);
 
-        string filePath = ResolvePath(bucket, objectKey);
+        string filePath = ResolvePath(objectKey);
         string? directory = Path.GetDirectoryName(filePath);
         if (directory is not null)
         {
@@ -58,7 +58,7 @@ internal sealed class FileSystemBlobClient(IOptions<FileSystemBlobOptions> optio
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagBasePath, bucket);
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagObjectKey, objectKey);
 
-        string filePath = ResolvePath(bucket, objectKey);
+        string filePath = ResolvePath(objectKey);
         Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920, useAsync: true);
         return Task.FromResult(stream);
     }
@@ -73,7 +73,7 @@ internal sealed class FileSystemBlobClient(IOptions<FileSystemBlobOptions> optio
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagBasePath, bucket);
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagObjectKey, objectKey);
 
-        string filePath = ResolvePath(bucket, objectKey);
+        string filePath = ResolvePath(objectKey);
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
@@ -92,7 +92,7 @@ internal sealed class FileSystemBlobClient(IOptions<FileSystemBlobOptions> optio
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagBasePath, bucket);
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagObjectKey, objectKey);
 
-        string filePath = ResolvePath(bucket, objectKey);
+        string filePath = ResolvePath(objectKey);
         FileInfo fileInfo = new(filePath);
         return Task.FromResult(fileInfo.Length);
     }
@@ -108,7 +108,7 @@ internal sealed class FileSystemBlobClient(IOptions<FileSystemBlobOptions> optio
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagBasePath, bucket);
         activity?.SetTag(BlobStorageFileSystemActivitySource.TagObjectKey, objectKey);
 
-        string filePath = ResolvePath(bucket, objectKey);
+        string filePath = ResolvePath(objectKey);
 
         FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: byteCount, useAsync: true);
         await using (fileStream.ConfigureAwait(false))
@@ -120,11 +120,11 @@ internal sealed class FileSystemBlobClient(IOptions<FileSystemBlobOptions> optio
     }
 
     /// <summary>
-    /// Resolves the full file path for a blob. The bucket parameter
-    /// is ignored — <see cref="BasePath"/> is used as the root directory.
+    /// Resolves the full file path for a blob.
+    /// <see cref="BasePath"/> is used as the root directory.
     /// The <paramref name="objectKey"/> maps to the relative path within <see cref="BasePath"/>.
     /// </summary>
-    private string ResolvePath(string _bucket, string objectKey)
+    private string ResolvePath(string objectKey)
     {
         // Prevent path traversal attacks — reject keys containing ".." segments.
         if (objectKey.Contains("..", StringComparison.Ordinal))

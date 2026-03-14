@@ -116,8 +116,8 @@ public sealed class KmsTransitEncryptionServiceTests
     }
 
     [Fact]
-    public void Class_Implements_IKmsTransitEncryptionService() =>
-        _sut.ShouldBeAssignableTo<IKmsTransitEncryptionService>();
+    public void Class_Implements_ITransitEncryptionService() =>
+        _sut.ShouldBeAssignableTo<ITransitEncryptionService>();
 
     [Fact]
     public void Class_IsInternal() =>

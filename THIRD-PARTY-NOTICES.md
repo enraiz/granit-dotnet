@@ -12,7 +12,7 @@ Dernière mise à jour : 2026-03-14
 
 | Licence      | Nombre de packages |
 | ------------ | ------------------ |
-| MIT          | 51                 |
+| MIT          | 56                 |
 | Apache-2.0   | 19                 |
 | BSD-3-Clause | 2                  |
 | BSD-2-Clause | 1                  |
@@ -26,6 +26,11 @@ Dernière mise à jour : 2026-03-14
 
 | Package | Version | Copyright |
 | ------- | ------- | --------- |
+| Azure.Communication.Email | 1.1.0 | (c) Microsoft Corporation |
+| Azure.Communication.Sms | 1.0.2 | (c) Microsoft Corporation |
+| Azure.Identity | 1.19.0 | (c) Microsoft Corporation |
+| Azure.Security.KeyVault.Keys | 4.9.0 | (c) Microsoft Corporation |
+| Azure.Security.KeyVault.Secrets | 4.9.0 | (c) Microsoft Corporation |
 | Asp.Versioning.Mvc | 10.0.0-preview.1 | (c) .NET Foundation |
 | Asp.Versioning.Mvc.ApiExplorer | 10.0.0-preview.1 | (c) .NET Foundation |
 | ClosedXML | 0.104.2 | ClosedXML Contributors |
@@ -57,6 +62,7 @@ Dernière mise à jour : 2026-03-14
 | StackExchange.Redis | 2.11.8 | Copyright 2014-2026 Stack Exchange, Inc. |
 | System.Composition.AttributedModel | 9.0.0 | (c) Microsoft Corporation |
 | System.Text.Json | 9.0.13 | (c) Microsoft Corporation |
+| Microsoft.Azure.NotificationHubs | 4.2.0 | (c) Microsoft Corporation |
 | MailKit | 4.12.0 | Copyright (c) 2013-2026 .NET Foundation and Contributors |
 | Microsoft.AspNetCore.SignalR.StackExchangeRedis | 10.0.3 | (c) Microsoft Corporation |
 | Microsoft.Extensions.Http | 10.0.3 | (c) Microsoft Corporation |
@@ -161,3 +167,20 @@ comme alternative au provider Keycloak.
 Ces SDK sont utilisés par le package `Granit.Vault.Aws` pour le chiffrement
 transit (KMS) et la gestion de credentials de base de données (Secrets Manager)
 comme alternative au provider HashiCorp Vault.
+
+### Azure.Security.KeyVault.Keys / Azure.Security.KeyVault.Secrets
+
+Ces SDK sont utilisés par le package `Granit.Vault.Azure` pour le chiffrement
+transit (Key Vault RSA) et la gestion de credentials de base de données
+(Key Vault Secrets) comme alternative au provider HashiCorp Vault.
+
+### Azure.Communication.Email / Azure.Communication.Sms
+
+Ces SDK sont utilisés par les packages `Granit.Notifications.Email.AzureCommunicationServices`
+et `Granit.Notifications.Sms.AzureCommunicationServices` pour l'envoi d'emails et
+de SMS via Azure Communication Services.
+
+### Microsoft.Azure.NotificationHubs
+
+Ce SDK est utilisé par le package `Granit.Notifications.MobilePush.AzureNotificationHubs`
+pour l'envoi de notifications push mobiles (FCM, APNS) via Azure Notification Hubs.

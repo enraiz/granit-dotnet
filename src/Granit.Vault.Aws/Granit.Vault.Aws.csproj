@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Granit.Encryption\Granit.Encryption.csproj" />
+    <ProjectReference Include="..\Granit.Vault\Granit.Vault.csproj" />
   </ItemGroup>
 
 </Project>

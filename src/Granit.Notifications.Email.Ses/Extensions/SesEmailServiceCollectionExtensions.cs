@@ -52,7 +52,7 @@ public static class SesEmailServiceCollectionExtensions
 
         services.AddKeyedSingleton<IEmailSender, SesEmailSender>("Ses");
 
-        NotificationsEmailSesActivitySource.Source.GetType(); // ensure static init
+        _ = NotificationsEmailSesActivitySource.Source; // ensure static init
 
         return services;
     }

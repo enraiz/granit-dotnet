@@ -1,16 +1,16 @@
 using Granit.Core.Modularity;
 using Granit.Encryption;
-using Granit.Vault.Extensions;
-using Granit.Vault.Providers;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Granit.Vault;
 
 /// <summary>
-/// Module Granit pour Vault (credentials dynamiques + Transit encryption).
-/// Disabled in Development (no Vault required locally).
-/// Registers <see cref="VaultStringEncryptionProvider"/> when enabled.
+/// Abstraction module for vault services (transit encryption, dynamic credentials).
+/// Install a provider module for the implementation:
+/// <list type="bullet">
+///   <item><c>GranitVaultHashiCorpModule</c> — HashiCorp Vault</item>
+///   <item><c>GranitVaultAzureModule</c> — Azure Key Vault</item>
+///   <item><c>GranitVaultAwsModule</c> — AWS KMS + Secrets Manager</item>
+/// </list>
 /// </summary>
 /// <remarks>
 /// Localization resources (<c>Localization/Vault/{culture}.json</c>) are embedded in this
@@ -18,15 +18,4 @@ namespace Granit.Vault;
 /// <see cref="VaultLocalizationResource"/>.
 /// </remarks>
 [DependsOn(typeof(GranitEncryptionModule))]
-public sealed class GranitVaultModule : GranitModule
-{
-    /// <inheritdoc />
-    public override bool IsEnabled(ServiceConfigurationContext context) =>
-        !context.Builder.Environment.IsDevelopment();
-
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.AddGranitVault();
-        context.Services.AddSingleton<IStringEncryptionProvider, VaultStringEncryptionProvider>();
-    }
-}
+public sealed class GranitVaultModule : GranitModule;

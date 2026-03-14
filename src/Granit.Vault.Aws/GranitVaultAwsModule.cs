@@ -1,12 +1,11 @@
 using Granit.Core.Modularity;
-using Granit.Encryption;
 using Granit.Vault.Aws.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace Granit.Vault.Aws;
 
 /// <summary>Module for AWS KMS + Secrets Manager vault provider.</summary>
-[DependsOn(typeof(GranitEncryptionModule))]
+[DependsOn(typeof(GranitVaultModule))]
 public sealed class GranitVaultAwsModule : GranitModule
 {
     /// <inheritdoc />

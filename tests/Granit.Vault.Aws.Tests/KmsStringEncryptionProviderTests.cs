@@ -10,7 +10,7 @@ namespace Granit.Vault.Aws.Tests;
 
 public sealed class KmsStringEncryptionProviderTests
 {
-    private readonly IKmsTransitEncryptionService _transitEncryption = Substitute.For<IKmsTransitEncryptionService>();
+    private readonly ITransitEncryptionService _transitEncryption = Substitute.For<ITransitEncryptionService>();
     private readonly KmsStringEncryptionProvider _sut;
 
     public KmsStringEncryptionProviderTests()

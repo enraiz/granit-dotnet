@@ -60,18 +60,18 @@ public static class AwsVaultServiceCollectionExtensions
         });
 
         // KMS transit encryption
-        services.AddSingleton<IKmsTransitEncryptionService, KmsTransitEncryptionService>();
+        services.AddSingleton<ITransitEncryptionService, KmsTransitEncryptionService>();
 
         // String encryption provider (synchronous bridge)
         services.AddSingleton<IStringEncryptionProvider, KmsStringEncryptionProvider>();
 
         // Database credential provider (BackgroundService)
         services.AddSingleton<AwsSecretsCredentialProvider>();
-        services.AddSingleton<IAwsDatabaseCredentialProvider>(sp =>
+        services.AddSingleton<IDatabaseCredentialProvider>(sp =>
             sp.GetRequiredService<AwsSecretsCredentialProvider>());
         services.AddHostedService(sp => sp.GetRequiredService<AwsSecretsCredentialProvider>());
 
-        VaultAwsActivitySource.Source.GetType(); // ensure static init
+        _ = VaultAwsActivitySource.Source; // ensure static init
 
         return services;
     }

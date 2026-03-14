@@ -65,7 +65,7 @@ public sealed class AwsVaultServiceCollectionExtensionsTests
         services.AddGranitVaultAws();
 
         services.ShouldContain(d =>
-            d.ServiceType == typeof(IKmsTransitEncryptionService) &&
+            d.ServiceType == typeof(ITransitEncryptionService) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
 
@@ -87,7 +87,7 @@ public sealed class AwsVaultServiceCollectionExtensionsTests
         services.AddGranitVaultAws();
 
         services.ShouldContain(d =>
-            d.ServiceType == typeof(IAwsDatabaseCredentialProvider) &&
+            d.ServiceType == typeof(IDatabaseCredentialProvider) &&
             d.Lifetime == ServiceLifetime.Singleton);
     }
 

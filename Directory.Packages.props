@@ -74,6 +74,8 @@
   <ItemGroup Label="Vault">
     <PackageVersion Include="AWSSDK.KeyManagementService" Version="4.*" />
     <PackageVersion Include="AWSSDK.SecretsManager" Version="4.*" />
+    <PackageVersion Include="Azure.Security.KeyVault.Keys" Version="4.*" />
+    <PackageVersion Include="Azure.Security.KeyVault.Secrets" Version="4.*" />
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
   </ItemGroup>
   <!-- Security patches: transitive dependency version overrides -->
@@ -84,6 +86,9 @@
 
   <ItemGroup Label="Notifications">
     <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.*" />
+    <PackageVersion Include="Azure.Communication.Email" Version="1.*" />
+    <PackageVersion Include="Azure.Communication.Sms" Version="1.*" />
+    <PackageVersion Include="Microsoft.Azure.NotificationHubs" Version="4.*" />
     <PackageVersion Include="MailKit" Version="4.*" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.*" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.*" />

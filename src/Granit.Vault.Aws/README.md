@@ -1,8 +1,8 @@
 # Granit.Vault.Aws
 
-AWS KMS encryption and Secrets Manager credential provider for Granit applications. Drop-in replacement for `Granit.Vault` (HashiCorp Vault).
+AWS KMS and Secrets Manager provider for Granit applications: transit encryption, database credential rotation, and string encryption.
 
-Part of the [Granit](https://github.com/granit-fx/granit-dotnet) framework.
+Part of the [Granit](https://granit-fx.dev) framework.
 
 ## Installation
 
@@ -12,8 +12,9 @@ dotnet add package Granit.Vault.Aws
 
 ## Features
 
-- **KMS transit encryption**: `IStringEncryptionProvider` backed by AWS KMS symmetric encryption
-- **Secrets Manager**: `IAwsDatabaseCredentialProvider` with automatic rotation detection
+- **KMS transit encryption**: `ITransitEncryptionService` backed by AWS KMS symmetric encryption
+- **Secrets Manager**: `IDatabaseCredentialProvider` with automatic rotation detection
+- **String encryption**: `IStringEncryptionProvider` for column-level data encryption
 - **Health check**: KMS key reachability probe
 - **IAM roles**: Default credential chain (ECS/EKS), access keys for local dev
 
@@ -34,6 +35,10 @@ dotnet add package Granit.Vault.Aws
 }
 ```
 
+## Dependencies
+
+- `Granit.Vault` (abstractions)
+
 ## Documentation
 
-See the [full documentation](https://github.com/granit-fx/granit-dotnet).
+See the [full documentation](https://granit-fx.dev).

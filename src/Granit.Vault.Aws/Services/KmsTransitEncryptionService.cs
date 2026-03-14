@@ -10,12 +10,11 @@ namespace Granit.Vault.Aws.Services;
 
 /// <summary>
 /// Transit encryption service using AWS KMS symmetric encryption.
-/// Mirrors the <c>ITransitEncryptionService</c> pattern from Granit.Vault.
 /// </summary>
 internal sealed partial class KmsTransitEncryptionService(
     IAmazonKeyManagementService kmsClient,
     IOptions<AwsVaultOptions> options,
-    ILogger<KmsTransitEncryptionService> logger) : IKmsTransitEncryptionService
+    ILogger<KmsTransitEncryptionService> logger) : ITransitEncryptionService
 {
     private readonly string _keyId = options.Value.KmsKeyId;
 

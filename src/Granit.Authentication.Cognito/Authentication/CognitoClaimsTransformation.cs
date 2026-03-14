@@ -31,9 +31,8 @@ public sealed class CognitoClaimsTransformation : IClaimsTransformation
         // Collect existing roles in a HashSet to avoid duplicates
         HashSet<string> existingRoles = [.. identity.FindAll(ClaimTypes.Role).Select(c => c.Value)];
 
-        foreach (Claim groupClaim in groupClaims)
+        foreach (string groupValue in groupClaims.Select(groupClaim => groupClaim.Value))
         {
-            string groupValue = groupClaim.Value;
             if (!string.IsNullOrEmpty(groupValue) && existingRoles.Add(groupValue))
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, groupValue));
