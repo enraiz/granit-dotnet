@@ -63,6 +63,7 @@
     <Project Path="src/Granit.Localization/Granit.Localization.csproj" />
     <Project Path="src/Granit.MultiTenancy/Granit.MultiTenancy.csproj" />
     <Project Path="src/Granit.Notifications.Brevo/Granit.Notifications.Brevo.csproj" />
+    <Project Path="src/Granit.Notifications.Email.Ses/Granit.Notifications.Email.Ses.csproj" />
     <Project Path="src/Granit.Notifications.Email.Smtp/Granit.Notifications.Email.Smtp.csproj" />
     <Project Path="src/Granit.Notifications.Email/Granit.Notifications.Email.csproj" />
     <Project Path="src/Granit.Notifications.Endpoints/Granit.Notifications.Endpoints.csproj" />
@@ -187,6 +188,7 @@
     <Project Path="tests/Granit.Localization.Tests/Granit.Localization.Tests.csproj" />
     <Project Path="tests/Granit.MultiTenancy.Tests/Granit.MultiTenancy.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Brevo.Tests/Granit.Notifications.Brevo.Tests.csproj" />
+    <Project Path="tests/Granit.Notifications.Email.Ses.Tests/Granit.Notifications.Email.Ses.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Email.Smtp.Tests/Granit.Notifications.Email.Smtp.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Email.Tests/Granit.Notifications.Email.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Endpoints.Tests/Granit.Notifications.Endpoints.Tests.csproj" />
