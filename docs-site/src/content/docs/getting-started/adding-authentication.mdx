@@ -1,6 +1,6 @@
 ---
 title: Adding Authentication
-description: Protect your API with JWT Bearer authentication and Keycloak claims transformation
+description: Protect your API with JWT Bearer authentication and provider-specific claims transformation
 sidebar:
   order: 3
 ---
@@ -66,6 +66,22 @@ Add a `JwtBearer` section to `appsettings.Development.json`:
         "Authority": "https://login.microsoftonline.com/{tenant-id}/v2.0",
         "Audience": "api://{client-id}",
         "RequireHttpsMetadata": true
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="AWS Cognito">
+    ```json
+    {
+      "JwtBearer": {
+        "Authority": "https://cognito-idp.{region}.amazonaws.com/{userPoolId}",
+        "Audience": "{clientId}",
+        "RequireHttpsMetadata": true
+      },
+      "Cognito": {
+        "UserPoolId": "{userPoolId}",
+        "ClientId": "{clientId}",
+        "Region": "{region}"
       }
     }
     ```
