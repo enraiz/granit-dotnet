@@ -1,10 +1,13 @@
 using Granit.Core.Diagnostics;
+using Granit.Identity.EntraId.HealthChecks;
 using Granit.Identity.EntraId.Internal;
 using Granit.Identity.EntraId.Options;
 using Granit.Identity.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Http.Resilience;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Identity.EntraId.Extensions;
 
@@ -59,4 +62,26 @@ public static class IdentityEntraIdServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Adds the Microsoft Entra ID health check (tags: <c>readiness</c>, <c>startup</c>).
+    /// </summary>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Optional check name (default: <c>"entraid"</c>).</param>
+    /// <param name="failureStatus">Optional failure status override.</param>
+    /// <param name="timeout">Optional timeout override.</param>
+    /// <returns>The builder for chaining.</returns>
+    public static IHealthChecksBuilder AddGranitEntraIdCheck(
+        this IHealthChecksBuilder builder,
+        string name = "entraid",
+        HealthStatus? failureStatus = null,
+        TimeSpan? timeout = null) =>
+        builder.Add(new HealthCheckRegistration(
+            name,
+            sp => new EntraIdHealthCheck(
+                sp.GetRequiredService<IHttpClientFactory>(),
+                sp.GetRequiredService<IOptions<EntraIdAdminOptions>>()),
+            failureStatus,
+            ["readiness", "startup"],
+            timeout));
 }

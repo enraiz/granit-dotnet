@@ -2,9 +2,11 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.SimpleEmailV2;
 using Granit.Notifications.Email.Ses.Diagnostics;
+using Granit.Notifications.Email.Ses.HealthChecks;
 using Granit.Notifications.Email.Ses.Internal;
 using Granit.Notifications.Email.Ses.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Notifications.Email.Ses.Extensions;
@@ -54,4 +56,24 @@ public static class SesEmailServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Adds the Amazon SES health check (tags: <c>readiness</c>, <c>startup</c>).
+    /// </summary>
+    /// <param name="builder">The health checks builder.</param>
+    /// <param name="name">Optional check name (default: <c>"ses"</c>).</param>
+    /// <param name="failureStatus">Optional failure status override.</param>
+    /// <param name="timeout">Optional timeout override.</param>
+    /// <returns>The builder for chaining.</returns>
+    public static IHealthChecksBuilder AddGranitSesCheck(
+        this IHealthChecksBuilder builder,
+        string name = "ses",
+        HealthStatus? failureStatus = null,
+        TimeSpan? timeout = null) =>
+        builder.Add(new HealthCheckRegistration(
+            name,
+            sp => new SesHealthCheck(sp.GetRequiredService<IOptions<SesOptions>>()),
+            failureStatus,
+            ["readiness", "startup"],
+            timeout));
 }
