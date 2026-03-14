@@ -9,8 +9,7 @@
 #   NUGET_API_KEY       — nuget.org API key (for publish on tag)
 #
 # Optional secrets:
-#   SONAR_HOST_URL      — SonarQube server URL
-#   SONAR_TOKEN         — SonarQube authentication token
+#   SONAR_TOKEN         — SonarCloud authentication token
 # =============================================================================
 
 name: CI
@@ -258,10 +257,10 @@ jobs:
   # ---------------------------------------------------------------------------
   # ANALYSIS
   # ---------------------------------------------------------------------------
-  sonarqube:
+  sonarcloud:
     needs: [build, test]
     runs-on: ubuntu-latest
-    if: vars.SONAR_HOST_URL != '' && secrets.SONAR_TOKEN != ''
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     continue-on-error: true
     timeout-minutes: 30
     steps:
@@ -287,7 +286,7 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
           restore-keys: nuget-${{ runner.os }}-
 
-      - name: SonarQube cache
+      - name: SonarCloud cache
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
@@ -301,19 +300,22 @@ jobs:
       - name: Install SonarScanner
         run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: SonarQube scan
+      - name: SonarCloud scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           dotnet sonarscanner begin \
-            /k:"granit-dotnet" \
-            /n:"Granit" \
-            /d:sonar.host.url="${{ vars.SONAR_HOST_URL }}" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /k:"granit-fx_granit-dotnet" \
+            /o:"granit-fx" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.exclusions=".nuget/**" \
             /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs" \
             /d:sonar.qualitygate.wait="true"
           dotnet build -c $CONFIGURATION
-          dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
   audit:
     needs: build
