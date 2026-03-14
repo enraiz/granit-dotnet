@@ -22,6 +22,8 @@ namespace Granit.Notifications.Email.Ses.HealthChecks;
 /// </remarks>
 internal sealed class SesHealthCheck(IOptions<SesOptions> options) : IHealthCheck
 {
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
@@ -43,6 +45,7 @@ internal sealed class SesHealthCheck(IOptions<SesOptions> options) : IHealthChec
 
             GetAccountResponse account = await client
                 .GetAccountAsync(new GetAccountRequest(), cancellationToken)
+                .WaitAsync(s_healthCheckTimeout, cancellationToken)
                 .ConfigureAwait(false);
 
             if (account.SendingEnabled is true)

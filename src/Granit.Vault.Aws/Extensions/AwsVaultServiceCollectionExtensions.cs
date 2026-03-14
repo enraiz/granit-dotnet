@@ -77,7 +77,7 @@ public static class AwsVaultServiceCollectionExtensions
     }
 
     /// <summary>Adds a KMS health check.</summary>
-    public static IHealthChecksBuilder AddGranitKmsCheck(
+    public static IHealthChecksBuilder AddGranitKmsHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "aws-kms",
         HealthStatus? failureStatus = null,

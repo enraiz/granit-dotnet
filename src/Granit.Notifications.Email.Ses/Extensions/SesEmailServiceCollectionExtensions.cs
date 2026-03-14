@@ -65,7 +65,7 @@ public static class SesEmailServiceCollectionExtensions
     /// <param name="failureStatus">Optional failure status override.</param>
     /// <param name="timeout">Optional timeout override.</param>
     /// <returns>The builder for chaining.</returns>
-    public static IHealthChecksBuilder AddGranitSesCheck(
+    public static IHealthChecksBuilder AddGranitSesHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "ses",
         HealthStatus? failureStatus = null,

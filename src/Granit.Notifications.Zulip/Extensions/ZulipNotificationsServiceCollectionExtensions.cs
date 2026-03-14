@@ -1,7 +1,10 @@
 using Granit.Notifications.Abstractions;
+using Granit.Notifications.Zulip.HealthChecks;
 using Granit.Notifications.Zulip.Internal;
 using Granit.Notifications.Zulip.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 
 namespace Granit.Notifications.Zulip.Extensions;
 
@@ -45,4 +48,16 @@ public static class ZulipNotificationsServiceCollectionExtensions
         services.AddScoped<INotificationChannel, ZulipNotificationChannel>();
         return services;
     }
+
+    /// <summary>
+    /// Adds a health check that verifies Zulip Bot API connectivity via <c>GET /api/v1/users/me</c>.
+    /// </summary>
+    public static IHealthChecksBuilder AddGranitZulipHealthCheck(this IHealthChecksBuilder builder) =>
+        builder.Add(new HealthCheckRegistration(
+            "zulip",
+            sp => new ZulipHealthCheck(
+                sp.GetRequiredService<IHttpClientFactory>(),
+                sp.GetRequiredService<IOptions<ZulipBotOptions>>()),
+            failureStatus: null,
+            tags: ["readiness"]));
 }

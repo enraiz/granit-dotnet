@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
+    <!-- Exclude from dotnet test in CI unit-test job (runs in dedicated architecture-test job). -->
+    <IsTestProject Condition="'$(SkipArchitectureTests)' == 'true'">false</IsTestProject>
     <!-- ArchUnitNET transitively pulls Microsoft.CodeAnalysis.Workspaces.MSBuild 4.x
          which conflicts with our Roslyn 5.x analyzers. Safe to suppress in test project. -->
     <NoWarn>$(NoWarn);NU1608</NoWarn>

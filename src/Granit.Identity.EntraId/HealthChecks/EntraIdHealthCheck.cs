@@ -22,6 +22,8 @@ internal sealed class EntraIdHealthCheck(
     IHttpClientFactory httpClientFactory,
     IOptions<EntraIdAdminOptions> options) : IHealthCheck
 {
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
@@ -41,6 +43,7 @@ internal sealed class EntraIdHealthCheck(
 
             using HttpResponseMessage response = await client
                 .PostAsync(opts.GetTokenEndpoint(), content, cancellationToken)
+                .WaitAsync(s_healthCheckTimeout, cancellationToken)
                 .ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)

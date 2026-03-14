@@ -164,7 +164,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitRedisCheck_WhenIConnectionMultiplexerNotRegistered_RegistersIt()
+    public void AddGranitRedisHealthCheck_WhenIConnectionMultiplexerNotRegistered_RegistersIt()
     {
         // Arrange
         ServiceCollection services = new();
@@ -173,7 +173,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         IHealthChecksBuilder builder = services.AddHealthChecks();
 
         // Act
-        builder.AddGranitRedisCheck();
+        builder.AddGranitRedisHealthCheck();
 
         // Assert — IConnectionMultiplexer must have been registered
         ServiceDescriptor? multiplexerDescriptor = services.FirstOrDefault(
@@ -183,7 +183,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitRedisCheck_WhenIConnectionMultiplexerAlreadyRegistered_DoesNotRegisterAgain()
+    public void AddGranitRedisHealthCheck_WhenIConnectionMultiplexerAlreadyRegistered_DoesNotRegisterAgain()
     {
         // Arrange
         ServiceCollection services = new();
@@ -192,7 +192,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         IHealthChecksBuilder builder = services.AddHealthChecks();
 
         // Act
-        builder.AddGranitRedisCheck();
+        builder.AddGranitRedisHealthCheck();
 
         // Assert — only one IConnectionMultiplexer registration
         IEnumerable<ServiceDescriptor> multiplexerDescriptors = services.Where(
@@ -201,7 +201,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddGranitRedisCheck_RegistersCheckTaggedReadiness()
+    public void AddGranitRedisHealthCheck_RegistersCheckTaggedReadiness()
     {
         // Arrange
         ServiceCollection services = new();
@@ -210,7 +210,7 @@ public sealed class RedisCachingServiceCollectionExtensionsTests
         IHealthChecksBuilder builder = services.AddHealthChecks();
 
         // Act
-        builder.AddGranitRedisCheck(name: "redis");
+        builder.AddGranitRedisHealthCheck(name: "redis");
 
         // Assert — HealthCheckRegistration tagged "readiness" and "startup"
         using ServiceProvider sp = services.BuildServiceProvider();

@@ -68,7 +68,7 @@ public static class IdentityKeycloakServiceCollectionExtensions
     /// <param name="name">Check name. Defaults to <c>"keycloak"</c>.</param>
     /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
     /// <param name="timeout">Check timeout. Defaults to 10 seconds.</param>
-    public static IHealthChecksBuilder AddGranitKeycloakCheck(
+    public static IHealthChecksBuilder AddGranitKeycloakHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "keycloak",
         HealthStatus? failureStatus = null,

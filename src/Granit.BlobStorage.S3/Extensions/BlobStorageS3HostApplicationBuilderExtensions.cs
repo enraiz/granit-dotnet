@@ -62,7 +62,7 @@ public static class BlobStorageS3HostApplicationBuilderExtensions
     /// <param name="name">Check name. Defaults to <c>"s3"</c>.</param>
     /// <param name="failureStatus">Status on failure. Defaults to <see cref="HealthStatus.Unhealthy"/>.</param>
     /// <param name="timeout">Check timeout. Defaults to 10 seconds.</param>
-    public static IHealthChecksBuilder AddGranitS3Check(
+    public static IHealthChecksBuilder AddGranitS3HealthCheck(
         this IHealthChecksBuilder builder,
         string name = "s3",
         HealthStatus? failureStatus = null,
