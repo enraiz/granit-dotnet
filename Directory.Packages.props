@@ -78,6 +78,8 @@
     <PackageVersion Include="Azure.Security.KeyVault.Keys" Version="4.*" />
     <PackageVersion Include="Azure.Security.KeyVault.Secrets" Version="4.*" />
     <PackageVersion Include="VaultSharp" Version="1.17.*" />
+    <PackageVersion Include="Google.Cloud.Kms.V1" Version="3.*" />
+    <PackageVersion Include="Google.Cloud.SecretManager.V1" Version="2.*" />
   </ItemGroup>
   <!-- Security patches: transitive dependency version overrides -->
   <!-- MimeKit 4.15.0 is vulnerable to GHSA-g7hc-96xr-gvvx (Moderate) -->

@@ -120,6 +120,7 @@
     <Project Path="src/Granit.Validation/Granit.Validation.csproj" />
     <Project Path="src/Granit.Vault.Aws/Granit.Vault.Aws.csproj" />
     <Project Path="src/Granit.Vault.Azure/Granit.Vault.Azure.csproj" />
+    <Project Path="src/Granit.Vault.GoogleCloud/Granit.Vault.GoogleCloud.csproj" />
     <Project Path="src/Granit.Vault.HashiCorp/Granit.Vault.HashiCorp.csproj" />
     <Project Path="src/Granit.Vault/Granit.Vault.csproj" />
     <Project Path="src/Granit.Webhooks.EntityFrameworkCore/Granit.Webhooks.EntityFrameworkCore.csproj" />
@@ -261,6 +262,7 @@
     <Project Path="tests/Granit.Validation.Tests/Granit.Validation.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Aws.Tests/Granit.Vault.Aws.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Azure.Tests/Granit.Vault.Azure.Tests.csproj" />
+    <Project Path="tests/Granit.Vault.GoogleCloud.Tests/Granit.Vault.GoogleCloud.Tests.csproj" />
     <Project Path="tests/Granit.Vault.HashiCorp.Tests/Granit.Vault.HashiCorp.Tests.csproj" />
     <Project Path="tests/Granit.Vault.Tests/Granit.Vault.Tests.csproj" />
     <Project Path="tests/Granit.Webhooks.EntityFrameworkCore.Tests/Granit.Webhooks.EntityFrameworkCore.Tests.csproj" />
