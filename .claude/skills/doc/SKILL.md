@@ -38,7 +38,7 @@ The documentation lives in `docs-site/` — an **Astro + Starlight** site.
 and across the documentation:
 
 ```typescript
-export const PACKAGE_COUNT = 93;          // .NET NuGet packages
+export const PACKAGE_COUNT = 120;         // .NET NuGet packages
 export const FRONTEND_PACKAGE_COUNT = 49; // @granit/* npm packages
 export const CULTURE_COUNT = 17;          // Supported cultures
 export const PATTERN_COUNT = 51;          // Design pattern pages (backend + frontend)

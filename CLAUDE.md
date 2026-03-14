@@ -12,7 +12,7 @@
 
 .NET 10 | C# 14 | EF Core 10 | VaultSharp 1.17+ | Serilog 9+ | OpenTelemetry 1.11+
 
-## Packages (97 packages)
+## Packages (120 packages)
 
 ### Core & utilities
 
