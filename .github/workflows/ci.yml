@@ -411,17 +411,11 @@ jobs:
           --skip-duplicate
 
   # ---------------------------------------------------------------------------
-  # DOCS (Astro Starlight → GitHub Pages)
+  # DOCS (Astro Starlight → Cloudflare Pages)
   # ---------------------------------------------------------------------------
   docs:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v6
 
@@ -443,11 +437,9 @@ jobs:
         working-directory: docs-site
         run: pnpm astro build
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@da0e0235f40ea0de66c4e1e8e25a0fdd569c0a54 # v3
         with:
-          path: docs-site/dist
-
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy docs-site/dist --project-name=granit-docs --branch=${{ github.ref_name }}
