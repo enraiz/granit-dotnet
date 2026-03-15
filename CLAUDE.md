@@ -16,7 +16,7 @@
 
 ```
 src/
-  Granit.Core/                             # Module system (ABP-inspired), shared domain types
+  Granit.Core/                             # Module system, shared domain types
   Granit.{Module}/                         # Abstractions + DI registration (e.g. Granit.BlobStorage)
   Granit.{Module}.Endpoints/               # Minimal API endpoints
   Granit.{Module}.EntityFrameworkCore/      # Isolated DbContext, EF configurations, migrations

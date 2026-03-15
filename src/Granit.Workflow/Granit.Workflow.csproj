@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Workflow</PackageId>
-    <Description>Generic finite state machine (FSM) engine for entity lifecycle management. Fluent API for workflow definitions, approval routing (Odoo-style), domain events (Wolverine), versioned entities with draft/published/archived lifecycle.</Description>
+    <Description>Generic finite state machine (FSM) engine for entity lifecycle management. Fluent API for workflow definitions, multi-step approval routing, domain events (Wolverine), versioned entities with draft/published/archived lifecycle.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

@@ -1,7 +1,7 @@
 namespace Granit.DataExchange.EntityFrameworkCore.Internal.Import.Entities;
 
 /// <summary>
-/// Maps an external identifier (e.g. Odoo <c>__export__</c> ID) to an internal entity ID.
+/// Maps an external identifier from a source system to an internal entity ID.
 /// Used by the <c>ExternalIdResolver</c> for roundtrip INSERT/UPDATE resolution.
 /// </summary>
 internal sealed class ExternalIdMappingEntity

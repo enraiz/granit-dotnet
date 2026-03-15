@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Granit.DataExchange.EntityFrameworkCore.Internal.Import.Identity;
 
 /// <summary>
-/// Resolves entity identity using an external ID mapping table (Odoo <c>__export__</c> pattern).
+/// Resolves entity identity using a dedicated external ID mapping table.
 /// Looks up the external ID in <see cref="DataExchangeDbContext"/>, then loads the entity from the application DbContext.
 /// </summary>
 /// <typeparam name="TEntity">The entity type.</typeparam>

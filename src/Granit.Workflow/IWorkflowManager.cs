@@ -2,8 +2,7 @@ namespace Granit.Workflow;
 
 /// <summary>
 /// Orchestrates workflow transitions with permission checking and approval routing.
-/// Follows the Odoo <c>button_confirm</c>/<c>button_approve</c> pattern:
-/// when a user lacks the required permission on a transition marked with
+/// When a user lacks the required permission on a transition marked with
 /// <see cref="WorkflowTransition{TState}.RequiresApproval"/>, the entity is routed
 /// to a pending review state and approvers are notified.
 /// </summary>

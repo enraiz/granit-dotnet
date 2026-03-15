@@ -4,7 +4,7 @@ namespace Granit.Workflow.Notifications;
 
 /// <summary>
 /// Notification type for workflow state transitions.
-/// Delivered to entity followers (Odoo-style) when a workflow changes state.
+/// Delivered to entity followers when a workflow changes state.
 /// </summary>
 public sealed class WorkflowStateChangedNotificationType
     : NotificationType<WorkflowStateChangedNotificationData>

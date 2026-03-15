@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Granit.Caching;
 
 /// <summary>
-/// Service de cache typé avec clé de type <typeparamref name="TKey"/> (ABP-style).
+/// Service de cache typé avec clé de type <typeparamref name="TKey"/>.
 /// La clé est automatiquement convertie en <see cref="string"/> via <c>key.ToString()</c>.
 /// Hérite de <see cref="ICacheService{TCacheItem}"/> pour la compatibilité avec les clés string.
 /// </summary>

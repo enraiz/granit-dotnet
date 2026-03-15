@@ -1,7 +1,7 @@
 // CA1711: the "Exception" suffix on an interface is intentional.
-// This ABP-inspired convention makes it immediately clear that the interface marks exceptions
+// This convention makes it immediately clear that the interface marks exceptions
 // whose messages are safe to expose to end users. Renaming to "IUserFriendlyError" would
-// break the semantic clarity of the pattern and diverge from the established ABP naming.
+// break the semantic clarity of the pattern (inspired by ABP's naming convention).
 #pragma warning disable CA1711
 
 namespace Granit.Core.Exceptions;

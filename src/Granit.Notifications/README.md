@@ -2,7 +2,7 @@
 
 Multi-channel notification engine for Granit. Provides `INotificationPublisher` for publishing
 notifications, Wolverine-based transactional fan-out, `INotificationChannel` for pluggable
-delivery channels, and Odoo-style entity tracking via `ITrackedEntity`.
+delivery channels, and automatic entity change tracking via `ITrackedEntity`.
 
 Part of the [granit](https://granit-fx.dev) framework.
 

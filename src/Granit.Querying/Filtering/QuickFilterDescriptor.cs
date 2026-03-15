@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 namespace Granit.Querying.Filtering;
 
 /// <summary>
-/// Immutable metadata about an independent toggleable filter (Odoo-style).
+/// Immutable metadata about an independent toggleable filter.
 /// Quick filters are individually activatable and combine with AND semantics.
 /// Unlike <see cref="FilterGroupDescriptor"/> presets which are mutually exclusive (OR within a group),
 /// quick filters act like independent checkboxes.

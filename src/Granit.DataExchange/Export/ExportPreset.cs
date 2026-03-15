@@ -1,8 +1,8 @@
 namespace Granit.DataExchange.Export;
 
 /// <summary>
-/// A saved export configuration preset (Odoo export template pattern).
-/// Stores the user's field selection and format preference for reuse.
+/// A saved export configuration preset that stores the user's field selection
+/// and format preference for reuse.
 /// </summary>
 /// <param name="DefinitionName">The export definition name (e.g. <c>"Acme.PatientExport"</c>).</param>
 /// <param name="PresetName">User-facing preset name (e.g. <c>"Export mensuel"</c>).</param>

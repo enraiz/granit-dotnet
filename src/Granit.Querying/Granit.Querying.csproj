@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Granit.Querying</PackageId>
-    <Description>Declarative query building for Granit list views. Fluent QueryDefinition API, typed filters with operator inference (HotChocolate-style), Odoo-inspired FilterGroups/presets/DatePeriod/SavedViews, whitelist-first security (Spatie-style). DTOs: QueryRequest, PagedResult, GroupedResult, QueryMetadata.</Description>
+    <Description>Declarative query building for Granit list views. Fluent QueryDefinition API, typed filters with operator inference, FilterGroups/presets/DatePeriod/SavedViews, whitelist-first security. DTOs: QueryRequest, PagedResult, GroupedResult, QueryMetadata.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

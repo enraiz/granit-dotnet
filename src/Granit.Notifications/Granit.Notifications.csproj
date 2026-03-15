@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.Notifications</PackageId>
-    <Description>Multi-channel notification engine for Granit. InApp channel, notification definitions, entity tracking abstractions (Odoo-style), and pluggable channel architecture with graceful degradation. Uses in-process channels by default; add Granit.Notifications.Wolverine for durable outbox dispatch.</Description>
+    <Description>Multi-channel notification engine for Granit. InApp channel, notification definitions, entity tracking abstractions, and pluggable channel architecture with graceful degradation. Uses in-process channels by default; add Granit.Notifications.Wolverine for durable outbox dispatch.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>

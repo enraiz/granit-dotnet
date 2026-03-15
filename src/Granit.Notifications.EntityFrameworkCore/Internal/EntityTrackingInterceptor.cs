@@ -8,7 +8,7 @@ namespace Granit.Notifications.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// EF Core SaveChanges interceptor that detects modifications on <see cref="ITrackedEntity"/>
-/// and publishes notifications to entity followers (Odoo-style auto-tracking).
+/// and publishes notifications to entity followers via automatic change tracking.
 /// </summary>
 internal sealed class EntityTrackingInterceptor(
     INotificationPublisher notificationPublisher,

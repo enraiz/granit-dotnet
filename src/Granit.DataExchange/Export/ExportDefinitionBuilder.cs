@@ -9,7 +9,7 @@ namespace Granit.DataExchange.Export;
 /// <remarks>
 /// <para>
 /// Only fields explicitly declared here are available for export — this acts as a
-/// security whitelist (Django <c>ExportResource</c> pattern).
+/// security whitelist.
 /// </para>
 /// <para>
 /// Navigation fields (<c>Field(e => e.Company, c => c.Name)</c>) use dot notation.
@@ -86,8 +86,7 @@ public sealed class ExportDefinitionBuilder<TEntity> where TEntity : class
     }
 
     /// <summary>
-    /// Includes the entity <c>Id</c> column in exports for roundtrip import compatibility
-    /// (Odoo <c>"I want to update data"</c> pattern).
+    /// Includes the entity <c>Id</c> column in exports for roundtrip import compatibility.
     /// </summary>
     public ExportDefinitionBuilder<TEntity> IncludeId()
     {

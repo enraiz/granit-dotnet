@@ -4,7 +4,7 @@ namespace Granit.Notifications.Domain;
 
 /// <summary>
 /// In-app notification stored in the user's inbox.
-/// The database is the source of truth; email/SMS/push are copies (Django lesson).
+/// The database is the source of truth; email/SMS/push are derivative copies.
 /// </summary>
 public sealed class UserNotification : Entity, IMultiTenant
 {

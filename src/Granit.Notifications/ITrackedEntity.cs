@@ -2,7 +2,7 @@ namespace Granit.Notifications;
 
 /// <summary>
 /// Marker interface for entities whose property changes should automatically
-/// generate notifications to followers (Odoo-style chatter).
+/// generate notifications to followers.
 /// </summary>
 public interface ITrackedEntity
 {

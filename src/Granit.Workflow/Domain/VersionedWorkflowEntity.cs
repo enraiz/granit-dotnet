@@ -4,7 +4,7 @@ namespace Granit.Workflow.Domain;
 
 /// <summary>
 /// Base class for entities combining versioned history with a workflow lifecycle.
-/// This is the "Case 3" entity: versioning + workflow (Odoo-style documents).
+/// This is the "Case 3" entity: versioning + workflow for document-like entities.
 /// </summary>
 /// <remarks>
 /// <para>

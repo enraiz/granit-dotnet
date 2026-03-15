@@ -7,7 +7,7 @@ namespace Granit.DataExchange.Import.Identity;
 /// <remarks>
 /// Three concrete strategies are provided in <c>Granit.DataExchange.EntityFrameworkCore</c>:
 /// <list type="bullet">
-///   <item><b>ExternalIdResolver</b>: uses a dedicated external ID mapping table (Odoo <c>__export__</c> pattern).</item>
+///   <item><b>ExternalIdResolver</b>: uses a dedicated external ID mapping table for stable cross-system references.</item>
 ///   <item><b>BusinessKeyResolver</b>: uses business key properties declared in <c>ImportDefinition&lt;T&gt;</c>.</item>
 ///   <item><b>CompositeKeyResolver</b>: uses multiple properties combined as a composite key.</item>
 /// </list>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Granit.Timeline</PackageId>
-    <Description>Unified activity stream engine for Granit (Odoo Chatter-inspired). Aggregates comments, internal notes, and system logs per entity. Opt-in via ITimelined marker interface, with graceful degradation when Notifications or BlobStorage are absent.</Description>
+    <Description>Unified activity stream engine for Granit. Aggregates comments, internal notes, and system logs per entity. Opt-in via ITimelined marker interface, with graceful degradation when Notifications or BlobStorage are absent.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>

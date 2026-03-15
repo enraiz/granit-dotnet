@@ -80,7 +80,7 @@ public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
     }
 
     /// <summary>
-    /// Declares a filter group with named presets (Odoo-style).
+    /// Declares a filter group with named presets.
     /// Presets within a group use OR semantics; groups are combined with AND.
     /// </summary>
     /// <param name="name">Unique name of the filter group.</param>
@@ -187,7 +187,7 @@ public sealed class QueryDefinitionBuilder<TEntity> where TEntity : class
     }
 
     /// <summary>
-    /// Declares an independent toggleable filter (Odoo-style quick filter).
+    /// Declares an independent toggleable filter (quick filter).
     /// Unlike filter group presets which are mutually exclusive (OR within a group),
     /// quick filters are independently activatable and combine with AND semantics.
     /// </summary>

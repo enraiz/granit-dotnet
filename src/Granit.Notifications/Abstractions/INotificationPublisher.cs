@@ -17,7 +17,7 @@ public interface INotificationPublisher
         CancellationToken cancellationToken = default) where TData : notnull;
 
     /// <summary>
-    /// Publishes a notification to explicit recipients with a related entity reference (Odoo-style).
+    /// Publishes a notification to explicit recipients with a related entity reference.
     /// </summary>
     ValueTask PublishAsync<TData>(
         NotificationType<TData> notificationType,
@@ -35,7 +35,7 @@ public interface INotificationPublisher
         CancellationToken cancellationToken = default) where TData : notnull;
 
     /// <summary>
-    /// Publishes a notification to all followers of the given entity (Odoo-style).
+    /// Publishes a notification to all followers of the given entity.
     /// </summary>
     ValueTask PublishToEntityFollowersAsync<TData>(
         NotificationType<TData> notificationType,
