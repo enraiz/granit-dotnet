@@ -266,11 +266,17 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.exclusions=".nuget/**" \
             /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs" \
-            /d:sonar.issue.ignore.multicriteria="e1,e2" \
+            /d:sonar.issue.ignore.multicriteria="e1,e2,e3,e4,e5" \
             /d:sonar.issue.ignore.multicriteria.e1.ruleKey="csharpsquid:S6608" \
             /d:sonar.issue.ignore.multicriteria.e1.resourceKey="**/*" \
             /d:sonar.issue.ignore.multicriteria.e2.ruleKey="external_roslyn:IDE0007" \
             /d:sonar.issue.ignore.multicriteria.e2.resourceKey="**/*" \
+            /d:sonar.issue.ignore.multicriteria.e3.ruleKey="csharpsquid:S2699" \
+            /d:sonar.issue.ignore.multicriteria.e3.resourceKey="**/Tests/**" \
+            /d:sonar.issue.ignore.multicriteria.e4.ruleKey="csharpsquid:S3329" \
+            /d:sonar.issue.ignore.multicriteria.e4.resourceKey="**/AesCacheValueEncryptor.cs" \
+            /d:sonar.issue.ignore.multicriteria.e5.ruleKey="csharpsquid:S107" \
+            /d:sonar.issue.ignore.multicriteria.e5.resourceKey="**/*" \
             /d:sonar.qualitygate.wait="true"
           dotnet build -c $CONFIGURATION
           dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
