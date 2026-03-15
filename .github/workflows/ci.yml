@@ -342,8 +342,11 @@ jobs:
             echo "version=0.1.0-dev.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Build
+        run: dotnet build -c $CONFIGURATION
+
       - name: Pack
-        run: dotnet pack -c $CONFIGURATION -p:PackageVersion=${{ steps.version.outputs.version }} -o ./nupkgs
+        run: dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=${{ steps.version.outputs.version }} -o ./nupkgs
 
       - name: Upload packages
         uses: actions/upload-artifact@v7
@@ -412,7 +415,7 @@ jobs:
   # ---------------------------------------------------------------------------
   docs:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     permissions:
       pages: write
       id-token: write
