@@ -264,7 +264,7 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
-            /d:sonar.exclusions=".nuget/**" \
+            /d:sonar.exclusions=".nuget/**,docs-site/**" \
             /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs" \
             /d:sonar.issue.ignore.multicriteria="e1,e2,e3,e4" \
             /d:sonar.issue.ignore.multicriteria.e1.ruleKey="csharpsquid:S6608" \
@@ -342,8 +342,11 @@ jobs:
             echo "version=0.1.0-dev.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Build
+        run: dotnet build -c $CONFIGURATION
+
       - name: Pack
-        run: dotnet pack -c $CONFIGURATION -p:PackageVersion=${{ steps.version.outputs.version }} -o ./nupkgs
+        run: dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=${{ steps.version.outputs.version }} -o ./nupkgs
 
       - name: Upload packages
         uses: actions/upload-artifact@v7
@@ -408,17 +411,11 @@ jobs:
           --skip-duplicate
 
   # ---------------------------------------------------------------------------
-  # DOCS (Astro Starlight → GitHub Pages)
+  # DOCS (Astro Starlight → Cloudflare Pages)
   # ---------------------------------------------------------------------------
   docs:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v6
 
@@ -440,11 +437,9 @@ jobs:
         working-directory: docs-site
         run: pnpm astro build
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@da0e0235f40ea0de66c4e1e8e25a0fdd569c0a54 # v3
         with:
-          path: docs-site/dist
-
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy docs-site/dist --project-name=granit-docs --branch=${{ github.ref_name }}
