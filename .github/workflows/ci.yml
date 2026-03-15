@@ -34,9 +34,9 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # BUILD + QUALITY (single job — avoids 750 MB artifact transfer)
+  # BUILD + TEST (single job — avoids 750 MB artifact transfer)
   # ---------------------------------------------------------------------------
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -211,7 +211,7 @@ jobs:
   # ANALYSIS
   # ---------------------------------------------------------------------------
   sonarcloud:
-    needs: build
+    needs: build-and-test
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     continue-on-error: true
@@ -315,7 +315,7 @@ jobs:
   # PACK
   # ---------------------------------------------------------------------------
   pack:
-    needs: build
+    needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     steps:
