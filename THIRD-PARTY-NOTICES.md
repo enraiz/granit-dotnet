@@ -154,7 +154,7 @@ de santé ne transite par l'infrastructure AWS.
 ### AWSSDK.SimpleEmailV2
 
 Ce SDK fournit un canal d'envoi d'emails via Amazon SES. Il est utilisé par le
-package `Granit.Notifications.Email.Ses` comme alternative au canal SMTP.
+package `Granit.Notifications.Email.AwsSes` comme alternative au canal SMTP.
 
 ### AWSSDK.CognitoIdentityProvider
 

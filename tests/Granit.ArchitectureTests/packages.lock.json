@@ -1735,18 +1735,18 @@
           "Granit.Notifications": "[0.1.0-dev, )"
         }
       },
+      "granit.notifications.email.awsses": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.SimpleEmailV2": "[4.*, )",
+          "Granit.Notifications.Email": "[0.1.0-dev, )"
+        }
+      },
       "granit.notifications.email.azurecommunicationservices": {
         "type": "Project",
         "dependencies": {
           "Azure.Communication.Email": "[1.*, )",
           "Azure.Identity": "[1.*, )",
-          "Granit.Notifications.Email": "[0.1.0-dev, )"
-        }
-      },
-      "granit.notifications.email.ses": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.SimpleEmailV2": "[4.*, )",
           "Granit.Notifications.Email": "[0.1.0-dev, )"
         }
       },
@@ -1783,6 +1783,13 @@
           "Granit.Notifications": "[0.1.0-dev, )"
         }
       },
+      "granit.notifications.mobilepush.awssns": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.SimpleNotificationService": "[4.*, )",
+          "Granit.Notifications.MobilePush": "[0.1.0-dev, )"
+        }
+      },
       "granit.notifications.mobilepush.azurenotificationhubs": {
         "type": "Project",
         "dependencies": {
@@ -1790,18 +1797,11 @@
           "Microsoft.Azure.NotificationHubs": "[4.*, )"
         }
       },
-      "granit.notifications.mobilepush.fcm": {
+      "granit.notifications.mobilepush.googlefcm": {
         "type": "Project",
         "dependencies": {
           "Granit.Notifications.MobilePush": "[0.1.0-dev, )",
           "Microsoft.Extensions.Http.Resilience": "[10.*, )"
-        }
-      },
-      "granit.notifications.mobilepush.sns": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.SimpleNotificationService": "[4.*, )",
-          "Granit.Notifications.MobilePush": "[0.1.0-dev, )"
         }
       },
       "granit.notifications.signalr": {
@@ -1817,18 +1817,18 @@
           "Granit.Notifications": "[0.1.0-dev, )"
         }
       },
+      "granit.notifications.sms.awssns": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.SimpleNotificationService": "[4.*, )",
+          "Granit.Notifications.Sms": "[0.1.0-dev, )"
+        }
+      },
       "granit.notifications.sms.azurecommunicationservices": {
         "type": "Project",
         "dependencies": {
           "Azure.Communication.Sms": "[1.*, )",
           "Azure.Identity": "[1.*, )",
-          "Granit.Notifications.Sms": "[0.1.0-dev, )"
-        }
-      },
-      "granit.notifications.sms.sns": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.SimpleNotificationService": "[4.*, )",
           "Granit.Notifications.Sms": "[0.1.0-dev, )"
         }
       },
