@@ -16,3 +16,4 @@ GRSEC004 | Security | Warning | DirectCookieAccessAnalyzer, IsEnabledByDefault=T
 GREF001 | EntityFramework | Warning | SynchronousSaveChangesAnalyzer, IsEnabledByDefault=True
 GRAPI001 | Api | Warning | UntypedResultsAnalyzer, IsEnabledByDefault=True
 GRAPI002 | Api | Warning | TypedResultsBadRequestAnalyzer, IsEnabledByDefault=True
+GRMOD001 | Architecture | Error | CrossModuleReferenceAnalyzer, IsEnabledByDefault=True
