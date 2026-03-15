@@ -61,7 +61,7 @@ public sealed class TwoPostgresContainersFixture : IAsyncLifetime
 
         if (!string.IsNullOrEmpty(ciHost))
         {
-            // CI mode: use the PostgreSQL service provided by GitLab CI.
+            // CI mode: use the PostgreSQL service container provided by CI.
             // Create two separate databases on the same server.
             string port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
             string user = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "granit_test";

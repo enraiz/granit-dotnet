@@ -1,9 +1,7 @@
 # =============================================================================
 # GitHub Actions CI/CD - Granit
 # =============================================================================
-# Pipeline: build → quality → security → analysis → pack → publish
-#
-# Mirrors the GitLab CI pipeline (.gitlab-ci.yml) — both run in parallel.
+# Pipeline: build → quality → security → analysis → pack → publish → deploy
 #
 # Required secrets:
 #   NUGET_API_KEY       — nuget.org API key (for publish on tag)
@@ -120,6 +118,9 @@ jobs:
         with:
           name: build-output
 
+      - name: Restore executable permissions (xUnit v3 out-of-process)
+        run: find tests -path '*/bin/Release/net10.0/*Tests' -type f ! -name '*.dll' ! -name '*.json' ! -name '*.pdb' -exec chmod +x {} +
+
       - name: Run tests
         run: >
           dotnet test -c $CONFIGURATION --no-build
@@ -168,6 +169,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
+
+      - name: Restore executable permissions (xUnit v3 out-of-process)
+        run: find tests -path '*/bin/Release/net10.0/*Tests' -type f ! -name '*.dll' ! -name '*.json' ! -name '*.pdb' -exec chmod +x {} +
 
       - name: Run architecture tests
         run: >
@@ -252,10 +256,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Gitleaks
+        run: |
+          GITLEAKS_VERSION=8.30.0
+          curl --proto '=https' -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+
+      - name: Gitleaks scan
+        run: gitleaks detect --source . --verbose --log-opts="--all"
 
   trivy:
     runs-on: ubuntu-latest
@@ -263,7 +271,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           scan-type: fs
           severity: HIGH,CRITICAL
@@ -352,6 +360,11 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.exclusions=".nuget/**" \
             /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs" \
+            /d:sonar.issue.ignore.multicriteria="e1,e2" \
+            /d:sonar.issue.ignore.multicriteria.e1.ruleKey="csharpsquid:S6608" \
+            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="**/*" \
+            /d:sonar.issue.ignore.multicriteria.e2.ruleKey="external_roslyn:IDE0007" \
+            /d:sonar.issue.ignore.multicriteria.e2.resourceKey="**/*" \
             /d:sonar.qualitygate.wait="true"
           dotnet build -c $CONFIGURATION
           dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"

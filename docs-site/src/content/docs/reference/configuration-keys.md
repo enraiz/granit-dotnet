@@ -626,7 +626,7 @@ Each entry in `Policies`:
 |---|---|---|---|
 | **Section** | -- | `Notifications:Email` | |
 | **Package** | -- | `Granit.Notifications.Email` | |
-| `Provider` | `string` | `"Smtp"` | Keyed service provider (`"Smtp"` or `"Brevo"`). |
+| `Provider` | `string` | `"Smtp"` | Keyed service provider (`"Smtp"`, `"Brevo"`, `"AzureCommunicationServices"`, `"Scaleway"`, `"SendGrid"`). |
 | `SenderAddress` | `string` | `""` | Default sender email. |
 | `SenderName` | `string` | `""` | Default sender display name. |
 
@@ -656,13 +656,52 @@ Each entry in `Policies`:
 | `BaseUrl` | `string` | `"https://api.brevo.com/v3"` | Brevo API base URL. |
 | `TimeoutSeconds` | `int` | `30` | HTTP request timeout. |
 
+### Scaleway TEM -- `ScalewayEmailOptions`
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| **Section** | -- | `Notifications:Email:Scaleway` | |
+| **Package** | -- | `Granit.Notifications.Email.Scaleway` | |
+| `SecretKey` | `string` | `""` | Scaleway API secret key (from Vault). |
+| `ProjectId` | `string` | `""` | Scaleway project ID. |
+| `DefaultSenderEmail` | `string` | `""` | Default sender email (must be verified in Scaleway TEM). |
+| `DefaultSenderName` | `string` | `""` | Default sender display name. |
+| `Region` | `string` | `"fr-par"` | Scaleway region. |
+| `BaseUrl` | `string` | `"https://api.scaleway.com"` | Scaleway API base URL. |
+| `TimeoutSeconds` | `int` | `30` | HTTP request timeout. |
+
+### SendGrid -- `SendGridEmailOptions`
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| **Section** | -- | `Notifications:Email:SendGrid` | |
+| **Package** | -- | `Granit.Notifications.Email.SendGrid` | |
+| `ApiKey` | `string` | `""` | SendGrid API key (from Vault). |
+| `DefaultSenderEmail` | `string` | `""` | Default sender email (must be verified in SendGrid). |
+| `DefaultSenderName` | `string` | `""` | Default sender display name. |
+| `SandboxMode` | `bool` | `false` | Enable SendGrid sandbox mode (no actual delivery). |
+| `TimeoutSeconds` | `int` | `30` | HTTP request timeout. |
+
+### Twilio -- `TwilioOptions`
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| **Section** | -- | `Notifications:Twilio` | |
+| **Package** | -- | `Granit.Notifications.Twilio` | |
+| `AccountSid` | `string` | `""` | Twilio Account SID. |
+| `AuthToken` | `string` | `""` | Twilio Auth Token (from Vault). |
+| `DefaultSmsFrom` | `string` | `""` | Default SMS sender number (E.164 format) or Messaging Service SID. |
+| `DefaultWhatsAppFrom` | `string` | `""` | Default WhatsApp sender (e.g. `whatsapp:+14155238886`). |
+| `MessagingServiceSid` | `string?` | `null` | Twilio Messaging Service SID (overrides `DefaultSmsFrom` when set). |
+| `TimeoutSeconds` | `int` | `30` | HTTP request timeout. |
+
 ### SMS channel -- `SmsChannelOptions`
 
 | Key | Type | Default | Description |
 |---|---|---|---|
 | **Section** | -- | `Notifications:Sms` | |
 | **Package** | -- | `Granit.Notifications.Sms` | |
-| `Provider` | `string` | `""` | Keyed service provider (e.g. `"Brevo"`). |
+| `Provider` | `string` | `""` | Keyed service provider (`"Brevo"`, `"AzureCommunicationServices"`, `"AwsSns"`, `"Twilio"`). |
 | `SenderId` | `string?` | `null` | Default sender ID. |
 
 ### WhatsApp channel -- `WhatsAppChannelOptions`
@@ -671,7 +710,7 @@ Each entry in `Policies`:
 |---|---|---|---|
 | **Section** | -- | `Notifications:WhatsApp` | |
 | **Package** | -- | `Granit.Notifications.WhatsApp` | |
-| `Provider` | `string` | `""` | Keyed service provider (e.g. `"Brevo"`). |
+| `Provider` | `string` | `""` | Keyed service provider (`"Brevo"`, `"Twilio"`). |
 
 ### Web Push (VAPID) -- `PushChannelOptions`
 
@@ -689,14 +728,14 @@ Each entry in `Policies`:
 |---|---|---|---|
 | **Section** | -- | `Notifications:MobilePush` | |
 | **Package** | -- | `Granit.Notifications.MobilePush` | |
-| `Provider` | `string` | `"Fcm"` | Keyed service provider. |
+| `Provider` | `string` | `"GoogleFcm"` | Keyed service provider. |
 
-### Firebase Cloud Messaging -- `FcmOptions`
+### Firebase Cloud Messaging -- `GoogleFcmOptions`
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| **Section** | -- | `Notifications:MobilePush:Fcm` | |
-| **Package** | -- | `Granit.Notifications.MobilePush.Fcm` | |
+| **Section** | -- | `Notifications:MobilePush:GoogleFcm` | |
+| **Package** | -- | `Granit.Notifications.MobilePush.GoogleFcm` | |
 | `ProjectId` | `string` | `""` | Firebase project ID. |
 | `ServiceAccountJson` | `string` | `""` | Service account JSON key (from Vault). |
 | `BaseAddress` | `string` | `"https://fcm.googleapis.com/"` | FCM API base address. |

@@ -14,7 +14,7 @@
     <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 
-  <!-- Version par défaut (écrasée en CI par -p:PackageVersion=0.1.0-dev.{CI_PIPELINE_IID}) -->
+  <!-- Version par défaut (écrasée en CI par -p:PackageVersion=0.1.0-dev.{run_number}) -->
   <PropertyGroup>
     <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
@@ -29,8 +29,8 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>dotnet;framework;modular;modular-monolith;vertical-slicing;efcore;wolverine;clean-architecture</PackageTags>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</RepositoryUrl>
-    <PackageProjectUrl>https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/granit-fx/granit-dotnet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/granit-fx/granit-dotnet</PackageProjectUrl>
     <Description>Granit - Rock-solid, production-ready modular framework for .NET. Built with Vertical Slicing and zero compromises on Developer Experience.</Description>
     <PackageIcon>granit-icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>

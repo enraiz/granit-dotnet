@@ -41,6 +41,11 @@ export default defineConfig({
           label: "GitHub",
           href: "https://github.com/granit-fx/granit-dotnet",
         },
+        {
+          icon: "discord",
+          label: "Discord",
+          href: "https://discord.gg/tZbD5neS",
+        },
       ],
       editLink: {
         baseUrl:
@@ -137,6 +142,10 @@ export default defineConfig({
                       {
                         label: "Dependency Graph",
                         link: "/reference/dependency-graph/",
+                      },
+                      {
+                        label: "Cloud Providers",
+                        link: "/reference/cloud-providers/",
                       },
                       {
                         label: "Provider Compatibility",

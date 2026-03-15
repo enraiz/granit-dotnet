@@ -3,7 +3,7 @@
 Architecture tests for the Granit framework using [ArchUnitNET](https://github.com/TngTech/ArchUnitNET).
 Validates layered architecture, module conventions, class design, DTO naming, and CQRS patterns.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://github.com/granit-fx/granit-dotnet) framework.
 
 ## Test categories
 
