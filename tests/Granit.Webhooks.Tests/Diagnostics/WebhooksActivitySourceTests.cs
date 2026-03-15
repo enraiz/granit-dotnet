@@ -39,12 +39,10 @@ public sealed class WebhooksActivitySourceTests : IDisposable
     public void StartActivity_returns_null_without_listener()
     {
         _listener.Dispose();
-        using var noopListener = new ActivityListener
-        {
-            ShouldListenTo = _ => false,
-        };
 
-        using Activity? activity = WebhooksActivitySource.Source.StartActivity("webhooks.test");
+        // Use a dedicated ActivitySource to avoid interference from parallel test listeners.
+        using var isolatedSource = new ActivitySource("Granit.Webhooks.Tests.Isolated");
+        using Activity? activity = isolatedSource.StartActivity("webhooks.test");
 
         activity.ShouldBeNull();
     }
