@@ -173,7 +173,7 @@ public sealed class CrossModuleReferenceCodeFixProvider : CodeFixProvider
         return document.WithSyntaxRoot(root!);
     }
 
-    private static string? GetUsingForNode(CompilationUnitSyntax compilationUnit, SyntaxNode node)
+    private static string? GetUsingForNode(CompilationUnitSyntax compilationUnit, SyntaxNode _)
     {
         // Try to find which using directive brought the type into scope.
         // Heuristic: look for a using that contains ".Modules." but not ".Contracts".

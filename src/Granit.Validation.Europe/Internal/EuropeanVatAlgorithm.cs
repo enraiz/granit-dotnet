@@ -85,7 +85,7 @@ internal static partial class EuropeanVatAlgorithm
             "FR" => FrenchVatAlgorithm.IsValid(normalized),
             "BE" => ValidateBelgianVat(normalized),
             "DE" => true, // DE USt-IdNr is 9 digits — regex-validated; no public check digit algo.
-            "NL" => ValidateDutchVat(normalized),
+            "NL" => true, // NL VAT: regex-validated (NL\d{9}B\d{2}); no public check digit algo.
             "ES" => ValidateSpanishVat(normalized),
             "IT" => PartitaIvaAlgorithm.IsValid(normalized[2..]),
             "LU" => ValidateLuxembourgVat(normalized),
@@ -106,12 +106,6 @@ internal static partial class EuropeanVatAlgorithm
 
         return BceAlgorithm.IsValid(digits);
     }
-
-    // Dutch VAT: NL + 9 digits + B + 2 digits. The 9 digits are not a BSN
-    // (different structure), so we validate format only beyond the regex.
-    // The "B" at position 12 distinguishes sub-entities.
-    private static bool ValidateDutchVat(string normalized) =>
-        true; // Regex already validated the format NL\d{9}B\d{2}.
 
     private static bool ValidateSpanishVat(string normalized)
     {
