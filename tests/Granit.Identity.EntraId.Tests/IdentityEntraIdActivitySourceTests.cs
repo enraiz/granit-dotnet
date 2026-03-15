@@ -92,9 +92,10 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
 
         await _provider.GetUserAsync("u1", TestContext.Current.CancellationToken);
 
-        Activity? activity = _activities.Find(a => a.OperationName == IdentityEntraIdActivitySource.GetUser);
+        Activity? activity = _activities.Find(a =>
+            a.OperationName == IdentityEntraIdActivitySource.GetUser
+            && a.GetTagItem("identity.user_id") is "u1");
         activity.ShouldNotBeNull();
-        activity.GetTagItem("identity.user_id").ShouldBe("u1");
     }
 
     [Fact]
@@ -118,9 +119,10 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
 
         await _provider.SetUserEnabledAsync("u1", true, TestContext.Current.CancellationToken);
 
-        Activity? activity = _activities.Find(a => a.OperationName == IdentityEntraIdActivitySource.SetUserEnabled);
+        Activity? activity = _activities.Find(a =>
+            a.OperationName == IdentityEntraIdActivitySource.SetUserEnabled
+            && a.GetTagItem("identity.user_id") is "u1");
         activity.ShouldNotBeNull();
-        activity.GetTagItem("identity.user_id").ShouldBe("u1");
     }
 
     [Fact]

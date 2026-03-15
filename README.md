@@ -10,6 +10,13 @@
   .NET 10 · C# 14 · EF Core 10 · CQRS · Vertical Slicing · Modular Architecture
 </p>
 
+<p align="center">
+  <a href="https://github.com/granit-fx/granit-dotnet/actions/workflows/ci.yml"><img src="https://github.com/granit-fx/granit-dotnet/actions/workflows/ci.yml/badge.svg?branch=develop" alt="CI"></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=granit-fx_granit-dotnet"><img src="https://sonarcloud.io/api/project_badges/measure?project=granit-fx_granit-dotnet&metric=alert_status" alt="Quality Gate Status"></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=granit-fx_granit-dotnet"><img src="https://sonarcloud.io/api/project_badges/measure?project=granit-fx_granit-dotnet&metric=coverage" alt="Coverage"></a>
+  <a href="https://github.com/granit-fx/granit-dotnet/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License"></a>
+</p>
+
 ---
 
 Granit is a rock-solid, production-ready modular framework for .NET and React.
