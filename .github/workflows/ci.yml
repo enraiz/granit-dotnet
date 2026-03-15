@@ -87,7 +87,7 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Download build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-output
 
@@ -114,7 +114,7 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Download build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-output
 
@@ -166,7 +166,7 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Download build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-output
 
@@ -340,7 +340,7 @@ jobs:
           key: sonar-${{ runner.os }}
 
       - name: Download coverage
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: coverage
 
@@ -389,7 +389,7 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Download build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-output
 
@@ -429,7 +429,7 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Download build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-output
 
@@ -470,7 +470,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Download packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: nupkgs
           path: nupkgs
@@ -495,7 +495,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Download packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: nupkgs
           path: nupkgs
