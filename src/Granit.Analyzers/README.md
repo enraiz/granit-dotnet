@@ -1,11 +1,18 @@
 # Granit.Analyzers
 
-Roslyn analyzers enforcing Granit conventions: zero-downtime migrations,
-security best practices, and Entity Framework Core usage rules.
+Roslyn analyzers enforcing Granit conventions: module boundaries,
+zero-downtime migrations, security best practices, Entity Framework Core
+usage rules, and Minimal API patterns.
 
 Part of the [granit](https://granit-fx.dev) framework.
 
 ## Rules
+
+### Architecture
+
+| Rule | Severity | CodeFix | Description |
+| ---- | -------- | ------- | ----------- |
+| GRMOD001 | Error | Yes | Cross-module reference to internal type — use Contracts |
 
 ### Migrations
 
@@ -23,12 +30,20 @@ Part of the [granit](https://granit-fx.dev) framework.
 | GRSEC001 | Warning | Yes | Avoid direct DateTime/DateTimeOffset clock access — use IClock |
 | GRSEC002 | Warning | Yes | Avoid Guid.NewGuid() — use IGuidGenerator |
 | GRSEC003 | Error | — | Potential hardcoded secret detected |
+| GRSEC004 | Warning | Yes | Avoid direct IResponseCookies access — use IGranitCookieManager |
 
 ### Entity Framework
 
 | Rule | Severity | CodeFix | Description |
 | ---- | -------- | ------- | ----------- |
 | GREF001 | Warning | Yes | Use SaveChangesAsync() instead of SaveChanges() |
+
+### API
+
+| Rule | Severity | CodeFix | Description |
+| ---- | -------- | ------- | ----------- |
+| GRAPI001 | Warning | Yes | Use TypedResults instead of Results for OpenAPI |
+| GRAPI002 | Warning | Yes | Use TypedResults.Problem() instead of BadRequest (RFC 7807) |
 
 ## Installation
 
