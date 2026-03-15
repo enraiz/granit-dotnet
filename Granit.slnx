@@ -74,6 +74,7 @@
     <Project Path="src/Granit.Notifications.Brevo/Granit.Notifications.Brevo.csproj" />
     <Project Path="src/Granit.Notifications.Email.AzureCommunicationServices/Granit.Notifications.Email.AzureCommunicationServices.csproj" />
     <Project Path="src/Granit.Notifications.Email.AwsSes/Granit.Notifications.Email.AwsSes.csproj" />
+    <Project Path="src/Granit.Notifications.Email.Scaleway/Granit.Notifications.Email.Scaleway.csproj" />
     <Project Path="src/Granit.Notifications.Email.SendGrid/Granit.Notifications.Email.SendGrid.csproj" />
     <Project Path="src/Granit.Notifications.Email.Smtp/Granit.Notifications.Email.Smtp.csproj" />
     <Project Path="src/Granit.Notifications.Email/Granit.Notifications.Email.csproj" />
@@ -221,6 +222,7 @@
     <Project Path="tests/Granit.Notifications.Brevo.Tests/Granit.Notifications.Brevo.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Email.AzureCommunicationServices.Tests/Granit.Notifications.Email.AzureCommunicationServices.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Email.AwsSes.Tests/Granit.Notifications.Email.AwsSes.Tests.csproj" />
+    <Project Path="tests/Granit.Notifications.Email.Scaleway.Tests/Granit.Notifications.Email.Scaleway.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Email.SendGrid.Tests/Granit.Notifications.Email.SendGrid.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Email.Smtp.Tests/Granit.Notifications.Email.Smtp.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Email.Tests/Granit.Notifications.Email.Tests.csproj" />

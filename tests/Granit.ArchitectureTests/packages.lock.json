@@ -1697,6 +1697,13 @@
           "Granit.Notifications.Email": "[0.1.0-dev, )"
         }
       },
+      "granit.notifications.email.scaleway": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Notifications.Email": "[0.1.0-dev, )",
+          "Microsoft.Extensions.Http.Resilience": "[10.*, )"
+        }
+      },
       "granit.notifications.email.sendgrid": {
         "type": "Project",
         "dependencies": {
