@@ -415,7 +415,7 @@ jobs:
   # ---------------------------------------------------------------------------
   docs:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/develop'
     permissions:
       pages: write
       id-token: write
