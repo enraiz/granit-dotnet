@@ -4,7 +4,7 @@ namespace Granit.Notifications.Domain;
 
 /// <summary>
 /// Notification subscription: either a topic subscription (EntityType/EntityId null)
-/// or an entity follower (Odoo-style).
+/// or an entity follower.
 /// </summary>
 public sealed class NotificationSubscription : CreationAuditedEntity, IMultiTenant
 {

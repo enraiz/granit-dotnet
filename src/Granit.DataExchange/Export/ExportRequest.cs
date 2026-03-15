@@ -10,8 +10,7 @@ namespace Granit.DataExchange.Export;
 /// <c>null</c> means all fields from the definition.
 /// </param>
 /// <param name="IncludeIdForImport">
-/// Whether to include the entity ID column for roundtrip import
-/// (Odoo <c>"I want to update data"</c> pattern).
+/// Whether to include the entity ID column for roundtrip import.
 /// </param>
 /// <param name="Sort">
 /// Comma-separated sort specification (e.g. <c>"-createdAt,lastName"</c>).

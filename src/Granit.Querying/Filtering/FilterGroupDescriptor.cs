@@ -1,7 +1,7 @@
 namespace Granit.Querying.Filtering;
 
 /// <summary>
-/// Immutable metadata about a filter group (Odoo-style preset group).
+/// Immutable metadata about a mutually exclusive filter preset group.
 /// Presets within a group use OR semantics; groups are combined with AND.
 /// </summary>
 public sealed class FilterGroupDescriptor

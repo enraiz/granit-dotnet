@@ -3,8 +3,8 @@ using Granit.Core.Domain;
 namespace Granit.Querying.SavedViews.Domain;
 
 /// <summary>
-/// Persistent saved view combining filters, sorting, grouping, and column visibility.
-/// Inspired by Odoo's <c>ir.filters</c> model.
+/// Persistent saved view combining filters, sorting, grouping, and column visibility
+/// (inspired by Odoo's <c>ir.filters</c> model).
 /// </summary>
 public sealed class SavedView : AuditedEntity
 {

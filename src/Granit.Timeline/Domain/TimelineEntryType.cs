@@ -2,7 +2,7 @@ namespace Granit.Timeline.Domain;
 
 /// <summary>
 /// Discriminator for <see cref="TimelineEntry"/>.
-/// Mirrors Odoo mail.message types: comment, system log, internal note.
+/// Classifies entries as comment, system log, or internal note.
 /// </summary>
 public enum TimelineEntryType
 {

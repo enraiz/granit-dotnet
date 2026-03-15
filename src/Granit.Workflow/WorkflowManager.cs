@@ -2,7 +2,7 @@ namespace Granit.Workflow;
 
 /// <summary>
 /// Default implementation of <see cref="IWorkflowManager{TState}"/>.
-/// Orchestrates transitions with permission checking and Odoo-style approval routing.
+/// Orchestrates transitions with permission checking and approval routing.
 /// </summary>
 /// <typeparam name="TState">Enum type representing the workflow states.</typeparam>
 public sealed class WorkflowManager<TState>(

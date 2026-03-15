@@ -1,7 +1,7 @@
 namespace Granit.Querying;
 
 /// <summary>
-/// Predefined date periods for date filter shortcuts (Odoo-style).
+/// Predefined date periods for date filter shortcuts.
 /// </summary>
 public enum DatePeriod
 {

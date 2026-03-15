@@ -15,10 +15,10 @@ public sealed record QueryMetadata
     /// <summary>Sortable field names.</summary>
     public required IReadOnlyList<SortableField> SortableFields { get; init; }
 
-    /// <summary>Preset filter groups (Odoo-style).</summary>
+    /// <summary>Preset filter groups with mutually exclusive options.</summary>
     public required IReadOnlyList<FilterGroupMeta> PresetFilterGroups { get; init; }
 
-    /// <summary>Independent toggleable filters (Odoo-style quick filters).</summary>
+    /// <summary>Independent toggleable quick filters.</summary>
     public required IReadOnlyList<QuickFilterMeta> QuickFilters { get; init; }
 
     /// <summary>Date filter shortcuts.</summary>

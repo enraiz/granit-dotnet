@@ -1,7 +1,7 @@
 # Granit.Notifications.Endpoints
 
 Minimal API REST endpoints for Granit.Notifications. Provides inbox (paginated notifications,
-unread count, mark as read), activity feed per entity (Odoo-style), user preferences,
+unread count, mark as read), per-entity activity feed, user preferences,
 subscription management, and entity follower management.
 
 Part of the [granit](https://granit-fx.dev) framework.

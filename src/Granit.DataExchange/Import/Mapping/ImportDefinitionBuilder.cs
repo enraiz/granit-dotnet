@@ -72,7 +72,7 @@ public sealed class ImportDefinitionBuilder<TEntity> where TEntity : class
     }
 
     /// <summary>
-    /// Enables External ID-based identity resolution (Odoo <c>__export__</c> pattern).
+    /// Enables external ID-based identity resolution using a dedicated mapping table.
     /// A dedicated mapping column is added for the external identifier.
     /// </summary>
     public ImportDefinitionBuilder<TEntity> HasExternalId()

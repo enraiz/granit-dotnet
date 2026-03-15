@@ -7,7 +7,7 @@ namespace Granit.Notifications.Internal;
 
 /// <summary>
 /// Built-in InApp channel: persists notifications in the user's inbox
-/// via <see cref="IUserNotificationWriter"/>. This is the "source of truth" (Django lesson).
+/// via <see cref="IUserNotificationWriter"/>. The database record is the source of truth.
 /// </summary>
 internal sealed class InAppNotificationChannel(
     IUserNotificationWriter userNotificationWriter,

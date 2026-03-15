@@ -1,6 +1,6 @@
 # Granit.Timeline
 
-Unified activity stream engine for Granit entities (inspired by Odoo Chatter).
+Unified activity stream engine for Granit entities.
 Aggregates comments, internal notes, and system logs per entity via `ITimelined`
 marker interface. Provides `ITimelineStore`, `ITimelineQuery`,
 `ITimelineFollowerService`, and `ITimelineNotifier` abstractions.

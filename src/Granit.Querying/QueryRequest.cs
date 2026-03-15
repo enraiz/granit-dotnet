@@ -57,7 +57,7 @@ public sealed record QueryRequest
 
     /// <summary>
     /// Active quick filter names. Quick filters are independent toggleable predicates
-    /// that combine with AND semantics (like Odoo's "My Appointments", "Unread" filters).
+    /// that combine with AND semantics (e.g. "My Appointments", "Unread").
     /// </summary>
     public IReadOnlyList<string>? QuickFilters { get; init; }
 

@@ -1,10 +1,20 @@
 ## Summary
 
-<!-- Describe what this PR does and why. -->
+<!-- Describe what this PR does and why. Link to the related issue if applicable. -->
+
+Closes #<!-- issue number -->
+
+## Type of change
+
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Breaking change (fix or feature that would break existing functionality)
+- [ ] Documentation only
+- [ ] Refactoring (no functional change)
 
 ## Changes
 
-- 
+-
 
 ## Checklist
 
@@ -14,4 +24,3 @@
 - [ ] Markdownlint passes on modified `.md` files
 - [ ] Documentation updated (if applicable)
 - [ ] No hardcoded secrets
-- [ ] CHANGELOG.md updated (if applicable)

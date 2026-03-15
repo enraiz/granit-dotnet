@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Routing;
 namespace Granit.DataExchange.Endpoints.Endpoints.Export;
 
 /// <summary>
-/// Export preset CRUD endpoints (Odoo export template pattern).
+/// CRUD endpoints for saved export configuration presets.
 /// </summary>
 internal static class ExportPresetEndpoints
 {

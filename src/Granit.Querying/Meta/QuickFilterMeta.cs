@@ -2,7 +2,7 @@ namespace Granit.Querying.Meta;
 
 /// <summary>
 /// Quick filter metadata for frontend auto-configuration.
-/// Quick filters are independent toggleable predicates (like Odoo's "My Appointments", "Unread").
+/// Quick filters are independent toggleable predicates (e.g. "My Appointments", "Unread").
 /// </summary>
 /// <param name="Name">Filter name (used in query string).</param>
 /// <param name="Label">User-facing label.</param>

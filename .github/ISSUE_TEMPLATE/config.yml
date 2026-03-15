@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/granit-fx/granit-dotnet/blob/develop/SECURITY.md
-    about: Please report security vulnerabilities via email, not public issues.
+    url: https://github.com/granit-fx/granit-dotnet/security/policy
+    about: Please report security vulnerabilities responsibly — not via public issues.
+  - name: Questions & Discussions
+    url: https://github.com/granit-fx/granit-dotnet/discussions
+    about: Ask questions, share ideas, or get help from the community.

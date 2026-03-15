@@ -12,8 +12,8 @@ namespace Granit.DataExchange.Export;
 /// The <see cref="Configure"/> method is called once at startup.
 /// </para>
 /// <para>
-/// Inspired by Django's <c>ExportResource</c> pattern: only fields explicitly
-/// declared in <see cref="Configure"/> are available for export (whitelist).
+/// Only fields explicitly declared in <see cref="Configure"/> are available
+/// for export (whitelist approach, inspired by Django's <c>ExportResource</c>).
 /// </para>
 /// <para>
 /// When <see cref="QueryDefinitionName"/> is set, the export pipeline delegates
