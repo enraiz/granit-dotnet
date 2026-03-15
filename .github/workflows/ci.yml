@@ -57,7 +57,7 @@ jobs:
         run: dotnet build -c $CONFIGURATION --no-restore -m:4 -p:SkipIntegrationTests=true
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-output
           path: |
@@ -132,7 +132,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: "**/TestResults/"
@@ -140,7 +140,7 @@ jobs:
 
       - name: Upload coverage
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: "**/coverage.opencover.xml"
@@ -181,7 +181,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: architecture-test-results
           path: "**/TestResults/"
@@ -240,7 +240,7 @@ jobs:
 
       - name: Upload integration test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: integration-test-results
           path: "**/TestResults/"
@@ -400,7 +400,7 @@ jobs:
 
       - name: Upload vulnerability report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vulnerability-report
           path: vulnerability-report.txt
@@ -446,7 +446,7 @@ jobs:
         run: dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=${{ steps.version.outputs.version }} -o ./nupkgs
 
       - name: Upload packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nupkgs
           path: nupkgs/
