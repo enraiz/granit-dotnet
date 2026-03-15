@@ -1,7 +1,10 @@
 # =============================================================================
 # GitHub Actions CI/CD - Granit
 # =============================================================================
-# Pipeline: build → quality → security → analysis → pack → publish → deploy
+# Pipeline: build+test → security → analysis → pack → publish → deploy
+#
+# Each job builds independently from NuGet cache (~10s restore).
+# No artifact sharing for bin/obj — avoids 750 MB upload/download overhead.
 #
 # Required secrets:
 #   NUGET_API_KEY       — nuget.org API key (for publish on tag)
@@ -31,71 +34,9 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # BUILD
+  # BUILD + QUALITY (single job — avoids 750 MB artifact transfer)
   # ---------------------------------------------------------------------------
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: NuGet cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
-          restore-keys: nuget-${{ runner.os }}-
-
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build -c $CONFIGURATION --no-restore -m:4 -p:SkipIntegrationTests=true
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: build-output
-          path: |
-            **/bin/
-            **/obj/
-          retention-days: 1
-
-  # ---------------------------------------------------------------------------
-  # QUALITY
-  # ---------------------------------------------------------------------------
-  format:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: NuGet cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
-          restore-keys: nuget-${{ runner.os }}-
-
-      - name: Download build
-        uses: actions/download-artifact@v8
-        with:
-          name: build-output
-
-      - name: Check formatting
-        run: dotnet format --verify-no-changes --no-restore
-
-  test:
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -113,15 +54,13 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
           restore-keys: nuget-${{ runner.os }}-
 
-      - name: Download build
-        uses: actions/download-artifact@v8
-        with:
-          name: build-output
+      - name: Build
+        run: dotnet build -c $CONFIGURATION -m:4 -p:SkipIntegrationTests=true
 
-      - name: Restore executable permissions (xUnit v3 out-of-process)
-        run: find tests -path '*/bin/Release/net10.0/*Tests' -type f ! -name '*.dll' ! -name '*.json' ! -name '*.pdb' -exec chmod +x {} +
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
 
-      - name: Run tests
+      - name: Run unit tests
         run: >
           dotnet test -c $CONFIGURATION --no-build
           -p:SkipIntegrationTests=true -p:SkipArchitectureTests=true
@@ -129,6 +68,12 @@ jobs:
           --collect:"XPlat Code Coverage"
           -- RunConfiguration.MaxCpuCount=4
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover,cobertura
+
+      - name: Run architecture tests
+        run: >
+          dotnet test tests/Granit.ArchitectureTests/Granit.ArchitectureTests.csproj
+          -c $CONFIGURATION --no-build
+          --logger "trx;LogFilePath=TestResults/results.trx"
 
       - name: Upload test results
         if: always()
@@ -146,49 +91,10 @@ jobs:
           path: "**/coverage.opencover.xml"
           retention-days: 7
 
-  architecture-test:
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: NuGet cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
-          restore-keys: nuget-${{ runner.os }}-
-
-      - name: Download build
-        uses: actions/download-artifact@v8
-        with:
-          name: build-output
-
-      - name: Restore executable permissions (xUnit v3 out-of-process)
-        run: find tests -path '*/bin/Release/net10.0/*Tests' -type f ! -name '*.dll' ! -name '*.json' ! -name '*.pdb' -exec chmod +x {} +
-
-      - name: Run architecture tests
-        run: >
-          dotnet test tests/Granit.ArchitectureTests/Granit.ArchitectureTests.csproj
-          -c $CONFIGURATION --no-build
-          --logger "trx;LogFilePath=TestResults/results.trx"
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: architecture-test-results
-          path: "**/TestResults/"
-          retention-days: 7
-
+  # ---------------------------------------------------------------------------
+  # INTEGRATION TESTS (needs Docker service container)
+  # ---------------------------------------------------------------------------
   integration-test:
-    needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     services:
@@ -247,7 +153,7 @@ jobs:
           retention-days: 7
 
   # ---------------------------------------------------------------------------
-  # SECURITY
+  # SECURITY (parallel, no build needed except CodeQL)
   # ---------------------------------------------------------------------------
   secret-detection:
     runs-on: ubuntu-latest
@@ -305,7 +211,7 @@ jobs:
   # ANALYSIS
   # ---------------------------------------------------------------------------
   sonarcloud:
-    needs: [build, test]
+    needs: build
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     continue-on-error: true
@@ -370,7 +276,6 @@ jobs:
           dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
   audit:
-    needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -388,13 +293,9 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
           restore-keys: nuget-${{ runner.os }}-
 
-      - name: Download build
-        uses: actions/download-artifact@v8
-        with:
-          name: build-output
-
       - name: Check vulnerable packages
         run: |
+          dotnet restore
           dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
           ! grep -q "has the following vulnerable packages" vulnerability-report.txt
 
@@ -410,7 +311,7 @@ jobs:
   # PACK
   # ---------------------------------------------------------------------------
   pack:
-    needs: [format, test]
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     steps:
@@ -428,11 +329,6 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
           restore-keys: nuget-${{ runner.os }}-
 
-      - name: Download build
-        uses: actions/download-artifact@v8
-        with:
-          name: build-output
-
       - name: Determine version
         id: version
         run: |
@@ -443,7 +339,7 @@ jobs:
           fi
 
       - name: Pack
-        run: dotnet pack -c $CONFIGURATION --no-build -p:PackageVersion=${{ steps.version.outputs.version }} -o ./nupkgs
+        run: dotnet pack -c $CONFIGURATION -p:PackageVersion=${{ steps.version.outputs.version }} -o ./nupkgs
 
       - name: Upload packages
         uses: actions/upload-artifact@v7
