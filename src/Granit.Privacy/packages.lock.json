@@ -10,9 +10,9 @@
       },
       "WolverineFx": {
         "type": "Direct",
-        "requested": "[5.18.*, )",
-        "resolved": "5.18.2",
-        "contentHash": "ID3GXymFnsWbwYrKa4i2HZMmAMslHrc6KX+AgK4WfKCFHQmHvOKzVSPu5xxkjB3a2Wq/kjwfiH23SQ9UTrT30A==",
+        "requested": "[5.19.*, )",
+        "resolved": "5.19.1",
+        "contentHash": "WshQCeeUjEHdCFZqlqfI5M1tU+FtrGYeAbTnOQBITeQtFwEykcZtAF+4bEWRhOg1xZla3rJdlhJAPJkbJcQINg==",
         "dependencies": {
           "JasperFx": "1.21.0",
           "JasperFx.Events": "1.23.1",

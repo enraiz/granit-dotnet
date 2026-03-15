@@ -52,12 +52,12 @@
       },
       "PuppeteerSharp": {
         "type": "Direct",
-        "requested": "[21.*, )",
-        "resolved": "21.1.1",
-        "contentHash": "rxrvYdKgQbO7Kxh4/xChw5LBv32HzKSxPvkEvtAfkHYGBkCikK+989xDVPCZJ+XPexuwkKSKPACrxMQGEQxUPQ==",
+        "requested": "[24.*, )",
+        "resolved": "24.39.0",
+        "contentHash": "T0Y6LiBa/c7Yk0O5i1A7FG0rSzgyJjGXtkGMCLwR9L7dZaXOjHj3/nq43KSlyzu98+loSKtVbFAnDpOM/Tc+zQ==",
         "dependencies": {
           "Microsoft.Extensions.Logging": "10.0.0",
-          "WebDriverBiDi": "0.0.43"
+          "WebDriverBiDi": "0.0.45"
         }
       },
       "Microsoft.Extensions.Configuration": {
@@ -119,8 +119,8 @@
       },
       "WebDriverBiDi": {
         "type": "Transitive",
-        "resolved": "0.0.43",
-        "contentHash": "QTVa7xGoCwn1NpxDdWgcfFdOCfcStwfSLb6Ueb5IZmyyPnJldrYs1n+Nl4h2wBQto0lGPgWl6o1FXtUMlH26Cg=="
+        "resolved": "0.0.45",
+        "contentHash": "lMQhMh32mqZCIBOkEP5DX+vtuoImuyKEAotqw33OuTZUgFFUFl+tEVPZ8fTIhsTCAXp5Nbhy2d3FeVxHYLehFw=="
       },
       "granit.core": {
         "type": "Project"
