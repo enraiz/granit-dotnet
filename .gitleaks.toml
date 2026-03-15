@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+  description = "Global allowlist for false positives"
+
+  paths = [
+    '''tests/.*Tests.*\.cs$''',
+    '''src/Granit\.Analyzers/AnalyzerReleases\.Unshipped\.md$''',
+  ]
