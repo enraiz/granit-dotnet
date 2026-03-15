@@ -14,7 +14,7 @@
     <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 
-  <!-- Version par défaut (écrasée en CI par -p:PackageVersion=0.1.0-dev.{CI_PIPELINE_IID}) -->
+  <!-- Version par défaut (écrasée en CI par -p:PackageVersion=0.1.0-dev.{run_number}) -->
   <PropertyGroup>
     <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>

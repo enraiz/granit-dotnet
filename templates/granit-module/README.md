@@ -2,7 +2,7 @@
 
 Granit module for MyModule.
 
-Part of the [granit](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet) framework.
+Part of the [granit](https://github.com/granit-fx/granit-dotnet) framework.
 
 ## Installation
 
@@ -12,4 +12,4 @@ dotnet add package Granit.MyModule
 
 ## Documentation
 
-See the [full documentation](https://gitlab.digitaldynamics.be/digital-dynamics/granit-dotnet).
+See the [full documentation](https://github.com/granit-fx/granit-dotnet).

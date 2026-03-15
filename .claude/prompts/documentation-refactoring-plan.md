@@ -284,20 +284,20 @@ Additionally, the plan must include:
   - Customization and theming (branding, dark mode, custom components)
   - Build performance at scale (150+ Markdown files)
   - Community and ecosystem maturity
-  - Hosting simplicity (GitLab Pages, Netlify, Vercel, self-hosted)
+  - Hosting simplicity (GitHub Pages, Netlify, Vercel, self-hosted)
   - i18n support (future-proofing — English first, French possible later)
   The recommendation must include a comparison table and a clear winner with rationale.
 - **Site structure requirements**: the chosen tool must support:
   - Sidebar auto-generation from directory structure OR explicit sidebar config
   - Breadcrumb navigation
-  - "Edit this page" links pointing to the GitLab repository
+  - "Edit this page" links pointing to the GitHub repository
   - OpenGraph / SEO metadata per page
   - Custom admonition blocks for "Pro tip", "Good to know", "Warning" callouts
   - Code blocks with syntax highlighting, line numbers, and title/filename labels
   - Mermaid diagram rendering (inline, no external service)
   - Tabs for multi-provider examples (PostgreSQL / SQL Server side by side)
 - **Validation checklist**: markdownlint, link checker, snippet compilation, build
-  in CI (the site must build without warnings in GitLab CI)
+  in CI (the site must build without warnings in GitHub Actions)
 - **Phased execution order**: which sections to tackle first for maximum impact
 - **Convention docs disposition**: which conventions are consumer-facing vs.
   contributor-only

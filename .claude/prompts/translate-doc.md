@@ -165,7 +165,7 @@ These terms are proper nouns or framework identifiers — keep them as-is:
 - **No emojis** in documentation content
 - **Show, don't tell**: lead with code, follow with explanation
 - **One intent per page**: concept, how-to, reference, or operation
-- **File format**: use `.md` by default (readable in GitLab). Use `.mdx` only for
+- **File format**: use `.md` by default (readable in GitHub). Use `.mdx` only for
   pages that need Starlight components (`<Tabs>`, `<Steps>`, `<FileTree>`, `<Badge>`,
   `<Card>`, `<LinkCard>`, `<LinkButton>`). Typical `.mdx` pages: `reference/modules/*`,
   `getting-started/*`, `guides/*`, `index.mdx` (landing).

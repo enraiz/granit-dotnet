@@ -6,7 +6,7 @@
 - **Repo**: `granit-dotnet` (company-level, not product-specific)
 - **License**: Apache-2.0 (open-source)
 - **Compliance**: GDPR + ISO 27001
-- **Publication**: nuget.org (planned), GitLab Package Registry (internal)
+- **Publication**: nuget.org (planned), GitHub Packages (internal)
 
 ## Stack & versions
 
@@ -185,7 +185,7 @@ edge case, GDPR/ISO 27001 constraint, third-party workaround.
 
 1. Read the entire file, not just the targeted function
 2. Check `git log -p -- <file>` to understand evolution
-3. If unclear, search for the linked GitLab issue before modifying
+3. If unclear, search for the linked GitHub issue before modifying
 4. When in doubt, **ask**
 
 **NEVER:**
