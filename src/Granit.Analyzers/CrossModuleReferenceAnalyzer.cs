@@ -194,18 +194,8 @@ public sealed class CrossModuleReferenceAnalyzer : DiagnosticAnalyzer
         return (moduleName, isContracts);
     }
 
-    private static bool HasModulesNamespace(INamespaceSymbol globalNamespace)
-    {
-        foreach (INamespaceSymbol member in globalNamespace.GetNamespaceMembers())
-        {
-            if (HasModulesNamespaceRecursive(member))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    private static bool HasModulesNamespace(INamespaceSymbol globalNamespace) =>
+        globalNamespace.GetNamespaceMembers().Any(HasModulesNamespaceRecursive);
 
     private static bool HasModulesNamespaceRecursive(INamespaceSymbol ns)
     {
@@ -214,12 +204,9 @@ public sealed class CrossModuleReferenceAnalyzer : DiagnosticAnalyzer
             return true;
         }
 
-        foreach (INamespaceSymbol child in ns.GetNamespaceMembers())
+        if (ns.GetNamespaceMembers().Any(HasModulesNamespaceRecursive))
         {
-            if (HasModulesNamespaceRecursive(child))
-            {
-                return true;
-            }
+            return true;
         }
 
         return false;

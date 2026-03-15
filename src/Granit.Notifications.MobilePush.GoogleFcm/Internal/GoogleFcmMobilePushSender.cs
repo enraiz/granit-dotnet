@@ -111,7 +111,7 @@ internal sealed partial class GoogleFcmMobilePushSender(
 }
 
 /// <summary>Thrown when a device token is no longer registered with FCM.</summary>
-internal sealed class FcmTokenUnregisteredException(string token)
+public sealed class FcmTokenUnregisteredException(string token)
     : Exception($"FCM token is unregistered: {token}");
 
 internal sealed record FcmPayload
