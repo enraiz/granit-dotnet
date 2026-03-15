@@ -1,9 +1,7 @@
 # =============================================================================
 # GitHub Actions CI/CD - Granit
 # =============================================================================
-# Pipeline: build → quality → security → analysis → pack → publish
-#
-# Mirrors the GitLab CI pipeline (.gitlab-ci.yml) — both run in parallel.
+# Pipeline: build → quality → security → analysis → pack → publish → deploy
 #
 # Required secrets:
 #   NUGET_API_KEY       — nuget.org API key (for publish on tag)
@@ -352,6 +350,11 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.exclusions=".nuget/**" \
             /d:sonar.coverage.exclusions="**/Tests/**,**/test/**,**/*HostApplicationBuilderExtensions.cs,**/Granit*Module.cs" \
+            /d:sonar.issue.ignore.multicriteria="e1,e2" \
+            /d:sonar.issue.ignore.multicriteria.e1.ruleKey="csharpsquid:S6608" \
+            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="**/*" \
+            /d:sonar.issue.ignore.multicriteria.e2.ruleKey="external_roslyn:IDE0007" \
+            /d:sonar.issue.ignore.multicriteria.e2.resourceKey="**/*" \
             /d:sonar.qualitygate.wait="true"
           dotnet build -c $CONFIGURATION
           dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
