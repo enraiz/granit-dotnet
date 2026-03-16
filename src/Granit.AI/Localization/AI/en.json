@@ -1,0 +1,10 @@
+{
+  "culture": "en",
+  "texts": {
+    "AI:Workspace:NotFound": "AI workspace '{0}' was not found.",
+    "AI:Provider:NotRegistered": "No AI provider is registered for '{0}'. Install the corresponding package.",
+    "AI:RateLimit:Exceeded": "AI rate limit exceeded for this workspace. Please try again later.",
+    "AI:Workspace:SystemImmutable": "System workspace '{0}' cannot be modified.",
+    "AI:Service:Unavailable": "The AI service is currently unavailable."
+  }
+}

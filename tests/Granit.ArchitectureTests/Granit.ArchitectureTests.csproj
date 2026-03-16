@@ -30,6 +30,7 @@
   <!-- Reference ALL src assemblies for architecture analysis
        (excludes Analyzers/CodeFixes/SourceGenerator which target netstandard2.0) -->
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Granit.AI\Granit.AI.csproj" />
     <ProjectReference Include="..\..\src\Granit.ApiDocumentation\Granit.ApiDocumentation.csproj" />
     <ProjectReference Include="..\..\src\Granit.ApiVersioning\Granit.ApiVersioning.csproj" />
     <ProjectReference Include="..\..\src\Granit.Authentication.ApiKeys\Granit.Authentication.ApiKeys.csproj" />
