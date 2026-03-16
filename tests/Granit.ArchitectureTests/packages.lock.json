@@ -1210,6 +1210,14 @@
           "Microsoft.Extensions.AI.OpenAI": "[10.*, )"
         }
       },
+      "granit.ai.entityframeworkcore": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.AI": "[0.1.0-dev, )",
+          "Granit.Persistence": "[0.1.0-dev, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
+        }
+      },
       "granit.ai.ollama": {
         "type": "Project",
         "dependencies": {

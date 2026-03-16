@@ -8,7 +8,7 @@ namespace Granit.AI.Ollama.Options;
 /// <remarks>
 /// <para>
 /// Ollama runs AI models locally — no API key is required. By default, the provider
-/// connects to <c>http://localhost:11434</c> and uses the <c>llama3.3</c> model.
+/// connects to <c>http://localhost:11434</c> and uses the <c>llama3.1</c> model.
 /// </para>
 /// <para>
 /// Override <see cref="Endpoint"/> to point to a remote Ollama instance (e.g. on a
@@ -30,9 +30,9 @@ public sealed class OllamaOptions
 
     /// <summary>
     /// The default model to use when an <see cref="AIWorkspace"/> does not specify a model.
-    /// Defaults to <c>llama3.3</c>.
+    /// Defaults to <c>llama3.1</c>.
     /// </summary>
-    public string DefaultModel { get; set; } = "llama3.3";
+    public string DefaultModel { get; set; } = "llama3.1";
 }
 
 /// <summary>
