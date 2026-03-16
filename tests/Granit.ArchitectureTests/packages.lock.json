@@ -824,6 +824,14 @@
           "Npgsql": "9.0.4"
         }
       },
+      "OpenAI": {
+        "type": "Transitive",
+        "resolved": "2.9.1",
+        "contentHash": "KPTFYEt1EhrPeIZXGBE+DlutFEpMo/RspqSdUJ3p6pMqsw3NeGJcIja/K0He1j9KyRq8ASfzBgp2biWbNUGnFA==",
+        "dependencies": {
+          "System.ClientModel": "1.9.0"
+        }
+      },
       "OpenTelemetry.Api.ProviderBuilderExtensions": {
         "type": "Transitive",
         "resolved": "1.15.0",
@@ -1177,6 +1185,52 @@
         "type": "Transitive",
         "resolved": "2.6.0",
         "contentHash": "XE8a+11nZg0LRaf+RGABEWaHIf8yGd5w8v/Ra1iWxMBmAVzwuKbW7G21mS0U7w7sh1lYcgckInWGgnz4qyET8A=="
+      },
+      "granit.ai": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Core": "[0.1.0-dev, )",
+          "Granit.Guids": "[0.1.0-dev, )",
+          "Microsoft.Extensions.AI.Abstractions": "[10.*, )"
+        }
+      },
+      "granit.ai.anthropic": {
+        "type": "Project",
+        "dependencies": {
+          "Anthropic": "[12.*, )",
+          "Granit.AI": "[0.1.0-dev, )"
+        }
+      },
+      "granit.ai.azureopenai": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.AI.OpenAI": "[2.*, )",
+          "Azure.Identity": "[1.*, )",
+          "Granit.AI": "[0.1.0-dev, )",
+          "Microsoft.Extensions.AI.OpenAI": "[10.*, )"
+        }
+      },
+      "granit.ai.entityframeworkcore": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.AI": "[0.1.0-dev, )",
+          "Granit.Persistence": "[0.1.0-dev, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.*, )"
+        }
+      },
+      "granit.ai.ollama": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.AI": "[0.1.0-dev, )",
+          "OllamaSharp": "[5.*, )"
+        }
+      },
+      "granit.ai.openai": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.AI": "[0.1.0-dev, )",
+          "Microsoft.Extensions.AI.OpenAI": "[10.*, )"
+        }
       },
       "granit.apidocumentation": {
         "type": "Project",
@@ -2210,6 +2264,15 @@
           "Granit.Workflow": "[0.1.0-dev, )"
         }
       },
+      "Anthropic": {
+        "type": "CentralTransitive",
+        "requested": "[12.*, )",
+        "resolved": "12.8.0",
+        "contentHash": "ruR9/PYqmhxY053VqwQCHuy7CMmY3t2Vh/xAyp9pdC8D0tsj6rn+asM+zrlmr5O9CUStpxP55QVvCNQnOVxggg==",
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "10.2.0"
+        }
+      },
       "Asp.Versioning.Mvc": {
         "type": "CentralTransitive",
         "requested": "[10.0.0-preview.*, )",
@@ -2280,6 +2343,16 @@
         "contentHash": "LBjXBRwjRFBzrA3b8CFFc2jzso+oxOZGncxJLpC0DKtAfXlIFg2b8S0ZANNmvcJsO77EFeMdvG0kNoW0X3/dKw==",
         "dependencies": {
           "AWSSDK.Core": "[4.0.3.17, 5.0.0)"
+        }
+      },
+      "Azure.AI.OpenAI": {
+        "type": "CentralTransitive",
+        "requested": "[2.*, )",
+        "resolved": "2.1.0",
+        "contentHash": "doixr3tcsIcdzbzF9NxKt+6U0NKj6aPeOCPYONPsWjyf3gxVndVJAdjPcVdqeR/3vcRHXRgGnGlv+iXx5jMA4g==",
+        "dependencies": {
+          "Azure.Core": "1.44.1",
+          "OpenAI": "2.1.0"
         }
       },
       "Azure.Communication.Email": {
@@ -2539,6 +2612,22 @@
           "Microsoft.EntityFrameworkCore.Relational": "10.0.5"
         }
       },
+      "Microsoft.Extensions.AI.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.4.0",
+        "contentHash": "t3S2H4do4YeNheIfE3GEl3MnKIrnxpbLu7a88spfApYR3in9ddhIq/GMtxgMaFjn/PUMTCFv5YH7Y6Q91dsDXQ=="
+      },
+      "Microsoft.Extensions.AI.OpenAI": {
+        "type": "CentralTransitive",
+        "requested": "[10.*, )",
+        "resolved": "10.4.0",
+        "contentHash": "7R1fyxwF8KtQi8k2ih3Y6dHZiUfnnmZIgXY7hQ+dFlPkVZoefgKAzdnnrFZzYOjXPeJxh3gqAQ4psXnp59wwqw==",
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "10.4.0",
+          "OpenAI": "2.9.1"
+        }
+      },
       "Microsoft.Extensions.Caching.Hybrid": {
         "type": "CentralTransitive",
         "requested": "[10.*, )",
@@ -2598,6 +2687,15 @@
           "Microsoft.EntityFrameworkCore": "[10.0.4, 11.0.0)",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.4, 11.0.0)",
           "Npgsql": "10.0.2"
+        }
+      },
+      "OllamaSharp": {
+        "type": "CentralTransitive",
+        "requested": "[5.*, )",
+        "resolved": "5.4.23",
+        "contentHash": "C3ZkMtENSgSXkpsHiW63fUMyPE0+4Kd9E1urakk/lQkFd2NQbBt15Cp7Wfsu+nQ4hOGSWAtzLCeIVEXFZK2iHQ==",
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "10.3.0"
         }
       },
       "OpenTelemetry": {
@@ -2672,8 +2770,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.8",
-        "contentHash": "Sp75IcOIZFMVawlpSiiHiyeWYJJVvbXKt1PcB9CcmjzJumofETWzOCMwfhKumbfBPLg/89sOBQUEfzKpXhAw6g=="
+        "resolved": "2.13.9",
+        "contentHash": "BeQpbWJbvnrM8mUCmMgB6ApbSQ4C+4PmiNvE2bfSsxfgmbfAUX4zIe2xFKlGwpOG5dCgqx/8RQwh53VJZRSypQ=="
       },
       "Scriban": {
         "type": "CentralTransitive",

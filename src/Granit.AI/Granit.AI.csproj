@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.AI</PackageId>
+    <Description>AI module for Granit. Provider-agnostic abstractions built on Microsoft.Extensions.AI: workspace management (named AI configurations per tenant), IChatClient/IEmbeddingGenerator factory, usage tracking, cost monitoring, and ISO 27001 audit trail.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Granit.AI.Tests" />
+    <InternalsVisibleTo Include="Granit.AI.Anthropic" />
+    <InternalsVisibleTo Include="Granit.AI.Anthropic.Tests" />
+    <InternalsVisibleTo Include="Granit.AI.AzureOpenAI" />
+    <InternalsVisibleTo Include="Granit.AI.AzureOpenAI.Tests" />
+    <InternalsVisibleTo Include="Granit.AI.EntityFrameworkCore" />
+    <InternalsVisibleTo Include="Granit.AI.EntityFrameworkCore.Tests" />
+    <InternalsVisibleTo Include="Granit.AI.Extraction" />
+    <InternalsVisibleTo Include="Granit.AI.Extraction.Tests" />
+    <InternalsVisibleTo Include="Granit.AI.Ollama" />
+    <InternalsVisibleTo Include="Granit.AI.Ollama.Tests" />
+    <InternalsVisibleTo Include="Granit.AI.OpenAI" />
+    <InternalsVisibleTo Include="Granit.AI.OpenAI.Tests" />
+    <InternalsVisibleTo Include="Granit.AI.VectorData" />
+    <InternalsVisibleTo Include="Granit.AI.VectorData.Tests" />
+    <!-- Required by NSubstitute (Castle.DynamicProxy) to mock internal interfaces in tests -->
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
+    <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
+    <!-- Optional at runtime: ICurrentTenant resolved via constructor injection (NullTenantContext when multi-tenancy is not installed) -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\**\*.json" />
+  </ItemGroup>
+
+</Project>

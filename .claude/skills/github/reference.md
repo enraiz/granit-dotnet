@@ -71,13 +71,32 @@ EOF
 )"
 ```
 
-## Issue linking
+## Sub-issues (parent-child hierarchy)
 
-GitHub does not have a native issue links API. Use description-based linking:
+```bash
+# Attach a child issue to a parent (sub-issue)
+CHILD_ID=$(gh api repos/$REPO/issues/{child_number} --jq .id)
+gh api repos/$REPO/issues/{parent_number}/sub_issues \
+  -X POST -F sub_issue_id="$CHILD_ID"
+
+# List sub-issues of a parent
+gh api repos/$REPO/issues/{parent_number}/sub_issues
+
+# Remove a sub-issue
+gh api repos/$REPO/issues/{parent_number}/sub_issues/{sub_issue_id} -X DELETE
+```
+
+**Important:** Use `-F` (not `-f`) for `sub_issue_id` — the API requires an integer.
+
+Also keep `#N` references in the parent description for readability.
+
+## Issue linking (description-based)
+
+For relationships that are not parent-child (e.g., "depends on", "related to"),
+use description references:
 
 ```bash
 # Add a reference in the parent issue description
-# Read current body, append the reference, update
 BODY=$(gh issue view {parent_number} -R "$REPO" --json body -q .body)
 gh issue edit {parent_number} -R "$REPO" --body "$(cat <<EOF
 $BODY

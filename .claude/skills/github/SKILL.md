@@ -29,21 +29,32 @@ Use `$REPO` in `gh -R "$REPO"` commands.
 
 Title rules: **no emoji**, prefix in brackets, concise.
 
-## Hierarchy (GitHub Free)
+**Language:** All GitHub issues (titles, descriptions, comments) must be written in
+**English** — the granit-dotnet and granit-front repos are open-source.
 
-No native sub-tasks. Hierarchy is managed by:
+## Hierarchy — Sub-issues API
 
-1. **`#N` references in the parent description** (dedicated section)
-2. **Cross-references in comments** when linking issues
+GitHub supports native sub-issues. Use the Sub-issues API to create parent-child
+relationships:
+
+```bash
+# Attach a child issue to a parent
+CHILD_ID=$(gh api repos/$REPO/issues/{child_number} --jq .id)
+gh api repos/$REPO/issues/{parent_number}/sub_issues -X POST -F sub_issue_id="$CHILD_ID"
+
+# List sub-issues of a parent
+gh api repos/$REPO/issues/{parent_number}/sub_issues
+```
 
 ```text
 Epic
- └── Feature (reference in ## Features)
-      └── Story (reference in ## User Stories)
+ └── Feature (sub-issue of Epic)
+      └── Story (sub-issue of Feature)
 ```
 
-GitHub does not have a native `relates_to` link API like GitLab. Use description
-references (`#N`) and comments to establish relationships.
+**Always use the sub-issues API** to establish hierarchy. Additionally, keep `#N`
+references in the parent description for readability (section `## Features` or
+`## User Stories`).
 
 ## Understand before acting
 
@@ -104,11 +115,11 @@ Two persona registries:
 
 NEVER invent a new persona.
 
-**Infra/governance personas:** SRE, Ingenieur DevOps, Developpeur, Architecte, DBA,
+**Infra/governance personas:** SRE, Ingénieur DevOps, Développeur, Architecte, DBA,
 RSSI, DPO, CTO, Direction, Directeur juridique, Auditeur interne, Auditeur externe,
-Utilisateur, Professionnel de sante, Product Owner
+Utilisateur, Product Owner
 
-**Application personas:** Visiteur, Utilisateur authentifie, Administrateur d'application,
+**Application personas:** Visiteur, Utilisateur authentifié, Administrateur d'application,
 Approbateur, Gestionnaire de contenu
 
 NEVER use hybrid roles ("slash roles" like `SRE / DevOps`).

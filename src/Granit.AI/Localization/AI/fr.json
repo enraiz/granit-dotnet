@@ -1,0 +1,10 @@
+{
+  "culture": "fr",
+  "texts": {
+    "AI:Workspace:NotFound": "L'espace de travail IA « {0} » est introuvable.",
+    "AI:Provider:NotRegistered": "Aucun fournisseur IA n'est enregistré pour « {0} ». Installez le package correspondant.",
+    "AI:RateLimit:Exceeded": "Le quota d'appels IA est dépassé pour cet espace de travail. Veuillez réessayer plus tard.",
+    "AI:Workspace:SystemImmutable": "L'espace de travail système « {0} » ne peut pas être modifié.",
+    "AI:Service:Unavailable": "Le service IA est actuellement indisponible."
+  }
+}

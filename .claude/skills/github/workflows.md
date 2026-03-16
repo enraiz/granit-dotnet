@@ -75,9 +75,15 @@ gh pr create -R "$REPO" \
    )"
    ```
 
-3. Update the Feature description (section `## User Stories`):
+3. Attach as sub-issue of the parent Feature **and** update the description:
 
    ```bash
+   # Attach via sub-issues API
+   STORY_ID=$(gh api repos/$REPO/issues/{story_number} --jq .id)
+   gh api repos/$REPO/issues/{feature_number}/sub_issues \
+     -X POST -F sub_issue_id="$STORY_ID"
+
+   # Also update the Feature description for readability
    BODY=$(gh issue view {feature_number} -R "$REPO" --json body -q .body)
    gh issue edit {feature_number} -R "$REPO" --body "$(cat <<EOF
    $BODY
@@ -138,7 +144,15 @@ gh pr create -R "$REPO" \
    ```
 
 3. Create each Story (see workflow above).
-4. Update the Epic description (section `## Features`) with the Feature reference.
+4. Attach the Feature as sub-issue of the Epic:
+
+   ```bash
+   FEATURE_ID=$(gh api repos/$REPO/issues/{feature_number} --jq .id)
+   gh api repos/$REPO/issues/{epic_number}/sub_issues \
+     -X POST -F sub_issue_id="$FEATURE_ID"
+   ```
+
+5. Update the Epic description (section `## Features`) with the Feature reference.
 
 ## Create an Epic
 
