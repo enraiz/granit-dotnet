@@ -12,10 +12,11 @@
     <PackageReference Include="Shouldly" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Granit.AI.Anthropic\Granit.AI.Anthropic.csproj" />
+    <ProjectReference Include="..\..\src\Granit.Encryption.ReEncryption\Granit.Encryption.ReEncryption.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,7 +8,7 @@
     <Project Path="src/Granit.Analyzers.CodeFixes/Granit.Analyzers.CodeFixes.csproj" />
     <Project Path="src/Granit.Analyzers/Granit.Analyzers.csproj" />
     <Project Path="src/Granit.AI/Granit.AI.csproj" />
-    <Project Path="src/Granit.AI.Anthropic/Granit.AI.Anthropic.csproj" />
+
     <Project Path="src/Granit.AI.AzureOpenAI/Granit.AI.AzureOpenAI.csproj" />
     <Project Path="src/Granit.AI.EntityFrameworkCore/Granit.AI.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.AI.Extraction/Granit.AI.Extraction.csproj" />
@@ -63,6 +63,8 @@
     <Project Path="src/Granit.DocumentGeneration.Pdf/Granit.DocumentGeneration.Pdf.csproj" />
     <Project Path="src/Granit.DocumentGeneration/Granit.DocumentGeneration.csproj" />
     <Project Path="src/Granit.Encryption/Granit.Encryption.csproj" />
+    <Project Path="src/Granit.Encryption.EntityFrameworkCore/Granit.Encryption.EntityFrameworkCore.csproj" />
+    <Project Path="src/Granit.Encryption.ReEncryption/Granit.Encryption.ReEncryption.csproj" />
     <Project Path="src/Granit.ExceptionHandling/Granit.ExceptionHandling.csproj" />
     <Project Path="src/Granit.Features.EntityFrameworkCore/Granit.Features.EntityFrameworkCore.csproj" />
     <Project Path="src/Granit.Features/Granit.Features.csproj" />
@@ -177,7 +179,7 @@
     <Project Path="tests/Granit.ArchitectureTests.Abstractions/Granit.ArchitectureTests.Abstractions.csproj" />
     <Project Path="tests/Granit.ArchitectureTests/Granit.ArchitectureTests.csproj" />
     <Project Path="tests/Granit.AI.Tests/Granit.AI.Tests.csproj" />
-    <Project Path="tests/Granit.AI.Anthropic.Tests/Granit.AI.Anthropic.Tests.csproj" />
+
     <Project Path="tests/Granit.AI.AzureOpenAI.Tests/Granit.AI.AzureOpenAI.Tests.csproj" />
     <Project Path="tests/Granit.AI.EntityFrameworkCore.Tests/Granit.AI.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.AI.Extraction.Tests/Granit.AI.Extraction.Tests.csproj" />
@@ -232,6 +234,8 @@
     <Project Path="tests/Granit.DocumentGeneration.Pdf.Tests/Granit.DocumentGeneration.Pdf.Tests.csproj" />
     <Project Path="tests/Granit.DocumentGeneration.Tests/Granit.DocumentGeneration.Tests.csproj" />
     <Project Path="tests/Granit.Encryption.Tests/Granit.Encryption.Tests.csproj" />
+    <Project Path="tests/Granit.Encryption.EntityFrameworkCore.Tests/Granit.Encryption.EntityFrameworkCore.Tests.csproj" />
+    <Project Path="tests/Granit.Encryption.ReEncryption.Tests/Granit.Encryption.ReEncryption.Tests.csproj" />
     <Project Path="tests/Granit.ExceptionHandling.Tests/Granit.ExceptionHandling.Tests.csproj" />
     <Project Path="tests/Granit.Features.EntityFrameworkCore.Tests/Granit.Features.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.Features.Tests/Granit.Features.Tests.csproj" />
