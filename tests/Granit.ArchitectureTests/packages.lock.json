@@ -2332,7 +2332,7 @@
         "type": "Project",
         "dependencies": {
           "Granit.Templating": "[0.1.0-dev, )",
-          "Scriban": "[6.*, )"
+          "Scriban": "[6.6.0, )"
         }
       },
       "granit.templating.workflow": {
@@ -3149,7 +3149,7 @@
       },
       "Scriban": {
         "type": "CentralTransitive",
-        "requested": "[6.*, )",
+        "requested": "[6.6.0, )",
         "resolved": "6.6.0",
         "contentHash": "rDzWFaCLsnFMRifEs9F95mCQ1f9thva2ckXlHZ6xzCJ5SFqsB1u1Y/ZtQlc0iySg+H7HOR75J7ya2X4RmJvOFw=="
       },
