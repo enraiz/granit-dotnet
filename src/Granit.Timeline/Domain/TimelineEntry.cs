@@ -112,14 +112,14 @@ public sealed class TimelineEntry : CreationAuditedAggregateRoot, ISoftDeletable
     }
 
     /// <summary>
-    /// Raises a <see cref="TimelineEntryPosted"/> domain event.
+    /// Raises a <see cref="TimelineEntryPostedEvent"/> domain event.
     /// Called by the store after the entry is fully initialized.
     /// </summary>
     internal void RaisePostedEvent() =>
-        AddDomainEvent(new TimelineEntryPosted(Id, EntityType, EntityId, EntryType, AuthorId));
+        AddDomainEvent(new TimelineEntryPostedEvent(Id, EntityType, EntityId, EntryType, AuthorId));
 
     /// <summary>
-    /// Marks this entry as soft-deleted and raises a <see cref="TimelineEntrySoftDeleted"/> domain event.
+    /// Marks this entry as soft-deleted and raises a <see cref="TimelineEntrySoftDeletedEvent"/> domain event.
     /// </summary>
     /// <exception cref="InvalidOperationException">When the entry is a <see cref="TimelineEntryType.SystemLog"/>.</exception>
     internal void SoftDelete(DateTimeOffset deletedAt, string? deletedBy)
@@ -132,6 +132,6 @@ public sealed class TimelineEntry : CreationAuditedAggregateRoot, ISoftDeletable
         IsDeleted = true;
         DeletedAt = deletedAt;
         DeletedBy = deletedBy;
-        AddDomainEvent(new TimelineEntrySoftDeleted(Id, EntityType, EntityId));
+        AddDomainEvent(new TimelineEntrySoftDeletedEvent(Id, EntityType, EntityId));
     }
 }
