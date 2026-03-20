@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-20T21:01:16.520707+00:00",
+  "generatedAt": "2026-03-20T21:25:08.925016+00:00",
   "repo": "granit-dotnet",
   "projectGraph": [
     {
@@ -8,14 +8,14 @@
         "Granit.Core",
         "Granit.Guids"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AI.AzureOpenAI",
       "deps": [
         "Granit.AI"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AI.Endpoints",
@@ -25,7 +25,7 @@
         "Granit.Querying.Endpoints",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AI.EntityFrameworkCore",
@@ -33,14 +33,14 @@
         "Granit.AI",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AI.Extraction",
       "deps": [
         "Granit.AI"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AI.Ollama",
@@ -48,21 +48,21 @@
         "Granit.AI",
         "Granit.Http.Resilience"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AI.OpenAI",
       "deps": [
         "Granit.AI"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AI.VectorData",
       "deps": [
         "Granit.AI"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AuditLog",
@@ -70,7 +70,7 @@
         "Granit.Core",
         "Granit.Querying"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AuditLog.ConfigurationChanges",
@@ -80,7 +80,7 @@
         "Granit.Guids",
         "Granit.Settings"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AuditLog.Endpoints",
@@ -89,7 +89,7 @@
         "Granit.Http.ApiDocumentation",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.AuditLog.EntityFrameworkCore",
@@ -97,7 +97,7 @@
         "Granit.AuditLog",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.ApiKeys",
@@ -108,7 +108,7 @@
         "Granit.Http.ExceptionHandling",
         "Granit.Querying"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.ApiKeys.Endpoints",
@@ -120,7 +120,7 @@
         "Granit.Timing",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.ApiKeys.EntityFrameworkCore",
@@ -128,42 +128,42 @@
         "Granit.Authentication.ApiKeys",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.Cognito",
       "deps": [
         "Granit.Authentication.JwtBearer"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.EntraId",
       "deps": [
         "Granit.Authentication.JwtBearer"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.GoogleCloud",
       "deps": [
         "Granit.Authentication.JwtBearer"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.JwtBearer",
       "deps": [
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authentication.Keycloak",
       "deps": [
         "Granit.Authentication.JwtBearer"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authorization",
@@ -171,7 +171,7 @@
         "Granit.Caching",
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authorization.AI",
@@ -179,7 +179,7 @@
         "Granit.AI",
         "Granit.Authorization"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authorization.Endpoints",
@@ -188,7 +188,7 @@
         "Granit.Http.ApiDocumentation",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Authorization.EntityFrameworkCore",
@@ -196,7 +196,7 @@
         "Granit.Authorization",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BackgroundJobs",
@@ -206,7 +206,7 @@
         "Granit.Security",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BackgroundJobs.Endpoints",
@@ -216,7 +216,7 @@
         "Granit.Querying",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BackgroundJobs.EntityFrameworkCore",
@@ -225,7 +225,7 @@
         "Granit.Guids",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BackgroundJobs.Wolverine",
@@ -233,7 +233,7 @@
         "Granit.BackgroundJobs",
         "Granit.Wolverine"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage",
@@ -242,7 +242,7 @@
         "Granit.Core",
         "Granit.Guids"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.AI",
@@ -250,14 +250,14 @@
         "Granit.AI",
         "Granit.BlobStorage"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.AzureBlob",
       "deps": [
         "Granit.BlobStorage"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.DbStore",
@@ -265,7 +265,7 @@
         "Granit.BlobStorage",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.Endpoints",
@@ -275,7 +275,7 @@
         "Granit.Querying.Endpoints",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.EntityFrameworkCore",
@@ -283,35 +283,35 @@
         "Granit.BlobStorage",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.FileSystem",
       "deps": [
         "Granit.BlobStorage"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.GoogleCloud",
       "deps": [
         "Granit.BlobStorage"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.Proxy",
       "deps": [
         "Granit.BlobStorage"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.BlobStorage.S3",
       "deps": [
         "Granit.BlobStorage"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Caching",
@@ -319,19 +319,19 @@
         "Granit.Core",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Caching.StackExchangeRedis",
       "deps": [
         "Granit.Caching"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Core",
       "deps": [],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DataExchange",
@@ -342,7 +342,7 @@
         "Granit.Timing",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DataExchange.AI",
@@ -350,14 +350,14 @@
         "Granit.AI",
         "Granit.DataExchange"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DataExchange.Csv",
       "deps": [
         "Granit.DataExchange"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DataExchange.Endpoints",
@@ -368,7 +368,7 @@
         "Granit.Guids",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DataExchange.EntityFrameworkCore",
@@ -376,14 +376,14 @@
         "Granit.DataExchange",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DataExchange.Excel",
       "deps": [
         "Granit.DataExchange"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DataExchange.Wolverine",
@@ -391,14 +391,14 @@
         "Granit.DataExchange",
         "Granit.Wolverine"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Diagnostics",
       "deps": [
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Diagnostics.Endpoints",
@@ -408,35 +408,35 @@
         "Granit.Http.ApiDocumentation",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DocumentGeneration",
       "deps": [
         "Granit.Templating"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DocumentGeneration.Excel",
       "deps": [
         "Granit.Templating"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.DocumentGeneration.Pdf",
       "deps": [
         "Granit.DocumentGeneration"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Encryption",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Encryption.EntityFrameworkCore",
@@ -445,21 +445,21 @@
         "Granit.Encryption",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Encryption.ReEncryption",
       "deps": [
         "Granit.Encryption.EntityFrameworkCore"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.EventBus",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.EventBus.Wolverine",
@@ -467,7 +467,7 @@
         "Granit.EventBus",
         "Granit.Wolverine"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Features",
@@ -475,7 +475,7 @@
         "Granit.Caching",
         "Granit.Localization"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Features.Endpoints",
@@ -485,7 +485,7 @@
         "Granit.Http.ApiDocumentation",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Features.EntityFrameworkCore",
@@ -494,14 +494,14 @@
         "Granit.Features",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Guids",
       "deps": [
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.ApiDocumentation",
@@ -509,14 +509,14 @@
         "Granit.Http.ApiVersioning",
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.ApiVersioning",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.Bulkhead",
@@ -526,14 +526,14 @@
         "Granit.Features",
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.Cookies",
       "deps": [
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.Cookies.Endpoints",
@@ -542,28 +542,28 @@
         "Granit.Http.ApiDocumentation",
         "Granit.Http.Cookies"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.Cookies.Klaro",
       "deps": [
         "Granit.Http.Cookies"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.Cors",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.ExceptionHandling",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.Idempotency",
@@ -571,14 +571,14 @@
         "Granit.Caching",
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.OutputCaching",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.OutputCaching.StackExchangeRedis",
@@ -586,21 +586,21 @@
         "Granit.Caching.StackExchangeRedis",
         "Granit.Http.OutputCaching"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.Resilience",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Http.ResponseCompression",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Identity",
@@ -608,14 +608,14 @@
         "Granit.Core",
         "Granit.Querying"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Identity.Cognito",
       "deps": [
         "Granit.Identity"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Identity.Endpoints",
@@ -627,7 +627,7 @@
         "Granit.Querying.Endpoints",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Identity.EntityFrameworkCore",
@@ -636,7 +636,7 @@
         "Granit.Persistence",
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Identity.EntraId",
@@ -645,14 +645,14 @@
         "Granit.Identity",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Identity.GoogleCloud",
       "deps": [
         "Granit.Identity"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Identity.Keycloak",
@@ -661,14 +661,14 @@
         "Granit.Identity",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Imaging",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Imaging.AI",
@@ -676,14 +676,14 @@
         "Granit.AI",
         "Granit.Imaging"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Imaging.MagickNet",
       "deps": [
         "Granit.Imaging"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Localization",
@@ -691,7 +691,7 @@
         "Granit.Caching",
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Localization.AI",
@@ -699,7 +699,7 @@
         "Granit.AI",
         "Granit.Localization"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Localization.Endpoints",
@@ -709,7 +709,7 @@
         "Granit.Localization",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Localization.EntityFrameworkCore",
@@ -717,14 +717,14 @@
         "Granit.Persistence",
         "Granit.Localization"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.MultiTenancy",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications",
@@ -733,7 +733,7 @@
         "Granit.Querying",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.AI",
@@ -741,7 +741,7 @@
         "Granit.AI",
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Brevo",
@@ -751,28 +751,28 @@
         "Granit.Notifications.Sms",
         "Granit.Notifications.WhatsApp"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Email",
       "deps": [
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Email.AwsSes",
       "deps": [
         "Granit.Notifications.Email"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Email.AzureCommunicationServices",
       "deps": [
         "Granit.Notifications.Email"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Email.Scaleway",
@@ -780,7 +780,7 @@
         "Granit.Http.Resilience",
         "Granit.Notifications.Email"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Email.SendGrid",
@@ -788,14 +788,14 @@
         "Granit.Http.Resilience",
         "Granit.Notifications.Email"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Email.Smtp",
       "deps": [
         "Granit.Notifications.Email"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Endpoints",
@@ -807,7 +807,7 @@
         "Granit.Notifications.MobilePush",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.EntityFrameworkCore",
@@ -816,28 +816,28 @@
         "Granit.Notifications.MobilePush",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.MobilePush",
       "deps": [
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.MobilePush.AwsSns",
       "deps": [
         "Granit.Notifications.MobilePush"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.MobilePush.AzureNotificationHubs",
       "deps": [
         "Granit.Notifications.MobilePush"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.MobilePush.GoogleFcm",
@@ -845,42 +845,42 @@
         "Granit.Http.Resilience",
         "Granit.Notifications.MobilePush"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.SignalR",
       "deps": [
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Sms",
       "deps": [
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Sms.AwsSns",
       "deps": [
         "Granit.Notifications.Sms"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Sms.AzureCommunicationServices",
       "deps": [
         "Granit.Notifications.Sms"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Sse",
       "deps": [
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Twilio",
@@ -889,21 +889,21 @@
         "Granit.Notifications.Sms",
         "Granit.Notifications.WhatsApp"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.WebPush",
       "deps": [
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.WhatsApp",
       "deps": [
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Wolverine",
@@ -911,7 +911,7 @@
         "Granit.Notifications",
         "Granit.Wolverine"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Notifications.Zulip",
@@ -919,14 +919,14 @@
         "Granit.Http.Resilience",
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Observability",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Observability.AI",
@@ -934,7 +934,7 @@
         "Granit.AI",
         "Granit.Observability"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Persistence",
@@ -944,7 +944,7 @@
         "Granit.Timing",
         "Granit.Http.ExceptionHandling"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Persistence.Hosting",
@@ -952,7 +952,7 @@
         "Granit.Persistence",
         "Granit.Persistence.Migrations"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Persistence.Migrations",
@@ -960,7 +960,7 @@
         "Granit.Persistence",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Persistence.Migrations.Wolverine",
@@ -968,28 +968,28 @@
         "Granit.Persistence.Migrations",
         "Granit.Wolverine"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Persistence.Postgres",
       "deps": [
         "Granit.Persistence.Hosting"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Persistence.SqlServer",
       "deps": [
         "Granit.Persistence.Hosting"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Privacy",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Privacy.AI",
@@ -997,14 +997,14 @@
         "Granit.AI",
         "Granit.Privacy"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Querying",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Querying.AI",
@@ -1013,7 +1013,7 @@
         "Granit.Querying",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Querying.Endpoints",
@@ -1025,7 +1025,7 @@
         "Granit.Timing",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Querying.EntityFrameworkCore",
@@ -1033,7 +1033,7 @@
         "Granit.Querying",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.RateLimiting",
@@ -1043,7 +1043,7 @@
         "Granit.Features",
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.ReferenceData",
@@ -1051,7 +1051,7 @@
         "Granit.Core",
         "Granit.Querying"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.ReferenceData.Endpoints",
@@ -1061,7 +1061,7 @@
         "Granit.ReferenceData",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.ReferenceData.EntityFrameworkCore",
@@ -1070,14 +1070,14 @@
         "Granit.Persistence",
         "Granit.ReferenceData"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Security",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Settings",
@@ -1087,7 +1087,7 @@
         "Granit.EventBus",
         "Granit.Security"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Settings.Endpoints",
@@ -1098,7 +1098,7 @@
         "Granit.Timing",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Settings.EntityFrameworkCore",
@@ -1106,14 +1106,14 @@
         "Granit.Persistence",
         "Granit.Settings"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Templating",
       "deps": [
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Templating.AI",
@@ -1121,7 +1121,7 @@
         "Granit.AI",
         "Granit.Templating"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Templating.Endpoints",
@@ -1132,7 +1132,7 @@
         "Granit.Templating",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Templating.EntityFrameworkCore",
@@ -1142,14 +1142,14 @@
         "Granit.Templating",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Templating.Scriban",
       "deps": [
         "Granit.Templating"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Templating.Workflow",
@@ -1157,7 +1157,7 @@
         "Granit.Templating",
         "Granit.Workflow"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Testing",
@@ -1167,7 +1167,7 @@
         "Granit.Security",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Testing.EntityFrameworkCore",
@@ -1175,7 +1175,7 @@
         "Granit.Persistence",
         "Granit.Testing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Timeline",
@@ -1186,7 +1186,7 @@
         "Granit.Security",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Timeline.AI",
@@ -1194,7 +1194,7 @@
         "Granit.AI",
         "Granit.Timeline"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Timeline.Endpoints",
@@ -1204,7 +1204,7 @@
         "Granit.Timeline",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Timeline.EntityFrameworkCore",
@@ -1212,7 +1212,7 @@
         "Granit.Timeline",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Timeline.Notifications",
@@ -1220,14 +1220,14 @@
         "Granit.Timeline",
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Timing",
       "deps": [
         "Granit.Core"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Validation",
@@ -1235,7 +1235,7 @@
         "Granit.Http.ExceptionHandling",
         "Granit.Localization"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Validation.AI",
@@ -1243,7 +1243,7 @@
         "Granit.AI",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Validation.Endpoints",
@@ -1251,7 +1251,7 @@
         "Granit.Http.ApiDocumentation",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Validation.Europe",
@@ -1259,7 +1259,7 @@
         "Granit.Localization",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Validation.NorthAmerica",
@@ -1267,7 +1267,7 @@
         "Granit.Localization",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Validation.UnitedKingdom",
@@ -1275,42 +1275,42 @@
         "Granit.Localization",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Vault",
       "deps": [
         "Granit.Encryption"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Vault.Aws",
       "deps": [
         "Granit.Vault"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Vault.Azure",
       "deps": [
         "Granit.Vault"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Vault.GoogleCloud",
       "deps": [
         "Granit.Vault"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Vault.HashiCorp",
       "deps": [
         "Granit.Vault"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Webhooks",
@@ -1320,7 +1320,7 @@
         "Granit.Http.Resilience",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Webhooks.Endpoints",
@@ -1330,7 +1330,7 @@
         "Granit.Validation",
         "Granit.Webhooks"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Webhooks.EntityFrameworkCore",
@@ -1338,7 +1338,7 @@
         "Granit.Webhooks",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Webhooks.Wolverine",
@@ -1346,7 +1346,7 @@
         "Granit.Webhooks",
         "Granit.Wolverine"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Wolverine",
@@ -1354,7 +1354,7 @@
         "Granit.Security",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Wolverine.Postgresql",
@@ -1362,7 +1362,7 @@
         "Granit.Wolverine",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Wolverine.SqlServer",
@@ -1370,7 +1370,7 @@
         "Granit.Wolverine",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Workflow",
@@ -1378,7 +1378,7 @@
         "Granit.Querying",
         "Granit.Timing"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Workflow.AI",
@@ -1386,7 +1386,7 @@
         "Granit.AI",
         "Granit.Workflow"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Workflow.Endpoints",
@@ -1396,7 +1396,7 @@
         "Granit.Workflow",
         "Granit.Validation"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Workflow.EntityFrameworkCore",
@@ -1404,7 +1404,7 @@
         "Granit.Workflow",
         "Granit.Persistence"
       ],
-      "framework": ""
+      "framework": "net10.0"
     },
     {
       "name": "Granit.Workflow.Notifications",
@@ -1414,7 +1414,7 @@
         "Granit.Workflow",
         "Granit.Notifications"
       ],
-      "framework": ""
+      "framework": "net10.0"
     }
   ],
   "symbols": [
