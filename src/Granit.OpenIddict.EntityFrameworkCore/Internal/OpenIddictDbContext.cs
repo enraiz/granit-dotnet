@@ -2,6 +2,7 @@ using Granit.Core.DataFiltering;
 using Granit.Core.MultiTenancy;
 using Granit.OpenIddict.Domain;
 using Granit.OpenIddict.Entities;
+using Granit.OpenIddict.Entities.OpenIddict;
 using Granit.OpenIddict.EntityFrameworkCore.Extensions;
 using Granit.Persistence.Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -15,7 +16,8 @@ namespace Granit.OpenIddict.EntityFrameworkCore.Internal;
 /// </summary>
 /// <remarks>
 /// Follows the canonical Granit isolated DbContext pattern
-/// (cf. <c>ApiKeysDbContext</c>).
+/// (cf. <c>ApiKeysDbContext</c>). Uses custom multi-tenant OpenIddict entities
+/// (<see cref="GranitOpenIddictApplication"/>, etc.) instead of the defaults.
 /// </remarks>
 internal sealed class OpenIddictDbContext(
     DbContextOptions<OpenIddictDbContext> options,
@@ -29,21 +31,27 @@ internal sealed class OpenIddictDbContext(
     /// <summary>Gets the user group members set.</summary>
     public DbSet<GranitUserGroupMember> UserGroupMembers => Set<GranitUserGroupMember>();
 
+    /// <summary>Gets the signing keys set.</summary>
+    public DbSet<SigningKey> SigningKeys => Set<SigningKey>();
+
     /// <inheritdoc/>
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(modelBuilder);
+        ArgumentNullException.ThrowIfNull(builder);
 
         // 1. ASP.NET Identity conventions (default table names, keys, indexes)
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
-        // 2. OpenIddict conventions (application, authorization, scope, token entities)
-        modelBuilder.UseOpenIddict<Guid>();
+        // 2. OpenIddict conventions with custom multi-tenant entities
+        builder.UseOpenIddict<GranitOpenIddictApplication, GranitOpenIddictAuthorization,
+            GranitOpenIddictScope, GranitOpenIddictToken, Guid>();
 
         // 3. Granit OpenIddict conventions (oidc_* table prefix, column constraints, manual filters)
-        modelBuilder.ConfigureOpenIddictModule(dataFilter);
+        builder.ConfigureOpenIddictModule(dataFilter);
 
         // 4. Granit cross-cutting conventions (IMultiTenant, ISoftDeletable, IActive, etc.)
-        modelBuilder.ApplyGranitConventions(currentTenant, dataFilter);
+        // This automatically adds multi-tenant filters for IMultiTenant entities
+        // (GranitOpenIddictApplication, GranitOpenIddictAuthorization, etc.)
+        builder.ApplyGranitConventions(currentTenant, dataFilter);
     }
 }

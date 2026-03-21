@@ -1,0 +1,164 @@
+using Granit.Core.Events;
+using Granit.Identity;
+using Granit.Identity.Models;
+using Granit.OpenIddict.Diagnostics;
+using Granit.OpenIddict.Endpoints.Dtos;
+using Granit.OpenIddict.Events;
+using Granit.OpenIddict.Permissions;
+using Granit.OpenIddict.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+
+namespace Granit.OpenIddict.Endpoints.Endpoints;
+
+internal static class AdminUserEndpoints
+{
+    internal static RouteGroupBuilder MapAdminUserEndpoints(this RouteGroupBuilder group)
+    {
+        RouteGroupBuilder users = group.MapGroup("/users");
+
+        users.MapGet("/", ListUsersAsync)
+            .WithName("ListUsers")
+            .WithSummary("Returns a paginated list of users.")
+            .WithDescription("Supports search, pagination, and tenant filtering.")
+            .Produces<IReadOnlyList<IdentityUser>>()
+            .RequireAuthorization(OpenIddictPermissions.Users.Read);
+
+        users.MapGet("/{userId:guid}", GetUserAsync)
+            .WithName("GetUser")
+            .WithSummary("Returns a user by ID.")
+            .WithDescription("Returns the full user detail including roles and groups.")
+            .Produces<IdentityUser>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization(OpenIddictPermissions.Users.Read);
+
+        users.MapPost("/", CreateUserAsync)
+            .WithName("CreateUser")
+            .WithSummary("Creates a new user.")
+            .WithDescription("Admin-initiated user creation. No email confirmation required.")
+            .Produces<IdentityUser>(StatusCodes.Status201Created)
+            .ProducesValidationProblem()
+            .RequireAuthorization(OpenIddictPermissions.Users.Create);
+
+        users.MapDelete("/{userId:guid}", DeleteUserAsync)
+            .WithName("DeleteUser")
+            .WithSummary("Soft-deletes a user.")
+            .WithDescription("Sets IsDeleted = true and revokes all active tokens.")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization(OpenIddictPermissions.Users.Delete);
+
+        users.MapPost("/{userId:guid}/impersonate", ImpersonateAsync)
+            .WithName("ImpersonateUser")
+            .WithSummary("Impersonates a user.")
+            .WithDescription(
+                "Issues a short-lived token (max 1h) with impersonator_id claim. "
+                + "Writes audit log and sends transparency notification.")
+            .Produces<ImpersonationResult>()
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization(OpenIddictPermissions.Users.Impersonate);
+
+        return group;
+    }
+
+    private static async Task<Ok<IReadOnlyList<IdentityUser>>> ListUsersAsync(
+        [FromServices] IIdentityUserReader userReader,
+        string? search = null, int page = 0, int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<IdentityUser> users = await userReader
+            .GetUsersAsync(search, page * pageSize, pageSize, cancellationToken)
+            .ConfigureAwait(false);
+        return TypedResults.Ok(users);
+    }
+
+    private static async Task<Results<Ok<IdentityUser>, NotFound>> GetUserAsync(
+        Guid userId,
+        [FromServices] IIdentityUserReader userReader,
+        CancellationToken cancellationToken = default)
+    {
+        IdentityUser? user = await userReader
+            .GetUserAsync(userId.ToString(), cancellationToken)
+            .ConfigureAwait(false);
+
+        return user is null
+            ? TypedResults.NotFound()
+            : TypedResults.Ok(user);
+    }
+
+    private static async Task<Created<IdentityUser>> CreateUserAsync(
+        AdminUserCreateRequest request,
+        [FromServices] IIdentityProvider identityProvider,
+        CancellationToken cancellationToken = default)
+    {
+        IdentityUser user = await identityProvider.CreateUserAsync(
+            new IdentityUserCreate(
+                request.Email,
+                request.Email,
+                request.FirstName,
+                request.LastName,
+                true,
+                request.TemporaryPassword),
+            cancellationToken).ConfigureAwait(false);
+
+        return TypedResults.Created($"/api/admin/users/{user.Id}", user);
+    }
+
+    private static async Task<Results<NoContent, NotFound>> DeleteUserAsync(
+        Guid userId,
+        [FromServices] IIdentityUserReader userReader,
+        [FromServices] IAccountDeletionService deletionService,
+        CancellationToken cancellationToken = default)
+    {
+        IdentityUser? user = await userReader
+            .GetUserAsync(userId.ToString(), cancellationToken)
+            .ConfigureAwait(false);
+
+        if (user is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        await deletionService.InitiateAsync(userId.ToString(), cancellationToken).ConfigureAwait(false);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<Ok<ImpersonationResult>, ProblemHttpResult>> ImpersonateAsync(
+        Guid userId,
+        HttpContext httpContext,
+        [FromServices] IImpersonationService impersonationService,
+        [FromServices] IDistributedEventBus eventBus,
+        [FromServices] OpenIddictMetrics metrics,
+        CancellationToken cancellationToken = default)
+    {
+        // Guard: cannot chain-impersonate
+        if (httpContext.User.FindFirst("impersonator_id") is not null)
+        {
+            return TypedResults.Problem(
+                detail: "Cannot impersonate while already impersonating.",
+                statusCode: StatusCodes.Status403Forbidden);
+        }
+
+        string adminId = httpContext.User.FindFirst("sub")!.Value;
+        string adminName = httpContext.User.FindFirst("email")?.Value
+                           ?? httpContext.User.FindFirst("name")?.Value
+                           ?? adminId;
+
+        ImpersonationResult result = await impersonationService
+            .ImpersonateAsync(userId.ToString(), adminId, adminName, cancellationToken)
+            .ConfigureAwait(false);
+
+        // Publish transparency event (GDPR/SOC2 — subscriber sends notification to impersonated user)
+        await eventBus.PublishAsync(
+            new UserImpersonatedEto(userId, Guid.Parse(adminId), null, TimeProvider.System.GetUtcNow()),
+            cancellationToken).ConfigureAwait(false);
+
+        metrics.RecordImpersonation(null);
+
+        return TypedResults.Ok(result);
+    }
+}

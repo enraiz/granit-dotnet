@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-21T17:23:44.919714+00:00",
+  "generatedAt": "2026-03-21T21:30:32.349471+00:00",
   "repo": "granit-dotnet",
   "projectGraph": [
     {
@@ -764,7 +764,8 @@
     {
       "name": "Granit.Notifications.Email",
       "deps": [
-        "Granit.Notifications"
+        "Granit.Notifications",
+        "Granit.Templating"
       ],
       "framework": "net10.0"
     },
@@ -961,7 +962,8 @@
       "name": "Granit.OpenIddict.BackgroundJobs",
       "deps": [
         "Granit.BackgroundJobs",
-        "Granit.OpenIddict"
+        "Granit.OpenIddict",
+        "Granit.Settings"
       ],
       "framework": "net10.0"
     },
@@ -979,6 +981,7 @@
     {
       "name": "Granit.OpenIddict.EntityFrameworkCore",
       "deps": [
+        "Granit.Encryption",
         "Granit.MultiTenancy",
         "Granit.OpenIddict",
         "Granit.Persistence"
@@ -8553,15 +8556,8 @@
       "kind": "class",
       "project": "Granit.DataExchange.EntityFrameworkCore",
       "file": "src/Granit.DataExchange.EntityFrameworkCore/GranitDataExchangeEntityFrameworkCoreModule.cs",
-      "line": 21,
-      "members": [
-        {
-          "name": "OnApplicationInitializationAsync",
-          "kind": "method",
-          "signature": "OnApplicationInitializationAsync(ApplicationInitializationContext context)",
-          "returnType": "Task"
-        }
-      ]
+      "line": 15,
+      "members": []
     },
     {
       "name": "ServiceCollectionExtensions",
@@ -17900,7 +17896,7 @@
       "kind": "class",
       "project": "Granit.OpenIddict.BackgroundJobs",
       "file": "src/Granit.OpenIddict.BackgroundJobs/GranitOpenIddictBackgroundJobsModule.cs",
-      "line": 13,
+      "line": 15,
       "members": []
     },
     {
@@ -17910,6 +17906,15 @@
       "project": "Granit.OpenIddict.BackgroundJobs",
       "file": "src/Granit.OpenIddict.BackgroundJobs/Jobs/OpenIddictIdleSessionEnforcementJob.cs",
       "line": 14,
+      "members": []
+    },
+    {
+      "name": "OpenIddictKeyRotationJob",
+      "fqn": "Granit.OpenIddict.BackgroundJobs.Jobs.OpenIddictKeyRotationJob",
+      "kind": "record",
+      "project": "Granit.OpenIddict.BackgroundJobs",
+      "file": "src/Granit.OpenIddict.BackgroundJobs/Jobs/OpenIddictKeyRotationJob.cs",
+      "line": 18,
       "members": []
     },
     {
@@ -17927,18 +17932,18 @@
       "kind": "class",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Diagnostics/OpenIddictMetrics.cs",
-      "line": 11,
+      "line": 15,
       "members": [
-        {
-          "name": "RecordTokenIssued",
-          "kind": "method",
-          "signature": "RecordTokenIssued(string? tenantId, string grantType)",
-          "returnType": "void"
-        },
         {
           "name": "RecordTokenRevoked",
           "kind": "method",
           "signature": "RecordTokenRevoked(string? tenantId, string reason)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordAuthenticationSuccess",
+          "kind": "method",
+          "signature": "RecordAuthenticationSuccess(string? tenantId, string grantType)",
           "returnType": "void"
         },
         {
@@ -17951,6 +17956,48 @@
           "name": "RecordRegistration",
           "kind": "method",
           "signature": "RecordRegistration(string? tenantId)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordPasswordChange",
+          "kind": "method",
+          "signature": "RecordPasswordChange(string? tenantId)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordPasswordReset",
+          "kind": "method",
+          "signature": "RecordPasswordReset(string? tenantId)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordAccountDeletion",
+          "kind": "method",
+          "signature": "RecordAccountDeletion(string? tenantId)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordImpersonation",
+          "kind": "method",
+          "signature": "RecordImpersonation(string? tenantId)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordTwoFactorEvent",
+          "kind": "method",
+          "signature": "RecordTwoFactorEvent(string? tenantId, string action)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordExternalLogin",
+          "kind": "method",
+          "signature": "RecordExternalLogin(string? tenantId, string provider, bool isNewUser)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordKeyRotation",
+          "kind": "method",
+          "signature": "RecordKeyRotation(int keysGenerated, int keysRetired, int keysRevoked)",
           "returnType": "void"
         },
         {
@@ -17984,6 +18031,61 @@
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Domain/GranitUserGroupMember.cs",
       "line": 8,
+      "members": []
+    },
+    {
+      "name": "SigningKey",
+      "fqn": "Granit.OpenIddict.Domain.SigningKey",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Domain/SigningKey.cs",
+      "line": 20,
+      "members": [
+        {
+          "name": "KeyId",
+          "kind": "property",
+          "signature": "string KeyId",
+          "returnType": "string"
+        },
+        {
+          "name": "KeyType",
+          "kind": "property",
+          "signature": "string KeyType",
+          "returnType": "string"
+        },
+        {
+          "name": "Algorithm",
+          "kind": "property",
+          "signature": "string Algorithm",
+          "returnType": "string"
+        },
+        {
+          "name": "EncryptedKeyMaterial",
+          "kind": "property",
+          "signature": "string EncryptedKeyMaterial",
+          "returnType": "string"
+        },
+        {
+          "name": "Status",
+          "kind": "property",
+          "signature": "SigningKeyStatus Status",
+          "returnType": "SigningKeyStatus"
+        },
+        {
+          "name": "ActivatedAt",
+          "kind": "property",
+          "signature": "DateTimeOffset ActivatedAt",
+          "returnType": "DateTimeOffset"
+        }
+      ]
+    },
+    {
+      "name": "SigningKeyStatus",
+      "fqn": "Granit.OpenIddict.Domain.SigningKeyStatus",
+      "kind": "enum",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Domain/SigningKey.cs",
+      "line": 55,
       "members": []
     },
     {
@@ -18104,6 +18206,49 @@
       "members": []
     },
     {
+      "name": "AdminUserCreateRequest",
+      "fqn": "Granit.OpenIddict.Endpoints.Dtos.AdminUserCreateRequest",
+      "kind": "record",
+      "project": "Granit.OpenIddict.Endpoints",
+      "file": "src/Granit.OpenIddict.Endpoints/Dtos/AdminUserCreateRequest.cs",
+      "line": 9,
+      "members": []
+    },
+    {
+      "name": "PasskeyRegistrationRequest",
+      "fqn": "Granit.OpenIddict.Endpoints.Dtos.PasskeyRegistrationRequest",
+      "kind": "record",
+      "project": "Granit.OpenIddict.Endpoints",
+      "file": "src/Granit.OpenIddict.Endpoints/Dtos/PasskeyRequests.cs",
+      "line": 6,
+      "members": []
+    },
+    {
+      "name": "PasskeyRenameRequest",
+      "fqn": "Granit.OpenIddict.Endpoints.Dtos.PasskeyRenameRequest",
+      "kind": "record",
+      "project": "Granit.OpenIddict.Endpoints",
+      "file": "src/Granit.OpenIddict.Endpoints/Dtos/PasskeyRequests.cs",
+      "line": 10,
+      "members": []
+    },
+    {
+      "name": "OpenIddictEndpointRouteBuilderExtensions",
+      "fqn": "Granit.OpenIddict.Endpoints.Extensions.OpenIddictEndpointRouteBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.OpenIddict.Endpoints",
+      "file": "src/Granit.OpenIddict.Endpoints/Extensions/OpenIddictEndpointRouteBuilderExtensions.cs",
+      "line": 12,
+      "members": [
+        {
+          "name": "MapOpenIddictEndpoints",
+          "kind": "method",
+          "signature": "MapOpenIddictEndpoints(this IEndpointRouteBuilder endpoints, Action<OpenIddictEndpointsOptions>? configure = null)",
+          "returnType": "RouteGroupBuilder"
+        }
+      ]
+    },
+    {
       "name": "GranitOpenIddictEndpointsModule",
       "fqn": "Granit.OpenIddict.Endpoints.GranitOpenIddictEndpointsModule",
       "kind": "class",
@@ -18111,6 +18256,40 @@
       "file": "src/Granit.OpenIddict.Endpoints/GranitOpenIddictEndpointsModule.cs",
       "line": 27,
       "members": []
+    },
+    {
+      "name": "OpenIddictEndpointsOptions",
+      "fqn": "Granit.OpenIddict.Endpoints.Options.OpenIddictEndpointsOptions",
+      "kind": "class",
+      "project": "Granit.OpenIddict.Endpoints",
+      "file": "src/Granit.OpenIddict.Endpoints/Options/OpenIddictEndpointsOptions.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "AccountRoutePrefix",
+          "kind": "property",
+          "signature": "string AccountRoutePrefix",
+          "returnType": "string"
+        },
+        {
+          "name": "AdminRoutePrefix",
+          "kind": "property",
+          "signature": "string AdminRoutePrefix",
+          "returnType": "string"
+        },
+        {
+          "name": "AccountTagName",
+          "kind": "property",
+          "signature": "string AccountTagName",
+          "returnType": "string"
+        },
+        {
+          "name": "AdminTagName",
+          "kind": "property",
+          "signature": "string AdminTagName",
+          "returnType": "string"
+        }
+      ]
     },
     {
       "name": "GranitRole",
@@ -18138,12 +18317,48 @@
       ]
     },
     {
+      "name": "GranitOpenIddictApplication",
+      "fqn": "Granit.OpenIddict.Entities.OpenIddict.GranitOpenIddictApplication",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Entities/OpenIddict/GranitOpenIddictApplication.cs",
+      "line": 13,
+      "members": []
+    },
+    {
+      "name": "GranitOpenIddictAuthorization",
+      "fqn": "Granit.OpenIddict.Entities.OpenIddict.GranitOpenIddictAuthorization",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Entities/OpenIddict/GranitOpenIddictAuthorization.cs",
+      "line": 9,
+      "members": []
+    },
+    {
+      "name": "GranitOpenIddictScope",
+      "fqn": "Granit.OpenIddict.Entities.OpenIddict.GranitOpenIddictScope",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Entities/OpenIddict/GranitOpenIddictScope.cs",
+      "line": 9,
+      "members": []
+    },
+    {
+      "name": "GranitOpenIddictToken",
+      "fqn": "Granit.OpenIddict.Entities.OpenIddict.GranitOpenIddictToken",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Entities/OpenIddict/GranitOpenIddictToken.cs",
+      "line": 9,
+      "members": []
+    },
+    {
       "name": "OpenIddictEntityFrameworkCoreHostApplicationBuilderExtensions",
       "fqn": "Granit.OpenIddict.EntityFrameworkCore.Extensions.OpenIddictEntityFrameworkCoreHostApplicationBuilderExtensions",
       "kind": "class",
       "project": "Granit.OpenIddict.EntityFrameworkCore",
       "file": "src/Granit.OpenIddict.EntityFrameworkCore/Extensions/OpenIddictEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 21,
+      "line": 23,
       "members": [
         {
           "name": "AddGranitOpenIddictEntityFrameworkCore",
@@ -18191,7 +18406,7 @@
       "kind": "class",
       "project": "Granit.OpenIddict.EntityFrameworkCore",
       "file": "src/Granit.OpenIddict.EntityFrameworkCore/GranitOpenIddictEntityFrameworkCoreModule.cs",
-      "line": 30,
+      "line": 38,
       "members": [
         {
           "name": "ConfigureServices",
@@ -18211,6 +18426,15 @@
       "members": []
     },
     {
+      "name": "PasswordResetRequestedEto",
+      "fqn": "Granit.OpenIddict.Events.PasswordResetRequestedEto",
+      "kind": "record",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Events/PasswordResetRequestedEto.cs",
+      "line": 19,
+      "members": []
+    },
+    {
       "name": "UserImpersonatedEto",
       "fqn": "Granit.OpenIddict.Events.UserImpersonatedEto",
       "kind": "record",
@@ -18227,6 +18451,22 @@
       "file": "src/Granit.OpenIddict/Events/UserRegisteredEto.cs",
       "line": 11,
       "members": []
+    },
+    {
+      "name": "ClaimsPrincipalDestinationExtensions",
+      "fqn": "Granit.OpenIddict.Extensions.ClaimsPrincipalDestinationExtensions",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Extensions/ClaimsPrincipalDestinationExtensions.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "SetDestinations",
+          "kind": "method",
+          "signature": "SetDestinations(this ClaimsPrincipal principal, IClaimsDestinationProvider destinationProvider)",
+          "returnType": "ClaimsPrincipal"
+        }
+      ]
     },
     {
       "name": "ClaimsPrincipalExtensions",
@@ -18250,7 +18490,7 @@
       "kind": "class",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/GranitOpenIddictModule.cs",
-      "line": 27,
+      "line": 28,
       "members": [
         {
           "name": "ConfigureServices",
@@ -18309,6 +18549,46 @@
           "kind": "property",
           "signature": "string[] Scopes",
           "returnType": "string[]"
+        }
+      ]
+    },
+    {
+      "name": "GranitKeyRotationOptions",
+      "fqn": "Granit.OpenIddict.Options.GranitKeyRotationOptions",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Options/GranitKeyRotationOptions.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "FromDays",
+          "kind": "method",
+          "signature": "FromDays(90)",
+          "returnType": "bool Enabled { get; set; } public TimeSpan KeyLifetime { get; set; } = TimeSpan."
+        },
+        {
+          "name": "FromDays",
+          "kind": "method",
+          "signature": "FromDays(14)",
+          "returnType": "TimeSpan GracePeriod { get; set; } = TimeSpan."
+        },
+        {
+          "name": "FromDays",
+          "kind": "method",
+          "signature": "FromDays(7)",
+          "returnType": "TimeSpan RotationLeadTime { get; set; } = TimeSpan."
+        },
+        {
+          "name": "RsaKeySize",
+          "kind": "property",
+          "signature": "int RsaKeySize",
+          "returnType": "int"
+        },
+        {
+          "name": "SigningAlgorithm",
+          "kind": "property",
+          "signature": "string SigningAlgorithm",
+          "returnType": "string"
         }
       ]
     },
@@ -18475,6 +18755,40 @@
       "members": []
     },
     {
+      "name": "AuthenticatorKeyInfo",
+      "fqn": "Granit.OpenIddict.Services.AuthenticatorKeyInfo",
+      "kind": "record",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/ITwoFactorService.cs",
+      "line": 41,
+      "members": []
+    },
+    {
+      "name": "ClaimsDestinations",
+      "fqn": "Granit.OpenIddict.Services.ClaimsDestinations",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IClaimsDestinationProvider.cs",
+      "line": 38,
+      "members": []
+    },
+    {
+      "name": "DefaultClaimsDestinationProvider",
+      "fqn": "Granit.OpenIddict.Services.DefaultClaimsDestinationProvider",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/DefaultClaimsDestinationProvider.cs",
+      "line": 27,
+      "members": [
+        {
+          "name": "GetDestinations",
+          "kind": "method",
+          "signature": "GetDestinations(Claim claim, ClaimsPrincipal principal)",
+          "returnType": "IEnumerable<string>"
+        }
+      ]
+    },
+    {
       "name": "ExternalClaimsMapper",
       "fqn": "Granit.OpenIddict.Services.ExternalClaimsMapper",
       "kind": "class",
@@ -18521,6 +18835,22 @@
           "kind": "method",
           "signature": "InitiateAsync(string userId, CancellationToken cancellationToken = default)",
           "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "IClaimsDestinationProvider",
+      "fqn": "Granit.OpenIddict.Services.IClaimsDestinationProvider",
+      "kind": "interface",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IClaimsDestinationProvider.cs",
+      "line": 20,
+      "members": [
+        {
+          "name": "GetDestinations",
+          "kind": "method",
+          "signature": "GetDestinations(Claim claim, ClaimsPrincipal principal)",
+          "returnType": "IEnumerable<string>"
         }
       ]
     },
@@ -18581,6 +18911,152 @@
       ]
     },
     {
+      "name": "IImpersonationService",
+      "fqn": "Granit.OpenIddict.Services.IImpersonationService",
+      "kind": "interface",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IImpersonationService.cs",
+      "line": 22,
+      "members": [
+        {
+          "name": "ImpersonateAsync",
+          "kind": "method",
+          "signature": "ImpersonateAsync(string targetUserId, string impersonatorId, string impersonatorName, CancellationToken cancellationToken = default)",
+          "returnType": "Task<ImpersonationResult>"
+        },
+        {
+          "name": "BackToImpersonatorAsync",
+          "kind": "method",
+          "signature": "BackToImpersonatorAsync(string impersonatorId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<ImpersonationResult>"
+        }
+      ]
+    },
+    {
+      "name": "IKeyRotationService",
+      "fqn": "Granit.OpenIddict.Services.IKeyRotationService",
+      "kind": "interface",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IKeyRotationService.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "RotateAsync",
+          "kind": "method",
+          "signature": "RotateAsync(CancellationToken cancellationToken = default)",
+          "returnType": "Task<KeyRotationResult>"
+        }
+      ]
+    },
+    {
+      "name": "IPasskeyService",
+      "fqn": "Granit.OpenIddict.Services.IPasskeyService",
+      "kind": "interface",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IPasskeyService.cs",
+      "line": 16,
+      "members": [
+        {
+          "name": "GetPasskeysAsync",
+          "kind": "method",
+          "signature": "GetPasskeysAsync(string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<IReadOnlyList<PasskeyInfo>>"
+        },
+        {
+          "name": "BeginRegistrationAsync",
+          "kind": "method",
+          "signature": "BeginRegistrationAsync(string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<string>"
+        },
+        {
+          "name": "CompleteRegistrationAsync",
+          "kind": "method",
+          "signature": "CompleteRegistrationAsync(string userId, string credentialJson, string? name = null, CancellationToken cancellationToken = default)",
+          "returnType": "Task<PasskeyInfo>"
+        },
+        {
+          "name": "BeginAssertionAsync",
+          "kind": "method",
+          "signature": "BeginAssertionAsync(CancellationToken cancellationToken = default)",
+          "returnType": "Task<string>"
+        },
+        {
+          "name": "RenameAsync",
+          "kind": "method",
+          "signature": "RenameAsync(string userId, Guid passkeyId, string newName, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "DeleteAsync",
+          "kind": "method",
+          "signature": "DeleteAsync(string userId, Guid passkeyId, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "IPasswordResetService",
+      "fqn": "Granit.OpenIddict.Services.IPasswordResetService",
+      "kind": "interface",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IPasswordResetService.cs",
+      "line": 10,
+      "members": [
+        {
+          "name": "RequestResetAsync",
+          "kind": "method",
+          "signature": "RequestResetAsync(string email, CancellationToken cancellationToken = default)",
+          "returnType": "Task<bool>"
+        },
+        {
+          "name": "ResetPasswordAsync",
+          "kind": "method",
+          "signature": "ResetPasswordAsync(string userId, string token, string newPassword, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "ISigningKeyStore",
+      "fqn": "Granit.OpenIddict.Services.ISigningKeyStore",
+      "kind": "interface",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/ISigningKeyStore.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "GetKeysAsync",
+          "kind": "method",
+          "signature": "GetKeysAsync(params SigningKeyStatus[] statuses)",
+          "returnType": "Task<IReadOnlyList<SigningKey>>"
+        },
+        {
+          "name": "GetActiveKeyAsync",
+          "kind": "method",
+          "signature": "GetActiveKeyAsync(string keyType, CancellationToken cancellationToken = default)",
+          "returnType": "Task<SigningKey?>"
+        },
+        {
+          "name": "CreateAsync",
+          "kind": "method",
+          "signature": "CreateAsync(SigningKey key, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "UpdateAsync",
+          "kind": "method",
+          "signature": "UpdateAsync(SigningKey key, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "PruneRevokedAsync",
+          "kind": "method",
+          "signature": "PruneRevokedAsync(DateTimeOffset olderThan, CancellationToken cancellationToken = default)",
+          "returnType": "Task<int>"
+        }
+      ]
+    },
+    {
       "name": "ITotpService",
       "fqn": "Granit.OpenIddict.Services.ITotpService",
       "kind": "interface",
@@ -18609,12 +19085,103 @@
       ]
     },
     {
+      "name": "ITwoFactorService",
+      "fqn": "Granit.OpenIddict.Services.ITwoFactorService",
+      "kind": "interface",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/ITwoFactorService.cs",
+      "line": 10,
+      "members": [
+        {
+          "name": "GetStatusAsync",
+          "kind": "method",
+          "signature": "GetStatusAsync(string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<TwoFactorStatus>"
+        },
+        {
+          "name": "GetAuthenticatorKeyAsync",
+          "kind": "method",
+          "signature": "GetAuthenticatorKeyAsync(string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<AuthenticatorKeyInfo>"
+        },
+        {
+          "name": "EnableAsync",
+          "kind": "method",
+          "signature": "EnableAsync(string userId, string code, CancellationToken cancellationToken = default)",
+          "returnType": "Task<IReadOnlyList<string>>"
+        },
+        {
+          "name": "DisableAsync",
+          "kind": "method",
+          "signature": "DisableAsync(string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "ResetAuthenticatorAsync",
+          "kind": "method",
+          "signature": "ResetAuthenticatorAsync(string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "GenerateRecoveryCodesAsync",
+          "kind": "method",
+          "signature": "GenerateRecoveryCodesAsync(string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<IReadOnlyList<string>>"
+        }
+      ]
+    },
+    {
+      "name": "ImpersonationResult",
+      "fqn": "Granit.OpenIddict.Services.ImpersonationResult",
+      "kind": "record",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IImpersonationService.cs",
+      "line": 56,
+      "members": []
+    },
+    {
+      "name": "KeyRotationResult",
+      "fqn": "Granit.OpenIddict.Services.KeyRotationResult",
+      "kind": "record",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IKeyRotationService.cs",
+      "line": 29,
+      "members": []
+    },
+    {
+      "name": "PasskeyInfo",
+      "fqn": "Granit.OpenIddict.Services.PasskeyInfo",
+      "kind": "record",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/IPasskeyService.cs",
+      "line": 65,
+      "members": []
+    },
+    {
       "name": "ProcessCallbackResult",
       "fqn": "Granit.OpenIddict.Services.ProcessCallbackResult",
       "kind": "record",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Services/IExternalLoginService.cs",
       "line": 58,
+      "members": []
+    },
+    {
+      "name": "TwoFactorStatus",
+      "fqn": "Granit.OpenIddict.Services.TwoFactorStatus",
+      "kind": "record",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/ITwoFactorService.cs",
+      "line": 35,
+      "members": []
+    },
+    {
+      "name": "UserSessionActivity",
+      "fqn": "Granit.OpenIddict.Services.UserSessionActivity",
+      "kind": "record",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Services/UserSessionActivity.cs",
+      "line": 13,
       "members": []
     },
     {
