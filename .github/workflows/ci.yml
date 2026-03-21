@@ -275,6 +275,7 @@ jobs:
             /d:sonar.issue.ignore.multicriteria.e3.resourceKey="**/Tests/**" \
             /d:sonar.issue.ignore.multicriteria.e4.ruleKey="csharpsquid:S3329" \
             /d:sonar.issue.ignore.multicriteria.e4.resourceKey="**/AesCacheValueEncryptor.cs" \
+            /d:sonar.python.version="3.12" \
             /d:sonar.qualitygate.wait="true"
           dotnet build -c $CONFIGURATION
           dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
@@ -379,10 +380,12 @@ jobs:
           path: nupkgs
 
       - name: Push to GitHub Packages
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           dotnet nuget push "nupkgs/*.nupkg"
           --source "https://nuget.pkg.github.com/granit-fx/index.json"
-          --api-key ${{ secrets.GITHUB_TOKEN }}
+          --api-key "$NUGET_AUTH_TOKEN"
           --skip-duplicate
 
   # nuget.org — release packages on version tags
@@ -404,10 +407,12 @@ jobs:
           path: nupkgs
 
       - name: Push to nuget.org
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
         run: >
           dotnet nuget push "nupkgs/*.nupkg"
           --source "https://api.nuget.org/v3/index.json"
-          --api-key ${{ secrets.NUGET_API_KEY }}
+          --api-key "$NUGET_AUTH_TOKEN"
           --skip-duplicate
 
   # ---------------------------------------------------------------------------
