@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using Granit.Core.Events;
 using Granit.Identity;
 using Granit.Identity.EntraId.Diagnostics;
 using Granit.Identity.EntraId.Internal;
@@ -23,7 +24,7 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
     private readonly IHttpClientFactory _httpClientFactory = Substitute.For<IHttpClientFactory>();
     private readonly EntraIdAdminTokenService _tokenService;
     private readonly IPasswordResetNotifier _passwordResetNotifier = Substitute.For<IPasswordResetNotifier>();
-    private readonly IIdentityEventPublisher _eventPublisher = Substitute.For<IIdentityEventPublisher>();
+    private readonly IDistributedEventBus _distributedEventBus = Substitute.For<IDistributedEventBus>();
     private readonly EntraIdIdentityProvider _provider;
 
     public IdentityEntraIdActivitySourceTests()
@@ -71,7 +72,7 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
             _httpClientFactory,
             MsOptions.Create(options),
             _passwordResetNotifier,
-            _eventPublisher,
+            _distributedEventBus,
             NullLogger<EntraIdIdentityProvider>.Instance);
     }
 
@@ -106,9 +107,11 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
 
         await _provider.GetUsersAsync(cancellationToken: TestContext.Current.CancellationToken);
 
-        Activity? activity = _activities.Find(a => a.OperationName == IdentityEntraIdActivitySource.GetUsers);
-        activity.ShouldNotBeNull();
-        activity.Status.ShouldBe(ActivityStatusCode.Error);
+        // Filter by both operation name AND status to avoid cross-contamination from parallel test classes
+        // (EntraIdIdentityProviderTests also calls GetUsersAsync with success, producing Unset activities).
+        _activities.ShouldContain(a =>
+            a.OperationName == IdentityEntraIdActivitySource.GetUsers
+            && a.Status == ActivityStatusCode.Error);
     }
 
     [Fact]
@@ -173,9 +176,11 @@ public sealed class IdentityEntraIdActivitySourceTests : IDisposable
 
         await _provider.GetRolesAsync(TestContext.Current.CancellationToken);
 
-        Activity? activity = _activities.Find(a => a.OperationName == IdentityEntraIdActivitySource.GetRoles);
-        activity.ShouldNotBeNull();
-        activity.Status.ShouldBe(ActivityStatusCode.Error);
+        // Filter by both operation name AND status to avoid cross-contamination from parallel test classes
+        // (EntraIdIdentityProviderAdditionalTests also calls GetRolesAsync with success, producing Unset activities).
+        _activities.ShouldContain(a =>
+            a.OperationName == IdentityEntraIdActivitySource.GetRoles
+            && a.Status == ActivityStatusCode.Error);
     }
 
     [Fact]
