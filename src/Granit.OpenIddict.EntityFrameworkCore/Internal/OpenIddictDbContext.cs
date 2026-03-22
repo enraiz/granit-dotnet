@@ -5,8 +5,10 @@ using Granit.OpenIddict.Entities;
 using Granit.OpenIddict.Entities.OpenIddict;
 using Granit.OpenIddict.EntityFrameworkCore.Extensions;
 using Granit.Persistence.Extensions;
+using Granit.Persistence.ExtraProperties;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Granit.OpenIddict.EntityFrameworkCore.Internal;
 
@@ -22,7 +24,8 @@ namespace Granit.OpenIddict.EntityFrameworkCore.Internal;
 internal sealed class OpenIddictDbContext(
     DbContextOptions<OpenIddictDbContext> options,
     ICurrentTenant? currentTenant = null,
-    IDataFilter? dataFilter = null)
+    IDataFilter? dataFilter = null,
+    IOptions<ExtraPropertyMappingOptions<GranitUser>>? extensionOptions = null)
     : IdentityDbContext<GranitUser, GranitRole, Guid>(options)
 {
     /// <summary>Gets the user groups set.</summary>
@@ -47,7 +50,7 @@ internal sealed class OpenIddictDbContext(
             GranitOpenIddictScope, GranitOpenIddictToken, Guid>();
 
         // 3. Granit OpenIddict conventions (oidc_* table prefix, column constraints, manual filters)
-        builder.ConfigureOpenIddictModule(dataFilter);
+        builder.ConfigureOpenIddictModule(dataFilter, extensionOptions?.Value);
 
         // 4. Granit cross-cutting conventions (IMultiTenant, ISoftDeletable, IActive, etc.)
         // This automatically adds multi-tenant filters for IMultiTenant entities
