@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-22T16:07:23.645146+00:00",
+  "generatedAt": "2026-03-22T16:20:26.378937+00:00",
   "repo": "granit-dotnet",
   "projectGraph": [
     {
@@ -13826,15 +13826,6 @@
       ]
     },
     {
-      "name": "IIdentityEventPublisher",
-      "fqn": "Granit.Identity.IIdentityEventPublisher",
-      "kind": "interface",
-      "project": "Granit.Identity",
-      "file": "src/Granit.Identity/IIdentityEventPublisher.cs",
-      "line": 15,
-      "members": []
-    },
-    {
       "name": "IIdentityGroupManager",
       "fqn": "Granit.Identity.IIdentityGroupManager",
       "kind": "interface",
@@ -19475,7 +19466,7 @@
       "kind": "class",
       "project": "Granit.Persistence",
       "file": "src/Granit.Persistence/ExtraProperties/ExtraPropertyMappingOptions.cs",
-      "line": 31,
+      "line": 32,
       "members": [
         {
           "name": "Mappings",
