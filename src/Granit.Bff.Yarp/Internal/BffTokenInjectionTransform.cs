@@ -1,7 +1,9 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Granit.Authentication.Oidc.ClientAuthentication;
+using Granit.Authentication.Oidc.ClientAuthentication.Internal;
+using Granit.Authentication.Oidc.DPoP;
 using Granit.Bff.Diagnostics;
-using Granit.Bff.DPoP;
 using Granit.Bff.Options;
 using Granit.Timing;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +27,7 @@ internal sealed partial class BffTokenInjectionTransform(
     IBffTokenStore tokenStore,
     IOptions<GranitBffOptions> options,
     IHttpClientFactory httpClientFactory,
-    IBffDPoPService dpopService,
+    IDPoPProofService dpopService,
     BffMetrics metrics,
     IClock clock,
     ILogger<BffTokenInjectionTransform> logger) : RequestTransform
@@ -128,7 +130,7 @@ internal sealed partial class BffTokenInjectionTransform(
                 ?? transformContext.HttpContext.Request.Path.Value ?? "/";
             string httpMethod = transformContext.HttpContext.Request.Method;
 
-            string dpopProof = dpopService.CreateProof(tokens.DPoPPrivateKeyJwk, httpMethod, targetUri);
+            string dpopProof = dpopService.CreateProof(tokens.DPoPPrivateKeyJwk, httpMethod, targetUri, tokens.DPoPNonce);
 
             transformContext.ProxyRequest.Headers.Authorization =
                 new AuthenticationHeaderValue("DPoP", tokens.AccessToken);
@@ -138,6 +140,23 @@ internal sealed partial class BffTokenInjectionTransform(
         {
             transformContext.ProxyRequest.Headers.Authorization =
                 new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
+        }
+
+        // Sliding session expiration — extend session if past halfway point
+        if (bffOptions.UseSessionSlidingExpiration && !string.IsNullOrEmpty(sessionId))
+        {
+            DateTimeOffset now = clock.Now;
+            DateTimeOffset halfwayPoint = tokens.SessionCreatedAt + (bffOptions.SessionDuration / 2);
+            DateTimeOffset absoluteMax = tokens.SessionCreatedAt + bffOptions.SessionAbsoluteMaxDuration;
+
+            // Only extend if past halfway and within absolute max
+            if (now >= halfwayPoint && now < absoluteMax)
+            {
+                // Re-store resets the distributed cache TTL to SessionDuration
+                await tokenStore.StoreAsync(
+                    frontend.Name, sessionId, tokens, httpContext.RequestAborted)
+                    .ConfigureAwait(false);
+            }
         }
     }
 
@@ -169,8 +188,9 @@ internal sealed partial class BffTokenInjectionTransform(
                 ["grant_type"] = "refresh_token",
                 ["refresh_token"] = currentTokens.RefreshToken!,
                 ["client_id"] = frontend.ClientId,
-                ["client_secret"] = frontend.ClientSecret,
             };
+
+            ResolveClientAuth(frontend).Apply(parameters, frontend.ClientId, tokenEndpoint);
 
             using FormUrlEncodedContent content = new(parameters);
             using var request = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint) { Content = content };
@@ -178,7 +198,8 @@ internal sealed partial class BffTokenInjectionTransform(
             // Attach DPoP proof for token refresh (RFC 9449 §5)
             if (!string.IsNullOrEmpty(currentTokens.DPoPPrivateKeyJwk))
             {
-                string dpopProof = dpopService.CreateProof(currentTokens.DPoPPrivateKeyJwk, "POST", tokenEndpoint);
+                string dpopProof = dpopService.CreateProof(
+                    currentTokens.DPoPPrivateKeyJwk, "POST", tokenEndpoint, currentTokens.DPoPNonce);
                 request.Headers.TryAddWithoutValidation("DPoP", dpopProof);
             }
 
@@ -189,6 +210,13 @@ internal sealed partial class BffTokenInjectionTransform(
             if (!response.IsSuccessStatusCode)
             {
                 return null;
+            }
+
+            // Capture updated DPoP-Nonce from refresh response (RFC 9449 §8)
+            string? dpopNonce = currentTokens.DPoPNonce;
+            if (response.Headers.TryGetValues("DPoP-Nonce", out IEnumerable<string>? nonceValues))
+            {
+                dpopNonce = nonceValues.FirstOrDefault() ?? dpopNonce;
             }
 
             using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken)
@@ -212,6 +240,7 @@ internal sealed partial class BffTokenInjectionTransform(
                 clock.Now.AddSeconds(expiresIn))
             {
                 DPoPPrivateKeyJwk = currentTokens.DPoPPrivateKeyJwk,
+                DPoPNonce = dpopNonce,
             };
         }
         catch (OperationCanceledException)
@@ -224,6 +253,11 @@ internal sealed partial class BffTokenInjectionTransform(
             return null;
         }
     }
+
+    private IClientAuthenticationStrategy ResolveClientAuth(BffFrontendOptions frontend) =>
+        frontend.ClientAuthenticationMethod == BffClientAuthenticationMethod.PrivateKeyJwt
+            ? new PrivateKeyJwtStrategy(frontend.ClientSigningKeyJwk!, clock)
+            : new ClientSecretPostStrategy(frontend.ClientSecret);
 
     // ──── Source-generated log messages ────
 

@@ -137,6 +137,14 @@
       "framework": "net10.0"
     },
     {
+      "name": "Granit.Authentication.DPoP",
+      "deps": [
+        "Granit.Core",
+        "Granit.Timing"
+      ],
+      "framework": "net10.0"
+    },
+    {
       "name": "Granit.Authentication.EntraId",
       "deps": [
         "Granit.Authentication.JwtBearer"
@@ -165,9 +173,26 @@
       "framework": "net10.0"
     },
     {
+      "name": "Granit.Authentication.Oidc",
+      "deps": [
+        "Granit.Core",
+        "Granit.Timing"
+      ],
+      "framework": "net10.0"
+    },
+    {
       "name": "Granit.Authentication.OpenIddict",
       "deps": [
         "Granit.Security"
+      ],
+      "framework": "net10.0"
+    },
+    {
+      "name": "Granit.Authentication.TokenManagement",
+      "deps": [
+        "Granit.Authentication.Oidc",
+        "Granit.Core",
+        "Granit.Timing"
       ],
       "framework": "net10.0"
     },
@@ -244,6 +269,7 @@
     {
       "name": "Granit.Bff",
       "deps": [
+        "Granit.Authentication.Oidc",
         "Granit.Core",
         "Granit.Security",
         "Granit.Timing"
@@ -253,6 +279,7 @@
     {
       "name": "Granit.Bff.Endpoints",
       "deps": [
+        "Granit.Authentication.Oidc",
         "Granit.Bff",
         "Granit.Http.ApiDocumentation",
         "Granit.Validation"
@@ -260,8 +287,19 @@
       "framework": "net10.0"
     },
     {
+      "name": "Granit.Bff.EntityFrameworkCore",
+      "deps": [
+        "Granit.BackgroundJobs",
+        "Granit.Bff",
+        "Granit.Guids",
+        "Granit.Persistence"
+      ],
+      "framework": "net10.0"
+    },
+    {
       "name": "Granit.Bff.Yarp",
       "deps": [
+        "Granit.Authentication.Oidc",
         "Granit.Bff"
       ],
       "framework": "net10.0"
@@ -702,7 +740,7 @@
       "framework": "net10.0"
     },
     {
-      "name": "Granit.Identity.Local.AspNetCore",
+      "name": "Granit.Identity.Local.AspNetIdentity",
       "deps": [
         "Granit.Identity",
         "Granit.OpenIddict.EntityFrameworkCore"
@@ -3210,7 +3248,7 @@
       "kind": "class",
       "project": "Granit.AuditLog.Endpoints",
       "file": "src/Granit.AuditLog.Endpoints/GranitAuditLogEndpointsModule.cs",
-      "line": 19,
+      "line": 21,
       "members": []
     },
     {
@@ -3258,7 +3296,7 @@
         {
           "name": "RecordPurged",
           "kind": "method",
-          "signature": "RecordPurged(long count, string category)",
+          "signature": "RecordPurged(long count, string category, string? tenantId)",
           "returnType": "void"
         },
         {
@@ -3275,7 +3313,7 @@
       "kind": "class",
       "project": "Granit.AuditLog.EntityFrameworkCore",
       "file": "src/Granit.AuditLog.EntityFrameworkCore/Extensions/AuditLogEntityFrameworkCoreServiceCollectionExtensions.cs",
-      "line": 21,
+      "line": 22,
       "members": [
         {
           "name": "AddGranitAuditLogEntityFrameworkCore",
@@ -3423,7 +3461,7 @@
       "kind": "class",
       "project": "Granit.AuditLog",
       "file": "src/Granit.AuditLog/Options/AuditLogOptions.cs",
-      "line": 9,
+      "line": 10,
       "members": [
         {
           "name": "PersistenceMode",
@@ -3824,7 +3862,7 @@
       "fqn": "Granit.Authentication.ApiKeys.Events.ApiKeyCreatedEto",
       "kind": "record",
       "project": "Granit.Authentication.ApiKeys",
-      "file": "src/Granit.Authentication.ApiKeys/Events/ApiKeyCreatedEvent.cs",
+      "file": "src/Granit.Authentication.ApiKeys/Events/ApiKeyCreatedEto.cs",
       "line": 12,
       "members": []
     },
@@ -3838,11 +3876,11 @@
       "members": []
     },
     {
-      "name": "ApiKeyRevokedEvent",
-      "fqn": "Granit.Authentication.ApiKeys.Events.ApiKeyRevokedEvent",
+      "name": "ApiKeyRevokedEto",
+      "fqn": "Granit.Authentication.ApiKeys.Events.ApiKeyRevokedEto",
       "kind": "record",
       "project": "Granit.Authentication.ApiKeys",
-      "file": "src/Granit.Authentication.ApiKeys/Events/ApiKeyRevokedEvent.cs",
+      "file": "src/Granit.Authentication.ApiKeys/Events/ApiKeyRevokedEto.cs",
       "line": 11,
       "members": []
     },
@@ -3851,7 +3889,7 @@
       "fqn": "Granit.Authentication.ApiKeys.Events.ApiKeyRotatedEto",
       "kind": "record",
       "project": "Granit.Authentication.ApiKeys",
-      "file": "src/Granit.Authentication.ApiKeys/Events/ApiKeyRotatedEvent.cs",
+      "file": "src/Granit.Authentication.ApiKeys/Events/ApiKeyRotatedEto.cs",
       "line": 12,
       "members": []
     },
@@ -4106,6 +4144,97 @@
           "kind": "property",
           "signature": "string? Audience",
           "returnType": "string?"
+        }
+      ]
+    },
+    {
+      "name": "DPoPJwtBearerExtensions",
+      "fqn": "Granit.Authentication.DPoP.Extensions.DPoPJwtBearerExtensions",
+      "kind": "class",
+      "project": "Granit.Authentication.DPoP",
+      "file": "src/Granit.Authentication.DPoP/Extensions/DPoPJwtBearerExtensions.cs",
+      "line": 15,
+      "members": [
+        {
+          "name": "AddGranitDPoPValidation",
+          "kind": "method",
+          "signature": "AddGranitDPoPValidation(this IServiceCollection services, Action<DPoPValidationOptions>? configure = null)",
+          "returnType": "IServiceCollection"
+        }
+      ]
+    },
+    {
+      "name": "GranitAuthenticationDPoPModule",
+      "fqn": "Granit.Authentication.DPoP.GranitAuthenticationDPoPModule",
+      "kind": "class",
+      "project": "Granit.Authentication.DPoP",
+      "file": "src/Granit.Authentication.DPoP/GranitAuthenticationDPoPModule.cs",
+      "line": 16,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "DPoPValidationOptions",
+      "fqn": "Granit.Authentication.DPoP.Options.DPoPValidationOptions",
+      "kind": "class",
+      "project": "Granit.Authentication.DPoP",
+      "file": "src/Granit.Authentication.DPoP/Options/DPoPValidationOptions.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "RequireDPoP",
+          "kind": "property",
+          "signature": "bool RequireDPoP",
+          "returnType": "bool"
+        },
+        {
+          "name": "FromSeconds",
+          "kind": "method",
+          "signature": "FromSeconds(30)",
+          "returnType": "TimeSpan ClockSkew { get; set; } = TimeSpan."
+        },
+        {
+          "name": "FromMinutes",
+          "kind": "method",
+          "signature": "FromMinutes(5)",
+          "returnType": "TimeSpan MaxProofLifetime { get; set; } = TimeSpan."
+        },
+        {
+          "name": "EnableReplayProtection",
+          "kind": "property",
+          "signature": "bool EnableReplayProtection",
+          "returnType": "bool"
+        }
+      ]
+    },
+    {
+      "name": "DPoPValidationResult",
+      "fqn": "Granit.Authentication.DPoP.Validation.DPoPValidationResult",
+      "kind": "record",
+      "project": "Granit.Authentication.DPoP",
+      "file": "src/Granit.Authentication.DPoP/Validation/IDPoPProofValidator.cs",
+      "line": 32,
+      "members": []
+    },
+    {
+      "name": "IDPoPProofValidator",
+      "fqn": "Granit.Authentication.DPoP.Validation.IDPoPProofValidator",
+      "kind": "interface",
+      "project": "Granit.Authentication.DPoP",
+      "file": "src/Granit.Authentication.DPoP/Validation/IDPoPProofValidator.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "ValidateAsync",
+          "kind": "method",
+          "signature": "ValidateAsync(string proofJwt, string httpMethod, string httpUri, CancellationToken cancellationToken = default)",
+          "returnType": "Task<DPoPValidationResult>"
         }
       ]
     },
@@ -4579,12 +4708,412 @@
       ]
     },
     {
+      "name": "Algorithms",
+      "fqn": "Granit.Authentication.Oidc.Algorithms",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 190,
+      "members": []
+    },
+    {
+      "name": "ClientAssertionTypes",
+      "fqn": "Granit.Authentication.Oidc.ClientAssertionTypes",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 76,
+      "members": []
+    },
+    {
+      "name": "ClientAuthenticationMethod",
+      "fqn": "Granit.Authentication.Oidc.ClientAuthentication.ClientAuthenticationMethod",
+      "kind": "enum",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/ClientAuthentication/ClientAuthenticationMethod.cs",
+      "line": 6,
+      "members": []
+    },
+    {
+      "name": "IClientAuthenticationStrategy",
+      "fqn": "Granit.Authentication.Oidc.ClientAuthentication.IClientAuthenticationStrategy",
+      "kind": "interface",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/ClientAuthentication/IClientAuthenticationStrategy.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "Apply",
+          "kind": "method",
+          "signature": "Apply(Dictionary<string, string> parameters, string clientId, string tokenEndpoint)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "CodeChallengeMethods",
+      "fqn": "Granit.Authentication.Oidc.CodeChallengeMethods",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 43,
+      "members": []
+    },
+    {
+      "name": "IDPoPProofService",
+      "fqn": "Granit.Authentication.Oidc.DPoP.IDPoPProofService",
+      "kind": "interface",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/DPoP/IDPoPProofService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "GenerateKeyPair",
+          "kind": "method",
+          "signature": "GenerateKeyPair()",
+          "returnType": "string"
+        },
+        {
+          "name": "CreateProof",
+          "kind": "method",
+          "signature": "CreateProof(string privateKeyJwk, string httpMethod, string httpUri, string? nonce = null)",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "Discovery",
+      "fqn": "Granit.Authentication.Oidc.Discovery",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 151,
+      "members": []
+    },
+    {
+      "name": "IDiscoveryDocumentService",
+      "fqn": "Granit.Authentication.Oidc.Discovery.IDiscoveryDocumentService",
+      "kind": "interface",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Discovery/IDiscoveryDocumentService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "GetAsync",
+          "kind": "method",
+          "signature": "GetAsync(string authority, CancellationToken cancellationToken = default)",
+          "returnType": "Task<OidcDiscoveryDocument>"
+        },
+        {
+          "name": "InvalidateCache",
+          "kind": "method",
+          "signature": "InvalidateCache(string authority)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "OidcDiscoveryDocument",
+      "fqn": "Granit.Authentication.Oidc.Discovery.OidcDiscoveryDocument",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Discovery/OidcDiscoveryDocument.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "Issuer",
+          "kind": "property",
+          "signature": "required string Issuer",
+          "returnType": "required string"
+        },
+        {
+          "name": "GrantTypesSupported",
+          "kind": "property",
+          "signature": "IReadOnlyList<string> GrantTypesSupported",
+          "returnType": "IReadOnlyList<string>"
+        },
+        {
+          "name": "ResponseTypesSupported",
+          "kind": "property",
+          "signature": "IReadOnlyList<string> ResponseTypesSupported",
+          "returnType": "IReadOnlyList<string>"
+        },
+        {
+          "name": "DPoPSigningAlgValuesSupported",
+          "kind": "property",
+          "signature": "IReadOnlyList<string> DPoPSigningAlgValuesSupported",
+          "returnType": "IReadOnlyList<string>"
+        }
+      ]
+    },
+    {
+      "name": "OidcDiscoveryException",
+      "fqn": "Granit.Authentication.Oidc.Discovery.OidcDiscoveryException",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Discovery/OidcDiscoveryException.cs",
+      "line": 6,
+      "members": []
+    },
+    {
+      "name": "GranitAuthenticationOidcModule",
+      "fqn": "Granit.Authentication.Oidc.GranitAuthenticationOidcModule",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/GranitAuthenticationOidcModule.cs",
+      "line": 17,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "GrantTypes",
+      "fqn": "Granit.Authentication.Oidc.GrantTypes",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 13,
+      "members": []
+    },
+    {
+      "name": "OidcConstants",
+      "fqn": "Granit.Authentication.Oidc.OidcConstants",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 8,
+      "members": []
+    },
+    {
+      "name": "Parameters",
+      "fqn": "Granit.Authentication.Oidc.Parameters",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 85,
+      "members": []
+    },
+    {
+      "name": "PkceHelper",
+      "fqn": "Granit.Authentication.Oidc.Pkce.PkceHelper",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Pkce/PkceHelper.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "GenerateCodeVerifier",
+          "kind": "method",
+          "signature": "GenerateCodeVerifier()",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "AuthorizationCodeTokenRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.AuthorizationCodeTokenRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/TokenRequest.cs",
+      "line": 23,
+      "members": []
+    },
+    {
+      "name": "AuthorizationRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.AuthorizationRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/AuthorizationRequest.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "AuthorizationEndpoint",
+          "kind": "property",
+          "signature": "required string AuthorizationEndpoint",
+          "returnType": "required string"
+        },
+        {
+          "name": "ToUrl",
+          "kind": "method",
+          "signature": "ToUrl()",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "ClientCredentialsTokenRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.ClientCredentialsTokenRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/TokenRequest.cs",
+      "line": 60,
+      "members": []
+    },
+    {
+      "name": "EndSessionRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.EndSessionRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/EndSessionRequest.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "ToUrl",
+          "kind": "method",
+          "signature": "ToUrl()",
+          "returnType": "required string EndSessionEndpoint { get; init; } public string? IdTokenHint { get; init; } public string? PostLogoutRedirectUri { get; init; } public string? ClientId { get; init; } public string? State { get; init; } public string"
+        }
+      ]
+    },
+    {
+      "name": "PushedAuthorizationRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.PushedAuthorizationRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/PushedAuthorizationRequest.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "ClientId",
+          "kind": "property",
+          "signature": "required string ClientId",
+          "returnType": "required string"
+        }
+      ]
+    },
+    {
+      "name": "RefreshTokenRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.RefreshTokenRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/TokenRequest.cs",
+      "line": 44,
+      "members": []
+    },
+    {
+      "name": "RevocationRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.RevocationRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/RevocationRequest.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "Token",
+          "kind": "property",
+          "signature": "required string Token",
+          "returnType": "required string"
+        }
+      ]
+    },
+    {
+      "name": "TokenRequest",
+      "fqn": "Granit.Authentication.Oidc.Requests.TokenRequest",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Requests/TokenRequest.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "ClientId",
+          "kind": "property",
+          "signature": "required string ClientId",
+          "returnType": "required string"
+        }
+      ]
+    },
+    {
+      "name": "ResponseTypes",
+      "fqn": "Granit.Authentication.Oidc.ResponseTypes",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 34,
+      "members": []
+    },
+    {
+      "name": "OidcError",
+      "fqn": "Granit.Authentication.Oidc.Responses.OidcError",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Responses/OidcError.cs",
+      "line": 9,
+      "members": []
+    },
+    {
+      "name": "PushedAuthorizationResponse",
+      "fqn": "Granit.Authentication.Oidc.Responses.PushedAuthorizationResponse",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Responses/PushedAuthorizationResponse.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "RequestUri",
+          "kind": "property",
+          "signature": "string? RequestUri",
+          "returnType": "string?"
+        },
+        {
+          "name": "FromJson",
+          "kind": "method",
+          "signature": "FromJson(JsonElement json)",
+          "returnType": "PushedAuthorizationResponse"
+        }
+      ]
+    },
+    {
+      "name": "TokenResponse",
+      "fqn": "Granit.Authentication.Oidc.Responses.TokenResponse",
+      "kind": "record",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/Responses/TokenResponse.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "AccessToken",
+          "kind": "property",
+          "signature": "string? AccessToken",
+          "returnType": "string?"
+        },
+        {
+          "name": "FromJson",
+          "kind": "method",
+          "signature": "FromJson(JsonElement json, string? dpopNonce = null)",
+          "returnType": "TokenResponse"
+        }
+      ]
+    },
+    {
+      "name": "TokenTypeIdentifiers",
+      "fqn": "Granit.Authentication.Oidc.TokenTypeIdentifiers",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 64,
+      "members": []
+    },
+    {
+      "name": "TokenTypes",
+      "fqn": "Granit.Authentication.Oidc.TokenTypes",
+      "kind": "class",
+      "project": "Granit.Authentication.Oidc",
+      "file": "src/Granit.Authentication.Oidc/OidcConstants.cs",
+      "line": 52,
+      "members": []
+    },
+    {
       "name": "OpenIddictValidationHostApplicationBuilderExtensions",
       "fqn": "Granit.Authentication.OpenIddict.Extensions.OpenIddictValidationHostApplicationBuilderExtensions",
       "kind": "class",
       "project": "Granit.Authentication.OpenIddict",
       "file": "src/Granit.Authentication.OpenIddict/Extensions/OpenIddictValidationHostApplicationBuilderExtensions.cs",
-      "line": 13,
+      "line": 15,
       "members": [
         {
           "name": "AddGranitOpenIddictAuthentication",
@@ -4611,6 +5140,151 @@
       "file": "src/Granit.Authentication.OpenIddict/Options/GranitOpenIddictValidationOptions.cs",
       "line": 6,
       "members": []
+    },
+    {
+      "name": "IClientCredentialsTokenCache",
+      "fqn": "Granit.Authentication.TokenManagement.Cache.IClientCredentialsTokenCache",
+      "kind": "interface",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/Cache/IClientCredentialsTokenCache.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "GetTokenAsync",
+          "kind": "method",
+          "signature": "GetTokenAsync(string clientName, CancellationToken cancellationToken = default)",
+          "returnType": "Task<string?>"
+        },
+        {
+          "name": "SetTokenAsync",
+          "kind": "method",
+          "signature": "SetTokenAsync(string clientName, string accessToken, TimeSpan expiry, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "RemoveTokenAsync",
+          "kind": "method",
+          "signature": "RemoveTokenAsync(string clientName, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "TokenManagementServiceCollectionExtensions",
+      "fqn": "Granit.Authentication.TokenManagement.Extensions.TokenManagementServiceCollectionExtensions",
+      "kind": "class",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/Extensions/TokenManagementServiceCollectionExtensions.cs",
+      "line": 17,
+      "members": [
+        {
+          "name": "AddGranitTokenManagement",
+          "kind": "method",
+          "signature": "AddGranitTokenManagement(this IServiceCollection services)",
+          "returnType": "IServiceCollection"
+        }
+      ]
+    },
+    {
+      "name": "GranitAuthenticationTokenManagementModule",
+      "fqn": "Granit.Authentication.TokenManagement.GranitAuthenticationTokenManagementModule",
+      "kind": "class",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/GranitAuthenticationTokenManagementModule.cs",
+      "line": 16,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "ClientCredentialsOptions",
+      "fqn": "Granit.Authentication.TokenManagement.Options.ClientCredentialsOptions",
+      "kind": "class",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/Options/ClientCredentialsOptions.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "Authority",
+          "kind": "property",
+          "signature": "string Authority",
+          "returnType": "string"
+        },
+        {
+          "name": "ClientId",
+          "kind": "property",
+          "signature": "string ClientId",
+          "returnType": "string"
+        },
+        {
+          "name": "ClientSecret",
+          "kind": "property",
+          "signature": "string? ClientSecret",
+          "returnType": "string?"
+        }
+      ]
+    },
+    {
+      "name": "TokenManagementOptions",
+      "fqn": "Granit.Authentication.TokenManagement.Options.TokenManagementOptions",
+      "kind": "class",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/Options/TokenManagementOptions.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "FromSeconds",
+          "kind": "method",
+          "signature": "FromSeconds(30)",
+          "returnType": "TimeSpan DefaultCacheMargin { get; set; } = TimeSpan."
+        }
+      ]
+    },
+    {
+      "name": "DPoPOptions",
+      "fqn": "Granit.Authentication.TokenManagement.Services.DPoPOptions",
+      "kind": "record",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/Services/ITokenEndpointService.cs",
+      "line": 12,
+      "members": []
+    },
+    {
+      "name": "ITokenEndpointService",
+      "fqn": "Granit.Authentication.TokenManagement.Services.ITokenEndpointService",
+      "kind": "interface",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/Services/ITokenEndpointService.cs",
+      "line": 18,
+      "members": [
+        {
+          "name": "RequestTokenAsync",
+          "kind": "method",
+          "signature": "RequestTokenAsync(string authority, TokenRequest request, IClientAuthenticationStrategy? clientAuth = null, DPoPOptions? dpop = null, CancellationToken cancellationToken = default)",
+          "returnType": "Task<TokenResponse>"
+        }
+      ]
+    },
+    {
+      "name": "ITokenRevocationService",
+      "fqn": "Granit.Authentication.TokenManagement.Services.ITokenRevocationService",
+      "kind": "interface",
+      "project": "Granit.Authentication.TokenManagement",
+      "file": "src/Granit.Authentication.TokenManagement/Services/ITokenRevocationService.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "RevokeTokenAsync",
+          "kind": "method",
+          "signature": "RevokeTokenAsync(string authority, RevocationRequest request, IClientAuthenticationStrategy? clientAuth = null, DPoPOptions? dpop = null, CancellationToken cancellationToken = default)",
+          "returnType": "Task<bool>"
+        }
+      ]
     },
     {
       "name": "AccessRiskScore",
@@ -4977,7 +5651,7 @@
       "kind": "class",
       "project": "Granit.Authorization.Endpoints",
       "file": "src/Granit.Authorization.Endpoints/GranitAuthorizationEndpointsModule.cs",
-      "line": 21,
+      "line": 23,
       "members": []
     },
     {
@@ -5346,7 +6020,7 @@
       "kind": "class",
       "project": "Granit.BackgroundJobs.Endpoints",
       "file": "src/Granit.BackgroundJobs.Endpoints/GranitBackgroundJobsEndpointsModule.cs",
-      "line": 21,
+      "line": 23,
       "members": []
     },
     {
@@ -5744,35 +6418,19 @@
       "members": []
     },
     {
-      "name": "IBffDPoPService",
-      "fqn": "Granit.Bff.DPoP.IBffDPoPService",
-      "kind": "interface",
-      "project": "Granit.Bff",
-      "file": "src/Granit.Bff/DPoP/IBffDPoPService.cs",
-      "line": 7,
-      "members": [
-        {
-          "name": "GenerateKeyPair",
-          "kind": "method",
-          "signature": "GenerateKeyPair()",
-          "returnType": "string"
-        },
-        {
-          "name": "CreateProof",
-          "kind": "method",
-          "signature": "CreateProof(string privateKeyJwk, string httpMethod, string httpUri)",
-          "returnType": "string"
-        }
-      ]
-    },
-    {
       "name": "BffMetrics",
       "fqn": "Granit.Bff.Diagnostics.BffMetrics",
       "kind": "class",
       "project": "Granit.Bff",
       "file": "src/Granit.Bff/Diagnostics/BffMetrics.cs",
-      "line": 11,
+      "line": 15,
       "members": [
+        {
+          "name": "RecordLogin",
+          "kind": "method",
+          "signature": "RecordLogin(string? tenantId)",
+          "returnType": "void"
+        },
         {
           "name": "RecordLogout",
           "kind": "method",
@@ -5827,7 +6485,7 @@
       "kind": "class",
       "project": "Granit.Bff.Endpoints",
       "file": "src/Granit.Bff.Endpoints/Extensions/BffEndpointRouteBuilderExtensions.cs",
-      "line": 140,
+      "line": 142,
       "members": [
         {
           "name": "InvokeAsync",
@@ -5843,7 +6501,60 @@
       "kind": "class",
       "project": "Granit.Bff.Endpoints",
       "file": "src/Granit.Bff.Endpoints/GranitBffEndpointsModule.cs",
-      "line": 12,
+      "line": 14,
+      "members": []
+    },
+    {
+      "name": "GranitBffEntityFrameworkCoreModule",
+      "fqn": "Granit.Bff.EntityFrameworkCore.GranitBffEntityFrameworkCoreModule",
+      "kind": "class",
+      "project": "Granit.Bff.EntityFrameworkCore",
+      "file": "src/Granit.Bff.EntityFrameworkCore/GranitBffEntityFrameworkCoreModule.cs",
+      "line": 18,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "BffSessionEntity",
+      "fqn": "Granit.Bff.EntityFrameworkCore.Internal.BffSessionEntity",
+      "kind": "class",
+      "project": "Granit.Bff.EntityFrameworkCore",
+      "file": "src/Granit.Bff.EntityFrameworkCore/Internal/BffSessionEntity.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "Id",
+          "kind": "property",
+          "signature": "Guid Id",
+          "returnType": "Guid"
+        },
+        {
+          "name": "FrontendName",
+          "kind": "property",
+          "signature": "string FrontendName",
+          "returnType": "string"
+        },
+        {
+          "name": "UserId",
+          "kind": "property",
+          "signature": "string? UserId",
+          "returnType": "string?"
+        }
+      ]
+    },
+    {
+      "name": "BffExpiredSessionCleanupJob",
+      "fqn": "Granit.Bff.EntityFrameworkCore.Jobs.BffExpiredSessionCleanupJob",
+      "kind": "record",
+      "project": "Granit.Bff.EntityFrameworkCore",
+      "file": "src/Granit.Bff.EntityFrameworkCore/Jobs/BffExpiredSessionCleanupJob.cs",
+      "line": 13,
       "members": []
     },
     {
@@ -5852,7 +6563,7 @@
       "kind": "class",
       "project": "Granit.Bff",
       "file": "src/Granit.Bff/GranitBffModule.cs",
-      "line": 26,
+      "line": 27,
       "members": [
         {
           "name": "ConfigureServices",
@@ -5909,8 +6620,23 @@
           "kind": "method",
           "signature": "RemoveAsync(string frontendName, string sessionId, CancellationToken cancellationToken = default)",
           "returnType": "Task"
+        },
+        {
+          "name": "GetSessionIdsByUserAsync",
+          "kind": "method",
+          "signature": "GetSessionIdsByUserAsync(string frontendName, string userId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<IReadOnlyList<string>>"
         }
       ]
+    },
+    {
+      "name": "BffClientAuthenticationMethod",
+      "fqn": "Granit.Bff.Options.BffClientAuthenticationMethod",
+      "kind": "enum",
+      "project": "Granit.Bff",
+      "file": "src/Granit.Bff/Options/GranitBffOptions.cs",
+      "line": 6,
+      "members": []
     },
     {
       "name": "BffFrontendOptions",
@@ -5918,7 +6644,7 @@
       "kind": "class",
       "project": "Granit.Bff",
       "file": "src/Granit.Bff/Options/GranitBffOptions.cs",
-      "line": 40,
+      "line": 79,
       "members": [
         {
           "name": "Name",
@@ -5973,6 +6699,12 @@
           "kind": "property",
           "signature": "string EffectivePostLogoutRedirectPath",
           "returnType": "string"
+        },
+        {
+          "name": "UsePushedAuthorizationRequests",
+          "kind": "property",
+          "signature": "bool UsePushedAuthorizationRequests",
+          "returnType": "bool"
         }
       ]
     },
@@ -5982,7 +6714,7 @@
       "kind": "class",
       "project": "Granit.Bff",
       "file": "src/Granit.Bff/Options/GranitBffOptions.cs",
-      "line": 11,
+      "line": 29,
       "members": [
         {
           "name": "Authority",
@@ -6001,6 +6733,24 @@
           "kind": "method",
           "signature": "FromMinutes(1)",
           "returnType": "TimeSpan RefreshGracePeriod { get; set; } = TimeSpan."
+        },
+        {
+          "name": "UseSessionSlidingExpiration",
+          "kind": "property",
+          "signature": "bool UseSessionSlidingExpiration",
+          "returnType": "bool"
+        },
+        {
+          "name": "FromHours",
+          "kind": "method",
+          "signature": "FromHours(8)",
+          "returnType": "TimeSpan SessionAbsoluteMaxDuration { get; set; } = TimeSpan."
+        },
+        {
+          "name": "RequireIssuerValidation",
+          "kind": "property",
+          "signature": "bool RequireIssuerValidation",
+          "returnType": "bool"
         },
         {
           "name": "Frontends",
@@ -6498,7 +7248,7 @@
       "kind": "class",
       "project": "Granit.BlobStorage.Endpoints",
       "file": "src/Granit.BlobStorage.Endpoints/GranitBlobStorageEndpointsModule.cs",
-      "line": 14,
+      "line": 16,
       "members": []
     },
     {
@@ -8987,7 +9737,7 @@
       "kind": "class",
       "project": "Granit.DataExchange.EntityFrameworkCore",
       "file": "src/Granit.DataExchange.EntityFrameworkCore/GranitDataExchangeEntityFrameworkCoreModule.cs",
-      "line": 15,
+      "line": 16,
       "members": []
     },
     {
@@ -9411,7 +10161,7 @@
       "fqn": "Granit.DataExchange.Export.Messages.ExportJobCompletedEto",
       "kind": "record",
       "project": "Granit.DataExchange",
-      "file": "src/Granit.DataExchange/Export/Messages/ExportJobCompletedEvent.cs",
+      "file": "src/Granit.DataExchange/Export/Messages/ExportJobCompletedEto.cs",
       "line": 19,
       "members": []
     },
@@ -9437,7 +10187,7 @@
       "kind": "class",
       "project": "Granit.DataExchange",
       "file": "src/Granit.DataExchange/GranitDataExchangeModule.cs",
-      "line": 35,
+      "line": 37,
       "members": [
         {
           "name": "ConfigureServices",
@@ -9955,7 +10705,7 @@
       "fqn": "Granit.DataExchange.Import.Messages.ImportJobCompletedEto",
       "kind": "record",
       "project": "Granit.DataExchange",
-      "file": "src/Granit.DataExchange/Import/Messages/ImportJobCompletedEvent.cs",
+      "file": "src/Granit.DataExchange/Import/Messages/ImportJobCompletedEto.cs",
       "line": 25,
       "members": []
     },
@@ -14635,11 +15385,11 @@
       ]
     },
     {
-      "name": "GranitIdentityLocalAspNetCoreModule",
-      "fqn": "Granit.Identity.Local.AspNetCore.GranitIdentityLocalAspNetCoreModule",
+      "name": "GranitIdentityLocalAspNetIdentityModule",
+      "fqn": "Granit.Identity.Local.AspNetIdentity.GranitIdentityLocalAspNetIdentityModule",
       "kind": "class",
-      "project": "Granit.Identity.Local.AspNetCore",
-      "file": "src/Granit.Identity.Local.AspNetCore/GranitIdentityLocalAspNetCoreModule.cs",
+      "project": "Granit.Identity.Local.AspNetIdentity",
+      "file": "src/Granit.Identity.Local.AspNetIdentity/GranitIdentityLocalAspNetIdentityModule.cs",
       "line": 27,
       "members": [
         {
@@ -18555,6 +19305,12 @@
       "line": 15,
       "members": [
         {
+          "name": "RecordTokenIssued",
+          "kind": "method",
+          "signature": "RecordTokenIssued(string? tenantId, string grantType)",
+          "returnType": "void"
+        },
+        {
           "name": "RecordTokenRevoked",
           "kind": "method",
           "signature": "RecordTokenRevoked(string? tenantId, string reason)",
@@ -18617,7 +19373,7 @@
         {
           "name": "RecordKeyRotation",
           "kind": "method",
-          "signature": "RecordKeyRotation(int keysGenerated, int keysRetired, int keysRevoked)",
+          "signature": "RecordKeyRotation(string? tenantId, int keysGenerated, int keysRetired, int keysRevoked)",
           "returnType": "void"
         },
         {
@@ -18659,7 +19415,7 @@
       "kind": "class",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Domain/SigningKey.cs",
-      "line": 20,
+      "line": 21,
       "members": [
         {
           "name": "KeyId",
@@ -18696,6 +19452,18 @@
           "kind": "property",
           "signature": "DateTimeOffset ActivatedAt",
           "returnType": "DateTimeOffset"
+        },
+        {
+          "name": "Create",
+          "kind": "method",
+          "signature": "Create(string keyId, string keyType, string algorithm, string encryptedKeyMaterial, DateTimeOffset activatedAt, DateTimeOffset expiresAt, int keySize = 2048)",
+          "returnType": "SigningKey"
+        },
+        {
+          "name": "Retire",
+          "kind": "method",
+          "signature": "Retire(DateTimeOffset retiredAt)",
+          "returnType": "void"
         }
       ]
     },
@@ -18705,7 +19473,7 @@
       "kind": "enum",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Domain/SigningKey.cs",
-      "line": 55,
+      "line": 98,
       "members": []
     },
     {
@@ -19250,6 +20018,22 @@
       "members": []
     },
     {
+      "name": "GranitOpenIddictOptionsExtensions",
+      "fqn": "Granit.OpenIddict.Options.GranitOpenIddictOptionsExtensions",
+      "kind": "class",
+      "project": "Granit.OpenIddict",
+      "file": "src/Granit.OpenIddict/Options/GranitOpenIddictOptions.cs",
+      "line": 109,
+      "members": [
+        {
+          "name": "WithFapi2Profile",
+          "kind": "method",
+          "signature": "WithFapi2Profile(this GranitOpenIddictOptions options)",
+          "returnType": "GranitOpenIddictOptions"
+        }
+      ]
+    },
+    {
       "name": "GranitOpenIddictSeedingOptions",
       "fqn": "Granit.OpenIddict.Options.GranitOpenIddictSeedingOptions",
       "kind": "class",
@@ -19305,7 +20089,7 @@
       "kind": "record",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Options/GranitOpenIddictSeedingOptions.cs",
-      "line": 31,
+      "line": 32,
       "members": []
     },
     {
@@ -19314,7 +20098,7 @@
       "kind": "record",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Options/GranitOpenIddictSeedingOptions.cs",
-      "line": 45,
+      "line": 47,
       "members": []
     },
     {
@@ -19675,6 +20459,12 @@
       "file": "src/Granit.OpenIddict/Services/ISigningKeyStore.cs",
       "line": 8,
       "members": [
+        {
+          "name": "GetKeysAsync",
+          "kind": "method",
+          "signature": "GetKeysAsync(SigningKeyStatus[] statuses, CancellationToken cancellationToken = default)",
+          "returnType": "Task<IReadOnlyList<SigningKey>>"
+        },
         {
           "name": "GetKeysAsync",
           "kind": "method",

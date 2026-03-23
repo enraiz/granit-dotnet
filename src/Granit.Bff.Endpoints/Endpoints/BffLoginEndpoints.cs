@@ -2,8 +2,10 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Granit.Authentication.Oidc.ClientAuthentication;
+using Granit.Authentication.Oidc.ClientAuthentication.Internal;
+using Granit.Authentication.Oidc.DPoP;
 using Granit.Bff.Diagnostics;
-using Granit.Bff.DPoP;
 using Granit.Bff.Options;
 using Granit.Timing;
 using Microsoft.AspNetCore.Builder;
@@ -33,7 +35,7 @@ internal static partial class BffLoginEndpoints
                 [FromServices] IDistributedCache cache,
                 [FromServices] IClock clock,
                 [FromServices] IHttpClientFactory httpClientFactory,
-                [FromServices] IBffDPoPService dpopService,
+                [FromServices] IDPoPProofService dpopService,
                 [FromServices] ILoggerFactory loggerFactory) =>
                 HandleLoginAsync(httpContext, frontend, options, cache, clock, httpClientFactory, dpopService, loggerFactory))
             .WithName($"BffLogin_{frontend.Name}")
@@ -49,16 +51,17 @@ internal static partial class BffLoginEndpoints
                 [FromQuery] string? code,
                 [FromQuery] string? state,
                 [FromQuery] string? error,
+                [FromQuery] string? iss,
                 [FromServices] IOptions<GranitBffOptions> options,
                 [FromServices] IDistributedCache cache,
                 [FromServices] IBffTokenStore tokenStore,
                 [FromServices] BffMetrics metrics,
                 [FromServices] IClock clock,
                 [FromServices] IHttpClientFactory httpClientFactory,
-                [FromServices] IBffDPoPService dpopService,
+                [FromServices] IDPoPProofService dpopService,
                 [FromServices] ILoggerFactory loggerFactory,
                 CancellationToken cancellationToken) =>
-                HandleCallbackAsync(httpContext, frontend, code, state, error, options, cache,
+                HandleCallbackAsync(httpContext, frontend, code, state, error, iss, options, cache,
                     tokenStore, metrics, clock, httpClientFactory, dpopService, loggerFactory, cancellationToken))
             .WithName($"BffCallback_{frontend.Name}")
             .WithSummary("Handles the OIDC callback, exchanges the code for tokens, and sets the session cookie.")
@@ -82,7 +85,7 @@ internal static partial class BffLoginEndpoints
         [FromServices] IDistributedCache cache,
         [FromServices] IClock clock,
         [FromServices] IHttpClientFactory httpClientFactory,
-        [FromServices] IBffDPoPService dpopService,
+        [FromServices] IDPoPProofService dpopService,
         [FromServices] ILoggerFactory loggerFactory)
     {
         ILogger logger = loggerFactory.CreateLogger("Granit.Bff.Endpoints.BffLoginEndpoints");
@@ -126,7 +129,7 @@ internal static partial class BffLoginEndpoints
             // PAR: push parameters to /connect/par, then redirect with request_uri only
             string? requestUri = await PushAuthorizationRequestAsync(
                 httpClientFactory, authorityBase, frontend, callbackUrl, scopes, state,
-                codeChallenge, logger).ConfigureAwait(false);
+                codeChallenge, clock, logger, httpContext.RequestAborted).ConfigureAwait(false);
 
             if (requestUri is not null)
             {
@@ -160,13 +163,14 @@ internal static partial class BffLoginEndpoints
         string? code,
         string? state,
         string? error,
+        string? iss,
         [FromServices] IOptions<GranitBffOptions> options,
         [FromServices] IDistributedCache cache,
         [FromServices] IBffTokenStore tokenStore,
         [FromServices] BffMetrics metrics,
         [FromServices] IClock clock,
         [FromServices] IHttpClientFactory httpClientFactory,
-        [FromServices] IBffDPoPService dpopService,
+        [FromServices] IDPoPProofService dpopService,
         [FromServices] ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
@@ -190,6 +194,28 @@ internal static partial class BffLoginEndpoints
         }
 
         GranitBffOptions bffOptions = options.Value;
+
+        // Verify authorization response issuer (RFC 9207, FAPI 2.0 §5.3.3.2)
+        if (bffOptions.RequireIssuerValidation)
+        {
+            string expectedIssuer = bffOptions.Authority.ToString().TrimEnd('/');
+
+            if (string.IsNullOrEmpty(iss))
+            {
+                LogIssuerMissing(logger, frontend.Name);
+                return TypedResults.Problem(
+                    detail: "Missing iss parameter in authorization response (RFC 9207).",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (!string.Equals(iss.TrimEnd('/'), expectedIssuer, StringComparison.OrdinalIgnoreCase))
+            {
+                LogIssuerMismatch(logger, iss, expectedIssuer, frontend.Name);
+                return TypedResults.Problem(
+                    detail: "Authorization response issuer does not match expected authority.",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+        }
 
         // Retrieve and remove PKCE state
         string pkceKey = $"{PkceKeyPrefix}{state}";
@@ -227,6 +253,15 @@ internal static partial class BffLoginEndpoints
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
+        // Enrich token set with user context for session management (#621)
+        string? userId = ExtractSubFromIdToken(tokens.IdToken);
+        string? userAgent = httpContext.Request.Headers.UserAgent.ToString();
+        tokens = tokens with
+        {
+            UserId = userId,
+            UserAgent = string.IsNullOrEmpty(userAgent) ? null : userAgent,
+        };
+
         // Generate session ID and store tokens — random, not DB-stored, so sequential GUIDs are not needed
 #pragma warning disable GRSEC002 // Session IDs are ephemeral cache keys, not clustered index values
         string sessionId = Guid.NewGuid().ToString("N");
@@ -260,7 +295,7 @@ internal static partial class BffLoginEndpoints
         string codeVerifier,
         string redirectUri,
         string? dpopPrivateKeyJwk,
-        IBffDPoPService dpopService,
+        IDPoPProofService dpopService,
         IClock clock,
         CancellationToken cancellationToken)
     {
@@ -273,48 +308,68 @@ internal static partial class BffLoginEndpoints
             ["code"] = code,
             ["redirect_uri"] = redirectUri,
             ["client_id"] = frontend.ClientId,
-            ["client_secret"] = frontend.ClientSecret,
             ["code_verifier"] = codeVerifier,
         };
 
-        using FormUrlEncodedContent content = new(parameters);
-        using var request = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint) { Content = content };
+        ResolveClientAuth(frontend, clock).Apply(parameters, frontend.ClientId, tokenEndpoint);
 
-        // Attach DPoP proof if key is available (RFC 9449 §4)
-        if (!string.IsNullOrEmpty(dpopPrivateKeyJwk))
+        HttpResponseMessage response = await SendTokenRequestAsync(
+            httpClient, tokenEndpoint, parameters, dpopPrivateKeyJwk, null, dpopService, cancellationToken)
+            .ConfigureAwait(false);
+
+        // Handle use_dpop_nonce error — single retry with server-provided nonce (RFC 9449 §8)
+        string? dpopNonce = null;
+        if (!response.IsSuccessStatusCode
+            && !string.IsNullOrEmpty(dpopPrivateKeyJwk)
+            && await IsDPoPNonceRequiredAsync(response, cancellationToken).ConfigureAwait(false))
         {
-            string dpopProof = dpopService.CreateProof(dpopPrivateKeyJwk, "POST", tokenEndpoint);
-            request.Headers.TryAddWithoutValidation("DPoP", dpopProof);
+            dpopNonce = response.Headers.TryGetValues("DPoP-Nonce", out IEnumerable<string>? nonceValues)
+                ? nonceValues.FirstOrDefault() : null;
+
+            if (!string.IsNullOrEmpty(dpopNonce))
+            {
+                response.Dispose();
+                response = await SendTokenRequestAsync(
+                    httpClient, tokenEndpoint, parameters, dpopPrivateKeyJwk, dpopNonce, dpopService, cancellationToken)
+                    .ConfigureAwait(false);
+            }
         }
 
-        using HttpResponseMessage response = await httpClient
-            .SendAsync(request, cancellationToken)
-            .ConfigureAwait(false);
-
-        if (!response.IsSuccessStatusCode)
+        using (response)
         {
-            return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            // Capture DPoP-Nonce from success response for future requests
+            if (response.Headers.TryGetValues("DPoP-Nonce", out IEnumerable<string>? successNonce))
+            {
+                dpopNonce = successNonce.FirstOrDefault() ?? dpopNonce;
+            }
+
+            using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            JsonElement tokenResponse = await JsonSerializer.DeserializeAsync<JsonElement>(stream, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            string accessToken = tokenResponse.GetProperty("access_token").GetString()!;
+            string? refreshToken = tokenResponse.TryGetProperty("refresh_token", out JsonElement rt) ? rt.GetString() : null;
+            string? idToken = tokenResponse.TryGetProperty("id_token", out JsonElement it) ? it.GetString() : null;
+            int expiresIn = tokenResponse.TryGetProperty("expires_in", out JsonElement ei) ? ei.GetInt32() : 3600;
+
+            return new BffTokenSet(
+                accessToken,
+                refreshToken,
+                idToken,
+                clock.Now.AddSeconds(expiresIn))
+            {
+                SessionCreatedAt = clock.Now,
+                DPoPPrivateKeyJwk = dpopPrivateKeyJwk,
+                DPoPNonce = dpopNonce,
+            };
         }
-
-        using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        JsonElement tokenResponse = await JsonSerializer.DeserializeAsync<JsonElement>(stream, cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        string accessToken = tokenResponse.GetProperty("access_token").GetString()!;
-        string? refreshToken = tokenResponse.TryGetProperty("refresh_token", out JsonElement rt) ? rt.GetString() : null;
-        string? idToken = tokenResponse.TryGetProperty("id_token", out JsonElement it) ? it.GetString() : null;
-        int expiresIn = tokenResponse.TryGetProperty("expires_in", out JsonElement ei) ? ei.GetInt32() : 3600;
-
-        return new BffTokenSet(
-            accessToken,
-            refreshToken,
-            idToken,
-            clock.Now.AddSeconds(expiresIn))
-        {
-            DPoPPrivateKeyJwk = dpopPrivateKeyJwk,
-        };
     }
 #pragma warning restore GRSEC003
 
@@ -339,7 +394,9 @@ internal static partial class BffLoginEndpoints
         string scopes,
         string state,
         string codeChallenge,
-        ILogger logger)
+        IClock clock,
+        ILogger logger,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -349,7 +406,6 @@ internal static partial class BffLoginEndpoints
             Dictionary<string, string> parameters = new()
             {
                 ["client_id"] = frontend.ClientId,
-                ["client_secret"] = frontend.ClientSecret,
                 ["response_type"] = "code",
                 ["redirect_uri"] = callbackUrl,
                 ["scope"] = scopes,
@@ -358,9 +414,11 @@ internal static partial class BffLoginEndpoints
                 ["code_challenge_method"] = "S256",
             };
 
+            ResolveClientAuth(frontend, clock).Apply(parameters, frontend.ClientId, parEndpoint);
+
             using FormUrlEncodedContent content = new(parameters);
             using HttpResponseMessage response = await httpClient
-                .PostAsync(parEndpoint, content)
+                .PostAsync(parEndpoint, content, cancellationToken)
                 .ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
@@ -369,10 +427,11 @@ internal static partial class BffLoginEndpoints
                 return null;
             }
 
-            using Stream stream = await response.Content.ReadAsStreamAsync()
+            using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            JsonElement parResponse = await JsonSerializer.DeserializeAsync<JsonElement>(stream)
+            JsonElement parResponse = await JsonSerializer.DeserializeAsync<JsonElement>(
+                stream, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             string? requestUri = parResponse.TryGetProperty("request_uri", out JsonElement ru)
@@ -399,6 +458,46 @@ internal static partial class BffLoginEndpoints
     }
 #pragma warning restore GRSEC003
 
+    private static async Task<HttpResponseMessage> SendTokenRequestAsync(
+        HttpClient httpClient,
+        string tokenEndpoint,
+        Dictionary<string, string> parameters,
+        string? dpopPrivateKeyJwk,
+        string? dpopNonce,
+        IDPoPProofService dpopService,
+        CancellationToken cancellationToken)
+    {
+        using FormUrlEncodedContent content = new(parameters);
+        using var request = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint) { Content = content };
+
+        if (!string.IsNullOrEmpty(dpopPrivateKeyJwk))
+        {
+            string dpopProof = dpopService.CreateProof(dpopPrivateKeyJwk, "POST", tokenEndpoint, dpopNonce);
+            request.Headers.TryAddWithoutValidation("DPoP", dpopProof);
+        }
+
+        return await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task<bool> IsDPoPNonceRequiredAsync(
+        HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using Stream errorStream = await response.Content.ReadAsStreamAsync(cancellationToken)
+                .ConfigureAwait(false);
+            JsonElement errorBody = await JsonSerializer.DeserializeAsync<JsonElement>(
+                errorStream, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            return errorBody.TryGetProperty("error", out JsonElement errorCode)
+                && errorCode.GetString() == "use_dpop_nonce";
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
     private static string GenerateCodeVerifier()
     {
         byte[] bytes = RandomNumberGenerator.GetBytes(CodeVerifierLength);
@@ -417,7 +516,53 @@ internal static partial class BffLoginEndpoints
             .TrimEnd('=');
     }
 
+    /// <summary>
+    /// Extracts the <c>sub</c> claim from an ID token JWT payload without full validation
+    /// (token was already validated by the authorization server during exchange).
+    /// </summary>
+    private static string? ExtractSubFromIdToken(string? idToken)
+    {
+        if (string.IsNullOrEmpty(idToken))
+        {
+            return null;
+        }
+
+        try
+        {
+            string[] parts = idToken.Split('.');
+            if (parts.Length < 2)
+            {
+                return null;
+            }
+
+            string payload = parts[1].Replace('-', '+').Replace('_', '/');
+            switch (payload.Length % 4)
+            {
+                case 2: payload += "=="; break;
+                case 3: payload += "="; break;
+            }
+
+            byte[] bytes = Convert.FromBase64String(payload);
+            using var doc = JsonDocument.Parse(bytes);
+            return doc.RootElement.TryGetProperty("sub", out JsonElement sub)
+                ? sub.GetString() : null;
+        }
+        catch (FormatException)
+        {
+            return null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
     private sealed record PkceState(string CodeVerifier, string State, string FrontendName, string? DPoPPrivateKeyJwk = null);
+
+    private static IClientAuthenticationStrategy ResolveClientAuth(BffFrontendOptions frontend, IClock clock) =>
+        frontend.ClientAuthenticationMethod == BffClientAuthenticationMethod.PrivateKeyJwt
+            ? new PrivateKeyJwtStrategy(frontend.ClientSigningKeyJwk!, clock)
+            : new ClientSecretPostStrategy(frontend.ClientSecret);
 
     // ──── Source-generated log messages ────
 
@@ -447,4 +592,10 @@ internal static partial class BffLoginEndpoints
 
     [LoggerMessage(Level = LogLevel.Error, Message = "BFF PAR: exception during pushed authorization request for frontend {FrontendName}")]
     private static partial void LogParException(ILogger logger, Exception exception, string frontendName);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "BFF callback: missing iss parameter in authorization response for frontend {FrontendName} (RFC 9207)")]
+    private static partial void LogIssuerMissing(ILogger logger, string frontendName);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "BFF callback: issuer mismatch — received '{ReceivedIssuer}', expected '{ExpectedIssuer}' for frontend {FrontendName}")]
+    private static partial void LogIssuerMismatch(ILogger logger, string receivedIssuer, string expectedIssuer, string frontendName);
 }

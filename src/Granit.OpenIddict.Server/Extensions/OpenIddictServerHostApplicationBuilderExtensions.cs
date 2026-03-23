@@ -30,6 +30,12 @@ public static class OpenIddictServerHostApplicationBuilderExtensions
         GranitOpenIddictOptions granitOptions = new();
         builder.Configuration.GetSection("OpenIddict").Bind(granitOptions);
 
+        // FAPI 2.0 profile: apply all mandatory server-side constraints
+        if (granitOptions.EnableFapi2Profile)
+        {
+            granitOptions.WithFapi2Profile();
+        }
+
         OpenIddictBuilder openIddict = builder.Services.AddOpenIddict();
 
         // ──── Server — OIDC authorization server ────
@@ -54,6 +60,12 @@ public static class OpenIddictServerHostApplicationBuilderExtensions
                 .AllowRefreshTokenFlow()
                 .AllowDeviceAuthorizationFlow();
 
+            // Token Exchange (RFC 8693) — microservice delegation/impersonation
+            if (granitOptions.EnableTokenExchange)
+            {
+                options.AllowTokenExchangeFlow();
+            }
+
             // PKCE required by default (can be relaxed per-application)
             options.RequireProofKeyForCodeExchange();
 
@@ -61,6 +73,13 @@ public static class OpenIddictServerHostApplicationBuilderExtensions
             if (granitOptions.RequirePar)
             {
                 options.RequirePushedAuthorizationRequests();
+            }
+
+            // ──── FAPI 2.0 hardening ────
+            if (granitOptions.EnableFapi2Profile)
+            {
+                // Authorization code lifetime ≤ 60s (FAPI 2.0 §5.3.2.1)
+                options.SetAuthorizationCodeLifetime(TimeSpan.FromSeconds(60));
             }
 
             // ──── Signing & encryption ────

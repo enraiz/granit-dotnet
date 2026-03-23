@@ -4,6 +4,7 @@
     "projects": [
       "src/Granit.Analyzers.CodeFixes/Granit.Analyzers.CodeFixes.csproj",
       "src/Granit.Analyzers/Granit.Analyzers.csproj",
+      "src/Granit.Authentication.Oidc/Granit.Authentication.Oidc.csproj",
       "src/Granit.Authorization/Granit.Authorization.csproj",
       "src/Granit.BackgroundJobs/Granit.BackgroundJobs.csproj",
       "src/Granit.Bff.Endpoints/Granit.Bff.Endpoints.csproj",
@@ -71,6 +72,7 @@
       "tests/Granit.BlobStorage.Tests/Granit.BlobStorage.Tests.csproj",
       "tests/Granit.Caching.FusionCache.Tests/Granit.Caching.FusionCache.Tests.csproj",
       "tests/Granit.Caching.StackExchangeRedis.Tests/Granit.Caching.StackExchangeRedis.Tests.csproj",
+      "tests/Granit.Caching.Tests.Integration/Granit.Caching.Tests.Integration.csproj",
       "tests/Granit.Caching.Tests/Granit.Caching.Tests.csproj",
       "tests/Granit.Http.ApiDocumentation.Tests/Granit.Http.ApiDocumentation.Tests.csproj",
       "tests/Granit.Http.ApiVersioning.Tests/Granit.Http.ApiVersioning.Tests.csproj",

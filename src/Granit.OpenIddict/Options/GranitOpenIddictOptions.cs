@@ -69,4 +69,56 @@ public sealed class GranitOpenIddictOptions
     /// </para>
     /// </remarks>
     public bool RequirePar { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether OAuth 2.0 Token Exchange (RFC 8693) is enabled.
+    /// Allows services to exchange an access token for a more constrained, audience-restricted one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Token exchange enables delegation and impersonation flows in microservice architectures.
+    /// A service receiving a user's token can exchange it for a narrower token scoped to a
+    /// downstream service's audience.
+    /// </para>
+    /// <para>Default: <see langword="false"/>.</para>
+    /// </remarks>
+    public bool EnableTokenExchange { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the FAPI 2.0 Security Profile is enabled.
+    /// When <see langword="true"/>, all FAPI 2.0 mandatory constraints are enforced.
+    /// </summary>
+    /// <remarks>
+    /// <para>Enabling this profile automatically sets:</para>
+    /// <list type="bullet">
+    /// <item><description><see cref="RequirePar"/> = <c>true</c> (RFC 9126)</description></item>
+    /// </list>
+    /// <para>
+    /// Additionally, the following must be configured on the BFF side:
+    /// <c>UseDPoP</c>, <c>UsePushedAuthorizationRequests</c>,
+    /// <c>ClientAuthenticationMethod = PrivateKeyJwt</c>.
+    /// </para>
+    /// <para>Default: <see langword="false"/>.</para>
+    /// </remarks>
+    public bool EnableFapi2Profile { get; set; }
+}
+
+/// <summary>
+/// Extension methods for <see cref="GranitOpenIddictOptions"/> FAPI 2.0 profile.
+/// </summary>
+public static class GranitOpenIddictOptionsExtensions
+{
+    /// <summary>
+    /// Enables the FAPI 2.0 Security Profile on the OpenIddict server.
+    /// Enforces PAR, PKCE S256, DPoP sender-constraining, private_key_jwt,
+    /// and issuer verification — all mandatory FAPI 2.0 requirements.
+    /// </summary>
+    /// <param name="options">The OpenIddict options.</param>
+    /// <returns>The options for chaining.</returns>
+    public static GranitOpenIddictOptions WithFapi2Profile(this GranitOpenIddictOptions options)
+    {
+        options.EnableFapi2Profile = true;
+        options.RequirePar = true;
+        return options;
+    }
 }
