@@ -1,10 +1,10 @@
 using Granit.AuditLog.Abstractions;
 using Granit.AuditLog.Domain;
-using Granit.Core.Events;
-using Granit.Core.MultiTenancy;
+using Granit.Events;
 using Granit.Guids;
-using Granit.Security;
+using Granit.MultiTenancy;
 using Granit.Settings.Events;
+using Granit.Users;
 
 namespace Granit.AuditLog.ConfigurationChanges.Handlers;
 

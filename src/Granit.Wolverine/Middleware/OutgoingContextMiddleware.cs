@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Granit.Core.MultiTenancy;
-using Granit.Security;
+using Granit.MultiTenancy;
+using Granit.Users;
 using Wolverine;
 
 namespace Granit.Wolverine.Middleware;

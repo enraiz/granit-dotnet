@@ -9,12 +9,12 @@
 // IClock is mocked for exact assertions (no BeCloseTo).
 // =============================================================================
 
-using Granit.Core.Domain;
-using Granit.Core.MultiTenancy;
+using Granit.Domain;
 using Granit.Guids;
+using Granit.MultiTenancy;
 using Granit.Persistence.Interceptors;
-using Granit.Security;
 using Granit.Timing;
+using Granit.Users;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using Shouldly;

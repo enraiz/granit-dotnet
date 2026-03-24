@@ -1,5 +1,5 @@
-using Granit.Core.Modularity;
-using Granit.Security;
+using Granit.Modularity;
+using Granit.Users;
 
 namespace Granit.Authentication.OpenIddict;
 
@@ -8,5 +8,4 @@ namespace Granit.Authentication.OpenIddict;
 /// Validates JWT/reference tokens from a remote Granit OpenIddict server without
 /// embedding the full OIDC stack.
 /// </summary>
-[DependsOn(typeof(GranitSecurityModule))]
 public sealed class GranitAuthenticationOpenIddictModule : GranitModule;

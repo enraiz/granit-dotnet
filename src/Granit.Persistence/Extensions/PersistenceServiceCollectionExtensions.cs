@@ -1,6 +1,6 @@
-using Granit.Core.DataFiltering;
-using Granit.Core.Diagnostics;
-using Granit.Core.Events;
+using Granit.DataFiltering;
+using Granit.Diagnostics;
+using Granit.Events;
 using Granit.Http.ExceptionHandling;
 using Granit.Persistence.DataSeeding;
 using Granit.Persistence.Diagnostics;
@@ -39,7 +39,7 @@ public static class PersistenceServiceCollectionExtensions
     ///   </item>
     ///   <item>
     ///     No-op <see cref="IIntegrationEventDispatcher"/> (replaced by Wolverine implementation
-    ///     when <c>Granit.EventBus.Wolverine</c> is configured).
+    ///     when <c>Granit.Events.Wolverine</c> is configured).
     ///   </item>
     ///   <item>
     ///     <see cref="EfCoreExceptionStatusCodeMapper"/> if

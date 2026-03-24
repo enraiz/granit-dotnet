@@ -1,7 +1,7 @@
-using Granit.Core.Modularity;
 using Granit.DataExchange.Extensions;
-using Granit.EventBus;
+using Granit.Events;
 using Granit.Guids;
+using Granit.Modularity;
 using Granit.Querying;
 using Granit.Timing;
 using Granit.Validation;
@@ -29,7 +29,7 @@ namespace Granit.DataExchange;
 /// </para>
 /// </remarks>
 [DependsOn(
-    typeof(GranitEventBusModule),
+    typeof(GranitEventsModule),
     typeof(GranitGuidsModule),
     typeof(GranitQueryingModule),
     typeof(GranitTimingModule),

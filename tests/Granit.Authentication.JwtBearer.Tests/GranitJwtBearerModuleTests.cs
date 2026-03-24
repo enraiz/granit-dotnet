@@ -4,8 +4,8 @@
 // Verifies that the module registers JWT Bearer services via ConfigureServices.
 // =============================================================================
 
-using Granit.Core.Modularity;
-using Granit.Security;
+using Granit.Modularity;
+using Granit.Users;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shouldly;

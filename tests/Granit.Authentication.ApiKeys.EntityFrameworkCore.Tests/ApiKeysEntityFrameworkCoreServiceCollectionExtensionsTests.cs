@@ -1,10 +1,10 @@
 using Granit.Authentication.ApiKeys.EntityFrameworkCore.Extensions;
 using Granit.Authentication.ApiKeys.EntityFrameworkCore.Internal;
-using Granit.Core.MultiTenancy;
 using Granit.Guids;
+using Granit.MultiTenancy;
 using Granit.Persistence.Interceptors;
-using Granit.Security;
 using Granit.Timing;
+using Granit.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

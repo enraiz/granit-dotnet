@@ -287,20 +287,14 @@
           "xunit.v3.runner.common": "[3.2.2]"
         }
       },
+      "granit": {
+        "type": "Project"
+      },
       "granit.authentication.jwtbearer": {
         "type": "Project",
         "dependencies": {
-          "Granit.Security": "[0.1.0-dev, )",
+          "Granit": "[0.1.0-dev, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.*, )"
-        }
-      },
-      "granit.core": {
-        "type": "Project"
-      },
-      "granit.security": {
-        "type": "Project",
-        "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {

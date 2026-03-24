@@ -1,6 +1,6 @@
-using Granit.Core.Events;
-using Granit.Core.MultiTenancy;
+using Granit.Events;
 using Granit.Guids;
+using Granit.MultiTenancy;
 using Granit.Privacy.DataDeletion;
 using Granit.Privacy.DataDeletion.Events;
 using Granit.Privacy.DataExport;
@@ -12,7 +12,7 @@ using Granit.Privacy.Endpoints.Permissions;
 using Granit.Privacy.LegalAgreements;
 using Granit.Privacy.LegalAgreements.Events;
 using Granit.Privacy.Options;
-using Granit.Security;
+using Granit.Users;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

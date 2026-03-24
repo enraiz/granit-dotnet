@@ -5,14 +5,14 @@
 // attachment inclusion against a SQLite in-memory database.
 // =============================================================================
 
-using Granit.Core.MultiTenancy;
 using Granit.Guids;
+using Granit.MultiTenancy;
 using Granit.Querying;
-using Granit.Security;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.Domain;
 using Granit.Timeline.EntityFrameworkCore.Internal;
 using Granit.Timing;
+using Granit.Users;
 using NSubstitute;
 using Shouldly;
 using Xunit;

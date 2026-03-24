@@ -1,11 +1,11 @@
 using System.Threading.RateLimiting;
-using Granit.Core.MultiTenancy;
 using Granit.Http.Bulkhead.Abstractions;
 using Granit.Http.Bulkhead.Diagnostics;
 using Granit.Http.Bulkhead.Exceptions;
 using Granit.Http.Bulkhead.Internal;
 using Granit.Http.Bulkhead.Options;
-using Granit.Security;
+using Granit.MultiTenancy;
+using Granit.Users;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

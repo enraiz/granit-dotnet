@@ -1,10 +1,10 @@
-using Granit.Core.Modularity;
 using Granit.Diagnostics;
 using Granit.Http.ExceptionHandling;
+using Granit.Modularity;
 using Granit.Observability;
 using Granit.Persistence;
-using Granit.Security;
 using Granit.Timing;
+using Granit.Users;
 using Granit.Validation;
 
 namespace Granit.Bundle.Essentials;
@@ -21,7 +21,6 @@ public static class GranitBuilderEssentialsExtensions
     public static GranitBuilder AddEssentials(this GranitBuilder builder)
     {
         builder.AddModule<GranitTimingModule>();
-        builder.AddModule<GranitSecurityModule>();
         builder.AddModule<GranitValidationModule>();
         builder.AddModule<GranitPersistenceModule>();
         builder.AddModule<GranitObservabilityModule>();

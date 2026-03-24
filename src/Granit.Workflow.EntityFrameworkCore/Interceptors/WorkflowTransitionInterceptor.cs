@@ -1,9 +1,9 @@
 using System.Reflection;
-using Granit.Core.Domain;
-using Granit.Core.MultiTenancy;
+using Granit.Domain;
 using Granit.Guids;
-using Granit.Security;
+using Granit.MultiTenancy;
 using Granit.Timing;
+using Granit.Users;
 using Granit.Workflow.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

@@ -1,9 +1,9 @@
-using Granit.Core.Modularity;
-using Granit.Core.MultiTenancy;
 using Granit.Guids;
-using Granit.Security;
+using Granit.Modularity;
+using Granit.MultiTenancy;
 using Granit.Testing.Fakes;
 using Granit.Timing;
+using Granit.Users;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 

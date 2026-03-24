@@ -4,12 +4,12 @@
 // Verifies that AddGranitTimeline registers all expected services.
 // =============================================================================
 
-using Granit.Core.MultiTenancy;
 using Granit.Guids;
-using Granit.Security;
+using Granit.MultiTenancy;
 using Granit.Timeline.Abstractions;
 using Granit.Timeline.Extensions;
 using Granit.Timing;
+using Granit.Users;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;

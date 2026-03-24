@@ -95,18 +95,18 @@
         "resolved": "10.0.5",
         "contentHash": "/HUHJ0tw/LQvD0DZrz50eQy/3z7PfX7WWEaXnjKTV9/TNdcgFlNTZGo49QhS7PTmhDqMyHRMqAXSBxLh0vso4g=="
       },
+      "granit": {
+        "type": "Project"
+      },
       "granit.authentication.apikeys": {
         "type": "Project",
         "dependencies": {
+          "Granit": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
           "Granit.Http.ExceptionHandling": "[0.1.0-dev, )",
           "Granit.Querying": "[0.1.0-dev, )",
-          "Granit.Security": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )"
         }
-      },
-      "granit.core": {
-        "type": "Project"
       },
       "granit.guids": {
         "type": "Project",
@@ -119,7 +119,7 @@
       "granit.http.exceptionhandling": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit": "[0.1.0-dev, )"
         }
       },
       "granit.persistence": {
@@ -127,7 +127,6 @@
         "dependencies": {
           "Granit.Guids": "[0.1.0-dev, )",
           "Granit.Http.ExceptionHandling": "[0.1.0-dev, )",
-          "Granit.Security": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore": "[10.*, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )",
@@ -139,19 +138,13 @@
       "granit.querying": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
-        }
-      },
-      "granit.security": {
-        "type": "Project",
-        "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit": "[0.1.0-dev, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
+          "Granit": "[0.1.0-dev, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
           "Microsoft.Extensions.Options": "[10.*, )"
         }

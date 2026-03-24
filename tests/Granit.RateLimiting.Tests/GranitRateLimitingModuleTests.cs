@@ -1,4 +1,4 @@
-using Granit.Core.Modularity;
+using Granit.Modularity;
 using Granit.RateLimiting.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -59,6 +59,5 @@ public sealed class GranitRateLimitingModuleTests
 
         Type[] dependedTypes = attrs.SelectMany(a => a.DependedTypes).ToArray();
 
-        dependedTypes.ShouldContain(typeof(Granit.Security.GranitSecurityModule));
     }
 }

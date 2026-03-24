@@ -1,10 +1,10 @@
 using System.Diagnostics.Metrics;
-using Granit.Core.MultiTenancy;
+using Granit.MultiTenancy;
 using Granit.RateLimiting.Abstractions;
 using Granit.RateLimiting.Diagnostics;
 using Granit.RateLimiting.Internal;
 using Granit.RateLimiting.Options;
-using Granit.Security;
+using Granit.Users;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;

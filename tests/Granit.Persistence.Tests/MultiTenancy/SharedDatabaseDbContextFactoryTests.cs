@@ -1,4 +1,4 @@
-using Granit.Core.MultiTenancy;
+using Granit.MultiTenancy;
 using Granit.Persistence.Interceptors;
 using Granit.Persistence.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +57,7 @@ public sealed class SharedDatabaseDbContextFactoryTests
         ServiceCollection services = new();
         services.AddSingleton(Substitute.For<Granit.Timing.IClock>());
         services.AddSingleton(Substitute.For<Granit.Guids.IGuidGenerator>());
-        services.AddSingleton(Substitute.For<Granit.Security.ICurrentUserService>());
+        services.AddSingleton(Substitute.For<Granit.Users.ICurrentUserService>());
         services.AddSingleton(Substitute.For<ICurrentTenant>());
         services.AddScoped<AuditedEntityInterceptor>();
         using ServiceProvider sp = services.BuildServiceProvider();

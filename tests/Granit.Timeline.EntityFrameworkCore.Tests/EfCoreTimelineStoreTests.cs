@@ -5,12 +5,12 @@
 // against a SQLite in-memory database.
 // =============================================================================
 
-using Granit.Core.MultiTenancy;
 using Granit.Guids;
-using Granit.Security;
+using Granit.MultiTenancy;
 using Granit.Timeline.Domain;
 using Granit.Timeline.EntityFrameworkCore.Internal;
 using Granit.Timing;
+using Granit.Users;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using Shouldly;

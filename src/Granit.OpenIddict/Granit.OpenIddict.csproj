@@ -21,12 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Granit.Core\Granit.Core.csproj" />
-    <ProjectReference Include="..\Granit.EventBus\Granit.EventBus.csproj" />
+    <ProjectReference Include="..\Granit\Granit.csproj" />
+    <ProjectReference Include="..\Granit.Events\Granit.Events.csproj" />
     <ProjectReference Include="..\Granit.Guids\Granit.Guids.csproj" />
     <ProjectReference Include="..\Granit.Identity\Granit.Identity.csproj" />
     <ProjectReference Include="..\Granit.Querying\Granit.Querying.csproj" />
-    <ProjectReference Include="..\Granit.Security\Granit.Security.csproj" />
     <ProjectReference Include="..\Granit.Timing\Granit.Timing.csproj" />
   </ItemGroup>
 

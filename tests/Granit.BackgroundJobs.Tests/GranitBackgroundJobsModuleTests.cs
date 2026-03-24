@@ -1,7 +1,7 @@
-using Granit.Core.Modularity;
 using Granit.Guids;
-using Granit.Security;
+using Granit.Modularity;
 using Granit.Timing;
+using Granit.Users;
 using Shouldly;
 using Xunit;
 
@@ -19,7 +19,6 @@ public sealed class GranitBackgroundJobsModuleTests
 
         attribute.ShouldNotBeNull();
         attribute!.DependedTypes.ShouldContain(typeof(GranitGuidsModule));
-        attribute.DependedTypes.ShouldContain(typeof(GranitSecurityModule));
         attribute.DependedTypes.ShouldContain(typeof(GranitTimingModule));
     }
 

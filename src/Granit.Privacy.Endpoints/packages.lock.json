@@ -38,8 +38,8 @@
       },
       "JasperFx": {
         "type": "Transitive",
-        "resolved": "1.21.2",
-        "contentHash": "iX6hOaDBjU+PlywN6Q7iVHV0e+Qv6mF4joJglU/kdjdxUxEIGmboLzdmCs+AN7YE81ZZu3/SOkVBvGPRG0rYSw==",
+        "resolved": "1.21.3",
+        "contentHash": "gRVPfkXd0dqt7jDJP+y1bAJD5fCvY3Aq4C0MmYFt3DR0OrBlQJufVMXJS+p8Fy+vQ3oAzHBA7uHakL16V+4dWA==",
         "dependencies": {
           "FastExpressionCompiler": "5.3.0",
           "ImTools": "4.0.0",
@@ -50,10 +50,10 @@
       },
       "JasperFx.Events": {
         "type": "Transitive",
-        "resolved": "1.24.0",
-        "contentHash": "vDkYMarrBqHSqoLBlpQfePz5FdVK/3LyFoBVRCzaWKeS/jxwUQG4fckHu30ozwZId1DulkHKcNjYziO5oyG08Q==",
+        "resolved": "1.24.1",
+        "contentHash": "SsmuFZCutD9NNsZAH7t9Hbrmo6YccxPkf0E5OdQxitxmHx3f/OkNzplGyhEbPwoURcRJzYMCtk2oUkqQjdG6Ew==",
         "dependencies": {
-          "JasperFx": "1.21.1"
+          "JasperFx": "1.21.3"
         }
       },
       "JasperFx.RuntimeCompiler": {
@@ -233,25 +233,24 @@
         "resolved": "2.6.0",
         "contentHash": "XE8a+11nZg0LRaf+RGABEWaHIf8yGd5w8v/Ra1iWxMBmAVzwuKbW7G21mS0U7w7sh1lYcgckInWGgnz4qyET8A=="
       },
+      "granit": {
+        "type": "Project"
+      },
       "granit.authorization": {
         "type": "Project",
         "dependencies": {
-          "Granit.Caching": "[0.1.0-dev, )",
-          "Granit.Security": "[0.1.0-dev, )"
+          "Granit.Caching": "[0.1.0-dev, )"
         }
       },
       "granit.caching": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
+          "Granit": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
           "ZiggyCreatures.FusionCache": "[2.*, )",
           "ZiggyCreatures.FusionCache.OpenTelemetry": "[2.*, )",
           "ZiggyCreatures.FusionCache.Serialization.SystemTextJson": "[2.*, )"
         }
-      },
-      "granit.core": {
-        "type": "Project"
       },
       "granit.guids": {
         "type": "Project",
@@ -263,7 +262,6 @@
         "type": "Project",
         "dependencies": {
           "Granit.Http.ApiVersioning": "[0.1.0-dev, )",
-          "Granit.Security": "[0.1.0-dev, )",
           "Microsoft.AspNetCore.OpenApi": "[10.*, )",
           "Scalar.AspNetCore": "[2.*, )"
         }
@@ -273,40 +271,34 @@
         "dependencies": {
           "Asp.Versioning.Mvc": "[10.0.0-preview.*, )",
           "Asp.Versioning.Mvc.ApiExplorer": "[10.0.0-preview.*, )",
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit": "[0.1.0-dev, )"
         }
       },
       "granit.http.exceptionhandling": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit": "[0.1.0-dev, )"
         }
       },
       "granit.localization": {
         "type": "Project",
         "dependencies": {
+          "Granit": "[0.1.0-dev, )",
           "Granit.Caching": "[0.1.0-dev, )",
-          "Granit.Core": "[0.1.0-dev, )",
           "SmartFormat": "[3.*, )"
         }
       },
       "granit.privacy": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )",
+          "Granit": "[0.1.0-dev, )",
           "WolverineFx": "[5.*, )"
-        }
-      },
-      "granit.security": {
-        "type": "Project",
-        "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
         }
       },
       "granit.timing": {
         "type": "Project",
         "dependencies": {
-          "Granit.Core": "[0.1.0-dev, )"
+          "Granit": "[0.1.0-dev, )"
         }
       },
       "granit.validation": {
@@ -400,8 +392,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.13",
-        "contentHash": "QS94/CNp2thhykXwBaOHjDe8Zlexs8v0QOrdLfUvxS85uW84IhCf1zGiOnYZNNtVxunJvtsr7yPgEP36TXnJ3w=="
+        "resolved": "2.13.14",
+        "contentHash": "l4QRu4M9NwPAnYnaBOan5MXBdiIsKmKQ8gJUSqaqDUoAxJZ+xBsP6kmZoDf9Qovl4E2Fv5qOAWnfpVMUrs2flQ=="
       },
       "SmartFormat": {
         "type": "CentralTransitive",
@@ -421,11 +413,11 @@
       "WolverineFx": {
         "type": "CentralTransitive",
         "requested": "[5.*, )",
-        "resolved": "5.22.0",
-        "contentHash": "Lj21RgjRxTz2cxNGN45DWzMCTsZIKr2dSYH6UwXq4P2raRnjyCW0qUIPjSk3Xg97lDDt9+HkKx+aTRlWBIfA7g==",
+        "resolved": "5.23.0",
+        "contentHash": "wP90xEOd3oX/Lhz2lul4nzK7LN8utZEs2EAPXTW8irMYCXhpLcgWeFqkIn1nZH0Ye5gcxFj82hKT3oXiBcD3ow==",
         "dependencies": {
-          "JasperFx": "1.21.2",
-          "JasperFx.Events": "1.24.0",
+          "JasperFx": "1.21.3",
+          "JasperFx.Events": "1.24.1",
           "JasperFx.RuntimeCompiler": "4.4.0",
           "NewId": "4.0.1",
           "Newtonsoft.Json": "13.0.3"

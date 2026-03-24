@@ -1,8 +1,8 @@
-using Granit.Core.MultiTenancy;
 using Granit.Guids;
-using Granit.Security;
+using Granit.MultiTenancy;
 using Granit.Testing.Fakes;
 using Granit.Timing;
+using Granit.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

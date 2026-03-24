@@ -1,4 +1,4 @@
-using Granit.Core.MultiTenancy;
+using Granit.MultiTenancy;
 using Granit.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,7 +76,7 @@ public sealed class PersistenceDbContextServiceCollectionExtensionsTests
     {
         services.AddSingleton(NSubstitute.Substitute.For<Granit.Timing.IClock>());
         services.AddSingleton(NSubstitute.Substitute.For<Granit.Guids.IGuidGenerator>());
-        services.AddSingleton(NSubstitute.Substitute.For<Granit.Security.ICurrentUserService>());
+        services.AddSingleton(NSubstitute.Substitute.For<Granit.Users.ICurrentUserService>());
         services.AddSingleton(NSubstitute.Substitute.For<ICurrentTenant>());
     }
 }

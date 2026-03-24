@@ -4,7 +4,7 @@ using System.Text.Encodings.Web;
 using Granit.Authentication.ApiKeys.Domain;
 using Granit.Authentication.ApiKeys.Internal;
 using Granit.Authentication.ApiKeys.Options;
-using Granit.Core.Domain;
+using Granit.Domain;
 using Granit.Timing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -303,7 +303,7 @@ public sealed class ApiKeyAuthenticationHandlerTests
         principal.FindFirstValue(ClaimTypes.Name).ShouldBe("Test Key");
 
         // ApiKey-specific claims
-        principal.FindFirstValue(ApiKeyClaimTypes.ActorKind).ShouldBe(nameof(Security.ActorKind.ExternalSystem));
+        principal.FindFirstValue(ApiKeyClaimTypes.ActorKind).ShouldBe(nameof(Users.ActorKind.ExternalSystem));
         principal.FindFirstValue(ApiKeyClaimTypes.ApiKeyId).ShouldBe(apiKey.Id.ToString());
         principal.FindFirstValue(ApiKeyClaimTypes.ApiKeyType).ShouldBe(ApiKeyType.Secret.ToString());
         principal.FindFirstValue(ApiKeyClaimTypes.Environment).ShouldBe("live");

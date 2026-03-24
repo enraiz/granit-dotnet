@@ -6,8 +6,8 @@
 // =============================================================================
 
 using System.Diagnostics;
-using Granit.Core.MultiTenancy;
-using Granit.Security;
+using Granit.MultiTenancy;
+using Granit.Users;
 using Granit.Wolverine.Middleware;
 using NSubstitute;
 using Shouldly;
