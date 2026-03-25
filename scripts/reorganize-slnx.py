@@ -21,11 +21,11 @@ SRC_DOMAINS = {
     },
     "Application": {
         "DataExchange", "DocumentGeneration", "Features", "Localization",
-        "Querying", "ReferenceData", "Settings", "Templating",
+        "QueryEngine", "ReferenceData", "Settings", "Templating",
         "Timeline", "Workflow",
     },
     "Infrastructure": {
-        "BackgroundJobs", "BlobStorage", "Caching", "EventBus",
+        "BackgroundJobs", "BlobStorage", "Caching", "Events",
         "Imaging", "Persistence", "Webhooks", "Wolverine",
     },
     "Compliance": {"AuditLog", "Privacy"},
