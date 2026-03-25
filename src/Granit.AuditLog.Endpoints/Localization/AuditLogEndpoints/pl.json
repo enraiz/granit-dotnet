@@ -1,7 +1,0 @@
-{
-  "culture": "pl",
-  "texts": {
-    "PermissionGroup:AuditLog": "Dziennik audytu",
-    "Permission:AuditLog.Entries.Read": "Wyświetlanie wpisów dziennika audytu (ścieżka audytu ISO 27001)"
-  }
-}

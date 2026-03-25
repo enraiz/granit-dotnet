@@ -1,7 +1,0 @@
-{
-  "culture": "en",
-  "texts": {
-    "PermissionGroup:AuditLog": "Audit Log",
-    "Permission:AuditLog.Entries.Read": "View audit log entries (ISO 27001 audit trail)"
-  }
-}

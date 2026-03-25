@@ -1,0 +1,7 @@
+{
+  "culture": "fr",
+  "texts": {
+    "PermissionGroup:Auditing": "Journal d'audit",
+    "Permission:Auditing.AuditEntries.Read": "Consulter les entrées du journal d'audit (piste d'audit ISO 27001)"
+  }
+}
