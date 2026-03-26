@@ -9579,8 +9579,71 @@
       "kind": "class",
       "project": "Granit",
       "file": "src/Granit/DataProtection/SensitiveDataAttribute.cs",
-      "line": 22,
+      "line": 41,
+      "members": [
+        {
+          "name": "Level",
+          "kind": "property",
+          "signature": "Sensitivity Level",
+          "returnType": "Sensitivity"
+        },
+        {
+          "name": "Mode",
+          "kind": "property",
+          "signature": "SensitiveDataMode Mode",
+          "returnType": "SensitiveDataMode"
+        }
+      ]
+    },
+    {
+      "name": "SensitiveDataMode",
+      "fqn": "Granit.DataProtection.SensitiveDataMode",
+      "kind": "enum",
+      "project": "Granit",
+      "file": "src/Granit/DataProtection/SensitiveDataMode.cs",
+      "line": 7,
       "members": []
+    },
+    {
+      "name": "SensitivePropertyRegistry",
+      "fqn": "Granit.DataProtection.SensitivePropertyRegistry",
+      "kind": "class",
+      "project": "Granit",
+      "file": "src/Granit/DataProtection/SensitivePropertyRegistry.cs",
+      "line": 28,
+      "members": [
+        {
+          "name": "IsSensitiveAtLevel",
+          "kind": "method",
+          "signature": "IsSensitiveAtLevel(string propertyName, Sensitivity minimumLevel, out SensitivePropertyEntry entry)",
+          "returnType": "bool"
+        }
+      ]
+    },
+    {
+      "name": "Sensitivity",
+      "fqn": "Granit.DataProtection.Sensitivity",
+      "kind": "enum",
+      "project": "Granit",
+      "file": "src/Granit/DataProtection/Sensitivity.cs",
+      "line": 18,
+      "members": []
+    },
+    {
+      "name": "struct",
+      "fqn": "Granit.DataProtection.struct",
+      "kind": "record",
+      "project": "Granit",
+      "file": "src/Granit/DataProtection/SensitivePropertyRegistry.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "IsSensitiveAtLevel",
+          "kind": "method",
+          "signature": "IsSensitiveAtLevel(string propertyName, Sensitivity minimumLevel, out SensitivePropertyEntry entry)",
+          "returnType": "bool"
+        }
+      ]
     },
     {
       "name": "IHealthCheckAggregator",
@@ -16199,7 +16262,7 @@
       "kind": "class",
       "project": "Granit.Mcp",
       "file": "src/Granit.Mcp/Extensions/McpServiceCollectionExtensions.cs",
-      "line": 21,
+      "line": 23,
       "members": []
     },
     {
@@ -16373,31 +16436,6 @@
           "returnType": "ValueTask<CallToolResult>"
         }
       ]
-    },
-    {
-      "name": "McpRedactAttribute",
-      "fqn": "Granit.Mcp.Sanitization.McpRedactAttribute",
-      "kind": "class",
-      "project": "Granit.Mcp",
-      "file": "src/Granit.Mcp/Sanitization/McpRedactAttribute.cs",
-      "line": 9,
-      "members": [
-        {
-          "name": "Strategy",
-          "kind": "property",
-          "signature": "RedactionStrategy Strategy",
-          "returnType": "RedactionStrategy"
-        }
-      ]
-    },
-    {
-      "name": "RedactionStrategy",
-      "fqn": "Granit.Mcp.Sanitization.RedactionStrategy",
-      "kind": "enum",
-      "project": "Granit.Mcp",
-      "file": "src/Granit.Mcp/Sanitization/RedactionStrategy.cs",
-      "line": 6,
-      "members": []
     },
     {
       "name": "McpServerEndpointRouteBuilderExtensions",
