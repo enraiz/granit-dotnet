@@ -1,22 +1,23 @@
 using Granit.Oidc.TokenManagement.Cache.Internal;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 using Xunit;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Granit.Oidc.TokenManagement.Tests;
 
-public sealed class ClientCredentialsTokenCacheTests
+public sealed class ClientCredentialsTokenCacheTests : IDisposable
 {
+    private readonly FusionCache _cache;
     private readonly ClientCredentialsTokenCache _sut;
 
     public ClientCredentialsTokenCacheTests()
     {
-        MemoryDistributedCache memoryCache = new(
-            Microsoft.Extensions.Options.Options.Create(new MemoryDistributedCacheOptions()));
-        _sut = new ClientCredentialsTokenCache(memoryCache, NullLogger<ClientCredentialsTokenCache>.Instance);
+        _cache = new FusionCache(new FusionCacheOptions());
+        _sut = new ClientCredentialsTokenCache(_cache, NullLogger<ClientCredentialsTokenCache>.Instance);
     }
+
+    public void Dispose() => _cache.Dispose();
 
     [Fact]
     public async Task GetTokenAsync_ReturnsCachedToken()
