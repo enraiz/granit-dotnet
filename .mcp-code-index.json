@@ -24079,7 +24079,7 @@
       "kind": "class",
       "project": "Granit.QueryEngine.AI",
       "file": "src/Granit.QueryEngine.AI/Extensions/QueryEngineAIHostApplicationBuilderExtensions.cs",
-      "line": 15,
+      "line": 16,
       "members": [
         {
           "name": "AddGranitQueryEngineAI",
@@ -24838,6 +24838,12 @@
           "kind": "method",
           "signature": "GetAsync(Guid id, CancellationToken cancellationToken = default)",
           "returnType": "Task<SavedView?>"
+        },
+        {
+          "name": "GetCountAsync",
+          "kind": "method",
+          "signature": "GetCountAsync(string entityType, string userId, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<int>"
         }
       ]
     },
@@ -25993,7 +25999,7 @@
       "kind": "class",
       "project": "Granit.Settings.EntityFrameworkCore",
       "file": "src/Granit.Settings.EntityFrameworkCore/Extensions/SettingsEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 13,
+      "line": 14,
       "members": []
     },
     {
@@ -26351,7 +26357,7 @@
       "kind": "class",
       "project": "Granit.Settings",
       "file": "src/Granit.Settings/Services/SettingManager.cs",
-      "line": 14,
+      "line": 15,
       "members": [
         {
           "name": "SetGlobalAsync",
