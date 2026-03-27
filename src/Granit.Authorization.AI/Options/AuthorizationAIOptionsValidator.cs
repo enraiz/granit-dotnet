@@ -3,36 +3,25 @@ using Microsoft.Extensions.Options;
 namespace Granit.Authorization.AI.Options;
 
 /// <summary>
-/// Validates <see cref="AuthorizationAIOptions"/> at startup to catch
-/// misconfigurations that could degrade AI anomaly detection security.
+/// Validates <see cref="AuthorizationAIOptions"/> at startup (fail-fast on misconfiguration).
 /// </summary>
-internal sealed class AuthorizationAIOptionsValidator
-    : IValidateOptions<AuthorizationAIOptions>
+internal sealed class AuthorizationAIOptionsValidator : IValidateOptions<AuthorizationAIOptions>
 {
+    /// <inheritdoc/>
     public ValidateOptionsResult Validate(string? name, AuthorizationAIOptions options)
     {
-        List<string>? failures = null;
+        if (options.TimeoutSeconds <= 0)
+        {
+            return ValidateOptionsResult.Fail(
+                $"{nameof(options.TimeoutSeconds)} must be positive.");
+        }
 
         if (options.UnavailableRiskScore is < 0.0 or > 1.0)
         {
-            (failures ??= []).Add(
-                $"UnavailableRiskScore must be between 0.0 and 1.0, got {options.UnavailableRiskScore}.");
+            return ValidateOptionsResult.Fail(
+                $"{nameof(options.UnavailableRiskScore)} must be between 0.0 and 1.0.");
         }
 
-        if (options.TimeoutSeconds is < 1 or > 30)
-        {
-            (failures ??= []).Add(
-                $"TimeoutSeconds must be between 1 and 30, got {options.TimeoutSeconds}.");
-        }
-
-        if (string.IsNullOrWhiteSpace(options.WorkspaceName))
-        {
-            (failures ??= []).Add(
-                "WorkspaceName must not be empty.");
-        }
-
-        return failures is null
-            ? ValidateOptionsResult.Success
-            : ValidateOptionsResult.Fail(failures);
+        return ValidateOptionsResult.Success;
     }
 }

@@ -6294,7 +6294,7 @@
       "kind": "class",
       "project": "Granit.Bff",
       "file": "src/Granit.Bff/GranitBffModule.cs",
-      "line": 28,
+      "line": 30,
       "members": [
         {
           "name": "ConfigureServices",
@@ -7346,7 +7346,7 @@
       "kind": "class",
       "project": "Granit.BlobStorage",
       "file": "src/Granit.BlobStorage/GranitBlobStorageModule.cs",
-      "line": 25,
+      "line": 24,
       "members": [
         {
           "name": "ConfigureServices",
@@ -7556,12 +7556,6 @@
           "kind": "method",
           "signature": "FromMinutes(5)",
           "returnType": "TimeSpan DownloadUrlExpiry { get; set; } = TimeSpan."
-        },
-        {
-          "name": "AllowedContentTypes",
-          "kind": "property",
-          "signature": "HashSet<string> AllowedContentTypes",
-          "returnType": "HashSet<string>"
         }
       ]
     },
@@ -7806,7 +7800,7 @@
       "kind": "class",
       "project": "Granit.BlobStorage",
       "file": "src/Granit.BlobStorage/Validators/MagicBytesValidator.cs",
-      "line": 21,
+      "line": 18,
       "members": [
         {
           "name": "Order",
@@ -10254,12 +10248,6 @@
           "kind": "property",
           "signature": "string? ChromiumExecutablePath",
           "returnType": "string?"
-        },
-        {
-          "name": "MaxConcurrentPages",
-          "kind": "property",
-          "signature": "int MaxConcurrentPages",
-          "returnType": "int"
         }
       ]
     },
