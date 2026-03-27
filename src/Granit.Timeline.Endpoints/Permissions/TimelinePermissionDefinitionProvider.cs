@@ -5,14 +5,8 @@ using Granit.Timeline.Endpoints.Internal;
 namespace Granit.Timeline.Endpoints.Permissions;
 
 /// <summary>
-/// Declares the <c>Timeline.Entries.Read</c> and <c>Timeline.Entries.Create</c> permissions
-/// in the Granit RBAC system.
+/// Declares all Timeline permissions in the Granit RBAC system.
 /// </summary>
-/// <remarks>
-/// Registered automatically by <see cref="GranitTimelineEndpointsModule"/>.
-/// Once registered, <c>DynamicPermissionPolicyProvider</c> creates the authorization policies
-/// via <c>PermissionRequirement</c> — the full <c>IPermissionChecker</c> pipeline is used.
-/// </remarks>
 internal sealed class TimelinePermissionDefinitionProvider : IPermissionDefinitionProvider
 {
     /// <inheritdoc />
@@ -32,5 +26,20 @@ internal sealed class TimelinePermissionDefinitionProvider : IPermissionDefiniti
             TimelinePermissions.Entries.Create,
             LocalizableString.Create<TimelineEndpointsLocalizationResource>(
                 "Permission:Timeline.Entries.Create"));
+
+        group.AddPermission(
+            TimelinePermissions.Entries.Manage,
+            LocalizableString.Create<TimelineEndpointsLocalizationResource>(
+                "Permission:Timeline.Entries.Manage"));
+
+        group.AddPermission(
+            TimelinePermissions.InternalNotes.Read,
+            LocalizableString.Create<TimelineEndpointsLocalizationResource>(
+                "Permission:Timeline.InternalNotes.Read"));
+
+        group.AddPermission(
+            TimelinePermissions.Followers.Manage,
+            LocalizableString.Create<TimelineEndpointsLocalizationResource>(
+                "Permission:Timeline.Followers.Manage"));
     }
 }

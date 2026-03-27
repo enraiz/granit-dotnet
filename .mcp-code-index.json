@@ -1532,6 +1532,7 @@
         "Granit",
         "Granit.Guids",
         "Granit.Http.Resilience",
+        "Granit.Encryption",
         "Granit.Timing"
       ],
       "framework": "net10.0"
@@ -27865,6 +27866,12 @@
       "line": 10,
       "members": [
         {
+          "name": "Create",
+          "kind": "method",
+          "signature": "Create(Guid id, Guid entryId, Guid blobId, string fileName, string contentType, long sizeBytes, DateTimeOffset createdAt, string createdBy, Guid? tenantId = null)",
+          "returnType": "TimelineAttachment"
+        },
+        {
           "name": "EntryId",
           "kind": "property",
           "signature": "Guid EntryId",
@@ -27891,12 +27898,6 @@
           "kind": "method",
           "signature": "Create(Guid id, string entityType, string entityId, TimelineEntryType entryType, string body, string authorId, string authorName, DateTimeOffset createdAt, string createdBy, Guid? tenantId = null, Guid? parentEntryId = null)",
           "returnType": "TimelineEntry"
-        },
-        {
-          "name": "EntityType",
-          "kind": "property",
-          "signature": "string EntityType",
-          "returnType": "string"
         },
         {
           "name": "EntityId",
@@ -27996,6 +27997,24 @@
       "project": "Granit.Timeline.Endpoints",
       "file": "src/Granit.Timeline.Endpoints/Permissions/TimelinePermissions.cs",
       "line": 14,
+      "members": []
+    },
+    {
+      "name": "Followers",
+      "fqn": "Granit.Timeline.Endpoints.Permissions.Followers",
+      "kind": "class",
+      "project": "Granit.Timeline.Endpoints",
+      "file": "src/Granit.Timeline.Endpoints/Permissions/TimelinePermissions.cs",
+      "line": 34,
+      "members": []
+    },
+    {
+      "name": "InternalNotes",
+      "fqn": "Granit.Timeline.Endpoints.Permissions.InternalNotes",
+      "kind": "class",
+      "project": "Granit.Timeline.Endpoints",
+      "file": "src/Granit.Timeline.Endpoints/Permissions/TimelinePermissions.cs",
+      "line": 27,
       "members": []
     },
     {
@@ -28232,7 +28251,7 @@
       "kind": "record",
       "project": "Granit.Timeline",
       "file": "src/Granit.Timeline/TimelineStreamEntry.cs",
-      "line": 7,
+      "line": 9,
       "members": [
         {
           "name": "Id",
@@ -30216,6 +30235,12 @@
           "returnType": "Guid?"
         },
         {
+          "name": "Status",
+          "kind": "property",
+          "signature": "WebhookSubscriptionStatus Status",
+          "returnType": "WebhookSubscriptionStatus"
+        },
+        {
           "name": "RecordSuccess",
           "kind": "method",
           "signature": "RecordSuccess(DateTimeOffset at)",
@@ -30402,7 +30427,7 @@
       "kind": "class",
       "project": "Granit.Webhooks",
       "file": "src/Granit.Webhooks/Endpoints/WebhookConfigEndpoint.cs",
-      "line": 11,
+      "line": 12,
       "members": [
         {
           "name": "MapGranitWebhooksConfig",
@@ -30577,7 +30602,7 @@
       "kind": "class",
       "project": "Granit.Webhooks",
       "file": "src/Granit.Webhooks/GranitWebhooksModule.cs",
-      "line": 31,
+      "line": 33,
       "members": [
         {
           "name": "ConfigureServices",
@@ -30593,7 +30618,7 @@
       "kind": "enum",
       "project": "Granit.Webhooks",
       "file": "src/Granit.Webhooks/Handlers/RetryWebhookHandler.cs",
-      "line": 135,
+      "line": 134,
       "members": []
     },
     {
@@ -30618,7 +30643,7 @@
       "kind": "class",
       "project": "Granit.Webhooks",
       "file": "src/Granit.Webhooks/Handlers/RetryWebhookHandler.cs",
-      "line": 104,
+      "line": 103,
       "members": []
     },
     {
@@ -30928,7 +30953,7 @@
         {
           "name": "Change",
           "kind": "method",
-          "signature": "Change(string? userId, string? firstName = null, string? lastName = null, ActorKind actorKind = ActorKind.User, Guid? apiKeyId = null)",
+          "signature": "Change(string? userId, ActorKind actorKind = ActorKind.User, Guid? apiKeyId = null)",
           "returnType": "IDisposable"
         }
       ]
@@ -30939,7 +30964,7 @@
       "kind": "class",
       "project": "Granit.Wolverine",
       "file": "src/Granit.Wolverine/Middleware/OutgoingContextMiddleware.cs",
-      "line": 29,
+      "line": 34,
       "members": [
         {
           "name": "Before",
@@ -31396,7 +31421,7 @@
       "kind": "class",
       "project": "Granit.Workflow.Endpoints",
       "file": "src/Granit.Workflow.Endpoints/Extensions/WorkflowEndpointsServiceCollectionExtensions.cs",
-      "line": 8,
+      "line": 10,
       "members": [
         {
           "name": "AddGranitWorkflowEndpoints",
@@ -31412,8 +31437,15 @@
       "kind": "class",
       "project": "Granit.Workflow.Endpoints",
       "file": "src/Granit.Workflow.Endpoints/GranitWorkflowEndpointsModule.cs",
-      "line": 32,
-      "members": []
+      "line": 33,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "WorkflowEndpointsOptions",
