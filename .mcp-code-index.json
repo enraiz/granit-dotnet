@@ -10018,6 +10018,22 @@
       ]
     },
     {
+      "name": "LogRedaction",
+      "fqn": "Granit.Diagnostics.LogRedaction",
+      "kind": "class",
+      "project": "Granit",
+      "file": "src/Granit/Diagnostics/LogRedaction.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "Email",
+          "kind": "method",
+          "signature": "Email(string email)",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
       "name": "DiagnosticsOptions",
       "fqn": "Granit.Diagnostics.Options.DiagnosticsOptions",
       "kind": "class",
@@ -15698,12 +15714,12 @@
       "kind": "class",
       "project": "Granit.Imaging.MagickNet",
       "file": "src/Granit.Imaging.MagickNet/Extensions/ImagingMagickNetServiceCollectionExtensions.cs",
-      "line": 13,
+      "line": 15,
       "members": [
         {
           "name": "AddGranitImagingMagickNet",
           "kind": "method",
-          "signature": "AddGranitImagingMagickNet(this IServiceCollection services)",
+          "signature": "AddGranitImagingMagickNet(this IServiceCollection services, Action<ImagingMagickNetOptions>? configure = null)",
           "returnType": "IServiceCollection"
         }
       ]
@@ -15721,6 +15737,46 @@
           "kind": "method",
           "signature": "ConfigureServices(ServiceConfigurationContext context)",
           "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "ImagingMagickNetOptions",
+      "fqn": "Granit.Imaging.MagickNet.Options.ImagingMagickNetOptions",
+      "kind": "class",
+      "project": "Granit.Imaging.MagickNet",
+      "file": "src/Granit.Imaging.MagickNet/Options/ImagingMagickNetOptions.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "MaxMemoryBytes",
+          "kind": "property",
+          "signature": "long MaxMemoryBytes",
+          "returnType": "long"
+        },
+        {
+          "name": "MaxWidthPixels",
+          "kind": "property",
+          "signature": "int MaxWidthPixels",
+          "returnType": "int"
+        },
+        {
+          "name": "MaxHeightPixels",
+          "kind": "property",
+          "signature": "int MaxHeightPixels",
+          "returnType": "int"
+        },
+        {
+          "name": "MaxListLength",
+          "kind": "property",
+          "signature": "int MaxListLength",
+          "returnType": "int"
+        },
+        {
+          "name": "MaxInputBytes",
+          "kind": "property",
+          "signature": "long MaxInputBytes",
+          "returnType": "long"
         }
       ]
     },
@@ -17084,7 +17140,7 @@
       "kind": "class",
       "project": "Granit.MultiTenancy",
       "file": "src/Granit.MultiTenancy/Middleware/TenantResolutionMiddleware.cs",
-      "line": 12,
+      "line": 15,
       "members": [
         {
           "name": "InvokeAsync",
@@ -17100,7 +17156,7 @@
       "kind": "class",
       "project": "Granit.MultiTenancy",
       "file": "src/Granit.MultiTenancy/Options/MultiTenancyOptions.cs",
-      "line": 6,
+      "line": 25,
       "members": [
         {
           "name": "IsEnabled",
@@ -17119,6 +17175,37 @@
           "kind": "property",
           "signature": "string TenantIdHeaderName",
           "returnType": "string"
+        },
+        {
+          "name": "HeaderTrustMode",
+          "kind": "property",
+          "signature": "TenantHeaderTrustMode HeaderTrustMode",
+          "returnType": "TenantHeaderTrustMode"
+        }
+      ]
+    },
+    {
+      "name": "TenantHeaderTrustMode",
+      "fqn": "Granit.MultiTenancy.Options.TenantHeaderTrustMode",
+      "kind": "enum",
+      "project": "Granit.MultiTenancy",
+      "file": "src/Granit.MultiTenancy/Options/MultiTenancyOptions.cs",
+      "line": 6,
+      "members": []
+    },
+    {
+      "name": "TenantResolutionResult",
+      "fqn": "Granit.MultiTenancy.Pipeline.TenantResolutionResult",
+      "kind": "record",
+      "project": "Granit.MultiTenancy",
+      "file": "src/Granit.MultiTenancy/Pipeline/TenantResolverPipeline.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "ResolveAsync",
+          "kind": "method",
+          "signature": "ResolveAsync(HttpContext context, CancellationToken cancellationToken = default)",
+          "returnType": "Task<TenantResolutionResult>"
         }
       ]
     },
@@ -17128,13 +17215,13 @@
       "kind": "class",
       "project": "Granit.MultiTenancy",
       "file": "src/Granit.MultiTenancy/Pipeline/TenantResolverPipeline.cs",
-      "line": 10,
+      "line": 17,
       "members": [
         {
           "name": "ResolveAsync",
           "kind": "method",
           "signature": "ResolveAsync(HttpContext context, CancellationToken cancellationToken = default)",
-          "returnType": "Task<TenantInfo?>"
+          "returnType": "Task<TenantResolutionResult>"
         }
       ]
     },
@@ -17575,7 +17662,7 @@
         {
           "name": "MarkAsReadAsync",
           "kind": "method",
-          "signature": "MarkAsReadAsync(Guid id, DateTimeOffset readAt, CancellationToken cancellationToken = default)",
+          "signature": "MarkAsReadAsync(Guid id, string recipientUserId, DateTimeOffset readAt, CancellationToken cancellationToken = default)",
           "returnType": "Task"
         },
         {
@@ -18288,7 +18375,7 @@
       "kind": "class",
       "project": "Granit.Notifications.Endpoints",
       "file": "src/Granit.Notifications.Endpoints/Endpoints/MobilePushTokenEndpoints.cs",
-      "line": 18,
+      "line": 19,
       "members": [
         {
           "name": "MapMobilePushTokenEndpoints",
@@ -18304,7 +18391,7 @@
       "kind": "class",
       "project": "Granit.Notifications.Endpoints",
       "file": "src/Granit.Notifications.Endpoints/Extensions/NotificationEndpointRouteBuilderExtensions.cs",
-      "line": 22,
+      "line": 23,
       "members": [
         {
           "name": "MapGranitNotificationEndpoints",
@@ -18873,7 +18960,7 @@
         {
           "name": "RemoveAsync",
           "kind": "method",
-          "signature": "RemoveAsync(string deviceToken, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "RemoveAsync(string deviceToken, string userId, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task"
         }
       ]
@@ -19331,7 +19418,7 @@
           "name": "Connect",
           "kind": "method",
           "signature": "Connect(string userId)",
-          "returnType": "SseConnection"
+          "returnType": "SseConnection?"
         },
         {
           "name": "Disconnect",
@@ -19365,6 +19452,18 @@
           "name": "HeartbeatIntervalSeconds",
           "kind": "property",
           "signature": "int HeartbeatIntervalSeconds",
+          "returnType": "int"
+        },
+        {
+          "name": "MaxConnectionsPerUser",
+          "kind": "property",
+          "signature": "int MaxConnectionsPerUser",
+          "returnType": "int"
+        },
+        {
+          "name": "MaxBufferSize",
+          "kind": "property",
+          "signature": "int MaxBufferSize",
           "returnType": "int"
         }
       ]
@@ -20841,6 +20940,15 @@
       "members": []
     },
     {
+      "name": "AccountTwoFactorDisableRequest",
+      "fqn": "Granit.OpenIddict.Endpoints.Dtos.AccountTwoFactorDisableRequest",
+      "kind": "record",
+      "project": "Granit.OpenIddict.Endpoints",
+      "file": "src/Granit.OpenIddict.Endpoints/Dtos/AccountTwoFactorDisableRequest.cs",
+      "line": 7,
+      "members": []
+    },
+    {
       "name": "AccountTwoFactorEnableRequest",
       "fqn": "Granit.OpenIddict.Endpoints.Dtos.AccountTwoFactorEnableRequest",
       "kind": "record",
@@ -21044,7 +21152,7 @@
       "kind": "class",
       "project": "Granit.OpenIddict.EntityFrameworkCore",
       "file": "src/Granit.OpenIddict.EntityFrameworkCore/Extensions/OpenIddictEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 20,
+      "line": 22,
       "members": [
         {
           "name": "AddGranitOpenIddict",
@@ -21117,7 +21225,7 @@
       "kind": "record",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Events/PasswordResetRequestedEto.cs",
-      "line": 19,
+      "line": 29,
       "members": []
     },
     {
@@ -21135,7 +21243,7 @@
       "kind": "record",
       "project": "Granit.OpenIddict",
       "file": "src/Granit.OpenIddict/Events/UserRegisteredEto.cs",
-      "line": 11,
+      "line": 14,
       "members": []
     },
     {
@@ -22305,6 +22413,22 @@
       ]
     },
     {
+      "name": "IInternalDbContextEnsurer",
+      "fqn": "Granit.Persistence.IInternalDbContextEnsurer",
+      "kind": "interface",
+      "project": "Granit.Persistence",
+      "file": "src/Granit.Persistence/IInternalDbContextEnsurer.cs",
+      "line": 21,
+      "members": [
+        {
+          "name": "EnsureCreatedAsync",
+          "kind": "method",
+          "signature": "EnsureCreatedAsync(CancellationToken cancellationToken = default)",
+          "returnType": "string ContextName { get; } Task"
+        }
+      ]
+    },
+    {
       "name": "ISoftDeletePurgeTarget",
       "fqn": "Granit.Persistence.ISoftDeletePurgeTarget",
       "kind": "interface",
@@ -22764,7 +22888,7 @@
       "kind": "enum",
       "project": "Granit.Persistence",
       "file": "src/Granit.Persistence/MultiTenancy/TenantSchemaOptions.cs",
-      "line": 6,
+      "line": 8,
       "members": []
     },
     {
@@ -22773,7 +22897,7 @@
       "kind": "class",
       "project": "Granit.Persistence",
       "file": "src/Granit.Persistence/MultiTenancy/TenantSchemaOptions.cs",
-      "line": 31,
+      "line": 33,
       "members": [
         {
           "name": "NamingConvention",
