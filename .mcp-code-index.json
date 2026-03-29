@@ -1250,6 +1250,13 @@
       "framework": "net10.0"
     },
     {
+      "name": "Granit.QueryEngine.Abstractions",
+      "deps": [
+        "Granit"
+      ],
+      "framework": "net10.0"
+    },
+    {
       "name": "Granit.QueryEngine.Endpoints",
       "deps": [
         "Granit.Http.ApiDocumentation",
@@ -24478,6 +24485,15 @@
       "project": "Granit.QueryEngine",
       "file": "src/Granit.QueryEngine/Filtering/QuickFilterDescriptor.cs",
       "line": 11,
+      "members": []
+    },
+    {
+      "name": "GranitQueryEngineAbstractionsModule",
+      "fqn": "Granit.QueryEngine.GranitQueryEngineAbstractionsModule",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/GranitQueryEngineAbstractionsModule.cs",
+      "line": 13,
       "members": []
     },
     {
