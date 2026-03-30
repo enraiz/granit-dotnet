@@ -1,5 +1,6 @@
 using Granit.Events;
 using Granit.Guids;
+using Granit.Http.Cookies;
 using Granit.MultiTenancy;
 using Granit.Privacy.DataDeletion;
 using Granit.Privacy.DataDeletion.Events;
@@ -12,6 +13,9 @@ using Granit.Privacy.Endpoints.Permissions;
 using Granit.Privacy.LegalAgreements;
 using Granit.Privacy.LegalAgreements.Events;
 using Granit.Privacy.Options;
+using Granit.Privacy.OptOut;
+using Granit.Privacy.OptOut.Events;
+using Granit.Privacy.ProcessingPurposes;
 using Granit.Privacy.Regulations;
 using Granit.Privacy.Regulations.Profiles;
 using Granit.Users;
@@ -21,6 +25,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Granit.Privacy.Endpoints.Extensions;
@@ -54,7 +59,11 @@ public static class PrivacyEndpointRouteBuilderExtensions
             group.RequireRateLimiting(options.RateLimitingPolicy);
         }
 
+        RegisterOptOutCookie(endpoints.ServiceProvider.GetRequiredService<ICookieRegistry>());
+
         MapRegulationEndpoints(group);
+        MapPurposeEndpoints(group);
+        MapOptOutEndpoints(group);
         MapExportEndpoints(group);
         MapDeletionEndpoints(group);
         MapAgreementEndpoints(group);
@@ -106,6 +115,160 @@ public static class PrivacyEndpointRouteBuilderExtensions
             profile.DataLocalizationRequired,
             profile.RequiresDpoOrRepresentative,
             profile.RequiredExportFormats.ToList()));
+    }
+
+    // -------------------------------------------------------------------------
+    // Processing purposes
+    // -------------------------------------------------------------------------
+
+    private static void MapPurposeEndpoints(RouteGroupBuilder group)
+    {
+        group.MapGet("/purposes", HandleGetPurposesAsync)
+             .RequireAuthorization(PrivacyPermissions.Purposes.Read)
+             .WithName("ListProcessingPurposes")
+             .WithSummary("Returns all registered processing purposes with their legal bases.")
+             .WithDescription(
+                 "Lists all processing purposes declared at application startup via RegisterProcessingPurpose(). "
+                 + "Each purpose includes its legal basis, whether explicit consent is required, and an optional data category.")
+             .Produces<IReadOnlyList<PrivacyProcessingPurposeResponse>>();
+    }
+
+    private static Task<Ok<IReadOnlyList<PrivacyProcessingPurposeResponse>>> HandleGetPurposesAsync(
+        [FromServices] IProcessingPurposeRegistry purposeRegistry)
+    {
+        IReadOnlyList<PrivacyProcessingPurposeResponse> result = purposeRegistry.GetAll()
+            .Select(p => new PrivacyProcessingPurposeResponse(
+                p.PurposeId, p.DisplayName, p.Description, p.LegalBasis,
+                p.RequiresExplicitConsent, p.DataCategory))
+            .ToList();
+
+        return Task.FromResult(TypedResults.Ok(result));
+    }
+
+    // -------------------------------------------------------------------------
+    // Opt-out (CCPA "Do Not Sell or Share")
+    // -------------------------------------------------------------------------
+
+    private static void MapOptOutEndpoints(RouteGroupBuilder group)
+    {
+        group.MapPost("/opt-out", HandleOptOutAsync)
+             .AllowAnonymous()
+             .WithName("RequestOptOut")
+             .WithSummary("Opts out of data sale/sharing (CCPA).")
+             .WithDescription(
+                 "Records a 'Do Not Sell or Share My Personal Information' request. "
+                 + "Supports both authenticated users and anonymous visitors (CCPA compliance). "
+                 + "For anonymous visitors, a granit_optout_id HTTP-Only cookie is set to track the opt-out.")
+             .Produces<PrivacyOptOutStatusResponse>(StatusCodes.Status201Created)
+             .ProducesProblem(StatusCodes.Status501NotImplemented);
+
+        group.MapGet("/opt-out/status", HandleGetOptOutStatusAsync)
+             .AllowAnonymous()
+             .WithName("GetOptOutStatus")
+             .WithSummary("Returns the current opt-out status.")
+             .WithDescription(
+                 "Checks whether the requesting user or visitor has an active opt-out. "
+                 + "For authenticated users, checks by UserId. For anonymous visitors, checks the granit_optout_id cookie.")
+             .Produces<PrivacyOptOutStatusResponse>();
+    }
+
+    private static async Task<Results<Created<PrivacyOptOutStatusResponse>, ProblemHttpResult>> HandleOptOutAsync(
+        HttpContext httpContext,
+        [FromServices] IDistributedEventBus eventBus,
+        [FromServices] IOptOutRecordReader? optOutReader,
+        [FromServices] IOptOutRecordWriter? optOutWriter,
+        [FromServices] IPrivacyRegulationResolver? regulationResolver,
+        [FromServices] ICurrentTenant currentTenant,
+        [FromServices] IGuidGenerator guidGenerator,
+        [FromServices] TimeProvider timeProvider,
+        [FromServices] PrivacyMetrics metrics,
+        [FromServices] IGranitCookieManager cookieManager,
+        CancellationToken cancellationToken)
+    {
+        if (optOutWriter is null)
+        {
+            return TypedResults.Problem(
+                detail: "Opt-out functionality requires an IOptOutRecordStore registration via UseOptOutRecordStore<T>().",
+                statusCode: StatusCodes.Status501NotImplemented);
+        }
+
+        Guid recordId = guidGenerator.Create();
+        DateTimeOffset now = timeProvider.GetUtcNow();
+        string regulation = await ResolveRegulationAsync(regulationResolver, cancellationToken).ConfigureAwait(false);
+        string? tenantId = ResolveTenantId(currentTenant);
+
+        // Determine identity — authenticated user or anonymous visitor
+        Guid? userId = TryGetUserIdOrNull(httpContext);
+        string? anonymousTrackId = null;
+
+        if (userId is null)
+        {
+            // Anonymous: read existing cookie or generate new tracking ID
+            anonymousTrackId = httpContext.Request.Cookies[OptOutConstants.CookieName]
+                ?? guidGenerator.Create().ToString();
+
+            await cookieManager.SetCookieAsync(httpContext, OptOutConstants.CookieName, anonymousTrackId)
+                .ConfigureAwait(false);
+        }
+
+        // Idempotency: return existing opt-out if already active
+        if (optOutReader is not null)
+        {
+            bool alreadyOptedOut = await optOutReader.IsOptedOutAsync(userId, anonymousTrackId, cancellationToken)
+                .ConfigureAwait(false);
+            if (alreadyOptedOut)
+            {
+                return TypedResults.Created(
+                    (string?)null,
+                    new PrivacyOptOutStatusResponse(true, null, regulation));
+            }
+        }
+
+        OptOutRecord record = new(recordId, userId, anonymousTrackId, OptOutState.Active, now, null, tenantId, regulation);
+        await optOutWriter.RecordOptOutAsync(record, cancellationToken).ConfigureAwait(false);
+
+        await eventBus.PublishAsync(
+            new OptOutRequestedEto(recordId, userId, anonymousTrackId, now, regulation, tenantId),
+            cancellationToken).ConfigureAwait(false);
+
+        metrics.RecordOptOutRequested(tenantId, regulation);
+
+        return TypedResults.Created(
+            (string?)null,
+            new PrivacyOptOutStatusResponse(true, now, regulation));
+    }
+
+    private static async Task<Ok<PrivacyOptOutStatusResponse>> HandleGetOptOutStatusAsync(
+        HttpContext httpContext,
+        [FromServices] IOptOutRecordReader? optOutReader,
+        [FromServices] IPrivacyRegulationResolver? regulationResolver,
+        CancellationToken cancellationToken)
+    {
+        if (optOutReader is null)
+        {
+            return TypedResults.Ok(new PrivacyOptOutStatusResponse(false, null, null));
+        }
+
+        Guid? userId = TryGetUserIdOrNull(httpContext);
+        string? anonymousTrackId = httpContext.Request.Cookies[OptOutConstants.CookieName];
+
+        bool isOptedOut = await optOutReader.IsOptedOutAsync(userId, anonymousTrackId, cancellationToken).ConfigureAwait(false);
+
+        string? regulation = null;
+        if (isOptedOut)
+        {
+            regulation = await ResolveRegulationAsync(regulationResolver, cancellationToken).ConfigureAwait(false);
+        }
+
+        return TypedResults.Ok(new PrivacyOptOutStatusResponse(isOptedOut, null, regulation));
+    }
+
+    private static Guid? TryGetUserIdOrNull(HttpContext httpContext)
+    {
+        System.Security.Claims.Claim? sub = httpContext.User.FindFirst("sub")
+            ?? httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+        return sub is not null && Guid.TryParse(sub.Value, out Guid userId) ? userId : null;
     }
 
     // -------------------------------------------------------------------------
@@ -675,6 +838,14 @@ public static class PrivacyEndpointRouteBuilderExtensions
 
     private static string? ResolveTenantId(ICurrentTenant currentTenant) =>
         currentTenant.IsAvailable ? currentTenant.Id?.ToString() : null;
+
+    private static void RegisterOptOutCookie(ICookieRegistry registry) =>
+        registry.Register(new CookieDefinition(
+            OptOutConstants.CookieName,
+            CookieCategory.StrictlyNecessary,
+            OptOutConstants.RetentionDays,
+            true,
+            "CCPA anonymous opt-out tracking identifier"));
 
     private static async Task<string> ResolveRegulationAsync(
         IPrivacyRegulationResolver? resolver,
