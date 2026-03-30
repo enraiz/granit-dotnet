@@ -8,7 +8,7 @@ using Wolverine;
 namespace Granit.Privacy.DataDeletion;
 
 /// <summary>
-/// Stateful Saga implementing the GDPR deletion cooling-off period (RGPD Art. 17).
+/// Stateful Saga implementing the privacy deletion cooling-off period (GDPR Art. 17, LGPD Art. 18, CCPA).
 /// </summary>
 /// <remarks>
 /// <para>
@@ -29,7 +29,7 @@ namespace Granit.Privacy.DataDeletion;
 /// second (cancel vs deadline) is silently discarded.
 /// </para>
 /// </remarks>
-public sealed class GdprDeletionSaga : Saga
+public sealed class PersonalDataDeletionSaga : Saga
 {
     /// <summary>Saga correlation ID — equals <see cref="DeletionDeferredEto.RequestId"/>.</summary>
     public Guid Id { get; set; }
@@ -38,6 +38,7 @@ public sealed class GdprDeletionSaga : Saga
     public Guid UserId { get; set; }
 
     /// <summary>Who requested the deletion (email or identifier).</summary>
+    [SensitiveData(Level = Sensitivity.Confidential)]
     public string RequestedBy { get; set; } = string.Empty;
 
     /// <summary>Reason provided by the user for deletion.</summary>
@@ -49,6 +50,12 @@ public sealed class GdprDeletionSaga : Saga
 
     /// <summary>When the data will be permanently deleted if not cancelled.</summary>
     public DateTimeOffset ScheduledDeletionAt { get; set; }
+
+    /// <summary>Applicable privacy regulation code for this deletion request.</summary>
+    public string Regulation { get; set; } = string.Empty;
+
+    /// <summary>Tenant identifier propagated from the starting event for metrics tagging.</summary>
+    public string? TenantId { get; set; }
 
     /// <summary>Whether the reminder notification has been sent.</summary>
     public bool ReminderSent { get; set; }
@@ -68,13 +75,15 @@ public sealed class GdprDeletionSaga : Saga
         UserId = @event.UserId;
         RequestedBy = @event.RequestedBy;
         Reason = @event.Reason;
+        Regulation = @event.Regulation;
+        TenantId = @event.TenantId;
         RequestedAt = @event.RequestedAt;
         ScheduledDeletionAt = @event.ScheduledDeletionAt;
 
         await tracker.RecordDeferredAsync(
             Id, UserId, Reason, RequestedAt, ScheduledDeletionAt).ConfigureAwait(false);
 
-        metrics.RecordDeletionDeferred(null);
+        metrics.RecordDeletionDeferred(TenantId, Regulation);
 
         TimeSpan gracePeriod = ScheduledDeletionAt - RequestedAt;
         int reminderDaysBefore = options.Value.ReminderDaysBefore;
@@ -101,7 +110,7 @@ public sealed class GdprDeletionSaga : Saga
     public DeletionReminderDueEto Handle(DeletionReminderDueEvent @event, PrivacyMetrics metrics)
     {
         ReminderSent = true;
-        metrics.RecordDeletionReminderSent(null);
+        metrics.RecordDeletionReminderSent(TenantId, Regulation);
 
         return new DeletionReminderDueEto(Id, UserId, ScheduledDeletionAt);
     }
@@ -120,12 +129,12 @@ public sealed class GdprDeletionSaga : Saga
         DateTimeOffset now = timeProvider.GetUtcNow();
 
         await tracker.MarkExecutedAsync(Id, now).ConfigureAwait(false);
-        metrics.RecordDeletionExecuted(null);
+        metrics.RecordDeletionExecuted(TenantId, Regulation);
         MarkCompleted();
 
         return
         [
-            new PersonalDataDeletionRequestedEto(Id, UserId, RequestedBy, now, Reason),
+            new PersonalDataDeletionRequestedEto(Id, UserId, RequestedBy, now, Reason, Regulation, TenantId),
             new DeletionExecutedEto(Id, UserId, now),
         ];
     }
@@ -140,7 +149,7 @@ public sealed class GdprDeletionSaga : Saga
         PrivacyMetrics metrics)
     {
         await tracker.MarkCancelledAsync(Id, @event.CancelledAt).ConfigureAwait(false);
-        metrics.RecordDeletionCancelled(null);
+        metrics.RecordDeletionCancelled(TenantId, Regulation);
         MarkCompleted();
     }
 }

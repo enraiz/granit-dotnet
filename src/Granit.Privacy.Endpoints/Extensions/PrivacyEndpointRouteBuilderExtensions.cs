@@ -12,6 +12,8 @@ using Granit.Privacy.Endpoints.Permissions;
 using Granit.Privacy.LegalAgreements;
 using Granit.Privacy.LegalAgreements.Events;
 using Granit.Privacy.Options;
+using Granit.Privacy.Regulations;
+using Granit.Privacy.Regulations.Profiles;
 using Granit.Users;
 using Granit.Validation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -24,12 +26,12 @@ using Microsoft.Extensions.Options;
 namespace Granit.Privacy.Endpoints.Extensions;
 
 /// <summary>
-/// Extension methods for mapping GDPR privacy endpoints.
+/// Extension methods for mapping privacy endpoints.
 /// </summary>
 public static class PrivacyEndpointRouteBuilderExtensions
 {
     /// <summary>
-    /// Maps GDPR privacy endpoints under <c>/{prefix}/privacy</c>: data export (Art. 15/20),
+    /// Maps privacy endpoints under <c>/{prefix}/privacy</c>: data export (Art. 15/20),
     /// data deletion (Art. 17), and legal agreement consent (Art. 7).
     /// </summary>
     /// <param name="endpoints">The endpoint route builder.</param>
@@ -47,11 +49,63 @@ public static class PrivacyEndpointRouteBuilderExtensions
             .RequireAuthorization()
             .WithTags(options.TagName);
 
+        if (!string.IsNullOrEmpty(options.RateLimitingPolicy))
+        {
+            group.RequireRateLimiting(options.RateLimitingPolicy);
+        }
+
+        MapRegulationEndpoints(group);
         MapExportEndpoints(group);
         MapDeletionEndpoints(group);
         MapAgreementEndpoints(group);
 
         return group;
+    }
+
+    // -------------------------------------------------------------------------
+    // Regulation
+    // -------------------------------------------------------------------------
+
+    private static void MapRegulationEndpoints(RouteGroupBuilder group)
+    {
+        group.MapGet("/regulation", HandleGetRegulationAsync)
+             .WithName("GetApplicableRegulation")
+             .WithSummary("Returns the privacy regulation profile applicable to the current tenant.")
+             .WithDescription(
+                 "Resolves the privacy regulation for the current tenant context via IPrivacyRegulationResolver. "
+                 + "Returns the full regulation profile including consent model, response timelines, breach notification "
+                 + "deadlines, age thresholds, cookie consent rules, and cross-border transfer requirements.")
+             .Produces<PrivacyRegulationProfileResponse>();
+    }
+
+    private static async Task<Ok<PrivacyRegulationProfileResponse>> HandleGetRegulationAsync(
+        [FromServices] IPrivacyRegulationResolver resolver,
+        CancellationToken cancellationToken)
+    {
+        PrivacyRegulationProfile profile = await resolver.ResolveAsync(cancellationToken).ConfigureAwait(false);
+
+        return TypedResults.Ok(new PrivacyRegulationProfileResponse(
+            profile.Regulation.Value,
+            profile.DisplayName,
+            profile.JurisdictionCode,
+            profile.ConsentModel.ToString(),
+            profile.AvailableLegalBases.Select(b => b.Value).ToList(),
+            profile.SubjectAccessRequestDays,
+            profile.SubjectAccessRequestExtensionDays,
+            profile.DeletionRequestDays,
+            profile.DefaultDeletionGracePeriodDays,
+            profile.MaxDeletionGracePeriodDays,
+            profile.BreachNotifyAuthorityHours,
+            profile.BreachNotifyIndividualsHours,
+            profile.MinimumConsentAge,
+            profile.RequiresParentalIdentityVerification,
+            profile.CookieConsentModel.ToString(),
+            profile.HonorGlobalPrivacyControl,
+            profile.RequiresCrossBorderAssessment,
+            profile.TransferMechanisms.ToList(),
+            profile.DataLocalizationRequired,
+            profile.RequiresDpoOrRepresentative,
+            profile.RequiredExportFormats.ToList()));
     }
 
     // -------------------------------------------------------------------------
@@ -108,7 +162,8 @@ public static class PrivacyEndpointRouteBuilderExtensions
                  + "When Defer is false, deletion is immediate. When Defer is true, a cooling-off "
                  + "period starts — the user receives a reminder email before the "
                  + "deadline and can cancel via POST /deletion/{requestId}/cancel. "
-                 + "A confirmation email is sent in both cases after deletion is executed.")
+                 + "A confirmation email is sent in both cases after deletion is executed. "
+                 + "Do not include personally identifiable information in the Reason field.")
              .Produces<PrivacyDeletionRequestResponse>(StatusCodes.Status202Accepted)
              .ProducesProblem(StatusCodes.Status409Conflict)
              .ProducesValidationProblem();
@@ -209,6 +264,7 @@ public static class PrivacyEndpointRouteBuilderExtensions
         [FromServices] TimeProvider timeProvider,
         [FromServices] ICurrentTenant currentTenant,
         [FromServices] IGuidGenerator guidGenerator,
+        [FromServices] IPrivacyRegulationResolver? regulationResolver,
         CancellationToken cancellationToken)
     {
         if (!TryGetUserId(currentUser, out Guid userId))
@@ -219,16 +275,17 @@ public static class PrivacyEndpointRouteBuilderExtensions
         Guid requestId = guidGenerator.Create();
         DateTimeOffset now = timeProvider.GetUtcNow();
         string? tenantId = ResolveTenantId(currentTenant);
+        string regulation = await ResolveRegulationAsync(regulationResolver, cancellationToken).ConfigureAwait(false);
 
         await tracker
             .RecordRequestAsync(requestId, userId, now, cancellationToken)
             .ConfigureAwait(false);
 
         await eventBus
-            .PublishAsync(new PersonalDataRequestedEto(requestId, userId, now), cancellationToken)
+            .PublishAsync(new PersonalDataRequestedEto(requestId, userId, now, regulation, tenantId), cancellationToken)
             .ConfigureAwait(false);
 
-        metrics.RecordExportRequested(tenantId);
+        metrics.RecordExportRequested(tenantId, regulation);
 
         return TypedResults.Accepted(
             $"/privacy/export/{requestId}",
@@ -290,11 +347,13 @@ public static class PrivacyEndpointRouteBuilderExtensions
         [FromServices] ICurrentUserService currentUser,
         [FromServices] IDistributedEventBus eventBus,
         [FromServices] IDeletionRequestTrackerReader deletionTracker,
+        [FromServices] IDeletionRequestTrackerWriter? deletionTrackerWriter,
         [FromServices] PrivacyMetrics metrics,
         [FromServices] TimeProvider timeProvider,
         [FromServices] ICurrentTenant currentTenant,
         [FromServices] IOptions<GranitPrivacyOptions> privacyOptions,
         [FromServices] IGuidGenerator guidGenerator,
+        [FromServices] IPrivacyRegulationResolver? regulationResolver,
         CancellationToken cancellationToken)
     {
         if (!TryGetUserId(currentUser, out Guid userId))
@@ -317,6 +376,7 @@ public static class PrivacyEndpointRouteBuilderExtensions
         DateTimeOffset now = timeProvider.GetUtcNow();
         string? tenantId = ResolveTenantId(currentTenant);
         string requestedBy = currentUser.Email ?? "unknown";
+        string regulation = await ResolveRegulationAsync(regulationResolver, cancellationToken).ConfigureAwait(false);
 
         if (body.Defer)
         {
@@ -325,21 +385,28 @@ public static class PrivacyEndpointRouteBuilderExtensions
 
             await eventBus
                 .PublishAsync(
-                    new DeletionDeferredEto(requestId, userId, requestedBy, now, body.Reason, scheduledDeletionAt),
+                    new DeletionDeferredEto(requestId, userId, requestedBy, now, body.Reason, scheduledDeletionAt, regulation, tenantId),
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            metrics.RecordDeletionDeferred(tenantId);
+            metrics.RecordDeletionDeferred(tenantId, regulation);
 
             return TypedResults.Accepted(
                 $"/privacy/deletion/{requestId}",
                 new PrivacyDeletionRequestResponse(requestId, scheduledDeletionAt));
         }
 
-        // Immediate deletion (existing behavior) + confirmation event
+        // Immediate deletion + confirmation event + audit trail (GDPR Art. 5(2))
+        if (deletionTrackerWriter is not null)
+        {
+            await deletionTrackerWriter
+                .RecordImmediateDeletionAsync(requestId, userId, body.Reason, now, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         await eventBus
             .PublishAsync(
-                new PersonalDataDeletionRequestedEto(requestId, userId, requestedBy, now, body.Reason),
+                new PersonalDataDeletionRequestedEto(requestId, userId, requestedBy, now, body.Reason, regulation, tenantId),
                 cancellationToken)
             .ConfigureAwait(false);
 
@@ -349,8 +416,8 @@ public static class PrivacyEndpointRouteBuilderExtensions
                 cancellationToken)
             .ConfigureAwait(false);
 
-        metrics.RecordDeletionRequested(tenantId);
-        metrics.RecordDeletionExecuted(tenantId);
+        metrics.RecordDeletionRequested(tenantId, regulation);
+        metrics.RecordDeletionExecuted(tenantId, regulation);
 
         return TypedResults.Accepted((string?)null);
     }
@@ -609,6 +676,19 @@ public static class PrivacyEndpointRouteBuilderExtensions
     private static string? ResolveTenantId(ICurrentTenant currentTenant) =>
         currentTenant.IsAvailable ? currentTenant.Id?.ToString() : null;
 
+    private static async Task<string> ResolveRegulationAsync(
+        IPrivacyRegulationResolver? resolver,
+        CancellationToken cancellationToken)
+    {
+        if (resolver is null)
+        {
+            return "EU_GDPR";
+        }
+
+        PrivacyRegulationProfile profile = await resolver.ResolveAsync(cancellationToken).ConfigureAwait(false);
+        return profile.Regulation.Value;
+    }
+
     private static PrivacyExportStatusResponse MapExportStatus(ExportRequestStatus status) =>
         new(
             status.RequestId,
@@ -629,8 +709,10 @@ public static class PrivacyEndpointRouteBuilderExtensions
             status.ExecutedAt);
 
     /// <summary>
-    /// Pseudonymizes an IP address by masking the last octet (IPv4) or last group (IPv6).
+    /// Pseudonymizes an IP address using <see cref="System.Net.IPAddress"/> for reliable parsing.
+    /// IPv4: masks to /16 (last 2 octets zeroed). IPv6: masks to /48 (last 80 bits zeroed).
     /// GDPR requires data minimization — the full IP is not stored.
+    /// Compliant with CNIL guidance on IP anonymization (2020) and WP29 Opinion 05/2014.
     /// </summary>
     internal static string? PseudonymizeIpAddress(string? ipAddress)
     {
@@ -639,18 +721,30 @@ public static class PrivacyEndpointRouteBuilderExtensions
             return null;
         }
 
-        // IPv4: replace last octet with 0
-        int lastDot = ipAddress.LastIndexOf('.');
-        if (lastDot > 0)
+        if (!System.Net.IPAddress.TryParse(ipAddress, out System.Net.IPAddress? ip))
         {
-            return $"{ipAddress[..lastDot]}.0";
+            return null;
         }
 
-        // IPv6: replace last group with 0
-        int lastColon = ipAddress.LastIndexOf(':');
-        if (lastColon > 0)
+        byte[] bytes = ip.GetAddressBytes();
+
+        if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
         {
-            return $"{ipAddress[..lastColon]}:0";
+            // IPv4: mask to /16 — zero last 2 octets
+            bytes[2] = 0;
+            bytes[3] = 0;
+            return new System.Net.IPAddress(bytes).ToString();
+        }
+
+        if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+        {
+            // IPv6: mask to /48 — zero last 10 bytes (80 bits)
+            for (int i = 6; i < 16; i++)
+            {
+                bytes[i] = 0;
+            }
+
+            return new System.Net.IPAddress(bytes).ToString();
         }
 
         return null;
