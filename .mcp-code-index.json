@@ -739,6 +739,7 @@
     {
       "name": "Granit.Identity.Federated.EntraId",
       "deps": [
+        "Granit.Diagnostics",
         "Granit.Http.Resilience",
         "Granit.Identity.Federated",
         "Granit.Timing"
@@ -755,6 +756,7 @@
     {
       "name": "Granit.Identity.Federated.Keycloak",
       "deps": [
+        "Granit.Diagnostics",
         "Granit.Http.Resilience",
         "Granit.Identity.Federated",
         "Granit.Timing"
@@ -904,6 +906,7 @@
     {
       "name": "Granit.Notifications.Brevo",
       "deps": [
+        "Granit.Diagnostics",
         "Granit.Http.Resilience",
         "Granit.Notifications.Email",
         "Granit.Notifications.Sms",
@@ -936,6 +939,7 @@
     {
       "name": "Granit.Notifications.Email.Scaleway",
       "deps": [
+        "Granit.Diagnostics",
         "Granit.Http.Resilience",
         "Granit.Notifications.Email"
       ],
@@ -944,6 +948,7 @@
     {
       "name": "Granit.Notifications.Email.SendGrid",
       "deps": [
+        "Granit.Diagnostics",
         "Granit.Http.Resilience",
         "Granit.Notifications.Email"
       ],
@@ -1046,6 +1051,7 @@
     {
       "name": "Granit.Notifications.Twilio",
       "deps": [
+        "Granit.Diagnostics",
         "Granit.Http.Resilience",
         "Granit.Notifications.Sms",
         "Granit.Notifications.WhatsApp"
@@ -1077,6 +1083,7 @@
     {
       "name": "Granit.Notifications.Zulip",
       "deps": [
+        "Granit.Diagnostics",
         "Granit.Http.Resilience",
         "Granit.Notifications.Abstractions"
       ],
@@ -1906,6 +1913,15 @@
       "project": "Granit.AI.Endpoints",
       "file": "src/Granit.AI.Endpoints/Dtos/AIWorkspaceUpdateRequest.cs",
       "line": 12,
+      "members": []
+    },
+    {
+      "name": "IAIWorkspaceMutableFields",
+      "fqn": "Granit.AI.Endpoints.Dtos.IAIWorkspaceMutableFields",
+      "kind": "interface",
+      "project": "Granit.AI.Endpoints",
+      "file": "src/Granit.AI.Endpoints/Dtos/IAIWorkspaceMutableFields.cs",
+      "line": 7,
       "members": []
     },
     {
@@ -10073,6 +10089,22 @@
           "kind": "method",
           "signature": "ConfigureServices(ServiceConfigurationContext context)",
           "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "HttpServiceHealthCheckBase",
+      "fqn": "Granit.Diagnostics.HealthChecks.HttpServiceHealthCheckBase",
+      "kind": "class",
+      "project": "Granit.Diagnostics",
+      "file": "src/Granit.Diagnostics/HealthChecks/HttpServiceHealthCheckBase.cs",
+      "line": 25,
+      "members": [
+        {
+          "name": "CheckHealthAsync",
+          "kind": "method",
+          "signature": "CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)",
+          "returnType": "Task<HealthCheckResult>"
         }
       ]
     },
@@ -25876,6 +25908,15 @@
       "members": []
     },
     {
+      "name": "ISavedViewRequest",
+      "fqn": "Granit.QueryEngine.SavedViews.ISavedViewRequest",
+      "kind": "interface",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/SavedViews/ISavedViewRequest.cs",
+      "line": 7,
+      "members": []
+    },
+    {
       "name": "ISavedViewStoreReader",
       "fqn": "Granit.QueryEngine.SavedViews.ISavedViewStoreReader",
       "kind": "interface",
@@ -26394,7 +26435,7 @@
       "kind": "record",
       "project": "Granit.ReferenceData.Endpoints",
       "file": "src/Granit.ReferenceData.Endpoints/Dtos/ReferenceDataCreateRequest.cs",
-      "line": 26,
+      "line": 28,
       "members": []
     },
     {
@@ -26412,7 +26453,7 @@
       "kind": "record",
       "project": "Granit.ReferenceData.Endpoints",
       "file": "src/Granit.ReferenceData.Endpoints/Dtos/ReferenceDataUpdateRequest.cs",
-      "line": 26,
+      "line": 28,
       "members": []
     },
     {
@@ -26540,6 +26581,15 @@
           "returnType": "void"
         }
       ]
+    },
+    {
+      "name": "IReferenceDataMutableFields",
+      "fqn": "Granit.ReferenceData.IReferenceDataMutableFields",
+      "kind": "interface",
+      "project": "Granit.ReferenceData",
+      "file": "src/Granit.ReferenceData/IReferenceDataMutableFields.cs",
+      "line": 7,
+      "members": []
     },
     {
       "name": "IReferenceDataSeeder",
