@@ -70,6 +70,13 @@ public sealed partial class IsolatedDbContextTests
                         continue;
                     }
 
+                    // Granit.Persistence.EntityFrameworkCore itself implements ApplyGranitConventions
+                    // — it is the centralized filter registration, not a manual override.
+                    if (rel.Contains("Granit.Persistence.EntityFrameworkCore", StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
                     violations.Add(rel);
                 }
             }
@@ -97,7 +104,7 @@ public sealed partial class IsolatedDbContextTests
 
             string content = File.ReadAllText(csproj);
 
-            if (!content.Contains("Granit.Persistence", StringComparison.Ordinal))
+            if (!content.Contains("Granit.Persistence.EntityFrameworkCore", StringComparison.Ordinal))
             {
                 violations.Add(Path.GetFileName(efProject));
             }
@@ -109,7 +116,7 @@ public sealed partial class IsolatedDbContextTests
     }
 
     [Fact]
-    public void EfCore_modules_should_DependOn_GranitPersistenceModule()
+    public void EfCore_modules_should_DependOn_GranitPersistenceEntityFrameworkCoreModule()
     {
         string srcDir = Path.Join(RepoRoot, "src");
 
@@ -126,7 +133,7 @@ public sealed partial class IsolatedDbContextTests
                     continue;
                 }
 
-                if (!content.Contains("GranitPersistenceModule", StringComparison.Ordinal))
+                if (!content.Contains("GranitPersistenceEntityFrameworkCoreModule", StringComparison.Ordinal))
                 {
                     violations.Add(Path.GetRelativePath(RepoRoot, csFile));
                 }
@@ -134,7 +141,7 @@ public sealed partial class IsolatedDbContextTests
         }
 
         violations.ShouldBeEmpty(
-            "Every *.EntityFrameworkCore module must have [DependsOn(typeof(GranitPersistenceModule))]. " +
+            "Every *.EntityFrameworkCore module must have [DependsOn(typeof(GranitPersistenceEntityFrameworkCoreModule))]. " +
             $"Violators: {string.Join(", ", violations)}");
     }
 

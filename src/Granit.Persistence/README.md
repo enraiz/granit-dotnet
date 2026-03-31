@@ -1,6 +1,6 @@
 # Granit.Persistence
 
-EF Core interceptors for ISO 27001 audit trail and GDPR soft delete for Granit applications.
+Persistence-agnostic abstractions for Granit: `Specification<T>`, `PagedResult<T>`, `SortExpression<T>`. No ORM dependency — consumed by EF Core, MongoDB, and Dapper implementations.
 
 Part of the [granit](https://granit-fx.dev) framework.
 
@@ -12,10 +12,7 @@ dotnet add package Granit.Persistence
 
 ## Dependencies
 
-- `Granit.Http.ExceptionHandling`
-- `Granit.Guids`
-- `Granit.Users`
-- `Granit.Timing`
+- `Granit`
 
 ## Documentation
 

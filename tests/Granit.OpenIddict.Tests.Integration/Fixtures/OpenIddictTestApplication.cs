@@ -7,6 +7,7 @@ using Granit.Identity;
 using Granit.Identity.Extensions;
 using Granit.Identity.Local.AspNetIdentity.Internal;
 using Granit.Identity.Local.Domain;
+using Granit.Identity.Local.Endpoints.Extensions;
 using Granit.Identity.Local.Services;
 using Granit.MultiTenancy;
 using Granit.OpenIddict.Diagnostics;
@@ -108,6 +109,7 @@ public sealed class OpenIddictTestApplication : IAsyncLifetime
         builder.Services.TryAddSingleton<IMeterFactory>(
             _ => new TestMeterFactory());
         builder.Services.TryAddSingleton<OpenIddictMetrics>();
+        builder.Services.TryAddSingleton<Granit.Identity.Local.Diagnostics.IdentityLocalMetrics>();
 
         // 5. Authorization (required by admin endpoints)
         builder.Services.AddAuthorization();
@@ -122,6 +124,7 @@ public sealed class OpenIddictTestApplication : IAsyncLifetime
         _app.MapPost("/connect/token", HandleTokenAsync);
 
         _app.MapOpenIddictEndpoints();
+        _app.MapAccountEndpoints();
 
         // 6. EnsureCreated + seed
         await using AsyncServiceScope scope = _app.Services.CreateAsyncScope();
