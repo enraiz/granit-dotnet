@@ -102,7 +102,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
     }
 
     [Fact]
-    public async Task SendEmailAsync_UsesFromOverride_WhenProvided()
+    public async Task SendEmailAsync_UsesFromEmailOverride_WhenProvided()
     {
         IEmailSender emailSender = _provider;
 
@@ -112,7 +112,7 @@ public sealed class BrevoNotificationProviderTests : IDisposable
                 To = "user@test.com",
                 Subject = "Test",
                 HtmlBody = "<p>Hi</p>",
-                FromOverride = "custom@test.com",
+                FromEmailOverride = "custom@test.com",
             },
             TestContext.Current.CancellationToken);
 
@@ -137,6 +137,56 @@ public sealed class BrevoNotificationProviderTests : IDisposable
         string body = _handler.Requests[0].Body;
         body.ShouldContain("default@test.com");
         body.ShouldContain("Test App");
+    }
+
+    [Fact]
+    public async Task SendEmailAsync_WithHeaders_IncludesHeadersInPayload()
+    {
+        IEmailSender emailSender = _provider;
+
+        await emailSender.SendAsync(
+            new EmailMessage
+            {
+                To = "user@test.com",
+                Subject = "Test",
+                HtmlBody = "<p>Hi</p>",
+                Headers = new Dictionary<string, string>
+                {
+                    ["List-Unsubscribe"] = "<https://example.com/unsub>",
+                    ["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click",
+                },
+            },
+            TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        string body = _handler.Requests[0].Body;
+        using var doc = JsonDocument.Parse(body);
+        JsonElement root = doc.RootElement;
+        JsonElement headers = root.GetProperty("headers");
+        headers.GetProperty("List-Unsubscribe").GetString().ShouldBe("<https://example.com/unsub>");
+        headers.GetProperty("List-Unsubscribe-Post").GetString().ShouldBe("List-Unsubscribe=One-Click");
+    }
+
+    [Fact]
+    public async Task SendEmailAsync_WithFromNameOverride_UsesOverrideName()
+    {
+        IEmailSender emailSender = _provider;
+
+        await emailSender.SendAsync(
+            new EmailMessage
+            {
+                To = "user@test.com",
+                Subject = "Test",
+                HtmlBody = "<p>Hi</p>",
+                FromNameOverride = "Override Sender",
+            },
+            TestContext.Current.CancellationToken);
+
+        _handler.Requests.Count.ShouldBe(1);
+        string body = _handler.Requests[0].Body;
+        using var doc = JsonDocument.Parse(body);
+        JsonElement root = doc.RootElement;
+        root.GetProperty("sender").GetProperty("name").GetString().ShouldBe("Override Sender");
     }
 
     [Fact]

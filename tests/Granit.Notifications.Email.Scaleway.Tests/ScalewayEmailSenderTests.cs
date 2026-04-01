@@ -34,7 +34,7 @@ public sealed class ScalewayEmailSenderTests
             To = "recipient@example.com",
             Subject = "Test subject",
             HtmlBody = "<p>Hello</p>",
-            FromOverride = fromOverride,
+            FromEmailOverride = fromOverride,
             PlainTextBody = plainText,
         };
 
@@ -134,7 +134,7 @@ public sealed class ScalewayEmailSenderTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task SendAsync_WithFromOverride_UsesOverrideAddress()
+    public async Task SendAsync_WithFromEmailOverride_UsesOverrideAddress()
     {
         (ScalewayEmailSender sender, MockHttpMessageHandler handler) = CreateSender();
 
@@ -148,7 +148,7 @@ public sealed class ScalewayEmailSenderTests
     }
 
     [Fact]
-    public async Task SendAsync_WithoutFromOverride_UsesDefaultSenderEmail()
+    public async Task SendAsync_WithoutFromEmailOverride_UsesDefaultSenderEmail()
     {
         (ScalewayEmailSender sender, MockHttpMessageHandler handler) = CreateSender();
 
@@ -193,6 +193,38 @@ public sealed class ScalewayEmailSenderTests
         using var doc = JsonDocument.Parse(body);
 
         doc.RootElement.TryGetProperty("text", out _).ShouldBeFalse();
+    }
+
+    // -------------------------------------------------------------------------
+    // Custom headers
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithHeaders_IncludesAdditionalHeadersInPayload()
+    {
+        (ScalewayEmailSender sender, MockHttpMessageHandler handler) = CreateSender();
+
+        EmailMessage message = new()
+        {
+            To = "recipient@example.com",
+            Subject = "Test subject",
+            HtmlBody = "<p>Hello</p>",
+            Headers = new Dictionary<string, string>
+            {
+                ["List-Unsubscribe"] = "<https://example.com/unsub>",
+                ["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click",
+            },
+        };
+
+        await sender.SendAsync(message, TestContext.Current.CancellationToken);
+
+        handler.LastRequest.ShouldNotBeNull();
+        string body = await handler.LastRequest.Content!.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        using var doc = JsonDocument.Parse(body);
+        JsonElement root = doc.RootElement;
+        JsonElement headers = root.GetProperty("additional_headers");
+        headers.GetProperty("List-Unsubscribe").GetString().ShouldBe("<https://example.com/unsub>");
+        headers.GetProperty("List-Unsubscribe-Post").GetString().ShouldBe("List-Unsubscribe=One-Click");
     }
 
     // -------------------------------------------------------------------------

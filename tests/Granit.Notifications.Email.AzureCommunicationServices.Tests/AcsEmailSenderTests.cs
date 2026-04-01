@@ -21,7 +21,7 @@ public sealed class AcsEmailSenderTests
         AcsEmailOptions opts = options ?? new AcsEmailOptions
         {
             ConnectionString = "endpoint=https://test.communication.azure.com/;accesskey=dGVzdA==",
-            SenderAddress = "noreply@example.com",
+            DefaultSenderEmail = "noreply@example.com",
             TimeoutSeconds = 10,
         };
 
@@ -44,7 +44,7 @@ public sealed class AcsEmailSenderTests
             To = "recipient@example.com",
             Subject = "Test subject",
             HtmlBody = "<p>Hello</p>",
-            FromOverride = fromOverride,
+            FromEmailOverride = fromOverride,
             PlainTextBody = plainText,
         };
 
@@ -94,7 +94,7 @@ public sealed class AcsEmailSenderTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task SendAsync_WithFromOverride_UsesSenderAddressFromOverride()
+    public async Task SendAsync_WithFromEmailOverride_UsesSenderAddressFromEmailOverride()
     {
         (AcsEmailSender sender, IAcsEmailTransport transport) = CreateSender();
         Azure.Communication.Email.EmailMessage? captured = null;
@@ -111,12 +111,12 @@ public sealed class AcsEmailSenderTests
     }
 
     [Fact]
-    public async Task SendAsync_WithoutFromOverride_UsesSenderAddress()
+    public async Task SendAsync_WithoutFromEmailOverride_UsesDefaultSenderEmail()
     {
         AcsEmailOptions opts = new()
         {
             ConnectionString = "endpoint=https://test.communication.azure.com/;accesskey=dGVzdA==",
-            SenderAddress = "sender@example.com",
+            DefaultSenderEmail = "sender@example.com",
             TimeoutSeconds = 5,
         };
         (AcsEmailSender sender, IAcsEmailTransport transport) = CreateSender(opts);
@@ -170,6 +170,93 @@ public sealed class AcsEmailSenderTests
     }
 
     // -------------------------------------------------------------------------
+    // Custom headers
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithHeaders_AddsCustomHeaders()
+    {
+        (AcsEmailSender sender, IAcsEmailTransport transport) = CreateSender();
+        Azure.Communication.Email.EmailMessage? captured = null;
+        await transport.SendAsync(
+            Arg.Do<Azure.Communication.Email.EmailMessage>(m => captured = m),
+            Arg.Any<CancellationToken>());
+
+        EmailMessage message = new()
+        {
+            To = "recipient@example.com",
+            Subject = "Test subject",
+            HtmlBody = "<p>Hello</p>",
+            Headers = new Dictionary<string, string>
+            {
+                ["List-Unsubscribe"] = "<https://example.com/unsub>",
+            },
+        };
+
+        await sender.SendAsync(message, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Headers.ShouldContain(h =>
+            h.Key == "List-Unsubscribe" && h.Value == "<https://example.com/unsub>");
+    }
+
+    // -------------------------------------------------------------------------
+    // Sender name formatting
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithDefaultSenderName_FormatsRfc5322From()
+    {
+        AcsEmailOptions opts = new()
+        {
+            ConnectionString = "endpoint=https://test.communication.azure.com/;accesskey=dGVzdA==",
+            DefaultSenderEmail = "noreply@example.com",
+            DefaultSenderName = "My App",
+            TimeoutSeconds = 5,
+        };
+        (AcsEmailSender sender, IAcsEmailTransport transport) = CreateSender(opts);
+        Azure.Communication.Email.EmailMessage? captured = null;
+        await transport.SendAsync(
+            Arg.Do<Azure.Communication.Email.EmailMessage>(m => captured = m),
+            Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.SenderAddress.ShouldBe("\"My App\" <noreply@example.com>");
+    }
+
+    [Fact]
+    public async Task SendAsync_WithFromNameOverride_UsesOverrideName()
+    {
+        AcsEmailOptions opts = new()
+        {
+            ConnectionString = "endpoint=https://test.communication.azure.com/;accesskey=dGVzdA==",
+            DefaultSenderEmail = "noreply@example.com",
+            DefaultSenderName = "Default",
+            TimeoutSeconds = 5,
+        };
+        (AcsEmailSender sender, IAcsEmailTransport transport) = CreateSender(opts);
+        Azure.Communication.Email.EmailMessage? captured = null;
+        await transport.SendAsync(
+            Arg.Do<Azure.Communication.Email.EmailMessage>(m => captured = m),
+            Arg.Any<CancellationToken>());
+
+        EmailMessage message = new()
+        {
+            To = "recipient@example.com",
+            Subject = "Test subject",
+            HtmlBody = "<p>Hello</p>",
+            FromNameOverride = "Override",
+        };
+
+        await sender.SendAsync(message, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.SenderAddress.ShouldBe("\"Override\" <noreply@example.com>");
+    }
+
+    // -------------------------------------------------------------------------
     // Logger
     // -------------------------------------------------------------------------
 
@@ -179,7 +266,7 @@ public sealed class AcsEmailSenderTests
         AcsEmailOptions opts = new()
         {
             ConnectionString = "endpoint=https://test.communication.azure.com/;accesskey=dGVzdA==",
-            SenderAddress = "sender@example.com",
+            DefaultSenderEmail = "sender@example.com",
             TimeoutSeconds = 5,
         };
 

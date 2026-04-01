@@ -28,7 +28,7 @@ public sealed class AwsSesEmailSenderTests
         AwsSesOptions opts = options ?? new AwsSesOptions
         {
             Region = "eu-west-1",
-            FromAddress = "noreply@example.com",
+            DefaultSenderEmail = "noreply@example.com",
             TimeoutSeconds = 10,
         };
         IAwsSesTransport transport = Substitute.For<IAwsSesTransport>();
@@ -49,7 +49,7 @@ public sealed class AwsSesEmailSenderTests
             To = "recipient@example.com",
             Subject = "Test subject",
             HtmlBody = "<p>Hello</p>",
-            FromOverride = fromOverride,
+            FromEmailOverride = fromOverride,
             PlainTextBody = plainText,
         };
 
@@ -109,7 +109,7 @@ public sealed class AwsSesEmailSenderTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public async Task SendAsync_WithFromOverride_UsesSenderAddressFromOverride()
+    public async Task SendAsync_WithFromEmailOverride_UsesSenderAddressFromEmailOverride()
     {
         (AwsSesEmailSender sender, IAwsSesTransport transport) = CreateSender();
         SendEmailRequest? captured = null;
@@ -126,12 +126,12 @@ public sealed class AwsSesEmailSenderTests
     }
 
     [Fact]
-    public async Task SendAsync_WithoutFromOverride_UsesFromAddress()
+    public async Task SendAsync_WithoutFromEmailOverride_UsesDefaultSenderEmail()
     {
         AwsSesOptions opts = new()
         {
             Region = "eu-west-1",
-            FromAddress = "sender@example.com",
+            DefaultSenderEmail = "sender@example.com",
             TimeoutSeconds = 5,
         };
         (AwsSesEmailSender sender, IAwsSesTransport transport) = CreateSender(opts);
@@ -147,12 +147,12 @@ public sealed class AwsSesEmailSenderTests
     }
 
     [Fact]
-    public async Task SendAsync_WithoutFromOverrideOrFromAddress_FallsBackToNoreply()
+    public async Task SendAsync_WithoutFromEmailOverrideOrDefaultSenderEmail_FallsBackToNoreply()
     {
         AwsSesOptions opts = new()
         {
             Region = "eu-west-1",
-            FromAddress = null,
+            DefaultSenderEmail = null,
             TimeoutSeconds = 5,
         };
         (AwsSesEmailSender sender, IAwsSesTransport transport) = CreateSender(opts);
@@ -215,7 +215,7 @@ public sealed class AwsSesEmailSenderTests
         AwsSesOptions opts = new()
         {
             Region = "eu-west-1",
-            FromAddress = "sender@example.com",
+            DefaultSenderEmail = "sender@example.com",
             ConfigurationSetName = "my-tracking-set",
             TimeoutSeconds = 5,
         };
@@ -237,7 +237,7 @@ public sealed class AwsSesEmailSenderTests
         AwsSesOptions opts = new()
         {
             Region = "eu-west-1",
-            FromAddress = "sender@example.com",
+            DefaultSenderEmail = "sender@example.com",
             ConfigurationSetName = null,
             TimeoutSeconds = 5,
         };
@@ -263,7 +263,7 @@ public sealed class AwsSesEmailSenderTests
         AwsSesOptions opts = new()
         {
             Region = "eu-central-1",
-            FromAddress = "sender@example.com",
+            DefaultSenderEmail = "sender@example.com",
             TimeoutSeconds = 5,
         };
         IAwsSesTransport transport = Substitute.For<IAwsSesTransport>();
@@ -286,6 +286,113 @@ public sealed class AwsSesEmailSenderTests
             Arg.Is<object>(o => o.ToString()!.Contains("rec***@example.com")),
             Arg.Any<Exception?>(),
             Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    // -------------------------------------------------------------------------
+    // Custom headers
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithHeaders_BuildsMessageHeaders()
+    {
+        (AwsSesEmailSender sender, IAwsSesTransport transport) = CreateSender();
+        SendEmailRequest? captured = null;
+        await transport.SendEmailAsync(
+            Arg.Do<SendEmailRequest>(r => captured = r),
+            Arg.Any<CancellationToken>());
+
+        EmailMessage message = new()
+        {
+            To = "recipient@example.com",
+            Subject = "Test subject",
+            HtmlBody = "<p>Hello</p>",
+            Headers = new Dictionary<string, string>
+            {
+                ["List-Unsubscribe"] = "<https://example.com/unsub>",
+                ["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click",
+            },
+        };
+
+        await sender.SendAsync(message, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Content.Simple.Headers.ShouldNotBeNull();
+        captured.Content.Simple.Headers.Count.ShouldBe(2);
+        captured.Content.Simple.Headers.ShouldContain(h =>
+            h.Name == "List-Unsubscribe" && h.Value == "<https://example.com/unsub>");
+        captured.Content.Simple.Headers.ShouldContain(h =>
+            h.Name == "List-Unsubscribe-Post" && h.Value == "List-Unsubscribe=One-Click");
+    }
+
+    [Fact]
+    public async Task SendAsync_WithoutHeaders_DoesNotSetMessageHeaders()
+    {
+        (AwsSesEmailSender sender, IAwsSesTransport transport) = CreateSender();
+        SendEmailRequest? captured = null;
+        await transport.SendEmailAsync(
+            Arg.Do<SendEmailRequest>(r => captured = r),
+            Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Content.Simple.Headers.ShouldBeNull();
+    }
+
+    // -------------------------------------------------------------------------
+    // Sender name formatting
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SendAsync_WithDefaultSenderName_FormatsRfc5322From()
+    {
+        AwsSesOptions opts = new()
+        {
+            Region = "eu-west-1",
+            DefaultSenderEmail = "noreply@example.com",
+            DefaultSenderName = "My App",
+            TimeoutSeconds = 5,
+        };
+        (AwsSesEmailSender sender, IAwsSesTransport transport) = CreateSender(opts);
+        SendEmailRequest? captured = null;
+        await transport.SendEmailAsync(
+            Arg.Do<SendEmailRequest>(r => captured = r),
+            Arg.Any<CancellationToken>());
+
+        await sender.SendAsync(SimpleMessage(), TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.FromEmailAddress.ShouldBe("\"My App\" <noreply@example.com>");
+    }
+
+    [Fact]
+    public async Task SendAsync_WithFromNameOverride_UsesOverrideName()
+    {
+        AwsSesOptions opts = new()
+        {
+            Region = "eu-west-1",
+            DefaultSenderEmail = "noreply@example.com",
+            DefaultSenderName = "Default",
+            TimeoutSeconds = 5,
+        };
+        (AwsSesEmailSender sender, IAwsSesTransport transport) = CreateSender(opts);
+        SendEmailRequest? captured = null;
+        await transport.SendEmailAsync(
+            Arg.Do<SendEmailRequest>(r => captured = r),
+            Arg.Any<CancellationToken>());
+
+        EmailMessage message = new()
+        {
+            To = "recipient@example.com",
+            Subject = "Test subject",
+            HtmlBody = "<p>Hello</p>",
+            FromNameOverride = "Override Name",
+        };
+
+        await sender.SendAsync(message, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.FromEmailAddress.ShouldBe("\"Override Name\" <noreply@example.com>");
     }
 
     // -------------------------------------------------------------------------

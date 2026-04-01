@@ -11,6 +11,7 @@ using Granit.Notifications.Email;
 using Granit.Notifications.Email.Internal;
 using Granit.Notifications.Email.Options;
 using Granit.Templating.Pipeline;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -34,7 +35,7 @@ public sealed class EmailNotificationChannelTests
         _options = Microsoft.Extensions.Options.Options.Create(new EmailChannelOptions
         {
             Provider = "Smtp",
-            SenderAddress = "no-reply@test.com",
+            DefaultSenderEmail = "no-reply@test.com",
         });
 
         _serviceProvider.GetRequiredKeyedService(typeof(IEmailSender), "Smtp")
@@ -44,6 +45,7 @@ public sealed class EmailNotificationChannelTests
             _serviceProvider,
             _options,
             _recipientResolver,
+            new ConfigurationBuilder().Build(),
             Substitute.For<ILogger<EmailNotificationChannel>>());
     }
 
@@ -89,7 +91,7 @@ public sealed class EmailNotificationChannelTests
     }
 
     [Fact]
-    public async Task SendAsync_SetsFromOverrideFromOptions()
+    public async Task SendAsync_SetsFromEmailOverrideFromOptions()
     {
         NotificationDeliveryContext context = BuildContext();
         SetupRecipient("user-1", email: "user@test.com");
@@ -104,7 +106,7 @@ public sealed class EmailNotificationChannelTests
         await _channel.SendAsync(context, TestContext.Current.CancellationToken);
 
         captured.ShouldNotBeNull();
-        captured!.FromOverride.ShouldBe("no-reply@test.com");
+        captured!.FromEmailOverride.ShouldBe("no-reply@test.com");
     }
 
     [Fact]
@@ -583,16 +585,230 @@ public sealed class EmailNotificationChannelTests
         capturedData["notification_type"].ShouldBe("test.notification");
     }
 
+    // ──── ToName and FromNameOverride propagation tests ────
+
+    [Fact]
+    public async Task SendAsync_SetsToNameFromRecipientDisplayName()
+    {
+        NotificationDeliveryContext context = BuildContext();
+        SetupRecipient("user-1", email: "user@test.com", displayName: "John Doe");
+        EmailMessage? captured = null;
+        _emailSender.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                captured = callInfo.Arg<EmailMessage>();
+                return Task.CompletedTask;
+            });
+
+        await _channel.SendAsync(context, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.ToName.ShouldBe("John Doe");
+    }
+
+    [Fact]
+    public async Task SendAsync_SetsFromNameOverrideFromOptions()
+    {
+        NotificationDeliveryContext context = BuildContext();
+        SetupRecipient("user-1", email: "user@test.com");
+
+        EmailNotificationChannel channel = CreateChannel(
+            opts: new EmailChannelOptions
+            {
+                Provider = "Smtp",
+                DefaultSenderEmail = "no-reply@test.com",
+                DefaultSenderName = "My App",
+            });
+
+        EmailMessage? captured = null;
+        _emailSender.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                captured = callInfo.Arg<EmailMessage>();
+                return Task.CompletedTask;
+            });
+
+        await channel.SendAsync(context, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.FromNameOverride.ShouldBe("My App");
+    }
+
+    // ──── List-Unsubscribe header tests (RFC 8058) ────
+
+    [Fact]
+    public async Task SendAsync_WhenAllowUserOptOut_SetsListUnsubscribeHeaders()
+    {
+        NotificationDeliveryContext context = BuildContext();
+        SetupRecipient("user-1", email: "user@test.com");
+
+        INotificationDefinitionStore defStore = Substitute.For<INotificationDefinitionStore>();
+        defStore.Get("test.notification").Returns(new NotificationDefinition("test.notification")
+        {
+            AllowUserOptOut = true,
+            GroupName = "Security",
+        });
+
+        EmailNotificationChannel channel = CreateChannel(
+            opts: new EmailChannelOptions
+            {
+                Provider = "Smtp",
+                DefaultSenderEmail = "no-reply@test.com",
+                UnsubscribeUrl = "https://app.test/prefs",
+            },
+            defStore: defStore);
+
+        EmailMessage? captured = null;
+        _emailSender.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                captured = callInfo.Arg<EmailMessage>();
+                return Task.CompletedTask;
+            });
+
+        await channel.SendAsync(context, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Headers.ShouldNotBeNull();
+        captured.Headers["List-Unsubscribe"].ShouldBe("<https://app.test/prefs>");
+        captured.Headers["List-Unsubscribe-Post"].ShouldBe("List-Unsubscribe=One-Click");
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenAllowUserOptOutFalse_DoesNotSetHeaders()
+    {
+        NotificationDeliveryContext context = BuildContext();
+        SetupRecipient("user-1", email: "user@test.com");
+
+        INotificationDefinitionStore defStore = Substitute.For<INotificationDefinitionStore>();
+        defStore.Get("test.notification").Returns(new NotificationDefinition("test.notification")
+        {
+            AllowUserOptOut = false,
+        });
+
+        EmailNotificationChannel channel = CreateChannel(defStore: defStore);
+
+        EmailMessage? captured = null;
+        _emailSender.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                captured = callInfo.Arg<EmailMessage>();
+                return Task.CompletedTask;
+            });
+
+        await channel.SendAsync(context, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Headers.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenNoDefinitionStore_DefaultsToOptOutAllowed()
+    {
+        NotificationDeliveryContext context = BuildContext();
+        SetupRecipient("user-1", email: "user@test.com");
+
+        EmailNotificationChannel channel = CreateChannel(
+            opts: new EmailChannelOptions
+            {
+                Provider = "Smtp",
+                DefaultSenderEmail = "no-reply@test.com",
+                UnsubscribeUrl = "https://app.test/prefs",
+            });
+
+        EmailMessage? captured = null;
+        _emailSender.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                captured = callInfo.Arg<EmailMessage>();
+                return Task.CompletedTask;
+            });
+
+        await channel.SendAsync(context, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Headers.ShouldNotBeNull();
+        captured.Headers["List-Unsubscribe"].ShouldBe("<https://app.test/prefs>");
+        captured.Headers["List-Unsubscribe-Post"].ShouldBe("List-Unsubscribe=One-Click");
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenNoUnsubscribeUrlConfigured_UsesBaseUrlFallback()
+    {
+        NotificationDeliveryContext context = BuildContext();
+        SetupRecipient("user-1", email: "user@test.com");
+
+        INotificationDefinitionStore defStore = Substitute.For<INotificationDefinitionStore>();
+        defStore.Get("test.notification").Returns(new NotificationDefinition("test.notification")
+        {
+            AllowUserOptOut = true,
+        });
+
+        IConfiguration config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Granit:Templating:App:BaseUrl"] = "https://myapp.com",
+            })
+            .Build();
+
+        EmailNotificationChannel channel = CreateChannel(
+            config: config,
+            defStore: defStore);
+
+        EmailMessage? captured = null;
+        _emailSender.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                captured = callInfo.Arg<EmailMessage>();
+                return Task.CompletedTask;
+            });
+
+        await channel.SendAsync(context, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Headers.ShouldNotBeNull();
+        captured.Headers["List-Unsubscribe"].ShouldBe("<https://myapp.com/notifications/preferences>");
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenNoUrlResolvable_DoesNotSetHeaders()
+    {
+        NotificationDeliveryContext context = BuildContext();
+        SetupRecipient("user-1", email: "user@test.com");
+
+        INotificationDefinitionStore defStore = Substitute.For<INotificationDefinitionStore>();
+        defStore.Get("test.notification").Returns(new NotificationDefinition("test.notification")
+        {
+            AllowUserOptOut = true,
+        });
+
+        EmailNotificationChannel channel = CreateChannel(defStore: defStore);
+
+        EmailMessage? captured = null;
+        _emailSender.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                captured = callInfo.Arg<EmailMessage>();
+                return Task.CompletedTask;
+            });
+
+        await channel.SendAsync(context, TestContext.Current.CancellationToken);
+
+        captured.ShouldNotBeNull();
+        captured.Headers.ShouldBeNull();
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private void SetupRecipient(string userId, string? email) =>
+    private void SetupRecipient(string userId, string? email, string? displayName = null) =>
         _recipientResolver.ResolveAsync(userId, Arg.Any<CancellationToken>())
             .Returns(new RecipientInfo
             {
                 UserId = userId,
                 Email = email,
+                DisplayName = displayName,
             });
 
     private static NotificationDeliveryContext BuildContext() => new()
@@ -605,4 +821,30 @@ public sealed class EmailNotificationChannelTests
         Data = JsonSerializer.SerializeToElement(new { key = "value" }),
         OccurredAt = DateTimeOffset.UtcNow,
     };
+
+    private EmailNotificationChannel CreateChannel(
+        EmailChannelOptions? opts = null,
+        IConfiguration? config = null,
+        INotificationDefinitionStore? defStore = null)
+    {
+        opts ??= new EmailChannelOptions
+        {
+            Provider = "Smtp",
+            DefaultSenderEmail = "no-reply@test.com",
+        };
+
+        config ??= new ConfigurationBuilder().Build();
+
+        if (defStore is not null)
+        {
+            _serviceProvider.GetService(typeof(INotificationDefinitionStore)).Returns(defStore);
+        }
+
+        return new EmailNotificationChannel(
+            _serviceProvider,
+            Microsoft.Extensions.Options.Options.Create(opts),
+            _recipientResolver,
+            config,
+            Substitute.For<ILogger<EmailNotificationChannel>>());
+    }
 }
