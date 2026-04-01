@@ -59,9 +59,17 @@ internal sealed partial class EmailNotificationChannel(
     {
         IEmailSender sender = serviceProvider.GetRequiredKeyedService<IEmailSender>(options.Value.Provider);
 
-        RecipientInfo? recipient = await recipientResolver.ResolveAsync(context.RecipientUserId, cancellationToken).ConfigureAwait(false);
+        RecipientInfo? recipient = context.RecipientOverride
+            ?? await recipientResolver.ResolveAsync(context.RecipientUserId, cancellationToken).ConfigureAwait(false);
         if (recipient?.Email is null)
         {
+            return;
+        }
+
+        // Validate email format (defense against misuse of RecipientOverride)
+        if (!System.Net.Mail.MailAddress.TryCreate(recipient.Email, out _))
+        {
+            Log.InvalidRecipientEmail(logger, context.NotificationTypeName);
             return;
         }
 
@@ -387,6 +395,10 @@ internal sealed partial class EmailNotificationChannel(
         [LoggerMessage(Level = LogLevel.Debug,
             Message = "Rendered email template '{NotificationType}' (culture: {Culture}).")]
         public static partial void TemplateRendered(ILogger logger, string notificationType, string? culture);
+
+        [LoggerMessage(Level = LogLevel.Warning,
+            Message = "Invalid recipient email format for notification '{NotificationType}'. Skipping delivery.")]
+        public static partial void InvalidRecipientEmail(ILogger logger, string notificationType);
 
         [LoggerMessage(Level = LogLevel.Warning,
             Message = "No template engine can render template for notification '{NotificationType}'.")]

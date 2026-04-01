@@ -2112,6 +2112,14 @@
           "Granit.Validation": "[0.1.0-dev, )"
         }
       },
+      "granit.identity.local.notifications": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Identity.Local": "[0.1.0-dev, )",
+          "Granit.Notifications.Abstractions": "[0.1.0-dev, )",
+          "Granit.Templating": "[0.1.0-dev, )"
+        }
+      },
       "granit.imaging": {
         "type": "Project",
         "dependencies": {
@@ -2196,6 +2204,7 @@
       "granit.notifications": {
         "type": "Project",
         "dependencies": {
+          "Granit.Encryption": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
           "Granit.Notifications.Abstractions": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )"
@@ -2380,6 +2389,7 @@
       "granit.notifications.wolverine": {
         "type": "Project",
         "dependencies": {
+          "Granit.Encryption": "[0.1.0-dev, )",
           "Granit.Notifications": "[0.1.0-dev, )",
           "Granit.Wolverine": "[0.1.0-dev, )",
           "WolverineFx": "[5.*, )"
