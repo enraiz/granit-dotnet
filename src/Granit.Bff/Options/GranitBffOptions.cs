@@ -131,9 +131,14 @@ public sealed class BffFrontendOptions
 
     /// <summary>
     /// Gets the session cookie name for this frontend.
-    /// Format: <c>__Host-bff-{name}</c>.
+    /// Production: <c>__Host-bff-{name}</c> (CSRF-hardened, requires HTTPS).
+    /// Development: <c>.bff-{name}</c> (compatible with HTTP).
+    /// Set automatically by <c>GranitBffEndpointsModule</c> based on the hosting environment.
     /// </summary>
-    public string SessionCookieName => $"__Host-bff-{Name}";
+    public string SessionCookieName => $"{CookiePrefix}bff-{Name}";
+
+    /// <summary>Cookie name prefix, set by the module based on environment.</summary>
+    internal string CookiePrefix { get; set; } = "__Host-";
 
     /// <summary>
     /// Gets the effective post-login redirect path.
