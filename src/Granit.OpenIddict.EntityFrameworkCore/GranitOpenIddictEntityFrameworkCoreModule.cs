@@ -1,13 +1,10 @@
 using Granit.Encryption;
-using Granit.Http.Cookies;
 using Granit.Identity.Local;
-using Granit.Identity.Local.Options;
 using Granit.Identity.Local.Services;
 using Granit.Modularity;
 using Granit.MultiTenancy;
 using Granit.OpenIddict.EntityFrameworkCore.Internal;
 using Granit.OpenIddict.EntityFrameworkCore.Seeding;
-using Granit.OpenIddict.Options;
 using Granit.OpenIddict.Server;
 using Granit.OpenIddict.Services;
 using Granit.Persistence.EntityFrameworkCore;
@@ -15,7 +12,6 @@ using Granit.Persistence.EntityFrameworkCore.DataSeeding;
 using Granit.Persistence.EntityFrameworkCore.ExtraProperties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Server;
 
@@ -25,17 +21,8 @@ namespace Granit.OpenIddict.EntityFrameworkCore;
 /// Granit module that registers EF Core persistence for OpenIddict.
 /// </summary>
 /// <remarks>
-/// <para>
-/// The host application must configure the <see cref="Internal.OpenIddictDbContext"/>
-/// connection string via <c>AddGranitOpenIddict(configure)</c>.
-/// This module registers the store implementations, OpenIddict core services,
-/// the declarative seed contributor, and passkey options.
-/// </para>
-/// <para>
-/// Depends on <see cref="GranitMultiTenancyModule"/> for GDPR-strict tenant isolation
-/// in OpenIddict stores, and <see cref="GranitEncryptionModule"/> for signing key
-/// material encryption at rest.
-/// </para>
+/// Registers <see cref="Internal.OpenIddictDbContext"/>, EF stores (groups, signing keys),
+/// data seeding, extra-property infrastructure, and signing key loading at startup.
 /// </remarks>
 [DependsOn(
     typeof(GranitEncryptionModule),
@@ -48,52 +35,12 @@ public sealed class GranitOpenIddictEntityFrameworkCoreModule : GranitModule
     /// <inheritdoc/>
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services
-            .AddOptions<GranitOpenIddictSeedingOptions>()
-            .BindConfiguration(GranitOpenIddictSeedingOptions.SectionName);
-
-        context.Services
-            .AddOptions<GranitPasskeyOptions>()
-            .BindConfiguration(GranitPasskeyOptions.SectionName);
-
+        // Data seeding
         context.Services.AddTransient<IDataSeedContributor, OpenIddictSeedContributor>();
-        context.Services.AddSingleton<ICookieDefinitionContributor, IdentityCookieDefinitionContributor>();
 
-        // Override default ASP.NET Core Identity cookie names to avoid leaking the technology stack.
-        // Production: __Host- prefix (Secure + Path=/ + no Domain, RFC 6265bis §4.1.3.2).
-        // Development: simple names without __Host- (requires HTTPS, incompatible with HTTP dev).
-        bool isDevelopment = context.Builder!.Environment.IsDevelopment();
-
-        ConfigureIdentityCookie(context.Services, isDevelopment,
-            Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme,
-            IdentityCookieDefinitionContributor.DefaultApplicationCookieName,
-            IdentityCookieDefinitionContributor.DevApplicationCookieName);
-
-        ConfigureIdentityCookie(context.Services, isDevelopment,
-            Microsoft.AspNetCore.Identity.IdentityConstants.TwoFactorUserIdScheme,
-            IdentityCookieDefinitionContributor.DefaultTwoFactorCookieName,
-            IdentityCookieDefinitionContributor.DevTwoFactorCookieName);
-
-        ConfigureIdentityCookie(context.Services, isDevelopment,
-            Microsoft.AspNetCore.Identity.IdentityConstants.ExternalScheme,
-            IdentityCookieDefinitionContributor.DefaultExternalCookieName,
-            IdentityCookieDefinitionContributor.DevExternalCookieName);
-
+        // EF Core stores
         context.Services.TryAddScoped<ILocalIdentityGroupStore, OpenIddictGroupStore>();
-        context.Services.TryAddScoped<ExternalClaimsMapper>();
-        context.Services.TryAddScoped<IExternalLoginService, AspNetExternalLoginService>();
-        context.Services.TryAddScoped<ITotpService, TotpService>();
-        context.Services.TryAddScoped<ITwoFactorService, AspNetTwoFactorService>();
-        context.Services.TryAddScoped<IAccountDeletionService, AspNetAccountDeletionService>();
-        context.Services.TryAddScoped<IPasswordResetService, AspNetPasswordResetService>();
         context.Services.TryAddScoped<ISigningKeyStore, EfSigningKeyStore>();
-        context.Services.TryAddScoped<IKeyRotationService, KeyRotationService>();
-        context.Services.TryAddScoped<IPasskeyService, AspNetPasskeyService>();
-        context.Services.TryAddScoped<IImpersonationService, AspNetImpersonationService>();
-
-        context.Services
-            .AddOptions<GranitKeyRotationOptions>()
-            .BindConfiguration(GranitKeyRotationOptions.SectionName);
 
         // GranitUser implements IHasExtraProperties — apps can extend user properties
         // by calling AddExtraPropertyMappings<GranitUser> in their own module.
@@ -103,20 +50,5 @@ public sealed class GranitOpenIddictEntityFrameworkCoreModule : GranitModule
         // Load signing/encryption keys from DB at startup (replaces ephemeral keys)
         context.Services.AddSingleton<IPostConfigureOptions<OpenIddictServerOptions>,
             DatabaseSigningKeyPostConfigure>();
-    }
-
-    private static void ConfigureIdentityCookie(
-        IServiceCollection services, bool isDevelopment, string scheme,
-        string prodCookieName, string devCookieName)
-    {
-        services.Configure<Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions>(
-            scheme,
-            options =>
-            {
-                options.Cookie.Name = isDevelopment ? devCookieName : prodCookieName;
-                options.Cookie.SecurePolicy = isDevelopment
-                    ? Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest
-                    : Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
-            });
     }
 }
