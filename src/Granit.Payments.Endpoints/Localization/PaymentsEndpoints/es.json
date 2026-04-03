@@ -1,0 +1,11 @@
+{
+  "culture": "es",
+  "texts": {
+    "PermissionGroup:Payments": "Pagos",
+    "Permission:Payments.Transactions.Read": "Consultar las transacciones de pago",
+    "Permission:Payments.Charges.Execute": "Iniciar pagos",
+    "Permission:Payments.Refunds.Execute": "Procesar reembolsos",
+    "Permission:Payments.Methods.Read": "Consultar los métodos de pago",
+    "Permission:Payments.Methods.Manage": "Gestionar los métodos de pago (añadir, eliminar)"
+  }
+}

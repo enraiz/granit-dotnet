@@ -1,0 +1,12 @@
+{
+  "culture": "nl",
+  "texts": {
+    "PermissionGroup:Subscriptions": "Abonnementen",
+    "Permission:Subscriptions.Plans.Read": "Abonnementsplannen bekijken",
+    "Permission:Subscriptions.Plans.Manage": "Abonnementsplannen beheren (aanmaken, publiceren, archiveren)",
+    "Permission:Subscriptions.Subscriptions.Read": "Abonnementen bekijken",
+    "Permission:Subscriptions.Subscriptions.Manage": "Abonnementen beheren (aanmaken, annuleren, van plan wijzigen)",
+    "Permission:Subscriptions.Seats.Read": "Stoeltoewijzingen bekijken",
+    "Permission:Subscriptions.Seats.Manage": "Stoeltoewijzingen beheren (toewijzen, intrekken)"
+  }
+}

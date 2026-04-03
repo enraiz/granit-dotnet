@@ -1,0 +1,11 @@
+{
+  "culture": "tr",
+  "texts": {
+    "PermissionGroup:Payments": "Ödemeler",
+    "Permission:Payments.Transactions.Read": "Ödeme işlemlerini görüntüle",
+    "Permission:Payments.Charges.Execute": "Ödeme başlat",
+    "Permission:Payments.Refunds.Execute": "İade işle",
+    "Permission:Payments.Methods.Read": "Ödeme yöntemlerini görüntüle",
+    "Permission:Payments.Methods.Manage": "Ödeme yöntemlerini yönet (ekle, kaldır)"
+  }
+}

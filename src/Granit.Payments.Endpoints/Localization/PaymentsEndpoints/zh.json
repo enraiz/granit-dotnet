@@ -1,0 +1,11 @@
+{
+  "culture": "zh",
+  "texts": {
+    "PermissionGroup:Payments": "支付",
+    "Permission:Payments.Transactions.Read": "查看支付交易",
+    "Permission:Payments.Charges.Execute": "发起收款",
+    "Permission:Payments.Refunds.Execute": "处理退款",
+    "Permission:Payments.Methods.Read": "查看支付方式",
+    "Permission:Payments.Methods.Manage": "管理支付方式（添加、移除）"
+  }
+}

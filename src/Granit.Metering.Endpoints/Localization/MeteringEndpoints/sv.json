@@ -1,0 +1,10 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Metering": "Mätning",
+    "Permission:Metering.Meters.Read": "Visa mätardefinitioner",
+    "Permission:Metering.Meters.Manage": "Hantera mätardefinitioner (skapa, uppdatera, inaktivera)",
+    "Permission:Metering.Usage.Read": "Visa användningsdata och kvotstatus",
+    "Permission:Metering.Usage.Record": "Registrera användningshändelser"
+  }
+}

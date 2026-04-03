@@ -1,0 +1,10 @@
+{
+  "culture": "pl",
+  "texts": {
+    "PermissionGroup:Metering": "Pomiary",
+    "Permission:Metering.Meters.Read": "Wyświetlanie definicji mierników",
+    "Permission:Metering.Meters.Manage": "Zarządzanie definicjami mierników (tworzenie, aktualizacja, dezaktywacja)",
+    "Permission:Metering.Usage.Read": "Wyświetlanie danych o użyciu i stanu limitów",
+    "Permission:Metering.Usage.Record": "Rejestrowanie zdarzeń użycia"
+  }
+}

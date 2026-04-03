@@ -1,0 +1,12 @@
+{
+  "culture": "it",
+  "texts": {
+    "PermissionGroup:Subscriptions": "Abbonamenti",
+    "Permission:Subscriptions.Plans.Read": "Visualizzare i piani di abbonamento",
+    "Permission:Subscriptions.Plans.Manage": "Gestire i piani di abbonamento (creare, pubblicare, archiviare)",
+    "Permission:Subscriptions.Subscriptions.Read": "Visualizzare gli abbonamenti",
+    "Permission:Subscriptions.Subscriptions.Manage": "Gestire gli abbonamenti (creare, annullare, cambiare piano)",
+    "Permission:Subscriptions.Seats.Read": "Visualizzare le assegnazioni dei posti",
+    "Permission:Subscriptions.Seats.Manage": "Gestire le assegnazioni dei posti (assegnare, revocare)"
+  }
+}

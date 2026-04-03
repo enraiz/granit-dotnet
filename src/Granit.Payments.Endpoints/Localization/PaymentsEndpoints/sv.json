@@ -1,0 +1,11 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Payments": "Betalningar",
+    "Permission:Payments.Transactions.Read": "Visa betalningstransaktioner",
+    "Permission:Payments.Charges.Execute": "Initiera betalningar",
+    "Permission:Payments.Refunds.Execute": "Behandla återbetalningar",
+    "Permission:Payments.Methods.Read": "Visa betalningsmetoder",
+    "Permission:Payments.Methods.Manage": "Hantera betalningsmetoder (lägga till, ta bort)"
+  }
+}

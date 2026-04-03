@@ -1,0 +1,12 @@
+{
+  "culture": "sv",
+  "texts": {
+    "PermissionGroup:Subscriptions": "Prenumerationer",
+    "Permission:Subscriptions.Plans.Read": "Visa prenumerationsplaner",
+    "Permission:Subscriptions.Plans.Manage": "Hantera prenumerationsplaner (skapa, publicera, arkivera)",
+    "Permission:Subscriptions.Subscriptions.Read": "Visa prenumerationer",
+    "Permission:Subscriptions.Subscriptions.Manage": "Hantera prenumerationer (skapa, avbryta, byta plan)",
+    "Permission:Subscriptions.Seats.Read": "Visa platstilldelningar",
+    "Permission:Subscriptions.Seats.Manage": "Hantera platstilldelningar (tilldela, återkalla)"
+  }
+}

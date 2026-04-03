@@ -1,0 +1,12 @@
+{
+  "culture": "pt",
+  "texts": {
+    "PermissionGroup:Subscriptions": "Subscrições",
+    "Permission:Subscriptions.Plans.Read": "Ver planos de subscrição",
+    "Permission:Subscriptions.Plans.Manage": "Gerir planos de subscrição (criar, publicar, arquivar)",
+    "Permission:Subscriptions.Subscriptions.Read": "Ver subscrições",
+    "Permission:Subscriptions.Subscriptions.Manage": "Gerir subscrições (criar, cancelar, alterar plano)",
+    "Permission:Subscriptions.Seats.Read": "Ver atribuições de lugares",
+    "Permission:Subscriptions.Seats.Manage": "Gerir atribuições de lugares (atribuir, revogar)"
+  }
+}

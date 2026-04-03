@@ -1,0 +1,10 @@
+{
+  "culture": "nl",
+  "texts": {
+    "PermissionGroup:Metering": "Metrologie",
+    "Permission:Metering.Meters.Read": "Meterdefinities bekijken",
+    "Permission:Metering.Meters.Manage": "Meterdefinities beheren (aanmaken, bijwerken, deactiveren)",
+    "Permission:Metering.Usage.Read": "Gebruiksgegevens en quotumstatus bekijken",
+    "Permission:Metering.Usage.Record": "Gebruiksgebeurtenissen registreren"
+  }
+}

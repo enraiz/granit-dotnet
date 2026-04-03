@@ -1,0 +1,12 @@
+{
+  "culture": "pt-BR",
+  "texts": {
+    "PermissionGroup:Subscriptions": "Assinaturas",
+    "Permission:Subscriptions.Plans.Read": "Visualizar planos de assinatura",
+    "Permission:Subscriptions.Plans.Manage": "Gerenciar planos de assinatura (criar, publicar, arquivar)",
+    "Permission:Subscriptions.Subscriptions.Read": "Visualizar assinaturas",
+    "Permission:Subscriptions.Subscriptions.Manage": "Gerenciar assinaturas (criar, cancelar, alterar plano)",
+    "Permission:Subscriptions.Seats.Read": "Visualizar atribuições de assentos",
+    "Permission:Subscriptions.Seats.Manage": "Gerenciar atribuições de assentos (atribuir, revogar)"
+  }
+}

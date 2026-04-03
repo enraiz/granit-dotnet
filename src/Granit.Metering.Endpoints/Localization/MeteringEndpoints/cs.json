@@ -1,0 +1,10 @@
+{
+  "culture": "cs",
+  "texts": {
+    "PermissionGroup:Metering": "Měření",
+    "Permission:Metering.Meters.Read": "Zobrazit definice měřičů",
+    "Permission:Metering.Meters.Manage": "Spravovat definice měřičů (vytvořit, aktualizovat, deaktivovat)",
+    "Permission:Metering.Usage.Read": "Zobrazit data o využití a stav kvót",
+    "Permission:Metering.Usage.Record": "Zaznamenat události využití"
+  }
+}

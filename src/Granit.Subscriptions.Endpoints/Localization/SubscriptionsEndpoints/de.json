@@ -1,0 +1,12 @@
+{
+  "culture": "de",
+  "texts": {
+    "PermissionGroup:Subscriptions": "Abonnements",
+    "Permission:Subscriptions.Plans.Read": "Abonnementpläne anzeigen",
+    "Permission:Subscriptions.Plans.Manage": "Abonnementpläne verwalten (erstellen, veröffentlichen, archivieren)",
+    "Permission:Subscriptions.Subscriptions.Read": "Abonnements anzeigen",
+    "Permission:Subscriptions.Subscriptions.Manage": "Abonnements verwalten (erstellen, kündigen, Plan wechseln)",
+    "Permission:Subscriptions.Seats.Read": "Platzzuweisungen anzeigen",
+    "Permission:Subscriptions.Seats.Manage": "Platzzuweisungen verwalten (zuweisen, widerrufen)"
+  }
+}
