@@ -1,5 +1,5 @@
 using Granit.Auditing.Endpoints.Internal;
-using Granit.Authorization.Abstractions;
+using Granit.Authorization;
 using Granit.Localization;
 
 namespace Granit.Auditing.Endpoints.Permissions;
@@ -22,5 +22,10 @@ internal sealed class AuditingPermissionDefinitionProvider : IPermissionDefiniti
             AuditingPermissions.AuditEntries.Read,
             LocalizableString.Create<AuditingEndpointsLocalizationResource>(
                 "Permission:Auditing.AuditEntries.Read"));
+
+        group.AddPermission(
+            AuditingPermissions.AuditEntries.Manage,
+            LocalizableString.Create<AuditingEndpointsLocalizationResource>(
+                "Permission:Auditing.AuditEntries.Manage"));
     }
 }

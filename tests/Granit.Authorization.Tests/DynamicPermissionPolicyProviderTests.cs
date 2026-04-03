@@ -7,7 +7,7 @@
 //   - Retourne null pour une policy totalement inconnue
 // =============================================================================
 
-using Granit.Authorization.Abstractions;
+using Granit.Authorization;
 using Granit.Authorization.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
