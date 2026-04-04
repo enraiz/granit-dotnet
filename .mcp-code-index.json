@@ -6784,8 +6784,15 @@
       "kind": "class",
       "project": "Granit.Bff.BackgroundJobs",
       "file": "src/Granit.Bff.BackgroundJobs/GranitBffBackgroundJobsModule.cs",
-      "line": 14,
-      "members": []
+      "line": 17,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "BffExpiredSessionCleanupJob",
@@ -6896,6 +6903,22 @@
           "kind": "method",
           "signature": "ConfigureServices(ServiceConfigurationContext context)",
           "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "BffEntityFrameworkCoreHostApplicationBuilderExtensions",
+      "fqn": "Granit.Bff.EntityFrameworkCore.Extensions.BffEntityFrameworkCoreHostApplicationBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Bff.EntityFrameworkCore",
+      "file": "src/Granit.Bff.EntityFrameworkCore/Extensions/BffEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
+      "line": 14,
+      "members": [
+        {
+          "name": "AddGranitBffEntityFrameworkCore",
+          "kind": "method",
+          "signature": "AddGranitBffEntityFrameworkCore(this IHostApplicationBuilder builder, Action<DbContextOptionsBuilder> configure)",
+          "returnType": "IHostApplicationBuilder"
         }
       ]
     },
@@ -7423,28 +7446,6 @@
       ]
     },
     {
-      "name": "DbStoreBlobContent",
-      "fqn": "Granit.BlobStorage.Database.Entities.DbStoreBlobContent",
-      "kind": "class",
-      "project": "Granit.BlobStorage.Database",
-      "file": "src/Granit.BlobStorage.Database/Entities/DbStoreBlobContent.cs",
-      "line": 12,
-      "members": [
-        {
-          "name": "Id",
-          "kind": "property",
-          "signature": "Guid Id",
-          "returnType": "Guid"
-        },
-        {
-          "name": "Content",
-          "kind": "property",
-          "signature": "byte[] Content",
-          "returnType": "byte[]"
-        }
-      ]
-    },
-    {
       "name": "BlobStorageDatabaseHostApplicationBuilderExtensions",
       "fqn": "Granit.BlobStorage.Database.Extensions.BlobStorageDatabaseHostApplicationBuilderExtensions",
       "kind": "class",
@@ -7453,9 +7454,9 @@
       "line": 21,
       "members": [
         {
-          "name": "AddGranitBlobStorageDbStore",
+          "name": "AddGranitBlobStorageDatabase",
           "kind": "method",
-          "signature": "AddGranitBlobStorageDbStore(this IHostApplicationBuilder builder, Action<DbContextOptionsBuilder> configure)",
+          "signature": "AddGranitBlobStorageDatabase(this IHostApplicationBuilder builder, Action<DbContextOptionsBuilder> configure)",
           "returnType": "IHostApplicationBuilder"
         }
       ]
@@ -7475,22 +7476,6 @@
       "kind": "class",
       "project": "Granit.BlobStorage.Database",
       "file": "src/Granit.BlobStorage.Database/Options/DatabaseBlobOptions.cs",
-      "line": 11,
-      "members": [
-        {
-          "name": "MaxBlobSizeBytes",
-          "kind": "property",
-          "signature": "long MaxBlobSizeBytes",
-          "returnType": "long"
-        }
-      ]
-    },
-    {
-      "name": "DbStoreBlobOptions",
-      "fqn": "Granit.BlobStorage.Database.Options.DbStoreBlobOptions",
-      "kind": "class",
-      "project": "Granit.BlobStorage.Database",
-      "file": "src/Granit.BlobStorage.Database/Options/DbStoreBlobOptions.cs",
       "line": 11,
       "members": [
         {
@@ -9096,7 +9081,7 @@
       "kind": "class",
       "project": "Granit.CustomerBalance",
       "file": "src/Granit.CustomerBalance/Extensions/CustomerBalanceHostApplicationBuilderExtensions.cs",
-      "line": 12,
+      "line": 13,
       "members": [
         {
           "name": "AddGranitCustomerBalance",
@@ -9191,6 +9176,38 @@
           "kind": "method",
           "signature": "GetExpiredCreditsAsync(DateTimeOffset now, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<BalanceTransaction>>"
+        }
+      ]
+    },
+    {
+      "name": "ICreditExpirationService",
+      "fqn": "Granit.CustomerBalance.ICreditExpirationService",
+      "kind": "interface",
+      "project": "Granit.CustomerBalance",
+      "file": "src/Granit.CustomerBalance/ICreditExpirationService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "ExpireCreditsAsync",
+          "kind": "method",
+          "signature": "ExpireCreditsAsync(CancellationToken cancellationToken = default)",
+          "returnType": "Task<int>"
+        }
+      ]
+    },
+    {
+      "name": "IOverpaymentCreditService",
+      "fqn": "Granit.CustomerBalance.IOverpaymentCreditService",
+      "kind": "interface",
+      "project": "Granit.CustomerBalance",
+      "file": "src/Granit.CustomerBalance/IOverpaymentCreditService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "CreditOverpaymentAsync",
+          "kind": "method",
+          "signature": "CreditOverpaymentAsync(Guid tenantId, string currency, decimal amount, Guid invoiceId, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
         }
       ]
     },
@@ -18264,8 +18281,31 @@
       "kind": "class",
       "project": "Granit.Invoicing.BackgroundJobs",
       "file": "src/Granit.Invoicing.BackgroundJobs/GranitInvoicingBackgroundJobsModule.cs",
-      "line": 10,
-      "members": []
+      "line": 13,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "IOverdueInvoiceDetectionService",
+      "fqn": "Granit.Invoicing.BackgroundJobs.IOverdueInvoiceDetectionService",
+      "kind": "interface",
+      "project": "Granit.Invoicing.BackgroundJobs",
+      "file": "src/Granit.Invoicing.BackgroundJobs/IOverdueInvoiceDetectionService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "DetectAsync",
+          "kind": "method",
+          "signature": "DetectAsync(CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
     },
     {
       "name": "OverdueInvoiceDetectionJob",
@@ -18836,7 +18876,7 @@
       "kind": "class",
       "project": "Granit.Invoicing",
       "file": "src/Granit.Invoicing/Extensions/InvoicingHostApplicationBuilderExtensions.cs",
-      "line": 12,
+      "line": 13,
       "members": [
         {
           "name": "AddGranitInvoicing",
@@ -18859,6 +18899,22 @@
           "kind": "method",
           "signature": "ConfigureServices(ServiceConfigurationContext context)",
           "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "IInvoiceCreationService",
+      "fqn": "Granit.Invoicing.IInvoiceCreationService",
+      "kind": "interface",
+      "project": "Granit.Invoicing",
+      "file": "src/Granit.Invoicing/IInvoiceCreationService.cs",
+      "line": 10,
+      "members": [
+        {
+          "name": "CreateAsync",
+          "kind": "method",
+          "signature": "CreateAsync(CreateInvoiceCommand command, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
         }
       ]
     },
@@ -20358,8 +20414,15 @@
       "kind": "class",
       "project": "Granit.Metering.BackgroundJobs",
       "file": "src/Granit.Metering.BackgroundJobs/GranitMeteringBackgroundJobsModule.cs",
-      "line": 13,
-      "members": []
+      "line": 16,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "MeteringAggregationJob",
@@ -24753,8 +24816,15 @@
       "kind": "class",
       "project": "Granit.OpenIddict.BackgroundJobs",
       "file": "src/Granit.OpenIddict.BackgroundJobs/GranitOpenIddictBackgroundJobsModule.cs",
-      "line": 17,
-      "members": []
+      "line": 20,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "OpenIddictIdleSessionEnforcementJob",
@@ -28617,8 +28687,15 @@
       "kind": "class",
       "project": "Granit.Privacy.BackgroundJobs",
       "file": "src/Granit.Privacy.BackgroundJobs/GranitPrivacyBackgroundJobsModule.cs",
-      "line": 13,
-      "members": []
+      "line": 16,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "DeletionDeadlineEnforcerJob",
@@ -31762,8 +31839,15 @@
       "kind": "class",
       "project": "Granit.Scheduling.BackgroundJobs",
       "file": "src/Granit.Scheduling.BackgroundJobs/GranitSchedulingBackgroundJobsModule.cs",
-      "line": 15,
-      "members": []
+      "line": 18,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "SchedulingCatchUpJob",
@@ -32940,8 +33024,15 @@
       "kind": "class",
       "project": "Granit.Subscriptions.BackgroundJobs",
       "file": "src/Granit.Subscriptions.BackgroundJobs/GranitSubscriptionsBackgroundJobsModule.cs",
-      "line": 13,
-      "members": []
+      "line": 16,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "CancelAtPeriodEndScanJob",
@@ -33683,7 +33774,7 @@
       "kind": "class",
       "project": "Granit.Subscriptions",
       "file": "src/Granit.Subscriptions/Extensions/SubscriptionsHostApplicationBuilderExtensions.cs",
-      "line": 14,
+      "line": 15,
       "members": [
         {
           "name": "AddGranitSubscriptions",
@@ -33722,6 +33813,54 @@
           "kind": "method",
           "signature": "ConfigureServices(ServiceConfigurationContext context)",
           "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "ICancelAtPeriodEndService",
+      "fqn": "Granit.Subscriptions.ICancelAtPeriodEndService",
+      "kind": "interface",
+      "project": "Granit.Subscriptions",
+      "file": "src/Granit.Subscriptions/ICancelAtPeriodEndService.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "CancelDueSubscriptionsAsync",
+          "kind": "method",
+          "signature": "CancelDueSubscriptionsAsync(CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "IDunningService",
+      "fqn": "Granit.Subscriptions.IDunningService",
+      "kind": "interface",
+      "project": "Granit.Subscriptions",
+      "file": "src/Granit.Subscriptions/IDunningService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "HandlePaymentFailureAsync",
+          "kind": "method",
+          "signature": "HandlePaymentFailureAsync(Guid tenantId, Guid invoiceId, decimal amount, string currency, string methodType, string providerName, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "IPeriodAdvancementService",
+      "fqn": "Granit.Subscriptions.IPeriodAdvancementService",
+      "kind": "interface",
+      "project": "Granit.Subscriptions",
+      "file": "src/Granit.Subscriptions/IPeriodAdvancementService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "AdvancePeriodsAsync",
+          "kind": "method",
+          "signature": "AdvancePeriodsAsync(CancellationToken cancellationToken = default)",
+          "returnType": "Task"
         }
       ]
     },
@@ -33872,6 +34011,38 @@
           "kind": "method",
           "signature": "UpdateSeatsExternalAsync(SubscriptionExternalMapping mapping, int quantity, CancellationToken cancellationToken = default)",
           "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "ISubscriptionProviderSyncService",
+      "fqn": "Granit.Subscriptions.ISubscriptionProviderSyncService",
+      "kind": "interface",
+      "project": "Granit.Subscriptions",
+      "file": "src/Granit.Subscriptions/ISubscriptionProviderSyncService.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "SyncCancellationAsync",
+          "kind": "method",
+          "signature": "SyncCancellationAsync(Guid subscriptionId, Guid tenantId, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "ISubscriptionReactivationService",
+      "fqn": "Granit.Subscriptions.ISubscriptionReactivationService",
+      "kind": "interface",
+      "project": "Granit.Subscriptions",
+      "file": "src/Granit.Subscriptions/ISubscriptionReactivationService.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "TryReactivateAsync",
+          "kind": "method",
+          "signature": "TryReactivateAsync(Guid tenantId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<bool>"
         }
       ]
     },
@@ -34212,8 +34383,15 @@
       "kind": "class",
       "project": "Granit.Subscriptions.Wolverine",
       "file": "src/Granit.Subscriptions.Wolverine/GranitSubscriptionsWolverineModule.cs",
-      "line": 13,
-      "members": []
+      "line": 16,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "TaxMetrics",
