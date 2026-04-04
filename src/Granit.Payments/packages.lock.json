@@ -54,12 +54,10 @@
       "granit": {
         "type": "Project"
       },
-      "granit.guids": {
+      "granit.payments.abstractions": {
         "type": "Project",
         "dependencies": {
-          "Granit.Timing": "[0.1.0-dev, )",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.*, )",
-          "Microsoft.Extensions.Options": "[10.*, )"
+          "Granit": "[0.1.0-dev, )"
         }
       },
       "granit.timing": {
