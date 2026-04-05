@@ -1,6 +1,10 @@
+using System.Diagnostics;
+using System.Security.Cryptography;
+using Granit.Events;
 using Granit.Identity.Local.Diagnostics;
 using Granit.Identity.Local.Domain;
 using Granit.Identity.Local.Endpoints.Dtos;
+using Granit.Identity.Local.Events;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -27,13 +31,12 @@ internal static partial class AccountLoginEndpoints
             .WithDescription(
                 "Validates credentials (email or username + password) against ASP.NET Core Identity. "
                 + "On success, sets the Identity authentication cookie and returns 200. "
-                + "On failure, returns the specific failure reason (invalid credentials, 2FA required, "
-                + "locked out, sign-in not allowed). This endpoint is designed for headless/BFF "
-                + "architectures where the SPA handles the login UI and redirects back to "
-                + "/connect/authorize after successful authentication.")
+                + "On failure, returns 401 with a generic message to prevent account enumeration. "
+                + "Locked-out users are notified exclusively via email with a password reset link. "
+                + "This endpoint is designed for headless/BFF architectures where the SPA handles "
+                + "the login UI and redirects back to /connect/authorize after successful authentication.")
             .Produces<AccountLoginResponse>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status423Locked)
             .AllowAnonymous()
             .RequireRateLimiting("authentication");
 
@@ -65,6 +68,29 @@ internal static partial class AccountLoginEndpoints
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
+        long startTicks = Stopwatch.GetTimestamp();
+
+        Results<Ok<AccountLoginResponse>, ProblemHttpResult> response = await HandleLoginCoreAsync(
+            request, signInManager, userManager, httpContext, cancellationToken)
+            .ConfigureAwait(false);
+
+        // Enforce a minimum response time to prevent timing side-channels.
+        // Without this, an attacker can distinguish "user not found" (~310ms with
+        // dummy hash) from "wrong password on existing account" (~450ms with hash
+        // + DB writes for lockout counter). The floor is randomized per request
+        // (500-700ms) so an attacker cannot fingerprint a fixed threshold.
+        await EnforceMinimumResponseTimeAsync(startTicks).ConfigureAwait(false);
+
+        return response;
+    }
+
+    private static async Task<Results<Ok<AccountLoginResponse>, ProblemHttpResult>> HandleLoginCoreAsync(
+        AccountLoginRequest request,
+        SignInManager<GranitUser> signInManager,
+        UserManager<GranitUser> userManager,
+        HttpContext httpContext,
+        CancellationToken cancellationToken)
+    {
         ILogger logger = httpContext.RequestServices
             .GetRequiredService<ILoggerFactory>()
             .CreateLogger("Granit.Identity.Local.Endpoints.AccountLoginEndpoints");
@@ -76,6 +102,10 @@ internal static partial class AccountLoginEndpoints
 
         if (user is null)
         {
+            // Perform a dummy hash so BCrypt/Argon2 CPU cost is incurred even
+            // when the user does not exist (covers the bulk of the timing gap).
+            PerformDummyPasswordHash(httpContext);
+
             LogLoginFailed(logger, request.Login, "user_not_found");
             metrics?.RecordAuthenticationFailure(null, "invalid_credentials");
 
@@ -108,9 +138,14 @@ internal static partial class AccountLoginEndpoints
             LogLoginLockedOut(logger, user.Id.ToString());
             metrics?.RecordAuthenticationFailure(null, "account_locked");
 
+            await PublishAccountLockedAsync(httpContext, userManager, user, cancellationToken)
+                .ConfigureAwait(false);
+
+            // Return 401 (same as invalid credentials) to prevent account enumeration.
+            // The user is notified of the lockout exclusively via email.
             return TypedResults.Problem(
-                detail: "Account is locked out. Try again later.",
-                statusCode: StatusCodes.Status423Locked);
+                detail: "Invalid credentials.",
+                statusCode: StatusCodes.Status401Unauthorized);
         }
 
         if (result.IsNotAllowed)
@@ -187,12 +222,24 @@ internal static partial class AccountLoginEndpoints
 
         if (result.IsLockedOut)
         {
-            LogLoginLockedOut(logger, "two-factor-user");
+            GranitUser? lockedUser = await signInManager.GetTwoFactorAuthenticationUserAsync()
+                .ConfigureAwait(false);
+
+            LogLoginLockedOut(logger, lockedUser?.Id.ToString() ?? "two-factor-user");
             metrics?.RecordAuthenticationFailure(null, "account_locked");
 
+            if (lockedUser is not null)
+            {
+                await PublishAccountLockedAsync(
+                    httpContext, signInManager.UserManager, lockedUser, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            // Return 401 (same as invalid code) to prevent account enumeration.
+            // The user is notified of the lockout exclusively via email.
             return TypedResults.Problem(
-                detail: "Account is locked out. Try again later.",
-                statusCode: StatusCodes.Status423Locked);
+                detail: "Invalid verification code.",
+                statusCode: StatusCodes.Status401Unauthorized);
         }
 
         LogTwoFactorFailed(logger, request.UseRecoveryCode ? "invalid_recovery_code" : "invalid_totp_code");
@@ -201,6 +248,81 @@ internal static partial class AccountLoginEndpoints
         return TypedResults.Problem(
             detail: "Invalid verification code.",
             statusCode: StatusCodes.Status401Unauthorized);
+    }
+
+    // ──── Timing attack mitigation ────
+
+    /// <summary>
+    /// Minimum response time range (milliseconds) for the login endpoint.
+    /// A random floor between these bounds is picked per request so that
+    /// an attacker cannot fingerprint a fixed threshold.
+    /// </summary>
+    private const int MinResponseFloorMs = 500;
+    private const int MaxResponseFloorMs = 700;
+
+    /// <summary>
+    /// Pre-computed BCrypt/Argon2 hash used for dummy verification when the user
+    /// does not exist. The actual password value is irrelevant — what matters is
+    /// that VerifyHashedPassword runs the same hashing algorithm as a real check,
+    /// burning ~300ms of CPU so the response time is indistinguishable from a
+    /// real password verification.
+    /// </summary>
+    private static readonly string DummyPasswordHash =
+        new PasswordHasher<GranitUser>().HashPassword(null!, "K4$hDummyP@ssw0rd!");
+
+    private static void PerformDummyPasswordHash(HttpContext httpContext)
+    {
+        IPasswordHasher<GranitUser> hasher = httpContext.RequestServices
+            .GetRequiredService<IPasswordHasher<GranitUser>>();
+
+        // Use a random password each time to introduce natural timing jitter
+        // and avoid a constant, fingerprint-able verification pattern.
+        hasher.VerifyHashedPassword(null!, DummyPasswordHash, RandomNumberGenerator.GetHexString(32));
+    }
+
+    /// <summary>
+    /// Pads the response time to a randomized minimum floor (500-700ms) so that
+    /// all failure paths (user not found, wrong password, locked out) are
+    /// indistinguishable by timing. If the handler already took longer than the
+    /// floor, no delay is added.
+    /// </summary>
+    private static async Task EnforceMinimumResponseTimeAsync(long startTicks)
+    {
+        int floorMs = RandomNumberGenerator.GetInt32(MinResponseFloorMs, MaxResponseFloorMs + 1);
+        TimeSpan elapsed = Stopwatch.GetElapsedTime(startTicks);
+        int remainingMs = floorMs - (int)elapsed.TotalMilliseconds;
+
+        if (remainingMs > 0)
+        {
+            await Task.Delay(remainingMs).ConfigureAwait(false);
+        }
+    }
+
+    // ──── Lockout event publishing ────
+
+    private static async Task PublishAccountLockedAsync(
+        HttpContext httpContext,
+        UserManager<GranitUser> userManager,
+        GranitUser user,
+        CancellationToken cancellationToken)
+    {
+        IDistributedEventBus? eventBus = httpContext.RequestServices.GetService<IDistributedEventBus>();
+        if (eventBus is null || user.Email is null)
+        {
+            return;
+        }
+
+        string resetToken = await userManager.GeneratePasswordResetTokenAsync(user)
+            .ConfigureAwait(false);
+
+        int maxAttempts = userManager.Options.Lockout.MaxFailedAccessAttempts;
+        // LockoutEnd is always set when IsLockedOut is true; fallback is a safety net.
+        DateTimeOffset lockoutEnd = user.LockoutEnd
+            ?? httpContext.RequestServices.GetRequiredService<TimeProvider>().GetUtcNow();
+
+        await eventBus.PublishAsync(
+            new AccountLockedEto(user.Id, user.Email, maxAttempts, resetToken, lockoutEnd, user.TenantId),
+            cancellationToken).ConfigureAwait(false);
     }
 
     // ──── Source-generated log messages ────

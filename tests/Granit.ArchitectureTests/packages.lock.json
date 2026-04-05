@@ -2094,6 +2094,7 @@
           "Granit.Events": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
           "Granit.Identity": "[0.1.0-dev, )",
+          "Granit.Settings": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )"
         }
       },
@@ -2112,6 +2113,7 @@
           "Granit.Caching": "[0.1.0-dev, )",
           "Granit.Http.ApiDocumentation": "[0.1.0-dev, )",
           "Granit.Identity.Local": "[0.1.0-dev, )",
+          "Granit.Settings": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )"
         }
       },
@@ -2563,6 +2565,7 @@
         "type": "Project",
         "dependencies": {
           "Granit": "[0.1.0-dev, )",
+          "Granit.Workflow": "[0.1.0-dev, )",
           "WolverineFx": "[5.*, )"
         }
       },
@@ -2717,7 +2720,8 @@
       "granit.templating": {
         "type": "Project",
         "dependencies": {
-          "Granit.Timing": "[0.1.0-dev, )"
+          "Granit.Timing": "[0.1.0-dev, )",
+          "Granit.Workflow": "[0.1.0-dev, )"
         }
       },
       "granit.templating.ai": {
@@ -2743,6 +2747,7 @@
           "Granit.Persistence.EntityFrameworkCore": "[0.1.0-dev, )",
           "Granit.Templating": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
+          "Granit.Workflow.EntityFrameworkCore": "[0.1.0-dev, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.*, )",
           "Microsoft.Extensions.Caching.Hybrid": "[10.*, )"
         }
@@ -3655,8 +3660,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.13.19",
-        "contentHash": "u6re2Vy+BZnywdyLAhzhdj4htb/WlGWaC+u0NrxDPbFTojuDMAw0INrdmzIYj7MDWJuhf3iYg5eLwH3X8MvPgA=="
+        "resolved": "2.13.20",
+        "contentHash": "KLWQcH0YisMa0nzv36S5TcKgZ5seAaTHXVcdG8S3H0UFFtAeBYwSOnzme6S9Ch1Tl9trpa0G8aiCjzF9H9khTw=="
       },
       "Scriban": {
         "type": "CentralTransitive",
