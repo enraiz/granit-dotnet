@@ -74,17 +74,18 @@ internal sealed partial class GranitMigrationRunner(
                 }
             }
 
+            // Ensure HOST internal DbContext tables BEFORE migrations so that
+            // HasTenantsAsync (which queries tenants_tenants) doesn't hit a missing table.
+            await EnsureHostInternalDbContextsAsync(ct).ConfigureAwait(false);
+
+            // Ensure Expand & Contract tracking table exists
+            await EnsureExpandContractDbAsync(ct).ConfigureAwait(false);
+
             // Migrate each DbContext in topological order
             foreach ((GranitModule module, Type dbContextType) in migratableModules)
             {
                 await MigrateWithRetryAsync(module, dbContextType, ct).ConfigureAwait(false);
             }
-
-            // Ensure Expand & Contract tracking table exists
-            await EnsureExpandContractDbAsync(ct).ConfigureAwait(false);
-
-            // Ensure HOST internal DbContext tables (BackgroundJobs, OpenIddict, etc.)
-            await EnsureHostInternalDbContextsAsync(ct).ConfigureAwait(false);
 
             // Resolve tenant enumerator for post-seed passes
             ITenantEnumerator? tenantEnumerator;
@@ -148,7 +149,23 @@ internal sealed partial class GranitMigrationRunner(
 
         foreach (GranitModule module in application.GetModuleInstances())
         {
-            if (module is IMigratableModule migratable)
+            // A module may implement IMigratableModule<T> for multiple DbContexts
+            // (e.g., a host DbContext + a tenant DbContext). Scan all implemented
+            // generic interfaces to discover every DbContext type.
+            bool found = false;
+            foreach (Type iface in module.GetType().GetInterfaces())
+            {
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IMigratableModule<>))
+                {
+                    Type dbContextType = iface.GetGenericArguments()[0];
+                    LogModuleDiscovered(module.GetType().Name, dbContextType.Name);
+                    result.Add((module, dbContextType));
+                    found = true;
+                }
+            }
+
+            // Fallback: non-generic IMigratableModule (custom DbContextType override)
+            if (!found && module is IMigratableModule migratable)
             {
                 Type dbContextType = migratable.DbContextType;
                 LogModuleDiscovered(module.GetType().Name, dbContextType.Name);
@@ -182,27 +199,27 @@ internal sealed partial class GranitMigrationRunner(
     {
         await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
 
-        // Check for multi-tenant migration
-        ITenantEnumerator? tenantEnumerator = scope.ServiceProvider.GetService<ITenantEnumerator>();
-        bool hasTenants = tenantEnumerator is not null
-            && await HasTenantsAsync(tenantEnumerator, ct).ConfigureAwait(false);
+        // Check if this DbContext is tenant-isolated (registered via AddGranitIsolatedDbContext)
+        bool isIsolated = scope.ServiceProvider.GetServices<MultiTenancy.IsolatedDbContextMarker>()
+            .Any(m => m.DbContextType == dbContextType);
 
-        if (hasTenants)
+        if (isIsolated)
         {
-            await MigratePerTenantAsync(moduleName, dbContextType, scope.ServiceProvider, tenantEnumerator!, ct)
-                .ConfigureAwait(false);
-        }
-        else if (tenantEnumerator is not null)
-        {
-            // ITenantEnumerator is registered (SchemaPerTenant / DatabasePerTenant)
-            // but no tenants exist yet (cold start). Skip migration — migrating
-            // without a tenant would create tables in "public" schema. The
-            // __EFMigrationsHistory in public would then prevent per-tenant migration
-            // later (SET search_path includes "public" → EF sees migrations as applied).
-            // Tables will be created per-tenant after seeding creates tenants.
+            ITenantEnumerator? tenantEnumerator = scope.ServiceProvider.GetService<ITenantEnumerator>();
+            bool hasTenants = tenantEnumerator is not null
+                && await HasTenantsAsync(tenantEnumerator, ct).ConfigureAwait(false);
+
+            if (hasTenants)
+            {
+                await MigratePerTenantAsync(moduleName, dbContextType, scope.ServiceProvider, tenantEnumerator!, ct)
+                    .ConfigureAwait(false);
+            }
+
+            // No tenants yet (cold start): skip — tables will be created per-tenant
+            // by the post-seed re-migration pass once host seeders create tenants.
             return;
         }
-        else
+
         {
             // SharedDatabase or single-tenant — migrate normally in default schema.
             LogMigratingContext(moduleName, dbContextType.Name);

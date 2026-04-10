@@ -57,7 +57,7 @@ public static class TemplatingEntityFrameworkCoreHostApplicationBuilderExtension
             }
         }, ServiceLifetime.Scoped);
 
-        builder.Services.AddTenantInternalDbContextEnsurer<TemplatingDbContext>();
+        builder.Services.AddHostInternalDbContextEnsurer<TemplatingDbContext>();
         builder.Services.AddScoped<EfDocumentTemplateStore>();
         builder.Services.AddScoped<IDocumentTemplateStoreReader>(sp => sp.GetRequiredService<EfDocumentTemplateStore>());
         builder.Services.AddScoped<IDocumentTemplateStoreWriter>(sp => sp.GetRequiredService<EfDocumentTemplateStore>());
