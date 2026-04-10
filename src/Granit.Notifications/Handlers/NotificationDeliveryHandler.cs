@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using Granit.Guids;
 using Granit.Notifications.Abstractions;
 using Granit.Notifications.Diagnostics;
@@ -68,7 +69,7 @@ public sealed partial class NotificationDeliveryHandler(
         var stopwatch = Stopwatch.StartNew();
         bool sent = false;
         string? errorMessage = null;
-        NotificationDeliveryException? deliveryException = null;
+        ExceptionDispatchInfo? failure = null;
         try
         {
             await channel.SendAsync(context, cancellationToken).ConfigureAwait(false);
@@ -97,8 +98,8 @@ public sealed partial class NotificationDeliveryHandler(
             LogNotificationDeliveryFailed(ex, command.ChannelName, command.DeliveryId, command.NotificationId);
 
             errorMessage = ex.Message;
-            deliveryException = new NotificationDeliveryException(
-                $"Failed to deliver notification {command.NotificationId} via {command.ChannelName}", ex);
+            failure = ExceptionDispatchInfo.Capture(new NotificationDeliveryException(
+                $"Failed to deliver notification {command.NotificationId} via {command.ChannelName}", ex));
         }
 
         // Record the delivery attempt AFTER the send — audit failures must NOT
@@ -126,10 +127,7 @@ public sealed partial class NotificationDeliveryHandler(
             LogAuditRecordFailed(ex, command.ChannelName, command.DeliveryId);
         }
 
-        if (deliveryException is not null)
-        {
-            throw deliveryException;
-        }
+        failure?.Throw();
     }
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Duplicate delivery {DeliveryId} skipped for notification {NotificationId} via '{ChannelName}' (already delivered)")]
