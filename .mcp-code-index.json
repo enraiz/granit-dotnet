@@ -366,6 +366,7 @@
       "deps": [
         "Granit.Authorization",
         "Granit.BlobStorage",
+        "Granit.Http.ApiDocumentation",
         "Granit.QueryEngine.AspNetCore",
         "Granit.RateLimiting",
         "Granit.Validation"
@@ -701,7 +702,8 @@
     {
       "name": "Granit.Http.Idempotency",
       "deps": [
-        "Granit.Caching"
+        "Granit.Caching",
+        "Granit.Http.ApiDocumentation"
       ],
       "framework": "net10.0"
     },
@@ -903,6 +905,7 @@
       "name": "Granit.Invoicing.Endpoints",
       "deps": [
         "Granit.Authorization",
+        "Granit.Http.ApiDocumentation",
         "Granit.Invoicing",
         "Granit.QueryEngine.AspNetCore",
         "Granit.Validation"
@@ -1037,6 +1040,7 @@
       "name": "Granit.Metering.Endpoints",
       "deps": [
         "Granit.Authorization",
+        "Granit.Http.ApiDocumentation",
         "Granit.Metering",
         "Granit.QueryEngine.AspNetCore",
         "Granit.Validation"
@@ -1399,7 +1403,7 @@
       "deps": [
         "Granit.Authorization",
         "Granit.Guids",
-        "Granit.Http.Idempotency",
+        "Granit.Http.ApiDocumentation",
         "Granit.Payments",
         "Granit.Validation"
       ],
@@ -1790,6 +1794,7 @@
       "name": "Granit.Subscriptions.Endpoints",
       "deps": [
         "Granit.Authorization",
+        "Granit.Http.ApiDocumentation",
         "Granit.Subscriptions",
         "Granit.QueryEngine.AspNetCore",
         "Granit.Validation"
@@ -2111,6 +2116,7 @@
       "name": "Granit.Webhooks.Endpoints",
       "deps": [
         "Granit.Authorization",
+        "Granit.Http.ApiDocumentation",
         "Granit.QueryEngine.AspNetCore",
         "Granit.Validation",
         "Granit.Webhooks"
@@ -2448,7 +2454,7 @@
       "kind": "class",
       "project": "Granit.AI.Endpoints",
       "file": "src/Granit.AI.Endpoints/Extensions/AIEndpointRouteBuilderExtensions.cs",
-      "line": 16,
+      "line": 15,
       "members": [
         {
           "name": "MapGranitAI",
@@ -2580,7 +2586,7 @@
       "kind": "class",
       "project": "Granit.AI.EntityFrameworkCore",
       "file": "src/Granit.AI.EntityFrameworkCore/Extensions/AIEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 16,
+      "line": 17,
       "members": [
         {
           "name": "AddGranitAIEntityFrameworkCore",
@@ -2858,22 +2864,6 @@
           "kind": "method",
           "signature": "CheckAsync(CancellationToken cancellationToken = default)",
           "returnType": "Task<AIQuotaResult>"
-        }
-      ]
-    },
-    {
-      "name": "IAIUsageQueryableProvider",
-      "fqn": "Granit.AI.IAIUsageQueryableProvider",
-      "kind": "interface",
-      "project": "Granit.AI",
-      "file": "src/Granit.AI/IAIUsageQueryableProvider.cs",
-      "line": 13,
-      "members": [
-        {
-          "name": "GetUsageRecords",
-          "kind": "method",
-          "signature": "GetUsageRecords()",
-          "returnType": "IQueryable<AIUsageRecord>"
         }
       ]
     },
@@ -7901,7 +7891,7 @@
       "kind": "class",
       "project": "Granit.BlobStorage.Endpoints",
       "file": "src/Granit.BlobStorage.Endpoints/Extensions/BlobStorageEndpointRouteBuilderExtensions.cs",
-      "line": 17,
+      "line": 16,
       "members": [
         {
           "name": "MapGranitBlobStorage",
@@ -7975,7 +7965,7 @@
       "kind": "class",
       "project": "Granit.BlobStorage.EntityFrameworkCore",
       "file": "src/Granit.BlobStorage.EntityFrameworkCore/Extensions/BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 12,
+      "line": 14,
       "members": [
         {
           "name": "AddGranitBlobStorageEntityFrameworkCore",
@@ -8297,22 +8287,6 @@
           "kind": "method",
           "signature": "TryExtractTenantId(string objectKey, out string? tenantId)",
           "returnType": "bool"
-        }
-      ]
-    },
-    {
-      "name": "IBlobQueryableProvider",
-      "fqn": "Granit.BlobStorage.IBlobQueryableProvider",
-      "kind": "interface",
-      "project": "Granit.BlobStorage",
-      "file": "src/Granit.BlobStorage/IBlobQueryableProvider.cs",
-      "line": 15,
-      "members": [
-        {
-          "name": "GetDescriptors",
-          "kind": "method",
-          "signature": "GetDescriptors()",
-          "returnType": "IQueryable<BlobDescriptor>"
         }
       ]
     },
@@ -15019,8 +14993,8 @@
       "name": "IIdempotencyMetadata",
       "fqn": "Granit.Http.Idempotency.Abstractions.IIdempotencyMetadata",
       "kind": "interface",
-      "project": "Granit.Http.Idempotency",
-      "file": "src/Granit.Http.Idempotency/Abstractions/IIdempotencyMetadata.cs",
+      "project": "Granit.Http.ApiDocumentation",
+      "file": "src/Granit.Http.ApiDocumentation/Idempotency/IIdempotencyMetadata.cs",
       "line": 7,
       "members": []
     },
@@ -15062,8 +15036,8 @@
       "name": "IdempotentAttribute",
       "fqn": "Granit.Http.Idempotency.Attributes.IdempotentAttribute",
       "kind": "class",
-      "project": "Granit.Http.Idempotency",
-      "file": "src/Granit.Http.Idempotency/Attributes/IdempotentAttribute.cs",
+      "project": "Granit.Http.ApiDocumentation",
+      "file": "src/Granit.Http.ApiDocumentation/Idempotency/IdempotentAttribute.cs",
       "line": 14,
       "members": [
         {
@@ -27475,7 +27449,7 @@
       "kind": "class",
       "project": "Granit.Payments.Endpoints",
       "file": "src/Granit.Payments.Endpoints/GranitPaymentsEndpointsModule.cs",
-      "line": 14,
+      "line": 12,
       "members": []
     },
     {
@@ -29556,38 +29530,6 @@
           "kind": "method",
           "signature": "GetActiveTenantIdsAsync(CancellationToken cancellationToken)",
           "returnType": "IAsyncEnumerable<Guid>"
-        }
-      ]
-    },
-    {
-      "name": "MigrationProgress",
-      "fqn": "Granit.Persistence.EntityFrameworkCore.Migrations.Internal.MigrationProgress",
-      "kind": "class",
-      "project": "Granit.Persistence.EntityFrameworkCore.Migrations",
-      "file": "src/Granit.Persistence.EntityFrameworkCore.Migrations/Internal/MigrationProgress.cs",
-      "line": 7,
-      "members": [
-        {
-          "name": "Id",
-          "kind": "property",
-          "signature": "Guid Id",
-          "returnType": "Guid"
-        }
-      ]
-    },
-    {
-      "name": "MigrationProgressConfiguration",
-      "fqn": "Granit.Persistence.EntityFrameworkCore.Migrations.Internal.MigrationProgressConfiguration",
-      "kind": "class",
-      "project": "Granit.Persistence.EntityFrameworkCore.Migrations",
-      "file": "src/Granit.Persistence.EntityFrameworkCore.Migrations/Internal/MigrationProgressConfiguration.cs",
-      "line": 10,
-      "members": [
-        {
-          "name": "Configure",
-          "kind": "method",
-          "signature": "Configure(EntityTypeBuilder<MigrationProgress> builder)",
-          "returnType": "void"
         }
       ]
     },
@@ -32616,6 +32558,22 @@
       ]
     },
     {
+      "name": "IQueryableSource",
+      "fqn": "Granit.QueryEngine.IQueryableSource",
+      "kind": "interface",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/IQueryableSource.cs",
+      "line": 19,
+      "members": [
+        {
+          "name": "GetQueryable",
+          "kind": "method",
+          "signature": "GetQueryable()",
+          "returnType": "IQueryable<TEntity>"
+        }
+      ]
+    },
+    {
       "name": "ColumnDefinition",
       "fqn": "Granit.QueryEngine.Meta.ColumnDefinition",
       "kind": "record",
@@ -33911,7 +33869,7 @@
       "kind": "class",
       "project": "Granit.Scheduling.Endpoints",
       "file": "src/Granit.Scheduling.Endpoints/Extensions/SchedulingEndpointRouteBuilderExtensions.cs",
-      "line": 17,
+      "line": 16,
       "members": [
         {
           "name": "MapGranitScheduling",
@@ -33976,7 +33934,7 @@
       "kind": "class",
       "project": "Granit.Scheduling.EntityFrameworkCore",
       "file": "src/Granit.Scheduling.EntityFrameworkCore/Extensions/SchedulingEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 13,
+      "line": 15,
       "members": [
         {
           "name": "AddGranitSchedulingEntityFrameworkCore",
@@ -34083,22 +34041,6 @@
           "kind": "method",
           "signature": "ConfigureServices(ServiceConfigurationContext context)",
           "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "IScheduledActionQueryableProvider",
-      "fqn": "Granit.Scheduling.IScheduledActionQueryableProvider",
-      "kind": "interface",
-      "project": "Granit.Scheduling",
-      "file": "src/Granit.Scheduling/IScheduledActionQueryableProvider.cs",
-      "line": 9,
-      "members": [
-        {
-          "name": "GetScheduledActions",
-          "kind": "method",
-          "signature": "GetScheduledActions()",
-          "returnType": "IQueryable<ScheduledAction>"
         }
       ]
     },
@@ -40627,28 +40569,6 @@
       "members": []
     },
     {
-      "name": "IWebhookQueryableProvider",
-      "fqn": "Granit.Webhooks.Abstractions.IWebhookQueryableProvider",
-      "kind": "interface",
-      "project": "Granit.Webhooks",
-      "file": "src/Granit.Webhooks/Abstractions/IWebhookQueryableProvider.cs",
-      "line": 15,
-      "members": [
-        {
-          "name": "GetSubscriptions",
-          "kind": "method",
-          "signature": "GetSubscriptions()",
-          "returnType": "IQueryable<WebhookSubscription>"
-        },
-        {
-          "name": "GetDeliveryAttempts",
-          "kind": "method",
-          "signature": "GetDeliveryAttempts()",
-          "returnType": "IQueryable<WebhookDeliveryAttempt>"
-        }
-      ]
-    },
-    {
       "name": "IWebhookSecretProtector",
       "fqn": "Granit.Webhooks.Abstractions.IWebhookSecretProtector",
       "kind": "interface",
@@ -41119,7 +41039,7 @@
       "kind": "class",
       "project": "Granit.Webhooks.Endpoints",
       "file": "src/Granit.Webhooks.Endpoints/Extensions/WebhooksEndpointRouteBuilderExtensions.cs",
-      "line": 18,
+      "line": 16,
       "members": [
         {
           "name": "MapGranitWebhooks",
@@ -41225,7 +41145,7 @@
       "kind": "class",
       "project": "Granit.Webhooks.EntityFrameworkCore",
       "file": "src/Granit.Webhooks.EntityFrameworkCore/Extensions/WebhooksEfCoreHostApplicationBuilderExtensions.cs",
-      "line": 14,
+      "line": 16,
       "members": [
         {
           "name": "AddGranitWebhooksEntityFrameworkCore",
