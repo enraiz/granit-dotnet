@@ -1794,6 +1794,7 @@
         "Granit",
         "Granit.Guids",
         "Granit.Invoicing.Abstractions",
+        "Granit.Metering",
         "Granit.Scheduling",
         "Granit.Timing",
         "Granit.Workflow"
@@ -21314,6 +21315,15 @@
       ]
     },
     {
+      "name": "BillingPeriodBoundaries",
+      "fqn": "Granit.Metering.BillingPeriodBoundaries",
+      "kind": "record",
+      "project": "Granit.Metering",
+      "file": "src/Granit.Metering/IBillingPeriodProvider.cs",
+      "line": 23,
+      "members": []
+    },
+    {
       "name": "MeteringMetrics",
       "fqn": "Granit.Metering.Diagnostics.MeteringMetrics",
       "kind": "class",
@@ -21728,6 +21738,22 @@
           "kind": "method",
           "signature": "RunAsync(CancellationToken cancellationToken = default)",
           "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "IBillingPeriodProvider",
+      "fqn": "Granit.Metering.IBillingPeriodProvider",
+      "kind": "interface",
+      "project": "Granit.Metering",
+      "file": "src/Granit.Metering/IBillingPeriodProvider.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "GetCurrentPeriodAsync",
+          "kind": "method",
+          "signature": "GetCurrentPeriodAsync(Guid tenantId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<BillingPeriodBoundaries?>"
         }
       ]
     },
@@ -36039,7 +36065,7 @@
       "kind": "class",
       "project": "Granit.Subscriptions",
       "file": "src/Granit.Subscriptions/Extensions/SubscriptionsHostApplicationBuilderExtensions.cs",
-      "line": 15,
+      "line": 16,
       "members": [
         {
           "name": "AddGranitSubscriptions",
@@ -36066,12 +36092,40 @@
       ]
     },
     {
+      "name": "SubscriptionLifecycleCacheInvalidationHandler",
+      "fqn": "Granit.Subscriptions.Features.Handlers.SubscriptionLifecycleCacheInvalidationHandler",
+      "kind": "class",
+      "project": "Granit.Subscriptions.Features",
+      "file": "src/Granit.Subscriptions.Features/Handlers/SubscriptionLifecycleCacheInvalidationHandler.cs",
+      "line": 18,
+      "members": [
+        {
+          "name": "HandleAsync",
+          "kind": "method",
+          "signature": "HandleAsync(SubscriptionSuspendedEto eto, IFeatureDefinitionStore definitionStore, IFusionCache cache, CancellationToken cancellationToken)",
+          "returnType": "Task"
+        },
+        {
+          "name": "HandleAsync",
+          "kind": "method",
+          "signature": "HandleAsync(SubscriptionCancelledEto eto, IFeatureDefinitionStore definitionStore, IFusionCache cache, CancellationToken cancellationToken)",
+          "returnType": "Task"
+        },
+        {
+          "name": "HandleAsync",
+          "kind": "method",
+          "signature": "HandleAsync(SubscriptionExpiredEto eto, IFeatureDefinitionStore definitionStore, IFusionCache cache, CancellationToken cancellationToken)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
       "name": "GranitSubscriptionsModule",
       "fqn": "Granit.Subscriptions.GranitSubscriptionsModule",
       "kind": "class",
       "project": "Granit.Subscriptions",
       "file": "src/Granit.Subscriptions/GranitSubscriptionsModule.cs",
-      "line": 21,
+      "line": 23,
       "members": [
         {
           "name": "ConfigureServices",
@@ -36376,6 +36430,12 @@
           "kind": "method",
           "signature": "GetActiveByPlanAsync(PlanId planId, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<Subscription>>"
+        },
+        {
+          "name": "GetPastDueForTenantAsync",
+          "kind": "method",
+          "signature": "GetPastDueForTenantAsync(Guid tenantId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<Subscription?>"
         }
       ]
     },
@@ -36728,12 +36788,12 @@
       "kind": "class",
       "project": "Granit.Subscriptions.Wolverine",
       "file": "src/Granit.Subscriptions.Wolverine/Handlers/PaymentFailedHandler.cs",
-      "line": 9,
+      "line": 11,
       "members": [
         {
           "name": "HandleAsync",
           "kind": "method",
-          "signature": "HandleAsync(PaymentFailedEto eto, IDunningService dunningService, ICurrentTenant currentTenant, CancellationToken cancellationToken)",
+          "signature": "HandleAsync(PaymentFailedEto eto, IDunningService dunningService, ICurrentTenant currentTenant, ILogger<PaymentFailedHandler> logger, CancellationToken cancellationToken)",
           "returnType": "Task"
         }
       ]

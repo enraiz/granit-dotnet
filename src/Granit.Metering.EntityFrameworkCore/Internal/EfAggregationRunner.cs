@@ -25,10 +25,16 @@ internal sealed partial class EfAggregationRunner(
 {
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
+        if (dataFilter is null)
+        {
+            Log.DataFilterUnavailable(logger);
+            return;
+        }
+
         // Disable tenant filter for the entire aggregation flow: the job runs
         // without tenant context and must enumerate definitions across all tenants,
         // then query each tenant's events with explicit TenantId predicates.
-        using IDisposable? _ = dataFilter?.Disable<IMultiTenant>();
+        using IDisposable? _ = dataFilter.Disable<IMultiTenant>();
 
         IReadOnlyList<MeterDefinition> definitions = await definitionReader
             .GetActiveAsync(cancellationToken).ConfigureAwait(false);
@@ -106,7 +112,15 @@ internal sealed partial class EfAggregationRunner(
 
         watermark.Advance(events[^1].Id, now);
 
-        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (DbUpdateException ex) when (IsDuplicateKeyException(ex))
+        {
+            Log.AggregationCollisionIgnored(logger, definition.Name, ex);
+            return;
+        }
 
         metrics.RecordAggregation(
             definition.TenantId?.ToString(),
@@ -126,11 +140,49 @@ internal sealed partial class EfAggregationRunner(
             _ => events.Sum(e => e.Quantity),
         };
 
+    /// <summary>
+    /// Provider-agnostic duplicate key detection. Mirrors the implementation in
+    /// <see cref="EfMeterEventStore"/> to avoid a hard dependency between the two stores.
+    /// </summary>
+    private static bool IsDuplicateKeyException(DbUpdateException ex)
+    {
+        if (ex.InnerException is null)
+        {
+            return false;
+        }
+
+        Type innerType = ex.InnerException.GetType();
+
+        if (innerType.GetProperty("SqlState")?.GetValue(ex.InnerException) is "23505")
+        {
+            return true; // PostgreSQL unique_violation
+        }
+
+        if (innerType.GetProperty("Number")?.GetValue(ex.InnerException) is int and (2601 or 2627))
+        {
+            return true; // SQL Server unique index / unique constraint
+        }
+
+        string? message = ex.InnerException.Message;
+        return message?.Contains("duplicate key", StringComparison.OrdinalIgnoreCase) == true
+            || message?.Contains("unique constraint", StringComparison.OrdinalIgnoreCase) == true
+            || message?.Contains("UNIQUE constraint failed", StringComparison.OrdinalIgnoreCase) == true;
+    }
+
     private static partial class Log
     {
         [LoggerMessage(Level = LogLevel.Debug,
             Message = "Aggregation batch completed for meter '{MeterName}': {EventCount} events")]
         public static partial void AggregationBatchCompleted(
             ILogger logger, string meterName, int eventCount);
+
+        [LoggerMessage(Level = LogLevel.Warning,
+            Message = "Aggregation batch for meter '{MeterName}' skipped due to duplicate key collision; a concurrent runner already committed the same period.")]
+        public static partial void AggregationCollisionIgnored(
+            ILogger logger, string meterName, Exception exception);
+
+        [LoggerMessage(Level = LogLevel.Warning,
+            Message = "Aggregation runner skipped: IDataFilter is not registered. Without the data filter, cross-tenant queries cannot be safely executed.")]
+        public static partial void DataFilterUnavailable(ILogger logger);
     }
 }
