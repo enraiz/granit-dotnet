@@ -33,6 +33,7 @@ internal static class SubscriptionEndpoints
             .WithSummary("Returns a subscription by ID.")
             .WithDescription("Returns the full subscription details including seat count and dunning status.")
             .Produces<SubscriptionResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization(SubscriptionsPermissions.Subscriptions.Read)
             .AllowHostAccess();
@@ -63,6 +64,7 @@ internal static class SubscriptionEndpoints
             .WithDescription("Switches to a different plan. Only allowed for Active or Trial subscriptions.")
             .WithMetadata(new IdempotentAttribute())
             .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict)
             .RequireAuthorization(SubscriptionsPermissions.Subscriptions.Manage);
@@ -91,14 +93,28 @@ internal static class SubscriptionEndpoints
     private static async Task<Results<Ok<SubscriptionResponse>, ProblemHttpResult>> GetSubscriptionByIdAsync(
         Guid id,
         [FromServices] ISubscriptionReader reader,
+        [FromServices] ICurrentTenant currentTenant,
         CancellationToken cancellationToken)
     {
+        if (!currentTenant.IsAvailable)
+        {
+            return TypedResults.Problem("Tenant context required.", statusCode: StatusCodes.Status400BadRequest);
+        }
+
         Subscription? sub = await reader
             .GetByIdAsync(SubscriptionId.Create(id), cancellationToken).ConfigureAwait(false);
 
-        return sub is null
-            ? TypedResults.Problem(statusCode: StatusCodes.Status404NotFound)
-            : TypedResults.Ok(SubscriptionResponse.FromEntity(sub));
+        if (sub is null)
+        {
+            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound);
+        }
+
+        if (sub.TenantId != currentTenant.Id!.Value)
+        {
+            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound);
+        }
+
+        return TypedResults.Ok(SubscriptionResponse.FromEntity(sub));
     }
 
     private static async Task<Results<Created<SubscriptionResponse>, ValidationProblem, ProblemHttpResult>> CreateSubscriptionAsync(
@@ -134,13 +150,24 @@ internal static class SubscriptionEndpoints
         SubscriptionCancelRequest request,
         [FromServices] ISubscriptionReader reader,
         [FromServices] ISubscriptionWriter writer,
+        [FromServices] ICurrentTenant currentTenant,
         [FromServices] IClock clock,
         CancellationToken cancellationToken)
     {
+        if (!currentTenant.IsAvailable)
+        {
+            return TypedResults.Problem("Tenant context required.", statusCode: StatusCodes.Status400BadRequest);
+        }
+
         Subscription? sub = await reader
             .GetByIdAsync(SubscriptionId.Create(id), cancellationToken).ConfigureAwait(false);
 
         if (sub is null)
+        {
+            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound);
+        }
+
+        if (sub.TenantId != currentTenant.Id!.Value)
         {
             return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound);
         }
@@ -170,12 +197,23 @@ internal static class SubscriptionEndpoints
         SubscriptionChangePlanRequest request,
         [FromServices] ISubscriptionReader reader,
         [FromServices] ISubscriptionWriter writer,
+        [FromServices] ICurrentTenant currentTenant,
         CancellationToken cancellationToken)
     {
+        if (!currentTenant.IsAvailable)
+        {
+            return TypedResults.Problem("Tenant context required.", statusCode: StatusCodes.Status400BadRequest);
+        }
+
         Subscription? sub = await reader
             .GetByIdAsync(SubscriptionId.Create(id), cancellationToken).ConfigureAwait(false);
 
         if (sub is null)
+        {
+            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound);
+        }
+
+        if (sub.TenantId != currentTenant.Id!.Value)
         {
             return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound);
         }
