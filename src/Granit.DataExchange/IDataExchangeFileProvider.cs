@@ -1,19 +1,20 @@
-namespace Granit.DataExchange.Import.Pipeline;
+namespace Granit.DataExchange;
 
 /// <summary>
-/// Provides file streams for import jobs.
-/// The application registers an implementation that retrieves the file from its blob storage.
+/// Provides file streams for data exchange jobs (import and export).
 /// </summary>
 /// <remarks>
-/// A concrete implementation is typically registered in the host application,
-/// bridging <c>IBlobStorage</c> or a local file system to the import pipeline.
+/// A default in-memory implementation is registered automatically — suitable for
+/// tests, CLI tools, and development. For production workloads, register
+/// <c>Granit.DataExchange.BlobStorage</c> to delegate to the configured blob
+/// storage provider (S3, Azure Blob, FileSystem, etc.).
 /// </remarks>
-public interface IImportFileProvider
+public interface IDataExchangeFileProvider
 {
     /// <summary>
     /// Opens a readable stream for the given blob reference.
     /// </summary>
-    /// <param name="blobReference">The blob reference stored on <see cref="Domain.ImportJob.BlobReference"/>.</param>
+    /// <param name="blobReference">The blob reference stored on the import/export job.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A readable stream. The caller is responsible for disposing it.</returns>
     Task<Stream> OpenAsync(string blobReference, CancellationToken cancellationToken = default);
