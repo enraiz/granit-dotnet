@@ -1,3 +1,5 @@
+using Granit.AI.Workspaces;
+
 namespace Granit.AI.Endpoints.Dtos;
 
 /// <summary>
@@ -9,8 +11,9 @@ namespace Granit.AI.Endpoints.Dtos;
 /// <param name="SystemPrompt">Optional system prompt.</param>
 /// <param name="Temperature">Sampling temperature (0.0–2.0).</param>
 /// <param name="MaxOutputTokens">Maximum tokens to generate.</param>
-/// <param name="Kind">Whether this workspace is <c>System</c> or <c>Dynamic</c>.</param>
+/// <param name="Kind">Whether this workspace is <see cref="AIWorkspaceKind.System"/> or <see cref="AIWorkspaceKind.Dynamic"/>.</param>
 /// <param name="IsActive">Whether this workspace is active.</param>
+/// <param name="Capabilities">Model capabilities resolved from the provider catalog, or <c>null</c> if unavailable.</param>
 public sealed record AIWorkspaceResponse(
     string Name,
     string Provider,
@@ -18,5 +21,6 @@ public sealed record AIWorkspaceResponse(
     string? SystemPrompt,
     float? Temperature,
     int? MaxOutputTokens,
-    string Kind,
-    bool IsActive);
+    AIWorkspaceKind Kind,
+    bool IsActive,
+    AIModelCapabilities? Capabilities);
