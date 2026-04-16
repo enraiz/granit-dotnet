@@ -1,6 +1,7 @@
 using Granit.Persistence.EntityFrameworkCore;
 using Granit.Subscriptions.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Granit.Subscriptions.EntityFrameworkCore.Internal;
 
@@ -29,7 +30,7 @@ internal sealed class EfPlanWriter(
 
             db.Set<Plan>().Update(plan);
 
-            foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<PlanPrice> entry in db.ChangeTracker.Entries<PlanPrice>())
+            foreach (EntityEntry<PlanPrice> entry in db.ChangeTracker.Entries<PlanPrice>())
             {
                 if (entry.State == EntityState.Modified
                     && !existingPriceIds.Contains(entry.Entity.Id))
