@@ -28115,12 +28115,21 @@
       "members": []
     },
     {
+      "name": "PaymentAvailabilityContext",
+      "fqn": "Granit.Payments.Contracts.PaymentAvailabilityContext",
+      "kind": "record",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/Contracts/PaymentAvailabilityContext.cs",
+      "line": 15,
+      "members": []
+    },
+    {
       "name": "PaymentAvailableMethod",
       "fqn": "Granit.Payments.Contracts.PaymentAvailableMethod",
       "kind": "record",
       "project": "Granit.Payments",
       "file": "src/Granit.Payments/Contracts/PaymentAvailableMethod.cs",
-      "line": 6,
+      "line": 11,
       "members": []
     },
     {
@@ -28148,6 +28157,31 @@
       "project": "Granit.Payments",
       "file": "src/Granit.Payments/Contracts/PaymentCheckoutSessionRequest.cs",
       "line": 4,
+      "members": []
+    },
+    {
+      "name": "PaymentMethodCapability",
+      "fqn": "Granit.Payments.Contracts.PaymentMethodCapability",
+      "kind": "record",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/Contracts/PaymentMethodCapability.cs",
+      "line": 18,
+      "members": [
+        {
+          "name": "new",
+          "kind": "method",
+          "signature": "new(SupportedCountries: ImmutableHashSet<string>.Empty, SupportedCurrencies: ImmutableHashSet<string>.Empty, SupportedSequenceTypes: PaymentMethodSequenceType.OneOff | PaymentMethodSequenceType.First | PaymentMethodSequenceType.Recurring, AmountBounds: ImmutableDictionary<string, PaymentMethodAmountBound>.Empty)",
+          "returnType": "PaymentMethodCapability Wildcard { get; } ="
+        }
+      ]
+    },
+    {
+      "name": "PaymentMethodCatalogEntry",
+      "fqn": "Granit.Payments.Contracts.PaymentMethodCatalogEntry",
+      "kind": "record",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/Contracts/PaymentMethodCatalogEntry.cs",
+      "line": 18,
       "members": []
     },
     {
@@ -28331,6 +28365,15 @@
       ]
     },
     {
+      "name": "PaymentMethodAmountBound",
+      "fqn": "Granit.Payments.Domain.PaymentMethodAmountBound",
+      "kind": "record",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/Domain/PaymentMethodAmountBound.cs",
+      "line": 9,
+      "members": []
+    },
+    {
       "name": "PaymentMethodCategory",
       "fqn": "Granit.Payments.Domain.PaymentMethodCategory",
       "kind": "enum",
@@ -28345,7 +28388,7 @@
       "kind": "class",
       "project": "Granit.Payments",
       "file": "src/Granit.Payments/Domain/PaymentMethodConfiguration.cs",
-      "line": 17,
+      "line": 25,
       "members": [
         {
           "name": "Activate",
@@ -28363,15 +28406,62 @@
           "name": "Activate",
           "kind": "method",
           "signature": "Activate()",
-          "returnType": "bool IsActive { get; private set; } public void"
+          "returnType": "bool IsActive { get; private set; } public ImmutableHashSet<string>? SupportedCountries { get; private set; } public ImmutableHashSet<string>? SupportedCurrencies { get; private set; } public PaymentMethodSequenceType? SupportedSequenceTypes { get; private set; } public ImmutableDictionary<string, PaymentMethodAmountBound>? AmountBounds { get; private set; } public void"
         },
         {
           "name": "Deactivate",
           "kind": "method",
           "signature": "Deactivate()",
           "returnType": "void"
+        },
+        {
+          "name": "SnapshotCapability",
+          "kind": "method",
+          "signature": "SnapshotCapability(PaymentMethodCapability capability)",
+          "returnType": "void"
         }
       ]
+    },
+    {
+      "name": "PaymentMethodCountries",
+      "fqn": "Granit.Payments.Domain.PaymentMethodCountries",
+      "kind": "class",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/Domain/PaymentMethodCountries.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "Create",
+          "kind": "method",
+          "signature": "Create(StringComparer.Ordinal, \"AT\", \"BE\", \"BG\", \"CY\", \"CZ\", \"DE\", \"DK\", \"EE\", \"ES\", \"FI\", \"FR\", \"GR\", \"HR\", \"HU\", \"IE\", \"IT\", \"LT\", \"LU\", \"LV\", \"MT\", \"NL\", \"PL\", \"PT\", \"RO\", \"SE\", \"SI\", \"SK\", \"IS\", \"LI\", \"NO\", \"CH\", \"GB\", \"AD\", \"MC\", \"SM\", \"VA\")",
+          "returnType": "ImmutableHashSet<string> SepaZone { get; } = ImmutableHashSet."
+        }
+      ]
+    },
+    {
+      "name": "PaymentMethodCurrencies",
+      "fqn": "Granit.Payments.Domain.PaymentMethodCurrencies",
+      "kind": "class",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/Domain/PaymentMethodCurrencies.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "Create",
+          "kind": "method",
+          "signature": "Create(StringComparer.Ordinal, \"EUR\")",
+          "returnType": "ImmutableHashSet<string> EurOnly { get; } = ImmutableHashSet."
+        }
+      ]
+    },
+    {
+      "name": "PaymentMethodSequenceType",
+      "fqn": "Granit.Payments.Domain.PaymentMethodSequenceType",
+      "kind": "enum",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/Domain/PaymentMethodSequenceType.cs",
+      "line": 14,
+      "members": []
     },
     {
       "name": "PaymentMethods",
@@ -28611,7 +28701,16 @@
       "kind": "record",
       "project": "Granit.Payments.Endpoints",
       "file": "src/Granit.Payments.Endpoints/Dtos/PaymentMethodResponse.cs",
-      "line": 21,
+      "line": 30,
+      "members": []
+    },
+    {
+      "name": "PaymentCatalogMethod",
+      "fqn": "Granit.Payments.Endpoints.Dtos.PaymentCatalogMethod",
+      "kind": "record",
+      "project": "Granit.Payments.Endpoints",
+      "file": "src/Granit.Payments.Endpoints/Dtos/PaymentMethodConfigurationDtos.cs",
+      "line": 30,
       "members": []
     },
     {
@@ -28651,12 +28750,30 @@
       "members": []
     },
     {
+      "name": "PaymentMethodAmountBoundResponse",
+      "fqn": "Granit.Payments.Endpoints.Dtos.PaymentMethodAmountBoundResponse",
+      "kind": "record",
+      "project": "Granit.Payments.Endpoints",
+      "file": "src/Granit.Payments.Endpoints/Dtos/PaymentMethodConfigurationDtos.cs",
+      "line": 58,
+      "members": []
+    },
+    {
+      "name": "PaymentMethodCapabilityResponse",
+      "fqn": "Granit.Payments.Endpoints.Dtos.PaymentMethodCapabilityResponse",
+      "kind": "record",
+      "project": "Granit.Payments.Endpoints",
+      "file": "src/Granit.Payments.Endpoints/Dtos/PaymentMethodConfigurationDtos.cs",
+      "line": 48,
+      "members": []
+    },
+    {
       "name": "PaymentMethodConfigurationItem",
       "fqn": "Granit.Payments.Endpoints.Dtos.PaymentMethodConfigurationItem",
       "kind": "record",
       "project": "Granit.Payments.Endpoints",
       "file": "src/Granit.Payments.Endpoints/Dtos/PaymentMethodConfigurationDtos.cs",
-      "line": 6,
+      "line": 11,
       "members": []
     },
     {
@@ -28669,12 +28786,21 @@
       "members": []
     },
     {
+      "name": "PaymentProviderCatalogResponse",
+      "fqn": "Granit.Payments.Endpoints.Dtos.PaymentProviderCatalogResponse",
+      "kind": "record",
+      "project": "Granit.Payments.Endpoints",
+      "file": "src/Granit.Payments.Endpoints/Dtos/PaymentMethodConfigurationDtos.cs",
+      "line": 39,
+      "members": []
+    },
+    {
       "name": "PaymentProviderConfigurationResponse",
       "fqn": "Granit.Payments.Endpoints.Dtos.PaymentProviderConfigurationResponse",
       "kind": "record",
       "project": "Granit.Payments.Endpoints",
       "file": "src/Granit.Payments.Endpoints/Dtos/PaymentMethodConfigurationDtos.cs",
-      "line": 13,
+      "line": 19,
       "members": []
     },
     {
@@ -28927,6 +29053,38 @@
       ]
     },
     {
+      "name": "PaymentProviderHealthCheck",
+      "fqn": "Granit.Payments.HealthChecks.PaymentProviderHealthCheck",
+      "kind": "class",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/HealthChecks/PaymentProviderHealthCheck.cs",
+      "line": 29,
+      "members": [
+        {
+          "name": "CheckHealthAsync",
+          "kind": "method",
+          "signature": "CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)",
+          "returnType": "Task<HealthCheckResult>"
+        }
+      ]
+    },
+    {
+      "name": "PaymentProviderHealthCheckBuilderExtensions",
+      "fqn": "Granit.Payments.HealthChecks.PaymentProviderHealthCheckBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Payments",
+      "file": "src/Granit.Payments/HealthChecks/PaymentProviderHealthCheckBuilderExtensions.cs",
+      "line": 10,
+      "members": [
+        {
+          "name": "AddGranitPaymentProviderHealthCheck",
+          "kind": "method",
+          "signature": "AddGranitPaymentProviderHealthCheck(this IHealthChecksBuilder builder, string providerName)",
+          "returnType": "IHealthChecksBuilder"
+        }
+      ]
+    },
+    {
       "name": "IAutoChargeService",
       "fqn": "Granit.Payments.IAutoChargeService",
       "kind": "interface",
@@ -29014,7 +29172,7 @@
       "kind": "interface",
       "project": "Granit.Payments",
       "file": "src/Granit.Payments/IPaymentMethodConfigurationWriter.cs",
-      "line": 6,
+      "line": 7,
       "members": [
         {
           "name": "AddAsync",
@@ -29039,6 +29197,18 @@
           "kind": "method",
           "signature": "UpsertActivationAsync(Guid newId, string providerName, string methodType, bool isActive, CancellationToken cancellationToken = default)",
           "returnType": "Task"
+        },
+        {
+          "name": "UpsertActivationWithSnapshotAsync",
+          "kind": "method",
+          "signature": "UpsertActivationWithSnapshotAsync(Guid newId, string providerName, string methodType, PaymentMethodCapability capability, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "UpdateCapabilitySnapshotAsync",
+          "kind": "method",
+          "signature": "UpdateCapabilitySnapshotAsync(string providerName, string methodType, PaymentMethodCapability capability, CancellationToken cancellationToken = default)",
+          "returnType": "Task<bool>"
         }
       ]
     },
@@ -29135,10 +29305,16 @@
       "line": 6,
       "members": [
         {
+          "name": "GetCatalogAsync",
+          "kind": "method",
+          "signature": "GetCatalogAsync(CancellationToken cancellationToken = default)",
+          "returnType": "string Name { get; } IReadOnlyList<PaymentMethodDescriptor> SupportedMethods { get; } Task<IReadOnlyList<PaymentMethodCatalogEntry>>"
+        },
+        {
           "name": "ChargeAsync",
           "kind": "method",
           "signature": "ChargeAsync(PaymentChargeRequest request, CancellationToken cancellationToken = default)",
-          "returnType": "string Name { get; } IReadOnlyList<PaymentMethodDescriptor> SupportedMethods { get; } Task<PaymentProviderChargeResult>"
+          "returnType": "Task<PaymentProviderChargeResult>"
         },
         {
           "name": "RefundAsync",
@@ -29171,7 +29347,7 @@
         {
           "name": "GetAvailableProvidersAsync",
           "kind": "method",
-          "signature": "GetAvailableProvidersAsync(Guid tenantId, CancellationToken cancellationToken = default)",
+          "signature": "GetAvailableProvidersAsync(Guid tenantId, PaymentAvailabilityContext? context = null, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<PaymentAvailableMethod>>"
         }
       ]
@@ -29308,7 +29484,7 @@
       "kind": "class",
       "project": "Granit.Payments.Mollie",
       "file": "src/Granit.Payments.Mollie/GranitPaymentsMollieModule.cs",
-      "line": 13,
+      "line": 14,
       "members": [
         {
           "name": "ConfigureServices",
@@ -29541,7 +29717,7 @@
       "kind": "class",
       "project": "Granit.Payments.SepaDirectDebit.Builtin",
       "file": "src/Granit.Payments.SepaDirectDebit.Builtin/GranitPaymentsSepaDirectDebitBuiltinModule.cs",
-      "line": 11,
+      "line": 12,
       "members": [
         {
           "name": "ConfigureServices",
@@ -29976,7 +30152,7 @@
       "kind": "class",
       "project": "Granit.Payments.SepaTransfer",
       "file": "src/Granit.Payments.SepaTransfer/GranitPaymentsSepaTransferModule.cs",
-      "line": 13,
+      "line": 14,
       "members": [
         {
           "name": "ConfigureServices",
@@ -30064,7 +30240,7 @@
       "kind": "class",
       "project": "Granit.Payments.Stripe",
       "file": "src/Granit.Payments.Stripe/GranitPaymentsStripeModule.cs",
-      "line": 15,
+      "line": 16,
       "members": [
         {
           "name": "ConfigureServices",

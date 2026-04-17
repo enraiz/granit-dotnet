@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Granit.Guids;
 using Granit.Payments.Contracts;
 using Granit.Payments.Domain;
@@ -26,6 +27,24 @@ internal sealed partial class SepaTransferPaymentProvider(
     [
         new(PaymentMethods.BankTransfer, PaymentMethodCategory.BankTransfer),
     ];
+
+    /// <inheritdoc/>
+    public Task<IReadOnlyList<PaymentMethodCatalogEntry>> GetCatalogAsync(CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<PaymentMethodCatalogEntry> catalog =
+        [
+            new(
+                MethodType: PaymentMethods.BankTransfer,
+                Category: PaymentMethodCategory.BankTransfer,
+                DisplayLabel: "SEPA Transfer",
+                Capability: new PaymentMethodCapability(
+                    SupportedCountries: PaymentMethodCountries.SepaZone,
+                    SupportedCurrencies: PaymentMethodCurrencies.EurOnly,
+                    SupportedSequenceTypes: PaymentMethodSequenceType.OneOff,
+                    AmountBounds: ImmutableDictionary<string, PaymentMethodAmountBound>.Empty)),
+        ];
+        return Task.FromResult(catalog);
+    }
 
     /// <inheritdoc/>
     public Task<PaymentProviderChargeResult> ChargeAsync(

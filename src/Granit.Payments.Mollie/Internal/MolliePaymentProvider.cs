@@ -59,6 +59,16 @@ internal sealed partial class MolliePaymentProvider(
     ];
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Returns a static catalog curated from the Mollie documentation
+    /// (<see cref="MollieCatalog"/>). A future enhancement can call
+    /// <c>IMethodClient.GetMethodListAsync(include: "pricing")</c> to pick up
+    /// account-level toggles and up-to-date bounds.
+    /// </remarks>
+    public Task<IReadOnlyList<PaymentMethodCatalogEntry>> GetCatalogAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(MollieCatalog.Entries);
+
+    /// <inheritdoc/>
     public async Task<PaymentProviderChargeResult> ChargeAsync(
         PaymentChargeRequest request, CancellationToken cancellationToken = default)
     {
