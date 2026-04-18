@@ -241,6 +241,12 @@
       "granit": {
         "type": "Project"
       },
+      "granit.dataexchange.abstractions": {
+        "type": "Project",
+        "dependencies": {
+          "Granit": "[0.1.0-dev, )"
+        }
+      },
       "granit.identity": {
         "type": "Project",
         "dependencies": {
@@ -251,7 +257,9 @@
       "granit.identity.federated": {
         "type": "Project",
         "dependencies": {
-          "Granit.Identity": "[0.1.0-dev, )"
+          "Granit.DataExchange.Abstractions": "[0.1.0-dev, )",
+          "Granit.Identity": "[0.1.0-dev, )",
+          "Granit.QueryEngine.Abstractions": "[0.1.0-dev, )"
         }
       },
       "granit.queryengine.abstractions": {

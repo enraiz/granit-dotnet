@@ -1,16 +1,21 @@
 using System.Threading.Channels;
 using Granit.DataExchange.Diagnostics;
 using Granit.DataExchange.Export;
+using Granit.DataExchange.Export.Domain;
 using Granit.DataExchange.Export.Internal;
 using Granit.DataExchange.Export.Messages;
+using Granit.DataExchange.Exports;
 using Granit.DataExchange.Import;
+using Granit.DataExchange.Import.Domain;
 using Granit.DataExchange.Import.Internal;
 using Granit.DataExchange.Import.Mapping;
 using Granit.DataExchange.Import.Messages;
 using Granit.DataExchange.Import.Pipeline;
 using Granit.DataExchange.Internal;
+using Granit.DataExchange.Queries;
 using Granit.Diagnostics;
 using Granit.Events.Extensions;
+using Granit.QueryEngine.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -68,6 +73,10 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton(Channel.CreateBounded<ExecuteImportCommand>(new BoundedChannelOptions(100) { FullMode = BoundedChannelFullMode.Wait }));
         services.TryAddSingleton<IImportCommandDispatcher, ChannelImportCommandDispatcher>();
         services.AddHostedService<ImportCommandWorker>();
+
+        // Query + Export definitions (ADR-020: owned by the base module).
+        services.AddQueryDefinition<ImportJob, ImportJobQueryDefinition>();
+        services.AddExportDefinition<ImportJob, ImportJobExportDefinition>();
 
         return services;
     }
@@ -138,24 +147,10 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IExportCommandDispatcher, ChannelExportCommandDispatcher>();
         services.AddHostedService<ExportCommandWorker>();
 
-        return services;
-    }
+        // Query + Export definitions (ADR-020: owned by the base module).
+        services.AddQueryDefinition<ExportJob, ExportJobQueryDefinition>();
+        services.AddExportDefinition<ExportJob, ExportJobExportDefinition>();
 
-    /// <summary>
-    /// Registers an export definition for the specified entity type.
-    /// </summary>
-    /// <typeparam name="TEntity">The source entity type.</typeparam>
-    /// <typeparam name="TDefinition">The export definition implementation.</typeparam>
-    /// <param name="services">The service collection.</param>
-    /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddExportDefinition<TEntity, TDefinition>(
-        this IServiceCollection services)
-        where TEntity : class
-        where TDefinition : ExportDefinition<TEntity>
-    {
-        services.AddSingleton<ExportDefinition<TEntity>, TDefinition>();
-        services.AddSingleton<IExportDefinitionDescriptor>(sp =>
-            sp.GetRequiredService<ExportDefinition<TEntity>>());
         return services;
     }
 

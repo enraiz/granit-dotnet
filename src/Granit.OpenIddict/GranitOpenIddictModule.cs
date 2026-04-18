@@ -1,3 +1,4 @@
+using Granit.DataExchange.Extensions;
 using Granit.Diagnostics;
 using Granit.Http.Cookies;
 using Granit.Identity.Local;
@@ -5,10 +6,14 @@ using Granit.Identity.Local.Options;
 using Granit.Identity.Local.Services;
 using Granit.Modularity;
 using Granit.OpenIddict.Diagnostics;
+using Granit.OpenIddict.Entities.OpenIddict;
+using Granit.OpenIddict.Exports;
 using Granit.OpenIddict.Internal;
 using Granit.OpenIddict.Options;
+using Granit.OpenIddict.Queries;
 using Granit.OpenIddict.Services;
 using Granit.QueryEngine;
+using Granit.QueryEngine.Extensions;
 using Granit.Users;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -89,6 +94,12 @@ public sealed class GranitOpenIddictModule : GranitModule
             Microsoft.AspNetCore.Identity.IdentityConstants.ExternalScheme,
             IdentityCookieDefinitionContributor.DefaultExternalCookieName,
             IdentityCookieDefinitionContributor.DevExternalCookieName);
+
+        // Query + Export definitions (ADR-020: owned by the base module).
+        context.Services.AddQueryDefinition<GranitOpenIddictApplication, GranitOpenIddictApplicationQueryDefinition>();
+        context.Services.AddQueryDefinition<GranitOpenIddictScope, GranitOpenIddictScopeQueryDefinition>();
+        context.Services.AddExportDefinition<GranitOpenIddictApplication, OpenIddictApplicationExportDefinition>();
+        context.Services.AddExportDefinition<GranitOpenIddictScope, OpenIddictScopeExportDefinition>();
     }
 
     private static void PostConfigureIdentityCookie(

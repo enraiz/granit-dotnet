@@ -1,5 +1,10 @@
+using Granit.DataExchange.Extensions;
+using Granit.QueryEngine.Extensions;
 using Granit.Timeline.Abstractions;
+using Granit.Timeline.Domain;
+using Granit.Timeline.Exports;
 using Granit.Timeline.Internal;
+using Granit.Timeline.Queries;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -28,6 +33,10 @@ public static class TimelineServiceCollectionExtensions
 
         // Notifier facade (no-op, replaced by Granit.Timeline.Notifications)
         services.TryAddScoped<ITimelineNotifier, NullTimelineNotifier>();
+
+        // Query + Export definitions (ADR-020: owned by the base module).
+        services.AddQueryDefinition<TimelineEntry, TimelineEntryQueryDefinition>();
+        services.AddExportDefinition<TimelineEntry, TimelineEntryExportDefinition>();
 
         return services;
     }
