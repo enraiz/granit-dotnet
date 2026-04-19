@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Granit.Privacy.BlobStorage" />
     <InternalsVisibleTo Include="Granit.Privacy.Tests" />
   </ItemGroup>
 

@@ -17,7 +17,12 @@ namespace Granit.Privacy;
 public sealed class GranitPrivacyBuilder(IServiceCollection services)
 {
     /// <summary>The underlying service collection.</summary>
-    internal IServiceCollection Services { get; } = services;
+    /// <remarks>
+    /// Exposed to let sibling packages (<c>Granit.Privacy.EntityFrameworkCore</c>,
+    /// <c>Granit.Privacy.BlobStorage</c>, …) register their own services from extension
+    /// methods on <see cref="GranitPrivacyBuilder"/>.
+    /// </remarks>
+    public IServiceCollection Services { get; } = services;
 
     /// <summary>Data provider names to register at startup.</summary>
     internal List<string> DataProviderNames { get; } = [];
@@ -35,6 +40,24 @@ public sealed class GranitPrivacyBuilder(IServiceCollection services)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(providerName);
         DataProviderNames.Add(providerName);
+        return this;
+    }
+
+    /// <summary>
+    /// Registers an <see cref="IPrivacyDataProvider"/> implementation and its provider name in
+    /// a single call. The concrete <typeparamref name="TProvider"/> is added to DI as scoped
+    /// and its <c>ProviderName</c> is recorded in the scatter-gather registry.
+    /// </summary>
+    /// <remarks>
+    /// The matching Wolverine handler is discovered automatically by assembly scanning — no
+    /// explicit handler registration is needed. See <c>PrivacyDataProviderHandlerBase&lt;T&gt;</c>
+    /// in <c>Granit.Privacy.BlobStorage</c>.
+    /// </remarks>
+    public GranitPrivacyBuilder AddDataProvider<TProvider>()
+        where TProvider : class, IPrivacyDataProvider
+    {
+        RegisterDataProvider(TProvider.ProviderName);
+        Services.AddScoped<TProvider>();
         return this;
     }
 

@@ -69,9 +69,11 @@
     <Project Path="src/Granit.Identity.Federated.EntraId/Granit.Identity.Federated.EntraId.csproj" />
     <Project Path="src/Granit.Identity.Federated.GoogleCloud/Granit.Identity.Federated.GoogleCloud.csproj" />
     <Project Path="src/Granit.Identity.Federated.Keycloak/Granit.Identity.Federated.Keycloak.csproj" />
+    <Project Path="src/Granit.Identity.Federated.Wolverine/Granit.Identity.Federated.Wolverine.csproj" />
     <Project Path="src/Granit.Identity.Federated/Granit.Identity.Federated.csproj" />
     <Project Path="src/Granit.Identity.Local.AspNetIdentity/Granit.Identity.Local.AspNetIdentity.csproj" />
     <Project Path="src/Granit.Identity.Local.Endpoints/Granit.Identity.Local.Endpoints.csproj" />
+    <Project Path="src/Granit.Identity.Local.Wolverine/Granit.Identity.Local.Wolverine.csproj" />
     <Project Path="src/Granit.Identity.Local/Granit.Identity.Local.csproj" />
     <Project Path="src/Granit.Identity/Granit.Identity.csproj" />
     <Project Path="src/Granit.OpenIddict.BackgroundJobs/Granit.OpenIddict.BackgroundJobs.csproj" />
@@ -176,12 +178,14 @@
     <Project Path="src/Granit.Auditing.ConfigurationChanges/Granit.Auditing.ConfigurationChanges.csproj" />
     <Project Path="src/Granit.Auditing.Endpoints/Granit.Auditing.Endpoints.csproj" />
     <Project Path="src/Granit.Auditing.EntityFrameworkCore/Granit.Auditing.EntityFrameworkCore.csproj" />
+    <Project Path="src/Granit.Auditing.Wolverine/Granit.Auditing.Wolverine.csproj" />
     <Project Path="src/Granit.Auditing/Granit.Auditing.csproj" />
     <Project Path="src/Granit.Http.Cookies.Endpoints/Granit.Http.Cookies.Endpoints.csproj" />
     <Project Path="src/Granit.Http.Cookies.Klaro/Granit.Http.Cookies.Klaro.csproj" />
     <Project Path="src/Granit.Http.Cookies/Granit.Http.Cookies.csproj" />
     <Project Path="src/Granit.Privacy.AI/Granit.Privacy.AI.csproj" />
     <Project Path="src/Granit.Privacy.BackgroundJobs/Granit.Privacy.BackgroundJobs.csproj" />
+    <Project Path="src/Granit.Privacy.BlobStorage/Granit.Privacy.BlobStorage.csproj" />
     <Project Path="src/Granit.Privacy.Endpoints/Granit.Privacy.Endpoints.csproj" />
     <Project Path="src/Granit.Privacy.Notifications/Granit.Privacy.Notifications.csproj" />
     <Project Path="src/Granit.Privacy.Regulations.Cookies/Granit.Privacy.Regulations.Cookies.csproj" />
@@ -213,6 +217,7 @@
     <Project Path="src/Granit.Notifications.Twilio/Granit.Notifications.Twilio.csproj" />
     <Project Path="src/Granit.Notifications.WebPush/Granit.Notifications.WebPush.csproj" />
     <Project Path="src/Granit.Notifications.WhatsApp/Granit.Notifications.WhatsApp.csproj" />
+    <Project Path="src/Granit.Notifications.Privacy.Wolverine/Granit.Notifications.Privacy.Wolverine.csproj" />
     <Project Path="src/Granit.Notifications.Wolverine/Granit.Notifications.Wolverine.csproj" />
     <Project Path="src/Granit.Notifications.Zulip/Granit.Notifications.Zulip.csproj" />
     <Project Path="src/Granit.Notifications/Granit.Notifications.csproj" />
@@ -367,9 +372,11 @@
     <Project Path="tests/Granit.Identity.Federated.GoogleCloud.Tests/Granit.Identity.Federated.GoogleCloud.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Federated.Keycloak.Tests/Granit.Identity.Federated.Keycloak.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Federated.Tests/Granit.Identity.Federated.Tests.csproj" />
+    <Project Path="tests/Granit.Identity.Federated.Wolverine.Tests/Granit.Identity.Federated.Wolverine.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Local.AspNetIdentity.Tests/Granit.Identity.Local.AspNetIdentity.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Local.Endpoints.Tests/Granit.Identity.Local.Endpoints.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Local.Tests/Granit.Identity.Local.Tests.csproj" />
+    <Project Path="tests/Granit.Identity.Local.Wolverine.Tests/Granit.Identity.Local.Wolverine.Tests.csproj" />
     <Project Path="tests/Granit.Identity.Tests/Granit.Identity.Tests.csproj" />
     <Project Path="tests/Granit.OpenIddict.BackgroundJobs.Tests/Granit.OpenIddict.BackgroundJobs.Tests.csproj" />
     <Project Path="tests/Granit.OpenIddict.Endpoints.Tests/Granit.OpenIddict.Endpoints.Tests.csproj" />
@@ -481,11 +488,13 @@
     <Project Path="tests/Granit.Auditing.Endpoints.Tests/Granit.Auditing.Endpoints.Tests.csproj" />
     <Project Path="tests/Granit.Auditing.EntityFrameworkCore.Tests/Granit.Auditing.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/Granit.Auditing.Tests/Granit.Auditing.Tests.csproj" />
+    <Project Path="tests/Granit.Auditing.Wolverine.Tests/Granit.Auditing.Wolverine.Tests.csproj" />
     <Project Path="tests/Granit.Http.Cookies.Endpoints.Tests/Granit.Http.Cookies.Endpoints.Tests.csproj" />
     <Project Path="tests/Granit.Http.Cookies.Klaro.Tests/Granit.Http.Cookies.Klaro.Tests.csproj" />
     <Project Path="tests/Granit.Http.Cookies.Tests/Granit.Http.Cookies.Tests.csproj" />
     <Project Path="tests/Granit.Privacy.AI.Tests/Granit.Privacy.AI.Tests.csproj" />
     <Project Path="tests/Granit.Privacy.BackgroundJobs.Tests/Granit.Privacy.BackgroundJobs.Tests.csproj" />
+    <Project Path="tests/Granit.Privacy.BlobStorage.Tests/Granit.Privacy.BlobStorage.Tests.csproj" />
     <Project Path="tests/Granit.Privacy.Endpoints.Tests/Granit.Privacy.Endpoints.Tests.csproj" />
     <Project Path="tests/Granit.Privacy.Notifications.Tests/Granit.Privacy.Notifications.Tests.csproj" />
     <Project Path="tests/Granit.Privacy.Regulations.Cookies.Tests/Granit.Privacy.Regulations.Cookies.Tests.csproj" />
@@ -518,6 +527,7 @@
     <Project Path="tests/Granit.Notifications.Twilio.Tests/Granit.Notifications.Twilio.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.WebPush.Tests/Granit.Notifications.WebPush.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.WhatsApp.Tests/Granit.Notifications.WhatsApp.Tests.csproj" />
+    <Project Path="tests/Granit.Notifications.Privacy.Wolverine.Tests/Granit.Notifications.Privacy.Wolverine.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Wolverine.Tests/Granit.Notifications.Wolverine.Tests.csproj" />
     <Project Path="tests/Granit.Notifications.Zulip.Tests/Granit.Notifications.Zulip.Tests.csproj" />
   </Folder>
