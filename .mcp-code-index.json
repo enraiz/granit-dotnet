@@ -105,6 +105,7 @@
         "Granit.Auditing",
         "Granit.Authorization",
         "Granit.Http.ApiDocumentation",
+        "Granit.QueryEngine.AspNetCore",
         "Granit.Validation"
       ],
       "framework": "net10.0"
@@ -4056,15 +4057,6 @@
       "members": []
     },
     {
-      "name": "AuditingQuery",
-      "fqn": "Granit.Auditing.AuditingQuery",
-      "kind": "record",
-      "project": "Granit.Auditing",
-      "file": "src/Granit.Auditing/AuditingQuery.cs",
-      "line": 17,
-      "members": []
-    },
-    {
       "name": "GranitAuditingConfigurationChangesModule",
       "fqn": "Granit.Auditing.ConfigurationChanges.GranitAuditingConfigurationChangesModule",
       "kind": "class",
@@ -4288,21 +4280,12 @@
       "members": []
     },
     {
-      "name": "AuditingQueryParameters",
-      "fqn": "Granit.Auditing.Endpoints.Dtos.AuditingQueryParameters",
-      "kind": "class",
-      "project": "Granit.Auditing.Endpoints",
-      "file": "src/Granit.Auditing.Endpoints/Dtos/AuditingQueryParameters.cs",
-      "line": 9,
-      "members": []
-    },
-    {
       "name": "AuditingEndpointRouteBuilderExtensions",
       "fqn": "Granit.Auditing.Endpoints.Extensions.AuditingEndpointRouteBuilderExtensions",
       "kind": "class",
       "project": "Granit.Auditing.Endpoints",
       "file": "src/Granit.Auditing.Endpoints/Extensions/AuditingEndpointRouteBuilderExtensions.cs",
-      "line": 14,
+      "line": 16,
       "members": [
         {
           "name": "MapGranitAuditing",
@@ -4367,7 +4350,7 @@
       "kind": "class",
       "project": "Granit.Auditing.EntityFrameworkCore",
       "file": "src/Granit.Auditing.EntityFrameworkCore/Extensions/AuditingEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 21,
+      "line": 22,
       "members": [
         {
           "name": "AddGranitAuditingEntityFrameworkCore",
@@ -4590,12 +4573,6 @@
           "kind": "method",
           "signature": "GetByIdAsync(Guid id, CancellationToken cancellationToken = default)",
           "returnType": "Task<AuditEntry?>"
-        },
-        {
-          "name": "GetPagedAsync",
-          "kind": "method",
-          "signature": "GetPagedAsync(AuditingQuery query, CancellationToken cancellationToken = default)",
-          "returnType": "Task<PagedResult<AuditEntry>>"
         },
         {
           "name": "GetByEntityAsync",
