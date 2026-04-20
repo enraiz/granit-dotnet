@@ -9,21 +9,24 @@ using ZiggyCreatures.Caching.Fusion;
 namespace Granit.Authorization.Services;
 
 /// <summary>
-/// Scoped permission checker implementing the full RBAC verification pipeline:
+/// Scoped permission checker implementing the full verification pipeline:
 /// <list type="number">
 /// <item>Not authenticated → denied</item>
 /// <item>AlwaysAllow (dev/test, authenticated users only) → granted</item>
 /// <item>AdminRole bypass (root of trust, case-insensitive) → granted without DB</item>
 /// <item>Permission undefined → <see cref="InvalidOperationException"/></item>
-/// <item>For each role: cache hit or store query; any true → granted</item>
+/// <item>Permission's <see cref="MultiTenancySide"/> incompatible with current tenant context → denied</item>
+/// <item>For each registered <see cref="IPermissionGrantProvider"/> (default order: User, Role, Client),
+///   query each of the provider's keys through cache / store. First positive match wins (fail-fast).</item>
 /// </list>
-/// Cache key format: <c>perm:{tenantId|"global"}:{roleName}:{permissionName}</c>
+/// Cache key format: <c>perm:{tenantId|"global"}:{providerName}:{providerKey}:{permissionName}</c>
 /// </summary>
 internal sealed class PermissionChecker(
     ICurrentUserService currentUserService,
     ICurrentTenant currentTenant,
     IPermissionDefinitionManager definitionManager,
     IPermissionGrantStore grantStore,
+    IEnumerable<IPermissionGrantProvider> grantProviders,
     IFusionCache cache,
     AuthorizationMetrics metrics,
     IOptions<GranitAuthorizationOptions> options) : IPermissionChecker
@@ -54,7 +57,8 @@ internal sealed class PermissionChecker(
             return true;
         }
 
-        if (!definitionManager.Exists(permissionName))
+        PermissionDefinition? definition = definitionManager.Find(permissionName);
+        if (definition is null)
         {
             throw new InvalidOperationException(
                 $"Permission '{permissionName}' is not defined. Register it via IPermissionDefinitionProvider.");
@@ -64,22 +68,36 @@ internal sealed class PermissionChecker(
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
         string tenantIdStr = tenantId?.ToString() ?? "global";
 
-        foreach (string role in roles)
+        if (!IsCompatibleWithCurrentSide(definition, currentTenant))
         {
-            PermissionGrantCacheItem result = await cache.GetOrSetAsync<PermissionGrantCacheItem>(
-                BuildCacheKey(tenantId, role, permissionName),
-                async (_, ct) =>
-                {
-                    metrics.RecordCacheMiss(tenantIdStr);
-                    return new PermissionGrantCacheItem(
-                        await grantStore.IsGrantedAsync(role, permissionName, tenantId, ct).ConfigureAwait(false));
-                },
-                new FusionCacheEntryOptions { Duration = opts.CacheDuration },
-                token: cancellationToken).ConfigureAwait(false);
+            metrics.RecordCheckDenied(tenantIdStr);
+            return false;
+        }
 
-            if (result.IsGranted)
+        PermissionGrantLookupContext lookup = BuildLookupContext(currentUserService, roles);
+
+        foreach (IPermissionGrantProvider provider in grantProviders)
+        {
+            IReadOnlyList<string> providerKeys = provider.GetProviderKeys(lookup);
+            foreach (string providerKey in providerKeys)
             {
-                return true;
+                PermissionGrantCacheItem result = await cache.GetOrSetAsync<PermissionGrantCacheItem>(
+                    BuildCacheKey(tenantId, provider.Name, providerKey, permissionName),
+                    async (_, ct) =>
+                    {
+                        metrics.RecordCacheMiss(tenantIdStr);
+                        return new PermissionGrantCacheItem(
+                            await grantStore.IsGrantedAsync(
+                                provider.Name, providerKey, permissionName, tenantId, ct)
+                            .ConfigureAwait(false));
+                    },
+                    new FusionCacheEntryOptions { Duration = opts.CacheDuration },
+                    token: cancellationToken).ConfigureAwait(false);
+
+                if (result.IsGranted)
+                {
+                    return true;
+                }
             }
         }
 
@@ -113,26 +131,28 @@ internal sealed class PermissionChecker(
         }
 
         Guid? tenantId = currentTenant.IsAvailable ? currentTenant.Id : null;
+        PermissionGrantLookupContext lookup = BuildLookupContext(currentUserService, roles);
 
         (HashSet<string> granted, List<string> uncached) = await PartitionCachedPermissionsAsync(
-            permissionNames, roles, tenantId, cancellationToken).ConfigureAwait(false);
+            permissionNames, lookup, tenantId, cancellationToken).ConfigureAwait(false);
 
         if (uncached.Count == 0)
         {
             return [.. granted];
         }
 
-        await QueryAndCachePermissionsAsync(uncached, roles, tenantId, granted, opts, cancellationToken)
+        await QueryAndCachePermissionsAsync(uncached, lookup, tenantId, granted, opts, cancellationToken)
             .ConfigureAwait(false);
 
         return [.. granted];
     }
 
-    // Walks each (permission, role) pair and splits them into cached-grants vs. uncached.
-    // A permission is added to 'uncached' at most once, even if several roles miss the cache.
+    // Walks each (permission, provider, key) triplet and splits them into cached-grants
+    // vs. uncached. A permission is added to 'uncached' at most once, even if several
+    // provider keys miss the cache.
     private async Task<(HashSet<string> Granted, List<string> Uncached)> PartitionCachedPermissionsAsync(
         IReadOnlyList<string> permissionNames,
-        IReadOnlyList<string> roles,
+        PermissionGrantLookupContext lookup,
         Guid? tenantId,
         CancellationToken cancellationToken)
     {
@@ -141,12 +161,18 @@ internal sealed class PermissionChecker(
 
         foreach (string permissionName in permissionNames)
         {
-            if (!definitionManager.Exists(permissionName))
+            PermissionDefinition? definition = definitionManager.Find(permissionName);
+            if (definition is null)
             {
                 continue;
             }
 
-            await PartitionPermissionAsync(permissionName, roles, tenantId, granted, uncached, cancellationToken)
+            if (!IsCompatibleWithCurrentSide(definition, currentTenant))
+            {
+                continue;
+            }
+
+            await PartitionPermissionAsync(permissionName, lookup, tenantId, granted, uncached, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -155,7 +181,7 @@ internal sealed class PermissionChecker(
 
     private async Task PartitionPermissionAsync(
         string permissionName,
-        IReadOnlyList<string> roles,
+        PermissionGrantLookupContext lookup,
         Guid? tenantId,
         HashSet<string> granted,
         List<string> uncached,
@@ -163,60 +189,87 @@ internal sealed class PermissionChecker(
     {
         bool uncachedRecorded = false;
 
-        foreach (string role in roles)
+        foreach (IPermissionGrantProvider provider in grantProviders)
         {
-            MaybeValue<PermissionGrantCacheItem> cached = await cache.TryGetAsync<PermissionGrantCacheItem>(
-                BuildCacheKey(tenantId, role, permissionName),
-                token: cancellationToken).ConfigureAwait(false);
+            foreach (string providerKey in provider.GetProviderKeys(lookup))
+            {
+                MaybeValue<PermissionGrantCacheItem> cached = await cache.TryGetAsync<PermissionGrantCacheItem>(
+                    BuildCacheKey(tenantId, provider.Name, providerKey, permissionName),
+                    token: cancellationToken).ConfigureAwait(false);
 
-            if (cached.HasValue)
-            {
-                if (cached.Value.IsGranted)
+                if (cached.HasValue)
                 {
-                    granted.Add(permissionName);
-                    uncachedRecorded = true; // no need to requery; cache is authoritative for this pair
+                    if (cached.Value.IsGranted)
+                    {
+                        granted.Add(permissionName);
+                        uncachedRecorded = true; // cache is authoritative for this pair
+                    }
                 }
-            }
-            else if (!uncachedRecorded)
-            {
-                uncached.Add(permissionName);
-                uncachedRecorded = true;
+                else if (!uncachedRecorded)
+                {
+                    uncached.Add(permissionName);
+                    uncachedRecorded = true;
+                }
             }
         }
     }
 
-    // Batch-query the store for all uncached permissions per role, then populate the cache.
+    // Batch-query the store for all uncached permissions per (provider, key), then populate the cache.
     private async Task QueryAndCachePermissionsAsync(
         List<string> uncached,
-        IReadOnlyList<string> roles,
+        PermissionGrantLookupContext lookup,
         Guid? tenantId,
         HashSet<string> granted,
         GranitAuthorizationOptions opts,
         CancellationToken cancellationToken)
     {
-        foreach (string role in roles)
+        FusionCacheEntryOptions entryOptions = new() { Duration = opts.CacheDuration };
+
+        foreach (IPermissionGrantProvider provider in grantProviders)
         {
-            IReadOnlyList<string> roleGrants = await grantStore.GetGrantedAsync(
-                role, uncached, tenantId, cancellationToken).ConfigureAwait(false);
-
-            foreach (string perm in roleGrants)
+            foreach (string providerKey in provider.GetProviderKeys(lookup))
             {
-                granted.Add(perm);
-            }
+                IReadOnlyList<string> granteeGrants = await grantStore.GetGrantedAsync(
+                    provider.Name, providerKey, uncached, tenantId, cancellationToken).ConfigureAwait(false);
 
-            FusionCacheEntryOptions entryOptions = new() { Duration = opts.CacheDuration };
-            foreach (string perm in uncached)
-            {
-                bool isGranted = roleGrants.Contains(perm);
-                await cache.SetAsync(
-                    BuildCacheKey(tenantId, role, perm),
-                    new PermissionGrantCacheItem(isGranted),
-                    entryOptions,
-                    token: cancellationToken).ConfigureAwait(false);
+                foreach (string perm in granteeGrants)
+                {
+                    granted.Add(perm);
+                }
+
+                foreach (string perm in uncached)
+                {
+                    bool isGranted = granteeGrants.Contains(perm);
+                    await cache.SetAsync(
+                        BuildCacheKey(tenantId, provider.Name, providerKey, perm),
+                        new PermissionGrantCacheItem(isGranted),
+                        entryOptions,
+                        token: cancellationToken).ConfigureAwait(false);
+                }
             }
         }
     }
 
-    internal static string BuildCacheKey(Guid? tenantId, string roleName, string permissionName) =>
-        $"perm:{tenantId?.ToString() ?? "global"}:{roleName}:{permissionName}";
+    /// <summary>
+    /// Builds the cache key for a permission check. Scopes the cache by tenant, provider and
+    /// provider key so that grants to a user and grants to a role of the same textual key
+    /// (unlikely but possible) never collide.
+    /// </summary>
+    internal static string BuildCacheKey(Guid? tenantId, string providerName, string providerKey, string permissionName) =>
+        $"perm:{tenantId?.ToString() ?? "global"}:{providerName}:{providerKey}:{permissionName}";
+
+    // Side enforcement: a Host-sided permission is only grantable when no tenant is active;
+    // a Tenant-sided one only when a tenant is active. Both-sided permissions pass in any context.
+    // When Granit.MultiTenancy is absent, NullTenantContext.IsAvailable is always false — so
+    // Tenant-sided permissions are uniformly denied, which is consistent: a consumer without
+    // multi-tenancy should not declare Tenant-sided permissions in the first place.
+    internal static bool IsCompatibleWithCurrentSide(PermissionDefinition definition, ICurrentTenant currentTenant) =>
+        currentTenant.IsAvailable
+            ? definition.MultiTenancySide.HasFlag(MultiTenancySide.Tenant)
+            : definition.MultiTenancySide.HasFlag(MultiTenancySide.Host);
+
+    private static PermissionGrantLookupContext BuildLookupContext(
+        ICurrentUserService currentUserService,
+        IReadOnlyList<string> roles) =>
+        new(currentUserService.UserId, roles, currentUserService.ClientId);
 }

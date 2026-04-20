@@ -6264,7 +6264,7 @@
       "kind": "class",
       "project": "Granit.Authorization",
       "file": "src/Granit.Authorization/Domain/PermissionGrant.cs",
-      "line": 10,
+      "line": 22,
       "members": [
         {
           "name": "Name",
@@ -6273,9 +6273,15 @@
           "returnType": "string"
         },
         {
-          "name": "RoleName",
+          "name": "ProviderName",
           "kind": "property",
-          "signature": "string RoleName",
+          "signature": "string ProviderName",
+          "returnType": "string"
+        },
+        {
+          "name": "ProviderKey",
+          "kind": "property",
+          "signature": "string ProviderKey",
           "returnType": "string"
         }
       ]
@@ -6430,7 +6436,7 @@
       "kind": "class",
       "project": "Granit.Authorization.EntityFrameworkCore",
       "file": "src/Granit.Authorization.EntityFrameworkCore/GranitAuthorizationDbProperties.cs",
-      "line": 13,
+      "line": 20,
       "members": [
         {
           "name": "DbTablePrefix",
@@ -6455,7 +6461,7 @@
       "kind": "record",
       "project": "Granit.Authorization",
       "file": "src/Granit.Authorization/Events/PermissionGrantChangedEvent.cs",
-      "line": 15,
+      "line": 17,
       "members": []
     },
     {
@@ -6496,13 +6502,19 @@
       "kind": "class",
       "project": "Granit.Authorization",
       "file": "src/Granit.Authorization/Extensions/HostAccessEndpointExtensions.cs",
-      "line": 10,
+      "line": 11,
       "members": [
         {
           "name": "AllowHostAccess",
           "kind": "method",
           "signature": "AllowHostAccess(this RouteHandlerBuilder builder)",
           "returnType": "RouteHandlerBuilder"
+        },
+        {
+          "name": "AllowHostAccess",
+          "kind": "method",
+          "signature": "AllowHostAccess(this RouteGroupBuilder group)",
+          "returnType": "RouteGroupBuilder"
         }
       ]
     },
@@ -6611,48 +6623,80 @@
       ]
     },
     {
+      "name": "IPermissionGrantProvider",
+      "fqn": "Granit.Authorization.IPermissionGrantProvider",
+      "kind": "interface",
+      "project": "Granit.Authorization",
+      "file": "src/Granit.Authorization/IPermissionGrantProvider.cs",
+      "line": 14,
+      "members": [
+        {
+          "name": "GetProviderKeys",
+          "kind": "method",
+          "signature": "GetProviderKeys(PermissionGrantLookupContext context)",
+          "returnType": "string Name { get; } IReadOnlyList<string>"
+        }
+      ]
+    },
+    {
       "name": "IPermissionGrantStore",
       "fqn": "Granit.Authorization.IPermissionGrantStore",
       "kind": "interface",
       "project": "Granit.Authorization",
       "file": "src/Granit.Authorization/IPermissionGrantStore.cs",
-      "line": 9,
+      "line": 10,
       "members": [
         {
           "name": "IsGrantedAsync",
           "kind": "method",
-          "signature": "IsGrantedAsync(string roleName, string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "IsGrantedAsync(string providerName, string providerKey, string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<bool>"
         },
         {
           "name": "GetGrantedPermissionsAsync",
           "kind": "method",
-          "signature": "GetGrantedPermissionsAsync(string roleName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "GetGrantedPermissionsAsync(string providerName, string providerKey, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<string>>"
         },
         {
           "name": "GetGrantedAsync",
           "kind": "method",
-          "signature": "GetGrantedAsync(string roleName, IReadOnlyList<string> permissionNames, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "GetGrantedAsync(string providerName, string providerKey, IReadOnlyList<string> permissionNames, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<string>>"
         },
         {
-          "name": "GetGrantedRolesAsync",
+          "name": "GetGranteesAsync",
           "kind": "method",
-          "signature": "GetGrantedRolesAsync(string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "GetGranteesAsync(string providerName, string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<string>>"
         },
         {
           "name": "GrantAsync",
           "kind": "method",
-          "signature": "GrantAsync(string permissionName, string roleName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "GrantAsync(string providerName, string providerKey, string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<bool>"
         },
         {
           "name": "RevokeAsync",
           "kind": "method",
-          "signature": "RevokeAsync(string permissionName, string roleName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "RevokeAsync(string providerName, string providerKey, string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<bool>"
+        }
+      ]
+    },
+    {
+      "name": "IPermissionGrantValidator",
+      "fqn": "Granit.Authorization.IPermissionGrantValidator",
+      "kind": "interface",
+      "project": "Granit.Authorization",
+      "file": "src/Granit.Authorization/IPermissionGrantValidator.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "ValidateAsync",
+          "kind": "method",
+          "signature": "ValidateAsync(PermissionGrantValidationContext context, CancellationToken cancellationToken = default)",
+          "returnType": "ValueTask<PermissionGrantValidationResult>"
         }
       ]
     },
@@ -6662,24 +6706,24 @@
       "kind": "interface",
       "project": "Granit.Authorization",
       "file": "src/Granit.Authorization/IPermissionManagerReader.cs",
-      "line": 7,
+      "line": 8,
       "members": [
         {
           "name": "IsGrantedAsync",
           "kind": "method",
-          "signature": "IsGrantedAsync(string permissionName, string roleName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "IsGrantedAsync(string permissionName, string providerName, string providerKey, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<bool>"
         },
         {
           "name": "GetGrantedPermissionsAsync",
           "kind": "method",
-          "signature": "GetGrantedPermissionsAsync(string roleName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "GetGrantedPermissionsAsync(string providerName, string providerKey, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<string>>"
         },
         {
-          "name": "GetGrantedRolesAsync",
+          "name": "GetGranteesAsync",
           "kind": "method",
-          "signature": "GetGrantedRolesAsync(string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
+          "signature": "GetGranteesAsync(string providerName, string permissionName, Guid? tenantId, CancellationToken cancellationToken = default)",
           "returnType": "Task<IReadOnlyList<string>>"
         }
       ]
@@ -6690,15 +6734,24 @@
       "kind": "interface",
       "project": "Granit.Authorization",
       "file": "src/Granit.Authorization/IPermissionManagerWriter.cs",
-      "line": 8,
+      "line": 10,
       "members": [
         {
           "name": "SetAsync",
           "kind": "method",
-          "signature": "SetAsync(string permissionName, string roleName, Guid? tenantId, bool isGranted, CancellationToken cancellationToken = default)",
+          "signature": "SetAsync(string permissionName, string providerName, string providerKey, Guid? tenantId, bool isGranted, CancellationToken cancellationToken = default)",
           "returnType": "Task"
         }
       ]
+    },
+    {
+      "name": "MultiTenancySide",
+      "fqn": "Granit.Authorization.MultiTenancySide",
+      "kind": "enum",
+      "project": "Granit.Authorization",
+      "file": "src/Granit.Authorization/MultiTenancySide.cs",
+      "line": 14,
+      "members": []
     },
     {
       "name": "GranitAuthorizationOptions",
@@ -6728,7 +6781,34 @@
       "kind": "record",
       "project": "Granit.Authorization",
       "file": "src/Granit.Authorization/PermissionDefinition.cs",
-      "line": 6,
+      "line": 13,
+      "members": []
+    },
+    {
+      "name": "PermissionGrantLookupContext",
+      "fqn": "Granit.Authorization.PermissionGrantLookupContext",
+      "kind": "record",
+      "project": "Granit.Authorization",
+      "file": "src/Granit.Authorization/PermissionGrantLookupContext.cs",
+      "line": 10,
+      "members": []
+    },
+    {
+      "name": "PermissionGrantProviderNames",
+      "fqn": "Granit.Authorization.PermissionGrantProviderNames",
+      "kind": "class",
+      "project": "Granit.Authorization",
+      "file": "src/Granit.Authorization/PermissionGrantProviderNames.cs",
+      "line": 12,
+      "members": []
+    },
+    {
+      "name": "PermissionGrantValidationContext",
+      "fqn": "Granit.Authorization.PermissionGrantValidationContext",
+      "kind": "record",
+      "project": "Granit.Authorization",
+      "file": "src/Granit.Authorization/PermissionGrantValidationContext.cs",
+      "line": 15,
       "members": []
     },
     {
@@ -6760,7 +6840,7 @@
         {
           "name": "AddPermission",
           "kind": "method",
-          "signature": "AddPermission(string name, LocalizableString? displayName = null)",
+          "signature": "AddPermission(string name, LocalizableString? displayName = null, MultiTenancySide multiTenancySide = MultiTenancySide.Both)",
           "returnType": "PermissionDefinition"
         }
       ]
@@ -6778,6 +6858,28 @@
           "kind": "property",
           "signature": "string Name",
           "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "struct",
+      "fqn": "Granit.Authorization.struct",
+      "kind": "record",
+      "project": "Granit.Authorization",
+      "file": "src/Granit.Authorization/PermissionGrantValidationResult.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "new",
+          "kind": "method",
+          "signature": "new(true, null, null)",
+          "returnType": "PermissionGrantValidationResult Success { get; } ="
+        },
+        {
+          "name": "Reject",
+          "kind": "method",
+          "signature": "Reject(string reasonCode, string? reasonMessage = null)",
+          "returnType": "PermissionGrantValidationResult"
         }
       ]
     },
@@ -7806,6 +7908,12 @@
           "kind": "property",
           "signature": "string EffectiveErrorRedirectPath",
           "returnType": "string"
+        },
+        {
+          "name": "UsePushedAuthorizationRequests",
+          "kind": "property",
+          "signature": "bool UsePushedAuthorizationRequests",
+          "returnType": "bool"
         }
       ]
     },
@@ -9724,7 +9832,7 @@
       "kind": "class",
       "project": "Granit.CustomerBalance.Endpoints",
       "file": "src/Granit.CustomerBalance.Endpoints/Extensions/CustomerBalanceEndpointRouteBuilderExtensions.cs",
-      "line": 12,
+      "line": 13,
       "members": [
         {
           "name": "MapGranitCustomerBalance",
@@ -39437,7 +39545,7 @@
       "kind": "class",
       "project": "Granit.Tax.Endpoints",
       "file": "src/Granit.Tax.Endpoints/Extensions/TaxEndpointRouteBuilderExtensions.cs",
-      "line": 12,
+      "line": 13,
       "members": [
         {
           "name": "MapGranitTax",
@@ -42040,6 +42148,12 @@
           "kind": "property",
           "signature": "Guid? ApiKeyId",
           "returnType": "Guid?"
+        },
+        {
+          "name": "ClientId",
+          "kind": "property",
+          "signature": "string? ClientId",
+          "returnType": "string?"
         }
       ]
     },
