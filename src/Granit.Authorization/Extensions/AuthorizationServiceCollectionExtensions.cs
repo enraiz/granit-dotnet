@@ -32,6 +32,7 @@ public static class AuthorizationServiceCollectionExtensions
         services.AddSingleton<IPermissionDefinitionManager, PermissionDefinitionManager>();
 
         services.TryAddSingleton<IPermissionGrantStore, NullPermissionGrantStore>();
+        services.TryAddSingleton<IRoleMetadataStore, NullRoleMetadataStore>();
         services.TryAddSingleton<AuthorizationMetrics>();
 
         services.AddScoped<IPermissionChecker, PermissionChecker>();
@@ -39,7 +40,8 @@ public static class AuthorizationServiceCollectionExtensions
         services.AddScoped<IPermissionManagerReader, PermissionManager>();
         services.AddScoped<IPermissionManagerWriter, PermissionManager>();
 
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<
+        // Scoped because it depends on IRoleMetadataStore (also Scoped when backed by EF Core).
+        services.TryAddEnumerable(ServiceDescriptor.Scoped<
             IPermissionGrantValidator, MultiTenancySidePermissionGrantValidator>());
 
         // Grant providers evaluated in the order below: specific → generic.

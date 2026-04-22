@@ -5,6 +5,7 @@ using Granit.Identity.Local.AspNetIdentity.Internal;
 using Granit.Identity.Local.Domain;
 using Granit.Identity.Local.Services;
 using Granit.Modularity;
+using Granit.Persistence.EntityFrameworkCore.DataSeeding;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -41,11 +42,22 @@ public sealed partial class GranitIdentityLocalAspNetIdentityModule : GranitModu
         // Replace default UserManager with GranitUserManager (exponential backoff lockout)
         context.Services.Replace(ServiceDescriptor.Scoped<UserManager<GranitUser>, GranitUserManager>());
 
+        // TenantAwareRoleLookupNormalizer is intentionally not wired here. When
+        // RoleEndpointsOptions.AllowTenantRoles is enabled, applications must replace the
+        // framework default ILookupNormalizer with that type — see the class remarks.
+
         // Replace default claims principal factory to inject tenant_id into the Identity cookie.
         // This ensures multi-tenancy middleware can resolve the tenant from the authenticated
         // cookie on subsequent requests (authorize, refresh, 2FA second step).
         context.Services.Replace(ServiceDescriptor.Scoped<
             IUserClaimsPrincipalFactory<GranitUser>, GranitUserClaimsPrincipalFactory>());
+
+        // Role orchestration — dual-writes GranitRole (Identity DbContext) + RoleMetadata
+        // (host DbContext) with compensating delete on metadata failure.
+        context.Services.TryAddScoped<IGranitRoleOrchestrator, GranitRoleOrchestrator>();
+
+        // Seed SuperAdmin / TenantAdministrator / User on host data seed.
+        context.Services.AddTransient<IHostDataSeedContributor, IdentityLocalRoleSeedContributor>();
 
         // ASP.NET Core Identity service implementations (depend on UserManager<GranitUser>)
         context.Services.TryAddScoped<ITotpService, TotpService>();
