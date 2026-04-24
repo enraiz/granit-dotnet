@@ -514,6 +514,7 @@
         "dependencies": {
           "Granit": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
+          "OpenTelemetry.Api": "[1.15.*, )",
           "ZiggyCreatures.FusionCache": "[2.*, )",
           "ZiggyCreatures.FusionCache.OpenTelemetry": "[2.*, )",
           "ZiggyCreatures.FusionCache.Serialization.SystemTextJson": "[2.*, )"
@@ -1073,8 +1074,8 @@
       "Scalar.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[2.*, )",
-        "resolved": "2.14.3",
-        "contentHash": "RUy9LiqIl8AY6j2veG2h5gLv31L/REoMMIYm2/7V73nEI/N0EnMpUjuz6FDNDrwhFi2hjqZGXYXA6Li8bZcilA=="
+        "resolved": "2.14.4",
+        "contentHash": "PyuqLRi7JXyTJm/rh+IWCA4Fct1SlZuWrdYiui5hiaBuSY88+roc4eWKfYaE6zrupBIwnEP8pJLe4ifvU7HtZA=="
       },
       "Scriban": {
         "type": "CentralTransitive",

@@ -447,6 +447,38 @@
       "framework": "net10.0"
     },
     {
+      "name": "Granit.Catalog",
+      "deps": [
+        "Granit",
+        "Granit.DataExchange.Abstractions",
+        "Granit.Guids",
+        "Granit.Localization",
+        "Granit.QueryEngine.Abstractions",
+        "Granit.Workflow"
+      ],
+      "framework": "net10.0"
+    },
+    {
+      "name": "Granit.Catalog.Endpoints",
+      "deps": [
+        "Granit.Authorization",
+        "Granit.Catalog",
+        "Granit.Http.Abstractions",
+        "Granit.QueryEngine.AspNetCore",
+        "Granit.Validation"
+      ],
+      "framework": "net10.0"
+    },
+    {
+      "name": "Granit.Catalog.EntityFrameworkCore",
+      "deps": [
+        "Granit.Guids",
+        "Granit.Persistence.EntityFrameworkCore",
+        "Granit.Catalog"
+      ],
+      "framework": "net10.0"
+    },
+    {
       "name": "Granit.CustomerBalance",
       "deps": [
         "Granit",
@@ -9876,6 +9908,415 @@
           "name": "InstanceName",
           "kind": "property",
           "signature": "string InstanceName",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "CatalogMetrics",
+      "fqn": "Granit.Catalog.Diagnostics.CatalogMetrics",
+      "kind": "class",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Diagnostics/CatalogMetrics.cs",
+      "line": 10,
+      "members": []
+    },
+    {
+      "name": "Product",
+      "fqn": "Granit.Catalog.Domain.Product",
+      "kind": "class",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Domain/Product.cs",
+      "line": 32,
+      "members": [
+        {
+          "name": "Create",
+          "kind": "method",
+          "signature": "Create(Guid id, string sku, string name, ProductType type, string unit, string? description = null)",
+          "returnType": "Product"
+        },
+        {
+          "name": "Name",
+          "kind": "property",
+          "signature": "string Name",
+          "returnType": "string"
+        },
+        {
+          "name": "Description",
+          "kind": "property",
+          "signature": "string? Description",
+          "returnType": "string?"
+        },
+        {
+          "name": "AsReadOnly",
+          "kind": "method",
+          "signature": "AsReadOnly()",
+          "returnType": "WorkflowLifecycleStatus LifecycleStatus { get; private set; } public string? ExtraPropertiesJson { get; set; } public IReadOnlyList<ProductExternalMapping> ExternalMappings => _externalMappings."
+        },
+        {
+          "name": "GetWorkflowEntityId",
+          "kind": "method",
+          "signature": "GetWorkflowEntityId()",
+          "returnType": "string"
+        },
+        {
+          "name": "Update",
+          "kind": "method",
+          "signature": "Update(string name, string? description, string unit)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "ProductExternalMapping",
+      "fqn": "Granit.Catalog.Domain.ProductExternalMapping",
+      "kind": "class",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Domain/ProductExternalMapping.cs",
+      "line": 15,
+      "members": [
+        {
+          "name": "Create",
+          "kind": "method",
+          "signature": "Create(Guid id, string providerName, string externalId)",
+          "returnType": "ProductExternalMapping"
+        },
+        {
+          "name": "ExternalId",
+          "kind": "property",
+          "signature": "string ExternalId",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "ProductType",
+      "fqn": "Granit.Catalog.Domain.ProductType",
+      "kind": "enum",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Domain/ProductType.cs",
+      "line": 8,
+      "members": []
+    },
+    {
+      "name": "AddProductExternalMappingRequest",
+      "fqn": "Granit.Catalog.Endpoints.Dtos.AddProductExternalMappingRequest",
+      "kind": "record",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Dtos/ProductRequestDtos.cs",
+      "line": 27,
+      "members": []
+    },
+    {
+      "name": "ProductCreateRequest",
+      "fqn": "Granit.Catalog.Endpoints.Dtos.ProductCreateRequest",
+      "kind": "record",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Dtos/ProductRequestDtos.cs",
+      "line": 4,
+      "members": []
+    },
+    {
+      "name": "ProductExternalMappingResponse",
+      "fqn": "Granit.Catalog.Endpoints.Dtos.ProductExternalMappingResponse",
+      "kind": "record",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Dtos/ProductResponse.cs",
+      "line": 31,
+      "members": []
+    },
+    {
+      "name": "ProductResponse",
+      "fqn": "Granit.Catalog.Endpoints.Dtos.ProductResponse",
+      "kind": "record",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Dtos/ProductResponse.cs",
+      "line": 7,
+      "members": []
+    },
+    {
+      "name": "ProductUpdateRequest",
+      "fqn": "Granit.Catalog.Endpoints.Dtos.ProductUpdateRequest",
+      "kind": "record",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Dtos/ProductRequestDtos.cs",
+      "line": 12,
+      "members": []
+    },
+    {
+      "name": "UpdateProductExtraPropertiesRequest",
+      "fqn": "Granit.Catalog.Endpoints.Dtos.UpdateProductExtraPropertiesRequest",
+      "kind": "record",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Dtos/ProductRequestDtos.cs",
+      "line": 23,
+      "members": []
+    },
+    {
+      "name": "CatalogEndpointRouteBuilderExtensions",
+      "fqn": "Granit.Catalog.Endpoints.Extensions.CatalogEndpointRouteBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Extensions/CatalogEndpointRouteBuilderExtensions.cs",
+      "line": 16,
+      "members": [
+        {
+          "name": "MapGranitCatalog",
+          "kind": "method",
+          "signature": "MapGranitCatalog(this IEndpointRouteBuilder endpoints, Action<CatalogEndpointsOptions>? configure = null)",
+          "returnType": "RouteGroupBuilder"
+        }
+      ]
+    },
+    {
+      "name": "GranitCatalogEndpointsModule",
+      "fqn": "Granit.Catalog.Endpoints.GranitCatalogEndpointsModule",
+      "kind": "class",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/GranitCatalogEndpointsModule.cs",
+      "line": 16,
+      "members": []
+    },
+    {
+      "name": "CatalogEndpointsOptions",
+      "fqn": "Granit.Catalog.Endpoints.Options.CatalogEndpointsOptions",
+      "kind": "class",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Options/CatalogEndpointsOptions.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "RoutePrefix",
+          "kind": "property",
+          "signature": "string RoutePrefix",
+          "returnType": "string"
+        },
+        {
+          "name": "ProductsTagName",
+          "kind": "property",
+          "signature": "string ProductsTagName",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "CatalogPermissions",
+      "fqn": "Granit.Catalog.Endpoints.Permissions.CatalogPermissions",
+      "kind": "class",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Permissions/CatalogPermissions.cs",
+      "line": 4,
+      "members": []
+    },
+    {
+      "name": "Products",
+      "fqn": "Granit.Catalog.Endpoints.Permissions.Products",
+      "kind": "class",
+      "project": "Granit.Catalog.Endpoints",
+      "file": "src/Granit.Catalog.Endpoints/Permissions/CatalogPermissions.cs",
+      "line": 10,
+      "members": []
+    },
+    {
+      "name": "CatalogEntityFrameworkCoreHostApplicationBuilderExtensions",
+      "fqn": "Granit.Catalog.EntityFrameworkCore.Extensions.CatalogEntityFrameworkCoreHostApplicationBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Catalog.EntityFrameworkCore",
+      "file": "src/Granit.Catalog.EntityFrameworkCore/Extensions/CatalogEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
+      "line": 13,
+      "members": [
+        {
+          "name": "AddGranitCatalogEntityFrameworkCore",
+          "kind": "method",
+          "signature": "AddGranitCatalogEntityFrameworkCore(this IHostApplicationBuilder builder, Action<DbContextOptionsBuilder> configure)",
+          "returnType": "IHostApplicationBuilder"
+        }
+      ]
+    },
+    {
+      "name": "CatalogModelBuilderExtensions",
+      "fqn": "Granit.Catalog.EntityFrameworkCore.Extensions.CatalogModelBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Catalog.EntityFrameworkCore",
+      "file": "src/Granit.Catalog.EntityFrameworkCore/Extensions/CatalogModelBuilderExtensions.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "ConfigureCatalogModule",
+          "kind": "method",
+          "signature": "ConfigureCatalogModule(this ModelBuilder modelBuilder)",
+          "returnType": "ModelBuilder"
+        }
+      ]
+    },
+    {
+      "name": "GranitCatalogDbProperties",
+      "fqn": "Granit.Catalog.EntityFrameworkCore.GranitCatalogDbProperties",
+      "kind": "class",
+      "project": "Granit.Catalog.EntityFrameworkCore",
+      "file": "src/Granit.Catalog.EntityFrameworkCore/GranitCatalogDbProperties.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "DbTablePrefix",
+          "kind": "property",
+          "signature": "string DbTablePrefix",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "GranitCatalogEntityFrameworkCoreModule",
+      "fqn": "Granit.Catalog.EntityFrameworkCore.GranitCatalogEntityFrameworkCoreModule",
+      "kind": "class",
+      "project": "Granit.Catalog.EntityFrameworkCore",
+      "file": "src/Granit.Catalog.EntityFrameworkCore/GranitCatalogEntityFrameworkCoreModule.cs",
+      "line": 12,
+      "members": []
+    },
+    {
+      "name": "ProductArchivedEvent",
+      "fqn": "Granit.Catalog.Events.ProductArchivedEvent",
+      "kind": "record",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Events/ProductArchivedEvent.cs",
+      "line": 7,
+      "members": []
+    },
+    {
+      "name": "ProductCreatedEvent",
+      "fqn": "Granit.Catalog.Events.ProductCreatedEvent",
+      "kind": "record",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Events/ProductCreatedEvent.cs",
+      "line": 7,
+      "members": []
+    },
+    {
+      "name": "ProductPublishedEvent",
+      "fqn": "Granit.Catalog.Events.ProductPublishedEvent",
+      "kind": "record",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Events/ProductPublishedEvent.cs",
+      "line": 7,
+      "members": []
+    },
+    {
+      "name": "ProductExportDefinition",
+      "fqn": "Granit.Catalog.Exports.ProductExportDefinition",
+      "kind": "class",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Exports/ProductExportDefinition.cs",
+      "line": 10,
+      "members": [
+        {
+          "name": "Name",
+          "kind": "property",
+          "signature": "string Name",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "CatalogHostApplicationBuilderExtensions",
+      "fqn": "Granit.Catalog.Extensions.CatalogHostApplicationBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Extensions/CatalogHostApplicationBuilderExtensions.cs",
+      "line": 17,
+      "members": [
+        {
+          "name": "AddGranitCatalog",
+          "kind": "method",
+          "signature": "AddGranitCatalog(this IHostApplicationBuilder builder)",
+          "returnType": "IHostApplicationBuilder"
+        }
+      ]
+    },
+    {
+      "name": "GranitCatalogModule",
+      "fqn": "Granit.Catalog.GranitCatalogModule",
+      "kind": "class",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/GranitCatalogModule.cs",
+      "line": 19,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "IProductReader",
+      "fqn": "Granit.Catalog.IProductReader",
+      "kind": "interface",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/IProductReader.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "GetByIdAsync",
+          "kind": "method",
+          "signature": "GetByIdAsync(Guid id, CancellationToken cancellationToken = default)",
+          "returnType": "Task<Product?>"
+        },
+        {
+          "name": "GetBySkuAsync",
+          "kind": "method",
+          "signature": "GetBySkuAsync(string sku, CancellationToken cancellationToken = default)",
+          "returnType": "Task<Product?>"
+        },
+        {
+          "name": "GetByStatusAsync",
+          "kind": "method",
+          "signature": "GetByStatusAsync(WorkflowLifecycleStatus status, CancellationToken cancellationToken = default)",
+          "returnType": "Task<IReadOnlyList<Product>>"
+        },
+        {
+          "name": "GetByExternalIdAsync",
+          "kind": "method",
+          "signature": "GetByExternalIdAsync(string providerName, string externalId, CancellationToken cancellationToken = default)",
+          "returnType": "Task<Product?>"
+        }
+      ]
+    },
+    {
+      "name": "IProductWriter",
+      "fqn": "Granit.Catalog.IProductWriter",
+      "kind": "interface",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/IProductWriter.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "AddAsync",
+          "kind": "method",
+          "signature": "AddAsync(Product product, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        },
+        {
+          "name": "UpdateAsync",
+          "kind": "method",
+          "signature": "UpdateAsync(Product product, CancellationToken cancellationToken = default)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "ProductQueryDefinition",
+      "fqn": "Granit.Catalog.Queries.ProductQueryDefinition",
+      "kind": "class",
+      "project": "Granit.Catalog",
+      "file": "src/Granit.Catalog/Queries/ProductQueryDefinition.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "Name",
+          "kind": "property",
+          "signature": "string Name",
           "returnType": "string"
         }
       ]
@@ -23865,7 +24306,7 @@
         {
           "name": "Create",
           "kind": "method",
-          "signature": "Create(Guid id, string name, string unit, AggregationType aggregationType, string? description = null)",
+          "signature": "Create(Guid id, string name, string unit, AggregationType aggregationType, string? description = null, Guid? productId = null)",
           "returnType": "MeterDefinition"
         },
         {
@@ -23875,10 +24316,16 @@
           "returnType": "string"
         },
         {
-          "name": "Description",
+          "name": "SetProduct",
+          "kind": "method",
+          "signature": "SetProduct(Guid? productId)",
+          "returnType": "string? Description { get; private set; } public AggregationType AggregationType { get; private set; } public bool Activated { get; private set; } public Guid? ProductId { get; private set; } public void"
+        },
+        {
+          "name": "TenantId",
           "kind": "property",
-          "signature": "string? Description",
-          "returnType": "string?"
+          "signature": "Guid? TenantId",
+          "returnType": "Guid?"
         },
         {
           "name": "Update",
@@ -23982,7 +24429,7 @@
       "kind": "record",
       "project": "Granit.Metering.Endpoints",
       "file": "src/Granit.Metering.Endpoints/Dtos/MeterDefinitionCreateRequest.cs",
-      "line": 10,
+      "line": 14,
       "members": []
     },
     {
@@ -23991,7 +24438,7 @@
       "kind": "record",
       "project": "Granit.Metering.Endpoints",
       "file": "src/Granit.Metering.Endpoints/Dtos/MeterDefinitionResponse.cs",
-      "line": 14,
+      "line": 17,
       "members": []
     },
     {
@@ -39421,7 +39868,7 @@
         {
           "name": "Create",
           "kind": "method",
-          "signature": "Create(Guid id, decimal amount, string currency, BillingInterval interval, DateTimeOffset effectiveFrom)",
+          "signature": "Create(Guid id, decimal amount, string currency, BillingInterval interval, DateTimeOffset effectiveFrom, Guid? productId = null)",
           "returnType": "PlanPrice"
         },
         {
@@ -39629,7 +40076,7 @@
       "kind": "record",
       "project": "Granit.Subscriptions.Endpoints",
       "file": "src/Granit.Subscriptions.Endpoints/Dtos/PriceVersioningDtos.cs",
-      "line": 13,
+      "line": 22,
       "members": []
     },
     {
@@ -39638,7 +40085,7 @@
       "kind": "record",
       "project": "Granit.Subscriptions.Endpoints",
       "file": "src/Granit.Subscriptions.Endpoints/Dtos/PriceVersioningDtos.cs",
-      "line": 19,
+      "line": 28,
       "members": []
     },
     {
@@ -39647,7 +40094,7 @@
       "kind": "record",
       "project": "Granit.Subscriptions.Endpoints",
       "file": "src/Granit.Subscriptions.Endpoints/Dtos/PriceVersioningDtos.cs",
-      "line": 4,
+      "line": 12,
       "members": []
     },
     {
@@ -39656,7 +40103,7 @@
       "kind": "record",
       "project": "Granit.Subscriptions.Endpoints",
       "file": "src/Granit.Subscriptions.Endpoints/Dtos/PriceVersioningDtos.cs",
-      "line": 10,
+      "line": 19,
       "members": []
     },
     {
