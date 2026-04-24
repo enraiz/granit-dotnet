@@ -40098,7 +40098,7 @@
         {
           "name": "Create",
           "kind": "method",
-          "signature": "Create(Guid id, decimal amount, string currency, BillingInterval interval, DateTimeOffset effectiveFrom, Guid? productId = null)",
+          "signature": "Create(Guid id, decimal amount, string currency, BillingInterval interval, DateTimeOffset effectiveFrom, Guid? productId = null, TieringMode? tieringMode = null)",
           "returnType": "PlanPrice"
         },
         {
@@ -40112,6 +40112,12 @@
           "kind": "property",
           "signature": "BillingInterval Interval",
           "returnType": "BillingInterval"
+        },
+        {
+          "name": "SetTiers",
+          "kind": "method",
+          "signature": "SetTiers(TieringMode mode, IEnumerable<PricingTier> tiers)",
+          "returnType": "void"
         }
       ]
     },
@@ -41094,6 +41100,12 @@
           "name": "ResolveUsageUnitPriceAsync",
           "kind": "method",
           "signature": "ResolveUsageUnitPriceAsync(PlanId planId, string currency, BillingInterval interval, string meterId, Guid? planPriceId = null, CancellationToken cancellationToken = default)",
+          "returnType": "Task<decimal>"
+        },
+        {
+          "name": "ResolveUsageAmountAsync",
+          "kind": "method",
+          "signature": "ResolveUsageAmountAsync(PlanId planId, string currency, BillingInterval interval, string meterId, decimal quantity, Guid? planPriceId = null, CancellationToken cancellationToken = default)",
           "returnType": "Task<decimal>"
         }
       ]
