@@ -11430,7 +11430,7 @@
       "kind": "record",
       "project": "Granit.CustomerBalance.Notifications",
       "file": "src/Granit.CustomerBalance.Notifications/CreditExpiredNotificationType.cs",
-      "line": 38,
+      "line": 40,
       "members": []
     },
     {
@@ -11439,7 +11439,7 @@
       "kind": "class",
       "project": "Granit.CustomerBalance.Notifications",
       "file": "src/Granit.CustomerBalance.Notifications/CreditExpiredNotificationType.cs",
-      "line": 14,
+      "line": 15,
       "members": [
         {
           "name": "new",
@@ -11514,7 +11514,7 @@
       "kind": "class",
       "project": "Granit.CustomerBalance.Notifications",
       "file": "src/Granit.CustomerBalance.Notifications/Handlers/CreditExpiredNotificationHandler.cs",
-      "line": 27,
+      "line": 15,
       "members": [
         {
           "name": "HandleAsync",
