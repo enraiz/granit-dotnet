@@ -3143,6 +3143,7 @@
         "dependencies": {
           "Granit.Notifications.Abstractions": "[0.1.0-dev, )",
           "Granit.Privacy": "[0.1.0-dev, )",
+          "Granit.Privacy.Regulations": "[0.1.0-dev, )",
           "Granit.Templating": "[0.1.0-dev, )"
         }
       },
