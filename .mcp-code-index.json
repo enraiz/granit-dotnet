@@ -120,6 +120,15 @@
       "framework": "net10.0"
     },
     {
+      "name": "Granit.Auditing.Notifications",
+      "deps": [
+        "Granit.Auditing",
+        "Granit.Notifications.Abstractions",
+        "Granit.Templating"
+      ],
+      "framework": "net10.0"
+    },
+    {
       "name": "Granit.Auditing.Privacy",
       "deps": [
         "Granit.Auditing",
@@ -4854,6 +4863,91 @@
       "file": "src/Granit.Auditing/Messages/AuditingBatch.cs",
       "line": 18,
       "members": []
+    },
+    {
+      "name": "AuditingAnomalyDetectedNotificationData",
+      "fqn": "Granit.Auditing.Notifications.AuditingAnomalyDetectedNotificationData",
+      "kind": "record",
+      "project": "Granit.Auditing.Notifications",
+      "file": "src/Granit.Auditing.Notifications/AuditingAnomalyDetectedNotificationType.cs",
+      "line": 55,
+      "members": []
+    },
+    {
+      "name": "AuditingAnomalyDetectedNotificationType",
+      "fqn": "Granit.Auditing.Notifications.AuditingAnomalyDetectedNotificationType",
+      "kind": "class",
+      "project": "Granit.Auditing.Notifications",
+      "file": "src/Granit.Auditing.Notifications/AuditingAnomalyDetectedNotificationType.cs",
+      "line": 20,
+      "members": [
+        {
+          "name": "new",
+          "kind": "method",
+          "signature": "new()",
+          "returnType": "AuditingAnomalyDetectedNotificationType Instance ="
+        },
+        {
+          "name": "Name",
+          "kind": "property",
+          "signature": "string Name",
+          "returnType": "string"
+        },
+        {
+          "name": "DefaultSeverity",
+          "kind": "property",
+          "signature": "NotificationSeverity DefaultSeverity",
+          "returnType": "NotificationSeverity"
+        }
+      ]
+    },
+    {
+      "name": "GranitAuditingNotificationsModule",
+      "fqn": "Granit.Auditing.Notifications.GranitAuditingNotificationsModule",
+      "kind": "class",
+      "project": "Granit.Auditing.Notifications",
+      "file": "src/Granit.Auditing.Notifications/GranitAuditingNotificationsModule.cs",
+      "line": 29,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "AnomalyDetectedHandler",
+      "fqn": "Granit.Auditing.Notifications.Handlers.AnomalyDetectedHandler",
+      "kind": "class",
+      "project": "Granit.Auditing.Notifications",
+      "file": "src/Granit.Auditing.Notifications/Handlers/AnomalyDetectedHandler.cs",
+      "line": 35,
+      "members": [
+        {
+          "name": "HandleAsync",
+          "kind": "method",
+          "signature": "HandleAsync(AuditEntryPersistedEto evt, INotificationPublisher publisher, IOptions<AuditNotificationOptions> options, CancellationToken cancellationToken)",
+          "returnType": "Task"
+        }
+      ]
+    },
+    {
+      "name": "AuditNotificationOptions",
+      "fqn": "Granit.Auditing.Notifications.Options.AuditNotificationOptions",
+      "kind": "class",
+      "project": "Granit.Auditing.Notifications",
+      "file": "src/Granit.Auditing.Notifications/Options/AuditNotificationOptions.cs",
+      "line": 20,
+      "members": [
+        {
+          "name": "AlertableCategories",
+          "kind": "property",
+          "signature": "IReadOnlyList<AuditCategory> AlertableCategories",
+          "returnType": "IReadOnlyList<AuditCategory>"
+        }
+      ]
     },
     {
       "name": "AuditingOptions",
