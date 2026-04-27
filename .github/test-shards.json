@@ -202,6 +202,7 @@
         "tests/Granit.Scheduling.BackgroundJobs.Tests",
         "tests/Granit.Scheduling.Endpoints.Tests",
         "tests/Granit.Scheduling.EntityFrameworkCore.Tests",
+        "tests/Granit.Scheduling.Notifications.Tests",
         "tests/Granit.Scheduling.Tests",
         "tests/Granit.Scheduling.Wolverine.Tests",
         "tests/Granit.Settings.Endpoints.Tests",
