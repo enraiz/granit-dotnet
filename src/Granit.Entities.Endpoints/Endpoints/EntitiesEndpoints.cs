@@ -216,6 +216,12 @@ internal static class EntitiesEndpoints
             }
         }
 
+        foreach (Granit.Entities.Relations.RelationDescriptor relation in descriptor.Relations
+            .Where(static r => r.RequiresPermission is not null))
+        {
+            referenced.Add(relation.RequiresPermission!);
+        }
+
         if (referenced.Count == 0)
         {
             return new HashSet<string>(StringComparer.Ordinal);
