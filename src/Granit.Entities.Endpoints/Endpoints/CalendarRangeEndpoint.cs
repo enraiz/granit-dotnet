@@ -31,6 +31,8 @@ internal static class CalendarRangeEndpoint
                 + "as the manifest endpoint (no calendar-specific permission, rationale: the calendar exposes an aggregate of data the user could already "
                 + "see via the list endpoint). FusionCache TTL is 1 minute by default; the cache key includes the resolved user permission hash plus the "
                 + "From/To window, and the response carries a strong ETag so callers can short-circuit unchanged windows with If-None-Match → 304. "
+                + "Per-entity eviction tags allow the EF Core companion package's CalendarRangeCacheInvalidator<T> to drop every cached window for the "
+                + "entity in one call when one of its rows is created, updated, or deleted (story #1691). "
                 + "Returns an empty list when the entity declares no calendar layout, no item matches, or the host has not yet wired a real "
                 + "ICalendarRangeService implementation.")
             .Produces<IReadOnlyList<CalendarItemResponse>>()
@@ -90,6 +92,7 @@ internal static class CalendarRangeEndpoint
 
         string cacheKey = EntityCacheKey.ForCalendarRange(
             name, request.Calendar, user, request.From, request.To);
+        string evictionTag = EntityCacheKey.EvictionTagForCalendarRange(name);
 
         IReadOnlyList<CalendarItemResponse> items = await cache.GetOrSetAsync(
             cacheKey,
@@ -97,6 +100,7 @@ internal static class CalendarRangeEndpoint
                 .GetItemsAsync(descriptor, layout, new CalendarRange(request.From, request.To), ct)
                 .ConfigureAwait(false),
             new FusionCacheEntryOptions { Duration = options.Value.CalendarRangeCacheTtl },
+            tags: [evictionTag],
             token: cancellationToken)
             .ConfigureAwait(false);
 

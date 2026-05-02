@@ -72,6 +72,20 @@ internal static class EntityCacheKey
     }
 
     /// <summary>
+    /// FusionCache eviction tag covering every cached calendar range for one
+    /// entity. The cache layer cannot determine which window a changed row
+    /// falls into without re-running the filter — burst-clearing every window
+    /// for the entity is the cheapest correct behaviour. Wired automatically by
+    /// the EF Core companion package's <c>CalendarRangeCacheInvalidator&lt;T&gt;</c>
+    /// when the entity emits framework lifecycle events (story #1691).
+    /// </summary>
+    public static string EvictionTagForCalendarRange(string entityName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(entityName);
+        return $"calendar:{entityName}";
+    }
+
+    /// <summary>
     /// SHA-256 over the sorted role + permission claim values. 16 hex chars is
     /// enough — collisions on this surface only mean a stale entry is served
     /// up to the next TTL boundary; security gating runs separately on every
