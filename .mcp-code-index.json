@@ -19041,12 +19041,30 @@
       "members": []
     },
     {
+      "name": "AppendVersionRequest",
+      "fqn": "Granit.Documents.Endpoints.Documents.Dtos.AppendVersionRequest",
+      "kind": "record",
+      "project": "Granit.Documents.Endpoints",
+      "file": "src/Granit.Documents.Endpoints/Documents/Dtos/AppendVersionRequest.cs",
+      "line": 10,
+      "members": []
+    },
+    {
       "name": "DocumentResponse",
       "fqn": "Granit.Documents.Endpoints.Documents.Dtos.DocumentResponse",
       "kind": "record",
       "project": "Granit.Documents.Endpoints",
       "file": "src/Granit.Documents.Endpoints/Documents/Dtos/DocumentResponse.cs",
       "line": 12,
+      "members": []
+    },
+    {
+      "name": "DocumentVersionResponse",
+      "fqn": "Granit.Documents.Endpoints.Documents.Dtos.DocumentVersionResponse",
+      "kind": "record",
+      "project": "Granit.Documents.Endpoints",
+      "file": "src/Granit.Documents.Endpoints/Documents/Dtos/DocumentVersionResponse.cs",
+      "line": 14,
       "members": []
     },
     {
@@ -19483,6 +19501,12 @@
           "kind": "method",
           "signature": "FinalizeUploadAsync(Guid blobId, Guid? folderId, Guid ownerUserId, string name, string? description = null, string? commitMessage = null, CancellationToken cancellationToken = default)",
           "returnType": "Task<Document>"
+        },
+        {
+          "name": "AppendVersionAsync",
+          "kind": "method",
+          "signature": "AppendVersionAsync(Guid documentId, Guid blobId, Guid uploadedByUserId, string? commitMessage = null, CancellationToken cancellationToken = default)",
+          "returnType": "Task<DocumentVersion?>"
         },
         {
           "name": "RequestDownloadUrlAsync",
