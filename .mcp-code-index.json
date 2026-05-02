@@ -953,6 +953,7 @@
       "name": "Granit.Entities.Endpoints",
       "deps": [
         "Granit.Authorization",
+        "Granit.Activities.Abstractions",
         "Granit.Caching",
         "Granit.Entities",
         "Granit.Http.ApiDocumentation",
@@ -20109,6 +20110,31 @@
       ]
     },
     {
+      "name": "ActivitiesDescriptor",
+      "fqn": "Granit.Entities.Activities.ActivitiesDescriptor",
+      "kind": "record",
+      "project": "Granit.Entities.Abstractions",
+      "file": "src/Granit.Entities.Abstractions/Activities/ActivitiesDescriptor.cs",
+      "line": 11,
+      "members": []
+    },
+    {
+      "name": "ActivitiesOptionsBuilder",
+      "fqn": "Granit.Entities.Activities.ActivitiesOptionsBuilder",
+      "kind": "class",
+      "project": "Granit.Entities.Abstractions",
+      "file": "src/Granit.Entities.Abstractions/Activities/ActivitiesOptionsBuilder.cs",
+      "line": 12,
+      "members": [
+        {
+          "name": "AllowedTypes",
+          "kind": "method",
+          "signature": "AllowedTypes(params string[] activityTypeNames)",
+          "returnType": "ActivitiesOptionsBuilder<TEntity>"
+        }
+      ]
+    },
+    {
       "name": "DetailBuilder",
       "fqn": "Granit.Entities.Details.DetailBuilder",
       "kind": "class",
@@ -20227,6 +20253,15 @@
       "project": "Granit.Entities.Endpoints",
       "file": "src/Granit.Entities.Endpoints/Dtos/EntityActionManifest.cs",
       "line": 21,
+      "members": []
+    },
+    {
+      "name": "EntityActivitiesManifest",
+      "fqn": "Granit.Entities.Endpoints.Dtos.EntityActivitiesManifest",
+      "kind": "record",
+      "project": "Granit.Entities.Endpoints",
+      "file": "src/Granit.Entities.Endpoints/Dtos/EntityActivitiesManifest.cs",
+      "line": 11,
       "members": []
     },
     {
@@ -20433,7 +20468,7 @@
       "kind": "record",
       "project": "Granit.Entities.Endpoints",
       "file": "src/Granit.Entities.Endpoints/Dtos/EntityManifestResponse.cs",
-      "line": 16,
+      "line": 17,
       "members": []
     },
     {
@@ -20618,7 +20653,7 @@
       "kind": "class",
       "project": "Granit.Entities.Abstractions",
       "file": "src/Granit.Entities.Abstractions/EntityDefinitionBuilder.cs",
-      "line": 16,
+      "line": 17,
       "members": [
         {
           "name": "DisplayKey",
@@ -20634,7 +20669,7 @@
       "kind": "record",
       "project": "Granit.Entities.Abstractions",
       "file": "src/Granit.Entities.Abstractions/EntityDefinitionDescriptor.cs",
-      "line": 24,
+      "line": 25,
       "members": [
         {
           "name": "Name",
