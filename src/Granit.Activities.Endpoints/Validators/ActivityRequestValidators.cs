@@ -22,8 +22,8 @@ public sealed class CreateActivityRequestValidator : AbstractValidator<CreateAct
 }
 
 // Empty validators — both request bodies carry no fields; the actor user id and
-// timestamp are resolved server-side. The architecture test requires every
-// *Request type to have a corresponding validator, so we ship no-op ones.
+// timestamp are resolved server-side (VULN-101). The architecture test requires
+// every *Request type to have a corresponding validator, so we ship no-op ones.
 public sealed class CompleteActivityRequestValidator : AbstractValidator<CompleteActivityRequest>;
 
 public sealed class CancelActivityRequestValidator : AbstractValidator<CancelActivityRequest>;
