@@ -13,7 +13,7 @@ public static class NpgsqlDbContextOptionsExtensions
     /// Configures the <see cref="DbContextOptionsBuilder"/> to use PostgreSQL via Npgsql
     /// with Granit's opinionated defaults:
     /// <list type="bullet">
-    ///   <item><see cref="NpgsqlDbContextOptionsBuilder.EnableRetryOnFailure(int, TimeSpan, IEnumerable{string}?)"/>
+    ///   <item><c>NpgsqlDbContextOptionsBuilder.EnableRetryOnFailure</c>
     ///         — max 3 retries, 30-second max delay.</item>
     ///   <item>Command timeout of 30 seconds.</item>
     /// </list>

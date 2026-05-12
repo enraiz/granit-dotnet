@@ -13,7 +13,7 @@ namespace Granit.AI.Ollama.Options;
 /// <para>
 /// Override <see cref="Endpoint"/> to point to a remote Ollama instance (e.g. on a
 /// dedicated GPU server). Override <see cref="DefaultModel"/> to change the fallback
-/// model when an <see cref="AIWorkspace"/> does not specify one.
+/// model when an <see cref="Granit.AI.Workspaces.AIWorkspace"/> does not specify one.
 /// </para>
 /// </remarks>
 public sealed class OllamaOptions
@@ -29,7 +29,7 @@ public sealed class OllamaOptions
     public string Endpoint { get; set; } = "http://localhost:11434";
 
     /// <summary>
-    /// The default model to use when an <see cref="AIWorkspace"/> does not specify a model.
+    /// The default model to use when an <see cref="Granit.AI.Workspaces.AIWorkspace"/> does not specify a model.
     /// Defaults to <c>llama3.1</c>.
     /// </summary>
     public string DefaultModel { get; set; } = "llama3.1";

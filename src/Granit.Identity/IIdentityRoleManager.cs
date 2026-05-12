@@ -7,27 +7,27 @@ namespace Granit.Identity;
 /// </summary>
 public interface IIdentityRoleManager
 {
-    /// <inheritdoc cref="IIdentityProvider.GetRolesAsync"/>
+    /// <summary>Lists every role defined in the identity provider.</summary>
     Task<IReadOnlyList<IdentityRole>> GetRolesAsync(
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.GetRoleMembersAsync"/>
+    /// <summary>Lists the users that hold the specified role.</summary>
     Task<IReadOnlyList<IIdentityUser>> GetRoleMembersAsync(
         string roleName,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.GetUserRolesAsync"/>
+    /// <summary>Lists the roles assigned to the specified user.</summary>
     Task<IReadOnlyList<IdentityRole>> GetUserRolesAsync(
         string userId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.AssignRoleAsync"/>
+    /// <summary>Assigns the specified role to the specified user.</summary>
     Task AssignRoleAsync(
         string userId,
         string roleName,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.RemoveRoleAsync"/>
+    /// <summary>Removes the specified role from the specified user.</summary>
     Task RemoveRoleAsync(
         string userId,
         string roleName,

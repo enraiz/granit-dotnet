@@ -13,7 +13,7 @@ namespace Granit.Privacy.Endpoints.Discovery;
 /// <para>
 /// Opt-in only — disabled by default. When disabled, no route is mapped and the
 /// path returns 404 naturally. When enabled, <see cref="LastUpdate"/> MUST be set
-/// (validated at startup via <see cref="GpcDiscoveryOptionsValidator"/>).
+/// (validated at startup via <see cref="Internal.GpcDiscoveryOptionsValidator"/>).
 /// </para>
 /// <para>
 /// <b>Host scoping.</b> The <c>.well-known</c> URI scheme (RFC 8615) is host-rooted:

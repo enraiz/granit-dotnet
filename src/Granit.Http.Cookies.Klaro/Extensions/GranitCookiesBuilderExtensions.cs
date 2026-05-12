@@ -7,7 +7,7 @@ public static class GranitCookiesBuilderExtensions
 {
     /// <summary>
     /// Configures the Klaro CMP as the consent resolver.
-    /// Registers <see cref="KlaroConsentResolver"/> as <see cref="IConsentResolver"/>
+    /// Registers <c>KlaroConsentResolver</c> as <see cref="IConsentResolver"/>
     /// and binds <see cref="Options.KlaroOptions"/> from the <c>Klaro</c> configuration section.
     /// </summary>
     /// <remarks>

@@ -347,7 +347,7 @@ public sealed class EntityDefinitionBuilder<TEntity> where TEntity : class
     /// </param>
     /// <remarks>
     /// Activity types named in <c>AllowedTypes(...)</c> that don't resolve in
-    /// <see cref="IActivityRegistry"/> at manifest time are silently dropped
+    /// <c>IActivityRegistry</c> at manifest time are silently dropped
     /// (per ADR-045 §3) — call sites can safely list types contributed by
     /// optional modules. The activity types registry itself is populated by
     /// the host via <c>AddGranitActivities()</c>; without it, the

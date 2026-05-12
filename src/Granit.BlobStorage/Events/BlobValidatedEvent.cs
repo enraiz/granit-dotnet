@@ -3,7 +3,7 @@ using Granit.Events;
 namespace Granit.BlobStorage.Events;
 
 /// <summary>
-/// Raised when a blob passes all validators and transitions to <see cref="BlobStatus.Valid"/>.
+/// Raised when a blob passes all validators and transitions to <see cref="Domain.BlobStatus.Valid"/>.
 /// </summary>
 public sealed record BlobValidatedEvent(
     Guid BlobId,

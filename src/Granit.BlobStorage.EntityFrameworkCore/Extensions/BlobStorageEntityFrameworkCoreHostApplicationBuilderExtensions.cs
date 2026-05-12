@@ -25,7 +25,7 @@ public static class BlobStorageEntityFrameworkCoreHostApplicationBuilderExtensio
     /// <c>TenantIsolationStrategy</c>.
     /// </para>
     /// <para>
-    /// <see cref="AuditedEntityInterceptor"/> is added automatically when
+    /// <see cref="Granit.Persistence.EntityFrameworkCore.Interceptors.AuditedEntityInterceptor"/> is added automatically when
     /// <c>Granit.Persistence</c> is configured, enabling the ISO 27001 3-year audit trail.
     /// </para>
     /// <para>

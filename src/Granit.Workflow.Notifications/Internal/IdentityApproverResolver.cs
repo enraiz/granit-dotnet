@@ -18,7 +18,7 @@ namespace Granit.Workflow.Notifications.Internal;
 ///     granted the required permission (from the authorization database).
 ///   </item>
 ///   <item>
-///     For each role, <see cref="IIdentityProvider.GetRoleMembersAsync"/> returns the members.
+///     For each role, <see cref="IIdentityRoleManager.GetRoleMembersAsync"/> returns the members.
 ///   </item>
 ///   <item>User IDs are aggregated and deduplicated.</item>
 /// </list>

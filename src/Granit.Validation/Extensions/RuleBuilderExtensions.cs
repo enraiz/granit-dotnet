@@ -9,8 +9,7 @@ namespace Granit.Validation.Extensions;
 public static class RuleBuilderExtensions
 {
     /// <summary>
-    /// Sets <see cref="IRuleBuilderOptions{T,TProperty}.WithErrorCode"/> and
-    /// <see cref="IRuleBuilderOptions{T,TProperty}.WithMessage"/> to the same value.
+    /// Sets <c>WithErrorCode</c> and <c>WithMessage</c> on the rule builder to the same value.
     /// </summary>
     /// <remarks>
     /// In Granit validators the error code is also the message key so that the Wolverine HTTP

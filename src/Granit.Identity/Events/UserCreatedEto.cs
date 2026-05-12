@@ -30,7 +30,7 @@ namespace Granit.Identity.Events;
 /// PII exposure in the database.
 /// </para>
 /// </remarks>
-/// <param name="UserId">Canonical <see cref="User.Id"/>.</param>
+/// <param name="UserId">Canonical <c>User.Id</c>.</param>
 /// <param name="DisplayName">Display label.</param>
 /// <param name="Email">Primary login email.</param>
 /// <param name="FirstName">Given name (optional).</param>

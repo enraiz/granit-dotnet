@@ -15,7 +15,7 @@ public interface IExportJobReader
 
     /// <summary>
     /// Lists export jobs with optional status filter and offset pagination.
-    /// Results are ordered by <see cref="ExportJob.CreatedAt"/> descending.
+    /// Results are ordered by <c>ExportJob.CreatedAt</c> descending.
     /// </summary>
     /// <param name="status">Optional status filter.</param>
     /// <param name="page">One-based page number.</param>

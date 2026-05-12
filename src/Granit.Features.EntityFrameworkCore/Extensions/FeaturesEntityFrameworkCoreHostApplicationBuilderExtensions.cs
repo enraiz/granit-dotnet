@@ -23,7 +23,7 @@ public static class FeaturesEntityFrameworkCoreHostApplicationBuilderExtensions
     /// <c>AddGranitFeatures()</c> with <see cref="EfCoreFeatureStore"/>,
     /// backed by <see cref="FeaturesDbContext"/> (table <c>feature_overrides</c>).
     /// <para>
-    /// <see cref="AuditedEntityInterceptor"/> is added automatically when
+    /// <see cref="Granit.Persistence.EntityFrameworkCore.Interceptors.AuditedEntityInterceptor"/> is added automatically when
     /// <c>Granit.Persistence</c> is configured, enabling the ISO 27001 3-year audit trail
     /// (<c>created_at</c>, <c>created_by</c>, <c>modified_at</c>, <c>modified_by</c>).
     /// </para>

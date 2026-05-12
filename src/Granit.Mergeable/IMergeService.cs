@@ -29,7 +29,7 @@ public interface IMergeService<TAggregate>
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Executes a merge atomically. Throws <see cref="MergeException"/> when a hard invariant
+    /// Executes a merge atomically. Throws <see cref="Granit.Mergeable.Exceptions.MergeException"/> when a hard invariant
     /// is violated. Idempotency-key replays return the cached result.
     /// </summary>
     Task<MergeResult<TAggregate>> MergeAsync(

@@ -41,7 +41,7 @@ public abstract class DependencyInjectionCodeFixProviderBase : CodeFixProvider
 
     /// <summary>
     /// Builds the replacement expression from the tracked node.
-    /// The base class applies <see cref="CSharpSyntaxNodeExtensions.WithTriviaFrom{T}"/> automatically.
+    /// The base class applies <see cref="Microsoft.CodeAnalysis.SyntaxNodeExtensions.WithTriviaFrom{T}"/> automatically.
     /// </summary>
     protected abstract SyntaxNode BuildReplacement(SyntaxNode trackedNode);
 

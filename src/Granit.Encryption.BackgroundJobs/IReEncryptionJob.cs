@@ -2,7 +2,7 @@ namespace Granit.Encryption.BackgroundJobs;
 
 /// <summary>
 /// Iterates entities that have
-/// <see cref="Granit.Encryption.EntityFrameworkCore.EncryptedAttribute"/> properties
+/// <c>Granit.Encryption.EntityFrameworkCore.EncryptedAttribute</c> properties
 /// and forces re-encryption to the current key version.
 /// </summary>
 /// <remarks>
@@ -12,7 +12,7 @@ namespace Granit.Encryption.BackgroundJobs;
 public interface IReEncryptionJob
 {
     /// <summary>
-    /// Re-encrypts all <see cref="Granit.Encryption.EntityFrameworkCore.EncryptedAttribute"/>
+    /// Re-encrypts all <c>Granit.Encryption.EntityFrameworkCore.EncryptedAttribute</c>
     /// properties of <typeparamref name="TEntity"/> in configurable batches.
     /// </summary>
     /// <typeparam name="TEntity">Entity type registered in the DbContext.</typeparam>

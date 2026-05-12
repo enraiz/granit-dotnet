@@ -74,7 +74,7 @@ public sealed class KeycloakAdminOptions
     /// <summary>
     /// Public Keycloak client ID with <c>Direct Access Grants</c> enabled,
     /// used to verify user credentials via the Resource Owner Password Grant.
-    /// Required for <see cref="IIdentityProvider.VerifyUserCredentialsAsync"/>.
+    /// Required for <see cref="IIdentityCredentialVerifier.VerifyUserCredentialsAsync"/>.
     /// </summary>
     /// <remarks>
     /// This is typically a public client (e.g. <c>my-frontend</c>) — not the confidential

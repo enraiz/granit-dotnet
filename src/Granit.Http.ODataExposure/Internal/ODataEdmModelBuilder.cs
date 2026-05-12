@@ -26,7 +26,7 @@ internal static class ODataEdmModelBuilder
     /// scalar-property whitelist resolved from each entity's
     /// <c>ExportDefinition</c>. Properties absent from the whitelist (including
     /// framework-internal collections such as <c>DomainEvents</c> /
-    /// <c>IntegrationEvents</c>) are <see cref="EntityTypeConfiguration.Ignore(PropertyInfo)"/>-ed
+    /// <c>IntegrationEvents</c>) are <c>EntityTypeConfiguration.Ignore(PropertyInfo)</c>-ed
     /// before the convention pass runs. Navigation properties listed in the
     /// descriptor's <see cref="ODataEntitySetDescriptor.ExpandWhitelist"/>
     /// remain available to the consumer; un-whitelisted navigation properties

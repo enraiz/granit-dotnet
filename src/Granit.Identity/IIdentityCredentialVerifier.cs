@@ -6,7 +6,7 @@ namespace Granit.Identity;
 /// </summary>
 public interface IIdentityCredentialVerifier
 {
-    /// <inheritdoc cref="IIdentityProvider.VerifyUserCredentialsAsync"/>
+    /// <summary>Verifies the given username/password pair against the identity provider.</summary>
     Task<bool> VerifyUserCredentialsAsync(
         string username,
         string password,

@@ -38,7 +38,7 @@ public interface IMergeable<TSelf> : IHasMergeTombstone
     IReadOnlyList<FieldConflict> GetConflicts(TSelf loser);
 
     /// <summary>
-    /// Folds <paramref name="loser"/> into this aggregate. Throws <see cref="MergeException"/>
+    /// Folds <paramref name="loser"/> into this aggregate. Throws <see cref="Granit.Mergeable.Exceptions.MergeException"/>
     /// when a hard invariant is violated (e.g. tenant mismatch, archived aggregate, currency
     /// mismatch). Caller is responsible for setting the loser's tombstone after this call.
     /// </summary>

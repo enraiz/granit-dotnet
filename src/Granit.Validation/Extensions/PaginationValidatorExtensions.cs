@@ -8,7 +8,7 @@ namespace Granit.Validation.Extensions;
 /// <remarks>
 /// These extensions use built-in FluentValidation validators (<c>GreaterThanOrEqualTo</c>,
 /// <c>InclusiveBetween</c>) whose error codes are already localized by
-/// <see cref="GranitErrorCodeLanguageManager"/>. No additional localization keys are required.
+/// <see cref="Internal.GranitErrorCodeLanguageManager"/>. No additional localization keys are required.
 /// </remarks>
 public static class PaginationValidatorExtensions
 {

@@ -4,7 +4,7 @@ namespace Granit.DataExchange.Export;
 
 /// <summary>
 /// Orchestrates data export: resolves the definition, queries data via
-/// <see cref="IExportDataSource{TEntity,TFilter}"/>, projects fields,
+/// <see cref="IExportDataSource{TEntity}"/>, projects fields,
 /// and writes the output file via <see cref="IExportWriter"/>.
 /// </summary>
 /// <remarks>
@@ -14,7 +14,7 @@ namespace Granit.DataExchange.Export;
 /// </para>
 /// <para>
 /// For large datasets (above the threshold), the export is dispatched to a background
-/// job via <see cref="IExportCommandDispatcher"/> and the caller polls for completion.
+/// job via an <c>ICommandSender</c> dispatch and the caller polls for completion.
 /// </para>
 /// </remarks>
 public interface IExportOrchestrator

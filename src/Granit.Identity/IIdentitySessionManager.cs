@@ -7,23 +7,23 @@ namespace Granit.Identity;
 /// </summary>
 public interface IIdentitySessionManager
 {
-    /// <inheritdoc cref="IIdentityProvider.GetUserSessionsAsync"/>
+    /// <summary>Lists active sessions for the specified user.</summary>
     Task<IReadOnlyList<IdentitySession>> GetUserSessionsAsync(
         string userId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.GetUserDeviceActivityAsync"/>
+    /// <summary>Returns the device-activity history for the specified user.</summary>
     Task<IReadOnlyList<IdentityDeviceActivity>> GetUserDeviceActivityAsync(
         string userId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.TerminateSessionAsync"/>
+    /// <summary>Terminates the specified session for the user.</summary>
     Task TerminateSessionAsync(
         string userId,
         string sessionId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.TerminateAllSessionsAsync"/>
+    /// <summary>Terminates every active session for the specified user.</summary>
     Task TerminateAllSessionsAsync(
         string userId,
         CancellationToken cancellationToken = default);

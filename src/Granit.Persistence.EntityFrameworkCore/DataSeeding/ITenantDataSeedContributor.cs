@@ -12,7 +12,7 @@ namespace Granit.Persistence.EntityFrameworkCore.DataSeeding;
 /// </para>
 /// <para>
 /// Because the tenant context is already active, implementations should <b>not</b> call
-/// <c>ICurrentTenant.Change()</c> or create their own <see cref="IServiceScope"/>.
+/// <c>ICurrentTenant.Change()</c> or create their own <c>IServiceScope</c>.
 /// Use <see cref="Microsoft.EntityFrameworkCore.IDbContextFactory{TContext}"/> to create
 /// a fresh <c>DbContext</c> connected to the correct tenant schema.
 /// </para>

@@ -8,7 +8,7 @@ namespace Granit.Bff.EntityFrameworkCore;
 
 /// <summary>
 /// Granit module for EF Core-backed BFF session persistence.
-/// Replaces the default <see cref="IDistributedCache"/>-backed <c>IBffTokenStore</c>
+/// Replaces the default <c>IDistributedCache</c>-backed <c>IBffTokenStore</c>
 /// for deployments without Redis.
 /// </summary>
 /// <remarks>

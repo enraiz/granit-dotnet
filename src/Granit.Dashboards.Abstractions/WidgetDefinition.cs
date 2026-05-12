@@ -45,7 +45,7 @@ namespace Granit.Dashboards;
 /// presentation-only kinds are registered here via <see cref="JsonDerivedTypeAttribute"/>;
 /// data-bound kinds defined in downstream packages (<c>Granit.Analytics</c>,
 /// <c>Granit.IoT.Dashboards</c>, ...) extend the chain at runtime through
-/// <see cref="WidgetDefinitionPolymorphism.AddDerivedType{TWidget}"/>. Avoids leaking
+/// <see cref="Json.WidgetDefinitionPolymorphism.AddDerivedType{TWidget}(System.Text.Json.JsonSerializerOptions, string)"/>. Avoids leaking
 /// CLR type names into the wire format.
 /// </remarks>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]

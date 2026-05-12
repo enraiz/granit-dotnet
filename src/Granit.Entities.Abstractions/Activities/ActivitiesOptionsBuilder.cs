@@ -17,7 +17,7 @@ public sealed class ActivitiesOptionsBuilder<TEntity>
 
     /// <summary>
     /// Restricts the activity type catalog this entity offers to the listed
-    /// names. Names that don't resolve in <see cref="IActivityRegistry"/> at
+    /// names. Names that don't resolve in <c>IActivityRegistry</c> at
     /// manifest time are silently dropped (per ADR-045 §3) — call sites can
     /// safely list types contributed by optional modules.
     /// </summary>

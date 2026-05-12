@@ -19,7 +19,7 @@ public static class PrivacyAIHostApplicationBuilderExtensions
     /// from the <c>AI:Privacy</c> configuration section.
     /// </summary>
     /// <remarks>
-    /// Registers <see cref="IAIPiiDetector"/> backed by an LLM via <see cref="AI.IAIChatClientFactory"/>.
+    /// Registers <see cref="IAIPiiDetector"/> backed by an LLM via <see cref="Granit.AI.IAIChatClientFactory"/>.
     /// Ensure the configured workspace points to a local model (Ollama) or a provider with
     /// a Data Processing Agreement to keep PII within the security perimeter.
     /// </remarks>

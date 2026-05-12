@@ -2,7 +2,7 @@ namespace Granit.Privacy.Regulations;
 
 /// <summary>
 /// Immutable policy object describing all jurisdiction-specific rules for a single privacy regulation.
-/// Built at startup by <see cref="IRegulationProfileProvider"/> implementations,
+/// Built at startup by <see cref="Profiles.IRegulationProfileProvider"/> implementations,
 /// resolved at runtime by <see cref="IPrivacyRegulationResolver"/>.
 /// </summary>
 public sealed record PrivacyRegulationProfile

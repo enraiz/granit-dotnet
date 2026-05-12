@@ -11,9 +11,9 @@ namespace Granit.Persistence.EntityFrameworkCore.MultiTenancy;
 /// Granit ships three built-in implementations:
 /// </para>
 /// <list type="bullet">
-///   <item><see cref="PostgresqlTenantSchemaActivator"/> (default) — <c>SET search_path TO "schema", public</c></item>
-///   <item><see cref="MySqlTenantSchemaActivator"/> — <c>USE `schema`</c> (MySQL / MariaDB)</item>
-///   <item><see cref="OracleTenantSchemaActivator"/> — <c>ALTER SESSION SET CURRENT_SCHEMA = "schema"</c></item>
+///   <item><c>PostgresqlTenantSchemaActivator</c> (default) — <c>SET search_path TO "schema", public</c></item>
+///   <item><c>MySqlTenantSchemaActivator</c> — <c>USE `schema`</c> (MySQL / MariaDB)</item>
+///   <item><c>OracleTenantSchemaActivator</c> — <c>ALTER SESSION SET CURRENT_SCHEMA = "schema"</c></item>
 /// </list>
 /// <para>
 /// <strong>Unsupported providers</strong> — The following do not support session-level schema
@@ -26,7 +26,7 @@ namespace Granit.Persistence.EntityFrameworkCore.MultiTenancy;
 ///         partition key (<c>TenantId</c>), not schemas.</item>
 /// </list>
 /// <para>
-/// The default is <see cref="PostgresqlTenantSchemaActivator"/>, registered via
+/// The default is <c>PostgresqlTenantSchemaActivator</c>, registered via
 /// <see cref="Extensions.PersistenceTenantExtensions"/> with <c>TryAddSingleton</c>.
 /// To use a different provider, register your <see cref="ITenantSchemaActivator"/>
 /// before calling <c>AddTenantPerSchemaDbContext</c>.

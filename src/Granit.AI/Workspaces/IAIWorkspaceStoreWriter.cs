@@ -5,7 +5,7 @@ namespace Granit.AI.Workspaces;
 /// </summary>
 /// <remarks>
 /// Implemented by <c>Granit.AI.EntityFrameworkCore</c>.
-/// Default: <see cref="NullAIWorkspaceStoreWriter"/> (no-op).
+/// Default: <see cref="Internal.NullAIWorkspaceStoreWriter"/> (no-op).
 /// </remarks>
 public interface IAIWorkspaceStoreWriter
 {

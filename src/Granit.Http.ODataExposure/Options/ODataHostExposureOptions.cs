@@ -78,7 +78,7 @@ public sealed class ODataHostExposureOptions
 /// <summary>
 /// Fluent builder for a host-feed EntitySet. Mirrors most of
 /// <see cref="ODataEntitySetBuilder{TEntity}"/>'s surface, with two
-/// host-specific changes: <see cref="AllowAnonymousAccess"/> is intentionally
+/// host-specific changes: <c>AllowAnonymousAccess</c> is intentionally
 /// absent (host-feed access is always gated), and
 /// <see cref="AcknowledgeCrossTenantExposure"/> is mandatory for
 /// <c>IMultiTenant</c> entities.

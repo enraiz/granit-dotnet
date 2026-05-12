@@ -5,7 +5,7 @@ namespace Granit.DataExchange.Export;
 /// </summary>
 /// <remarks>
 /// Registered as a singleton alongside the generic definition by
-/// <see cref="ServiceCollectionExtensions.AddExportDefinition{TEntity,TDefinition}"/>.
+/// <c>ServiceCollectionExtensions.AddExportDefinition{TEntity,TDefinition}</c>.
 /// Endpoints and other services can enumerate <c>IEnumerable&lt;IExportDefinitionDescriptor&gt;</c>
 /// to find a definition by name without compile-time knowledge of the entity type.
 /// </remarks>

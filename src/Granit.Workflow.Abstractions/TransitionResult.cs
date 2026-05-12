@@ -1,7 +1,7 @@
 namespace Granit.Workflow;
 
 /// <summary>
-/// Result of a workflow transition attempt via <see cref="IWorkflowManager{TState}"/>.
+/// Result of a workflow transition attempt via <c>IWorkflowManager{TState}</c>.
 /// </summary>
 /// <typeparam name="TState">Enum type representing the workflow states.</typeparam>
 public sealed record TransitionResult<TState> where TState : struct, Enum

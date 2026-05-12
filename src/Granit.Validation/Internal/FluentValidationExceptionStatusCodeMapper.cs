@@ -8,7 +8,7 @@ namespace Granit.Validation.Internal;
 /// Maps <see cref="FluentValidation.ValidationException"/> to HTTP 422 Unprocessable Entity.
 /// </summary>
 /// <remarks>
-/// Registered in the <see cref="GranitExceptionHandling.IExceptionStatusCodeMapper"/> chain by
+/// Registered in the <see cref="Granit.Http.ExceptionHandling.IExceptionStatusCodeMapper"/> chain by
 /// <see cref="GranitValidationModule"/>. It must be registered <b>before</b> the
 /// <c>DefaultExceptionStatusCodeMapper</c> fallback so that it wins on
 /// <see cref="FluentValidation.ValidationException"/>.

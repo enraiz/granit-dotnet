@@ -68,7 +68,7 @@ public sealed class SqliteDbContextFactory<TContext> : IDisposable
     /// (audit, versioning, concurrency stamp, soft-delete) wired to the fakes.
     /// </summary>
     /// <param name="ensureCreated">
-    /// When <c>true</c> (default), calls <see cref="DatabaseFacade.EnsureCreated"/>
+    /// When <c>true</c> (default), calls <c>DatabaseFacade.EnsureCreated</c>
     /// to create the schema. Set to <c>false</c> if the schema is already created
     /// or you want to apply migrations manually.
     /// </param>

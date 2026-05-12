@@ -19,7 +19,7 @@ namespace Granit.Mergeable.EntityFrameworkCore.Internal;
 /// </list>
 /// </para>
 /// <para>
-/// The lock granularity is per-tenant (one global lock per host when <paramref name="tenantId"/>
+/// The lock granularity is per-tenant (one global lock per host when the tenant id
 /// is null). Aggregate types share the lock at the tenant level — merging two parties and two
 /// invoices simultaneously on the same tenant is unusual and the conservative serialisation
 /// is acceptable; can be split per-aggregate-type later if contention proves measurable.

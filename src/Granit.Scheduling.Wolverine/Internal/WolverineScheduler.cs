@@ -12,7 +12,7 @@ namespace Granit.Scheduling.Wolverine.Internal;
 /// <summary>
 /// Wolverine-backed implementation of <see cref="IScheduler"/>.
 /// Persists a <see cref="ScheduledAction"/> and schedules the payload
-/// for future delivery via <see cref="IMessageBus.ScheduleAsync{T}"/>.
+/// for future delivery via <c>IMessageBus.ScheduleAsync</c>.
 /// </summary>
 internal sealed class WolverineScheduler(
     IMessageBus messageBus,

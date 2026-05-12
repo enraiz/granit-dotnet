@@ -18,7 +18,7 @@ namespace Granit.MultiTenancy.Provisioning;
 /// </para>
 /// <para>
 /// The handler is auto-discovered by Wolverine's assembly scanning — no manual
-/// registration in <see cref="ConfigureServices"/> is needed.
+/// registration in <c>ConfigureServices</c> is needed.
 /// </para>
 /// </remarks>
 [DependsOn(

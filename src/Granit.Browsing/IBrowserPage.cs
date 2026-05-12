@@ -32,7 +32,7 @@ public interface IBrowserPage : IAsyncDisposable
     /// <remarks>
     /// Providers validate the URL through <c>Granit.Http.Security.IUrlSafetyValidator</c>
     /// before issuing the engine request. A blocked URL surfaces as
-    /// <see cref="Sandbox.SandboxViolationException"/>.
+    /// <see cref="Exceptions.SandboxViolationException"/>.
     /// </remarks>
     Task NavigateAsync(Uri url, NavigationOptions? options = null, CancellationToken cancellationToken = default);
 

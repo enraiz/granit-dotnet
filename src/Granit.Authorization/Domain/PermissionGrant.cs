@@ -40,7 +40,7 @@ public sealed class PermissionGrant : AuditedAggregateRoot, IMultiTenant
 
     /// <summary>
     /// Provider-specific grantee key: role name for <c>"R"</c>, the
-    /// canonical <see cref="Granit.Identity.Domain.User.Id"/> stringified
+    /// canonical <c>Granit.Identity.Domain.User.Id</c> stringified
     /// for <c>"U"</c> (per ADR-051 B-step 4), or OIDC <c>client_id</c> for
     /// <c>"C"</c>. Max 256 characters.
     /// </summary>

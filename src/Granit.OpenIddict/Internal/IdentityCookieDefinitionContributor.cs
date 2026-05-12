@@ -12,7 +12,7 @@ namespace Granit.OpenIddict.Internal;
 /// application-level overrides via <c>ConfigureApplicationCookie()</c>.
 /// </summary>
 /// <remarks>
-/// Default cookie names are overridden by <see cref="GranitOpenIddictEntityFrameworkCoreModule"/>
+/// Default cookie names are overridden by <c>GranitOpenIddictEntityFrameworkCoreModule</c>
 /// to avoid leaking the underlying technology stack via cookie names.
 /// </remarks>
 internal sealed class IdentityCookieDefinitionContributor(

@@ -2,12 +2,12 @@ namespace Granit.Identity.Federated.EntraId;
 
 /// <summary>
 /// Optional hook to notify a user after a temporary password has been set
-/// via <see cref="IIdentityProvider.SendPasswordResetEmailAsync"/>.
+/// via <see cref="IIdentityPasswordManager.SendPasswordResetEmailAsync"/>.
 /// </summary>
 /// <remarks>
 /// <para>
 /// Microsoft Entra ID does not natively support sending password reset emails via the Graph API.
-/// When <see cref="IIdentityProvider.SendPasswordResetEmailAsync"/> is called, the Entra ID provider
+/// When <see cref="IIdentityPasswordManager.SendPasswordResetEmailAsync"/> is called, the Entra ID provider
 /// generates a temporary password, sets it with <c>forceChangePasswordNextSignIn = true</c>,
 /// then invokes this notifier to deliver the temporary password to the user.
 /// </para>

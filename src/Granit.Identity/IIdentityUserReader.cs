@@ -5,14 +5,14 @@ namespace Granit.Identity;
 /// </summary>
 public interface IIdentityUserReader
 {
-    /// <inheritdoc cref="IIdentityProvider.GetUsersAsync"/>
+    /// <summary>Lists users from the identity provider, optionally filtered by a search term.</summary>
     Task<IReadOnlyList<IIdentityUser>> GetUsersAsync(
         string? search = null,
         int? first = null,
         int? max = null,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.GetUserAsync"/>
+    /// <summary>Returns a single user by ID, or <c>null</c> if not found.</summary>
     Task<IIdentityUser?> GetUserAsync(
         string userId,
         CancellationToken cancellationToken = default);

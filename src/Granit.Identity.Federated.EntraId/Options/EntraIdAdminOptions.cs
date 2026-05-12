@@ -54,7 +54,7 @@ public sealed class EntraIdAdminOptions
     /// <summary>
     /// Default domain for constructing <c>userPrincipalName</c> when creating users.
     /// Example: <c>contoso.onmicrosoft.com</c>.
-    /// Required for <see cref="IIdentityProvider.CreateUserAsync"/>.
+    /// Required for <see cref="IIdentityUserWriter.CreateUserAsync"/>.
     /// </summary>
     public string? DefaultDomain { get; set; }
 
@@ -70,7 +70,7 @@ public sealed class EntraIdAdminOptions
     /// <summary>
     /// Public client ID with <c>Allow public client flows</c> enabled,
     /// used to verify user credentials via the Resource Owner Password Credentials (ROPC) flow.
-    /// Required for <see cref="IIdentityProvider.VerifyUserCredentialsAsync"/>.
+    /// Required for <see cref="IIdentityCredentialVerifier.VerifyUserCredentialsAsync"/>.
     /// </summary>
     public string? RopcClientId { get; set; }
 

@@ -44,7 +44,7 @@ public interface IBrowserSandboxProfile
     /// Schemes the page is permitted to navigate to or fetch from. Default
     /// <c>["https"]</c> in <c>DefaultSandboxProfile</c>. A request whose scheme is not in
     /// the list is short-circuited with
-    /// <see cref="Sandbox.SandboxViolationKind.SchemeNotAllowed"/>.
+    /// <see cref="Exceptions.SandboxViolationKind.SchemeNotAllowed"/>.
     /// </summary>
     IReadOnlyList<string> AllowedSchemes { get; }
 

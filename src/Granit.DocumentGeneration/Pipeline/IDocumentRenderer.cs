@@ -7,7 +7,7 @@ namespace Granit.DocumentGeneration.Pipeline;
 /// </summary>
 /// <remarks>
 /// Implement this interface to add support for a new output format.
-/// Register the implementation via <see cref="ServiceCollectionExtensions.AddDocumentRenderer{TRenderer}"/>.
+/// Register the implementation via <see cref="Extensions.ServiceCollectionExtensions.AddDocumentRenderer{TRenderer}"/>.
 /// <para>
 /// Built-in implementations are provided in separate packages:
 /// <list type="bullet">

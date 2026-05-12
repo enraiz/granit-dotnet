@@ -5,7 +5,7 @@ namespace Granit.AI.VectorData;
 /// </summary>
 /// <remarks>
 /// Uses <see cref="IVectorCollectionFactory"/> for vector storage and
-/// <see cref="Granit.AI.IEmbeddingGeneratorFactory"/> for generating embeddings from text.
+/// <c>Granit.AI.IEmbeddingGeneratorFactory</c> for generating embeddings from text.
 /// </remarks>
 public interface ISemanticSearchService
 {

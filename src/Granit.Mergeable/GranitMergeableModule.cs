@@ -3,7 +3,7 @@ using Granit.Modularity;
 namespace Granit.Mergeable;
 
 /// <summary>
-/// Granit module exposing the generic merge primitive: <see cref="IMergeable{TSelf}"/>,
+/// Granit module exposing the generic merge primitive: <see cref="Granit.Mergeable.Domain.IMergeable{TSelf}"/>,
 /// <see cref="IReferenceRewriter{TAggregate}"/> registry, <see cref="IMergeService{TAggregate}"/>
 /// orchestrator contract, plus tombstone state (<c>Granit.Mergeable.Domain.IHasMergeTombstone</c>).
 /// </summary>

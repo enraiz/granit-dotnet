@@ -15,7 +15,7 @@ public interface IWorkflowDefinition<TState> where TState : struct, Enum
 
     /// <summary>
     /// Returns the transitions available from the given <paramref name="from"/> state.
-    /// Does not check user permissions — use <see cref="IWorkflowManager{TState}"/>
+    /// Does not check user permissions — use <c>IWorkflowManager{TState}</c>
     /// for permission-aware transition queries.
     /// </summary>
     IReadOnlyList<WorkflowTransition<TState>> GetAllowedTransitions(TState from);

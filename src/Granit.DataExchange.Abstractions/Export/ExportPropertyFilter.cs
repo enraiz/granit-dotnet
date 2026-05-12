@@ -10,7 +10,7 @@ namespace Granit.DataExchange.Export;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Used by <see cref="ReflectionExportDefinition"/> to provide automatic export
+/// Used by <c>ReflectionExportDefinition</c> to provide automatic export
 /// coverage for entities that lack an explicit <see cref="ExportDefinition{TEntity}"/>.
 /// </para>
 /// <para>

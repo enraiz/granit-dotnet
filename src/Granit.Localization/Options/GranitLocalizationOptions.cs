@@ -50,7 +50,7 @@ public sealed class GranitLocalizationOptions
     /// <summary>
     /// Enables auto-discovery of JSON resources by naming convention.
     /// When enabled, loaded assemblies are scanned to detect types marked with
-    /// <see cref="Attributes.LocalizationResourceNameAttribute"/> and their
+    /// <see cref="LocalizationResourceNameAttribute"/> and their
     /// embedded JSON files, without an explicit <c>AddJson()</c> registration.
     /// </summary>
     public bool EnableAutoDiscovery { get; set; }

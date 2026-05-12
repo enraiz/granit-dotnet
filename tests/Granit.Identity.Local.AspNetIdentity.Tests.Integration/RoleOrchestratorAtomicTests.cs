@@ -12,7 +12,7 @@ using Xunit;
 namespace Granit.Identity.Local.AspNetIdentity.Tests.Integration;
 
 /// <summary>
-/// End-to-end tests for <see cref="GranitRoleOrchestrator"/>'s <b>atomic</b> execution
+/// End-to-end tests for <c>GranitRoleOrchestrator</c>'s <b>atomic</b> execution
 /// path — the shared-connection EF Core transaction that commits Identity + metadata
 /// in a single Postgres transaction. Complements <see cref="RoleOrchestratorTests"/>
 /// which exercises the compensating-write fallback.

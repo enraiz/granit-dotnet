@@ -21,7 +21,7 @@ namespace Granit.Persistence.EntityFrameworkCore.MultiTenancy;
 /// GDPR/ISO 27001 inter-tenant isolation requirements.
 /// </para>
 /// <para>
-/// <see cref="AuditedEntityInterceptor"/> is wired automatically when available in DI,
+/// <see cref="Interceptors.AuditedEntityInterceptor"/> is wired automatically when available in DI,
 /// satisfying the 3-year ISO 27001 audit trail requirement.
 /// </para>
 /// <para>

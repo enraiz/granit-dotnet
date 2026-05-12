@@ -12,7 +12,7 @@ namespace Granit.Domain;
 /// </para>
 /// <para>
 /// When a concurrent update is detected (stamp mismatch in the <c>WHERE</c> clause),
-/// EF Core throws <see cref="Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException"/>,
+/// EF Core throws <c>Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException</c>,
 /// which is mapped to HTTP 409 Conflict by <c>EfCoreExceptionStatusCodeMapper</c>.
 /// </para>
 /// <para>

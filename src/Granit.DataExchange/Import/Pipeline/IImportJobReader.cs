@@ -18,7 +18,7 @@ public interface IImportJobReader
 
     /// <summary>
     /// Lists import jobs with optional status filter and offset pagination.
-    /// Results are ordered by <see cref="ImportJob.CreatedAt"/> descending.
+    /// Results are ordered by <c>ImportJob.CreatedAt</c> descending.
     /// </summary>
     /// <param name="status">Optional status filter.</param>
     /// <param name="page">One-based page number.</param>

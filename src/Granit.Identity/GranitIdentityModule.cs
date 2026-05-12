@@ -13,7 +13,7 @@ namespace Granit.Identity;
 
 /// <summary>
 /// Granit module for identity provider abstractions.
-/// Registers a <see cref="NullIdentityProvider"/> by default plus the
+/// Registers a <see cref="Internal.NullIdentityProvider"/> by default plus the
 /// canonical <see cref="User"/> aggregate's QueryDefinition,
 /// ExportDefinition, and EntityDefinition (per ADR-051).
 /// Install a provider package (e.g. <c>Granit.Identity.Federated.Keycloak</c>)

@@ -8,7 +8,7 @@ namespace Granit.Notifications.Domain;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Rows are finalized through <see cref="INotificationDeliveryWriter.CompleteDeliveryAttemptAsync"/>:
+/// Rows are finalized through <see cref="Abstractions.INotificationDeliveryWriter.CompleteDeliveryAttemptAsync(Guid, bool, long, string?, CancellationToken)"/>:
 /// <see cref="IsSuccess"/> is <see langword="null"/> between claim and terminal outcome (successful or failed delivery).
 /// This lets the dispatcher claim the row before invoking SMTP so concurrent workers cannot duplicate sends.
 /// </para>

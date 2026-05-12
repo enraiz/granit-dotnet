@@ -1,7 +1,7 @@
 namespace Granit.BlobStorage;
 
 /// <summary>
-/// Combined persistence abstraction for <see cref="BlobDescriptor"/> records.
+/// Combined persistence abstraction for <see cref="Domain.BlobDescriptor"/> records.
 /// Extends both <see cref="IBlobDescriptorReader"/> and <see cref="IBlobDescriptorWriter"/>.
 /// </summary>
 /// <remarks>

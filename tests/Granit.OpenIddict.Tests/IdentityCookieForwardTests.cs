@@ -11,7 +11,7 @@ using Xunit;
 namespace Granit.OpenIddict.Tests;
 
 /// <summary>
-/// Regression tests for the <see cref="CookieAuthenticationOptions.ForwardDefaultSelector"/>
+/// Regression tests for the <c>AuthenticationSchemeOptions.ForwardDefaultSelector</c>
 /// wired onto the <see cref="IdentityConstants.ApplicationScheme"/> cookie by
 /// <see cref="GranitOpenIddictModule"/>.
 /// </summary>

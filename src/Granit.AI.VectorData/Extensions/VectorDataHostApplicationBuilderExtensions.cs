@@ -19,7 +19,7 @@ public static class VectorDataHostApplicationBuilderExtensions
     /// <remarks>
     /// A concrete <see cref="IVectorCollectionFactory"/> implementation must be registered
     /// by a provider package (e.g. <c>Granit.AI.VectorData.PgVector</c>).
-    /// An <see cref="IEmbeddingGeneratorFactory"/> must also be registered
+    /// An <c>IEmbeddingGeneratorFactory</c> must also be registered
     /// by an AI provider package.
     /// </remarks>
     /// <param name="builder">The host application builder.</param>

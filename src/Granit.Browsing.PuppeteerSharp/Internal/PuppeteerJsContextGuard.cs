@@ -12,7 +12,7 @@ namespace Granit.Browsing.PuppeteerSharp.Internal;
 /// PuppeteerSharp does not expose a context-level JS-disable knob at launch — the engine
 /// reuses a single browser-level renderer pool. The provider therefore calls
 /// <c>SetJavaScriptEnabledAsync(false)</c> on the brand-new page object before
-/// <see cref="IPuppeteerPage.GoToAsync(string)"/> is invoked. This is best-effort: a
+/// <c>IPage.GoToAsync(string)</c> is invoked. This is best-effort: a
 /// race-free disable would require Playwright's per-context option which Puppeteer lacks.
 /// </remarks>
 internal static class PuppeteerJsContextGuard

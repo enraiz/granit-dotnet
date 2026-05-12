@@ -27,7 +27,7 @@ public interface IBlobValidator
     int Order { get; }
 
     /// <summary>Runs the validation step.</summary>
-    /// <param name="context">Context providing access to the <see cref="BlobDescriptor"/> and S3 metadata.</param>
+    /// <param name="context">Context providing access to the <see cref="Domain.BlobDescriptor"/> and S3 metadata.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task<BlobValidationResult> ValidateAsync(BlobValidationContext context, CancellationToken cancellationToken = default);
 }

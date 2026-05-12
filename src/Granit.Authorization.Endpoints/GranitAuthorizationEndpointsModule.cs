@@ -16,7 +16,7 @@ namespace Granit.Authorization.Endpoints;
 /// <see cref="Extensions.AuthorizationEndpointRouteBuilderExtensions.MapGranitAuthorization"/>.
 /// Requires <see cref="GranitAuthorizationModule"/> for permission policy enforcement.
 /// The application host must register an implementation of
-/// <see cref="Abstractions.IPermissionManagerReader"/>/<see cref="Abstractions.IPermissionManagerWriter"/>
+/// <see cref="IPermissionManagerReader"/>/<see cref="IPermissionManagerWriter"/>
 /// (e.g. via <c>[DependsOn(typeof(GranitAuthorizationEntityFrameworkCoreModule))]</c>).
 /// Permission definition providers are auto-discovered by <c>GranitAuthorizationModule</c>.
 /// </remarks>

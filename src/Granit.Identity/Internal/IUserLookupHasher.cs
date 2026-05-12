@@ -15,7 +15,7 @@ namespace Granit.Identity.Internal;
 /// equality lookups; parallel <c>*Hash</c> columns
 /// (<c>HMAC-SHA256(pepper, lower-cased value)</c>) are indexed instead.
 /// Same pattern as
-/// <see cref="Granit.Identity.Federated.Internal.IUserLookupHasher"/>;
+/// <c>Granit.Identity.Federated.Internal.IUserLookupHasher</c>;
 /// each module owns its own hasher so the peppers — and therefore the indexes
 /// — can be rotated independently.
 /// </para>

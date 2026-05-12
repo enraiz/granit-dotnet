@@ -13,7 +13,7 @@ namespace Granit.AI.Mcp.Internal;
 /// <see cref="SamplingGuard"/> for cost control, rate limiting, and audit.
 /// </summary>
 /// <remarks>
-/// Registered as the <see cref="McpServerOptions.SamplingHandler"/> callback.
+/// Registered as the <c>McpServerOptions.SamplingHandler</c> callback.
 /// When an external MCP server requests an LLM completion, this adapter:
 /// <list type="number">
 ///   <item>Validates the request via <see cref="SamplingGuard"/></item>

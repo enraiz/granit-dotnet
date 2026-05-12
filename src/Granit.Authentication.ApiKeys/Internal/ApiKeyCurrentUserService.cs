@@ -6,7 +6,7 @@ namespace Granit.Authentication.ApiKeys.Internal;
 /// <summary>
 /// <see cref="ICurrentUserService"/> implementation for API key authentication contexts.
 /// Sets <see cref="ICurrentUserService.ActorKind"/> to
-/// <see cref="Security.ActorKind.ExternalSystem"/>.
+/// <see cref="Users.ActorKind.ExternalSystem"/>.
 /// </summary>
 internal sealed class ApiKeyCurrentUserService : ICurrentUserService
 {

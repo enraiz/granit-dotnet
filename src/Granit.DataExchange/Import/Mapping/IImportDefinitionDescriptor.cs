@@ -5,7 +5,7 @@ namespace Granit.DataExchange.Import.Mapping;
 /// </summary>
 /// <remarks>
 /// Registered as a singleton alongside the generic <see cref="ImportDefinition{TEntity}"/> by
-/// <see cref="ServiceCollectionExtensions.AddImportDefinition{TEntity,TDefinition}"/>.
+/// <see cref="Extensions.ServiceCollectionExtensions.AddImportDefinition{TEntity,TDefinition}"/>.
 /// Endpoints and other services can enumerate <c>IEnumerable&lt;IImportDefinitionDescriptor&gt;</c>
 /// to find a definition by name without compile-time knowledge of the entity type.
 /// </remarks>

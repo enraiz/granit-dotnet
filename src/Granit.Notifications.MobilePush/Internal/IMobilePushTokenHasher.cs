@@ -6,13 +6,13 @@ namespace Granit.Notifications.MobilePush.Internal;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <see cref="Granit.Notifications.EntityFrameworkCore.Entities.MobilePushTokenEntity.DeviceToken"/>
-/// is encrypted at rest via <see cref="Granit.Encryption.EncryptedAttribute"/>.
+/// <c>Granit.Notifications.EntityFrameworkCore.Entities.MobilePushTokenEntity.DeviceToken</c>
+/// is encrypted at rest via <c>Granit.Encryption.EncryptedAttribute</c>.
 /// AES-CBC ciphertext is non-deterministic (random IV), so equality lookups on
 /// the encrypted column are impossible — a parallel deterministic-hash column
 /// (<c>DeviceTokenHash = HMAC-SHA256(pepper, deviceToken)</c>) is indexed for
 /// the upsert / remove paths instead. Same pattern as
-/// <see cref="Granit.Identity.Federated.Internal.IUserLookupHasher"/>.
+/// <c>Granit.Identity.Federated.Internal.IUserLookupHasher</c>.
 /// </para>
 /// <para>
 /// The pepper MUST be distinct from the encryption key so the two can be

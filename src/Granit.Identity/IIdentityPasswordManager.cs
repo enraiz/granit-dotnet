@@ -5,17 +5,17 @@ namespace Granit.Identity;
 /// </summary>
 public interface IIdentityPasswordManager
 {
-    /// <inheritdoc cref="IIdentityProvider.GetPasswordChangedAtAsync"/>
+    /// <summary>Returns the timestamp of the user's last password change, or <c>null</c> if unknown.</summary>
     Task<DateTimeOffset?> GetPasswordChangedAtAsync(
         string userId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.SendPasswordResetEmailAsync"/>
+    /// <summary>Sends a password-reset email to the specified user.</summary>
     Task SendPasswordResetEmailAsync(
         string userId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.SetTemporaryPasswordAsync"/>
+    /// <summary>Sets a temporary password for the specified user, forcing reset on next login.</summary>
     Task SetTemporaryPasswordAsync(
         string userId,
         string temporaryPassword,

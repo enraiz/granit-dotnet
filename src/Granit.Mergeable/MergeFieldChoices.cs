@@ -12,7 +12,7 @@ namespace Granit.Mergeable;
 /// <c>"ExternalMappings.stripe"</c>.
 /// </para>
 /// <para>
-/// Use <see cref="Empty"/> to defer entirely to defaults, or <see cref="Builder"/> for
+/// Use <see cref="Empty"/> to defer entirely to defaults, or <see cref="MergeFieldChoicesBuilder"/> for
 /// fluent construction.
 /// </para>
 /// </remarks>
@@ -24,7 +24,7 @@ public sealed class MergeFieldChoices
     /// <summary>Map of field path → winner side.</summary>
     public IReadOnlyDictionary<string, WinnerSide> Choices { get; }
 
-    /// <summary>Creates a frozen choices set from a dictionary. Use <see cref="Builder"/> for fluent style.</summary>
+    /// <summary>Creates a frozen choices set from a dictionary. Use <see cref="MergeFieldChoicesBuilder"/> for fluent style.</summary>
     public MergeFieldChoices(IReadOnlyDictionary<string, WinnerSide> choices)
     {
         ArgumentNullException.ThrowIfNull(choices);

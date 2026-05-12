@@ -39,8 +39,7 @@ namespace Granit.Identity.Local.AspNetIdentity.Tests.Integration;
 /// Authentication is driven by <see cref="PermissionTestAuthHandler"/> — tests
 /// flip the caller identity via the <c>X-Test-User-Id</c> and
 /// <c>X-Test-Roles</c> headers. Permission grants are seeded directly on the
-/// host DbContext via <see cref="SeedUserGrantAsync"/> and
-/// <see cref="SeedRoleGrantAsync"/>.
+/// host DbContext via <see cref="SeedUserGrantAsync"/>.
 /// </remarks>
 public sealed class RoleEndpointsPermissionTestApplication : IAsyncLifetime
 {

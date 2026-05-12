@@ -142,7 +142,7 @@ public sealed class GranitPrivacyBuilder(IServiceCollection services)
     /// </summary>
     /// <remarks>
     /// Required for the <c>GET /privacy/export</c> endpoints to query export status.
-    /// The application must also wire an <see cref="Events.ExportCompletedEto"/> handler
+    /// The application must also wire an <see cref="DataExport.Events.ExportCompletedEto"/> handler
     /// that calls <see cref="IExportRequestTrackerWriter.MarkCompletedAsync"/> to update
     /// the read model when the scatter-gather saga finishes.
     /// </remarks>

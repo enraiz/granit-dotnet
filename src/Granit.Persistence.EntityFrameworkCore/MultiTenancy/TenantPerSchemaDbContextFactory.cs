@@ -24,7 +24,7 @@ namespace Granit.Persistence.EntityFrameworkCore.MultiTenancy;
 /// would expose data from a previously-pooled tenant connection (ISO 27001 breach).
 /// </para>
 /// <para>
-/// <see cref="AuditedEntityInterceptor"/> is wired automatically when available in DI,
+/// <see cref="Interceptors.AuditedEntityInterceptor"/> is wired automatically when available in DI,
 /// satisfying the 3-year ISO 27001 audit trail requirement.
 /// </para>
 /// </remarks>

@@ -5,7 +5,7 @@ namespace Granit.AI.Workspaces;
 /// </summary>
 /// <remarks>
 /// Implemented by <c>Granit.AI.EntityFrameworkCore</c>.
-/// Default: <see cref="NullAIWorkspaceStoreReader"/> (returns empty results).
+/// Default: <see cref="Internal.NullAIWorkspaceStoreReader"/> (returns empty results).
 /// </remarks>
 public interface IAIWorkspaceStoreReader
 {

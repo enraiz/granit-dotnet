@@ -18,7 +18,7 @@ namespace Granit.Identity.Events;
 /// outbox should be pruned frequently to limit plaintext PII exposure
 /// in the database.
 /// </remarks>
-/// <param name="UserId">Canonical <see cref="User.Id"/>.</param>
+/// <param name="UserId">Canonical <c>User.Id</c>.</param>
 /// <param name="DisplayName">Updated display label.</param>
 /// <param name="Email">Updated login email.</param>
 /// <param name="FirstName">Updated given name (optional).</param>

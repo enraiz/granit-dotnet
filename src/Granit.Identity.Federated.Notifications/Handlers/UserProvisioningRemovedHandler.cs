@@ -17,7 +17,7 @@ namespace Granit.Identity.Federated.Notifications.Handlers;
 /// <see cref="INotificationPublisher.PublishToSubscribersAsync{TData}"/>:
 /// tenant administrators opt in through the standard notifications
 /// subscription UI, and the dispatch engine intersects subscribers with
-/// the active tenant context (<paramref name="evt"/>'s
+/// the active tenant context (the event's
 /// <see cref="IdentityUserDeletedEto.TenantId"/> is honoured by the
 /// dispatch pipeline's tenant filter).
 /// </para>

@@ -13,7 +13,7 @@ public static class ModelBuilderExtensions
     /// </summary>
     /// <remarks>
     /// Call this method in <c>OnModelCreating</c> of the host application's DbContext
-    /// that implements <see cref="Internal.ISettingsDbContext"/>.
+    /// that implements <see cref="ISettingsDbContext"/>.
     /// </remarks>
     /// <param name="modelBuilder">The model builder.</param>
     /// <returns>The model builder for chaining.</returns>

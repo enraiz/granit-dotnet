@@ -7,22 +7,22 @@ namespace Granit.Identity;
 /// </summary>
 public interface IIdentityGroupManager
 {
-    /// <inheritdoc cref="IIdentityProvider.GetGroupsAsync"/>
+    /// <summary>Lists every group defined in the identity provider.</summary>
     Task<IReadOnlyList<IdentityGroup>> GetGroupsAsync(
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.GetUserGroupsAsync"/>
+    /// <summary>Lists the groups the specified user belongs to.</summary>
     Task<IReadOnlyList<IdentityGroup>> GetUserGroupsAsync(
         string userId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.AddUserToGroupAsync"/>
+    /// <summary>Adds the specified user to the specified group.</summary>
     Task AddUserToGroupAsync(
         string userId,
         string groupId,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.RemoveUserFromGroupAsync"/>
+    /// <summary>Removes the specified user from the specified group.</summary>
     Task RemoveUserFromGroupAsync(
         string userId,
         string groupId,

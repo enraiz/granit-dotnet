@@ -19,7 +19,7 @@ namespace Granit.Domain;
 /// </code>
 /// <para>
 /// If the stamp in the database differs from the original value, EF Core throws
-/// <see cref="Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException"/>,
+/// <c>Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException</c>,
 /// mapped to HTTP 409 Conflict by <c>EfCoreExceptionStatusCodeMapper</c>.
 /// </para>
 /// </remarks>

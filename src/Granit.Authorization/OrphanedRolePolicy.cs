@@ -27,8 +27,7 @@ public enum OrphanedRolePolicy
     /// <summary>
     /// The sync flips <c>IsOrphaned = true</c> and stamps <c>OrphanedAt</c> on any
     /// row whose name is no longer returned by the provider, then saves. The
-    /// <see cref="Domain.Events.RoleOrphanedEvent"/> domain event and the
-    /// <see cref="Events.RoleOrphanedEto"/> integration event fire. Permission grants
+    /// <see cref="Events.RoleOrphanedEvent"/> domain event fires. Permission grants
     /// keep resolving because the row is preserved; an admin reviews and either
     /// restores (admin re-adds the role upstream, the next sync clears the flag) or
     /// hard-deletes (via the admin endpoint, tracked separately).

@@ -12,7 +12,7 @@ public sealed class VectorDataOptions
 
     /// <summary>
     /// The logical name of the embedding workspace.
-    /// Used to resolve the correct <see cref="Granit.AI.IEmbeddingGeneratorFactory"/> instance.
+    /// Used to resolve the correct <c>Granit.AI.IEmbeddingGeneratorFactory</c> instance.
     /// </summary>
     public string EmbeddingWorkspace { get; set; } = "default";
 

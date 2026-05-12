@@ -14,7 +14,7 @@ namespace Granit.DataExchange.Export;
 /// <para>
 /// Navigation fields (<c>Field(e => e.Company, c => c.Name)</c>) use dot notation.
 /// The developer <b>must</b> call the necessary <c>Include()</c> in
-/// <see cref="IExportDataSource{TEntity}"/>. No auto-include magic in V1.
+/// <c>IExportDataSource{TEntity}</c>. No auto-include magic in V1.
 /// </para>
 /// </remarks>
 public sealed class ExportDefinitionBuilder<TEntity> where TEntity : class
@@ -61,7 +61,7 @@ public sealed class ExportDefinitionBuilder<TEntity> where TEntity : class
     /// <param name="configure">Optional fluent configuration.</param>
     /// <remarks>
     /// The developer must ensure the corresponding <c>Include()</c> is present in
-    /// <see cref="IExportDataSource{TEntity}"/>. If not, the value will be <c>null</c>.
+    /// <c>IExportDataSource{TEntity}</c>. If not, the value will be <c>null</c>.
     /// </remarks>
     public ExportDefinitionBuilder<TEntity> Field<TNav, TProp>(
         Expression<Func<TEntity, TNav?>> navigation,
@@ -96,7 +96,7 @@ public sealed class ExportDefinitionBuilder<TEntity> where TEntity : class
     }
 
     /// <summary>
-    /// Includes business key columns (from the matching <see cref="Mapping.ImportDefinition{TEntity}"/>)
+    /// Includes business key columns (from the matching <c>ImportDefinition{TEntity}</c>)
     /// for roundtrip import resolution.
     /// </summary>
     public ExportDefinitionBuilder<TEntity> IncludeBusinessKey()

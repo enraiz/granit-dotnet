@@ -1,3 +1,5 @@
+using Granit.Domain;
+
 namespace Granit.Workflow.Domain;
 
 /// <summary>
@@ -12,7 +14,7 @@ public enum WorkflowLifecycleStatus
     PendingReview = 1,
 
     /// <summary>
-    /// Active published version. Exactly one per <see cref="IVersionedEntity.VersionId"/>
+    /// Active published version. Exactly one per <see cref="IVersioned.VersionId"/>
     /// at any time (enforced by unique filtered index).
     /// Maps to <c>IPublishable.IsPublished = true</c>.
     /// </summary>

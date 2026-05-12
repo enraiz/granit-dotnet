@@ -23,7 +23,7 @@ public static class LocalizationEntityFrameworkCoreHostApplicationBuilderExtensi
     /// <see cref="CachedLocalizationOverrideStore"/> — registered by
     /// <c>GranitLocalizationModule</c> — resolves it via
     /// <c>IServiceScopeFactory</c> per DB operation, ensuring ISO 27001 audit compliance
-    /// through <see cref="AuditedEntityInterceptor"/> on write operations.
+    /// through <see cref="Granit.Persistence.EntityFrameworkCore.Interceptors.AuditedEntityInterceptor"/> on write operations.
     /// </para>
     /// <para>
     /// Must be called after the module system has been initialized (i.e. after

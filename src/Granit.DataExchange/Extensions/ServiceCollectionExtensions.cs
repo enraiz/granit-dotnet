@@ -36,12 +36,12 @@ public static class ServiceCollectionExtensions
     ///   <item><see cref="IImportOrchestrator"/> (scoped) — pipeline orchestrator.</item>
     /// </list>
     /// <para>
-    /// At least one <see cref="Parsing.IFileParser"/> must be registered separately.
+    /// At least one <see cref="Import.Parsing.IFileParser"/> must be registered separately.
     /// Use <c>Granit.DataExchange.Csv</c> or <c>Granit.DataExchange.Excel</c>.
     /// </para>
     /// <para>
     /// An <c>ICommandSender</c> implementation must be registered (<c>Granit.Wolverine</c>
-    /// or another provider) — this module dispatches <see cref="ExecuteImportCommand"/>
+    /// or another provider) — this module dispatches <see cref="Import.Messages.ExecuteImportCommand"/>
     /// via <c>ICommandSender</c> for asynchronous execution by <c>ExecuteImportCommandHandler</c>.
     /// </para>
     /// </remarks>
@@ -111,7 +111,7 @@ public static class ServiceCollectionExtensions
     /// </para>
     /// <para>
     /// An <c>ICommandSender</c> implementation must be registered (<c>Granit.Wolverine</c>
-    /// or another provider) — this module dispatches <see cref="Messages.ExecuteExportCommand"/>
+    /// or another provider) — this module dispatches <see cref="Export.Messages.ExecuteExportCommand"/>
     /// via <c>ICommandSender</c> for asynchronous execution by <c>ExecuteExportCommandHandler</c>.
     /// </para>
     /// </remarks>

@@ -22,7 +22,7 @@ public interface IMigratableModule
 /// to declare that the module owns a host <see cref="DbContext"/> with EF Core migrations.
 /// The <see cref="IGranitMigrationRunner"/> discovers all modules implementing this interface
 /// in topological order (respecting <c>[DependsOn]</c>) and calls
-/// <see cref="DatabaseFacade.MigrateAsync(System.Threading.CancellationToken)"/> on each.
+/// <c>DatabaseFacade.MigrateAsync(CancellationToken)</c> on each.
 /// </para>
 /// <para>
 /// Internal Granit DbContexts (e.g., <c>BackgroundJobsDbContext</c>) do NOT implement this

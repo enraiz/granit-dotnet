@@ -15,7 +15,7 @@ public static class AuthorizationEfCoreServiceCollectionExtensions
 {
     /// <summary>
     /// Registers EF Core persistence for permission grants and role metadata.
-    /// Replaces the default <see cref="NullPermissionGrantStore"/> and
+    /// Replaces the default <see cref="Granit.Authorization.Services.NullPermissionGrantStore"/> and
     /// <see cref="Services.NullRoleMetadataStore"/> registered by <c>Granit.Authorization</c>
     /// with EF-backed implementations. <c>IPermissionManagerReader</c> and
     /// <c>IPermissionManagerWriter</c> are already registered by <c>Granit.Authorization</c>

@@ -8,8 +8,8 @@ namespace Granit.BlobStorage.Validators;
 /// Order: <b>20</b>. Runs after <see cref="MagicBytesValidator"/> (Order=10).
 /// </para>
 /// <para>
-/// The limit (<see cref="BlobDescriptor.MaxAllowedBytes"/>) is set per upload request and persisted
-/// in the <see cref="BlobDescriptor"/>. This prevents a client from bypassing the declared limit
+/// The limit (<see cref="Granit.BlobStorage.Domain.BlobDescriptor.MaxAllowedBytes"/>) is set per upload request and persisted
+/// in the <see cref="Granit.BlobStorage.Domain.BlobDescriptor"/>. This prevents a client from bypassing the declared limit
 /// by uploading a larger file directly to the pre-signed S3 URL.
 /// </para>
 /// </remarks>

@@ -7,7 +7,7 @@ namespace Granit.Authorization;
 /// <param name="UserId">
 /// Subject (<c>sub</c>) claim value, or <see langword="null"/> for
 /// anonymous. Per ADR-051 B-step 4 this resolves to the canonical
-/// <see cref="Granit.Identity.Domain.User.Id"/> stringified — the
+/// <c>Granit.Identity.Domain.User.Id</c> stringified — the
 /// same value is held in <c>LocalIdentity.Id</c> and
 /// <c>FederatedIdentity.UserId</c> so the lookup matches grants
 /// regardless of the login path.

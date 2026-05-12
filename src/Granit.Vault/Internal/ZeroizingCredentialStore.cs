@@ -17,7 +17,7 @@ namespace Granit.Vault.Internal;
 /// <see cref="Password"/> reads are short-lived and scoped to the consumer.
 /// </para>
 /// <para>
-/// Thread-safety: readers use <see cref="Volatile.Read(ref byte[])"/>; writers swap
+/// Thread-safety: readers use <c>Volatile.Read</c>; writers swap
 /// via <see cref="Interlocked.Exchange{T}(ref T, T)"/> then zeroize the old buffer.
 /// Callers are expected to be single-writer (the credential background service).
 /// </para>

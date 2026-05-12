@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
     ///   <item><c>app.*</c> global context (singleton, bound to <c>Granit:Templating:App</c>)</item>
     /// </list>
     /// <para>
-    /// Also calls <see cref="ServiceCollectionExtensions.AddGranitTemplating"/> to ensure the
+    /// Also calls <c>ServiceCollectionExtensions.AddGranitTemplating</c> to ensure the
     /// core pipeline is registered.
     /// </para>
     /// </remarks>

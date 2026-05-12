@@ -1,7 +1,7 @@
 namespace Granit.Http.ExceptionHandling.Options;
 
 /// <summary>
-/// Configuration options for <see cref="GranitExceptionHandler"/>.
+/// Configuration options for <c>GranitExceptionHandler</c>.
 /// </summary>
 public sealed class ExceptionHandlingOptions
 {

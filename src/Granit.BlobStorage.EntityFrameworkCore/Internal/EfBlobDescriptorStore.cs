@@ -10,7 +10,7 @@ namespace Granit.BlobStorage.EntityFrameworkCore.Internal;
 /// EF Core implementation of <see cref="IBlobDescriptorStore"/>.
 /// </summary>
 /// <remarks>
-/// All reads are implicitly scoped to the current tenant via the <see cref="IMultiTenant"/>
+/// All reads are implicitly scoped to the current tenant via the <see cref="Granit.Domain.IMultiTenant"/>
 /// query filter applied by <c>ApplyGranitConventions</c> on <see cref="BlobStorageDbContext"/>.
 /// Each operation creates and disposes its own <see cref="BlobStorageDbContext"/> via
 /// <see cref="IDbContextFactory{TContext}"/>, making it safe for concurrent request handling.

@@ -27,7 +27,7 @@ namespace Granit.Persistence.EntityFrameworkCore;
 /// ensuring thread-safe concurrent access and fresh query filter evaluation per operation.
 /// </para>
 /// <para>
-/// <b>Host context bypass:</b> When <paramref name="currentTenant"/> is provided and no
+/// <b>Host context bypass:</b> When <c>currentTenant</c> is provided and no
 /// tenant is active (<see cref="ICurrentTenant.IsAvailable"/> is <c>false</c>), the
 /// <see cref="GranitFilterNames.MultiTenant"/> named query filter is bypassed on all read
 /// operations so the caller sees entities across all tenants. This is used for host-level
@@ -108,7 +108,7 @@ public abstract class EfStoreBase<TEntity, TContext>
     /// Every implicit bypass is recorded as
     /// <c>granit.persistence.cross_tenant_query</c> with <c>origin=implicit</c> on
     /// <see cref="PersistenceMetrics"/>. New call-sites that need cross-tenant access
-    /// should prefer the explicit <see cref="QueryAcrossTenants(TContext)"/> for
+    /// should prefer the explicit <c>QueryAcrossTenants</c> for
     /// readability and to receive an <c>origin=explicit</c> metric tag.
     /// </para>
     /// </remarks>

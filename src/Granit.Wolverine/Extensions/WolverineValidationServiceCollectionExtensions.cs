@@ -28,7 +28,7 @@ public static class WolverineValidationServiceCollectionExtensions
     /// Modules that contain validators but are <strong>not</strong> Wolverine handler
     /// modules (e.g. a Core module with no handlers) must still register their
     /// validators manually via
-    /// <see cref="ValidationServiceCollectionExtensions.AddGranitValidatorsFromAssemblyContaining{T}"/>.
+    /// <c>ValidationServiceCollectionExtensions.AddGranitValidatorsFromAssemblyContaining{T}</c>.
     /// </para>
     /// </remarks>
     /// <param name="services">The service collection.</param>

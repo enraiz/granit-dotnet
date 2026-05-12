@@ -12,7 +12,7 @@ public sealed record AIUsageRecord
     public Guid? TenantId { get; init; }
 
     /// <summary>
-    /// Canonical <see cref="Granit.Identity.Domain.User.Id"/> that made
+    /// Canonical <c>Granit.Identity.Domain.User.Id</c> that made
     /// the request (per ADR-051), or <c>null</c> if anonymous / system.
     /// The same Guid resolves both the local and federated login paths.
     /// </summary>

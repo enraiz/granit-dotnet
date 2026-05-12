@@ -12,7 +12,7 @@ namespace Granit.Identity.Federated.Privacy.DataExport;
 /// </summary>
 /// <remarks>
 /// Federated providers (Keycloak, Entra ID, Cognito, Google Cloud) typically emit a
-/// GUID-format <c>sub</c> claim — we round-trip <paramref name="userId"/> as the string
+/// GUID-format <c>sub</c> claim — we round-trip the supplied user id as the string
 /// representation to match <see cref="FederatedIdentity.ExternalUserId"/>. When the user is
 /// not cached locally (e.g. they authenticated once and never exercised a feature that
 /// populated the cache), the provider returns <see cref="ReadOnlyMemory{T}.Empty"/>.

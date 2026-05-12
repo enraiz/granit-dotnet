@@ -4,7 +4,7 @@ namespace Granit.Observability.AI;
 /// Analyzes a batch of log entries using AI to produce insights and detect anomalies.
 /// </summary>
 /// <remarks>
-/// The analyzer sends structured log data to an LLM via <see cref="AI.IAIChatClientFactory"/>
+/// The analyzer sends structured log data to an LLM via <see cref="Granit.AI.IAIChatClientFactory"/>
 /// and parses the response into a structured <see cref="LogAnalysisReport"/>.
 /// The workspace used for analysis is configurable via
 /// <see cref="Options.ObservabilityAIOptions.WorkspaceName"/>.

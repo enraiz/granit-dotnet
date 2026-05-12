@@ -7,7 +7,7 @@ namespace Granit.DataExchange.Export;
 /// <para>
 /// Implementations discover entity types at runtime — typically by scanning
 /// EF Core <c>DbContext</c> models. The <see cref="IExportDefinitionProvider"/>
-/// creates <see cref="ReflectionExportDefinition"/> instances for each type
+/// creates <c>ReflectionExportDefinition</c> instances for each type
 /// that does not already have an explicit <see cref="ExportDefinition{TEntity}"/>.
 /// </para>
 /// <para>

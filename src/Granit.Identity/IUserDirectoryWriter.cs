@@ -29,7 +29,7 @@ public interface IUserDirectoryWriter
 {
     /// <summary>
     /// Persists a new <see cref="User"/> row. Caller-supplied
-    /// <see cref="Granit.Domain.Entity{TKey}.Id"/> is honoured — this is
+    /// <c>Granit.Domain.Entity{TKey}.Id</c> is honoured — this is
     /// the alignment point that lets the local-side <c>LocalIdentity</c>
     /// re-use the same Guid for both rows so historical references
     /// continue to resolve.

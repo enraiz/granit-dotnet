@@ -38,7 +38,7 @@ public interface ITemplateEngine
     /// </param>
     /// <param name="globalContexts">
     /// Ambient context objects injected into every template (date/time, tenant, culture, …).
-    /// Each context is exposed under its <see cref="ITemplateGlobalContext.Namespace"/>.
+    /// Each context is exposed under its <see cref="Granit.Templating.GlobalContext.ITemplateGlobalContext.ContextName"/>.
     /// </param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>

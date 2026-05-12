@@ -9,7 +9,7 @@ namespace Granit.Dashboards.Templating;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Composition order recognised by <see cref="DefaultVariableSubstituter"/> (later wins):
+/// Composition order recognised by <c>DefaultVariableSubstituter</c> (later wins):
 /// state parameters, resolved entity aliases (story P2.3), the active dashboard time
 /// window, the row data when invoked from a row-click action, and the series data
 /// when invoked from a chart series-click action. Consumers compose the dictionary

@@ -7,7 +7,7 @@ namespace Granit.Identity.Queries;
 /// Admin-grid query surface for the canonical <see cref="User"/> aggregate
 /// (ADR-051). Whitelists the columns that may be filtered / sorted /
 /// projected via the QueryEngine pipeline (and, transitively, by the OData
-/// feed once <see cref="UserEntityDefinition"/> wires up).
+/// feed once <c>UserEntityDefinition</c> wires up).
 /// </summary>
 /// <remarks>
 /// Whitelisted columns are deliberately profile-only — never auth secrets

@@ -8,7 +8,7 @@ namespace Granit.Workflow;
 /// <para>
 /// This interface decouples <c>Granit.Workflow</c> from <c>Granit.Authorization</c>.
 /// When <c>Granit.Authorization</c> is registered, a bridge implementation delegates
-/// to <see cref="Granit.Authorization.Abstractions.IPermissionChecker"/>.
+/// to <c>Granit.Authorization.IPermissionChecker</c>.
 /// </para>
 /// <para>
 /// The default registration is <see cref="Internal.NullWorkflowPermissionChecker"/>

@@ -3,7 +3,7 @@ using Granit.Exceptions;
 namespace Granit.BlobStorage.Exceptions;
 
 /// <summary>
-/// Thrown when a <see cref="BlobDescriptor"/> is not found for the current tenant.
+/// Thrown when a <see cref="Domain.BlobDescriptor"/> is not found for the current tenant.
 /// Maps to <c>404 Not Found</c>.
 /// </summary>
 /// <remarks>

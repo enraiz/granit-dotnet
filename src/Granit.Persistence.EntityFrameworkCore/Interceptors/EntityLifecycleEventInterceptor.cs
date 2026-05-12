@@ -27,8 +27,8 @@ namespace Granit.Persistence.EntityFrameworkCore.Interceptors;
 /// </list>
 /// </para>
 /// <para>
-/// Inter-callback state is stored in <see cref="DbContext.Items"/> (keyed by
-/// <see cref="PendingDomainEventsKey"/>) rather than <c>AsyncLocal</c> to avoid
+/// Inter-callback state is stored in a static <c>ConcurrentDictionary</c> keyed by
+/// <c>DbContext.ContextId.InstanceId</c> rather than <c>AsyncLocal</c> to avoid
 /// cross-request leaks on interceptors registered as singletons.
 /// </para>
 /// <para>

@@ -16,7 +16,7 @@ public static class PermissionGrantProviderNames
 
     /// <summary>
     /// Provider name for user-based grants: <c>ProviderKey</c> holds the
-    /// canonical <see cref="Granit.Identity.Domain.User.Id"/> (Guid string)
+    /// canonical <c>Granit.Identity.Domain.User.Id</c> (Guid string)
     /// per ADR-051 B-step 4. The same Guid resolves both the local-side
     /// <c>LocalIdentity</c> and the federated-side <c>FederatedIdentity</c>
     /// rows when the alignment guarantee holds, so a single grant covers

@@ -2,7 +2,7 @@ namespace Granit.QueryEngine.AspNetCore.Options;
 
 /// <summary>
 /// Configuration options for query endpoints registered via
-/// <see cref="QueryEndpointRouteBuilderExtensions.MapGranitQuery{TEntity}"/>.
+/// <c>QueryEndpointRouteBuilderExtensions.MapGranitQuery{TEntity}</c>.
 /// </summary>
 public sealed class QueryEndpointOptions
 {

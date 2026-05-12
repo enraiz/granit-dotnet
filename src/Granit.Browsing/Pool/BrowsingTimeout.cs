@@ -10,7 +10,7 @@ namespace Granit.Browsing.Pool;
 /// sandbox-aware timeout semantics (VULN-100).
 /// </summary>
 /// <remarks>
-/// The wrapper links <paramref name="outer"/> to a fresh
+/// The wrapper links the caller's cancellation token to a fresh
 /// <see cref="CancellationTokenSource"/> that cancels after the supplied duration. The
 /// caller's task is awaited with <see cref="Task.WaitAsync(TimeSpan, CancellationToken)"/>,
 /// surfacing a <see cref="TimeoutException"/> when the cap is hit and propagating

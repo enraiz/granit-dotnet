@@ -7,19 +7,19 @@ namespace Granit.Identity;
 /// </summary>
 public interface IIdentityUserWriter
 {
-    /// <inheritdoc cref="IIdentityProvider.SetUserEnabledAsync"/>
+    /// <summary>Enables or disables the specified user account.</summary>
     Task SetUserEnabledAsync(
         string userId,
         bool enabled,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.UpdateUserAsync"/>
+    /// <summary>Applies the supplied profile changes to the specified user.</summary>
     Task UpdateUserAsync(
         string userId,
         IdentityUserUpdate update,
         CancellationToken cancellationToken = default);
 
-    /// <inheritdoc cref="IIdentityProvider.CreateUserAsync"/>
+    /// <summary>Creates a new identity user and returns the persisted record.</summary>
     Task<IIdentityUser> CreateUserAsync(
         IdentityUserCreate user,
         CancellationToken cancellationToken = default);

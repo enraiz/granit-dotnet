@@ -12,8 +12,8 @@ namespace Granit.Webhooks.EntityFrameworkCore.Internal;
 /// </summary>
 /// <remarks>
 /// Can be used as a standalone context or integrated into an existing application DbContext
-/// by applying <see cref="WebhookSubscriptionConfiguration"/> and
-/// <see cref="WebhookDeliveryAttemptConfiguration"/> in the application's <c>OnModelCreating</c>.
+/// by applying <see cref="Configurations.WebhookSubscriptionConfiguration"/> and
+/// <see cref="Configurations.WebhookDeliveryAttemptConfiguration"/> in the application's <c>OnModelCreating</c>.
 /// </remarks>
 internal sealed class WebhooksDbContext(
     DbContextOptions<WebhooksDbContext> options,

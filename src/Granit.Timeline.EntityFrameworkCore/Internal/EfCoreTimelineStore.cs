@@ -15,7 +15,7 @@ namespace Granit.Timeline.EntityFrameworkCore.Internal;
 /// EF Core implementation of <see cref="ITimelineWriter"/> backed by PostgreSQL.
 /// </summary>
 /// <remarks>
-/// All reads are implicitly scoped to the current tenant via the <see cref="IMultiTenant"/>
+/// All reads are implicitly scoped to the current tenant via the <see cref="Granit.Domain.IMultiTenant"/>
 /// query filter applied by <c>ApplyGranitConventions</c> on <see cref="TimelineDbContext"/>.
 /// Each operation creates and disposes its own <see cref="TimelineDbContext"/> via
 /// <see cref="IDbContextFactory{TContext}"/>, making it safe for concurrent request handling.

@@ -2,12 +2,12 @@ namespace Granit.DataExchange.Export;
 
 /// <summary>
 /// Resolves export definitions by merging explicit <see cref="IExportDefinitionDescriptor"/>
-/// registrations with auto-generated <see cref="ReflectionExportDefinition"/> fallbacks.
+/// registrations with auto-generated <c>ReflectionExportDefinition</c> fallbacks.
 /// </summary>
 /// <remarks>
 /// <para>
 /// Explicit definitions (registered via
-/// <see cref="Extensions.ServiceCollectionExtensions.AddExportDefinition{TEntity,TDefinition}"/>)
+/// <c>ServiceCollectionExtensions.AddExportDefinition{TEntity,TDefinition}</c>)
 /// always take precedence over auto-generated ones.
 /// </para>
 /// <para>

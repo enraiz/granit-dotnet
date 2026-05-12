@@ -3,7 +3,7 @@ using Granit.Events;
 namespace Granit.BlobStorage.Events;
 
 /// <summary>
-/// Raised when a blob fails validation and transitions to <see cref="BlobStatus.Rejected"/>.
+/// Raised when a blob fails validation and transitions to <see cref="Domain.BlobStatus.Rejected"/>.
 /// </summary>
 public sealed record BlobRejectedEvent(
     Guid BlobId,

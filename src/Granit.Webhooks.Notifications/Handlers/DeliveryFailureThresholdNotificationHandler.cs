@@ -11,7 +11,7 @@ namespace Granit.Webhooks.Notifications.Handlers;
 /// <remarks>
 /// <para>
 /// <b>Recipient strategy.</b> The Eto carries no user identifier — it is raised by the
-/// <see cref="WebhookSubscription"/> aggregate against a subscription that may or may
+/// <see cref="Granit.Webhooks.Domain.WebhookSubscription"/> aggregate against a subscription that may or may
 /// not be tenant-scoped. To stay decoupled from any tenant-admin resolver, the bridge
 /// publishes via <see cref="INotificationPublisher.PublishToSubscribersAsync{TData}"/>:
 /// administrators opt in through the standard notifications subscription UI, and the
