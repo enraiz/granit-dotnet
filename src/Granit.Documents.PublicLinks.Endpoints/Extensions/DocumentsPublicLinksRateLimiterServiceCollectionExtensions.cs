@@ -60,10 +60,13 @@ public static class DocumentsPublicLinksRateLimiterServiceCollectionExtensions
 
         if (configuration is not null)
         {
+            // No ValidateDataAnnotations here — full validation is owned by
+            // AddGranitDocumentsPublicLinks (base module). This call only needs
+            // RateLimitPerMinute bound; SigningKey may legitimately come from a
+            // different source (Vault) wired after this extension runs.
             services
                 .AddOptions<GranitDocumentsPublicLinksOptions>()
-                .Bind(configuration.GetSection(GranitDocumentsPublicLinksOptions.SectionName))
-                .ValidateDataAnnotations();
+                .Bind(configuration.GetSection(GranitDocumentsPublicLinksOptions.SectionName));
         }
 
         services.AddRateLimiter(rateLimiterOptions =>

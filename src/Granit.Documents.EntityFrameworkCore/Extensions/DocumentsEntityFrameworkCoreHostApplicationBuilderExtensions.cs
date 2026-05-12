@@ -1,6 +1,7 @@
 using Granit.Documents.Authorization;
 using Granit.Documents.Domain;
 using Granit.Documents.EntityFrameworkCore.Internal;
+using Granit.Documents.Extensions;
 using Granit.Documents.Options;
 using Granit.Persistence.EntityFrameworkCore.Extensions;
 using Granit.Persistence.EntityFrameworkCore.MultiTenancy;

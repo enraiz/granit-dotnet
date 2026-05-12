@@ -1,5 +1,6 @@
 using Granit.Documents.Endpoints;
 using Granit.Documents.Renditions;
+using Granit.Documents.Renditions.Endpoints.Extensions;
 using Granit.Modularity;
 using Microsoft.Extensions.DependencyInjection;
 

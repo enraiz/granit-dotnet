@@ -1,6 +1,7 @@
 using Granit.Documents.PublicLinks.Endpoints.Options;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Granit.Documents.PublicLinks.Endpoints.Extensions;
 
 /// <summary>
 /// DI extensions for <c>Granit.Documents.PublicLinks.Endpoints</c>.

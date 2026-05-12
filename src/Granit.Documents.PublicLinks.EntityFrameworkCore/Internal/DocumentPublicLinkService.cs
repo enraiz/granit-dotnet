@@ -1,8 +1,10 @@
 using Granit.BlobStorage;
 using Granit.BlobStorage.Options;
 using Granit.Documents.Domain;
+using Granit.Documents.PublicLinks;
 using Granit.Documents.PublicLinks.Diagnostics;
 using Granit.Documents.PublicLinks.Domain;
+using Granit.Documents.PublicLinks.EntityFrameworkCore.Exceptions;
 using Granit.Documents.PublicLinks.Events;
 using Granit.Documents.PublicLinks.Options;
 using Granit.Events;
@@ -10,7 +12,7 @@ using Granit.Guids;
 using Granit.Users;
 using Microsoft.Extensions.Options;
 
-namespace Granit.Documents.PublicLinks.Internal;
+namespace Granit.Documents.PublicLinks.EntityFrameworkCore.Internal;
 
 /// <summary>
 /// Default <see cref="IDocumentPublicLinkService"/>. Composes

@@ -1,5 +1,5 @@
 using Granit.Documents.PublicLinks.Domain;
-using Granit.Documents.PublicLinks.Internal;
+using Granit.Documents.PublicLinks.EntityFrameworkCore.Exceptions;
 using Granit.Persistence.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

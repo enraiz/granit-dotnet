@@ -18,7 +18,7 @@ namespace Granit.Documents;
 /// </para>
 /// <para>
 /// Phase 1 ships only the scaffolding declared in
-/// <see cref="Microsoft.Extensions.DependencyInjection.DocumentsServiceCollectionExtensions.AddGranitDocuments(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{Options.GranitDocumentsOptions}?)"/>.
+/// <see cref="Granit.Documents.Extensions.DocumentsServiceCollectionExtensions.AddGranitDocuments(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{Granit.Documents.Options.GranitDocumentsOptions}?)"/>.
 /// Domain types, endpoints, and persistence are introduced in subsequent stories
 /// of the tracking Epic.
 /// </para>

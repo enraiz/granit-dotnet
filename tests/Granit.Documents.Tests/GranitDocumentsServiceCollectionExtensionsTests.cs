@@ -1,5 +1,6 @@
 using Granit.Documents.Diagnostics;
 using Granit.Documents.Domain;
+using Granit.Documents.Extensions;
 using Granit.Documents.Options;
 using Granit.Taxonomy.Registration;
 using Microsoft.Extensions.Configuration;

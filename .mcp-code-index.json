@@ -22007,7 +22007,7 @@
       "kind": "class",
       "project": "Granit.Documents.EntityFrameworkCore",
       "file": "src/Granit.Documents.EntityFrameworkCore/Extensions/DocumentsEntityFrameworkCoreHostApplicationBuilderExtensions.cs",
-      "line": 18,
+      "line": 19,
       "members": [
         {
           "name": "AddGranitDocumentsEntityFrameworkCore",
@@ -22283,6 +22283,22 @@
           "kind": "property",
           "signature": "string Name",
           "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "DocumentsServiceCollectionExtensions",
+      "fqn": "Granit.Documents.Extensions.DocumentsServiceCollectionExtensions",
+      "kind": "class",
+      "project": "Granit.Documents",
+      "file": "src/Granit.Documents/Extensions/DocumentsServiceCollectionExtensions.cs",
+      "line": 21,
+      "members": [
+        {
+          "name": "AddGranitDocuments",
+          "kind": "method",
+          "signature": "AddGranitDocuments(this IServiceCollection services, Action<GranitDocumentsOptions>? configure = null)",
+          "returnType": "IServiceCollection"
         }
       ]
     },
@@ -23210,6 +23226,22 @@
       ]
     },
     {
+      "name": "DocumentsPublicLinksEndpointsServiceCollectionExtensions",
+      "fqn": "Granit.Documents.PublicLinks.Endpoints.Extensions.DocumentsPublicLinksEndpointsServiceCollectionExtensions",
+      "kind": "class",
+      "project": "Granit.Documents.PublicLinks.Endpoints",
+      "file": "src/Granit.Documents.PublicLinks.Endpoints/Extensions/DocumentsPublicLinksEndpointsServiceCollectionExtensions.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "AddGranitDocumentsPublicLinksEndpoints",
+          "kind": "method",
+          "signature": "AddGranitDocumentsPublicLinksEndpoints(this IServiceCollection services)",
+          "returnType": "IServiceCollection"
+        }
+      ]
+    },
+    {
       "name": "DocumentsPublicLinksRateLimiterServiceCollectionExtensions",
       "fqn": "Granit.Documents.PublicLinks.Endpoints.Extensions.DocumentsPublicLinksRateLimiterServiceCollectionExtensions",
       "kind": "class",
@@ -23231,7 +23263,7 @@
       "kind": "class",
       "project": "Granit.Documents.PublicLinks.Endpoints",
       "file": "src/Granit.Documents.PublicLinks.Endpoints/GranitDocumentsPublicLinksEndpointsModule.cs",
-      "line": 15,
+      "line": 16,
       "members": [
         {
           "name": "ConfigureServices",
@@ -23386,7 +23418,7 @@
       "kind": "class",
       "project": "Granit.Documents.PublicLinks",
       "file": "src/Granit.Documents.PublicLinks/Extensions/ServiceCollectionExtensions.cs",
-      "line": 10,
+      "line": 9,
       "members": [
         {
           "name": "AddGranitDocumentsPublicLinks",
@@ -23691,12 +23723,28 @@
       ]
     },
     {
+      "name": "RenditionsEndpointsServiceCollectionExtensions",
+      "fqn": "Granit.Documents.Renditions.Endpoints.Extensions.RenditionsEndpointsServiceCollectionExtensions",
+      "kind": "class",
+      "project": "Granit.Documents.Renditions.Endpoints",
+      "file": "src/Granit.Documents.Renditions.Endpoints/Extensions/RenditionsEndpointsServiceCollectionExtensions.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "AddGranitDocumentsRenditionsEndpoints",
+          "kind": "method",
+          "signature": "AddGranitDocumentsRenditionsEndpoints(this IServiceCollection services)",
+          "returnType": "IServiceCollection"
+        }
+      ]
+    },
+    {
       "name": "GranitDocumentsRenditionsEndpointsModule",
       "fqn": "Granit.Documents.Renditions.Endpoints.GranitDocumentsRenditionsEndpointsModule",
       "kind": "class",
       "project": "Granit.Documents.Renditions.Endpoints",
       "file": "src/Granit.Documents.Renditions.Endpoints/GranitDocumentsRenditionsEndpointsModule.cs",
-      "line": 17,
+      "line": 18,
       "members": [
         {
           "name": "ConfigureServices",
@@ -68947,54 +68995,6 @@
       "file": "src/Granit.Workspaces.Abstractions/WorkspaceSectionDescriptor.cs",
       "line": 12,
       "members": []
-    },
-    {
-      "name": "DocumentsPublicLinksEndpointsServiceCollectionExtensions",
-      "fqn": "Microsoft.Extensions.DependencyInjection.DocumentsPublicLinksEndpointsServiceCollectionExtensions",
-      "kind": "class",
-      "project": "Granit.Documents.PublicLinks.Endpoints",
-      "file": "src/Granit.Documents.PublicLinks.Endpoints/Extensions/DocumentsPublicLinksEndpointsServiceCollectionExtensions.cs",
-      "line": 8,
-      "members": [
-        {
-          "name": "AddGranitDocumentsPublicLinksEndpoints",
-          "kind": "method",
-          "signature": "AddGranitDocumentsPublicLinksEndpoints(this IServiceCollection services)",
-          "returnType": "IServiceCollection"
-        }
-      ]
-    },
-    {
-      "name": "DocumentsServiceCollectionExtensions",
-      "fqn": "Microsoft.Extensions.DependencyInjection.DocumentsServiceCollectionExtensions",
-      "kind": "class",
-      "project": "Granit.Documents",
-      "file": "src/Granit.Documents/Extensions/DocumentsServiceCollectionExtensions.cs",
-      "line": 21,
-      "members": [
-        {
-          "name": "AddGranitDocuments",
-          "kind": "method",
-          "signature": "AddGranitDocuments(this IServiceCollection services, Action<GranitDocumentsOptions>? configure = null)",
-          "returnType": "IServiceCollection"
-        }
-      ]
-    },
-    {
-      "name": "RenditionsEndpointsServiceCollectionExtensions",
-      "fqn": "Microsoft.Extensions.DependencyInjection.RenditionsEndpointsServiceCollectionExtensions",
-      "kind": "class",
-      "project": "Granit.Documents.Renditions.Endpoints",
-      "file": "src/Granit.Documents.Renditions.Endpoints/Extensions/RenditionsEndpointsServiceCollectionExtensions.cs",
-      "line": 8,
-      "members": [
-        {
-          "name": "AddGranitDocumentsRenditionsEndpoints",
-          "kind": "method",
-          "signature": "AddGranitDocumentsRenditionsEndpoints(this IServiceCollection services)",
-          "returnType": "IServiceCollection"
-        }
-      ]
     }
   ]
 }

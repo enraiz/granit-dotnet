@@ -1,6 +1,7 @@
 using Granit.Documents.Renditions.Endpoints.Options;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Granit.Documents.Renditions.Endpoints.Extensions;
 
 /// <summary>
 /// DI extensions for the Granit.Documents.Renditions endpoints surface.

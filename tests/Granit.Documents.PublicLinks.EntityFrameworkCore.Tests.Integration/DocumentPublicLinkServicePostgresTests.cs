@@ -7,7 +7,6 @@ using Granit.Documents.PublicLinks.Diagnostics;
 using Granit.Documents.PublicLinks.Domain;
 using Granit.Documents.PublicLinks.EntityFrameworkCore.Internal;
 using Granit.Documents.PublicLinks.Events;
-using Granit.Documents.PublicLinks.Internal;
 using Granit.Documents.PublicLinks.Options;
 using Granit.Events;
 using Granit.Guids;
