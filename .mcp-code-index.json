@@ -18450,7 +18450,7 @@
       "kind": "class",
       "project": "Granit.Http.Bulkhead",
       "file": "src/Granit.Http.Bulkhead/ConcurrencyLimiterRegistry.cs",
-      "line": 28,
+      "line": 29,
       "members": [
         {
           "name": "AcquireAsync",
@@ -18485,6 +18485,24 @@
           "kind": "method",
           "signature": "RecordRejected(string policyName, string? tenantId)",
           "returnType": "void"
+        },
+        {
+          "name": "RecordEvicted",
+          "kind": "method",
+          "signature": "RecordEvicted(string reason, int count)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordUnknownPolicy",
+          "kind": "method",
+          "signature": "RecordUnknownPolicy(string policyName)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordAbandoned",
+          "kind": "method",
+          "signature": "RecordAbandoned(string policyName, string? tenantId)",
+          "returnType": "void"
         }
       ]
     },
@@ -18494,7 +18512,7 @@
       "kind": "class",
       "project": "Granit.Http.Bulkhead",
       "file": "src/Granit.Http.Bulkhead/Exceptions/BulkheadRejectedException.cs",
-      "line": 9,
+      "line": 11,
       "members": []
     },
     {
@@ -18528,6 +18546,15 @@
           "returnType": "void"
         }
       ]
+    },
+    {
+      "name": "BulkheadLocalizationResource",
+      "fqn": "Granit.Http.Bulkhead.Localization.BulkheadLocalizationResource",
+      "kind": "class",
+      "project": "Granit.Http.Bulkhead",
+      "file": "src/Granit.Http.Bulkhead/Localization/BulkheadLocalizationResource.cs",
+      "line": 9,
+      "members": []
     },
     {
       "name": "BulkheadPolicyOptions",
@@ -18603,7 +18630,7 @@
       "kind": "class",
       "project": "Granit.Http.Bulkhead",
       "file": "src/Granit.Http.Bulkhead/TenantPartitionedBulkhead.cs",
-      "line": 19,
+      "line": 20,
       "members": [
         {
           "name": "AcquireAsync",
