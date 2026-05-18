@@ -16,9 +16,6 @@ public sealed class JwtClaimTenantResolver(IOptions<MultiTenancyOptions> options
     public int Order => 200;
 
     /// <inheritdoc/>
-    public bool IsAuthoritative => true;
-
-    /// <inheritdoc/>
     public Task<TenantInfo?> ResolveAsync(HttpContext context, CancellationToken cancellationToken = default)
     {
         string? claim = context.User.FindFirstValue(_options.TenantIdClaimType);

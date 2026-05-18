@@ -8,12 +8,7 @@ namespace Granit.MultiTenancy.Pipeline;
 /// </summary>
 /// <param name="Tenant">Resolved tenant info, or <c>null</c> if no resolver matched.</param>
 /// <param name="ResolverType">Simple type name of the resolver that matched, or <c>"none"</c>.</param>
-/// <param name="IsAuthoritative">
-/// <c>true</c> when the matching resolver derived the tenant from a server-validated
-/// artefact (e.g. JWT claim). Non-authoritative resolutions (header, query, domain)
-/// for Host users must pass <c>IHostImpersonationGate</c>.
-/// </param>
-public sealed record TenantResolutionResult(TenantInfo? Tenant, string ResolverType, bool IsAuthoritative = false);
+public sealed record TenantResolutionResult(TenantInfo? Tenant, string ResolverType);
 
 /// <summary>
 /// Pipeline for resolving the current tenant.
@@ -37,10 +32,10 @@ public sealed class TenantResolverPipeline(IEnumerable<ITenantResolver> resolver
             TenantInfo? tenant = await resolver.ResolveAsync(context, cancellationToken).ConfigureAwait(false);
             if (tenant is not null)
             {
-                return new TenantResolutionResult(tenant, resolver.GetType().Name, resolver.IsAuthoritative);
+                return new TenantResolutionResult(tenant, resolver.GetType().Name);
             }
         }
 
-        return new TenantResolutionResult(null, "none", IsAuthoritative: false);
+        return new TenantResolutionResult(null, "none");
     }
 }
