@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using Granit.MultiTenancy.Authorization;
 using Granit.MultiTenancy.Diagnostics;
+using Granit.MultiTenancy.Internal;
 using Granit.MultiTenancy.Options;
 using Granit.MultiTenancy.Pipeline;
 using Granit.MultiTenancy.Stores;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,7 +26,9 @@ public sealed partial class TenantResolutionMiddleware(
     TenantResolverPipeline pipeline,
     ITenantReader tenantReader,
     IHostImpersonationGate hostImpersonationGate,
+    IHostImpersonationAuditWriter hostImpersonationAuditWriter,
     MultiTenancyMetrics metrics,
+    IStringLocalizer<MultiTenancyLocalizationResource> localizer,
     IOptions<MultiTenancyOptions> options,
     ILogger<TenantResolutionMiddleware> logger) : IMiddleware
 {
@@ -32,7 +36,9 @@ public sealed partial class TenantResolutionMiddleware(
     private readonly TenantResolverPipeline _pipeline = pipeline;
     private readonly ITenantReader _tenantReader = tenantReader;
     private readonly IHostImpersonationGate _hostImpersonationGate = hostImpersonationGate;
+    private readonly IHostImpersonationAuditWriter _hostImpersonationAuditWriter = hostImpersonationAuditWriter;
     private readonly MultiTenancyMetrics _metrics = metrics;
+    private readonly IStringLocalizer<MultiTenancyLocalizationResource> _localizer = localizer;
     private readonly MultiTenancyOptions _options = options.Value;
     private readonly ILogger _logger = logger;
 
@@ -58,11 +64,14 @@ public sealed partial class TenantResolutionMiddleware(
                 {
                     // Tenant user: header (or any non-JWT resolver) must match the JWT claim.
                     if (Guid.TryParse(jwtClaim, out Guid jwtTenantId)
-                        && jwtTenantId != result.Tenant.Id)
+                        && result.Tenant.Id is Guid resolvedTenantId
+                        && jwtTenantId != resolvedTenantId)
                     {
                         _metrics.RecordResolutionFailed();
-                        LogTenantMismatch(result.Tenant.Id!.Value, result.ResolverType, jwtTenantId);
-                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        LogTenantMismatch(resolvedTenantId, result.ResolverType, jwtTenantId);
+                        await ProblemDetailsWriter
+                            .WriteTenantMismatchAsync(context, _localizer, resolvedTenantId, jwtTenantId)
+                            .ConfigureAwait(false);
                         return;
                     }
                 }
@@ -76,16 +85,18 @@ public sealed partial class TenantResolutionMiddleware(
                         .CanImpersonateAsync(context.User, result.Tenant.Id.Value, context.RequestAborted)
                         .ConfigureAwait(false);
 
+                    // Audit BEFORE short-circuiting so the trail captures attempts, not
+                    // just successes. Audit-write failures must not propagate — wrap.
+                    await SafeAuditAsync(context, result, decision).ConfigureAwait(false);
+
                     if (!decision.Allowed)
                     {
-                        _metrics.RecordHostImpersonationDenied(
-                            result.Tenant.Id.Value.ToString(),
-                            decision.DenyReasonCode ?? "unspecified");
-                        LogHostImpersonationDenied(
-                            result.Tenant.Id.Value,
-                            result.ResolverType,
-                            decision.DenyReasonCode ?? "unspecified");
-                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        string reason = decision.DenyReasonCode ?? "unspecified";
+                        _metrics.RecordHostImpersonationDenied(result.Tenant.Id.Value.ToString(), reason);
+                        LogHostImpersonationDenied(result.Tenant.Id.Value, result.ResolverType, reason);
+                        await ProblemDetailsWriter
+                            .WriteHostImpersonationDeniedAsync(context, _localizer, reason, result.Tenant.Id)
+                            .ConfigureAwait(false);
                         return;
                     }
 
@@ -128,4 +139,36 @@ public sealed partial class TenantResolutionMiddleware(
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Host impersonation denied: principal attempting to impersonate {TenantId} via {ResolverType} — deny reason: {DenyReason}.")]
     private partial void LogHostImpersonationDenied(Guid tenantId, string resolverType, string denyReason);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Host impersonation audit-write failed for tenant {TenantId}. Audit trail may be incomplete.")]
+    private partial void LogAuditWriteFailed(Exception exception, Guid tenantId);
+
+    private async ValueTask SafeAuditAsync(
+        HttpContext context,
+        TenantResolutionResult result,
+        HostImpersonationDecision decision)
+    {
+        if (result.Tenant?.Id is not Guid tenantId)
+        {
+            return;
+        }
+
+        try
+        {
+            await _hostImpersonationAuditWriter.WriteAsync(
+                context.User,
+                tenantId,
+                decision,
+                result.ResolverType,
+                context.Connection.RemoteIpAddress?.ToString(),
+                context.Request.Headers.UserAgent.ToString(),
+                context.TraceIdentifier,
+                context.RequestAborted).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // Audit failure must NEVER break the request — log + swallow.
+            LogAuditWriteFailed(ex, tenantId);
+        }
+    }
 }
