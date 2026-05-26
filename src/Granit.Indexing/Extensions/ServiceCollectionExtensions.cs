@@ -2,6 +2,7 @@ using Granit.Diagnostics;
 using Granit.Indexing.Diagnostics;
 using Granit.Indexing.Internal;
 using Granit.Indexing.Options;
+using Granit.LanguageDetection.Extensions;
 using Granit.MultiTenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -15,7 +16,7 @@ namespace Granit.Indexing.Extensions;
 /// <remarks>
 /// Concrete backends ship in dedicated packages (<c>Granit.Indexing.EntityFrameworkCore</c>
 /// for Postgres tsvector, <c>Granit.Indexing.Elasticsearch</c> for ES). Concrete language
-/// detectors / summarisers / auto-taggers ship in <c>Granit.Indexing.Lingua</c> and the
+/// detectors ship in <c>Granit.LanguageDetection.Trigram</c>; concrete summarisers / auto-taggers ship in the
 /// AI provider packages.
 /// </remarks>
 public static class ServiceCollectionExtensions
@@ -59,9 +60,8 @@ public static class ServiceCollectionExtensions
         // their own ISearchResultAuthorizer<TKey> AFTER this call.
         services.TryAdd(ServiceDescriptor.Singleton(typeof(ISearchResultAuthorizer<>), typeof(NullSearchResultAuthorizer<>)));
 
-        // Composite language detector — picks up every ILanguageDetector via DI.
-        services.TryAddSingleton<CompositeLanguageDetector>();
-        services.TryAddSingleton<ILanguageDetector>(sp => sp.GetRequiredService<CompositeLanguageDetector>());
+        // Language detection composite — abstractions live in Granit.LanguageDetection.
+        services.AddGranitLanguageDetection();
 
         // Open-generic search-service orchestrator.
         services.TryAdd(ServiceDescriptor.Scoped(typeof(ISearchService<,>), typeof(DefaultSearchService<,>)));

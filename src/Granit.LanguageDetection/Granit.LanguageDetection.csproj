@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Granit.LanguageDetection</PackageId>
+    <Description>Cross-cutting language-detection abstractions for the Granit framework. ILanguageDetector facade + ILanguageDetectorProvider marker + CompositeLanguageDetector priority chain. Concrete implementations ship in dedicated packages (e.g. Granit.LanguageDetection.Trigram).</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Granit\Granit.csproj" />
+  </ItemGroup>
+
+</Project>
