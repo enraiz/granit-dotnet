@@ -4,6 +4,7 @@ using System.Text.Json;
 using Granit.BlobStorage;
 using Granit.BlobStorage.Domain;
 using Granit.BlobStorage.Options;
+using Granit.Domain.ValueObjects;
 using Granit.IO;
 using Granit.IO.Extensions;
 using Granit.Privacy.BlobStorage.DataExport;
@@ -66,6 +67,27 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
             catch (IOException) { /* best-effort */ }
         }
     }
+
+    // Convenience factory — produces ReceivedFragment values in the Takeout-style shape.
+    private static ReceivedFragment StagedFragment(string providerName, Guid blobId, string entryPath, string contentType = "application/json") =>
+        new(
+            ProviderName: providerName,
+            FragmentKind: "staged",
+            SourceContainer: PrivacyExportContainerNames.FragmentContainer,
+            BlobReferenceId: BlobReference.Create(blobId.ToString()),
+            EntryPath: entryPath,
+            ContentType: contentType,
+            IntegrityTag: "v1:test");
+
+    private static ReceivedFragment EmptyFragment(string providerName, Guid requestId) =>
+        new(
+            ProviderName: providerName,
+            FragmentKind: "empty",
+            SourceContainer: PrivacyExportContainerNames.FragmentContainer,
+            BlobReferenceId: BlobReference.Create($"{PrivacyExportContainerNames.EmptyFragmentPrefix}{requestId}"),
+            EntryPath: $"{providerName}.empty",
+            ContentType: "application/octet-stream",
+            IntegrityTag: string.Empty);
 
     private ExportArchiveAssemblyHandler CreateHandler(GranitPrivacyOptions? opts = null) =>
         new(
@@ -135,13 +157,13 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
         Guid archiveBlobId = SetupArchiveUpload();
 
         ExportCompletedEto evt = new(
-            requestId, userId, $"personal-data-export/{requestId}",
+            requestId, userId, BlobReference.Create($"personal-data-export/{requestId}"),
             IsPartial: false,
             MissingProviders: [],
             Fragments:
             [
-                new ReceivedFragment("identity", blobA.ToString(), "application/json"),
-                new ReceivedFragment("auditing", blobB.ToString(), "application/json"),
+                StagedFragment("identity", blobA, "identity.json"),
+                StagedFragment("auditing", blobB, "audit.json"),
             ],
             Regulation: "EU_GDPR",
             RequestedAt: RequestedAt);
@@ -160,11 +182,13 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
             archiveBlobId,
             Arg.Any<CancellationToken>());
 
-        // Verify the assembled ZIP contains both fragments + manifest.json
+        // Verify the assembled ZIP contains both fragments (using their EntryPath) + manifest.json
         byte[] zipBytes = _http.CapturedUploads.Single().Body;
         using MemoryStream ms = new(zipBytes);
         using ZipArchive zip = new(ms, ZipArchiveMode.Read);
         zip.Entries.Select(e => e.Name).ShouldContain("manifest.json");
+        zip.Entries.Select(e => e.FullName).ShouldContain("identity.json");
+        zip.Entries.Select(e => e.FullName).ShouldContain("audit.json");
         zip.Entries.Count.ShouldBe(3);
 
         ExportManifest manifest = await ReadManifest(zip, TestContext.Current.CancellationToken);
@@ -188,15 +212,14 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
         SetupFragmentDownload(blobA, "identity.json", "application/json", """{"id":"u1"}"""u8.ToArray());
         SetupArchiveUpload();
 
-        string emptySentinel = $"{PrivacyExportContainerNames.EmptyFragmentPrefix}{requestId}";
         ExportCompletedEto evt = new(
-            requestId, userId, $"personal-data-export/{requestId}",
+            requestId, userId, BlobReference.Create($"personal-data-export/{requestId}"),
             IsPartial: false,
             MissingProviders: [],
             Fragments:
             [
-                new ReceivedFragment("identity", blobA.ToString(), "application/json"),
-                new ReceivedFragment("notifications", emptySentinel, "application/json"),
+                StagedFragment("identity", blobA, "identity.json"),
+                EmptyFragment("notifications", requestId),
             ],
             Regulation: "EU_GDPR",
             RequestedAt: RequestedAt);
@@ -231,10 +254,10 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
         SetupArchiveUpload();
 
         ExportCompletedEto evt = new(
-            requestId, Guid.NewGuid(), $"personal-data-export/{requestId}",
+            requestId, Guid.NewGuid(), BlobReference.Create($"personal-data-export/{requestId}"),
             IsPartial: true,
             MissingProviders: ["auditing"],
-            Fragments: [new ReceivedFragment("identity", blobA.ToString(), "application/json")],
+            Fragments: [StagedFragment("identity", blobA, "identity.json")],
             Regulation: "EU_GDPR",
             RequestedAt: RequestedAt);
 
@@ -243,7 +266,7 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
         await _tracker.Received(1).MarkCompletedAsync(
             requestId,
             ExportRequestState.PartiallyCompleted,
-            Arg.Any<Granit.Domain.ValueObjects.BlobReference?>(),
+            Arg.Any<BlobReference?>(),
             Arg.Is<IReadOnlyList<string>>(l => l.Count == 1 && l[0] == "auditing"),
             Arg.Any<CancellationToken>());
     }
@@ -259,10 +282,10 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
         SetupFragmentDownload(blobA, "identity.json", "application/json", payload);
 
         ExportCompletedEto evt = new(
-            requestId, Guid.NewGuid(), $"personal-data-export/{requestId}",
+            requestId, Guid.NewGuid(), BlobReference.Create($"personal-data-export/{requestId}"),
             IsPartial: false,
             MissingProviders: [],
-            Fragments: [new ReceivedFragment("identity", blobA.ToString(), "application/json")],
+            Fragments: [StagedFragment("identity", blobA, "identity.json")],
             Regulation: "EU_GDPR",
             RequestedAt: RequestedAt);
 
@@ -290,10 +313,10 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
         SetupArchiveUpload();
 
         ExportCompletedEto evt = new(
-            requestId, Guid.NewGuid(), $"personal-data-export/{requestId}",
+            requestId, Guid.NewGuid(), BlobReference.Create($"personal-data-export/{requestId}"),
             IsPartial: false,
             MissingProviders: [],
-            Fragments: [new ReceivedFragment("identity", blobA.ToString(), "application/json")],
+            Fragments: [StagedFragment("identity", blobA, "identity.json")],
             Regulation: "EU_GDPR",
             RequestedAt: RequestedAt);
 
@@ -316,10 +339,10 @@ public sealed class ExportArchiveAssemblyHandlerTests : IDisposable
         SetupArchiveUpload();
 
         ExportCompletedEto evt = new(
-            requestId, Guid.NewGuid(), $"personal-data-export/{requestId}",
+            requestId, Guid.NewGuid(), BlobReference.Create($"personal-data-export/{requestId}"),
             IsPartial: false,
             MissingProviders: [],
-            Fragments: [new ReceivedFragment("identity", blobA.ToString(), "application/json")],
+            Fragments: [StagedFragment("identity", blobA, "identity.json")],
             Regulation: "EU_GDPR",
             RequestedAt: RequestedAt);
 

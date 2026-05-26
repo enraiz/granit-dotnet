@@ -1,3 +1,4 @@
+using Granit.Domain.ValueObjects;
 using Granit.Privacy.DataExport;
 using Granit.Privacy.DataExport.Events;
 using Shouldly;
@@ -47,30 +48,56 @@ public sealed class ExportEventsTests
         a.ShouldNotBe(b);
     }
 
-    // ──── PersonalDataPreparedEto ────
+    // ──── PersonalDataPreparedEto (Takeout-style: FragmentKind + EntryPath + IntegrityTag) ────
 
     [Fact]
     public void PersonalDataPreparedEto_Constructor_SetsAllProperties()
     {
         var requestId = Guid.NewGuid();
+        var blob = BlobReference.Create(Guid.NewGuid().ToString());
 
-        PersonalDataPreparedEto sut = new(requestId, "patients", "blob-ref-1", "application/json");
+        PersonalDataPreparedEto sut = new(
+            RequestId: requestId,
+            ProviderName: "patients",
+            FragmentKind: "staged",
+            SourceContainer: "gdpr-exports",
+            BlobReferenceId: blob,
+            EntryPath: "patients.json",
+            ContentType: "application/json",
+            IntegrityTag: "v1:abcdef");
 
         sut.RequestId.ShouldBe(requestId);
         sut.ProviderName.ShouldBe("patients");
-        sut.BlobReferenceId.Value.ShouldBe("blob-ref-1");
+        sut.FragmentKind.ShouldBe("staged");
+        sut.SourceContainer.ShouldBe("gdpr-exports");
+        sut.BlobReferenceId.ShouldBe(blob);
+        sut.EntryPath.ShouldBe("patients.json");
         sut.ContentType.ShouldBe("application/json");
+        sut.IntegrityTag.ShouldBe("v1:abcdef");
     }
 
     [Fact]
     public void PersonalDataPreparedEto_Equality_SameValues_AreEqual()
     {
         var requestId = Guid.NewGuid();
+        var blob = BlobReference.Create("blob-1");
 
-        PersonalDataPreparedEto a = new(requestId, "p", "blob-1", "application/json");
-        PersonalDataPreparedEto b = new(requestId, "p", "blob-1", "application/json");
+        PersonalDataPreparedEto a = new(requestId, "p", "staged", "gdpr-exports", blob, "p.json", "application/json", "v1:t");
+        PersonalDataPreparedEto b = new(requestId, "p", "staged", "gdpr-exports", blob, "p.json", "application/json", "v1:t");
 
         a.ShouldBe(b);
+    }
+
+    [Fact]
+    public void PersonalDataPreparedEto_DifferentFragmentKind_AreNotEqual()
+    {
+        var requestId = Guid.NewGuid();
+        var blob = BlobReference.Create("blob-1");
+
+        PersonalDataPreparedEto staged = new(requestId, "p", "staged", "gdpr-exports", blob, "p.json", "application/json", "v1:t");
+        PersonalDataPreparedEto passthrough = new(requestId, "p", "passthrough", "gdpr-exports", blob, "p.json", "application/json", "v1:t");
+
+        staged.ShouldNotBe(passthrough);
     }
 
     // ──── ExportCompletedEto ────
@@ -83,7 +110,7 @@ public sealed class ExportEventsTests
         List<string> missingProviders = ["billing", "appointments"];
 
         DateTimeOffset requestedAt = DateTimeOffset.UtcNow;
-        ExportCompletedEto sut = new(requestId, userId, "gdpr-export/123", true, missingProviders, [], "EU_GDPR", requestedAt);
+        ExportCompletedEto sut = new(requestId, userId, BlobReference.Create("gdpr-export/123"), true, missingProviders, [], "EU_GDPR", requestedAt);
 
         sut.RequestId.ShouldBe(requestId);
         sut.UserId.ShouldBe(userId);
@@ -101,14 +128,20 @@ public sealed class ExportEventsTests
     {
         var requestId = Guid.NewGuid();
         var userId = Guid.NewGuid();
+        var blob = BlobReference.Create("blob-1");
 
-        List<ReceivedFragment> fragments = [new("identity", "blob-1", "application/json")];
+        List<ReceivedFragment> fragments =
+        [
+            new("identity", "staged", "gdpr-exports", blob, "identity.json", "application/json", "v1:t"),
+        ];
 
-        ExportCompletedEto sut = new(requestId, userId, "gdpr-export/abc", false, [], fragments, "EU_GDPR", DateTimeOffset.UtcNow);
+        ExportCompletedEto sut = new(requestId, userId, BlobReference.Create("gdpr-export/abc"), false, [], fragments, "EU_GDPR", DateTimeOffset.UtcNow);
 
         sut.IsPartial.ShouldBeFalse();
         sut.MissingProviders.ShouldBeEmpty();
         sut.Fragments.Count.ShouldBe(1);
+        sut.Fragments[0].EntryPath.ShouldBe("identity.json");
+        sut.Fragments[0].FragmentKind.ShouldBe("staged");
     }
 
     [Fact]
@@ -120,8 +153,8 @@ public sealed class ExportEventsTests
 
         List<ReceivedFragment> fragments = [];
         DateTimeOffset requestedAt = DateTimeOffset.UtcNow;
-        ExportCompletedEto a = new(requestId, userId, "ref", true, missing, fragments, "EU_GDPR", requestedAt);
-        ExportCompletedEto b = new(requestId, userId, "ref", true, missing, fragments, "EU_GDPR", requestedAt);
+        ExportCompletedEto a = new(requestId, userId, BlobReference.Create("ref"), true, missing, fragments, "EU_GDPR", requestedAt);
+        ExportCompletedEto b = new(requestId, userId, BlobReference.Create("ref"), true, missing, fragments, "EU_GDPR", requestedAt);
 
         a.ShouldBe(b);
     }
