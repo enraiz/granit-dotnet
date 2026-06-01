@@ -1,0 +1,10 @@
+{
+  "culture": "es",
+  "texts": {
+    "HostnamesEndpoints:Workspace.Item": "Nombres de host",
+    "HostnamesEndpoints:Workspace.Section": "Nombres de host gestionados",
+    "Permission:Hostnames.Hostnames.Read": "Leer nombres de host",
+    "Permission:Hostnames.Hostnames.Manage": "Gestionar nombres de host",
+    "PermissionGroup:Hostnames": "Nombres de host"
+  }
+}

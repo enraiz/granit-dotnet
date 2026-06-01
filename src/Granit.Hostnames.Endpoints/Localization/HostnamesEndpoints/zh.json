@@ -1,0 +1,10 @@
+{
+  "culture": "zh",
+  "texts": {
+    "HostnamesEndpoints:Workspace.Item": "主机名",
+    "HostnamesEndpoints:Workspace.Section": "托管主机名",
+    "Permission:Hostnames.Hostnames.Read": "读取主机名",
+    "Permission:Hostnames.Hostnames.Manage": "管理主机名",
+    "PermissionGroup:Hostnames": "主机名"
+  }
+}

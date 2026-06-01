@@ -1,0 +1,10 @@
+{
+  "culture": "nl",
+  "texts": {
+    "HostnamesEndpoints:Workspace.Item": "Hostnamen",
+    "HostnamesEndpoints:Workspace.Section": "Beheerde hostnamen",
+    "Permission:Hostnames.Hostnames.Read": "Hostnamen raadplegen",
+    "Permission:Hostnames.Hostnames.Manage": "Hostnamen beheren",
+    "PermissionGroup:Hostnames": "Hostnamen"
+  }
+}

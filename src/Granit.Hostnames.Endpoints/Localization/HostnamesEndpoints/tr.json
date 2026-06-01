@@ -1,0 +1,10 @@
+{
+  "culture": "tr",
+  "texts": {
+    "HostnamesEndpoints:Workspace.Item": "Ana Bilgisayar Adları",
+    "HostnamesEndpoints:Workspace.Section": "Yönetilen ana bilgisayar adları",
+    "Permission:Hostnames.Hostnames.Read": "Ana bilgisayar adlarını oku",
+    "Permission:Hostnames.Hostnames.Manage": "Ana bilgisayar adlarını yönet",
+    "PermissionGroup:Hostnames": "Ana Bilgisayar Adları"
+  }
+}

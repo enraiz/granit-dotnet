@@ -1,0 +1,10 @@
+{
+  "culture": "sv",
+  "texts": {
+    "HostnamesEndpoints:Workspace.Item": "Värdnamn",
+    "HostnamesEndpoints:Workspace.Section": "Hanterade värdnamn",
+    "Permission:Hostnames.Hostnames.Read": "Läsa värdnamn",
+    "Permission:Hostnames.Hostnames.Manage": "Hantera värdnamn",
+    "PermissionGroup:Hostnames": "Värdnamn"
+  }
+}
