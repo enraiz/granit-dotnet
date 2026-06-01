@@ -6,6 +6,8 @@ using Granit.Hostnames.Exports;
 using Granit.Hostnames.Queries;
 using Granit.Modularity;
 using Granit.QueryEngine.Extensions;
+using Granit.Workflow;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Granit.Hostnames;
 
@@ -15,6 +17,7 @@ namespace Granit.Hostnames;
 /// HTTP endpoints in <c>Granit.Hostnames.Endpoints</c>; DNS verification and provider adapters in
 /// their own sibling packages — by design for a layer-pure base package.
 /// </summary>
+[DependsOn(typeof(GranitWorkflowModule))]
 public sealed class GranitHostnamesModule : GranitModule
 {
     /// <inheritdoc/>
@@ -23,6 +26,8 @@ public sealed class GranitHostnamesModule : GranitModule
         ArgumentNullException.ThrowIfNull(context);
 
         GranitActivitySourceRegistry.Register(HostnamesActivitySource.Name);
+
+        context.Services.TryAddSingleton<HostnamesMetrics>();
 
         context.Services.AddQueryDefinition<ManagedHostname, ManagedHostnameQueryDefinition>();
         context.Services.AddExportDefinition<ManagedHostname, ManagedHostnameExportDefinition>();

@@ -1,4 +1,5 @@
 using Granit.Hostnames.Contracts;
+using Granit.Hostnames.Diagnostics;
 using Granit.Hostnames.Domain;
 using Granit.MultiTenancy;
 using Granit.Persistence;
@@ -20,7 +21,8 @@ namespace Granit.Hostnames.EntityFrameworkCore.Internal;
 /// </remarks>
 internal sealed class EfManagedHostnameStore(
     IDbContextFactory<HostnamesDbContext> contextFactory,
-    ICurrentTenant currentTenant)
+    ICurrentTenant currentTenant,
+    HostnamesMetrics metrics)
     : EfStoreBase<ManagedHostname, HostnamesDbContext>(contextFactory, currentTenant),
       IManagedHostnameReader,
       IManagedHostnameWriter
@@ -68,13 +70,39 @@ internal sealed class EfManagedHostnameStore(
                 .OrderBy(h => (object)h.Host.Value),
             cancellationToken);
 
+    /// <inheritdoc/>
+    public Task<IReadOnlyList<ManagedHostname>> ListDueForVerificationAsync(
+        DateTimeOffset now,
+        int batchSize = 100,
+        CancellationToken cancellationToken = default) =>
+        ReadAsync<IReadOnlyList<ManagedHostname>>(
+            async db =>
+            {
+                // Poller query: status ∈ {Verifying, Error} AND NextCheckAt ≤ now (non-null).
+                // Bypass tenant filter — the poller is a system job, not tenant-scoped.
+                List<ManagedHostname> results = await db.ManagedHostnames
+                    .IgnoreQueryFilters([GranitFilterNames.MultiTenant])
+                    .Where(h =>
+                        (h.Status == HostnameStatus.Verifying || h.Status == HostnameStatus.Error) &&
+                        h.NextCheckAt != null && h.NextCheckAt <= now)
+                    .OrderBy(h => h.NextCheckAt)
+                    .Take(batchSize)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false);
+                return results;
+            },
+            cancellationToken);
+
     // ── IManagedHostnameWriter ──────────────────────────────────────────
 
     /// <inheritdoc/>
-    public new Task AddAsync(
+    public new async Task AddAsync(
         ManagedHostname hostname,
-        CancellationToken cancellationToken = default) =>
-        base.AddAsync(hostname, cancellationToken);
+        CancellationToken cancellationToken = default)
+    {
+        await base.AddAsync(hostname, cancellationToken).ConfigureAwait(false);
+        metrics.RecordCreated(hostname.TenantId);
+    }
 
     /// <inheritdoc/>
     public new Task UpdateAsync(
@@ -83,8 +111,11 @@ internal sealed class EfManagedHostnameStore(
         base.UpdateAsync(hostname, cancellationToken);
 
     /// <inheritdoc/>
-    public new Task DeleteAsync(
+    public new async Task DeleteAsync(
         ManagedHostname hostname,
-        CancellationToken cancellationToken = default) =>
-        base.DeleteAsync(hostname, cancellationToken);
+        CancellationToken cancellationToken = default)
+    {
+        await base.DeleteAsync(hostname, cancellationToken).ConfigureAwait(false);
+        metrics.RecordDeleted(hostname.TenantId);
+    }
 }
