@@ -947,7 +947,8 @@
       "deps": [
         "Granit",
         "Granit.Http.ApiDocumentation",
-        "Granit.Http.Cookies"
+        "Granit.Http.Cookies",
+        "Granit.Validation"
       ],
       "framework": "net10.0"
     },
@@ -45629,14 +45630,7 @@
       "project": "Granit.Templating",
       "file": "src/Granit.Templating/Store/TemplateRevision.cs",
       "line": 8,
-      "members": [
-        {
-          "name": "RevisionId",
-          "kind": "property",
-          "signature": "required Guid RevisionId",
-          "returnType": "required Guid"
-        }
-      ]
+      "members": []
     },
     {
       "name": "TemplateSummary",
