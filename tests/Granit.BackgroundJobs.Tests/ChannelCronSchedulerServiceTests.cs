@@ -38,7 +38,7 @@ public sealed class ChannelCronSchedulerServiceTests
     }
 
     private ChannelCronSchedulerService CreateService() =>
-        new(_scopeFactory, _clock, NullLogger<ChannelCronSchedulerService>.Instance);
+        new(_scopeFactory, _clock, Substitute.For<IHostEnvironment>(), NullLogger<ChannelCronSchedulerService>.Instance);
 
     /// <summary>
     /// Starts the <see cref="BackgroundService"/> and waits for <c>ExecuteAsync</c> to complete.
