@@ -2,7 +2,6 @@ using Granit.Extensions;
 using Granit.Http.ApiDocumentation.Extensions;
 using Granit.Modularity;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -29,8 +28,8 @@ namespace Granit.OpenApi.Generation;
 /// interface parameter as a request body and throws on GET/DELETE. The correct fix is at the source —
 /// annotate every application-service handler parameter with <c>[FromServices]</c>, which forces service
 /// binding regardless of registration. Where that discipline is not yet in place, pass the leaking
-/// contracts to <see cref="OpenApiContractServiceCollectionExtensions.AddContractServiceStubs"/> from
-/// the <paramref name="configure"/> hook — an explicit, self-documenting list, never a blanket mask.
+/// contracts to <see cref="Extensions.OpenApiContractServiceCollectionExtensions.AddContractServiceStubs"/> from
+/// the <c>configure</c> hook — an explicit, self-documenting list, never a blanket mask.
 /// </para>
 /// </remarks>
 public static class OpenApiContractGenerator
