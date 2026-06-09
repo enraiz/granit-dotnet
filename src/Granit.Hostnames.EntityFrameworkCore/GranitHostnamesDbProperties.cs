@@ -11,18 +11,19 @@ namespace Granit.Hostnames.EntityFrameworkCore;
 /// </remarks>
 public static class GranitHostnamesDbProperties
 {
-    /// <summary>Table name prefix for all hostname tables. Default: <c>"hostname_"</c>.</summary>
-    public static string DbTablePrefix { get; set; } = "hostname_";
+    /// <summary>Table name prefix for all hostname tables. Default: <c>"hostnames_"</c>.</summary>
+    public static string DbTablePrefix { get; set; } = "hostnames_";
 
     private static string? _dbSchema;
     private static bool _dbSchemaExplicitlySet;
 
     /// <summary>
-    /// Database schema. Falls back to <see cref="GranitDbDefaults.DbSchema"/> when not explicitly set.
+    /// Database schema. Falls back to <see cref="GranitDbDefaults.HostDbSchema"/>, then
+    /// <see cref="GranitDbDefaults.DbSchema"/> when not explicitly set.
     /// </summary>
     public static string? DbSchema
     {
-        get => _dbSchemaExplicitlySet ? _dbSchema : GranitDbDefaults.DbSchema;
+        get => _dbSchemaExplicitlySet ? _dbSchema : GranitDbDefaults.HostDbSchema ?? GranitDbDefaults.DbSchema;
         set { _dbSchema = value; _dbSchemaExplicitlySet = true; }
     }
 }
