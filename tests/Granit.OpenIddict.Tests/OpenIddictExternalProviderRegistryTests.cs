@@ -1,4 +1,4 @@
-using Granit.OpenIddict.Options;
+using Granit.Authentication.External.Options;
 using Granit.OpenIddict.Services;
 using Microsoft.AspNetCore.Authentication;
 using NSubstitute;
@@ -14,10 +14,10 @@ public sealed class OpenIddictExternalProviderRegistryTests
 
     private OpenIddictExternalProviderRegistry CreateSut(params string[] configuredProviders)
     {
-        Microsoft.Extensions.Options.IOptions<GranitOpenIddictClientOptions> options =
-            MsOptions.Create(new GranitOpenIddictClientOptions
+        Microsoft.Extensions.Options.IOptions<ExternalAuthOptions> options =
+            MsOptions.Create(new ExternalAuthOptions
             {
-                Providers = [.. configuredProviders.Select(name => new ExternalProviderOptions { Name = name })],
+                Providers = [.. configuredProviders.Select(name => new ExternalAuthProvider { Type = name })],
             });
         return new OpenIddictExternalProviderRegistry(options, _schemeProvider);
     }
