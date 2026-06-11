@@ -3,9 +3,6 @@ using Granit.LanguageDetection.AI.Diagnostics;
 using Granit.LanguageDetection.AI.Internal;
 using Granit.LanguageDetection.AI.Options;
 using Granit.LanguageDetection.AI.Prompts;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 namespace Granit.LanguageDetection.AI.Extensions;
 
