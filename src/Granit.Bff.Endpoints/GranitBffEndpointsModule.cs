@@ -4,7 +4,9 @@ using Granit.Bff.Options;
 using Granit.Caching;
 using Granit.Http.ApiDocumentation;
 using Granit.Http.Cookies;
+using Granit.IpGeolocation;
 using Granit.Modularity;
+using Granit.UserSessions;
 using Granit.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -26,6 +28,8 @@ namespace Granit.Bff.Endpoints;
     typeof(GranitCachingModule),
     typeof(GranitHttpApiDocumentationModule),
     typeof(GranitHttpCookiesModule),
+    typeof(GranitIpGeolocationModule),
+    typeof(GranitUserSessionsAbstractionsModule),
     typeof(GranitValidationModule))]
 public sealed class GranitBffEndpointsModule : GranitModule
 {

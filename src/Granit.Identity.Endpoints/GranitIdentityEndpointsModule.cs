@@ -2,8 +2,10 @@ using Granit.Authorization;
 using Granit.Http.ApiDocumentation;
 using Granit.Identity.Endpoints.Internal;
 using Granit.Identity.Endpoints.Workspaces;
+using Granit.IpGeolocation;
 using Granit.Localization.Extensions;
 using Granit.Modularity;
+using Granit.UserSessions;
 using Granit.Validation;
 using Granit.Workspaces;
 using Granit.Workspaces.Extensions;
@@ -30,6 +32,8 @@ namespace Granit.Identity.Endpoints;
     typeof(GranitAuthorizationModule),
     typeof(GranitHttpApiDocumentationModule),
     typeof(GranitIdentityModule),
+    typeof(GranitIpGeolocationModule),
+    typeof(GranitUserSessionsAbstractionsModule),
     typeof(GranitValidationModule),
     typeof(GranitWorkspacesAbstractionsModule))]
 public sealed class GranitIdentityEndpointsModule : GranitModule

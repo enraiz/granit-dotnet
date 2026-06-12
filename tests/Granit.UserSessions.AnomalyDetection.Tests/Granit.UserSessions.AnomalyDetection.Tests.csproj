@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <!-- justification: CA2012 false positive — tests mock a ValueTask-returning member with
+         NSubstitute's .Returns(ValueTask.FromResult(...)); the substitute consumes the ValueTask
+         once, it is never stored or double-consumed. -->
+    <NoWarn>$(NoWarn);CA2012</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Granit.UserSessions.AnomalyDetection\Granit.UserSessions.AnomalyDetection.csproj" />
+  </ItemGroup>
+
+</Project>
