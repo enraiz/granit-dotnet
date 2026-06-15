@@ -196,6 +196,12 @@ public static class ModelBuilderExtensions
         }
 
         // --- Value object conventions ---
+        // 0. Map [QueryableValueObject] properties so their inner .Value is queryable (ADR-070):
+        //    ComplexProperty (a real scalar column) by default, or a JSON column for nullable ones.
+        //    Declared first so the SVO is a complex/owned type rather than the opaque scalar
+        //    converter; steps 1-2 below leave these (and JSON-owned VOs) alone.
+        ApplyQueryableValueObjectMappings(modelBuilder);
+
         // 1. Remove any ValueObject type that EF Core auto-discovered as an entity type.
         //    Value objects (e.g. PlanId, OpenGraph, ImageDimensions) have no identity and
         //    must NOT be treated as entities. Each is re-attached to its owner as a column:
@@ -376,7 +382,8 @@ public static class ModelBuilderExtensions
     private static void RemoveValueObjectEntityTypes(ModelBuilder modelBuilder)
     {
         var valueObjectEntityTypes = modelBuilder.Model.GetEntityTypes()
-            .Where(et => typeof(ValueObject).IsAssignableFrom(et.ClrType))
+            .Where(et => typeof(ValueObject).IsAssignableFrom(et.ClrType)
+                && !IsQueryableValueObjectOwned(et))
             .ToList();
 
         if (valueObjectEntityTypes.Count == 0)
@@ -537,6 +544,85 @@ public static class ModelBuilderExtensions
         property.SetValueConverter(new JsonValueObjectConverter<T>());
         property.SetValueComparer(new JsonValueObjectComparer<T>());
         property.SetAnnotation(GranitPersistenceAnnotationNames.JsonSerialized, true);
+    }
+
+    // Maps each [QueryableValueObject] SingleValueObject<T> property so its inner .Value is
+    // queryable (ADR-070), instead of the default opaque value converter:
+    //   - ComplexProperty (default): .Value as a real scalar column named after the property (no
+    //     "_Value" suffix — switching from the converter keeps the same column name, no rename).
+    //     Nullable columns get a shadow discriminator (EF requirement for an all-optional complex
+    //     type) — the .Value column stays a real, indexable scalar.
+    //   - Json: OwnsOne(...).ToJson() — an alternative for nullable VOs that avoids the
+    //     discriminator column (at the cost of JSON storage + weaker indexing).
+    // Either way the QueryEngine drills into .Value (mapping-agnostic).
+    private static void ApplyQueryableValueObjectMappings(ModelBuilder modelBuilder)
+    {
+        NullabilityInfoContext nullabilityContext = new();
+
+        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes().ToList()) // NOSONAR S3445 - ToList(): mapping mutates the model, cannot enumerate the live collection
+        {
+            foreach (PropertyInfo property in entityType.ClrType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (property.GetCustomAttribute<QueryableValueObjectAttribute>() is not { } attribute)
+                {
+                    continue;
+                }
+
+                if (GetSingleValueObjectBase(property.PropertyType) is null)
+                {
+                    throw new InvalidOperationException(
+                        $"'{entityType.ClrType.Name}.{property.Name}' is marked [QueryableValueObject] " +
+                        $"but its type '{property.PropertyType.Name}' is not a SingleValueObject<T>.");
+                }
+
+                if (attribute.Storage == QueryableValueObjectStorage.Json)
+                {
+                    // JSON column (OwnsOne().ToJson()) — supports null; the inner .Value is queried
+                    // via the provider's JSON path.
+                    modelBuilder.Entity(entityType.ClrType)
+                        .OwnsOne(property.PropertyType, property.Name, owned => owned.ToJson());
+                    continue;
+                }
+
+                Microsoft.EntityFrameworkCore.Metadata.Builders.ComplexPropertyBuilder complexBuilder =
+                    modelBuilder.Entity(entityType.ClrType).ComplexProperty(property.Name);
+
+                bool nullable = IsNullableReference(nullabilityContext, property);
+                if (nullable)
+                {
+                    // An optional complex type whose only contained property is also optional cannot
+                    // distinguish 'null VO' from 'present VO with a null/empty value' by column
+                    // values alone — EF requires a shadow discriminator. This keeps .Value a real,
+                    // indexable scalar column (unlike the JSON strategy). See ADR-070.
+                    complexBuilder.IsRequired(false);
+                    complexBuilder.HasDiscriminator();
+                }
+
+                complexBuilder
+                    .Property(nameof(SingleValueObject<string>.Value))
+                    .HasColumnName(property.Name)
+                    .IsRequired(!nullable);
+            }
+        }
+    }
+
+    // True when the entity type is the owned (JSON) side of a [QueryableValueObject(Json)] mapping —
+    // an intentional, framework-sanctioned OwnsOne that must survive RemoveValueObjectEntityTypes.
+    // An author's *unmarked* OwnsOne over a value object is still removed/rejected (ADR-017/058).
+    private static bool IsQueryableValueObjectOwned(IReadOnlyEntityType entityType) =>
+        entityType.IsOwned()
+        && entityType.FindOwnership()?.PrincipalToDependent?.PropertyInfo
+            ?.GetCustomAttribute<QueryableValueObjectAttribute>() is not null;
+
+    private static bool IsNullableReference(NullabilityInfoContext context, PropertyInfo property)
+    {
+        if (Nullable.GetUnderlyingType(property.PropertyType) is not null)
+        {
+            return true;
+        }
+
+        NullabilityInfo info = context.Create(property);
+        return info.ReadState == NullabilityState.Nullable || info.WriteState == NullabilityState.Nullable;
     }
 
     // Scans all entity properties for SingleValueObject<T> types and applies a ValueConverter

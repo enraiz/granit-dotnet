@@ -19111,6 +19111,31 @@
       "members": []
     },
     {
+      "name": "QueryableValueObjectAttribute",
+      "fqn": "Granit.Domain.QueryableValueObjectAttribute",
+      "kind": "class",
+      "project": "Granit",
+      "file": "src/Granit/Domain/QueryableValueObjectAttribute.cs",
+      "line": 42,
+      "members": [
+        {
+          "name": "Storage",
+          "kind": "property",
+          "signature": "QueryableValueObjectStorage Storage",
+          "returnType": "QueryableValueObjectStorage"
+        }
+      ]
+    },
+    {
+      "name": "QueryableValueObjectStorage",
+      "fqn": "Granit.Domain.QueryableValueObjectStorage",
+      "kind": "enum",
+      "project": "Granit",
+      "file": "src/Granit/Domain/QueryableValueObjectAttribute.cs",
+      "line": 6,
+      "members": []
+    },
+    {
       "name": "SingleValueObject",
       "fqn": "Granit.Domain.SingleValueObject",
       "kind": "class",
@@ -47470,7 +47495,7 @@
       "kind": "class",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/QueryDefinitionBuilder.cs",
-      "line": 14,
+      "line": 15,
       "members": []
     },
     {

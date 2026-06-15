@@ -53,8 +53,20 @@ internal static class FilterExpressionBuilder
 
         if (property is not null)
         {
-            member = Expression.Property(parameter, property);
-            propertyType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            // A [QueryableValueObject] column resolves to its `.Value` string column (ADR-070,
+            // strategy B) so equality/IN/substring operate on the real scalar. Range operators are
+            // dropped (a string value object has no meaningful ordering — the same stance as a
+            // converter-mapped VO). A plain value-object column stays the VO type (equality
+            // reconstructs it).
+            if (ValueObjectMemberResolver.IsQueryableValueObject(property)
+                && criteria.Operator is FilterOperator.Gt or FilterOperator.Gte
+                    or FilterOperator.Lt or FilterOperator.Lte or FilterOperator.Between)
+            {
+                return null;
+            }
+
+            member = ValueObjectMemberResolver.Resolve(parameter, property);
+            propertyType = Nullable.GetUnderlyingType(member.Type) ?? member.Type;
         }
         else if (shadowColumns is not null
                  && shadowColumns.TryGetValue(criteria.Field, out ColumnDescriptor? shadowCol))
