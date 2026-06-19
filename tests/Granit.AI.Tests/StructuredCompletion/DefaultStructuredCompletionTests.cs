@@ -33,7 +33,7 @@ public sealed class DefaultStructuredCompletionTests
     {
         _workspaceProvider
             .GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new AIWorkspace { Name = "test", Provider = "OpenAI", Model = "gpt-4o-mini" });
+            .Returns(new AIWorkspace { Key = "test", Provider = "OpenAI", Model = "gpt-4o-mini" });
 
         _capabilityResolver
             .ResolveAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())

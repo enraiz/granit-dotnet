@@ -59,7 +59,7 @@ internal sealed class AzureOpenAICredentialResolver(
         if (string.IsNullOrWhiteSpace(endpoint))
         {
             throw new AIProviderCredentialNotConfiguredException(
-                ProviderName, workspace.Name, workspace.TenantId);
+                ProviderName, workspace.Key, workspace.TenantId);
         }
 
         // SSRF validation on the resolved endpoint.
@@ -80,7 +80,7 @@ internal sealed class AzureOpenAICredentialResolver(
         if (!opts.AllowManagedIdentityFallback)
         {
             throw new AIProviderCredentialNotConfiguredException(
-                ProviderName, workspace.Name, workspace.TenantId);
+                ProviderName, workspace.Key, workspace.TenantId);
         }
 
         return new AIProviderCredential

@@ -13,7 +13,7 @@ public sealed class AnthropicProviderFactoryTests
     private static AIWorkspace CreateWorkspace(string? model = "claude-sonnet-4-6", string? apiKey = null) =>
         new()
         {
-            Name = "test",
+            Key = "test",
             Provider = "Anthropic",
             Model = model!,
             ApiKey = apiKey,

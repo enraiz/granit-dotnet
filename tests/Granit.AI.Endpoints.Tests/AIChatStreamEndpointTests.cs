@@ -27,7 +27,7 @@ public sealed class AIChatStreamEndpointTests : IAsyncDisposable
     public AIChatStreamEndpointTests()
     {
         _workspaceProvider.GetAsync("my-gpt4", Arg.Any<CancellationToken>())
-            .Returns(new AIWorkspace { Name = "my-gpt4", Provider = "OpenAI", Model = "gpt-4o" });
+            .Returns(new AIWorkspace { Key = "my-gpt4", Provider = "OpenAI", Model = "gpt-4o" });
         _usageRecordFactory.Create(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<int>(), Arg.Any<int>(), Arg.Any<TimeSpan?>())

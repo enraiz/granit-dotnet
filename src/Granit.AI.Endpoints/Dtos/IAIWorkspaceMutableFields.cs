@@ -13,10 +13,10 @@ public interface IAIWorkspaceMutableFields
     string Model { get; }
 
     /// <summary>
-    /// Human-readable display label (e.g. <c>GPT-4o</c>, <c>Support AI</c>).
+    /// Short human-readable label (e.g. <c>GPT-4o</c>, <c>Support AI</c>). Max 64 chars.
     /// When <see langword="null"/>, the model identifier is used as the display fallback.
     /// </summary>
-    string? WorkspaceModelName { get; }
+    string? DisplayName { get; }
 
     /// <summary>Optional system prompt.</summary>
     string? SystemPrompt { get; }

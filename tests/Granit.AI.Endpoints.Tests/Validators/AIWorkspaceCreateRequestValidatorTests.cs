@@ -20,22 +20,22 @@ public sealed class AIWorkspaceCreateRequestValidatorTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Name_empty_fails(string? name)
+    public void Key_empty_fails(string? key)
     {
-        AIWorkspaceCreateRequest request = new(name!, "OpenAI", "gpt-4o", null, null, null, null);
+        AIWorkspaceCreateRequest request = new(key!, "OpenAI", "gpt-4o", null, null, null, null);
         TestValidationResult<AIWorkspaceCreateRequest> result = _validator.TestValidate(request);
-        result.ShouldHaveValidationErrorFor(x => x.Name);
+        result.ShouldHaveValidationErrorFor(x => x.Key);
     }
 
     [Theory]
     [InlineData("MY-WORKSPACE")]
     [InlineData("workspace with spaces")]
     [InlineData("-starts-with-dash")]
-    public void Name_invalid_format_fails(string name)
+    public void Key_invalid_format_fails(string key)
     {
-        AIWorkspaceCreateRequest request = new(name, "OpenAI", "gpt-4o", null, null, null, null);
+        AIWorkspaceCreateRequest request = new(key, "OpenAI", "gpt-4o", null, null, null, null);
         TestValidationResult<AIWorkspaceCreateRequest> result = _validator.TestValidate(request);
-        result.ShouldHaveValidationErrorFor(x => x.Name);
+        result.ShouldHaveValidationErrorFor(x => x.Key);
     }
 
     [Fact]
@@ -81,18 +81,18 @@ public sealed class AIWorkspaceCreateRequestValidatorTests
     }
 
     [Fact]
-    public void WorkspaceModelName_too_long_fails()
+    public void DisplayName_too_long_fails()
     {
         AIWorkspaceCreateRequest request = new("test", "OpenAI", "gpt-4o", new string('x', 65), null, null, null);
         TestValidationResult<AIWorkspaceCreateRequest> result = _validator.TestValidate(request);
-        result.ShouldHaveValidationErrorFor(x => x.WorkspaceModelName);
+        result.ShouldHaveValidationErrorFor(x => x.DisplayName);
     }
 
     [Fact]
-    public void WorkspaceModelName_null_passes()
+    public void DisplayName_null_passes()
     {
         AIWorkspaceCreateRequest request = new("test", "OpenAI", "gpt-4o", null, null, null, null);
         TestValidationResult<AIWorkspaceCreateRequest> result = _validator.TestValidate(request);
-        result.ShouldNotHaveValidationErrorFor(x => x.WorkspaceModelName);
+        result.ShouldNotHaveValidationErrorFor(x => x.DisplayName);
     }
 }

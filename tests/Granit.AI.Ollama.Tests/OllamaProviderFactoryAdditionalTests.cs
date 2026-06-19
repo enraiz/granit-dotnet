@@ -12,7 +12,7 @@ public sealed class OllamaProviderFactoryAdditionalTests
     private static AIWorkspace CreateWorkspace(string? model = "llama3.2") =>
         new()
         {
-            Name = "test",
+            Key = "test",
             Provider = "Ollama",
             Model = model!,
         };

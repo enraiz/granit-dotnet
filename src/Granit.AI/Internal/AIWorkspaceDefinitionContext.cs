@@ -17,10 +17,10 @@ internal sealed class AIWorkspaceDefinitionContext : IAIWorkspaceDefinitionConte
 
         AIWorkspace systemWorkspace = workspace with { Kind = AIWorkspaceKind.System };
 
-        if (!_workspaces.TryAdd(systemWorkspace.Name, systemWorkspace))
+        if (!_workspaces.TryAdd(systemWorkspace.Key, systemWorkspace))
         {
             throw new InvalidOperationException(
-                $"A system workspace named '{systemWorkspace.Name}' is already registered.");
+                $"A system workspace named '{systemWorkspace.Key}' is already registered.");
         }
     }
 }

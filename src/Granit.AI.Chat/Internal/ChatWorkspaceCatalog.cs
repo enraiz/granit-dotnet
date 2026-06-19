@@ -31,7 +31,7 @@ internal sealed class ChatWorkspaceCatalog(
             // capability set (null) is treated as chat-capable, mirroring the send-time guard.
             if (capabilities is not { Chat: false })
             {
-                chatCapable.Add(workspace.Name);
+                chatCapable.Add(workspace.Key);
             }
         }
 

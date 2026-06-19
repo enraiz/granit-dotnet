@@ -58,7 +58,7 @@ internal sealed class AnthropicCredentialResolver(
         if (credential is null || string.IsNullOrWhiteSpace(credential.ApiKey))
         {
             throw new AIProviderCredentialNotConfiguredException(
-                ProviderName, workspace.Name, workspace.TenantId);
+                ProviderName, workspace.Key, workspace.TenantId);
         }
 
         return credential;

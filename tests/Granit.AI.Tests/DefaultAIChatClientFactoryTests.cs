@@ -14,10 +14,10 @@ public sealed class DefaultAIChatClientFactoryTests
     private readonly IAIWorkspaceProvider _workspaceProvider = Substitute.For<IAIWorkspaceProvider>();
     private readonly IOptions<GranitAIOptions> _options = Microsoft.Extensions.Options.Options.Create(new GranitAIOptions { DefaultWorkspace = "default" });
 
-    private static AIWorkspace CreateWorkspace(string name = "test", string provider = "OpenAI") =>
+    private static AIWorkspace CreateWorkspace(string key = "test", string provider = "OpenAI") =>
         new()
         {
-            Name = name,
+            Key = key,
             Provider = provider,
             Model = "gpt-4o",
         };

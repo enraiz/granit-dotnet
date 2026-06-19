@@ -30,7 +30,7 @@ public sealed class NullAIWorkspaceStoreWriterTests
     private readonly NullAIWorkspaceStoreWriter _sut = new();
 
     private static AIWorkspace CreateWorkspace() =>
-        new() { Name = "test", Provider = "OpenAI", Model = "gpt-4o" };
+        new() { Key = "test", Provider = "OpenAI", Model = "gpt-4o" };
 
     [Fact]
     public Task CreateAsync_DoesNotThrow() =>

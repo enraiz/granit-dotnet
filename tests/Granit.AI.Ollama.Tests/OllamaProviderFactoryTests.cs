@@ -14,7 +14,7 @@ public sealed class OllamaProviderFactoryTests
     private static AIWorkspace CreateWorkspace(string? model = "llama3.2", string? endpoint = null) =>
         new()
         {
-            Name = "test",
+            Key = "test",
             Provider = "Ollama",
             Model = model!,
             Endpoint = endpoint,

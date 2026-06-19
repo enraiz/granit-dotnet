@@ -35,7 +35,7 @@ internal sealed class EfAIWorkspaceStore(
         using (dataFilter.Disable<IActive>())
         {
             AIWorkspaceEntity? entity = await FirstOrDefaultAsync(
-                w => w.Name == workspaceName, cancellationToken).ConfigureAwait(false);
+                w => w.Key == workspaceName, cancellationToken).ConfigureAwait(false);
 
             return entity?.ToRecord();
         }
@@ -49,7 +49,7 @@ internal sealed class EfAIWorkspaceStore(
         {
             IReadOnlyList<AIWorkspaceEntity> entities = await ListAsync(
                 Spec.For<AIWorkspaceEntity>()
-                    .OrderBy(w => (object)w.Name),
+                    .OrderBy(w => (object)w.Key),
                 cancellationToken).ConfigureAwait(false);
 
             return entities.Select(e => e.ToRecord()).ToList();
@@ -70,7 +70,7 @@ internal sealed class EfAIWorkspaceStore(
         catch (DbUpdateException ex) when (DbUpdateExceptionHelper.IsDuplicateKeyException(ex))
         {
             throw new InvalidOperationException(
-                $"A workspace named '{workspace.Name}' already exists.", ex);
+                $"A workspace with key '{workspace.Key}' already exists.", ex);
         }
     }
 
@@ -84,7 +84,7 @@ internal sealed class EfAIWorkspaceStore(
             await WriteAsync(async db =>
             {
                 AIWorkspaceEntity? entity = await db.Workspaces
-                    .FirstOrDefaultAsync(w => w.Name == workspace.Name, cancellationToken).ConfigureAwait(false);
+                    .FirstOrDefaultAsync(w => w.Key == workspace.Key, cancellationToken).ConfigureAwait(false);
 
                 if (entity is null)
                 {
@@ -93,7 +93,7 @@ internal sealed class EfAIWorkspaceStore(
 
                 entity.Provider = workspace.Provider;
                 entity.Model = workspace.Model;
-                entity.WorkspaceModelName = workspace.WorkspaceModelName;
+                entity.DisplayName = workspace.DisplayName;
                 entity.SystemPrompt = workspace.SystemPrompt;
                 entity.Temperature = workspace.Temperature;
                 entity.MaxOutputTokens = workspace.MaxOutputTokens;
@@ -112,7 +112,7 @@ internal sealed class EfAIWorkspaceStore(
             await WriteAsync(async db =>
             {
                 AIWorkspaceEntity? entity = await db.Workspaces
-                    .FirstOrDefaultAsync(w => w.Name == workspaceName, cancellationToken).ConfigureAwait(false);
+                    .FirstOrDefaultAsync(w => w.Key == workspaceName, cancellationToken).ConfigureAwait(false);
 
                 if (entity is not null)
                 {

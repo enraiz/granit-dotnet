@@ -53,7 +53,7 @@ public sealed class ChatServiceTests
     {
         _guidGenerator.Create().Returns(_ => Guid.NewGuid());
         _workspaceProvider.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new AIWorkspace { Name = "default", Provider = "OpenAI", Model = "gpt-4o" });
+            .Returns(new AIWorkspace { Key = "default", Provider = "OpenAI", Model = "gpt-4o" });
         _capabilityResolver.ResolveAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new AIModelCapabilities { Chat = true });
         StubLoop(DefaultResult);
@@ -556,7 +556,7 @@ public sealed class ChatServiceTests
     {
         ChatService service = CreateService();
         _workspaceProvider.GetAsync("analytics", Arg.Any<CancellationToken>())
-            .Returns(new AIWorkspace { Name = "analytics", Provider = "OpenAI", Model = "gpt-4o" });
+            .Returns(new AIWorkspace { Key = "analytics", Provider = "OpenAI", Model = "gpt-4o" });
 
         ChatSendResult result = await SendAsync(
             service, Request() with { WorkspaceName = "analytics" }, TestContext.Current.CancellationToken);

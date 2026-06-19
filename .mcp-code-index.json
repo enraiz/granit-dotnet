@@ -7104,9 +7104,9 @@
       "line": 13,
       "members": [
         {
-          "name": "Name",
+          "name": "Key",
           "kind": "property",
-          "signature": "required string Name",
+          "signature": "required string Key",
           "returnType": "required string"
         },
         {

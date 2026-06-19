@@ -6,10 +6,10 @@ namespace Granit.AI.Tests;
 
 public sealed class AIWorkspaceDefinitionContextTests
 {
-    private static AIWorkspace CreateWorkspace(string name) =>
+    private static AIWorkspace CreateWorkspace(string key) =>
         new()
         {
-            Name = name,
+            Key = key,
             Provider = "OpenAI",
             Model = "gpt-4o",
         };

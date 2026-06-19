@@ -46,7 +46,7 @@ public sealed class AIToolOrchestratorTests
 
         IAIWorkspaceProvider workspaceProvider = Substitute.For<IAIWorkspaceProvider>();
         workspaceProvider.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new AIWorkspace { Name = "default", Provider = "OpenAI", Model = "gpt-4o" });
+            .Returns(new AIWorkspace { Key = "default", Provider = "OpenAI", Model = "gpt-4o" });
 
         IAIUsageRecordFactory recordFactory = Substitute.For<IAIUsageRecordFactory>();
         recordFactory.Create(

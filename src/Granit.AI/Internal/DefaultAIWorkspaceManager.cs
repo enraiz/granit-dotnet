@@ -14,10 +14,10 @@ internal sealed class DefaultAIWorkspaceManager(
     {
         EnsureDynamic(workspace.Kind);
 
-        AIWorkspace? existing = await reader.FindAsync(workspace.Name, cancellationToken);
+        AIWorkspace? existing = await reader.FindAsync(workspace.Key, cancellationToken);
         if (existing is not null)
         {
-            throw new InvalidOperationException($"Workspace '{workspace.Name}' already exists.");
+            throw new InvalidOperationException($"Workspace '{workspace.Key}' already exists.");
         }
 
         await writer.CreateAsync(workspace, cancellationToken);
@@ -25,10 +25,10 @@ internal sealed class DefaultAIWorkspaceManager(
 
     public async Task UpdateAsync(AIWorkspace workspace, CancellationToken cancellationToken = default)
     {
-        AIWorkspace? existing = await reader.FindAsync(workspace.Name, cancellationToken);
+        AIWorkspace? existing = await reader.FindAsync(workspace.Key, cancellationToken);
         if (existing is null)
         {
-            throw new InvalidOperationException($"Workspace '{workspace.Name}' not found.");
+            throw new InvalidOperationException($"Workspace '{workspace.Key}' not found.");
         }
 
         EnsureDynamic(existing.Kind);

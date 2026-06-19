@@ -60,7 +60,7 @@ internal sealed class OllamaCredentialResolver(
         if (credential is null || string.IsNullOrWhiteSpace(credential.Endpoint))
         {
             throw new AIProviderCredentialNotConfiguredException(
-                ProviderName, workspace.Name, workspace.TenantId);
+                ProviderName, workspace.Key, workspace.TenantId);
         }
 
         AIEndpointPolicy policy = credential.Scope == AIProviderCredentialScope.Host

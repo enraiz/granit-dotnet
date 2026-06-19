@@ -56,7 +56,7 @@ internal sealed class OpenAICredentialResolver(
         if (credential is null || string.IsNullOrWhiteSpace(credential.ApiKey))
         {
             throw new AIProviderCredentialNotConfiguredException(
-                ProviderName, workspace.Name, workspace.TenantId);
+                ProviderName, workspace.Key, workspace.TenantId);
         }
 
         if (!string.IsNullOrWhiteSpace(credential.Endpoint))

@@ -125,10 +125,10 @@ internal static class AIWorkspaceEndpoints
     {
         AIWorkspace workspace = new()
         {
-            Name = request.Name,
+            Key = request.Key,
             Provider = request.Provider,
             Model = request.Model,
-            WorkspaceModelName = request.WorkspaceModelName,
+            DisplayName = request.DisplayName,
             SystemPrompt = request.SystemPrompt,
             Temperature = request.Temperature,
             MaxOutputTokens = request.MaxOutputTokens,
@@ -142,17 +142,17 @@ internal static class AIWorkspaceEndpoints
         catch (InvalidOperationException)
         {
             return TypedResults.Problem(
-                detail: $"A workspace named '{request.Name}' already exists.",
+                detail: $"A workspace with key '{request.Key}' already exists.",
                 statusCode: StatusCodes.Status409Conflict);
         }
 
-        AIWorkspace? created = await provider.GetAsync(request.Name, cancellationToken).ConfigureAwait(false);
+        AIWorkspace? created = await provider.GetAsync(request.Key, cancellationToken).ConfigureAwait(false);
 
         AIModelCapabilities? capabilities = await capabilityResolver
             .ResolveAsync(request.Provider, request.Model, cancellationToken)
             .ConfigureAwait(false);
 
-        return TypedResults.Created($"/workspaces/{request.Name}", MapToResponse(created!, capabilities));
+        return TypedResults.Created($"/workspaces/{request.Key}", MapToResponse(created!, capabilities));
     }
 
     private static async Task<Results<Ok<AIWorkspaceResponse>, ProblemHttpResult>> UpdateAsync(
@@ -181,7 +181,7 @@ internal static class AIWorkspaceEndpoints
         {
             Provider = request.Provider,
             Model = request.Model,
-            WorkspaceModelName = request.WorkspaceModelName,
+            DisplayName = request.DisplayName,
             SystemPrompt = request.SystemPrompt,
             Temperature = request.Temperature,
             MaxOutputTokens = request.MaxOutputTokens,
@@ -224,10 +224,10 @@ internal static class AIWorkspaceEndpoints
     }
 
     private static AIWorkspaceResponse MapToResponse(AIWorkspace workspace, AIModelCapabilities? capabilities) => new(
-        workspace.Name,
+        workspace.Key,
         workspace.Provider,
         workspace.Model,
-        workspace.WorkspaceModelName,
+        workspace.DisplayName,
         workspace.SystemPrompt,
         workspace.Temperature,
         workspace.MaxOutputTokens,

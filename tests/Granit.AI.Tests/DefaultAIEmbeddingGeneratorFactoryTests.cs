@@ -15,7 +15,7 @@ public sealed class DefaultAIEmbeddingGeneratorFactoryTests
     private readonly IOptions<GranitAIOptions> _options = Microsoft.Extensions.Options.Options.Create(new GranitAIOptions { DefaultWorkspace = "default" });
 
     private static AIWorkspace CreateWorkspace(string name = "test", string provider = "OpenAI") =>
-        new() { Name = name, Provider = provider, Model = "text-embedding-3-small" };
+        new() { Key = name, Provider = provider, Model = "text-embedding-3-small" };
 
     [Fact]
     public async Task CreateAsync_KnownWorkspaceAndProvider_ReturnsEmbeddingGenerator()

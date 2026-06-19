@@ -12,8 +12,8 @@ public sealed class ChatWorkspaceCatalogTests
     private readonly IAIWorkspaceProvider _workspaceProvider = Substitute.For<IAIWorkspaceProvider>();
     private readonly IAIWorkspaceCapabilityResolver _capabilityResolver = Substitute.For<IAIWorkspaceCapabilityResolver>();
 
-    private static AIWorkspace Workspace(string name, string model) =>
-        new() { Name = name, Provider = "OpenAI", Model = model };
+    private static AIWorkspace Workspace(string key, string model) =>
+        new() { Key = key, Provider = "OpenAI", Model = model };
 
     private ChatWorkspaceCatalog Catalog(string defaultWorkspace) =>
         new(_workspaceProvider, _capabilityResolver,

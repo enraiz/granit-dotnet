@@ -10,13 +10,13 @@ namespace Granit.AI.EntityFrameworkCore.Entities;
 /// </summary>
 internal sealed class AIWorkspaceEntity : AuditedEntity, IActive, IMultiTenant, ISoftDeletable
 {
-    public string Name { get; set; } = string.Empty;
+    public string Key { get; set; } = string.Empty;
 
     public string Provider { get; set; } = string.Empty;
 
     public string Model { get; set; } = string.Empty;
 
-    public string? WorkspaceModelName { get; set; }
+    public string? DisplayName { get; set; }
 
     public string? SystemPrompt { get; set; }
 
@@ -53,10 +53,10 @@ internal sealed class AIWorkspaceEntity : AuditedEntity, IActive, IMultiTenant, 
 
     public AIWorkspace ToRecord() => new()
     {
-        Name = Name,
+        Key = Key,
         Provider = Provider,
         Model = Model,
-        WorkspaceModelName = WorkspaceModelName,
+        DisplayName = DisplayName,
         SystemPrompt = SystemPrompt,
         Temperature = Temperature,
         MaxOutputTokens = MaxOutputTokens,
@@ -69,10 +69,10 @@ internal sealed class AIWorkspaceEntity : AuditedEntity, IActive, IMultiTenant, 
 
     public static AIWorkspaceEntity FromRecord(AIWorkspace workspace) => new()
     {
-        Name = workspace.Name,
+        Key = workspace.Key,
         Provider = workspace.Provider,
         Model = workspace.Model,
-        WorkspaceModelName = workspace.WorkspaceModelName,
+        DisplayName = workspace.DisplayName,
         SystemPrompt = workspace.SystemPrompt,
         Temperature = workspace.Temperature,
         MaxOutputTokens = workspace.MaxOutputTokens,

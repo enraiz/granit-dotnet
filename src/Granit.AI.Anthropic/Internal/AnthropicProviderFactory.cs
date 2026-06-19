@@ -56,7 +56,7 @@ internal sealed class AnthropicProviderFactory(
         if (string.IsNullOrWhiteSpace(credential.ApiKey))
         {
             throw new AIProviderCredentialNotConfiguredException(
-                ProviderName, workspace.Name, workspace.TenantId);
+                ProviderName, workspace.Key, workspace.TenantId);
         }
 
         AnthropicClient sdkClient = clientCache.GetOrCreate(credential.ApiKey);

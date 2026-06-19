@@ -13,7 +13,7 @@ public sealed class AzureOpenAIProviderFactoryTests
     private static AIWorkspace CreateWorkspace(string? model = "gpt-4o", string? apiKey = null, string? endpoint = null) =>
         new()
         {
-            Name = "test",
+            Key = "test",
             Provider = "AzureOpenAI",
             Model = model!,
             ApiKey = apiKey,

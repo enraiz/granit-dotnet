@@ -21,7 +21,7 @@ internal sealed class AIWorkspaceEntityConfiguration : IEntityTypeConfiguration<
 
         builder.Property(e => e.TenantId);
 
-        builder.Property(e => e.Name)
+        builder.Property(e => e.Key)
             .HasMaxLength(100)
             .IsRequired();
 
@@ -33,7 +33,7 @@ internal sealed class AIWorkspaceEntityConfiguration : IEntityTypeConfiguration<
             .HasMaxLength(100)
             .IsRequired();
 
-        builder.Property(e => e.WorkspaceModelName)
+        builder.Property(e => e.DisplayName)
             .HasMaxLength(64);
 
         builder.Property(e => e.SystemPrompt)
@@ -77,8 +77,8 @@ internal sealed class AIWorkspaceEntityConfiguration : IEntityTypeConfiguration<
         builder.Property(e => e.ModifiedBy)
             .HasMaxLength(256);
 
-        // Workspace name is unique per tenant.
-        builder.HasIndex(e => new { e.TenantId, e.Name })
+        // Workspace key is unique per tenant.
+        builder.HasIndex(e => new { e.TenantId, e.Key })
             .IsUnique()
             .HasDatabaseName($"uq_{GranitAIDbProperties.DbTablePrefix}workspaces_tenant_name");
     }

@@ -44,9 +44,9 @@ public sealed class EfAIWorkspaceStoreTests : IAsyncDisposable
         await context.Database.EnsureDeletedAsync();
     }
 
-    private static AIWorkspace CreateWorkspace(string name = "test-ws") => new()
+    private static AIWorkspace CreateWorkspace(string key = "test-ws") => new()
     {
-        Name = name,
+        Key = key,
         Provider = "OpenAI",
         Model = "gpt-4o",
         Activated = true,
@@ -60,7 +60,7 @@ public sealed class EfAIWorkspaceStoreTests : IAsyncDisposable
         AIWorkspace? result = await _store.FindAsync("test-ws", TestContext.Current.CancellationToken);
 
         result.ShouldNotBeNull();
-        result.Name.ShouldBe("test-ws");
+        result.Key.ShouldBe("test-ws");
         result.Provider.ShouldBe("OpenAI");
         result.Model.ShouldBe("gpt-4o");
         result.Kind.ShouldBe(AIWorkspaceKind.Dynamic);
@@ -94,7 +94,7 @@ public sealed class EfAIWorkspaceStoreTests : IAsyncDisposable
         IReadOnlyList<AIWorkspace> results = await _store.GetAllAsync(TestContext.Current.CancellationToken);
 
         results.Count.ShouldBe(2);
-        results.Select(r => r.Name).ShouldBe(["active", "inactive"]);
+        results.Select(r => r.Key).ShouldBe(["active", "inactive"]);
     }
 
     [Fact]

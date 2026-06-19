@@ -13,9 +13,10 @@ namespace Granit.AI.Workspaces;
 public sealed record AIWorkspace
 {
     /// <summary>
-    /// Unique name identifying this workspace (e.g. <c>support-chat</c>, <c>document-extraction</c>).
+    /// Machine key identifying this workspace (e.g. <c>support-chat</c>, <c>document-extraction</c>).
+    /// Lowercase alphanumeric with hyphens; unique per tenant.
     /// </summary>
-    public required string Name { get; init; }
+    public required string Key { get; init; }
 
     /// <summary>
     /// Provider identifier (e.g. <c>OpenAI</c>, <c>AzureOpenAI</c>, <c>Anthropic</c>, <c>Ollama</c>).
@@ -28,10 +29,10 @@ public sealed record AIWorkspace
     public required string Model { get; init; }
 
     /// <summary>
-    /// Human-readable display label for this workspace (e.g. <c>GPT-4o</c>, <c>Support AI</c>).
-    /// When <see langword="null"/>, consumers should fall back to <see cref="Model"/>.
+    /// Short human-readable label for this workspace (e.g. <c>GPT-4o</c>, <c>Support AI</c>).
+    /// Max 64 chars. When <see langword="null"/>, consumers fall back to <see cref="Model"/>.
     /// </summary>
-    public string? WorkspaceModelName { get; init; }
+    public string? DisplayName { get; init; }
 
     /// <summary>
     /// Optional system prompt prepended to all conversations in this workspace.

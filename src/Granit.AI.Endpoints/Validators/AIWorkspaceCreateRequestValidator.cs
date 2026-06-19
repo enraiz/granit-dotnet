@@ -14,7 +14,7 @@ internal sealed class AIWorkspaceCreateRequestValidator : GranitValidator<AIWork
     {
         Include(new AIWorkspaceMutableFieldsValidator<AIWorkspaceCreateRequest>());
 
-        RuleFor(x => x.Name)
+        RuleFor(x => x.Key)
             .NotEmpty()
             .MaximumLength(128)
             .Matches("^[a-z0-9][a-z0-9-]*$")
