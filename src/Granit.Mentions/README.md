@@ -1,47 +1,60 @@
 # Granit.Mentions
 
-Domain-neutral `@` mention seam: a typed, searchable, ACL-bound entity reference consumed by AI chat,
-Timeline, and other features. A mention isn't an AI concept — the AI is just one consumer (it injects
-a resolved mention into the prompt as untrusted context).
+The `@` mention picker, built **on** [`Granit.DataLookup`](../Granit.DataLookup/README.md) with no
+changes to that framework and **no mention-specific contract**. A mention is just a lookup source
+opted into the picker — so any entity already exposed as a lookup (via its `QueryDefinition` or a
+queryable) becomes mentionable with a single line and **zero new classes**.
 
-The picker rides on [`Granit.DataLookup`](../Granit.DataLookup/README.md): a single `mentions` facade
-source exposes every opted-in resolver through `GET /lookups/mentions`, with **no changes to the
-DataLookup framework**.
+## How it works
 
-## Concepts
+- A single facade `ILookupSource` named `mentions` is registered (`AddGranitMentions`).
+- `AddMentionSource("user")` tags an existing lookup source as mentionable.
+- The facade fans the picker out across the tagged sources (optionally narrowed by `scope.type`),
+  applies **lenient** per-type authorization (an unauthorized type is skipped, never a 403 for the
+  whole picker), merges and caps, and re-stamps each item's value as a composite `type:value` so one
+  source resolves any type.
 
-- **`IMentionResolver`** — one mentionable type (`user`, `invoice`, …). Searches candidates
-  (`MentionSuggestion`) and resolves a chosen reference to a `MentionTarget`. Declares an optional
-  `RequiredPermission`.
-- **`IMentionRegistry`** — the opted-in resolvers for the current scope, keyed by type.
-- **`IMentionAuthorizer`** — enforces each resolver's `RequiredPermission` (default:
-  `PermissionMentionAuthorizer` over `IPermissionChecker`). Shared by the picker and AI chat.
-- **`MentionLookupSource`** — the `ILookupSource` facade (`Name = "mentions"`): fans out the query
-  across resolvers (optionally narrowed by `scope.type`), applies **lenient** per-type auth (an
-  unauthorized type is skipped, never a 403 for the whole picker), merges and caps, and encodes the
-  chosen reference as a composite `type:id` value so one source resolves any type.
+## Host wiring
 
-## Usage
-
-Add resolvers via the builder; the registry and `mentions` facade are wired automatically:
+Mentions are served by the **`Granit.DataLookup` endpoints** — there is no mention-specific
+endpoint. A host that wants the `@` picker:
 
 ```csharp
-services.AddGranitMentions(b => b.Add<InvoiceMentionResolver>());
+// 1. Expose each entity as a lookup, then tag it mentionable.
+services.AddQueryDefinitionLookup<Invoice, MyDbContext>();   // Granit.DataLookup.EntityFrameworkCore
+services.AddMentionSource("invoice");
+services.AddUserDirectoryLookup().AddMentionSource("user");  // Granit.Identity.EntityFrameworkCore — @user
+
+// 2. Map the DataLookup endpoints (this is what serves the picker).
+app.MapGranitDataLookups();
 ```
 
-Front-end picker:
+## Endpoints
 
-```text
-GET /lookups/mentions?search=<q>&scope.type=<optional type>
-```
+| Purpose | Route |
+| ------- | ----- |
+| Search the picker | `GET /lookups/mentions?search=<q>&scope.type=<optional type>` |
+| Resolve a selection | `GET /lookups/mentions/resolve?value=<type>:<id>` |
+| List mentionable + other sources | `GET /lookups` |
 
-Selecting a suggestion yields the composite value `type:id`; resolve rehydrates it via
-`GET /lookups/mentions/resolve?value=type:id`.
+Each suggestion's `value` is the composite `type:id` (e.g. `user:3f2a…`) and `extra.type` carries
+the type — the front sends `type:id` back, and an AI-chat turn carries it as a `MentionRequest`. AI
+chat resolves through the same facade and injects the result wrapped in the untrusted-document
+envelope.
 
-## Authoring a resolver
+## Authorization
 
-Implement `IMentionResolver` in a bridge package referencing both `Granit.Mentions` and the source
-module — e.g. [`Granit.Identity.Mentions`](../Granit.Identity.Mentions/README.md) exposes `@user`.
+Two layers: the whole `/lookups` group requires `DataLookup.Lookups.Read` (access to pickers), and
+each tagged source's own `RequiredPermission` is checked **leniently** inside the facade — an
+unauthorized type is dropped from the results, never a 403 for the whole picker. For `@user` the
+per-type gate is `Identity.Users.Read`.
+
+## Why no `IMentionResolver`
+
+A mention and a lookup are the same primitive (a typed, searchable, ACL-bound reference). Reusing
+`ILookupSource` means: one contract, one registry, and automatic registration via the existing
+DataLookup adapters — instead of a hand-written resolver class per entity. Bespoke cases (a
+non-EF/computed source) just implement `ILookupSource` directly and get tagged.
 
 ## Documentation
 
