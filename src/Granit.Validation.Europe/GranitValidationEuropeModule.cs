@@ -6,7 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Granit.Validation.Europe;
 
 /// <summary>
-/// Granit module for European regulatory identifier validation (France, Belgium).
+/// Granit module for European regulatory identifier validation
+/// (Belgium, France, Germany, Italy, Luxembourg, Netherlands, Spain).
 /// </summary>
 [DependsOn(
     typeof(GranitLocalizationModule),
@@ -19,7 +20,7 @@ public sealed class GranitValidationEuropeModule : GranitModule
         context.Services.Configure<GranitLocalizationOptions>(options =>
         {
             options.Resources
-                .Add<ValidationEuropeLocalizationResource>("fr")
+                .Add<ValidationEuropeLocalizationResource>("en")
                 .AddJson(
                     typeof(ValidationEuropeLocalizationResource).Assembly,
                     "Granit.Validation.Europe.Localization.ValidationEurope");
