@@ -4375,6 +4375,13 @@
           "Granit.Workflow": "[0.1.0-dev, )"
         }
       },
+      "granit.workflow.scheduling": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Scheduling": "[0.1.0-dev, )",
+          "Granit.Workflow": "[0.1.0-dev, )"
+        }
+      },
       "granit.workspaces.abstractions": {
         "type": "Project",
         "dependencies": {
