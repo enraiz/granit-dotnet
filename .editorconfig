@@ -86,6 +86,34 @@ dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case_style
 dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
+# ── Roslynator: rules promoted to warning in framework source only ────────────
+# These have been cleaned across all src/ projects and are now enforced (a warning ==
+# a build error under TreatWarningsAsErrors). Test projects stay at the advisory
+# `suggestion` baseline. Promote a rule here only after `dotnet format analyzers
+# --diagnostics RCSxxxx` reports zero remaining hits on src-only.slnf.
+[src/**.cs]
+# RCS1214: unnecessary interpolated string ($"literal" with no holes → "literal")
+dotnet_diagnostic.RCS1214.severity = warning
+# RCS1192: unnecessary verbatim string literal (@"no-escapes" → "no-escapes")
+dotnet_diagnostic.RCS1192.severity = warning
+# RCS1146: use conditional access (null-check + member access → ?.)
+dotnet_diagnostic.RCS1146.severity = warning
+# RCS1118: mark local variable as const (never-reassigned, constant initializer)
+dotnet_diagnostic.RCS1118.severity = warning
+# RCS1085: use auto-implemented property (backing field + expression-body getter → { get; })
+dotnet_diagnostic.RCS1085.severity = warning
+# RCS1077: optimize LINQ (List<T>.Select(f).ToList() → List<T>.ConvertAll(f))
+dotnet_diagnostic.RCS1077.severity = warning
+# RCS1197: optimize StringBuilder.Append/AppendLine (avoids intermediate string.Join alloc)
+dotnet_diagnostic.RCS1197.severity = warning
+# RCS1123: add parentheses when necessary (explicit *-in-+ grouping; precedence unchanged)
+dotnet_diagnostic.RCS1123.severity = warning
+#
+# RCS1124 (inline single-use local) was evaluated and deliberately left at the suggestion
+# baseline: its auto-fix removes named `snapshot` locals that document volatile-read
+# semantics, emits `(MemoryStream)new()`-style casts, and left non-fixable cases — a
+# net readability loss for a subjective gain. Do not promote without hand-curation.
+
 [*.{csproj,props,targets}]
 indent_size = 2
 
