@@ -100,7 +100,7 @@
       "deps": [
         "Granit.AI",
         "Granit.Authorization",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
       ],
@@ -274,7 +274,7 @@
         "Granit.Auditing",
         "Granit.Authorization",
         "Granit.Http.ApiDocumentation",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
       ],
@@ -343,8 +343,8 @@
         "Granit.Http.Abstractions",
         "Granit.Http.ApiDocumentation",
         "Granit.Authorization",
-        "Granit.QueryEngine",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Abstractions",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Timing",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
@@ -496,7 +496,7 @@
       "deps": [
         "Granit.Authorization",
         "Granit.Http.ApiDocumentation",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
       ],
@@ -668,7 +668,7 @@
         "Granit.BlobStorage",
         "Granit.Http.Abstractions",
         "Granit.Http.RateLimiting",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
       ],
@@ -771,7 +771,7 @@
         "Granit.DataExchange.Abstractions",
         "Granit.Events",
         "Granit.Guids",
-        "Granit.QueryEngine",
+        "Granit.QueryEngine.Abstractions",
         "Granit.Timing",
         "Granit.Validation"
       ],
@@ -1353,8 +1353,8 @@
         "Granit.Authorization",
         "Granit.Identity",
         "Granit.IpGeolocation",
-        "Granit.QueryEngine",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Abstractions",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Identity.Abstractions",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
@@ -1706,7 +1706,7 @@
         "Granit.Http.ApiDocumentation",
         "Granit.Authorization",
         "Granit.Localization",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
       ],
@@ -2126,8 +2126,7 @@
       "name": "Granit.OpenApi.Generator",
       "deps": [
         "Granit.OpenApi.Generation",
-        "Granit.*.Endpoints",
-        "Granit.QueryEngine.AspNetCore"
+        "Granit.*.Endpoints"
       ],
       "framework": "net10.0"
     },
@@ -2353,7 +2352,7 @@
         "Granit.Http.RateLimiting",
         "Granit.Privacy",
         "Granit.Privacy.Regulations",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
       ],
@@ -2405,20 +2404,19 @@
       "framework": "net10.0"
     },
     {
-      "name": "Granit.QueryEngine",
+      "name": "Granit.QueryEngine.AI",
       "deps": [
-        "Granit",
-        "Granit.QueryEngine.Abstractions"
+        "Granit.AI",
+        "Granit.QueryEngine.Abstractions",
+        "Granit.Timing"
       ],
       "framework": "net10.0"
     },
     {
-      "name": "Granit.QueryEngine.AI",
+      "name": "Granit.QueryEngine.AI.Tools",
       "deps": [
-        "Granit.AI",
         "Granit.AI.Tools",
-        "Granit.QueryEngine.Abstractions",
-        "Granit.Timing"
+        "Granit.QueryEngine.Abstractions"
       ],
       "framework": "net10.0"
     },
@@ -2431,12 +2429,12 @@
       "framework": "net10.0"
     },
     {
-      "name": "Granit.QueryEngine.AspNetCore",
+      "name": "Granit.QueryEngine.Endpoints",
       "deps": [
         "Granit.Http.ApiDocumentation",
         "Granit.Authorization",
         "Granit.Entities.Abstractions",
-        "Granit.QueryEngine",
+        "Granit.QueryEngine.Abstractions",
         "Granit.Validation"
       ],
       "framework": "net10.0"
@@ -2444,7 +2442,7 @@
     {
       "name": "Granit.QueryEngine.EntityFrameworkCore",
       "deps": [
-        "Granit.QueryEngine",
+        "Granit.QueryEngine.Abstractions",
         "Granit.Persistence.EntityFrameworkCore"
       ],
       "framework": "net10.0"
@@ -2490,7 +2488,7 @@
       "deps": [
         "Granit.Authorization",
         "Granit.Scheduling",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
       ],
@@ -2579,7 +2577,7 @@
       "deps": [
         "Granit.Http.ApiDocumentation",
         "Granit.Authorization",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Templating",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
@@ -2886,7 +2884,7 @@
       "deps": [
         "Granit.Authorization",
         "Granit.Http.Abstractions",
-        "Granit.QueryEngine.AspNetCore",
+        "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Webhooks",
         "Granit.Workspaces.Abstractions"
@@ -48525,22 +48523,6 @@
       "members": []
     },
     {
-      "name": "QueryDataToolRegistrationExtensions",
-      "fqn": "Granit.QueryEngine.AI.Extensions.QueryDataToolRegistrationExtensions",
-      "kind": "class",
-      "project": "Granit.QueryEngine.AI",
-      "file": "src/Granit.QueryEngine.AI/Extensions/QueryDataToolRegistrationExtensions.cs",
-      "line": 8,
-      "members": [
-        {
-          "name": "AddQueryData",
-          "kind": "method",
-          "signature": "AddQueryData(this AIToolRegistrationBuilder tools, Action<QueryDataToolBuilder> configure)",
-          "returnType": "AIToolRegistrationBuilder"
-        }
-      ]
-    },
-    {
       "name": "QueryEngineAIHostApplicationBuilderExtensions",
       "fqn": "Granit.QueryEngine.AI.Extensions.QueryEngineAIHostApplicationBuilderExtensions",
       "kind": "class",
@@ -48611,123 +48593,38 @@
       ]
     },
     {
+      "name": "QueryDataToolRegistrationExtensions",
+      "fqn": "Granit.QueryEngine.AI.Tools.Extensions.QueryDataToolRegistrationExtensions",
+      "kind": "class",
+      "project": "Granit.QueryEngine.AI.Tools",
+      "file": "src/Granit.QueryEngine.AI.Tools/Extensions/QueryDataToolRegistrationExtensions.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "AddQueryData",
+          "kind": "method",
+          "signature": "AddQueryData(this AIToolRegistrationBuilder tools, Action<QueryDataToolBuilder> configure)",
+          "returnType": "AIToolRegistrationBuilder"
+        }
+      ]
+    },
+    {
+      "name": "GranitQueryEngineAIToolsModule",
+      "fqn": "Granit.QueryEngine.AI.Tools.GranitQueryEngineAIToolsModule",
+      "kind": "class",
+      "project": "Granit.QueryEngine.AI.Tools",
+      "file": "src/Granit.QueryEngine.AI.Tools/GranitQueryEngineAIToolsModule.cs",
+      "line": 20,
+      "members": []
+    },
+    {
       "name": "QueryDataToolBuilder",
-      "fqn": "Granit.QueryEngine.AI.QueryDataToolBuilder",
+      "fqn": "Granit.QueryEngine.AI.Tools.QueryDataToolBuilder",
       "kind": "class",
-      "project": "Granit.QueryEngine.AI",
-      "file": "src/Granit.QueryEngine.AI/QueryDataToolBuilder.cs",
+      "project": "Granit.QueryEngine.AI.Tools",
+      "file": "src/Granit.QueryEngine.AI.Tools/QueryDataToolBuilder.cs",
       "line": 12,
       "members": []
-    },
-    {
-      "name": "QueryRequestBinder",
-      "fqn": "Granit.QueryEngine.AspNetCore.Binding.QueryRequestBinder",
-      "kind": "class",
-      "project": "Granit.QueryEngine.AspNetCore",
-      "file": "src/Granit.QueryEngine.AspNetCore/Binding/QueryRequestBinder.cs",
-      "line": 21,
-      "members": [
-        {
-          "name": "BindAsync",
-          "kind": "method",
-          "signature": "BindAsync(HttpContext context, ParameterInfo parameter)",
-          "returnType": "ValueTask<QueryRequest?>"
-        }
-      ]
-    },
-    {
-      "name": "BindableQueryRequest",
-      "fqn": "Granit.QueryEngine.AspNetCore.Dtos.BindableQueryRequest",
-      "kind": "class",
-      "project": "Granit.QueryEngine.AspNetCore",
-      "file": "src/Granit.QueryEngine.AspNetCore/Dtos/BindableQueryRequest.cs",
-      "line": 15,
-      "members": [
-        {
-          "name": "BindableQueryRequest",
-          "kind": "method",
-          "signature": "BindableQueryRequest(QueryRequest value)",
-          "returnType": "QueryRequest Value { get; } private"
-        },
-        {
-          "name": "BindAsync",
-          "kind": "method",
-          "signature": "BindAsync(HttpContext context, ParameterInfo parameter)",
-          "returnType": "ValueTask<BindableQueryRequest?>"
-        }
-      ]
-    },
-    {
-      "name": "QueryCatalogEntryResponse",
-      "fqn": "Granit.QueryEngine.AspNetCore.Dtos.QueryCatalogEntryResponse",
-      "kind": "record",
-      "project": "Granit.QueryEngine.AspNetCore",
-      "file": "src/Granit.QueryEngine.AspNetCore/Dtos/QueryCatalogEntryResponse.cs",
-      "line": 31,
-      "members": []
-    },
-    {
-      "name": "QueryCatalogEndpointRouteBuilderExtensions",
-      "fqn": "Granit.QueryEngine.AspNetCore.Extensions.QueryCatalogEndpointRouteBuilderExtensions",
-      "kind": "class",
-      "project": "Granit.QueryEngine.AspNetCore",
-      "file": "src/Granit.QueryEngine.AspNetCore/Extensions/QueryCatalogEndpointRouteBuilderExtensions.cs",
-      "line": 12,
-      "members": [
-        {
-          "name": "MapGranitQueryCatalog",
-          "kind": "method",
-          "signature": "MapGranitQueryCatalog(this IEndpointRouteBuilder endpoints, string prefix = \"\")",
-          "returnType": "RouteGroupBuilder"
-        }
-      ]
-    },
-    {
-      "name": "QueryEndpointRouteBuilderExtensions",
-      "fqn": "Granit.QueryEngine.AspNetCore.Extensions.QueryEndpointRouteBuilderExtensions",
-      "kind": "class",
-      "project": "Granit.QueryEngine.AspNetCore",
-      "file": "src/Granit.QueryEngine.AspNetCore/Extensions/QueryEndpointRouteBuilderExtensions.cs",
-      "line": 23,
-      "members": []
-    },
-    {
-      "name": "GranitQueryEngineAspNetCoreModule",
-      "fqn": "Granit.QueryEngine.AspNetCore.GranitQueryEngineAspNetCoreModule",
-      "kind": "class",
-      "project": "Granit.QueryEngine.AspNetCore",
-      "file": "src/Granit.QueryEngine.AspNetCore/GranitQueryEngineAspNetCoreModule.cs",
-      "line": 26,
-      "members": [
-        {
-          "name": "ConfigureServices",
-          "kind": "method",
-          "signature": "ConfigureServices(ServiceConfigurationContext context)",
-          "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "QueryEndpointOptions",
-      "fqn": "Granit.QueryEngine.AspNetCore.Options.QueryEndpointOptions",
-      "kind": "class",
-      "project": "Granit.QueryEngine.AspNetCore",
-      "file": "src/Granit.QueryEngine.AspNetCore/Options/QueryEndpointOptions.cs",
-      "line": 7,
-      "members": [
-        {
-          "name": "TagName",
-          "kind": "property",
-          "signature": "string? TagName",
-          "returnType": "string?"
-        },
-        {
-          "name": "IncludeListEndpoint",
-          "kind": "property",
-          "signature": "bool IncludeListEndpoint",
-          "returnType": "bool"
-        }
-      ]
     },
     {
       "name": "ColumnBuilder",
@@ -48766,7 +48663,7 @@
     {
       "name": "ColumnDescriptor",
       "fqn": "Granit.QueryEngine.ColumnDescriptor",
-      "kind": "class",
+      "kind": "record",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/ColumnDescriptor.cs",
       "line": 8,
@@ -48792,10 +48689,120 @@
       "name": "QueryEngineMetrics",
       "fqn": "Granit.QueryEngine.Diagnostics.QueryEngineMetrics",
       "kind": "class",
-      "project": "Granit.QueryEngine",
-      "file": "src/Granit.QueryEngine/Diagnostics/QueryEngineMetrics.cs",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/Diagnostics/QueryEngineMetrics.cs",
       "line": 10,
       "members": []
+    },
+    {
+      "name": "QueryRequestBinder",
+      "fqn": "Granit.QueryEngine.Endpoints.Binding.QueryRequestBinder",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Endpoints",
+      "file": "src/Granit.QueryEngine.Endpoints/Binding/QueryRequestBinder.cs",
+      "line": 21,
+      "members": [
+        {
+          "name": "BindAsync",
+          "kind": "method",
+          "signature": "BindAsync(HttpContext context, ParameterInfo parameter)",
+          "returnType": "ValueTask<QueryRequest?>"
+        }
+      ]
+    },
+    {
+      "name": "BindableQueryRequest",
+      "fqn": "Granit.QueryEngine.Endpoints.Dtos.BindableQueryRequest",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Endpoints",
+      "file": "src/Granit.QueryEngine.Endpoints/Dtos/BindableQueryRequest.cs",
+      "line": 15,
+      "members": [
+        {
+          "name": "BindableQueryRequest",
+          "kind": "method",
+          "signature": "BindableQueryRequest(QueryRequest value)",
+          "returnType": "QueryRequest Value { get; } private"
+        },
+        {
+          "name": "BindAsync",
+          "kind": "method",
+          "signature": "BindAsync(HttpContext context, ParameterInfo parameter)",
+          "returnType": "ValueTask<BindableQueryRequest?>"
+        }
+      ]
+    },
+    {
+      "name": "QueryCatalogEntryResponse",
+      "fqn": "Granit.QueryEngine.Endpoints.Dtos.QueryCatalogEntryResponse",
+      "kind": "record",
+      "project": "Granit.QueryEngine.Endpoints",
+      "file": "src/Granit.QueryEngine.Endpoints/Dtos/QueryCatalogEntryResponse.cs",
+      "line": 31,
+      "members": []
+    },
+    {
+      "name": "QueryCatalogEndpointRouteBuilderExtensions",
+      "fqn": "Granit.QueryEngine.Endpoints.Extensions.QueryCatalogEndpointRouteBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Endpoints",
+      "file": "src/Granit.QueryEngine.Endpoints/Extensions/QueryCatalogEndpointRouteBuilderExtensions.cs",
+      "line": 12,
+      "members": [
+        {
+          "name": "MapGranitQueryCatalog",
+          "kind": "method",
+          "signature": "MapGranitQueryCatalog(this IEndpointRouteBuilder endpoints, string prefix = \"\")",
+          "returnType": "RouteGroupBuilder"
+        }
+      ]
+    },
+    {
+      "name": "QueryEndpointRouteBuilderExtensions",
+      "fqn": "Granit.QueryEngine.Endpoints.Extensions.QueryEndpointRouteBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Endpoints",
+      "file": "src/Granit.QueryEngine.Endpoints/Extensions/QueryEndpointRouteBuilderExtensions.cs",
+      "line": 23,
+      "members": []
+    },
+    {
+      "name": "GranitQueryEngineEndpointsModule",
+      "fqn": "Granit.QueryEngine.Endpoints.GranitQueryEngineEndpointsModule",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Endpoints",
+      "file": "src/Granit.QueryEngine.Endpoints/GranitQueryEngineEndpointsModule.cs",
+      "line": 26,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "QueryEndpointOptions",
+      "fqn": "Granit.QueryEngine.Endpoints.Options.QueryEndpointOptions",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Endpoints",
+      "file": "src/Granit.QueryEngine.Endpoints/Options/QueryEndpointOptions.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "TagName",
+          "kind": "property",
+          "signature": "string? TagName",
+          "returnType": "string?"
+        },
+        {
+          "name": "IncludeListEndpoint",
+          "kind": "property",
+          "signature": "bool IncludeListEndpoint",
+          "returnType": "bool"
+        }
+      ]
     },
     {
       "name": "GranitQueryEngineEntityFrameworkCoreModule",
@@ -48819,15 +48826,15 @@
       "kind": "class",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/Extensions/QueryDefinitionServiceCollectionExtensions.cs",
-      "line": 14,
+      "line": 15,
       "members": []
     },
     {
       "name": "ServiceCollectionExtensions",
       "fqn": "Granit.QueryEngine.Extensions.ServiceCollectionExtensions",
       "kind": "class",
-      "project": "Granit.QueryEngine",
-      "file": "src/Granit.QueryEngine/Extensions/ServiceCollectionExtensions.cs",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/Extensions/ServiceCollectionExtensions.cs",
       "line": 19,
       "members": [
         {
@@ -48841,7 +48848,7 @@
     {
       "name": "AggregateDescriptor",
       "fqn": "Granit.QueryEngine.Filtering.AggregateDescriptor",
-      "kind": "class",
+      "kind": "record",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/Filtering/AggregateDescriptor.cs",
       "line": 6,
@@ -48859,7 +48866,7 @@
     {
       "name": "DateFilterDescriptor",
       "fqn": "Granit.QueryEngine.Filtering.DateFilterDescriptor",
-      "kind": "class",
+      "kind": "record",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/Filtering/DateFilterDescriptor.cs",
       "line": 6,
@@ -48893,7 +48900,7 @@
     {
       "name": "FilterGroupDescriptor",
       "fqn": "Granit.QueryEngine.Filtering.FilterGroupDescriptor",
-      "kind": "class",
+      "kind": "record",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/Filtering/FilterGroupDescriptor.cs",
       "line": 7,
@@ -48927,32 +48934,16 @@
     {
       "name": "GroupByDescriptor",
       "fqn": "Granit.QueryEngine.Filtering.GroupByDescriptor",
-      "kind": "class",
+      "kind": "record",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/Filtering/GroupByDescriptor.cs",
       "line": 6,
       "members": []
     },
     {
-      "name": "IQueryFilter",
-      "fqn": "Granit.QueryEngine.Filtering.IQueryFilter",
-      "kind": "interface",
-      "project": "Granit.QueryEngine.Abstractions",
-      "file": "src/Granit.QueryEngine.Abstractions/Filtering/IQueryFilter.cs",
-      "line": 10,
-      "members": [
-        {
-          "name": "Apply",
-          "kind": "method",
-          "signature": "Apply(string value)",
-          "returnType": "string Name { get; } Expression<Func<TEntity, bool>>"
-        }
-      ]
-    },
-    {
       "name": "PresetDescriptor",
       "fqn": "Granit.QueryEngine.Filtering.PresetDescriptor",
-      "kind": "class",
+      "kind": "record",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/Filtering/PresetDescriptor.cs",
       "line": 8,
@@ -48961,7 +48952,7 @@
     {
       "name": "QuickFilterDescriptor",
       "fqn": "Granit.QueryEngine.Filtering.QuickFilterDescriptor",
-      "kind": "class",
+      "kind": "record",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/Filtering/QuickFilterDescriptor.cs",
       "line": 11,
@@ -48973,16 +48964,7 @@
       "kind": "class",
       "project": "Granit.QueryEngine.Abstractions",
       "file": "src/Granit.QueryEngine.Abstractions/GranitQueryEngineAbstractionsModule.cs",
-      "line": 13,
-      "members": []
-    },
-    {
-      "name": "GranitQueryEngineModule",
-      "fqn": "Granit.QueryEngine.GranitQueryEngineModule",
-      "kind": "class",
-      "project": "Granit.QueryEngine",
-      "file": "src/Granit.QueryEngine/GranitQueryEngineModule.cs",
-      "line": 18,
+      "line": 19,
       "members": [
         {
           "name": "ConfigureServices",
@@ -49385,6 +49367,47 @@
       "file": "src/Granit.QueryEngine.Abstractions/QueryRequest.cs",
       "line": 16,
       "members": []
+    },
+    {
+      "name": "QueryRequestCandidate",
+      "fqn": "Granit.QueryEngine.QueryRequestCandidate",
+      "kind": "record",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/QueryRequestSanitizer.cs",
+      "line": 11,
+      "members": []
+    },
+    {
+      "name": "QueryRequestSanitizationResult",
+      "fqn": "Granit.QueryEngine.QueryRequestSanitizationResult",
+      "kind": "record",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/QueryRequestSanitizer.cs",
+      "line": 42,
+      "members": [
+        {
+          "name": "Sanitize",
+          "kind": "method",
+          "signature": "Sanitize(QueryRequestCandidate candidate, QueryMetadata metadata)",
+          "returnType": "QueryRequestSanitizationResult"
+        }
+      ]
+    },
+    {
+      "name": "QueryRequestSanitizer",
+      "fqn": "Granit.QueryEngine.QueryRequestSanitizer",
+      "kind": "class",
+      "project": "Granit.QueryEngine.Abstractions",
+      "file": "src/Granit.QueryEngine.Abstractions/QueryRequestSanitizer.cs",
+      "line": 53,
+      "members": [
+        {
+          "name": "Sanitize",
+          "kind": "method",
+          "signature": "Sanitize(QueryRequestCandidate candidate, QueryMetadata metadata)",
+          "returnType": "QueryRequestSanitizationResult"
+        }
+      ]
     },
     {
       "name": "IGlobalSearchStrategy",

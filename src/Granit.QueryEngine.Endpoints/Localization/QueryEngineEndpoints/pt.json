@@ -1,0 +1,10 @@
+{
+  "culture": "pt",
+  "texts": {
+    "QueryEngine:Validation:CursorPageMutuallyExclusive": "'Cursor' e 'Page' são mutuamente exclusivos.",
+    "QueryEngine:Validation:FilterEntryTooLong": "Uma chave de filtro não pode exceder 200 caracteres e um valor de filtro não pode exceder 2000 caracteres.",
+    "QueryEngine:Validation:MaxFilterEntries": "São permitidas no máximo 50 entradas de filtro.",
+    "QueryEngine:Validation:MaxPresetEntries": "São permitidas no máximo 20 predefinições.",
+    "QueryEngine:Validation:MaxQuickFilterEntries": "São permitidos no máximo 20 filtros rápidos."
+  }
+}
