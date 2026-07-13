@@ -1825,8 +1825,8 @@
         "dependencies": {
           "Granit.Authentication.ApiKeys": "[0.1.0-dev, )",
           "Granit.Authorization": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.ApiDocumentation": "[0.1.0-dev, )",
+          "Granit.Http.Idempotency.Abstractions": "[0.1.0-dev, )",
           "Granit.QueryEngine.Abstractions": "[0.1.0-dev, )",
           "Granit.QueryEngine.Endpoints": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )",
@@ -2139,7 +2139,7 @@
         "dependencies": {
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.BlobStorage": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
+          "Granit.Http.Idempotency.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.RateLimiting": "[0.1.0-dev, )",
           "Granit.QueryEngine.Endpoints": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )",
@@ -2191,7 +2191,7 @@
           "Granit": "[0.1.0-dev, )",
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
-          "Granit.Http.Security": "[0.1.0-dev, )",
+          "Granit.Http.UrlSafety": "[0.1.0-dev, )",
           "Granit.IO": "[0.1.0-dev, )",
           "Granit.MultiTenancy": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )"
@@ -2211,6 +2211,19 @@
           "Granit.Browsing": "[0.1.0-dev, )",
           "PdfPig": "[0.1.*, )",
           "PuppeteerSharp": "[25.*, )"
+        }
+      },
+      "granit.bulkhead": {
+        "type": "Project",
+        "dependencies": {
+          "Granit": "[0.1.0-dev, )",
+          "Granit.Features": "[0.1.0-dev, )"
+        }
+      },
+      "granit.bulkhead.wolverine": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.Bulkhead": "[0.1.0-dev, )"
         }
       },
       "granit.caching": {
@@ -2336,7 +2349,6 @@
         "dependencies": {
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.DataLookup": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )"
         }
       },
@@ -2363,6 +2375,8 @@
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.Diagnostics": "[0.1.0-dev, )",
           "Granit.Http.ApiDocumentation": "[0.1.0-dev, )",
+          "Granit.Http.SecurityHeaders": "[0.1.0-dev, )",
+          "Granit.Http.SecurityHeaders.Abstractions": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )",
           "Granit.Workspaces.Abstractions": "[0.1.0-dev, )"
         }
@@ -2583,9 +2597,6 @@
           "Granit.Html": "[0.1.0-dev, )"
         }
       },
-      "granit.http.abstractions": {
-        "type": "Project"
-      },
       "granit.http.apidocumentation": {
         "type": "Project",
         "dependencies": {
@@ -2607,8 +2618,7 @@
       "granit.http.bulkhead": {
         "type": "Project",
         "dependencies": {
-          "Granit": "[0.1.0-dev, )",
-          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Bulkhead": "[0.1.0-dev, )",
           "Granit.Http.ExceptionHandling": "[0.1.0-dev, )"
         }
       },
@@ -2633,18 +2643,6 @@
           "Granit.Validation": "[0.1.0-dev, )"
         }
       },
-      "granit.http.cookies.klaro": {
-        "type": "Project",
-        "dependencies": {
-          "Granit.Http.Cookies": "[0.1.0-dev, )"
-        }
-      },
-      "granit.http.cors": {
-        "type": "Project",
-        "dependencies": {
-          "Granit": "[0.1.0-dev, )"
-        }
-      },
       "granit.http.exceptionhandling": {
         "type": "Project",
         "dependencies": {
@@ -2657,13 +2655,22 @@
           "Granit.Features": "[0.1.0-dev, )"
         }
       },
+      "granit.http.hosting": {
+        "type": "Project",
+        "dependencies": {
+          "Granit": "[0.1.0-dev, )"
+        }
+      },
       "granit.http.idempotency": {
         "type": "Project",
         "dependencies": {
           "Granit.Caching": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
+          "Granit.Http.Idempotency.Abstractions": "[0.1.0-dev, )",
           "Microsoft.IO.RecyclableMemoryStream": "[3.*, )"
         }
+      },
+      "granit.http.idempotency.abstractions": {
+        "type": "Project"
       },
       "granit.http.odataexposure": {
         "type": "Project",
@@ -2672,7 +2679,6 @@
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.DataExchange.Abstractions": "[0.1.0-dev, )",
           "Granit.Entities.Abstractions": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.RateLimiting": "[0.1.0-dev, )",
           "Granit.QueryEngine.Abstractions": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )",
@@ -2708,19 +2714,6 @@
           "Microsoft.Extensions.Http.Resilience": "[10.*, )"
         }
       },
-      "granit.http.responsecompression": {
-        "type": "Project",
-        "dependencies": {
-          "Granit": "[0.1.0-dev, )"
-        }
-      },
-      "granit.http.security": {
-        "type": "Project",
-        "dependencies": {
-          "Granit": "[0.1.0-dev, )",
-          "Granit.MultiTenancy": "[0.1.0-dev, )"
-        }
-      },
       "granit.http.securityheaders": {
         "type": "Project",
         "dependencies": {
@@ -2731,12 +2724,10 @@
       "granit.http.securityheaders.abstractions": {
         "type": "Project"
       },
-      "granit.http.securityheaders.endpoints": {
+      "granit.http.urlsafety": {
         "type": "Project",
         "dependencies": {
-          "Granit.Diagnostics.Endpoints": "[0.1.0-dev, )",
-          "Granit.Http.SecurityHeaders": "[0.1.0-dev, )",
-          "Granit.Http.SecurityHeaders.Abstractions": "[0.1.0-dev, )"
+          "Granit": "[0.1.0-dev, )"
         }
       },
       "granit.identity": {
@@ -2923,8 +2914,8 @@
           "Granit.Authentication.External": "[0.1.0-dev, )",
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.Caching": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.ApiDocumentation": "[0.1.0-dev, )",
+          "Granit.Http.Idempotency.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.SecurityHeaders": "[0.1.0-dev, )",
           "Granit.Identity.Endpoints": "[0.1.0-dev, )",
           "Granit.Identity.Local": "[0.1.0-dev, )",
@@ -3558,8 +3549,8 @@
           "Granit.Auditing": "[0.1.0-dev, )",
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.Caching": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.ApiDocumentation": "[0.1.0-dev, )",
+          "Granit.Http.Idempotency.Abstractions": "[0.1.0-dev, )",
           "Granit.OpenIddict": "[0.1.0-dev, )",
           "Granit.OpenIddict.Server": "[0.1.0-dev, )",
           "Granit.QueryEngine.Abstractions": "[0.1.0-dev, )",
@@ -3656,7 +3647,6 @@
         "type": "Project",
         "dependencies": {
           "Granit.Authorization": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.RateLimiting": "[0.1.0-dev, )",
           "Granit.Presence": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )"
@@ -3748,9 +3738,9 @@
         "dependencies": {
           "Granit.Authorization": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.ApiDocumentation": "[0.1.0-dev, )",
           "Granit.Http.Cookies": "[0.1.0-dev, )",
+          "Granit.Http.Idempotency.Abstractions": "[0.1.0-dev, )",
           "Granit.Http.RateLimiting": "[0.1.0-dev, )",
           "Granit.Privacy": "[0.1.0-dev, )",
           "Granit.Privacy.Regulations": "[0.1.0-dev, )",
@@ -4258,7 +4248,7 @@
           "Granit.Encryption": "[0.1.0-dev, )",
           "Granit.Guids": "[0.1.0-dev, )",
           "Granit.Http.Resilience": "[0.1.0-dev, )",
-          "Granit.Http.Security": "[0.1.0-dev, )",
+          "Granit.Http.UrlSafety": "[0.1.0-dev, )",
           "Granit.Localization": "[0.1.0-dev, )",
           "Granit.QueryEngine.Abstractions": "[0.1.0-dev, )",
           "Granit.Timing": "[0.1.0-dev, )"
@@ -4275,7 +4265,7 @@
         "type": "Project",
         "dependencies": {
           "Granit.Authorization": "[0.1.0-dev, )",
-          "Granit.Http.Abstractions": "[0.1.0-dev, )",
+          "Granit.Http.Idempotency.Abstractions": "[0.1.0-dev, )",
           "Granit.QueryEngine.Endpoints": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )",
           "Granit.Webhooks": "[0.1.0-dev, )",

@@ -338,7 +338,7 @@
       "name": "Granit.Authentication.ApiKeys.Endpoints",
       "deps": [
         "Granit.Authentication.ApiKeys",
-        "Granit.Http.Abstractions",
+        "Granit.Http.Idempotency.Abstractions",
         "Granit.Http.ApiDocumentation",
         "Granit.Authorization",
         "Granit.QueryEngine.Abstractions",
@@ -664,7 +664,7 @@
       "deps": [
         "Granit.Authorization",
         "Granit.BlobStorage",
-        "Granit.Http.Abstractions",
+        "Granit.Http.Idempotency.Abstractions",
         "Granit.Http.RateLimiting",
         "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
@@ -718,7 +718,7 @@
         "Granit",
         "Granit.Authorization",
         "Granit.Guids",
-        "Granit.Http.Security",
+        "Granit.Http.UrlSafety",
         "Granit.IO",
         "Granit.MultiTenancy",
         "Granit.Timing"
@@ -736,6 +736,21 @@
       "name": "Granit.Browsing.PuppeteerSharp",
       "deps": [
         "Granit.Browsing"
+      ],
+      "framework": "net10.0"
+    },
+    {
+      "name": "Granit.Bulkhead",
+      "deps": [
+        "Granit",
+        "Granit.Features"
+      ],
+      "framework": "net10.0"
+    },
+    {
+      "name": "Granit.Bulkhead.Wolverine",
+      "deps": [
+        "Granit.Bulkhead"
       ],
       "framework": "net10.0"
     },
@@ -894,6 +909,8 @@
       "deps": [
         "Granit.Authorization",
         "Granit.Diagnostics",
+        "Granit.Http.SecurityHeaders",
+        "Granit.Http.SecurityHeaders.Abstractions",
         "Granit.Http.ApiDocumentation",
         "Granit.Validation",
         "Granit.Workspaces.Abstractions"
@@ -1136,11 +1153,6 @@
       "framework": "net10.0"
     },
     {
-      "name": "Granit.Http.Abstractions",
-      "deps": [],
-      "framework": "net10.0"
-    },
-    {
       "name": "Granit.Http.ApiDocumentation",
       "deps": [
         "Granit.Http.ApiVersioning",
@@ -1158,9 +1170,8 @@
     {
       "name": "Granit.Http.Bulkhead",
       "deps": [
-        "Granit",
-        "Granit.Http.ExceptionHandling",
-        "Granit.Features"
+        "Granit.Bulkhead",
+        "Granit.Http.ExceptionHandling"
       ],
       "framework": "net10.0"
     },
@@ -1189,20 +1200,6 @@
       "framework": "net10.0"
     },
     {
-      "name": "Granit.Http.Cookies.Klaro",
-      "deps": [
-        "Granit.Http.Cookies"
-      ],
-      "framework": "net10.0"
-    },
-    {
-      "name": "Granit.Http.Cors",
-      "deps": [
-        "Granit"
-      ],
-      "framework": "net10.0"
-    },
-    {
       "name": "Granit.Http.ExceptionHandling",
       "deps": [
         "Granit"
@@ -1217,11 +1214,23 @@
       "framework": "net10.0"
     },
     {
+      "name": "Granit.Http.Hosting",
+      "deps": [
+        "Granit"
+      ],
+      "framework": "net10.0"
+    },
+    {
       "name": "Granit.Http.Idempotency",
       "deps": [
         "Granit.Caching",
-        "Granit.Http.Abstractions"
+        "Granit.Http.Idempotency.Abstractions"
       ],
+      "framework": "net10.0"
+    },
+    {
+      "name": "Granit.Http.Idempotency.Abstractions",
+      "deps": [],
       "framework": "net10.0"
     },
     {
@@ -1268,21 +1277,6 @@
       "framework": "net10.0"
     },
     {
-      "name": "Granit.Http.ResponseCompression",
-      "deps": [
-        "Granit"
-      ],
-      "framework": "net10.0"
-    },
-    {
-      "name": "Granit.Http.Security",
-      "deps": [
-        "Granit",
-        "Granit.MultiTenancy"
-      ],
-      "framework": "net10.0"
-    },
-    {
       "name": "Granit.Http.SecurityHeaders",
       "deps": [
         "Granit",
@@ -1296,11 +1290,9 @@
       "framework": "net10.0"
     },
     {
-      "name": "Granit.Http.SecurityHeaders.Endpoints",
+      "name": "Granit.Http.UrlSafety",
       "deps": [
-        "Granit.Diagnostics.Endpoints",
-        "Granit.Http.SecurityHeaders",
-        "Granit.Http.SecurityHeaders.Abstractions"
+        "Granit"
       ],
       "framework": "net10.0"
     },
@@ -1507,7 +1499,7 @@
         "Granit.Authentication.External",
         "Granit.Authorization",
         "Granit.Caching",
-        "Granit.Http.Abstractions",
+        "Granit.Http.Idempotency.Abstractions",
         "Granit.Http.ApiDocumentation",
         "Granit.Http.SecurityHeaders",
         "Granit.Identity.Endpoints",
@@ -2172,7 +2164,7 @@
         "Granit.Auditing",
         "Granit.Authorization",
         "Granit.Caching",
-        "Granit.Http.Abstractions",
+        "Granit.Http.Idempotency.Abstractions",
         "Granit.Http.ApiDocumentation",
         "Granit.OpenIddict",
         "Granit.OpenIddict.Server",
@@ -2363,7 +2355,7 @@
       "deps": [
         "Granit.Authorization",
         "Granit.Guids",
-        "Granit.Http.Abstractions",
+        "Granit.Http.Idempotency.Abstractions",
         "Granit.Http.ApiDocumentation",
         "Granit.Http.Cookies",
         "Granit.Http.RateLimiting",
@@ -2888,7 +2880,7 @@
         "Granit.DataExchange.Abstractions",
         "Granit.Guids",
         "Granit.Http.Resilience",
-        "Granit.Http.Security",
+        "Granit.Http.UrlSafety",
         "Granit.Encryption",
         "Granit.Localization",
         "Granit.QueryEngine.Abstractions",
@@ -2908,7 +2900,7 @@
       "name": "Granit.Webhooks.Endpoints",
       "deps": [
         "Granit.Authorization",
-        "Granit.Http.Abstractions",
+        "Granit.Http.Idempotency.Abstractions",
         "Granit.QueryEngine.Endpoints",
         "Granit.Validation",
         "Granit.Webhooks",
@@ -15669,6 +15661,275 @@
       ]
     },
     {
+      "name": "BulkheadLease",
+      "fqn": "Granit.Bulkhead.Abstractions.BulkheadLease",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Abstractions/BulkheadLease.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "new",
+          "kind": "method",
+          "signature": "new(null, null)",
+          "returnType": "BulkheadLease NoOp ="
+        }
+      ]
+    },
+    {
+      "name": "IBulkheadQuotaProvider",
+      "fqn": "Granit.Bulkhead.Abstractions.IBulkheadQuotaProvider",
+      "kind": "interface",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Abstractions/IBulkheadQuotaProvider.cs",
+      "line": 7,
+      "members": [
+        {
+          "name": "GetPermitLimitAsync",
+          "kind": "method",
+          "signature": "GetPermitLimitAsync(string policyName, CancellationToken cancellationToken = default)",
+          "returnType": "Task<int?>"
+        }
+      ]
+    },
+    {
+      "name": "ConcurrencyLimiterRegistry",
+      "fqn": "Granit.Bulkhead.ConcurrencyLimiterRegistry",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/ConcurrencyLimiterRegistry.cs",
+      "line": 36,
+      "members": [
+        {
+          "name": "AcquireAsync",
+          "kind": "method",
+          "signature": "AcquireAsync(string key, int permitLimit, int queueLimit, CancellationToken cancellationToken)",
+          "returnType": "ValueTask<RateLimitLease>"
+        },
+        {
+          "name": "Dispose",
+          "kind": "method",
+          "signature": "Dispose()",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "BulkheadMetrics",
+      "fqn": "Granit.Bulkhead.Diagnostics.BulkheadMetrics",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Diagnostics/BulkheadMetrics.cs",
+      "line": 10,
+      "members": [
+        {
+          "name": "RecordReleased",
+          "kind": "method",
+          "signature": "RecordReleased(string policyName, string? tenantId)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordRejected",
+          "kind": "method",
+          "signature": "RecordRejected(string policyName, string? tenantId)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordEvicted",
+          "kind": "method",
+          "signature": "RecordEvicted(string reason, int count)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordUnknownPolicy",
+          "kind": "method",
+          "signature": "RecordUnknownPolicy(string policyName)",
+          "returnType": "void"
+        },
+        {
+          "name": "RecordAbandoned",
+          "kind": "method",
+          "signature": "RecordAbandoned(string policyName, string? tenantId)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "BulkheadRejectedException",
+      "fqn": "Granit.Bulkhead.Exceptions.BulkheadRejectedException",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Exceptions/BulkheadRejectedException.cs",
+      "line": 11,
+      "members": []
+    },
+    {
+      "name": "BulkheadServiceCollectionExtensions",
+      "fqn": "Granit.Bulkhead.Extensions.BulkheadServiceCollectionExtensions",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Extensions/BulkheadServiceCollectionExtensions.cs",
+      "line": 16,
+      "members": [
+        {
+          "name": "AddGranitBulkhead",
+          "kind": "method",
+          "signature": "AddGranitBulkhead(this IServiceCollection services, Action<GranitBulkheadOptions>? configure = null)",
+          "returnType": "IServiceCollection"
+        }
+      ]
+    },
+    {
+      "name": "GranitBulkheadModule",
+      "fqn": "Granit.Bulkhead.GranitBulkheadModule",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/GranitBulkheadModule.cs",
+      "line": 17,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "BulkheadLocalizationResource",
+      "fqn": "Granit.Bulkhead.Localization.BulkheadLocalizationResource",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Localization/BulkheadLocalizationResource.cs",
+      "line": 9,
+      "members": []
+    },
+    {
+      "name": "BulkheadPolicyOptions",
+      "fqn": "Granit.Bulkhead.Options.BulkheadPolicyOptions",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Options/BulkheadPolicyOptions.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "PermitLimit",
+          "kind": "property",
+          "signature": "int PermitLimit",
+          "returnType": "int"
+        },
+        {
+          "name": "FromSeconds",
+          "kind": "method",
+          "signature": "FromSeconds(30)",
+          "returnType": "int QueueLimit { get; set; } public TimeSpan QueueTimeout { get; set; } = TimeSpan."
+        }
+      ]
+    },
+    {
+      "name": "GranitBulkheadOptions",
+      "fqn": "Granit.Bulkhead.Options.GranitBulkheadOptions",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/Options/GranitBulkheadOptions.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "Enabled",
+          "kind": "property",
+          "signature": "bool Enabled",
+          "returnType": "bool"
+        },
+        {
+          "name": "BypassRoles",
+          "kind": "property",
+          "signature": "string[] BypassRoles",
+          "returnType": "string[]"
+        },
+        {
+          "name": "new",
+          "kind": "method",
+          "signature": "new(StringComparer.OrdinalIgnoreCase)",
+          "returnType": "bool UseFeatureBasedQuotas { get; set; } public Dictionary<string, BulkheadPolicyOptions> Policies { get; set; } ="
+        },
+        {
+          "name": "FromMinutes",
+          "kind": "method",
+          "signature": "FromMinutes(30)",
+          "returnType": "TimeSpan IdleTimeout { get; set; } = TimeSpan."
+        },
+        {
+          "name": "FromMinutes",
+          "kind": "method",
+          "signature": "FromMinutes(5)",
+          "returnType": "TimeSpan CleanupInterval { get; set; } = TimeSpan."
+        },
+        {
+          "name": "MaxLimiters",
+          "kind": "property",
+          "signature": "int MaxLimiters",
+          "returnType": "int"
+        }
+      ]
+    },
+    {
+      "name": "TenantPartitionedBulkhead",
+      "fqn": "Granit.Bulkhead.TenantPartitionedBulkhead",
+      "kind": "class",
+      "project": "Granit.Bulkhead",
+      "file": "src/Granit.Bulkhead/TenantPartitionedBulkhead.cs",
+      "line": 20,
+      "members": [
+        {
+          "name": "AcquireAsync",
+          "kind": "method",
+          "signature": "AcquireAsync(string policyName, CancellationToken cancellationToken)",
+          "returnType": "Task<BulkheadLease>"
+        }
+      ]
+    },
+    {
+      "name": "BulkheadAttribute",
+      "fqn": "Granit.Bulkhead.Wolverine.Attributes.BulkheadAttribute",
+      "kind": "class",
+      "project": "Granit.Bulkhead.Wolverine",
+      "file": "src/Granit.Bulkhead.Wolverine/Attributes/BulkheadAttribute.cs",
+      "line": 9,
+      "members": [
+        {
+          "name": "PolicyName",
+          "kind": "property",
+          "signature": "string PolicyName",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "BulkheadMiddleware",
+      "fqn": "Granit.Bulkhead.Wolverine.BulkheadMiddleware",
+      "kind": "class",
+      "project": "Granit.Bulkhead.Wolverine",
+      "file": "src/Granit.Bulkhead.Wolverine/BulkheadMiddleware.cs",
+      "line": 29,
+      "members": [
+        {
+          "name": "BeforeAsync",
+          "kind": "method",
+          "signature": "BeforeAsync(object message, TenantPartitionedBulkhead bulkhead, CancellationToken cancellationToken)",
+          "returnType": "Task<BulkheadLease>"
+        }
+      ]
+    },
+    {
+      "name": "GranitBulkheadWolverineModule",
+      "fqn": "Granit.Bulkhead.Wolverine.GranitBulkheadWolverineModule",
+      "kind": "class",
+      "project": "Granit.Bulkhead.Wolverine",
+      "file": "src/Granit.Bulkhead.Wolverine/GranitBulkheadWolverineModule.cs",
+      "line": 20,
+      "members": []
+    },
+    {
       "name": "AesCacheValueEncryptor",
       "fqn": "Granit.Caching.AesCacheValueEncryptor",
       "kind": "class",
@@ -15755,6 +16016,12 @@
       "file": "src/Granit.Caching/IConditionalCache.cs",
       "line": 29,
       "members": [
+        {
+          "name": "IsDistributed",
+          "kind": "property",
+          "signature": "bool IsDistributed",
+          "returnType": "bool"
+        },
         {
           "name": "DeleteAsync",
           "kind": "method",
@@ -18626,6 +18893,33 @@
       "members": []
     },
     {
+      "name": "CspAuditResponse",
+      "fqn": "Granit.Diagnostics.Endpoints.Dtos.CspAuditResponse",
+      "kind": "record",
+      "project": "Granit.Diagnostics.Endpoints",
+      "file": "src/Granit.Diagnostics.Endpoints/Dtos/CspAuditResponse.cs",
+      "line": 30,
+      "members": []
+    },
+    {
+      "name": "CspContributorInfo",
+      "fqn": "Granit.Diagnostics.Endpoints.Dtos.CspContributorInfo",
+      "kind": "record",
+      "project": "Granit.Diagnostics.Endpoints",
+      "file": "src/Granit.Diagnostics.Endpoints/Dtos/CspAuditResponse.cs",
+      "line": 38,
+      "members": []
+    },
+    {
+      "name": "CspEndpointAudit",
+      "fqn": "Granit.Diagnostics.Endpoints.Dtos.CspEndpointAudit",
+      "kind": "record",
+      "project": "Granit.Diagnostics.Endpoints",
+      "file": "src/Granit.Diagnostics.Endpoints/Dtos/CspAuditResponse.cs",
+      "line": 54,
+      "members": []
+    },
+    {
       "name": "DiagnosticsEndpointRouteBuilderExtensions",
       "fqn": "Granit.Diagnostics.Endpoints.Extensions.DiagnosticsEndpointRouteBuilderExtensions",
       "kind": "class",
@@ -18642,12 +18936,28 @@
       ]
     },
     {
+      "name": "SecurityHeadersAuditEndpointRouteBuilderExtensions",
+      "fqn": "Granit.Diagnostics.Endpoints.Extensions.SecurityHeadersAuditEndpointRouteBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Diagnostics.Endpoints",
+      "file": "src/Granit.Diagnostics.Endpoints/Extensions/SecurityHeadersAuditEndpointRouteBuilderExtensions.cs",
+      "line": 14,
+      "members": [
+        {
+          "name": "MapGranitSecurityHeadersAudit",
+          "kind": "method",
+          "signature": "MapGranitSecurityHeadersAudit(this IEndpointRouteBuilder endpoints, Action<SecurityHeadersAuditOptions>? configure = null)",
+          "returnType": "RouteGroupBuilder"
+        }
+      ]
+    },
+    {
       "name": "GranitDiagnosticsEndpointsModule",
       "fqn": "Granit.Diagnostics.Endpoints.GranitDiagnosticsEndpointsModule",
       "kind": "class",
       "project": "Granit.Diagnostics.Endpoints",
       "file": "src/Granit.Diagnostics.Endpoints/GranitDiagnosticsEndpointsModule.cs",
-      "line": 23,
+      "line": 27,
       "members": [
         {
           "name": "ConfigureServices",
@@ -18663,6 +18973,28 @@
       "kind": "class",
       "project": "Granit.Diagnostics.Endpoints",
       "file": "src/Granit.Diagnostics.Endpoints/Options/DiagnosticsEndpointsOptions.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "RoutePrefix",
+          "kind": "property",
+          "signature": "string RoutePrefix",
+          "returnType": "string"
+        },
+        {
+          "name": "TagName",
+          "kind": "property",
+          "signature": "string TagName",
+          "returnType": "string"
+        }
+      ]
+    },
+    {
+      "name": "SecurityHeadersAuditOptions",
+      "fqn": "Granit.Diagnostics.Endpoints.Options.SecurityHeadersAuditOptions",
+      "kind": "class",
+      "project": "Granit.Diagnostics.Endpoints",
+      "file": "src/Granit.Diagnostics.Endpoints/Options/SecurityHeadersAuditOptions.cs",
       "line": 6,
       "members": [
         {
@@ -24663,145 +24995,26 @@
       ]
     },
     {
-      "name": "BulkheadLease",
-      "fqn": "Granit.Http.Bulkhead.Abstractions.BulkheadLease",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Abstractions/BulkheadLease.cs",
-      "line": 9,
-      "members": [
-        {
-          "name": "new",
-          "kind": "method",
-          "signature": "new(null, null)",
-          "returnType": "BulkheadLease NoOp ="
-        }
-      ]
-    },
-    {
-      "name": "IBulkheadQuotaProvider",
-      "fqn": "Granit.Http.Bulkhead.Abstractions.IBulkheadQuotaProvider",
-      "kind": "interface",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Abstractions/IBulkheadQuotaProvider.cs",
-      "line": 7,
-      "members": [
-        {
-          "name": "GetPermitLimitAsync",
-          "kind": "method",
-          "signature": "GetPermitLimitAsync(string policyName, CancellationToken cancellationToken = default)",
-          "returnType": "Task<int?>"
-        }
-      ]
-    },
-    {
       "name": "BulkheadEndpointExtensions",
       "fqn": "Granit.Http.Bulkhead.AspNetCore.BulkheadEndpointExtensions",
       "kind": "class",
       "project": "Granit.Http.Bulkhead",
       "file": "src/Granit.Http.Bulkhead/AspNetCore/BulkheadEndpointExtensions.cs",
-      "line": 11,
+      "line": 12,
       "members": []
     },
     {
-      "name": "BulkheadAttribute",
-      "fqn": "Granit.Http.Bulkhead.Attributes.BulkheadAttribute",
+      "name": "BulkheadHttpServiceCollectionExtensions",
+      "fqn": "Granit.Http.Bulkhead.Extensions.BulkheadHttpServiceCollectionExtensions",
       "kind": "class",
       "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Attributes/BulkheadAttribute.cs",
-      "line": 9,
-      "members": [
-        {
-          "name": "PolicyName",
-          "kind": "property",
-          "signature": "string PolicyName",
-          "returnType": "string"
-        }
-      ]
-    },
-    {
-      "name": "ConcurrencyLimiterRegistry",
-      "fqn": "Granit.Http.Bulkhead.ConcurrencyLimiterRegistry",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/ConcurrencyLimiterRegistry.cs",
-      "line": 29,
-      "members": [
-        {
-          "name": "AcquireAsync",
-          "kind": "method",
-          "signature": "AcquireAsync(string key, int permitLimit, int queueLimit, CancellationToken cancellationToken)",
-          "returnType": "ValueTask<RateLimitLease>"
-        },
-        {
-          "name": "Dispose",
-          "kind": "method",
-          "signature": "Dispose()",
-          "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "BulkheadMetrics",
-      "fqn": "Granit.Http.Bulkhead.Diagnostics.BulkheadMetrics",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Diagnostics/BulkheadMetrics.cs",
+      "file": "src/Granit.Http.Bulkhead/Extensions/BulkheadHttpServiceCollectionExtensions.cs",
       "line": 10,
       "members": [
         {
-          "name": "RecordReleased",
+          "name": "AddGranitHttpBulkhead",
           "kind": "method",
-          "signature": "RecordReleased(string policyName, string? tenantId)",
-          "returnType": "void"
-        },
-        {
-          "name": "RecordRejected",
-          "kind": "method",
-          "signature": "RecordRejected(string policyName, string? tenantId)",
-          "returnType": "void"
-        },
-        {
-          "name": "RecordEvicted",
-          "kind": "method",
-          "signature": "RecordEvicted(string reason, int count)",
-          "returnType": "void"
-        },
-        {
-          "name": "RecordUnknownPolicy",
-          "kind": "method",
-          "signature": "RecordUnknownPolicy(string policyName)",
-          "returnType": "void"
-        },
-        {
-          "name": "RecordAbandoned",
-          "kind": "method",
-          "signature": "RecordAbandoned(string policyName, string? tenantId)",
-          "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "BulkheadRejectedException",
-      "fqn": "Granit.Http.Bulkhead.Exceptions.BulkheadRejectedException",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Exceptions/BulkheadRejectedException.cs",
-      "line": 11,
-      "members": []
-    },
-    {
-      "name": "BulkheadServiceCollectionExtensions",
-      "fqn": "Granit.Http.Bulkhead.Extensions.BulkheadServiceCollectionExtensions",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Extensions/BulkheadServiceCollectionExtensions.cs",
-      "line": 18,
-      "members": [
-        {
-          "name": "AddGranitBulkhead",
-          "kind": "method",
-          "signature": "AddGranitBulkhead(this IServiceCollection services, Action<GranitBulkheadOptions>? configure = null)",
+          "signature": "AddGranitHttpBulkhead(this IServiceCollection services)",
           "returnType": "IServiceCollection"
         }
       ]
@@ -24812,122 +25025,13 @@
       "kind": "class",
       "project": "Granit.Http.Bulkhead",
       "file": "src/Granit.Http.Bulkhead/GranitHttpBulkheadModule.cs",
-      "line": 16,
+      "line": 17,
       "members": [
         {
           "name": "ConfigureServices",
           "kind": "method",
           "signature": "ConfigureServices(ServiceConfigurationContext context)",
           "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "BulkheadLocalizationResource",
-      "fqn": "Granit.Http.Bulkhead.Localization.BulkheadLocalizationResource",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Localization/BulkheadLocalizationResource.cs",
-      "line": 9,
-      "members": []
-    },
-    {
-      "name": "BulkheadPolicyOptions",
-      "fqn": "Granit.Http.Bulkhead.Options.BulkheadPolicyOptions",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Options/BulkheadPolicyOptions.cs",
-      "line": 8,
-      "members": [
-        {
-          "name": "PermitLimit",
-          "kind": "property",
-          "signature": "int PermitLimit",
-          "returnType": "int"
-        },
-        {
-          "name": "FromSeconds",
-          "kind": "method",
-          "signature": "FromSeconds(30)",
-          "returnType": "int QueueLimit { get; set; } public TimeSpan QueueTimeout { get; set; } = TimeSpan."
-        }
-      ]
-    },
-    {
-      "name": "GranitBulkheadOptions",
-      "fqn": "Granit.Http.Bulkhead.Options.GranitBulkheadOptions",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Options/GranitBulkheadOptions.cs",
-      "line": 9,
-      "members": [
-        {
-          "name": "Enabled",
-          "kind": "property",
-          "signature": "bool Enabled",
-          "returnType": "bool"
-        },
-        {
-          "name": "BypassRoles",
-          "kind": "property",
-          "signature": "string[] BypassRoles",
-          "returnType": "string[]"
-        },
-        {
-          "name": "new",
-          "kind": "method",
-          "signature": "new(StringComparer.OrdinalIgnoreCase)",
-          "returnType": "bool UseFeatureBasedQuotas { get; set; } public Dictionary<string, BulkheadPolicyOptions> Policies { get; set; } ="
-        },
-        {
-          "name": "FromMinutes",
-          "kind": "method",
-          "signature": "FromMinutes(30)",
-          "returnType": "TimeSpan IdleTimeout { get; set; } = TimeSpan."
-        },
-        {
-          "name": "FromMinutes",
-          "kind": "method",
-          "signature": "FromMinutes(5)",
-          "returnType": "TimeSpan CleanupInterval { get; set; } = TimeSpan."
-        },
-        {
-          "name": "MaxLimiters",
-          "kind": "property",
-          "signature": "int MaxLimiters",
-          "returnType": "int"
-        }
-      ]
-    },
-    {
-      "name": "TenantPartitionedBulkhead",
-      "fqn": "Granit.Http.Bulkhead.TenantPartitionedBulkhead",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/TenantPartitionedBulkhead.cs",
-      "line": 20,
-      "members": [
-        {
-          "name": "AcquireAsync",
-          "kind": "method",
-          "signature": "AcquireAsync(string policyName, CancellationToken cancellationToken)",
-          "returnType": "Task<BulkheadLease>"
-        }
-      ]
-    },
-    {
-      "name": "BulkheadMiddleware",
-      "fqn": "Granit.Http.Bulkhead.Wolverine.BulkheadMiddleware",
-      "kind": "class",
-      "project": "Granit.Http.Bulkhead",
-      "file": "src/Granit.Http.Bulkhead/Wolverine/BulkheadMiddleware.cs",
-      "line": 29,
-      "members": [
-        {
-          "name": "BeforeAsync",
-          "kind": "method",
-          "signature": "BeforeAsync(object message, TenantPartitionedBulkhead bulkhead, CancellationToken cancellationToken)",
-          "returnType": "Task<BulkheadLease>"
         }
       ]
     },
@@ -24948,22 +25052,6 @@
       "file": "src/Granit.Http.Cookies/CookieCategory.cs",
       "line": 6,
       "members": []
-    },
-    {
-      "name": "CookieConsentServiceCollectionExtensions",
-      "fqn": "Granit.Http.Cookies.CookieConsent.Extensions.CookieConsentServiceCollectionExtensions",
-      "kind": "class",
-      "project": "Granit.Http.Cookies.CookieConsent",
-      "file": "src/Granit.Http.Cookies.CookieConsent/Extensions/CookieConsentServiceCollectionExtensions.cs",
-      "line": 11,
-      "members": [
-        {
-          "name": "AddGranitCookiesCookieConsent",
-          "kind": "method",
-          "signature": "AddGranitCookiesCookieConsent(this IServiceCollection services)",
-          "returnType": "IServiceCollection"
-        }
-      ]
     },
     {
       "name": "GranitCookiesBuilderExtensions",
@@ -25218,7 +25306,7 @@
       "kind": "class",
       "project": "Granit.Http.Cookies",
       "file": "src/Granit.Http.Cookies/GranitHttpCookiesModule.cs",
-      "line": 14,
+      "line": 21,
       "members": [
         {
           "name": "ConfigureServices",
@@ -25383,70 +25471,6 @@
       ]
     },
     {
-      "name": "GranitCookiesBuilderExtensions",
-      "fqn": "Granit.Http.Cookies.Klaro.Extensions.GranitCookiesBuilderExtensions",
-      "kind": "class",
-      "project": "Granit.Http.Cookies.Klaro",
-      "file": "src/Granit.Http.Cookies.Klaro/Extensions/GranitCookiesBuilderExtensions.cs",
-      "line": 6,
-      "members": [
-        {
-          "name": "UseKlaro",
-          "kind": "method",
-          "signature": "UseKlaro(this GranitCookiesBuilder builder)",
-          "returnType": "GranitCookiesBuilder"
-        }
-      ]
-    },
-    {
-      "name": "KlaroServiceCollectionExtensions",
-      "fqn": "Granit.Http.Cookies.Klaro.Extensions.KlaroServiceCollectionExtensions",
-      "kind": "class",
-      "project": "Granit.Http.Cookies.Klaro",
-      "file": "src/Granit.Http.Cookies.Klaro/Extensions/KlaroServiceCollectionExtensions.cs",
-      "line": 11,
-      "members": [
-        {
-          "name": "AddGranitCookiesKlaro",
-          "kind": "method",
-          "signature": "AddGranitCookiesKlaro(this IServiceCollection services)",
-          "returnType": "IServiceCollection"
-        }
-      ]
-    },
-    {
-      "name": "GranitHttpCookiesKlaroModule",
-      "fqn": "Granit.Http.Cookies.Klaro.GranitHttpCookiesKlaroModule",
-      "kind": "class",
-      "project": "Granit.Http.Cookies.Klaro",
-      "file": "src/Granit.Http.Cookies.Klaro/GranitHttpCookiesKlaroModule.cs",
-      "line": 13,
-      "members": [
-        {
-          "name": "ConfigureServices",
-          "kind": "method",
-          "signature": "ConfigureServices(ServiceConfigurationContext context)",
-          "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "KlaroOptions",
-      "fqn": "Granit.Http.Cookies.Klaro.Options.KlaroOptions",
-      "kind": "class",
-      "project": "Granit.Http.Cookies.Klaro",
-      "file": "src/Granit.Http.Cookies.Klaro/Options/KlaroOptions.cs",
-      "line": 12,
-      "members": [
-        {
-          "name": "CookieName",
-          "kind": "property",
-          "signature": "string CookieName",
-          "returnType": "string"
-        }
-      ]
-    },
-    {
       "name": "GranitCookiesOptions",
       "fqn": "Granit.Http.Cookies.Options.GranitCookiesOptions",
       "kind": "class",
@@ -25498,60 +25522,6 @@
       "file": "src/Granit.Http.Cookies/ThirdPartyServiceDefinition.cs",
       "line": 13,
       "members": []
-    },
-    {
-      "name": "CorsHostApplicationBuilderExtensions",
-      "fqn": "Granit.Http.Cors.Extensions.CorsHostApplicationBuilderExtensions",
-      "kind": "class",
-      "project": "Granit.Http.Cors",
-      "file": "src/Granit.Http.Cors/Extensions/CorsHostApplicationBuilderExtensions.cs",
-      "line": 13,
-      "members": [
-        {
-          "name": "AddGranitCors",
-          "kind": "method",
-          "signature": "AddGranitCors(this IHostApplicationBuilder builder)",
-          "returnType": "IHostApplicationBuilder"
-        }
-      ]
-    },
-    {
-      "name": "GranitHttpCorsModule",
-      "fqn": "Granit.Http.Cors.GranitHttpCorsModule",
-      "kind": "class",
-      "project": "Granit.Http.Cors",
-      "file": "src/Granit.Http.Cors/GranitHttpCorsModule.cs",
-      "line": 14,
-      "members": [
-        {
-          "name": "ConfigureServices",
-          "kind": "method",
-          "signature": "ConfigureServices(ServiceConfigurationContext context)",
-          "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "GranitCorsOptions",
-      "fqn": "Granit.Http.Cors.Options.GranitCorsOptions",
-      "kind": "class",
-      "project": "Granit.Http.Cors",
-      "file": "src/Granit.Http.Cors/Options/GranitCorsOptions.cs",
-      "line": 13,
-      "members": [
-        {
-          "name": "AllowedOrigins",
-          "kind": "property",
-          "signature": "string[] AllowedOrigins",
-          "returnType": "string[]"
-        },
-        {
-          "name": "AllowCredentials",
-          "kind": "property",
-          "signature": "bool AllowCredentials",
-          "returnType": "bool"
-        }
-      ]
     },
     {
       "name": "ExceptionHandlingApplicationBuilderExtensions",
@@ -25652,13 +25622,130 @@
       "members": []
     },
     {
-      "name": "IIdempotencyMetadata",
-      "fqn": "Granit.Http.Idempotency.Abstractions.IIdempotencyMetadata",
-      "kind": "interface",
-      "project": "Granit.Http.Abstractions",
-      "file": "src/Granit.Http.Abstractions/Idempotency/Abstractions/IIdempotencyMetadata.cs",
-      "line": 7,
-      "members": []
+      "name": "CorsHostApplicationBuilderExtensions",
+      "fqn": "Granit.Http.Hosting.Cors.Extensions.CorsHostApplicationBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Http.Hosting",
+      "file": "src/Granit.Http.Hosting/Cors/Extensions/CorsHostApplicationBuilderExtensions.cs",
+      "line": 14,
+      "members": [
+        {
+          "name": "AddGranitCors",
+          "kind": "method",
+          "signature": "AddGranitCors(this IHostApplicationBuilder builder)",
+          "returnType": "IHostApplicationBuilder"
+        }
+      ]
+    },
+    {
+      "name": "GranitCorsOptions",
+      "fqn": "Granit.Http.Hosting.Cors.Options.GranitCorsOptions",
+      "kind": "class",
+      "project": "Granit.Http.Hosting",
+      "file": "src/Granit.Http.Hosting/Cors/Options/GranitCorsOptions.cs",
+      "line": 13,
+      "members": [
+        {
+          "name": "AllowedOrigins",
+          "kind": "property",
+          "signature": "string[] AllowedOrigins",
+          "returnType": "string[]"
+        },
+        {
+          "name": "AllowCredentials",
+          "kind": "property",
+          "signature": "bool AllowCredentials",
+          "returnType": "bool"
+        }
+      ]
+    },
+    {
+      "name": "GranitHttpHostingModule",
+      "fqn": "Granit.Http.Hosting.GranitHttpHostingModule",
+      "kind": "class",
+      "project": "Granit.Http.Hosting",
+      "file": "src/Granit.Http.Hosting/GranitHttpHostingModule.cs",
+      "line": 21,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "ResponseCompressionApplicationBuilderExtensions",
+      "fqn": "Granit.Http.Hosting.ResponseCompression.Extensions.ResponseCompressionApplicationBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Http.Hosting",
+      "file": "src/Granit.Http.Hosting/ResponseCompression/Extensions/ResponseCompressionApplicationBuilderExtensions.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "UseGranitResponseCompression",
+          "kind": "method",
+          "signature": "UseGranitResponseCompression(this IApplicationBuilder app)",
+          "returnType": "IApplicationBuilder"
+        }
+      ]
+    },
+    {
+      "name": "ResponseCompressionHostApplicationBuilderExtensions",
+      "fqn": "Granit.Http.Hosting.ResponseCompression.Extensions.ResponseCompressionHostApplicationBuilderExtensions",
+      "kind": "class",
+      "project": "Granit.Http.Hosting",
+      "file": "src/Granit.Http.Hosting/ResponseCompression/Extensions/ResponseCompressionHostApplicationBuilderExtensions.cs",
+      "line": 14,
+      "members": [
+        {
+          "name": "AddGranitResponseCompression",
+          "kind": "method",
+          "signature": "AddGranitResponseCompression(this IHostApplicationBuilder builder)",
+          "returnType": "IHostApplicationBuilder"
+        }
+      ]
+    },
+    {
+      "name": "GranitResponseCompressionOptions",
+      "fqn": "Granit.Http.Hosting.ResponseCompression.Options.GranitResponseCompressionOptions",
+      "kind": "class",
+      "project": "Granit.Http.Hosting",
+      "file": "src/Granit.Http.Hosting/ResponseCompression/Options/GranitResponseCompressionOptions.cs",
+      "line": 36,
+      "members": [
+        {
+          "name": "EnableForHttps",
+          "kind": "property",
+          "signature": "bool EnableForHttps",
+          "returnType": "bool"
+        },
+        {
+          "name": "EnableBrotli",
+          "kind": "property",
+          "signature": "bool EnableBrotli",
+          "returnType": "bool"
+        },
+        {
+          "name": "EnableGzip",
+          "kind": "property",
+          "signature": "bool EnableGzip",
+          "returnType": "bool"
+        },
+        {
+          "name": "BrotliLevel",
+          "kind": "property",
+          "signature": "CompressionLevel BrotliLevel",
+          "returnType": "CompressionLevel"
+        },
+        {
+          "name": "GzipLevel",
+          "kind": "property",
+          "signature": "CompressionLevel GzipLevel",
+          "returnType": "CompressionLevel"
+        }
+      ]
     },
     {
       "name": "IIdempotencyStore",
@@ -25691,28 +25778,6 @@
           "kind": "method",
           "signature": "DeleteAsync(string key, CancellationToken cancellationToken)",
           "returnType": "Task"
-        }
-      ]
-    },
-    {
-      "name": "IdempotentAttribute",
-      "fqn": "Granit.Http.Idempotency.Attributes.IdempotentAttribute",
-      "kind": "class",
-      "project": "Granit.Http.Abstractions",
-      "file": "src/Granit.Http.Abstractions/Idempotency/Attributes/IdempotentAttribute.cs",
-      "line": 14,
-      "members": [
-        {
-          "name": "Required",
-          "kind": "property",
-          "signature": "bool Required",
-          "returnType": "bool"
-        },
-        {
-          "name": "CompletedTtlSeconds",
-          "kind": "property",
-          "signature": "int CompletedTtlSeconds",
-          "returnType": "int"
         }
       ]
     },
@@ -25793,6 +25858,37 @@
       ]
     },
     {
+      "name": "IIdempotencyMetadata",
+      "fqn": "Granit.Http.Idempotency.IIdempotencyMetadata",
+      "kind": "interface",
+      "project": "Granit.Http.Idempotency.Abstractions",
+      "file": "src/Granit.Http.Idempotency.Abstractions/IIdempotencyMetadata.cs",
+      "line": 7,
+      "members": []
+    },
+    {
+      "name": "IdempotentAttribute",
+      "fqn": "Granit.Http.Idempotency.IdempotentAttribute",
+      "kind": "class",
+      "project": "Granit.Http.Idempotency.Abstractions",
+      "file": "src/Granit.Http.Idempotency.Abstractions/IdempotentAttribute.cs",
+      "line": 13,
+      "members": [
+        {
+          "name": "Required",
+          "kind": "property",
+          "signature": "bool Required",
+          "returnType": "bool"
+        },
+        {
+          "name": "CompletedTtlSeconds",
+          "kind": "property",
+          "signature": "int CompletedTtlSeconds",
+          "returnType": "int"
+        }
+      ]
+    },
+    {
       "name": "IdempotencyEntry",
       "fqn": "Granit.Http.Idempotency.Models.IdempotencyEntry",
       "kind": "record",
@@ -25810,10 +25906,10 @@
       "line": 9,
       "members": [
         {
-          "name": "HeaderName",
+          "name": "AllowInMemoryStore",
           "kind": "property",
-          "signature": "string HeaderName",
-          "returnType": "string"
+          "signature": "bool AllowInMemoryStore",
+          "returnType": "bool"
         },
         {
           "name": "KeyPrefix",
@@ -26298,294 +26394,6 @@
       "members": []
     },
     {
-      "name": "ResponseCompressionApplicationBuilderExtensions",
-      "fqn": "Granit.Http.ResponseCompression.Extensions.ResponseCompressionApplicationBuilderExtensions",
-      "kind": "class",
-      "project": "Granit.Http.ResponseCompression",
-      "file": "src/Granit.Http.ResponseCompression/Extensions/ResponseCompressionApplicationBuilderExtensions.cs",
-      "line": 8,
-      "members": [
-        {
-          "name": "UseGranitResponseCompression",
-          "kind": "method",
-          "signature": "UseGranitResponseCompression(this IApplicationBuilder app)",
-          "returnType": "IApplicationBuilder"
-        }
-      ]
-    },
-    {
-      "name": "ResponseCompressionHostApplicationBuilderExtensions",
-      "fqn": "Granit.Http.ResponseCompression.Extensions.ResponseCompressionHostApplicationBuilderExtensions",
-      "kind": "class",
-      "project": "Granit.Http.ResponseCompression",
-      "file": "src/Granit.Http.ResponseCompression/Extensions/ResponseCompressionHostApplicationBuilderExtensions.cs",
-      "line": 14,
-      "members": [
-        {
-          "name": "AddGranitResponseCompression",
-          "kind": "method",
-          "signature": "AddGranitResponseCompression(this IHostApplicationBuilder builder)",
-          "returnType": "IHostApplicationBuilder"
-        }
-      ]
-    },
-    {
-      "name": "GranitHttpResponseCompressionModule",
-      "fqn": "Granit.Http.ResponseCompression.GranitHttpResponseCompressionModule",
-      "kind": "class",
-      "project": "Granit.Http.ResponseCompression",
-      "file": "src/Granit.Http.ResponseCompression/GranitHttpResponseCompressionModule.cs",
-      "line": 15,
-      "members": [
-        {
-          "name": "ConfigureServices",
-          "kind": "method",
-          "signature": "ConfigureServices(ServiceConfigurationContext context)",
-          "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "GranitResponseCompressionOptions",
-      "fqn": "Granit.Http.ResponseCompression.Options.GranitResponseCompressionOptions",
-      "kind": "class",
-      "project": "Granit.Http.ResponseCompression",
-      "file": "src/Granit.Http.ResponseCompression/Options/GranitResponseCompressionOptions.cs",
-      "line": 36,
-      "members": [
-        {
-          "name": "EnableForHttps",
-          "kind": "property",
-          "signature": "bool EnableForHttps",
-          "returnType": "bool"
-        },
-        {
-          "name": "EnableBrotli",
-          "kind": "property",
-          "signature": "bool EnableBrotli",
-          "returnType": "bool"
-        },
-        {
-          "name": "EnableGzip",
-          "kind": "property",
-          "signature": "bool EnableGzip",
-          "returnType": "bool"
-        },
-        {
-          "name": "BrotliLevel",
-          "kind": "property",
-          "signature": "CompressionLevel BrotliLevel",
-          "returnType": "CompressionLevel"
-        },
-        {
-          "name": "GzipLevel",
-          "kind": "property",
-          "signature": "CompressionLevel GzipLevel",
-          "returnType": "CompressionLevel"
-        }
-      ]
-    },
-    {
-      "name": "HttpSecurityMetrics",
-      "fqn": "Granit.Http.Security.Diagnostics.HttpSecurityMetrics",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/Diagnostics/HttpSecurityMetrics.cs",
-      "line": 10,
-      "members": []
-    },
-    {
-      "name": "UrlSafetyServiceCollectionExtensions",
-      "fqn": "Granit.Http.Security.Extensions.UrlSafetyServiceCollectionExtensions",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/Extensions/UrlSafetyServiceCollectionExtensions.cs",
-      "line": 13,
-      "members": [
-        {
-          "name": "AddGranitUrlSafety",
-          "kind": "method",
-          "signature": "AddGranitUrlSafety(this IServiceCollection services, Action<UrlSafetyOptions>? configure = null)",
-          "returnType": "IServiceCollection"
-        }
-      ]
-    },
-    {
-      "name": "GranitHttpSecurityModule",
-      "fqn": "Granit.Http.Security.GranitHttpSecurityModule",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/GranitHttpSecurityModule.cs",
-      "line": 15,
-      "members": [
-        {
-          "name": "ConfigureServices",
-          "kind": "method",
-          "signature": "ConfigureServices(ServiceConfigurationContext context)",
-          "returnType": "void"
-        }
-      ]
-    },
-    {
-      "name": "IUrlSafetyValidator",
-      "fqn": "Granit.Http.Security.IUrlSafetyValidator",
-      "kind": "interface",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/IUrlSafetyValidator.cs",
-      "line": 14,
-      "members": [
-        {
-          "name": "ValidateAsync",
-          "kind": "method",
-          "signature": "ValidateAsync(Uri url, CancellationToken ct = default)",
-          "returnType": "ValueTask<UrlSafetyResult>"
-        },
-        {
-          "name": "ValidateAsync",
-          "kind": "method",
-          "signature": "ValidateAsync(Uri url, UrlSafetyOptions optionOverrides, CancellationToken ct = default)",
-          "returnType": "ValueTask<UrlSafetyResult>"
-        }
-      ]
-    },
-    {
-      "name": "IpAddressAnonymizer",
-      "fqn": "Granit.Http.Security.IpAddressAnonymizer",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/IpAddressAnonymizer.cs",
-      "line": 23,
-      "members": [
-        {
-          "name": "Mask",
-          "kind": "method",
-          "signature": "Mask(IPAddress? address)",
-          "returnType": "string?"
-        }
-      ]
-    },
-    {
-      "name": "HttpSecurityLocalizationResource",
-      "fqn": "Granit.Http.Security.Localization.HttpSecurityLocalizationResource",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/Localization/HttpSecurityLocalizationResource.cs",
-      "line": 9,
-      "members": []
-    },
-    {
-      "name": "UrlSafetyOptions",
-      "fqn": "Granit.Http.Security.Options.UrlSafetyOptions",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/Options/UrlSafetyOptions.cs",
-      "line": 8,
-      "members": [
-        {
-          "name": "AllowedSchemes",
-          "kind": "property",
-          "signature": "IReadOnlyList<string> AllowedSchemes",
-          "returnType": "IReadOnlyList<string>"
-        },
-        {
-          "name": "AllowPrivateNetworks",
-          "kind": "property",
-          "signature": "bool AllowPrivateNetworks",
-          "returnType": "bool"
-        },
-        {
-          "name": "AllowedHostPatterns",
-          "kind": "property",
-          "signature": "IReadOnlyList<string> AllowedHostPatterns",
-          "returnType": "IReadOnlyList<string>"
-        },
-        {
-          "name": "DeniedHostPatterns",
-          "kind": "property",
-          "signature": "IReadOnlyList<string> DeniedHostPatterns",
-          "returnType": "IReadOnlyList<string>"
-        },
-        {
-          "name": "MaxUrlLength",
-          "kind": "property",
-          "signature": "int MaxUrlLength",
-          "returnType": "int"
-        },
-        {
-          "name": "FromSeconds",
-          "kind": "method",
-          "signature": "FromSeconds(1)",
-          "returnType": "TimeSpan DnsResolveTimeout { get; set; } = TimeSpan."
-        }
-      ]
-    },
-    {
-      "name": "PrivateNetworkClassifier",
-      "fqn": "Granit.Http.Security.PrivateNetworkClassifier",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/PrivateNetworkClassifier.cs",
-      "line": 26,
-      "members": [
-        {
-          "name": "IsBlocked",
-          "kind": "method",
-          "signature": "IsBlocked(IPAddress ip)",
-          "returnType": "bool"
-        }
-      ]
-    },
-    {
-      "name": "ReservedTldClassifier",
-      "fqn": "Granit.Http.Security.ReservedTldClassifier",
-      "kind": "class",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/ReservedTldClassifier.cs",
-      "line": 6,
-      "members": [
-        {
-          "name": "IsReserved",
-          "kind": "method",
-          "signature": "IsReserved(string host, out string tld)",
-          "returnType": "bool"
-        }
-      ]
-    },
-    {
-      "name": "UrlSafetyViolation",
-      "fqn": "Granit.Http.Security.UrlSafetyViolation",
-      "kind": "record",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/UrlSafetyViolation.cs",
-      "line": 17,
-      "members": []
-    },
-    {
-      "name": "UrlSafetyViolationKind",
-      "fqn": "Granit.Http.Security.UrlSafetyViolationKind",
-      "kind": "enum",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/UrlSafetyViolationKind.cs",
-      "line": 8,
-      "members": []
-    },
-    {
-      "name": "struct",
-      "fqn": "Granit.Http.Security.struct",
-      "kind": "record",
-      "project": "Granit.Http.Security",
-      "file": "src/Granit.Http.Security/UrlSafetyResult.cs",
-      "line": 11,
-      "members": [
-        {
-          "name": "Invalid",
-          "kind": "method",
-          "signature": "Invalid(UrlSafetyViolation v)",
-          "returnType": "UrlSafetyResult"
-        }
-      ]
-    },
-    {
       "name": "AllowsPopupAuthorizationMetadata",
       "fqn": "Granit.Http.SecurityHeaders.AllowsPopupAuthorizationMetadata",
       "kind": "class",
@@ -26746,80 +26554,6 @@
           "kind": "property",
           "signature": "bool UpgradeInsecureRequests",
           "returnType": "bool"
-        }
-      ]
-    },
-    {
-      "name": "CspAuditResponse",
-      "fqn": "Granit.Http.SecurityHeaders.Endpoints.Dtos.CspAuditResponse",
-      "kind": "record",
-      "project": "Granit.Http.SecurityHeaders.Endpoints",
-      "file": "src/Granit.Http.SecurityHeaders.Endpoints/Dtos/CspAuditResponse.cs",
-      "line": 28,
-      "members": []
-    },
-    {
-      "name": "CspContributorInfo",
-      "fqn": "Granit.Http.SecurityHeaders.Endpoints.Dtos.CspContributorInfo",
-      "kind": "record",
-      "project": "Granit.Http.SecurityHeaders.Endpoints",
-      "file": "src/Granit.Http.SecurityHeaders.Endpoints/Dtos/CspAuditResponse.cs",
-      "line": 36,
-      "members": []
-    },
-    {
-      "name": "CspEndpointAudit",
-      "fqn": "Granit.Http.SecurityHeaders.Endpoints.Dtos.CspEndpointAudit",
-      "kind": "record",
-      "project": "Granit.Http.SecurityHeaders.Endpoints",
-      "file": "src/Granit.Http.SecurityHeaders.Endpoints/Dtos/CspAuditResponse.cs",
-      "line": 52,
-      "members": []
-    },
-    {
-      "name": "SecurityHeadersEndpointRouteBuilderExtensions",
-      "fqn": "Granit.Http.SecurityHeaders.Endpoints.Extensions.SecurityHeadersEndpointRouteBuilderExtensions",
-      "kind": "class",
-      "project": "Granit.Http.SecurityHeaders.Endpoints",
-      "file": "src/Granit.Http.SecurityHeaders.Endpoints/Extensions/SecurityHeadersEndpointRouteBuilderExtensions.cs",
-      "line": 13,
-      "members": [
-        {
-          "name": "MapGranitSecurityHeadersAudit",
-          "kind": "method",
-          "signature": "MapGranitSecurityHeadersAudit(this IEndpointRouteBuilder endpoints, Action<SecurityHeadersEndpointsOptions>? configure = null)",
-          "returnType": "RouteGroupBuilder"
-        }
-      ]
-    },
-    {
-      "name": "GranitHttpSecurityHeadersEndpointsModule",
-      "fqn": "Granit.Http.SecurityHeaders.Endpoints.GranitHttpSecurityHeadersEndpointsModule",
-      "kind": "class",
-      "project": "Granit.Http.SecurityHeaders.Endpoints",
-      "file": "src/Granit.Http.SecurityHeaders.Endpoints/GranitHttpSecurityHeadersEndpointsModule.cs",
-      "line": 22,
-      "members": []
-    },
-    {
-      "name": "SecurityHeadersEndpointsOptions",
-      "fqn": "Granit.Http.SecurityHeaders.Endpoints.Options.SecurityHeadersEndpointsOptions",
-      "kind": "class",
-      "project": "Granit.Http.SecurityHeaders.Endpoints",
-      "file": "src/Granit.Http.SecurityHeaders.Endpoints/Options/SecurityHeadersEndpointsOptions.cs",
-      "line": 6,
-      "members": [
-        {
-          "name": "RoutePrefix",
-          "kind": "property",
-          "signature": "string RoutePrefix",
-          "returnType": "string"
-        },
-        {
-          "name": "TagName",
-          "kind": "property",
-          "signature": "string TagName",
-          "returnType": "string"
         }
       ]
     },
@@ -27154,13 +26888,204 @@
       ]
     },
     {
-      "name": "MinimumResponseTimeGuard",
-      "fqn": "Granit.Http.Timing.MinimumResponseTimeGuard",
-      "kind": "struct",
-      "project": "Granit.Http.Abstractions",
-      "file": "src/Granit.Http.Abstractions/Timing/MinimumResponseTimeGuard.cs",
-      "line": 26,
+      "name": "UrlSafetyMetrics",
+      "fqn": "Granit.Http.UrlSafety.Diagnostics.UrlSafetyMetrics",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/Diagnostics/UrlSafetyMetrics.cs",
+      "line": 15,
       "members": []
+    },
+    {
+      "name": "UrlSafetyServiceCollectionExtensions",
+      "fqn": "Granit.Http.UrlSafety.Extensions.UrlSafetyServiceCollectionExtensions",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/Extensions/UrlSafetyServiceCollectionExtensions.cs",
+      "line": 13,
+      "members": [
+        {
+          "name": "AddGranitUrlSafety",
+          "kind": "method",
+          "signature": "AddGranitUrlSafety(this IServiceCollection services, Action<UrlSafetyOptions>? configure = null)",
+          "returnType": "IServiceCollection"
+        }
+      ]
+    },
+    {
+      "name": "GranitHttpUrlSafetyModule",
+      "fqn": "Granit.Http.UrlSafety.GranitHttpUrlSafetyModule",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/GranitHttpUrlSafetyModule.cs",
+      "line": 15,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
+    },
+    {
+      "name": "IUrlSafetyValidator",
+      "fqn": "Granit.Http.UrlSafety.IUrlSafetyValidator",
+      "kind": "interface",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/IUrlSafetyValidator.cs",
+      "line": 14,
+      "members": [
+        {
+          "name": "ValidateAsync",
+          "kind": "method",
+          "signature": "ValidateAsync(Uri url, CancellationToken ct = default)",
+          "returnType": "ValueTask<UrlSafetyResult>"
+        },
+        {
+          "name": "ValidateAsync",
+          "kind": "method",
+          "signature": "ValidateAsync(Uri url, UrlSafetyOptions optionOverrides, CancellationToken ct = default)",
+          "returnType": "ValueTask<UrlSafetyResult>"
+        }
+      ]
+    },
+    {
+      "name": "IpAddressAnonymizer",
+      "fqn": "Granit.Http.UrlSafety.IpAddressAnonymizer",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/IpAddressAnonymizer.cs",
+      "line": 23,
+      "members": [
+        {
+          "name": "Mask",
+          "kind": "method",
+          "signature": "Mask(IPAddress? address)",
+          "returnType": "string?"
+        }
+      ]
+    },
+    {
+      "name": "UrlSafetyLocalizationResource",
+      "fqn": "Granit.Http.UrlSafety.Localization.UrlSafetyLocalizationResource",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/Localization/UrlSafetyLocalizationResource.cs",
+      "line": 9,
+      "members": []
+    },
+    {
+      "name": "UrlSafetyOptions",
+      "fqn": "Granit.Http.UrlSafety.Options.UrlSafetyOptions",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/Options/UrlSafetyOptions.cs",
+      "line": 8,
+      "members": [
+        {
+          "name": "AllowedSchemes",
+          "kind": "property",
+          "signature": "IReadOnlyList<string> AllowedSchemes",
+          "returnType": "IReadOnlyList<string>"
+        },
+        {
+          "name": "AllowPrivateNetworks",
+          "kind": "property",
+          "signature": "bool AllowPrivateNetworks",
+          "returnType": "bool"
+        },
+        {
+          "name": "AllowedHostPatterns",
+          "kind": "property",
+          "signature": "IReadOnlyList<string> AllowedHostPatterns",
+          "returnType": "IReadOnlyList<string>"
+        },
+        {
+          "name": "DeniedHostPatterns",
+          "kind": "property",
+          "signature": "IReadOnlyList<string> DeniedHostPatterns",
+          "returnType": "IReadOnlyList<string>"
+        },
+        {
+          "name": "MaxUrlLength",
+          "kind": "property",
+          "signature": "int MaxUrlLength",
+          "returnType": "int"
+        },
+        {
+          "name": "FromSeconds",
+          "kind": "method",
+          "signature": "FromSeconds(1)",
+          "returnType": "TimeSpan DnsResolveTimeout { get; set; } = TimeSpan."
+        }
+      ]
+    },
+    {
+      "name": "PrivateNetworkClassifier",
+      "fqn": "Granit.Http.UrlSafety.PrivateNetworkClassifier",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/PrivateNetworkClassifier.cs",
+      "line": 26,
+      "members": [
+        {
+          "name": "IsBlocked",
+          "kind": "method",
+          "signature": "IsBlocked(IPAddress ip)",
+          "returnType": "bool"
+        }
+      ]
+    },
+    {
+      "name": "ReservedTldClassifier",
+      "fqn": "Granit.Http.UrlSafety.ReservedTldClassifier",
+      "kind": "class",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/ReservedTldClassifier.cs",
+      "line": 6,
+      "members": [
+        {
+          "name": "IsReserved",
+          "kind": "method",
+          "signature": "IsReserved(string host, out string tld)",
+          "returnType": "bool"
+        }
+      ]
+    },
+    {
+      "name": "UrlSafetyViolation",
+      "fqn": "Granit.Http.UrlSafety.UrlSafetyViolation",
+      "kind": "record",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/UrlSafetyViolation.cs",
+      "line": 17,
+      "members": []
+    },
+    {
+      "name": "UrlSafetyViolationKind",
+      "fqn": "Granit.Http.UrlSafety.UrlSafetyViolationKind",
+      "kind": "enum",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/UrlSafetyViolationKind.cs",
+      "line": 8,
+      "members": []
+    },
+    {
+      "name": "struct",
+      "fqn": "Granit.Http.UrlSafety.struct",
+      "kind": "record",
+      "project": "Granit.Http.UrlSafety",
+      "file": "src/Granit.Http.UrlSafety/UrlSafetyResult.cs",
+      "line": 11,
+      "members": [
+        {
+          "name": "Invalid",
+          "kind": "method",
+          "signature": "Invalid(UrlSafetyViolation v)",
+          "returnType": "UrlSafetyResult"
+        }
+      ]
     },
     {
       "name": "IOMetrics",
@@ -41952,7 +41877,7 @@
       "kind": "class",
       "project": "Granit.OpenApi.Generator",
       "file": "src/Granit.OpenApi.Generator/GeneratorModule.cs",
-      "line": 54,
+      "line": 53,
       "members": []
     },
     {
@@ -45749,12 +45674,12 @@
       "kind": "class",
       "project": "Granit.Privacy.BlobStorage.Endpoints",
       "file": "src/Granit.Privacy.BlobStorage.Endpoints/Extensions/PrivacyBlobStorageEndpointRouteBuilderExtensions.cs",
-      "line": 19,
+      "line": 22,
       "members": [
         {
           "name": "MapGranitPrivacyExportDownload",
           "kind": "method",
-          "signature": "MapGranitPrivacyExportDownload(this IEndpointRouteBuilder endpoints, string routePrefix = \"privacy\", string tagName = \"Privacy\")",
+          "signature": "MapGranitPrivacyExportDownload(this IEndpointRouteBuilder endpoints, string? routePrefix = null, string? tagName = null)",
           "returnType": "RouteGroupBuilder"
         }
       ]
@@ -45765,8 +45690,15 @@
       "kind": "class",
       "project": "Granit.Privacy.BlobStorage.Endpoints",
       "file": "src/Granit.Privacy.BlobStorage.Endpoints/GranitPrivacyBlobStorageEndpointsModule.cs",
-      "line": 16,
-      "members": []
+      "line": 18,
+      "members": [
+        {
+          "name": "ConfigureServices",
+          "kind": "method",
+          "signature": "ConfigureServices(ServiceConfigurationContext context)",
+          "returnType": "void"
+        }
+      ]
     },
     {
       "name": "PrivacyBlobStorageEndpointsOptions",
@@ -52904,7 +52836,7 @@
       "kind": "class",
       "project": "Granit.Testing",
       "file": "src/Granit.Testing/Endpoints/GranitEndpointTestHost.cs",
-      "line": 15,
+      "line": 16,
       "members": [
         {
           "name": "CreateAuthenticatedClient",

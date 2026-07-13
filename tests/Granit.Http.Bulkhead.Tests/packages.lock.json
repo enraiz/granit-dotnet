@@ -274,6 +274,13 @@
       "granit": {
         "type": "Project"
       },
+      "granit.bulkhead": {
+        "type": "Project",
+        "dependencies": {
+          "Granit": "[0.1.0-dev, )",
+          "Granit.Features": "[0.1.0-dev, )"
+        }
+      },
       "granit.caching": {
         "type": "Project",
         "dependencies": {
@@ -305,8 +312,7 @@
       "granit.http.bulkhead": {
         "type": "Project",
         "dependencies": {
-          "Granit": "[0.1.0-dev, )",
-          "Granit.Features": "[0.1.0-dev, )",
+          "Granit.Bulkhead": "[0.1.0-dev, )",
           "Granit.Http.ExceptionHandling": "[0.1.0-dev, )"
         }
       },
