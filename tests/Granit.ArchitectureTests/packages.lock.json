@@ -3732,6 +3732,13 @@
         "dependencies": {
           "Granit.BlobStorage": "[0.1.0-dev, )",
           "Granit.IO": "[0.1.0-dev, )",
+          "Granit.Privacy": "[0.1.0-dev, )"
+        }
+      },
+      "granit.privacy.blobstorage.endpoints": {
+        "type": "Project",
+        "dependencies": {
+          "Granit.BlobStorage": "[0.1.0-dev, )",
           "Granit.Privacy": "[0.1.0-dev, )",
           "Granit.Validation": "[0.1.0-dev, )"
         }
