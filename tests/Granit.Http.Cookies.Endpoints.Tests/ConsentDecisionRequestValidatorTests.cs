@@ -1,8 +1,5 @@
-using FluentValidation.Results;
 using Granit.Http.Cookies.Endpoints.Dtos;
 using Granit.Http.Cookies.Endpoints.Validators;
-using Shouldly;
-using Xunit;
 
 namespace Granit.Http.Cookies.Endpoints.Tests;
 

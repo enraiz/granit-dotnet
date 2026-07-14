@@ -1,8 +1,5 @@
 using System.Globalization;
 using Granit.QueryEngine.Filtering;
-using Microsoft.OData;
-using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
 
 namespace Granit.Http.ODataExposure.Internal;
 
@@ -175,7 +172,7 @@ internal static class ODataFilterTranslator
             return rejection!;
         }
 
-        if (!TryStringifyConstant(constant!, out string? value, out ODataFilterTranslationResult? constantRejection))
+        if (!TryStringifyConstant((ConstantNode)constant!, out string? value, out ODataFilterTranslationResult? constantRejection))
         {
             return constantRejection!;
         }
@@ -207,7 +204,7 @@ internal static class ODataFilterTranslator
             return rejection!;
         }
 
-        if (!TryStringifyConstant(constant!, out string? value, out ODataFilterTranslationResult? constantRejection))
+        if (!TryStringifyConstant((ConstantNode)constant!, out string? value, out ODataFilterTranslationResult? constantRejection))
         {
             return constantRejection!;
         }

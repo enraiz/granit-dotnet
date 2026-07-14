@@ -1,4 +1,3 @@
-using FluentValidation;
 using Granit.Http.Cookies.Endpoints.Dtos;
 using Granit.Validation;
 using Granit.Validation.Extensions;
